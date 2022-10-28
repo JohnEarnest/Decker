@@ -1408,7 +1408,7 @@ modals=_=>{
 			const name=ls(rtext_string(ms.text.table))
 			const savedeck=_=>{
 				let d=deck_write(deck)
-				if(/\.html$/i.test(name)){q('script').innerHTML='\n'+d,d=q('body').innerHTML}
+				if(/\.html$/i.test(name)){q('script[language="decker"]').innerHTML='\n'+d,d=q('body').innerHTML}
 				dirty=0,save_text(name,d)
 			}
 			const save_image=_=>{
@@ -2863,5 +2863,5 @@ q('body').ondrop=e=>{
 	if(/^audio\//.test(file.type)){load_sound(file)}
 }
 
-pushstate(lmenv()),load_deck(deck_read(q('script').innerText))
+pushstate(lmenv()),load_deck(deck_read(q('script[language="decker"]').innerText))
 resize(),(pump&&clearTimeout(pump)),loop()
