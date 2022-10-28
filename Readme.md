@@ -4,14 +4,14 @@ Decker is a multimedia platform for creating and sharing interactive documents, 
 
 ![Decker, complete with toolbars](images/wings.gif)
 
-You can learn more about Decker on [my website](beyondloom.com/decker/), or just dive in and [try it online](beyondloom.com/decker/tour.html).
+You can learn more about Decker on [my website](http://beyondloom.com/decker/), or just dive in and [try it online](http://beyondloom.com/decker/tour.html).
 
 There is also a [community forum](https://internet-janitor.itch.io/decker) on itch.io.
 
 
 Building
 --------
-The [web version](beyondloom.com/decker/tour.html) of Decker (web-decker) can be built with a `make` script. The test suite uses [Node.js](https://nodejs.org/en/):
+The [web version](http://beyondloom.com/decker/tour.html) of Decker (web-decker) can be built with a `make` script. The test suite uses [Node.js](https://nodejs.org/en/):
 
 ```
 make testjs
