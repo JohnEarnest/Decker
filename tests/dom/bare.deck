@@ -1,0 +1,12 @@
+{deck}
+version:1
+card:0
+size:[320,240]
+locked:0
+
+{card:home}
+{widgets}
+pusher:{"type":"button","text":"Push Me!","style":"rect","size":[40,60],"pos":[10,35],"locked":1,"script":"nuffing","show":"transparent","value":1}
+outfield:{"type":"field","border":1,"value":"some text"}
+expenses:{"type":"grid","format":"i$","value":{"a":[11,22],"b":[33,44]}}
+frame:{"type":"canvas","size":[10,8],"image":"%%IMG2AAoACAJQ","pattern":2}

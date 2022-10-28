@@ -1,0 +1,20 @@
+# export an animated GIF image.
+
+deck:readdeck[]
+canvas:deck.card.add["canvas"]
+canvas.size:160,160
+
+frames: each f in range 32
+	canvas.clear[]
+	each color name i in colors
+		a:pi*(i/8)+(f/16)
+		canvas.brush:4
+		canvas.pattern:color
+		canvas.line[80+60*unit a]
+	end
+	canvas.copy[]
+end
+
+if write["recording.gif" frames]
+	print["saved recording.gif"]
+end

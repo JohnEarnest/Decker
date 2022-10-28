@@ -1,0 +1,12 @@
+non-tail recursion
+8
+tail recursion: shallow
+8
+deepest observed stack: 6
+tail recursion: deep
+80005
+deepest observed stack: 6
+false tail-calls
+0
+1
+2

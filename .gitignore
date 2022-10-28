@@ -1,0 +1,6 @@
+*.DS_Store
+c/build/
+c/resources.h
+js/build/
+docs/*.html
+*.o

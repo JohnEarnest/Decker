@@ -1,0 +1,37 @@
+{deck}
+version:1
+card:0
+size:[512,342]
+
+{card:home}
+{widgets}
+push:{"type":"button","size":[60,20],"pos":[0,0],"script":"home.0"}
+pull:{"type":"grid","size":[100,50],"pos":[0,0],"value":{"time":[0,1,2,3],"message":["zeroth","first","second","third"]}}
+
+{script:home.0}
+logger.put["second"]
+logger.put["third"]
+pull.value:logger.get[]
+{end}
+
+{module:logger}
+description:"a utility module for logging"
+{data}
+log:{"time":[0,1,2,3],"message":["zeroth","first","second","third"]}
+{script}
+log:table data.log
+
+mod.put:on _ x do
+ log:insert
+  time:count log # would be sys.now, but that's a PITA for testing
+  message:x
+ into log
+ data.log:cols log
+ log
+end
+
+mod.get:on _ do
+ log
+end
+{end}
+

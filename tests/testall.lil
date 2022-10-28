@@ -1,0 +1,381 @@
+
+# main integration tests for Lil
+on header name do
+	print["\n%s:\n%s" name (1+count name)take"="]
+end
+
+d.apple:11
+d.cherry:22
+d.banana:33
+
+o.cherry:44
+o.durian:55
+
+header["literals"]
+show[52]
+show[-48.9]
+show[.23]
+show["some\ntext"]
+show[()]
+
+header["monads"]
+show[- 33]
+show[! 23]
+show[floor 23.95]
+show[cos 3.14]
+show[sqrt 25]
+show[count ()]
+show[count 11,222,3333]
+show[first 11,223,3333]
+show[last  11,223,3333]
+show[range 5]
+show[range -3.5]
+show[range d]
+show[range "ABC"]
+show[list "one"]
+show[sum (list 1,2),(list 10,20)]
+show[sum list "23"]
+show[sum ("23","52")]
+show[raze (list 1,2),(list 3),(),(list 4,5)]
+show[max (list 1,3),(list 4,2)]
+show[max max (list 1,3),(list 4,2)]
+show[min () max  () raze () sum ()]
+show[min 42 max -42 raze 42 sum 42]
+show[typeof 42]
+show[typeof "foobarf"]
+show[typeof 45,99]
+show[typeof d]
+show[typeof table d]
+show[typeof header]
+show[typeof sys]
+show[typeof print]
+show[flip ()]
+show[flip ("one","two","three")]
+show[flip (list 1,2,3),(list 4,5,6)]
+show[flip 22,(list 33,44),(list 55,66,77,88)]
+show[flip table ()]
+show[flip insert kind:"tax","gas","power","food" jan:11,22,33,44 feb:55,66,77,88 into 0]
+show[flip insert jan:11,22,33,44 feb:55,66,77,88 key:"tax","gas","power","food" into 0]
+show[!!(0,1,-23) !!("","0","foo") !!() !!()dict() !!table 1 !!on x do end]
+show[heading 3,5]
+show[mag ((list 9,0),(list 3,4),(list 0,7))]
+show[unit 0,(pi/2),(pi/4)]
+show[heading unit 0,(pi/2),(pi/4)]
+
+header["dyads"]
+show[2+3]
+show[1+"two"]
+show[2-3]
+show[2*3]
+show[2/3]
+show[1/0]
+show[0/0]
+show[0%5]
+show[3%11]
+show[3%-1]
+show[3%(-6,-5,-4,-3,-2,-1,0,1,2,3)]
+show[2^8]
+show[(3<5),"apple"<"banana"]
+show[(3>5),"apple">"banana"]
+show[(3=5),"apple"="apple"]
+show[("one"=0) (0="one") ("1"=1)]
+show[(3&5),list "apple"&"banana"]
+show[(3|5),list "apple"|"banana"]
+show["|"split"one|two|three"]
+show["+@" split "A+@BEE+SEA+@DEE"]
+show["FOO"split"BAR"]
+show["FOO"split""]
+show["" split "ABCDE"]
+show["+"split"+A++B+"]
+show["_|_"fuse("beef","stew","meal")]
+show[("a","b")dict 3,4]
+show["foo" dict 1]
+show["abc" dict "def"]
+show[d,o]
+show[d,()] # dict,listy -> dict,dict
+show[d,""]
+show[d,11,22]
+show[d,"AB"]
+show[header,header]
+show[("needle" in "haystack"),("needle" in "needles"),(3 in 4,3,15),("cherry" in d)]
+show[("Apple","Banana","Peach","Beef")in("Banana","Beef")]
+show[random[() 1]]
+show["untitled" unless 0]
+show["untitled" unless "title"]
+show[(insert a:11 b:22 into 0),(insert c:33 into 0)] # two 1-length tables
+show[(insert a:() b:() into 0),(insert c:33 into 0)] # left empty
+show[(insert a:11 b:22 into 0),(insert c:() into 0)] # right empty
+show[(insert a:() b:() into 0),(insert c:() into 0)] # both empty
+
+header["drop/take"]
+show[(list 3 take list 5),(list 2 take "ABCDEF"),(list 6 take "AB"),(list -2 take range 5),(list 2 take d)]
+show[(list 3 drop list 5),(list 3 drop "ABCDEF"),(list -2 drop "ABCDE"),(list 2 drop d)]
+show[-1 drop "ABC"]     # minus after whitespace
+show[(-1 drop "ABC")]   # minus after paren
+show[foo:-1 drop "ABC"] # minus after set
+show[2*-1 drop 3,4,5]   # minus after times (etc)
+show[-2 take table 11,22,33,44]
+
+# filter out
+show[(33,44) drop 11,22,44,55                         ]# list drop
+show[("foo","baz") drop "quux","foo","zami"           ]# list drop
+show["foo" drop "bar","foo","quux"                    ]# str -> list drop
+show["cherry" drop d                                  ]# str -> list dict drop
+show[("b","c") drop insert a:99,88 b:33,44 into 0     ]# list table drop (cols)
+show[(2,0,5) drop insert a:99,88,77 b:33,44,55 into 0 ]# list table drop (rows)
+show["b"       drop insert a:99,88 b:33,44 into 0     ]# str -> list table drop
+show[(list 0,1) drop 3 cross 2                        ]
+
+# filter
+show[(33,44) take 11,22,44,55                         ]# list take
+show[("foo","baz") take "quux","foo","zami"           ]# list take
+show["foo" take "bar","foo","quux"                    ]# str -> list take
+show["cherry" take d                                  ]# str -> list dict take
+show[("b","c") take insert a:99,88 b:33,44 into 0     ]# list table take (cols)
+show[(2,0,5) take insert a:99,88,77 b:33,44,55 into 0 ]# list table take (rows)
+show["b"       take insert a:99,88 b:33,44 into 0     ]# str -> list table take
+show[((list 2,0),(list 0,1),(list 3,3)) take 3 cross 2]
+
+# limit
+show[(3 limit "ABCD"),(3 limit "A")]
+show[(list 3 limit 11,22,33,44),(list 3 limit 11,22)]
+show[(list 2 limit d),(list 5 limit d)]
+show[(1 limit table 11,22,33)]
+
+header["matching"]
+show[(1~1),(1~2),(1~1,2)]
+show[("apple"~"apple"),("apple"~"orange")]
+show[((1,2,3)~(1,2,3)),((1,4,3)~(1,2,3)),((1,2)~(1,2,3))]
+show[(d~d),(d~o),(o~o.durian:55)]
+show[((table range 4)~(table range 4)),((table range 4)~(table range 3))]
+
+header["vectorization"]
+show[2+10,20,30]
+show[!31,0,5.9]
+show[(100,200)+30,40]
+show[1+()]
+show[()+"three"]
+show[-(list 11,22,-33),(list -44,55)]
+show[100+(list 11,22,33),(list 44,55)]
+
+header["control structures"]
+if 1>0 print["yes"] end
+if 0>1 print["NEVER"] print["EVER"] end
+if 0>1 print["no"] else print["narp"] end
+if 1 if 0 print["WELP"] end end
+each x in range 3 print[x] end
+each x in "abcde" print[x] end
+each x k in range 3 show[x,10+k] end
+each x k in ("a","b")dict 3,4 show[x,k] end
+each x k i in ("a","b")dict 3,4 show[x,k,i] end
+a:3 r:() while a>0 r:r,a a:a-1 end show[r]
+each in -(1 drop "b" split "ab") end # minified bug report; edge case for split.
+show[each x in "ABC" 2 take x end]
+show[each v k in d "%s:%s" format v,k end]
+show[each z in "|"split"one|two|three" count z end]
+show["|" fuse each a in 1,2,3 "," fuse each b in 4,5 "A" end end]
+
+header["assignment and indexing"]
+a:23  show[a+100]
+a:"abc"  show[a[1]]
+a:()  a[0]:5  a[1]:999  show[a]
+zoot[0].foo:29 zoot[1].foo:30 show[zoot]
+a:()  a["key"]:5  show[a]
+a:()  a.foo:6  show[a.foo]
+a:2,3 a[1]:5,99 a[1][0]:333 show[a]
+a:"foobar"  a[4]:"ZOOT"  show[a]
+show[zzz.string:"test"]
+
+header["anonymous assigning and indexing"]
+plam.fungus:999
+show[(plam).fungus    ]
+show[(plam).fungus:32 ]  # this will return an amended version...
+show[plam             ]  # but it will not modify the original in place(!)
+show[(22,33,44)[1]    ]  # index an ephemeral expression
+show[(22,33,44)[1]:999]  # amend an entirely ephemeral expression
+
+show["foo".bar        ]  # nonexistent dict index: 0
+show[(1,2).bar        ]  # likewise, 0
+show["foo".bar:99     ]  # widen to a dict and assign
+show[(1,2).bar:99     ]  # likewise, widen to a dict and assign
+
+header["tables"]
+m.foo:11,22,33
+m.baz:("one","two","three")
+show[t:table m]
+show[r:rows t]
+show[table r]
+show[cols t]
+show[table 1,2,3]
+show[table ()]
+show[table (list 1,2,3),(list 3,4),(list 6,7,8),(list 9,10,11)]
+show[table d]
+show[count t]
+show[(list first t),list last t]
+show[("foo" in t),("zami" in t)]
+show[5 take t]
+show[2 drop t]
+show[0 take t]
+show[t , table d]
+show[t[0]]
+show[t.baz]
+each x k in t show[k,":",x] end
+show[table (1,2) dict (3,4)]
+show[table ((list list "foo"),(list list "bar")) dict (list 11,22),(list 33,44)]
+show[table ("text","font","arg") dict ("simple","","")]
+
+header["queries"]
+gr.name:"Alice","Sam","Alex","Tina","Oscar","Blake"
+gr.sex: "F","?","?","F","M","?"
+gr:table gr
+
+ppl.name:"Alice","Sam","Thomas","Sara","Walter"
+ppl.age:25,28,40,34,43
+ppl.job:"Developer","Sales","Developer","Developer","Accounting"
+ppl:table ppl
+
+con.name:"Alice","Anthony","Tara","Mike","Phil"
+con.sport:"Bowling","Bowling","Cornhole","Bowling","Cornhole"
+con.score:180,182,6,210,5
+con:table con
+
+on avg a do (sum a)/count a end
+
+show[select A:foo B:baz from t                                                        ] # rename columns
+show[select where index > 1 from t                                                    ] # select all columns, filter rows
+show[select where sex in ("M","F") from gr                                            ] # filtering with "in"
+show[select orderby index desc from t                                                 ] # sort into reverse order
+show[select index from t                                                              ] # extract a simple synthetic column
+show[select by sex from gr                                                            ] # group by a simple column
+show[select by sex orderby name asc from gr                                           ] # sort within a group
+show[select first name first sex by sex orderby name asc from gr                      ] # reduce along a group
+show[select 2*index from t                                                            ] # compute synthetic new columns
+show[select gindex first name by sex from gr                                          ] # rectangular result of grouping + gindex
+show[select  gindex index by sex from gr                                              ] # internal indices: select
+show[extract gindex index by sex from gr                                              ] # internal indices: extract
+show[select value group by value from "AACBABA"                                       ] # "group" index
+show[select value group by value from "DEFFED"                                        ] # "group" index
+show[extract foo from t                                                               ] # simple column extraction
+show[extract first baz from t                                                         ] # simple scalar extraction
+show[extract fb:last baz from t                                                       ] # extract with name
+show[extract a:first baz b:last baz from t                                            ] # extract with names
+show[extract a:first baz last baz from t                                              ] # extract with mixed names/unnamed
+show[extract sex by sex from gr                                                       ] # extracting under grouping
+show[extract count sex by sex from gr                                                 ] # extracting tabulation under grouping
+show[extract list value by floor index/3 from "ABCDEFGHI"                             ] # partition a list
+show[update job:"Unemployed" from ppl                                                 ] # fire a whole column
+show[update job:"Manager" where name="Alice" from ppl                                 ] # promote a value for a specific row
+show[update job:"Engineer" where job="Developer" from ppl                             ] # reassign a value to multiple rows
+show[update age:age+30 where job="Developer" from ppl                                 ] # ravage lifespans for multiple rows
+show[update job_age:avg[age] by job from ppl                                          ] # compute a new column, preserving existing cols and their order
+show[update rank:1+gindex victor:name=first name by sport orderby score desc from con ] # updating with a sort
+show[update index:2*index from "ABC"                                                  ] # preserve writes to an index column
+show[insert job:"Writer" name:"John" age:32 into ppl                                  ] # insert columns in an arbitrary order
+show[insert name:"John" age:32 job:"Writer" color:"Green" into ppl                    ] # insert a single record, pad novel columns
+show[insert name:("Philip","Angela") age:35 into ppl                                  ] # spread lists, replicate scalars, zero missing columns
+show[insert name:("John","Eric") age:32 zodiac:("Taurus","Virgo") into 0              ] # insert into empty table to take all
+
+# some important edge cases:
+show[select  name job where job="Plumber" from ppl           ] # select  gives no result rows
+show[select  n:count name v:2+3 where job="Plumber" from ppl ] # must eval column expressions, even with no result rows
+show[extract job where job="Plumber" from ppl                ] # extract gives no result rows
+show[extract n:count name v:2+3 where job="Plumber" from ppl ] # must eval column expressions, even with no result rows
+show[extract where job="Developer" from ppl                  ] # no columns specified for extract, get all cols as a dict
+show[extract from table ()                                   ] # extract of no rows or columns
+show[select  from ()                                         ] # a list behaves like a table with the column "value"
+show[extract from ()                                         ] # a list behaves like a table with the column "value"
+show[update job:"Farmer" where job="Plumber" from ppl        ] # update  changes no rows
+show[select  value where 2       from ("One","Two")          ] # "where"   gives non-boolvec
+show[select  value by    2       from ("One","Two")          ] # "by"      gives non-list
+show[select  value orderby 2 asc from ("One","Two")          ] # "orderby" gives non-list
+
+# fun with queries as loops
+file: "foo 1 2\nbar 3 4\nbaz 5 6"
+cells: extract list " " split value by index from ("\n" split file)
+show[select value[0][0] floor value[0][1] floor value[0][2] by index from cells] # force unnamed columns
+show[select value[0][0] value[0][1] value[0][2] by index from cells            ] # make sure we don't reuse names!
+
+header["joins"]
+a:() # need to reset a because it has been used previously
+a.k: 11,23,14,32
+a.a: "A","B","C","D"
+b.k: 30,11,32,14
+b.b: 1000,2000,3000,4000
+ta: table a
+tb: table b
+show[ta]
+show[tb]
+show[ta join tb]
+show[ta cross tb]
+show[(1,2) cross 3,4,5]
+show[3 cross 2]
+show[2 cross "ABC"]
+show["ABC" join "DE"]
+show["AB" join "DEF"]
+show[((list 11,22),(list 33,44),(list 55,66)) join "ABC" join "DEF"]
+show[3 join 4]
+
+header["functions"]
+show[avg]
+on baz func do
+	func["two"]
+end
+on twice x do
+	"" fuse x,x
+end
+show[baz[twice]]
+show[baz[on whatever x do "" fuse x,x,x end]]
+
+y:9999
+on pair x y do
+	x,y
+end
+show[pair[3 5]]
+show[pair[3]]
+show[pair[3 5 7]]
+
+on avg x do
+	s:0
+	each v in x
+		s:s+v
+	end
+	s / count x
+end
+show[select job:(first job) avg_age:avg[age] by job from ppl]
+
+on scale steps a b do
+	floor a+(b-a)*(range steps)/steps-1
+end
+show[scale[10 -5 5]]
+
+on test x y z do
+	x,y,z
+end
+show[test[1-1] ] # (0,0,0)
+show[test[1- 1]] # (0,0,0)
+show[test[1 -1]] # (1,-1,0)
+
+temp:()
+temp[1,2]:5
+show[temp]
+
+notafunc:"+-+"
+show[notafunc[2 3 4]]
+
+container.member:on twice x do x*2 end
+show[container]
+show[container.member[23]]
+outer.inner.member:on func x y do x,100*y end
+show[(outer.inner).member[5 7]]
+
+on twofer x y do 
+	"[%s] - (%i)" format x,y
+end
+show[twofer[]]
+show[twofer["test"]]
+show[twofer["test" 999]]
+show[twofer["test" 999][3]]
+show[twofer.funky] # equivalent to twofer["funky"] which is of course an invocation!
+print["invoke native via brackets."]
+
+print["\nfinished."]

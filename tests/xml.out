@@ -1,0 +1,72 @@
+lists:
+======
+onetwothree
+
+string escaping:
+================
+An escaped &lt;/tag&gt;.
+
+self-closing tag with attrs:
+============================
+<a href="http://beyondloom.com" target="_blank"/>
+
+child tags:
+===========
+<a href="http://beyondloom.com" target="_blank">
+  <baz/>
+  plain text
+  <quux/>
+</a>
+
+nested tags:
+============
+<a href="http://beyondloom.com" target="_blank">
+  <baz>
+    <zami boof="99"/>
+  </baz>
+  plain text
+  <quux/>
+</a>
+
+simple tags:
+============
+({"tag":"foo","attr":{},"children":()},{"tag":"bar","attr":{},"children":()})
+nested tags + body text:
+========================
+({"tag":"foo","attr":{},"children":({"tag":"bar","attr":{},"children":("text")})})
+collapse whitespace:
+====================
+("some words and so on")
+decode entities:
+================
+("fish & chips!")
+mixed body text:
+================
+("some text ",{"tag":"b","attr":{},"children":("bolded")}," or ",{"tag":"i","attr":{},"children":("italicized")})
+attrs:
+======
+({"tag":"foo","attr":{"zero":1,"one":"2","two":"tw\"o","three":"thr'ee","four":"a&b"},"children":()})
+comments:
+=========
+("text ",{"tag":"b","attr":{},"children":("bolded")})
+prolog:
+=======
+({"tag":"boop","attr":{},"children":()})
+cdata:
+======
+({"tag":"foo","attr":{},"children":("some <escaped> text!")})
+unterminated cdata:
+===================
+({"tag":"foo","attr":{},"children":("some text")})
+no tag name:
+============
+({"tag":"","attr":{},"children":()})
+
+fun with squashing:
+===================
+{"channel":{"title":"ChannelName","language":"en"}}
+{"rss":{"version":"2.0"}}
+{"rss":{"version":"2.0","channel":{"title":"ChannelName","language":"en"}}}
+{"channel":{"item":({"title":"First"},{"title":"Second"})}}
+({"item":{"title":"First"}},{"item":{"title":"Second"}})
+{"channel":{"item":({"title":"First","url":"google.com"},{"title":"Second","url":"example.com"})}}

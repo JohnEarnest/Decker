@@ -1,0 +1,29 @@
+
+# test double-dot "spread" indexing
+
+# dictionaries
+d1:extract a:"one"   b:"two"  from 0
+d2:extract a:"three" b:"four" from 0
+d3:extract a:"five"  b:"six"  from 0
+ds:(list d1),(list d2),(list d3)
+show[ds..a]              # extract a column
+show[ds..a:"new"]        # amend-each dict
+show[ds]                 # spreading assignments don't modify the source object;
+ds:ds..a:"new" show[ds]  # ...unless you have an explicit leading assign.
+
+# lists
+ls:(list 11,22,33,44),(list 55,66,77,88)
+show[ls.[2]]      # extract a column
+
+# lists-of-tables
+t1:table "ABC" cross "DE"
+t2:table "MN" cross "Q"
+ts:(list t1),(list t2)
+show[ts..c1]      # extract columns
+show[ts..c1[1]]   # extract cell from each column
+
+# tables
+show[t1.[1]] # extract the first row
+
+# nesting
+show[((range 3)..a:99)..b:32]

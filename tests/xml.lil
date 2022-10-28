@@ -1,0 +1,111 @@
+
+on header name do
+	print["%s:\n%s" name (1+count name)take"="]
+end
+
+# ----- format -------------
+
+header["lists"]
+print["%s\n" writexml["one","two","three"]]
+
+header["string escaping"]
+print["%s\n" writexml["An escaped </tag>."]]
+
+header["self-closing tag with attrs"]
+foo.tag:"a"
+foo.attr.href:"http://beyondloom.com"
+foo.attr.target:"_blank"
+print[writexml[foo]]
+
+header["child tags"]
+foo.children[0].tag:"baz"
+foo.children[1]:"plain text"
+foo.children[2].tag:"quux"
+print[writexml[foo]]
+
+header["nested tags"]
+foo.children[0].children[0].tag:"zami"
+foo.children[0].children[0].attr.boof:99
+print[writexml[foo]]
+
+
+# ----- parse --------------
+
+header["simple tags"]
+show[readxml["<foo></foo> <BAR/>"]]
+
+header["nested tags + body text"]
+show[readxml["<foo><bar>text</bar></foo>"]]
+
+header["collapse whitespace"]
+show[readxml["some   words\n and so on"]]
+
+header["decode entities"]
+show[readxml["fish&nbsp;&amp; chips!"]]
+
+header["mixed body text"]
+show[readxml["some text <B>bolded</B> or <i>italicized</i>"]]
+
+header["attrs"]
+show[readxml["<foo zero one=2 two='tw\"o' three=\"thr'ee\" four='a&amp;b'/>"]]
+
+header["comments"]
+show[readxml["<!-- skip me -->text <b>bolded<!--except--></B>"]]
+
+header["prolog"]
+show[readxml["<?xml version=\"1.0\" encoding=\"UTF-8\"?> <boop/>"]]
+
+header["cdata"]
+show[readxml["<foo><![CDATA[some <escaped> text!]]></foo>"]]
+
+header["unterminated cdata"]
+show[readxml["<foo><![CDATA[some text"]]
+
+header["no tag name"]
+show[readxml["<>"]]
+
+# ----- squash --------------
+
+# transform rss-style XML into a more compact structure
+# and along the way, demonstrate how much of a pain in the ass
+# it is to do nontrivial XML rewrites...
+
+on squash x do
+	on delist x do if 1=count x first x else x end end
+	on gather x do list if 1=count x squash[first x] else raze squash[x] end end
+	on union x do
+		r:()
+		each c in x.children
+			r[c.tag]:(() unless r[c.tag]),gather[c.children]
+		end
+		r:delist @ r
+	end
+	on squash x do
+		case.dict:on _ x do
+			rr[x.tag]:if x.children
+				r:if 1=count x.children squash[first x.children] else union[x] end
+				if "string"~typeof r r else x.attr,r end
+			else
+				x.attr
+			end
+		end
+		case.string:on _ x do x end
+		case.list  :on _ x do delist[squash @ x] end
+		case[typeof x][x]
+	end
+	squash[x]
+end
+
+print[""]
+header["fun with squashing"]
+show[squash[readxml["<channel><title>ChannelName</title><language>en</language></channel>"]]]
+
+show[squash[readxml["<rss version=\"2.0\"></rss>"]]]
+
+show[squash[readxml["<rss version=\"2.0\"><channel><title>ChannelName</title><language>en</language></channel></rss>"]]]
+
+show[squash[readxml["<channel><item><title>First</title></item><item><title>Second</title></item></channel>"]]]
+
+show[squash[readxml["<item><title>First</title></item><item><title>Second</title></item>"]]]
+
+show[squash[readxml["<channel><item><title>First</title><url>google.com</url></item><item><title>Second</title><url>example.com</url></item></channel>"]]]

@@ -1,0 +1,46 @@
+
+
+on addrec x y do
+	if x>0
+		1+addrec[x-1 y]
+	else
+		y
+	end
+end
+
+on addtail x y do
+	if x>0
+		addtail[x-1 y+1]
+	else
+		y
+	end
+end
+
+print["non-tail recursion"]
+print[addrec[3 5]]
+
+print["tail recursion: shallow"]
+print[addtail[3 5]]
+
+print["deepest observed stack: %i" sys.workspace.depth]
+
+print["tail recursion: deep"]
+print[addtail[80000 5]]
+
+print["deepest observed stack: %i" sys.workspace.depth]
+
+print["false tail-calls"]
+# this is a minimized example from a more elaborate
+# program posing problems. while loops create scopes,
+# they must not be treated as a possible site for a tail call:
+on poison do
+	y:0 # if a tail call, this modifies the outer scope!
+end
+each y in range 3
+	each x in list 1 poison[] end
+	print[y]
+end
+# should print
+# 0
+# 1
+# 2

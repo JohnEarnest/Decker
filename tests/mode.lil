@@ -1,0 +1,43 @@
+
+# one algorithm, written four ways:
+
+# imperative
+on mode1 a do
+	r:()
+	each x in a
+		r[x]:1+r[x]
+	end
+	bk:0 bc:0
+	each c k in r
+		if c>bc bc:c bk:k end
+	end
+	bk
+end
+show[mode1["ABBCABBA"]]
+show[mode1[1,2,2,3,4,2,1]]
+
+# hybrid
+on mode2 a do
+	r:()
+	each x in a
+		r[x]:1+r[x]
+	end
+	extract first key orderby value desc from r
+end
+show[mode2["ABBCABBA"]]
+show[mode2[1,2,2,3,4,2,1]]
+
+# monolithic query
+on mode3 a do
+	extract first key orderby value desc from
+	select key:first value value:count value by value from a
+end
+show[mode3["ABBCABBA"]]
+show[mode3[1,2,2,3,4,2,1]]
+
+# factored queries
+on counts x do select key:first value value:count value by value from x end
+on hist   x do select key value orderby value desc from x end
+on mode4  x do first hist[counts[x]].key end
+show[mode4["ABBCABBA"]]
+show[mode4[1,2,2,3,4,2,1]]

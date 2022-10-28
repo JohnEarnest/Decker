@@ -1,0 +1,59 @@
+{deck}
+version:1
+card:0
+size:[512,342]
+name:"Transition Editor"
+
+{card:home}
+image:"%%IMG2AgABVgD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8A\/wD\/AP8Arg=="
+script:"home.0"
+{widgets}
+a:{"type":"canvas","size":[102,84],"pos":[25,43],"locked":1,"image":"%%IMG2AGYAVAj\/CP8I\/wj\/CP8I\/wguAQIIYwEECGIBBghgARcITwEYCE4BGAhNARkITQEZCEwBGghMARoITAEaCEwBGghLARsISgEcCEoBHQhJAR0ISAEeCEgBHghHAR8IRwEfCEYBIQhFAQ8IAQERCEUBDggCAREIRAEPCAIBEQhEAQ8IAwERCEMBDggEAREIQgEkCEIBJQhAASYIQAEmCEABJghAAScIPgEoCD4BKAg9ASoIPAEqCDwBKgg7ASsIOwEsCDoBLAg5ARQICAERCDkBFAgIAREIOAEUCAkBEgg2ARUICQESCDYBFAgKARMINAEVCAoBEwg0ARUICgETCDMBFggKARQIMgEVCAsBFAgxARYICwEUCDABFwgLARUILwEXCAoBFggwARUICwEXCDABFAgLARcIMQESCAsBGAhOARkITgEYCFEBFAhUAQ0IXAEGCP8I\/wj\/CLc=","scale":1}
+b:{"type":"canvas","size":[102,84],"pos":[151,43],"locked":1,"image":"%%IMG2AGYAVAn\/Cf8J\/wn\/CYYAHAlGACMJQwAlCUEAJwlAACcJPwAoCT4AKQk9ACkJPQApCT0AKQk9ABAJBgATCT0ADwkJABEJPQAOCQsAEAk9AA4JCwAQCTwAEAkKABAJPAAQCQoAEAk9AA8JCgAQCT0ADgkLABAJPQAOCQsAEAk9AA8JCQARCT0AKAk+ACgJPgAnCT8AJQlBACYJQAAoCT4AKQk9ACoJPAArCTsALAk6ACwJOgAsCToALQk5AC0JOQAQCQoAEwk6AA4JDAATCTkADgkNABIJOQAPCQwAEwk4AA4JDQATCTgADgkNABMJOAAPCQwAEwk4ABEJCQAUCTgALgk4AC4JOAAuCTgALgk4AC4JOAAuCTgALgk4AC4JOAAtCTcALwk2AC8JNwAuCTkAKQlTAAoJ\/wn\/Cf8J\/wn\/Cf8J9g==","scale":1}
+preview:{"type":"canvas","size":[102,84],"pos":[281,42],"locked":1,"image":"%%IMG2AGYAVAj\/CP8I\/wj\/CP8I\/wguAQIIYwEECGIBBghgARcITwEYCE4BGAhNARkITQEZCEwBGghMARoITAEaCEwBGghLARsISgEcCEoBHQhJAR0ISAEeCEgBHghHAR8IRwEfCEYBIQhFAQ8IAQERCEUBDggCAREIRAEPCAIBEQhEAQ8IAwERCEMBDggEAREIQgEkCEIBDwABARUIQAEmCEABJghAASYIQAEnCD4BKAg+ASgIPQEqCDwBKgg8ASoIOwErCDsBLAg6ASwIOQEUCAgBEQg5ARQICAERCDgBFAgJARIINgEVCAkBEgg2ARQICgETCDQBFQgKARMINAEVCAoBEwgzARYICgEUCDIBFQgLARQIMQEWCAsBFAgwARcICwEVCC8BFwgKARYIMAEVCAsBFwgwARQICwEXCDEBEggLARgITgEZCE4BGAhRARQIVAENCFwBBgj\/CP8I\/wi3","scale":1}
+field1:{"type":"field","size":[77,12],"pos":[37,28],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"before"}
+field2:{"type":"field","size":[77,12],"pos":[163,28],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"after"}
+field3:{"type":"field","size":[77,16],"pos":[292,27],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"preview"}
+code:{"type":"field","size":[475,184],"pos":[17,142],"script":"home.1","scrollbar":1,"style":"code","scroll":304,"value":"on star c t do\n o:c.size\/2\n r:(2.5*t)*o\n i:unit (pi\/2)+(range 10)*(pi\/5)\n p:each v index in i\n  o+(if 2%index 1 else 0.5 end*r)*v\n end\n c.poly[p]\nend\n\non StarIn c a b t do\n star[c t]\n c.merge[a b]\nend\n\non StarOut c a b t do\n star[c 1-t]\n c.merge[b a]\nend\n\non oval pos size do\n flip pos+size*flip unit 2*pi*(range 20)\/20\nend\n\non heart c t do\n o:(0.5,0.6)*c.size\n r:t*c.size\n p:each v in (1,0,-1,0)join(0,-1,0,1) o+r*v end\n c.poly[p]\n c.poly[oval[o+r*( 1,-1)\/2 r\/sqrt 2]]\n c.poly[oval[o+r*(-1,-1)\/2 r\/sqrt 2]]\nend\n\non HeartIn c a b t do\n heart[c t]\n c.merge[a b]\nend\n\non HeartOut c a b t do\n heart[c 1-t]\n c.merge[b a]\nend\n\nStarIn"}
+button1:{"type":"button","size":[89,31],"pos":[404,30],"script":"home.2","text":"Play"}
+tweenval:{"type":"slider","size":[90,24],"pos":[403,75],"script":"home.3","interval":[0,1],"step":0.1}
+
+{script:home.0}
+on func do
+ env:()
+ env.pi:pi
+ eval[code.text env].value
+end
+
+on frame f t do
+ preview.clear[]
+ f[preview a.copy[] b.copy[] t] 
+end
+
+on play do
+ f:func[]
+ each t in (range 31)/30
+  frame[f t]
+  sleep[1]
+ end
+end
+{end}
+
+{script:home.1}
+on run do
+ frame[func[] tweenval.value]
+end
+{end}
+
+{script:home.2}
+on click do
+ play[]
+end
+{end}
+
+{script:home.3}
+on change val do
+ frame[func[] val]
+end
+{end}
+

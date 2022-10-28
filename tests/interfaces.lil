@@ -1,0 +1,46 @@
+
+# test the basic/universal interfaces,
+# to make sure the mechanisms are working:
+
+show[sys]
+
+sys.seed:5
+show[sys.seed]
+
+show[random[100 10]]
+sys.seed:5
+show[random[100 10]]
+
+# while we're here, gently test the RNG:
+show[random[100]]
+show[random["ABC"]]
+show[random[11,22,33]]
+show[random["ABCDE" -5]]
+
+# accessing an interface via a container
+# should work the same as if it is a global:
+sys.seed:99
+wrap.sys:sys
+show[wrap]
+show[wrap.sys.seed]
+
+# same deal for assignment into an interface
+# inside a container:
+wrap.sys.seed:66
+show[wrap]
+show[wrap.sys.seed]
+show[sys.seed]
+
+# match and equals support reference
+# equality for interfaces:
+show[(sys~sys),(sys~0),(sys~"")]
+show[sys=(sys,22,0,sys,"")]
+
+# in general, bogus indexing produces 0
+show[sys.foobarf]
+
+# assigning through a bogus index returns the arg
+show[sys.foobarf:"quux"]
+
+# all interfaces respond to `.type` identically to `typeof`:
+show[sys.type]

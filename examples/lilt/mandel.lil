@@ -1,0 +1,22 @@
+# draw a nifty ASCII Mandelbrot set to stdout
+
+on scale steps a b do
+	a+(b-a)*(range steps)/steps-1
+end
+
+on mandelbrot x0 y0 do
+	i:x:y: 0
+	while (i<100) & 4>(x^2)+(y^2)
+		t:x0+(x^2)-y^2
+		y:y0+2*x*y
+		x:t
+		i:i+1
+	end
+	" .,-~:;=!*#$@"[12&.6*i]
+end
+
+each y in scale[30 -1 1]
+	print[each x in scale[80 -2.5 1] mandelbrot[x y] end]
+end
+
+show[sys.workspace]

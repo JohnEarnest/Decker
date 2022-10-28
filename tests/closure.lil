@@ -1,0 +1,97 @@
+
+# lexical closure experiments.
+
+# assignments don't leak out of their enclosing scope:
+on foo do
+	y:22
+	show[y] # 22
+end
+foo[]
+show[y] # 0
+
+# but if you've declared a variable outside,
+# it can be written from inside:
+q:999
+on foo do
+	q:888
+	show[q] # 888
+end
+foo[]
+show[q] # 888
+
+# nested functions see their parent's locals:
+on foo do
+	z:33
+	on bar do
+		show[z] # 33
+	end
+	bar[]
+end
+foo[]
+
+# functions passed into functions retain their lexical bindings,
+# cannot see the bindings of their caller,
+# and do not modify their caller's bindings:
+g:333
+on quux x do
+	z:99
+	w:88
+	x[77]
+	show[z] # 99
+end
+on zami x do
+	z:23
+	show[z,w,g,x] # 23,0,333,77
+end
+quux[zami]
+
+on nest x do
+	on nest x do # this must not shadow its parent declaration!
+		show[5*x]
+	end
+	show[20*x]
+end
+nest[100]
+nest[100]
+
+on counter do
+	x:100
+	on inc do # this closes over an environment that is otherwise torn down when counter returns...
+		r:x
+		x:x+1
+		r
+	end
+end
+c:counter[]
+show[c[]]
+show[c[]]
+d:counter[]
+show[d[]]
+show[c[]]
+
+# demonstrate send's "uplevel" semantics:
+on boop x do
+	print["It is I, the outer boop: %s" x]
+end
+on beep do
+	on boop do
+		print["It is I, the inner boop."]
+		send boop[25] # this is not recursive!
+		send thisFunctionDoesNotExist[]
+	end
+	boop[]
+end
+beep[]
+
+# along different code paths, locals may be assigned (or not assigned)
+# in a different order. this must not impact their retrieval:
+on saddle x do
+	if x
+		saddle_a:33
+	else
+		saddle_b:66
+	end
+	saddle_a,saddle_b
+end
+show[saddle[1]]
+show[saddle[0]]

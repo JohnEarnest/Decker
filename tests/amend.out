@@ -1,0 +1,31 @@
+bare:
+999
+
+index:
+{"bar":"A"}
+{"bar":"A","quux":"B"}
+{"bar":"A","quux":"B"}
+
+subscript:
+"baz:baz"
+
+via function:
+fetch foo...
+{"bar":"D","quux":"B"}
+on get x do ... end
+{"bar":"A","quux":"B"}
+
+via indexed function:
+{"key":on get x do ... end}
+fetch foo...
+{"bar":"C","quux":"B"}
+{"key":on get x do ... end}
+{"bar":"A","quux":"B"}
+{"key":37}
+
+interface via function:
+access sys...
+9876
+access sys...
+12345
+12345 on getsys do ... end

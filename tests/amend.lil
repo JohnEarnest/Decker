@@ -1,0 +1,52 @@
+
+# exercise various quirks and surprises in amending (indexed assignment)
+
+# simple bare assignment (not an amend):
+print["bare:"]
+zami:999
+show[zami]
+
+# simple indexed assignment:
+print["\nindex:"]
+foo.bar:"A"
+show[foo]
+show[foo.quux:"B"]
+show[foo]
+
+# note: what looks like subscripting
+# on a function is actually application:
+on func x do
+	":" fuse x,x
+end
+print["\nsubscript:"]
+show[func.baz]
+
+# amending a bare function result:
+on get x do
+	print["fetch foo..."]
+	foo
+end
+print["\nvia function:"]
+show[get[].bar:"D"] # anonymous amend of 'foo.bar'
+show[get]           # we *must not* reassign the source
+show[foo]           # nor should we modify foo in place or reassign it
+
+# amending an indexed function result:
+contain.key:get
+print["\nvia indexed function:"]
+show[contain]
+show[contain.key[].bar:"C"]  # anonymous amend of 'foo.bar'
+show[contain]                # we *must not* reassign the source
+show[foo]                    # nor should we modify foo in place or reassign it
+contain.key:37 show[contain] # reassign a member that happens to be a function
+
+# amending a bare function result that is an interface:
+on getsys do
+	print["access sys..."]
+	sys
+end
+sys.seed:9876
+print["\ninterface via function:"]
+show[getsys[].seed]        # accessing an interface member via a function call
+show[getsys[].seed:12345]  # amending an interface member via a function call
+show[sys.seed getsys]      # make sure the write happened and we didn't blow away the function

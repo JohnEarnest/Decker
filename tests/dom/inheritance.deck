@@ -1,0 +1,25 @@
+{deck}
+version:1
+card:0
+size:[512,342]
+
+{card:home}
+{widgets}
+plain:{"type":"button","size":[60,20],"pos":[0,0]}
+pusher:{"type":"button","size":[40,60],"pos":[10,35],"locked":1,"script":"home.0","show":"transparent","text":"Push Me!","style":"rect","value":1}
+outfield:{"type":"field","size":[100,20],"pos":[0,0],"border":1,"value":"some text"}
+expenses:{"type":"grid","size":[100,50],"pos":[0,0],"format":"i$","value":{"a":[11,22],"b":[33,44]}}
+frame:{"type":"canvas","size":[10,8],"pos":[0,0],"image":"%%IMG2AAoACAJQ","pattern":2}
+
+{script:home.0}
+nuffing
+{end}
+
+{card:child}
+parent:"home"
+{widgets}
+pusher:{"value":0}
+outfield:{"value":"something else"}
+expenses:{"value":{"a":[11,22],"b":[33,44],"c":[44,66]}}
+frame:{"image":"%%IMG2AAoACAILAwECCgMCAgoDAQIKAwECCgMCAgoDAQIL","pattern":3}
+

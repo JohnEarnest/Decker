@@ -1,0 +1,43 @@
+
+# parse error
+show[eval["99`5"]]
+
+# empty expression
+show[eval[""]]
+
+# simple expression
+show[eval["1+2"]]
+
+# chaining extraction
+show[eval["2+3"].value]
+
+# reference passed-in bindings
+foo.a:100
+foo.b:200
+show[eval["a+b" foo]]
+
+# capture new bindings
+show[eval["foo:69"]]
+
+# external bindings don't leak in
+show[eval["foo"]]
+
+# internal bindings don't leak out
+c:444
+show[eval["c:42 11+22"]]
+show[c]
+
+# passed-in binding dict doesn't mutate
+show[eval["c:999" foo]]
+show[foo]
+
+# parser edge case: ending on a keyword
+show[eval["on foo do 99 end"]]
+
+# functions built in an eval[] retain the correct closure
+inside:eval["on one x do 100*x end  on two x do one[3*x] end"].value
+show[inside[5]]
+
+outside.const:300
+inside:eval["on one x do const*x end  on two x do one[3+x] end" outside].value
+show[inside[4]]

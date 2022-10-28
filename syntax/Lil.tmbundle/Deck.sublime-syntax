@@ -1,0 +1,38 @@
+%YAML 1.2
+---
+name: Deck
+scope: source.deck
+
+file_extensions:
+  - deck
+
+contexts:
+  main:
+    - match: ^\#
+      scope: comment.deck
+      push:
+        - meta_scope: comment.line.deck
+        - match: \n
+          pop: true
+
+    - match: ^\{(deck|sounds|fonts|widgets|data)\}
+      scope: markup.heading
+
+    - match: "^\\{card:([^\\}]+)\\}"
+      scope: markup.heading
+      captures:
+        1: entity.name.section
+
+    - match: "^\\{script(:([^\\}]+))?\\}"
+      scope: markup.heading
+      captures:
+        1: meta.annotation.identifier
+      embed: scope:source.lil
+      escape: ^\{end\}
+      escape_captures:
+        0: markup.heading
+
+    - match: "^\\{module:([^\\}]+)\\}"
+      scope: markup.heading
+      captures:
+        1: meta.annotation.identifier

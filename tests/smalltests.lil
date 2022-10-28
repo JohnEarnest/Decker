@@ -1,0 +1,86 @@
+
+# very simple test cases
+# for early stages of bringing up an interpreter
+
+# unary, binary, order of operations
+show[-25]           # -25
+show[3*5-4]         # 3
+show[(3*5)-4]       # 11
+show[1,2,3]         # (1,2,3)
+
+# conditionals and fallthrough
+show[if 1<3 222 else 333 end] # 222
+show[if 1>3 222 else 333 end] # 333
+show[if 1>4 222 end         ] # 0
+
+# last item in block
+show[if 1  2+2  3*5 end ]     # 15
+
+# simple set and get
+show[a:234]   # 234
+show[100+a]   # 334
+
+# indexed set and get
+show[b.foo.bar:"quuz"] # {"foo":{"bar":"quuz"}}
+show[b.foo           ] # {"bar":"quuz"}
+show[b.foo.bar       ] # "quuz"
+
+# basic while loop
+i:1 show[while i<7 show[i] i:i*2 end]
+# 1
+# 2
+# 4
+# 8
+
+# basic each loop
+show[each x in 3,5,7 show[100+x] 50+x end]
+# 103
+# 105
+# 107
+# (53,55,57)
+
+# iteration over a dictionary
+each v k i in ("foo","bar") dict 11,22 show[v,k,i] end
+# (11,"foo",0)
+# (22,"bar",1)
+
+# basic definition and call
+show[on plustwice x y do x+y,y end]
+show[plustwice[3 500]]  # (503,503)
+
+# insert from nothing
+show[t:insert name:"Sara","Eric","Laura","Alice" job:"Programmer","Programmer","IT","Manager" into 0]
+#+---------+--------------+
+#| name    | job          |
+#+---------+--------------+
+#| "Sara"  | "Programmer" |
+#| "Eric"  | "Programmer" |
+#| "Laura" | "IT"         |
+#| "Alice" | "Manager"    |
+#+---------+--------------+
+
+# select
+show[select name where job="Programmer" orderby name asc from t]
+#+--------+
+#| name   |
+#+--------+
+#| "Eric" |
+#| "Sara" |
+#+--------+
+
+# update
+show[update dep_count:count job by job from t]
+#+---------+--------------+-----------+
+#| name    | job          | dep_count |
+#+---------+--------------+-----------+
+#| "Sara"  | "Programmer" | 2         |
+#| "Eric"  | "Programmer" | 2         |
+#| "Laura" | "IT"         | 1         |
+#| "Alice" | "Manager"    | 1         |
+#+---------+--------------+-----------+
+
+# extract
+show[extract name orderby name asc from t]
+#("Alice","Eric","Laura","Sara")
+show[extract value by value from "ABBABC"]
+#("A","A","B","B","B","C")

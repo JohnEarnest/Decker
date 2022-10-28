@@ -1,0 +1,14 @@
+{"value":0,"vars":{},"error":"Invalid character '`'."}
+{"value":0,"vars":{},"error":""}
+{"value":3,"vars":{},"error":""}
+5
+{"value":300,"vars":{"a":100,"b":200},"error":""}
+{"value":69,"vars":{"foo":69},"error":""}
+{"value":0,"vars":{},"error":""}
+{"value":33,"vars":{"c":42},"error":""}
+444
+{"value":999,"vars":{"a":100,"b":200,"c":999},"error":""}
+{"a":100,"b":200}
+{"value":on foo do ... end,"vars":{"foo":on foo do ... end},"error":""}
+1500
+2100

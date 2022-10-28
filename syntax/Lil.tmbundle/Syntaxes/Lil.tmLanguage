@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>fileTypes</key>
+	<array>
+		<string>lil</string>
+	</array>
+	<key>name</key>
+	<string>Lil</string>
+	<key>patterns</key>
+	<array>
+		<dict>
+			<key>comment</key>
+			<string>Single line comments</string>
+			<key>match</key>
+			<string>\#.*</string>
+			<key>name</key>
+			<string>comment.line.number-sign.lil</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>Control flow keywords</string>
+			<key>match</key>
+			<string>(?&lt;=^|[^a-zA-Z_?\d.])(?:if|else|end|while|each|send|on|do|select|extract|update|insert|into|from|where|by|orderby|asc|desc|with)(?=$|[^a-zA-Z_?\d])</string>
+			<key>name</key>
+			<string>keyword.control.lil</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>Primitive operators</string>
+			<key>match</key>
+			<string>(?&lt;=^|[^a-zA-Z_?\d.])(?:floor|cos|sin|tan|exp|ln|sqrt|sum|min|max|raze|count|first|last|range|list|table|rows|cols|split|fuse|cat|dict|take|drop|in|at|join|cross|parse|format|typeof|unless|flip|limit|mag|unit|heading)(?=$|[^a-zA-Z_?\d])</string>
+			<key>name</key>
+			<string>support.function.lil</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>Subroutine Calls</string>
+			<key>match</key>
+			<string>([a-zA-Z_?][a-zA-Z_?\d]*)\s*(?=\[)</string>
+			<key>name</key>
+			<string>support.function.call.lil</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>Subroutine Defs</string>
+			<key>match</key>
+			<string>(?&lt;=on)\s+([a-zA-Z_?][a-zA-Z_?\d.]*)</string>
+			<key>name</key>
+			<string>entity.name.function.lil</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>String Literals</string>
+			<key>begin</key>
+			<string>"</string>
+			<key>end</key>
+			<string>"</string>
+			<key>name</key>
+			<string>string.quoted.double.lil</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>match</key>
+					<string>\\[n0\\"]</string>
+					<key>name</key>
+					<string>constant.character.escape.lil</string>
+				</dict>
+			</array>
+		</dict>
+	</array>
+	<key>scopeName</key>
+	<string>source.lil</string>
+	<key>uuid</key>
+	<string>08550b99-efd5-40f6-a6b6-0b812d0d33e1</string>
+</dict>
+</plist>

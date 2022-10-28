@@ -1,0 +1,5 @@
+
+# missing a 'do' to separate args from body:
+on foobar x y
+	quux zami
+

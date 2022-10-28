@@ -1,0 +1,29 @@
+
+# data conversion tests
+
+t.a:11,22,33
+t.b:0,1,0 t.t:("one,two","three\nfour","five")
+t:table t
+show[c:writecsv[t "fbss"]]
+show[readcsv[c "fbss"]]
+show[writecsv[table range 5]] # rectangular table(!)
+
+t2:insert foo:"A","B" bar:-2.953,99.8 into 0
+show[writecsv[t2 "sc"]]
+
+show[readcsv["foo,bar\nA,-$2.953\nB,$99.8" "sc"]]     # currency casts
+show[readcsv["A,B\none,-12.3\ntwo,45.999" "si"]]      # integer casts
+show[readcsv["A,B\none,-12.3\ntwo,45.999"]]           # unspecified datatypes
+show[readcsv["A,B\none\ntwo,45.999"]]                 # pad ragged column data
+show[readcsv["A,B,C\none,11,true\ntwo,12,true" "si"]] # trim extra columns
+show[readcsv["A,B\none,-12.3\ntwo,45.999\n"]]         # ignore a trailing newline
+show[readcsv["A,B\none,-12.3\ntwo,45.999\n" "_i"]]    # explicitly drop column
+show[readcsv["A,B\none,-12.3\ntwo,45.999" "sisi"]]    # pad out missing columns
+show[readcsv[""]]                                     # no headers or data
+show[readcsv["first,second,third"]]                   # headers only
+show[readcsv["first,second,third\n  "]]               # headers only, with whitespace
+
+# custom delimiters
+t3:insert foo:"C|D" bar:789 into t2
+show[writecsv[t3 "sc" "|"]]
+show[readcsv["first|second|third\n11|22|33" "fff" "|"]]

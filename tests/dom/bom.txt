@@ -1,0 +1,1 @@
+﻿Some ASCII contents after the bom!

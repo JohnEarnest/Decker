@@ -1,0 +1,87 @@
+#!/usr/bin/env lilt
+# An excruciatingly simple podcast fetcher based on Lilt's XML parser.
+
+#feedUrl: "https://feeds.simplecast.com/wjQvYtdl"
+feedUrl: "https://arraycast.com/episodes?format=rss"
+
+print["fetching feed from %s..." feedUrl]
+shell["wget -q %s -O feed.xml" format feedUrl]
+feed:read["feed.xml"]
+shell["rm feed.xml"]
+xml:first readxml[feed]
+
+# RSS XML has a very sparse and heavily nested structure.
+# let's begin by flattening it out and making it easier to traverse:
+on squash x do
+	on delist x do if 1=count x first x else x end end
+	on gather x do if 1=count x squash[first x] else raze squash[x] end end
+	on union x do
+		r:()
+		each c in x.children
+			r[c.tag]:(() unless r[c.tag]),list gather[c.children]
+		end
+		r:delist @ r
+	end
+	on squash x do
+		case.dict:on _ x do
+			rr[x.tag]:if x.children
+				r:if 1=count x.children squash[first x.children] else union[x] end
+				if "string"~typeof r r else x.attr,r end
+			else
+				x.attr
+			end
+		end
+		case.string:on _ x do x end
+		case.list  :on _ x do delist[squash @ x] end
+		case[typeof x][x]
+	end
+	squash[x]
+end
+
+# RSS fields often contain fragments of HTML-
+# collapse these into simple text runs:
+on htmlText x do
+	on flatten x do
+		"" fuse if x.children
+			flatten @ x.children
+		else
+			x
+		end
+	end
+	"" fuse flatten @ readxml[x]
+end
+
+# RSS pubdates use the extremely inconvenient
+# RFC 822 date-time format, like "Wed, 02 Oct 2002 08:00:00 EST"
+# rearrange it into something we can sort on lexicographically:
+on pubDateToISO x do
+	m:("|" split "Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec") dict 1+range 12
+	each v in x
+		p:("day","month","year","hour","minute","second") dict "%*s, %i %s %i %i:%i:%i" parse v
+		"%p" format p.month:m[p.month]
+	end
+end
+
+# do some munging on the feed to get the parts we care about:
+root:squash[xml]
+doc:root.rss.channel
+data:select
+	title
+	pubdate:pubDateToISO[pubdate]
+	file:(list "%s.mp3") format "%s:" parse title
+	url:"%s?" parse enclosure..url
+from table doc.item
+
+# present a command-line UI:
+print["\n%s\n%s\n%s\n" doc.title ((count doc.title)take"=") htmlText[doc.description]]
+print["found %i episodes." (count data)]
+data:5 limit select where !file in dir["."].name orderby pubdate desc from data
+print["found %i unfetched recent episodes.\n" (count data)]
+each row in rows data
+	if "y"~"%1l" parse input["fetch %s? (y/n) " row.title]
+		print["fetching %s..." row.url]
+		start:sys.ms
+		shell["wget --no-clobber -q %s -O \"%s\"" format row.url,row.file]
+		print["completed in %f seconds." (sys.ms-start)/1000]
+	end
+end

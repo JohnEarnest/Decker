@@ -1,0 +1,35 @@
+
+# test suite for the @ pseudo-operator.
+
+# @ performs multi-indexing
+show[(11,22,33,44) @ 0,1,0,2,0]
+
+# and dictionary extraction
+show[(11,22,33,44) @ ("a","b") dict 2,0]
+
+# in general, `x @ y` is equivalent to `each v k i in y (x[v k i]) end`
+on step x y z do
+	(x,y,z)
+end
+show[step @ ("a","b") dict 11,22]
+
+# ...with the exception that `x` is evaluated only once:
+on fetch do
+	print["fetched"]
+	on apply x do
+		"applied <%s>" format x
+	end
+end
+show[fetch[] @ 10+range 3]
+
+# chained application
+on foo x do
+	print["foo %j" x]
+	x+500,1000
+end
+on bar x do
+	print["bar %j" x]
+	200,x
+end
+show[      bar @ range 3]
+show[foo @ bar @ range 3]

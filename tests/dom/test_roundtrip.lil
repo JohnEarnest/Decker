@@ -1,0 +1,21 @@
+# check whether all example decks will round-trip intact via this DOM implementation
+
+basedir:"examples/decks/"
+
+on roundtrip path do
+	d:readdeck[path]
+	writedeck["temp.deck" d]
+	s:shell["cmp -s temp.deck %s" format path] # exit code { 0:matched, 1:differed, 2:error }
+	if s.exit
+		print["round trip for %s failed:" path]
+		print[shell["diff temp.deck %s" format path].out]
+		exit[1]
+	end
+	shell["rm temp.deck"]
+end
+
+each name in extract name where type=".deck" from dir["examples/decks/"]
+	roundtrip["%s%s" format basedir,name]
+end
+
+print["all roundtrip tests passed."]

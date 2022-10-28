@@ -1,0 +1,13 @@
+{deck}
+version:1
+card:0
+size:[512,342]
+
+{card:home}
+
+{module:trivial}
+description:"a trivial module"
+{script}
+extract a:22 b:33 from 0
+{end}
+

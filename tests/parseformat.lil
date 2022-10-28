@@ -1,0 +1,135 @@
+
+# tests for parse and format
+
+print["parse:"]
+
+# literals
+show["%m%none%m%n"    parse "one"   ]
+show["%m%none%m%n"    parse "two"   ]
+show["ab%%cd%m%n"     parse "ab%cd" ]
+# end of input
+show["pre%z"          parse "pr","pre","pre!","pre " ] # matched entire string?
+# ints
+show["%i %i"          parse "123 -5"                ] # basics
+show["%3i%2i%5i"      parse "12345678"              ] # fixed-width
+show["%h %h %H %H"    parse "AB ab AB ab"           ] # case insensitivity
+show["%h %h"          parse "FACEB00F ffffffff"     ] # large hex
+show["%*h%n,%*i%n%m"  parse "AB,42"                 ] # skip ints
+# floats
+show["%f%n %f%n %f%n" parse "-3 .3 0.997"           ] # basics
+show["%c %c %c"       parse "$23 -$3.5 420.69"      ] # currency ($ optional)
+show["%5f%f"          parse "12.3456.7"             ] # fixed-width
+show["%*f%n,%*f%n%m"  parse ".3,1.2"                ] # skip floats
+# strings
+show["%s,%s,%s"       parse "one,two,three"         ] # basics
+show["%3s%10s"        parse "ABCDE"                 ] # fixed-width
+show["%a"             parse "ABCDE"                 ] # ascii decode
+show["%b,%b,%b"       parse "true,false,yes"        ] # booleans
+show["%*s,%s,%*s"     parse "one,two,three"         ] # skip strings
+# case conversion
+show["%u,%u,%u"       parse "one,Two,THREE"         ] # to uppercase
+show["%l,%l,%l"       parse "one,Two,THREE"         ] # to lowercase
+# date-time
+show["%e%n"           parse "2021-01-02T03:04:57Z!" ] # epoch
+show["%p%m"           parse "2021-01-02T03:04:57Z!" ] # parts
+show["%e%m"           parse "bogus!"                ] # epoch mismatch
+show["%p%m"           parse "outtatime!"            ] # parts mismatch
+# padding
+show["%2i%2f%2h%5e"   parse " 1 2 A 1984"           ] # tolerate leading whitespace
+show["%2i%2f%2h%n%m"  parse "1@2@A@"                ] # skip trailing junk in fixed-width fields, but it fails the match
+
+# char classes
+show["%rAB"           parse "B","AB","AAAAB"        ] # zero or more As
+show["%.2rAB"         parse "ABBABACABA"            ] # zero or more [AB]
+show["%-.2rAB%s"      parse "TEXTUNTILBTEXT"        ] # zero or more [^AB]
+show["%-rC"           parse "AAABBB"                ] # zero or more [^C] consuming the entire string
+show["%*2rA%m"        parse "B","AB","AAB"          ] # match exactly two As
+show["%2.2rAB"        parse "ABC","ACC","ABBBC"     ] # read exactly two [AB]
+show["%-2.2rAB"       parse "CDC","CA","AAA"        ] # read exactly two [^AB]
+show["%-rA"           parse "   BCA"                ] # %r does not skip leading whitespace
+show["%oA"            parse "B","AB","AAB"          ] # zero or one As
+
+print["format:"]
+
+# simple forms
+show["%m%none%m%n"    format ()                     ]
+show["%m%none%m%n"    format ()                     ]
+show["ab%%cd%m%n"     format ""                     ]
+show["%b,%b,%b,%b"    format "beef",1,42            ] # booleans
+show["%i,%i,%i"       format 42,-342                ] # ints
+show["%i"             format 4294967295             ] # large int
+show["%h %H %h"       format 171,171                ] # hex ints
+show["%f:%f"          format -123.456,333           ] # natural floats
+show["%.3f/%.2f"      format -123.456,333           ] # floats with decimal places
+show["%c,%.3c"        format 3.5,-93.99             ] # currency
+show["%s [%s]"        format "one","two"            ] # strings
+show["%l:%u"          format "One","Two"            ] # case conversion
+show["%-2.2rAB%2r!%r!"format "one","b","anylength"  ] # char class
+show["%-2.2oAB%2o!%o!"format "one","b","anylength"  ] # char class
+show["%a"             format list 65,66,67          ] # ascii chars
+show["%a"             format list 65,10,127,-5,67   ] # invalid ascii chars become space
+show["%e"             format 1609556697             ] # epoch
+show["%p" format "%p" parse  "2021-02-03T04:05:58Z" ] # parts
+d.year:1984 d.month:5 d.day:25
+show["%p"             format d                      ] # partial parts
+# skips
+show["%*i|%*e|%*s|%*w|%i" format 42]
+# padding
+show["%4H %4H"        format 171,65539              ] # space pad
+show["%04H %04H"      format 171,65539              ] # zero pad
+show[":%-7s:%7s:"     format "left","right"         ] # justification
+show["%08H %08h"      format 4207849487,4294967295  ] # large hex
+# truncation
+show["%-.10e"               format 1609556697             ]
+show["%-.6s,%.6s"           format "longleft","longright" ]
+show["%3.3s|%3.3s|%3.3s"    format "A","ABC","ABCDE"      ]
+show["%-3.3s|%-3.3s|%-3.3s" format "A","ABC","ABCDE"      ]
+# embedded
+show["%%%ii" format 34]
+
+print["tabular:"]
+# crack fixed-width records into a table
+data: "apple  $1.00 1\ncherry $0.3515\nbanana $0.75 2"
+show[table ("name","price","amt") dict flip "%6s%6c%2i" parse "\n" split data]
+# make sure cracking works for single-element patterns
+show["%s!" parse "foo!","bar!"]
+show["%*4i-%*2i-%*2iT%*2i:%*2i:%*2iZ%n%m" parse "2003-invalid"]
+
+print["json:"]
+# formatting
+show["%j" format 42                              ]
+show["%j" format list 11,22,33                   ]
+show["%j" format "string\n with\"/escapes\\!"    ]
+show["%j" format ().foo:999                      ]
+show["%j" format table 11,22,33                  ]
+# parsing
+show["%j %j %j" parse "true null false"          ] # simple literals
+show["%j%n"     parse "[true,false,true]"        ] # simple list
+show["%j%n"     parse "[true false true]"        ] # list w/o delimiters
+show["%j%n"     parse "[true,false"              ] # list w/o end
+show["%j"       parse "-23.4"                    ] # simple num
+show["%j"       parse "23.9e+3"                  ] # complex json number
+show["%j%n"     parse "[12,13,@99"               ] # garbage in list
+show["%j"       parse "\"foob\""                 ] # simple string
+show["%j"       parse "\"A\\\\nB\\\\C\\/D\\\"\"" ] # simple escapes
+show["%j"       parse "\"D\\u0041B\""            ] # unicode escape
+show["%j"       parse "\"A\\?B\""                ] # bogus escape
+show["%j"       parse "\"AB"                     ] # unterminated string
+show["%j"       parse "{\"a\":11,\"b\":22}"      ] # simple dict
+show["%j%n"     parse "{\"a\":23,"               ] # dict w/o end
+show["%j%n"     parse "{\"a\":23,@"              ] # garbage in dict
+show["%j"       parse "{1:5,2:99}"               ] # non-string dict keys
+# fixed-width
+show["%1s%3j%1s" parse "AtrueB"                  ] # overlong literal
+show["%1s%3j%1s" parse "A12.34e5B"               ] # truncated number
+show["%1s%5j%1s" parse "A\"\\u0041\"B"           ] # truncated escape sequence
+show["A%jB%m"    parse "23B"                     ] # non-matching sequence
+
+print["recursive:"]
+show[()                            format (11,"two")                     ] # identity
+show[(list "%s.mp3")               format ("one","two","three")          ] # format a column
+show[(":","%03i")                  format 11,22,33                       ] # fuse a formatted column
+show[("(list %s)",",","%2i")       format ((list 1,2,3),(list 4,5,6))    ] # format, fuse, format
+show[(",\n","(list %s)",",","%2i") format ((list 1,2,3),(list 4,5,6))    ] # fuse, format, fuse, format
+show[(list "%u - %i")              format insert a:"u","v" b:11,22 into 0] # explode a table into rows
+show[("\n","%u - %i")              format insert a:"u","v" b:11,22 into 0] # explode a table into rows, fuse
