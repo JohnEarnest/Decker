@@ -77,6 +77,5 @@ web-decker: js
 docs:
 	@multimarkdown docs/lil.md    > docs/lil.html
 	@multimarkdown docs/lilt.md   > docs/lilt.html
-	@multimarkdown docs/lilac.md  > docs/lilac.html
 	@multimarkdown docs/decker.md > docs/decker.html
 	@multimarkdown docs/format.md > docs/format.html
