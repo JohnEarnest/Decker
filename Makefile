@@ -7,6 +7,8 @@ ifeq ($(UNAME),Darwin)
 	FLAGS=-Wall -Werror -Wextra -Wpedantic -Os
 	# FLAGS:=$(FLAGS) -fsanitize=undefined
 	# FLAGS:=$(FLAGS) -fsanitize=address
+
+	OPEN=open
 endif
 ifeq ($(UNAME),Linux)
 	COMPILER=gcc
@@ -17,6 +19,8 @@ ifeq ($(UNAME),Linux)
 	# -Wno-misleading-indentation silences warnings which are entirely spurious.
 	# -Wno-format-truncation likewise silences spurious warnings regarding snprintf() truncation.
 	FLAGS:=$(FLAGS) -Wno-misleading-indentation -Wno-format-truncation
+
+	OPEN=xdg-open
 endif
 
 resources:
@@ -71,7 +75,7 @@ testjs: js
 web-decker: js
 	@chmod +x ./scripts/web_decker.sh
 	@./scripts/web_decker.sh examples/decks/tour.deck js/build/decker.html $(VERSION)
-	open js/build/decker.html
+	${OPEN} js/build/decker.html
 
 .PHONY: docs
 docs:
