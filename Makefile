@@ -72,10 +72,15 @@ testjs: js
 	@node js/build/lilt.js tests/dom/domtests.lil
 	@node js/build/lilt.js tests/dom/test_roundtrip.lil
 
-web-decker: js
+js-build: js
 	@chmod +x ./scripts/web_decker.sh
 	@./scripts/web_decker.sh examples/decks/tour.deck js/build/decker.html $(VERSION)
+	
+web-decker: js-build
 	${OPEN} js/build/decker.html
+
+docker: js-build
+	docker build -t decker .
 
 .PHONY: docs
 docs:
