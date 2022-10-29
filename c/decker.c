@@ -3132,7 +3132,7 @@ void load_deck(lv*d){
 	int minscale=(size.x*2<=dis.w&&size.y*2<=dis.h)?2:1;
 	if(win){SDL_SetWindowSize(win,size.x*minscale,size.y*minscale),SDL_DestroyTexture(gfx);}
 	else{
-		win=SDL_CreateWindow("Decker",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,size.x*minscale,size.y*minscale,SDL_WINDOW_SHOWN);serr(win);
+		win=SDL_CreateWindow("Decker",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,size.x*minscale,size.y*minscale,SDL_WINDOW_SHOWN|SDL_WINDOW_ALLOW_HIGHDPI);serr(win);
 		ren=SDL_CreateRenderer(win,-1,SDL_RENDERER_SOFTWARE);serr(ren);
 	}
 	gfx=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,size.x,size.y);
