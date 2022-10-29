@@ -1,22 +1,18 @@
 #!/bin/bash
-# install lilt, lilac, and lil support resources
+# install lilt, and lil support resources
 
 DESTDIR=""
 PREFIX="/usr/local"
 INSTALLDIR="${DESTDIR}${PREFIX}/bin/"
 
 # install binaries
-if [[ ! -f "./c/build/lilt" && ! -f "./c/build/lilac" ]]; then
+if [[ ! -f "./c/build/lilt" ]]; then
 	echo "no staged binaries found. build first with 'make'"
 	exit 1
 fi
 if [ -f "./c/build/lilt" ]; then
 	echo "copying lilt to ${INSTALLDIR}..."
 	sudo cp ./c/build/lilt "${INSTALLDIR}lilt"
-fi
-if [ -f "./c/build/lilac" ]; then
-	echo "copying lilac to ${INSTALLDIR}..."
-	sudo cp ./c/build/lilac "${INSTALLDIR}lilac"
 fi
 
 # install syntax profiles
