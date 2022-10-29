@@ -59,7 +59,7 @@ rundecker: decker
 .PHONY: jsres
 js: jsres
 	@mkdir -p js/build/
-	@echo "VERSION=\"${VERSION}\"\n" > js/build/lilt.js
+	@echo "VERSION=\"${VERSION}\"" > js/build/lilt.js
 	@cat js/lil.js js/repl.js >> js/build/lilt.js
 
 testjs: js
