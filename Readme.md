@@ -59,7 +59,7 @@ to build the image (default name is `decker`). To run it as a Docker container, 
 make docker-run
 ```
 
-which will start a container instance and open your browser to the correct URL. To push the image to [Docker Hub], do
+which will start a container instance and open your browser to the correct URL. To push the image to [Docker Hub] do
 
 ```
 docker login # then input your username/password
