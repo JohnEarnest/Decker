@@ -132,7 +132,7 @@ d.a.key:"apple"
 d.b.key:"pear"
 
 d           # {"a":{"key":"apple"},"b":{"key":"pear"}}
-d.a         # {"one":"apple"}
+d.a         # {"key":"apple"}
 d.a.key     # "apple"
 d..key      # {"a":"apple","b":"pear"}
 ```
