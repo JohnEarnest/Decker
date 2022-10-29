@@ -82,6 +82,10 @@ web-decker: js-build
 docker: js-build
 	docker build -t decker .
 
+docker-run: docker
+	docker run -it --rm -d -p 8081:80 --name web decker
+	${OPEN} http://localhost:8081
+
 .PHONY: docs
 docs:
 	@multimarkdown docs/lil.md    > docs/lil.html
