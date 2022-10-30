@@ -7,16 +7,14 @@ INSTALLDIR="${DESTDIR}${PREFIX}/bin/"
 
 # install binaries
 if [[ ! -f "./c/build/lilt" ]]; then
-	echo "no lilt binaries found. build first with 'make lilt'"
-	exit 1
+	echo "skipping lilt. no binary found. build first with 'make lilt'"
 fi
 if [ -f "./c/build/lilt" ]; then
 	echo "copying lilt to ${INSTALLDIR}..."
 	sudo cp ./c/build/lilt "${INSTALLDIR}lilt"
 fi
 if [[ ! -f "./c/build/decker" ]]; then
-	echo "no decker binaries found. build first with 'make decker'"
-	exit 1
+	echo "skipping decker. no binary found. build first with 'make decker'"
 fi
 if [ -f "./c/build/decker" ]; then
 	echo "copying decker to ${INSTALLDIR}..."

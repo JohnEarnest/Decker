@@ -6,6 +6,7 @@ PREFIX="/usr/local"
 INSTALLDIR="${DESTDIR}${PREFIX}/bin/"
 
 sudo rm -f "${INSTALLDIR}lilt"
+sudo rm -f "${INSTALLDIR}decker"
 
 rm -rf ~/Library/Application\ Support/Sublime\ Text/Packages/Lil.tmbundle
 rm -rf ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/Lil.tmbundle
