@@ -1161,7 +1161,7 @@ modals=_=>{
 	const pal=deck.patterns.pal.pix
 	if(ms.type=='about'){
 		const b=draw_modalbox(rect(190,70))
-		if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'Ok',1)||ev.exit)modal_exit(0)
+		if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'OK',1)||ev.exit)modal_exit(0)
 		draw_text(b,`Decker v${VERSION}`,FONT_MENU,1),b.y+=15
 		draw_text(b,'by John Earnest',FONT_BODY,1),b.y+=12
 	}
@@ -1209,7 +1209,7 @@ modals=_=>{
 				{const g=rect(c.x,c.y-3+c.h,c.w,7);if(over(g)){draw_hline(c.x,c.x+c.w,c.y+c.h-1,13),gutter=z+1}}
 			}
 		};frame.clip=oc
-		if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'Ok',1)||ev.exit||ev.action)modal_exit(0)
+		if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'OK',1)||ev.exit||ev.action)modal_exit(0)
 		const c=rect(b.x,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,60,20),'New',1)){
 			const c=deck_add(deck,lms('card')),n=ln(ifield(curr,'index'))
@@ -1294,7 +1294,7 @@ modals=_=>{
 		if(ms.grid.row>=0){
 			const l=layout_plaintext(PANGRAM,deck.fonts.v[ms.grid.row],ALIGN.left,rect(psize.w,psize.h));draw_text_wrap(psize,l,1)}
 		const c=rect(b.x+b.w-60,b.y+b.h-20)
-		if(ui_button(rect(c.x,c.y,60,20),'Ok',ms.grid.row>=0)||choose){
+		if(ui_button(rect(c.x,c.y,60,20),'OK',ms.grid.row>=0)||choose){
 			const nf=ms.grid.table.v.name[ms.grid.row];modal_exit(1)
 			if(uimode=='object'){ob_edit_prop('font',nf)}
 			else if(wid.ft&&wid.cursor.x!=wid.cursor.y){const c=wid.cursor;field_stylespan(nf,lms('')),wid.cursor=c,mark_dirty()}
@@ -1307,7 +1307,7 @@ modals=_=>{
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Font/Deck Accessory Mover',FONT_MENU,1)
 		const lgrid=rect(b.x            ,b.y+15 ,100    ,b.h-(15+15+5+20))
 		const rgrid=rect(b.x+b.w-lgrid.w,lgrid.y,lgrid.w,lgrid.h         )
-		if(ui_button(rect(rgrid.x+(rgrid.w-80)/2,b.y+b.h-20,80,20),'Ok',1)||ev.exit)modal_exit(0)
+		if(ui_button(rect(rgrid.x+(rgrid.w-80)/2,b.y+b.h-20,80,20),'OK',1)||ev.exit)modal_exit(0)
 		ui_table(lgrid,[16,lgrid.w-38],'Is',ms.grid );if(ms.grid .row>-1)ms.grid2.row=-1
 		ui_table(rgrid,[16,rgrid.w-38],'Is',ms.grid2);if(ms.grid2.row>-1)ms.grid .row=-1
 		draw_vline(lgrid.x+lgrid.w,lgrid.y+lgrid.h+5,b.y+b.h,18)
@@ -1444,10 +1444,10 @@ modals=_=>{
 	}
 	else if(ms.type=='alert'){
 		const b=draw_modal_rtext(rect(0,5+20))
-		if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'Ok',1)||ev.exit)modal_exit(0)
+		if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'OK',1)||ev.exit)modal_exit(0)
 	}
 	else if(ms.type=='confirm'){
-		const b=draw_modal_rtext(rect(0,5+20)),v=ms.verb?ls(ms.verb):'Ok'
+		const b=draw_modal_rtext(rect(0,5+20)),v=ms.verb?ls(ms.verb):'OK'
 		const vs=font_textsize(FONT_MENU,v);vs.x=min(max(60,vs.x+10),200-65);const c=rect(b.x+b.w-vs.x,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,vs.x,20),v,1))modal_exit(1);c.x-=65
 		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_exit(0)
@@ -1455,12 +1455,12 @@ modals=_=>{
 	else if(ms.type=='input'){
 		const b=draw_modal_rtext(rect(0,5+20+5+20))
 		ui_field(rect(b.x,b.y+b.h-(20+5+20),b.w,20),ms.text)
-		if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'Ok',1)||ev.exit)modal_exit(0)
+		if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'OK',1)||ev.exit)modal_exit(0)
 	}
 	else if(ms.type=='choose_lil'){
 		const b=draw_modal_rtext(rect(0,5+60+5+20))
 		const choose=ui_table(rect(b.x,b.y+b.h-(20+5+60),b.w,60),[],'s',ms.grid)
-		if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'Ok',ms.grid.row>=0)||choose)modal_exit(1)
+		if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'OK',ms.grid.row>=0)||choose)modal_exit(1)
 	}
 	else if(ms.type=='open_lil'){
 		const b=draw_modalbox(rect(125,45))
@@ -1519,7 +1519,7 @@ modals=_=>{
 		dr.grid_size.x=ln(rtext_string(ms.name.table)),dr.grid_size.x=max(1,dr.grid_size.x)
 		dr.grid_size.y=ln(rtext_string(ms.text.table)),dr.grid_size.y=max(1,dr.grid_size.y)
 		const c=rect(b.x,b.y+b.h-20)
-		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'Ok',1)||ev.exit)modal_exit(1)
+		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='deck_props'){
 		const b=draw_modalbox(rect(220,100))
@@ -1533,7 +1533,7 @@ modals=_=>{
 		const c=rect(b.x,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(deck),modal_exit(0);c.x+=65
 		if(ui_button(rect(c.x,c.y,60,20),'Protect...',1))modal_enter('save_locked')
-		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'Ok',1)||ev.exit)modal_exit(1)
+		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='card_props'){
 		const b=draw_modalbox(rect(220,100)),card=ifield(deck,'card')
@@ -1545,7 +1545,7 @@ modals=_=>{
 		}
 		const c=rect(b.x,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(card),modal_exit(0)
-		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'Ok',1)||ev.exit)modal_exit(1)
+		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='button_props'){
 		const b=draw_modalbox(rect(220,170)),button=ob.sel[0]
@@ -1564,7 +1564,7 @@ modals=_=>{
 		const c=rect(b.x,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(button),modal_exit(0); c.x+=65
 		if(ui_button(rect(c.x,c.y,60,20),'Action...',1))modal_enter('action')
-		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'Ok',1)||ev.exit)modal_exit(1)
+		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='field_props'){
 		const b=draw_modalbox(rect(220,170+60)),f=ob.sel[0], p=unpack_field(f)
@@ -1589,7 +1589,7 @@ modals=_=>{
 		if(ui_radio(rint(rect(ab.x,ab.y,b.w/2,16)),'Align Right',1,align=='right' )){iwrite(f,lms('align'),lms('right' )),mark_dirty()}ab.y+=16
 		const c=rect(b.x,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(f),modal_exit(0)
-		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'Ok',1)||ev.exit)modal_exit(1)
+		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='slider_props'){
 		const b=draw_modalbox(rect(220,170)),f=ob.sel[0]
@@ -1613,7 +1613,7 @@ modals=_=>{
 		iwrite(f,lms('interval'),lml([rtext_string(ms.form0.table),rtext_string(ms.form1.table)]))
 		iwrite(f,lms('step'),rtext_string(ms.form2.table)),mark_dirty()
 		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(f),modal_exit(0)
-		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'Ok',1)||ev.exit)modal_exit(1)
+		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='canvas_props'){
 		const b=draw_modalbox(rect(220,125)),canvas=ob.sel[0]
@@ -1628,7 +1628,7 @@ modals=_=>{
 		if(ui_checkbox(rect(cb.x,cb.y,b.w,16),'Border',1,border))border^=1,iwrite(canvas,lms('border'),lmn(border)),mark_dirty()
 		const c=rect(b.x,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(canvas),modal_exit(0)
-		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'Ok',1)||ev.exit)modal_exit(1)
+		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='grid_props'){
 		const b=draw_modalbox(rect(220,140)),grid=ob.sel[0]
@@ -1646,14 +1646,14 @@ modals=_=>{
 		const c=rect(b.x,b.y+b.h-20), w=ll(ifield(grid,'widths'))
 		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(grid),modal_exit(0);c.x+=65
 		if(ui_button(rect(c.x,c.y,90,20),'Reset Widths',w.length))iwrite(grid,lms('widths'),lml([])),mark_dirty()
-		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'Ok',1)||ev.exit)modal_exit(1)
+		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='action'){
 		const b=draw_modalbox(rect(220,180))
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Button Action',FONT_MENU,1)
 		const c=rect(b.x+b.w-60,b.y+b.h-20), cr=rect(b.x,b.y+36)
 		const ready=(ms.act_go||ms.act_sound)&&(ms.act_go?(ms.act_gomode!=4||count(ms.verb)):1)&&(ms.act_sound?count(ms.message):1)
-		if(ui_button(rect(c.x,c.y,60,20),'Ok',ready))modal_exit(1);c.x-=65
+		if(ui_button(rect(c.x,c.y,60,20),'OK',ready))modal_exit(1);c.x-=65
 		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_exit(0)
 		if(ui_checkbox(rint(rect(b.x,b.y+20,b.w/2,16)),'Go to Card',1,ms.act_go))ms.act_go^=1
 		if(ui_radio(rect(cr.x+5,cr.y,80,16),'First'   ,ms.act_go,ms.act_gomode==0))ms.act_gomode=0;cr.y+=16

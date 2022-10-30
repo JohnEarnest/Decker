@@ -161,7 +161,7 @@ Clicking "Action..." brings up a special dialog that can help you give buttons b
 
 You can navigate to another card (relative to the current card or absolute), optionally with a transition animation, you can play a sound (perhaps recorded from your microphone or imported from an external file), or you can do both!
 
-When you're finished, click "Ok", and your button is ready to use with the interact tool. The "Action" dialog has written a script for you automatically, but you can see what it looks like by going back to the button properties dialog and clicking "Script...".
+When you're finished, click "OK", and your button is ready to use with the interact tool. The "Action" dialog has written a script for you automatically, but you can see what it looks like by going back to the button properties dialog and clicking "Script...".
 
 ![](images/scripteditor.gif)
 
@@ -318,7 +318,7 @@ The Font/Deck Accessory mover is for transferring _resources_ between decks. You
 
 ![](images/mover.gif)
 
-On the left is a list of resources in the _source_ deck, and on the right is a list of the resources in the _open_ deck. With a resource on the left selected, you can copy it into the open deck, and with a resource on the right selected you can delete it from the open deck. Selecting any resource will display a preview. Press "Ok" or escape when you're finished.
+On the left is a list of resources in the _source_ deck, and on the right is a list of the resources in the _open_ deck. With a resource on the left selected, you can copy it into the open deck, and with a resource on the right selected you can delete it from the open deck. Selecting any resource will display a preview. Press "OK" or escape when you're finished.
 
 Resources consist of:
 
@@ -439,7 +439,7 @@ The transition `y`, should be the name of a transition function installed with `
 9) `alert[]` blocks all script execution until the user dismisses the modal. It can prompt the user in several ways depending on the `type` argument, if provided:
 
 - `"none"` (the default): Don't prompt the user for input and always return `1`.
-- `"bool"`: Prompt the user with two buttons, "Cancel" and a verb given by `x` (or `"Ok"`, by default). Return `1` if the verb-button is clicked, `0` on cancel.
+- `"bool"`: Prompt the user with two buttons, "Cancel" and a verb given by `x` (or `"OK"`, by default). Return `1` if the verb-button is clicked, `0` on cancel.
 - `"string"`: Prompt the user to enter a string. If `x` is present, use it as a default value. Return the input string.
 - `"choose"`: Prompt the user to pick one element from a list or dictionary `x`, using `y` as a default value, if provided. If `x` is a dictionary. Return an element from `x`. If `x` is missing or empty, the user will _always_ be presented with the option `"0"`.
 
