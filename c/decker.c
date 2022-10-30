@@ -1180,7 +1180,7 @@ void modals(){
 	char*pal=patterns_pal(ifield(deck,"patterns"));
 	if(ms.type==modal_about){
 		rect b=draw_modalbox((pair){190,70});char v[256];
-		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"Ok",1)||ev.exit)modal_exit(0);
+		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"OK",1)||ev.exit)modal_exit(0);
 		snprintf(v,sizeof(v),"Decker v%s",VERSION);draw_text(b,v,FONT_MENU,1);b.y+=15;
 		draw_text(b,"by John Earnest",FONT_BODY,1);b.y+=12;
 		snprintf(v,sizeof(v),"built on %s, %s",__DATE__,__TIME__);draw_text(b,v,FONT_BODY,1);
@@ -1232,7 +1232,7 @@ void modals(){
 				{rect g={c.x,c.y-3+c.h,c.w,7};if(over(g)){draw_hline(c.x,c.x+c.w,c.y+c.h-1,13);gutter=z+1;}}
 			}
 		}frame.clip=oc;
-		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"Ok",1)||ev.exit||ev.action)modal_exit(0);
+		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"OK",1)||ev.exit||ev.action)modal_exit(0);
 		pair c={b.x,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,60,20},"New",1)){
 			lv*c=n_deck_add(deck,l_list(lmistr("card")));
@@ -1325,7 +1325,7 @@ void modals(){
 		rect psize={b.x,gsize.y+gsize.h+5,b.w,50};draw_box(psize,0,1);psize=inset(psize,2);
 		if(ms.grid.row>=0){layout_plaintext(pangram,ifield(deck,"fonts")->lv[ms.grid.row],align_left,(pair){psize.w,psize.h});draw_text_wrap(psize,1);}
 		pair c={b.x+b.w-60,b.y+b.h-20};
-		if(ui_button((rect){c.x,c.y,60,20},"Ok",ms.grid.row>=0)||choose){
+		if(ui_button((rect){c.x,c.y,60,20},"OK",ms.grid.row>=0)||choose){
 			lv*nf=ms.grid.table->lv[1]->lv[ms.grid.row];modal_exit(1);
 			if(uimode==mode_object){ob_edit_prop("font",nf);}
 			else if(wid.ft&&wid.cursor.x!=wid.cursor.y){pair c=wid.cursor;field_stylespan(nf,lmistr(""));wid.cursor=c;mark_dirty();}
@@ -1338,7 +1338,7 @@ void modals(){
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Font/Deck Accessory Mover",FONT_MENU,1);
 		rect lgrid={b.x            ,b.y+15 ,100    ,b.h-(15+15+5+20)};
 		rect rgrid={b.x+b.w-lgrid.w,lgrid.y,lgrid.w,lgrid.h         };
-		if(ui_button((rect){rgrid.x+(rgrid.w-80)/2,b.y+b.h-20,80,20},"Ok",1)||ev.exit)modal_exit(0);
+		if(ui_button((rect){rgrid.x+(rgrid.w-80)/2,b.y+b.h-20,80,20},"OK",1)||ev.exit)modal_exit(0);
 		ui_table(lgrid,2,16,lgrid.w-38,"Is",&ms.grid );if(ms.grid .row>-1)ms.grid2.row=-1;
 		ui_table(rgrid,2,16,rgrid.w-38,"Is",&ms.grid2);if(ms.grid2.row>-1)ms.grid .row=-1;
 		draw_vline(lgrid.x+lgrid.w,lgrid.y+lgrid.h+5,b.y+b.h,18);
@@ -1475,10 +1475,10 @@ void modals(){
 	}
 	else if(ms.type==modal_alert){
 		rect b=modal_rtext((pair){0,5+20});
-		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"Ok",1)||ev.exit)modal_exit(0);
+		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"OK",1)||ev.exit)modal_exit(0);
 	}
 	else if(ms.type==modal_confirm){
-		rect b=modal_rtext((pair){0,5+20});char*v=ms.verb?ls(ms.verb)->sv:"Ok";
+		rect b=modal_rtext((pair){0,5+20});char*v=ms.verb?ls(ms.verb)->sv:"OK";
 		pair vs=font_textsize(FONT_MENU,v);vs.x=MIN(MAX(60,vs.x+10),200-65); pair c={b.x+b.w-vs.x,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,vs.x,20},v,1))modal_exit(1);c.x-=65;
 		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_exit(0);
@@ -1486,12 +1486,12 @@ void modals(){
 	else if(ms.type==modal_input){
 		rect b=modal_rtext((pair){0,5+20+5+20});
 		ui_field((rect){b.x,b.y+b.h-(20+5+20),b.w,20},&ms.text);
-		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"Ok",1)||ev.exit)modal_exit(0);
+		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"OK",1)||ev.exit)modal_exit(0);
 	}
 	else if(ms.type==modal_choose_lil){
 		rect b=modal_rtext((pair){0,5+60+5+20});
 		int choose=ui_table((rect){b.x,b.y+b.h-(20+5+60),b.w,60},0,0,0,"s",&ms.grid);
-		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"Ok",ms.grid.row>=0)||choose)modal_exit(1);
+		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"OK",ms.grid.row>=0)||choose)modal_exit(1);
 	}
 	else if(ms.type==modal_brush){
 		pair grid={6,4};int ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY);
@@ -1536,7 +1536,7 @@ void modals(){
 		dr.grid_size.x=ln(rtext_all(ms.name.table));dr.grid_size.x=MAX(1,dr.grid_size.x);
 		dr.grid_size.y=ln(rtext_all(ms.text.table));dr.grid_size.y=MAX(1,dr.grid_size.y);
 		pair c={b.x,b.y+b.h-20};
-		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"Ok",1)||ev.exit)modal_exit(1);
+		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
 	else if(ms.type==modal_deck_props){
 		rect b=draw_modalbox((pair){220,100});
@@ -1550,7 +1550,7 @@ void modals(){
 		pair c={b.x,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))setscript(deck),modal_exit(0);c.x+=65;
 		if(ui_button((rect){c.x,c.y,60,20},"Protect...",1))modal_enter(modal_save_locked);
-		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"Ok",1)||ev.exit)modal_exit(1);
+		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
 	else if(ms.type==modal_card_props){
 		rect b=draw_modalbox((pair){220,100});lv*card=ifield(deck,"card");
@@ -1563,7 +1563,7 @@ void modals(){
 		}
 		pair c={b.x,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))setscript(card),modal_exit(0);
-		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"Ok",1)||ev.exit)modal_exit(1);
+		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
 	else if(ms.type==modal_button_props){
 		rect b=draw_modalbox((pair){220,170});lv*button=ob.sel->lv[0];
@@ -1582,7 +1582,7 @@ void modals(){
 		pair c={b.x,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))setscript(button),modal_exit(0); c.x+=65;
 		if(ui_button((rect){c.x,c.y,60,20},"Action...",1))modal_enter(modal_action);
-		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"Ok",1)||ev.exit)modal_exit(1);
+		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
 	else if(ms.type==modal_field_props){
 		rect b=draw_modalbox((pair){220,170+60});lv*f=ob.sel->lv[0];field p=unpack_field(f,NULL);
@@ -1607,7 +1607,7 @@ void modals(){
 		if(ui_radio((rect){ab.x,ab.y,b.w/2,16},"Align Right",1,align==align_right )){iwrite(f,lmistr("align"),lmistr("right" )),mark_dirty();}ab.y+=16;
 		pair c={b.x,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))setscript(f),modal_exit(0);
-		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"Ok",1)||ev.exit)modal_exit(1);
+		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
 	else if(ms.type==modal_slider_props){
 		rect b=draw_modalbox((pair){220,170});lv*f=ob.sel->lv[0];
@@ -1629,7 +1629,7 @@ void modals(){
 		draw_text((rect){ib.x+5,ib.y+2,40,20},"Step",FONT_MENU,1);ui_field((rect){ib.x+40,ib.y,b.w/2-40,18},&ms.form2);ib.y+=20;
 		pair c={b.x,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))setscript(f),modal_exit(0);
-		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"Ok",1)||ev.exit)modal_exit(1);
+		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
 	else if(ms.type==modal_canvas_props){
 		rect b=draw_modalbox((pair){220,125});lv*canvas=ob.sel->lv[0];
@@ -1644,7 +1644,7 @@ void modals(){
 		if(ui_checkbox((rect){cb.x,cb.y,b.w,16},"Border",1,border)){border^=1;iwrite(canvas,lmistr("border"),lmn(border)),mark_dirty();}
 		pair c={b.x,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))setscript(canvas),modal_exit(0);
-		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"Ok",1)||ev.exit)modal_exit(1);
+		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
 	else if(ms.type==modal_grid_props){
 		rect b=draw_modalbox((pair){220,140});lv*grid=ob.sel->lv[0];
@@ -1663,14 +1663,14 @@ void modals(){
 		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))setscript(grid),modal_exit(0);c.x+=65;
 		lv*w=ifield(grid,"widths");
 		if(ui_button((rect){c.x,c.y,90,20},"Reset Widths",w->c))iwrite(grid,lmistr("widths"),lml(0)),mark_dirty();
-		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"Ok",1)||ev.exit)modal_exit(1);
+		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
 	else if(ms.type==modal_action){
 		rect b=draw_modalbox((pair){220,180});
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Button Action",FONT_MENU,1);
 		pair c={b.x+b.w-60,b.y+b.h-20};
 		int ready=(ms.act_go||ms.act_sound)&&(ms.act_go?(ms.act_gomode!=4||ms.verb->c):1)&&(ms.act_sound?(ms.message->c):1);
-		if(ui_button((rect){c.x,c.y,60,20},"Ok",ready))modal_exit(1);c.x-=65;
+		if(ui_button((rect){c.x,c.y,60,20},"OK",ready))modal_exit(1);c.x-=65;
 		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_exit(0);
 		if(ui_checkbox((rect){b.x,b.y+20,b.w/2,16},"Go to Card",1,ms.act_go))ms.act_go^=1; pair cr={b.x,b.y+36};
 		if(ui_radio((rect){cr.x+5,cr.y,80,16},"First"   ,ms.act_go,ms.act_gomode==0))ms.act_gomode=0;cr.y+=16;
