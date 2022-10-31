@@ -78,11 +78,11 @@ The data block types used by Decker are as follows:
 
 	- `2`: a run-length encoded (RLE) 8-bit image. In each pair of bytes, the first byte indicates a pattern number (See: _Pattern Record_), and the second byte indicates the number of pixels to assign with this pattern, scanning in rows, left-to-right. RLE provides a substantially more compact lossless representation of low-complexity images without requiring a complicated encoder or decoder.
 
-- `FNT` a _font record_. The format is always `0`. Decker fonts define glyphs corresponding to printable ASCII excluding the space character (33-126; 95 glyphs total), an extra glyph representing an ellipsis (for truncating text on display), as well as some metadata to permit different font sizes and variable-width glyphs. The payload has the following structure:
+- `FNT` a _font record_. The format is always `0`. Decker fonts define glyphs corresponding to printable ASCII including the space character (32-126; 95 glyphs total), an extra glyph representing an ellipsis (for truncating text on display), as well as some metadata to permit different font sizes and variable-width glyphs. The payload has the following structure:
 
 	- 1 unsigned byte: the maximum width of each glyph in the font, in pixels.
 	- 1 unsigned byte: the height of glyphs, in pixels, including all vertical padding.
-	- 1 unsigned byte: the number of horizontal pixels to advance for a space character.
+	- 1 unsigned byte: the number of horizontal pixels to advance between characters.
 	- 96 glyph records, each consisting of:
 		- 1 unsigned byte giving the _true_ width of the glyph: how many pixels to advance horizontally after drawing the glyph.
 		- `(width/8)*height` bytes of packed image data, in which each byte represents 8 horizontally adjacent pixels. Glyphs with a width that is not evenly divisible by 8 will be padded with 0 bits. Note the similarity to `IMG0`.
