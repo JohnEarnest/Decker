@@ -911,7 +911,7 @@ ui_list    =(r,              value)=>widget_grid(null,{size:r,font:FONT_BODY,wid
 
 listen_show=(align,bare,x)=>{
 	frame=context;while(li.hist.length>=LISTEN_LINES)li.hist.shift()
-	li.hist.push([draw_lil(rsub(LISTEN_SIZE(),rect(18,5)),align,bare,x),(align==ALIGN.left&&bare)?x:NONE])
+	li.hist.push([draw_lil(rsub(LISTEN_SIZE(),rect(18,5)),align,bare,x),x])
 	li.scroll=RTEXT_END
 }
 n_show=(a)=>{if(a.length<2){listen_show(ALIGN.right,0,a[0])}else{listen_show(ALIGN.right,1,lms(a.map(show).join(' ')))};return a[0]}

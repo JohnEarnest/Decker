@@ -764,7 +764,7 @@ lv* draw_lil(pair size,int align,int bare,lv*x){
 #define LISTEN_H 100
 void listen_show(int align,int bare,lv*x){
 	frame=context;while(li.hist->c>=LISTEN_LINES)ll_unshift(li.hist);
-	ll_add(li.hist,lml2(draw_lil((pair){LISTEN_W-18,LISTEN_H-5},align,bare,x),(align==align_left&&bare)?x:NONE));
+	ll_add(li.hist,lml2(draw_lil((pair){LISTEN_W-18,LISTEN_H-5},align,bare,x),x));
 	li.scroll=RTEXT_END;
 }
 lv* n_show(lv*self,lv*a){
