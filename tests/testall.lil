@@ -290,6 +290,11 @@ show[select  value by    2       from ("One","Two")          ] # "by"      gives
 show[select  value orderby 2 asc from ("One","Two")          ] # "orderby" gives non-list
 x:321 show[select x from (insert a:"x","y" b:1,2 into 0)] # do not shadow visible variables with query internal iterators
 
+e:insert c:""split"ABBBABABABABAAABA" n:(7,7,2,4,4,0,3,4,2,0,9,7,4,6,8,2,3) into 0
+show[select c n orderby (c join n) asc from e] # orderby should lexicographically sort tuples
+e:insert n:((list 7,7,2),(list 9,0),(list list 2),(list 3,4),(list 7,7,1),(list 9,2)) into 0
+show[select index n orderby n asc from e] # tolerate mixed-length tuples
+
 # fun with queries as loops
 file: "foo 1 2\nbar 3 4\nbaz 5 6"
 cells: extract list " " split value by index from ("\n" split file)

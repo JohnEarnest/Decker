@@ -315,7 +315,7 @@ In a `select`, `extract` or `update`, clauses are carried out in the following o
 
 - rows are filtered down to only those with a truthy result in the `where` clause. (The implicit `index` column represents their original row numbers.)
 - rows are grouped by the values in the `by` clause, in order of appearance. (The implicit `gindex` column represents each row's original index within its group, and the implicit `group` column represents the index of the group each row belongs to.)
-- each group is sorted according to the values in the `orderby` clause, either ascending (`asc`) or descending (`desc`). As with `<` and `>`, numbers are sorted by value, and anything else is sorted lexicographically by its string equivalent.
+- each group is sorted according to the values in the `orderby` clause, either ascending (`asc`) or descending (`desc`). Lists are sorted lexicographically, numbers are sorted by value, and anything else is sorted lexicographically by its string equivalent.
 - for each group, result columns are computed.
 - for each group, result columns are _rectangularized_: the group will have as many result rows as the column of maximum `count`.
 - rows are ungrouped: result rows across all groups are concatenated, preserving their grouped order. (This may change the _overall_ order- see `update` if you want to preserve it.)
@@ -391,6 +391,17 @@ select name job by job orderby name asc from people     # sort names within each
 # | "Thomas" | "Developer"  |
 # | "Sam"    | "Sales"      |
 # | "Walter" | "Accounting" |
+# +----------+--------------+
+
+select name job orderby (job join name) asc from people     # sort by multiple columns
+# +----------+--------------+
+# | name     | job          |
+# +----------+--------------+
+# | "Walter" | "Accounting" |
+# | "Alice"  | "Developer"  |
+# | "Sara"   | "Developer"  |
+# | "Thomas" | "Developer"  |
+# | "Sam"    | "Sales"      |
 # +----------+--------------+
 ```
 

@@ -512,9 +512,15 @@ runop=_=>{
 			const o=dyad.take(ct,lml(ll(arg()))),b=dyad.take(ct,lml(ll(arg()))),w=dyad.take(ct,lml(ll(arg()))),r=monad.rows(t)
 			const uk=r.v.reduce((x,_,z)=>{if(lb(w.v[z]))dset(x,b.v[z],b.v[z]);return x},lmd([],[]))
 			const rows=uk.v.map((v,group)=>{ // sort groups, select rows
+				const lex_list=(x,y,a,ix)=>{
+					if(x.length<ix&&y.length<ix)return 0;const xv=x[ix]||NONE,yv=y[ix]||NONE
+					return lex_less(xv,yv)?a: lex_more(xv,yv)?!a: lex_list(x,y,a,ix+1)
+				}
+				const lex_less=(a,b)=>lil(a)&&lil(b)? lex_list(a.v,b.v,1,0): lb(dyad['<'](a,b))
+				const lex_more=(a,b)=>lil(a)&&lil(b)? lex_list(a.v,b.v,0,0): lb(dyad['>'](a,b))
 				const gp=range(r.v.length).filter(x=>lb(w.v[x])&&match(v,b.v[x])).sort((a,b)=>{
-					if(lb(dyad['<'](o.v[a],o.v[b])))return  order_dir
-					if(lb(dyad['>'](o.v[a],o.v[b])))return -order_dir
+					if(lex_less(o.v[a],o.v[b]))return  order_dir
+					if(lex_more(o.v[a],o.v[b]))return -order_dir
 					return a-b // produce a stable sort
 				})
 				return monad.table(lml(gp.map((v,z)=>{const t=r.v[v];dset(t,lms('gindex'),lmn(z)),dset(t,lms('group'),lmn(group));return t})))

@@ -777,10 +777,17 @@ lv* env_bind(lv*e,lv*k,lv*v){lv*r=lmenv(e);EACH(z,k)env_local(r,k->lv[z],z<v->c?
 #define getpc()        idx_peek(&state.pcs)
 
 lv*order_vec=NULL;int order_dir=0; // this is gross. qsort() is badly designed, and qsort_r is unportable.
+int lex_less(lv*a,lv*b);int lex_more(lv*a,lv*b);// forward refs
+int lex_list(lv*x,lv*y,int a,int ix){
+	if(x->c<ix&&y->c<ix)return 0;lv*xv=x->c>ix?x->lv[ix]:NONE,*yv=y->c>ix?y->lv[ix]:NONE;
+	return lex_less(xv,yv)?a: lex_more(xv,yv)?!a: lex_list(x,y,a,ix+1);
+}
+int lex_less(lv*a,lv*b){return lil(a)&&lil(b)? lex_list(a,b,1,0): lb(l_less(a,b));}
+int lex_more(lv*a,lv*b){return lil(a)&&lil(b)? lex_list(a,b,0,0): lb(l_more(a,b));}
 int orderby(const void*av,const void*bv){
 	int a=*(int*)av,b=*(int*)bv;
-	if(lb(l_less(order_vec->lv[a],order_vec->lv[b])))return  order_dir;
-	if(lb(l_more(order_vec->lv[a],order_vec->lv[b])))return -order_dir;
+	if(lex_less(order_vec->lv[a],order_vec->lv[b]))return  order_dir;
+	if(lex_more(order_vec->lv[a],order_vec->lv[b]))return -order_dir;
 	return a-b; // produce a stable sort
 }
 void docall(lv*f,lv*a,int tail){
