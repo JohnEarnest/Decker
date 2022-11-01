@@ -814,7 +814,7 @@ widget_field=(target,x,value)=>{
 }
 field_showcursor=_=>{
 	const b=wid.f.size, bi=inset(b,2);if(wid.f.scrollbar)bi.w-=ARROWS[0].size.x+3
-	const fnt=wid.f.font?wid.f.font: wid.f.style==field_code?FONT_MONO: FONT_BODY
+	const fnt=wid.f.font?wid.f.font: wid.f.style=='code'?FONT_MONO: FONT_BODY
 	const layout=layout_richtext(deck,wid.fv.table,fnt,wid.f.align,bi.w), os=wid.fv.scroll
 	const c=layout_cursor(layout,wid.cursor.y,fnt,wid.f), ch=min(bi.h,c.h);c.y-=wid.fv.scroll
 	if(c.y<0){wid.fv.scroll+=c.y}if(c.y+ch>=bi.h){wid.fv.scroll+=((c.y+ch)-bi.h)}
@@ -869,7 +869,7 @@ field_input=text=>{
 }
 field_keys=(code,shift)=>{
 	const b=wid.f.size, bi=inset(b,2);if(wid.f.scrollbar)bi.w-=ARROWS[0].size.x+3
-	const fnt=wid.f.font?wid.f.font: wid.f.style==field_code?FONT_MONO: FONT_BODY, layout=layout_richtext(deck,wid.fv.table,fnt,wid.f.align,bi.w)
+	const fnt=wid.f.font?wid.f.font: wid.f.style=='code'?FONT_MONO: FONT_BODY, layout=layout_richtext(deck,wid.fv.table,fnt,wid.f.align,bi.w)
 	let m=0, s=wid.cursor.x!=wid.cursor.y
 	const l=wid.cursor.y>=layout.layout.length?layout.lines.length-1:layout.layout[wid.cursor.y].line, c=layout_cursor(layout,wid.cursor.y,fnt,wid.f)
 	if(code=='ArrowLeft'   ){m=1;if(s&&!shift){wid.cursor.x=wid.cursor.y=min(wid.cursor.x,wid.cursor.y)}else{wid.cursor.y--}}
@@ -2814,8 +2814,10 @@ docopy=_=>{
 dopaste=x=>{
 	if(ms.type==null&&/^%%IMG[012]/.test(x)){
 		const i=image_read(x);if(i.size.x==0||i.size.y==0)return
-		if(wid.fv){field_edit(lms(''),i,'i',wid.cursor)}
-		else{setmode('draw'),bg_paste(i)}
+		if(wid.fv){
+			if(wid.f.style!='rich'){field_input(x)}
+			else{field_edit(lms(''),i,'i',wid.cursor)}
+		}else{setmode('draw'),bg_paste(i)}
 	}
 	else if(ms.type=='recording'&&au.mode=='stopped'&&/^%%SND0/.test(x)){sound_edit(sound_replace(sound_read(x)))}
 	else if(ms.type==null&&/^%%WGT0/.test(x)){setmode('object'),card_paste(ifield(deck,'card'),lms(x))}

@@ -2562,6 +2562,7 @@ void object_properties(lv*x){
 }
 void text_edit_menu(){
 	int selection=wid.fv!=NULL&&wid.cursor.x!=wid.cursor.y;
+	int rich=wid.fv!=NULL&&wid.f.style==field_rich;
 	if(menu_item("Undo",wid.hist_cursor>0          ,'z'))field_undo();
 	if(menu_item("Redo",wid.hist_cursor<wid.hist->c,'Z'))field_redo();
 	menu_separator();
@@ -2570,7 +2571,7 @@ void text_edit_menu(){
 		lv*s=rtext_span(wid.fv->table,wid.cursor),*i=rtext_is_image(s);
 		SDL_SetClipboardText((i?image_write(i):rtext_all(s))->sv);
 	}
-	if(has_clip("%%IMG")&&menu_item("Paste Inline Image",wid.fv!=NULL,'v')){
+	if(has_clip("%%IMG")&&rich&&menu_item("Paste Inline Image",wid.fv!=NULL,'v')){
 		char*t=SDL_GetClipboardText();field_edit(lmistr(""),image_read(lmcstr(t)),"i",wid.cursor);SDL_free(t);
 	}
 	else if(menu_item("Paste",wid.fv!=NULL&&SDL_HasClipboardText(),'v')){
