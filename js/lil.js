@@ -376,9 +376,9 @@ parse=text=>{
 		else{co=lmblk(),blk_get(co,lms('index'))}if(!match('from'))er(`Expected 'from'.`)
 		expr(b),blk_op1(b,'@tab')
 		blk_lit(b,cw),blk_op(b,op.COL),blk_lit(b,cb),blk_op(b,op.COL),blk_lit(b,co),blk_op(b,op.COL),blk_lit(b,lmn(dir)),blk_opa(b,op.QUERY,func=='@upd')
-		const keys=lml(cols.k.concat([lms('@index')]))
-		blk_op(b,op.ITER);const head=blk_here(b);blk_lit(b,['x']);const each=blk_opa(b,op.EACH,0);
-			blk_lit(b,keys),blk_get(b,lms('x')),cols.v.map(x=>(blk_lit(b,x),blk_op(b,op.COL)))
+		const keys=lml(cols.k.concat([lms('@index')])),name=tempname()
+		blk_op(b,op.ITER);const head=blk_here(b);blk_lit(b,[ls(name)]);const each=blk_opa(b,op.EACH,0);
+			blk_lit(b,keys),blk_get(b,name),cols.v.map(x=>(blk_lit(b,x),blk_op(b,op.COL)))
 			blk_lit(b,index),blk_op(b,op.COL),blk_op(b,op.DROP),blk_opa(b,op.BUND,count(keys)),blk_op2(b,'dict')
 		blk_opa(b,op.NEXT,head),blk_sets(b,each,blk_here(b)),blk_lit(b,keys),blk_op3(b,func)
 	}

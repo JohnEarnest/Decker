@@ -288,6 +288,7 @@ show[update job:"Farmer" where job="Plumber" from ppl        ] # update  changes
 show[select  value where 2       from ("One","Two")          ] # "where"   gives non-boolvec
 show[select  value by    2       from ("One","Two")          ] # "by"      gives non-list
 show[select  value orderby 2 asc from ("One","Two")          ] # "orderby" gives non-list
+x:321 show[select x from (insert a:"x","y" b:1,2 into 0)] # do not shadow visible variables with query internal iterators
 
 # fun with queries as loops
 file: "foo 1 2\nbar 3 4\nbaz 5 6"

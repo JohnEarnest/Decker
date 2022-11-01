@@ -668,7 +668,7 @@ void parsequery(lv*b,char*op,int dcol){
 	expr(b),blk_op1(b,"@tab");
 	blk_lit(b,cw),blk_op(b,COL);blk_lit(b,cb),blk_op(b,COL);blk_lit(b,co),blk_op(b,COL);
 	blk_lit(b,lmn(dir));blk_opa(b,QUERY,!strcmp(op,"@upd"));
-	lv*name=lmistr("x"),*names=l_list(name),*keys=l_comma(l_range(cols),lmistr("@index"));
+	lv*name=tempname(),*names=l_list(name),*keys=l_comma(l_range(cols),lmistr("@index"));
 	blk_op(b,ITER);int head=blk_here(b);blk_lit(b,names);
 	int each=blk_opa(b,EACH,0);
 		blk_lit(b,keys);blk_get(b,name);EACH(z,cols){blk_lit(b,cols->lv[z]);blk_op(b,COL);}
