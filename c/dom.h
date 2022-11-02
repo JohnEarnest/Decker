@@ -659,7 +659,7 @@ void draw_icon(pair pos,lv*i,int pattern){
 	for(int a=0;a<s.y;a++)for(int b=0;b<s.x;b++)if(i->b->sv[b+(a*s.x)]&&inclip(pos.x+b,pos.y+a))PIX(pos.x+b,pos.y+a)=pattern;
 }
 void draw_rect(rect r,int pattern){for(int a=r.y;a<r.y+r.h;a++)for(int b=r.x;b<r.x+r.w;b++)if(inclip(b,a))PIX(b,a)=pattern;}
-void draw_invert_raw(char*pal,rect r){for(int a=r.y;a<r.y+r.h;a++)for(int b=r.x;b<r.x+r.w;b++)if(inclip(b,a))PIX(b,a)=1^draw_pattern(pal,PIX(b,a),b,a);}
+void draw_invert_raw(char*pal,rect r){for(int a=r.y;a<r.y+r.h;a++)for(int b=r.x;b<r.x+r.w;b++)if(inclip(b,a))PIX(b,a)=1^draw_pattern(pal,0xFF&PIX(b,a),b,a);}
 void draw_line(rect r,int brush,int pattern){
 	int dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1; while(1){
 		for(int b=0;b<8;b++)for(int a=0;a<8;a++)if(BSH(brush,a,b)&&inclip(r.x+a-3,r.y+b-3))PIX(r.x+a-3,r.y+b-3)=pattern;
@@ -1185,8 +1185,8 @@ lv* n_canvas_line(lv*self,lv*z){
 	for(int z=0;z<poly_count-1;z++)draw_line(rect_pair(pcast(poly[z]),pcast(poly[z+1])),frame.brush,frame.pattern);return NONE;
 }
 lv* n_canvas_merge(lv*self,lv*z){
-	pick_canvas(self);for(int y=0;y<frame.size.y;y++)for(int x=0;x<frame.size.x;x++){
-		if(!inclip(x,y))continue;int p=PIX(x,y),c=0;
+	pick_canvas(self);if(lil(l_first(z)))z=l_first(z);for(int y=0;y<frame.size.y;y++)for(int x=0;x<frame.size.x;x++){
+		if(!inclip(x,y))continue;int p=0xFF&PIX(x,y),c=0;
 		if(p<z->c&&image_is(z->lv[p])&&!is_empty(z->lv[p])){lv*i=z->lv[p];pair s=image_size(i);c=i->b->sv[(x%s.x)+(y%s.y)*s.x];}
 		PIX(x,y)=c;
 	}return NONE;

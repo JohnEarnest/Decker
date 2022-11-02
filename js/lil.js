@@ -1688,7 +1688,7 @@ canvas_read=(x,card)=>{
 				return NONE
 			})
 			if(ikey(i,'merge'))return lmnat(z=>{
-				canvas_pick(self);const nice=x=>x&&image_is(x)&&x.size.x>0&&x.size.y>0, size=frame.image.size
+				canvas_pick(self);if(lil(z[0]))z=ll(z[0]);const nice=x=>x&&image_is(x)&&x.size.x>0&&x.size.y>0, size=frame.image.size
 				for(let y=0;y<size.y;y++)for(let x=0;x<size.x;x++){
 					const h=rect(x,y);if(!inclip(h))continue;let p=gpix(h),c=0;
 					if(nice(z[p])){const i=z[p];c=i.pix[(x%i.size.x)+(y%i.size.y)*i.size.x]}
