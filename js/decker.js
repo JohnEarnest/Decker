@@ -2472,7 +2472,7 @@ all_menus=_=>{
 				if(menu_item('Unindent'      ,1    ))field_indent(0)
 				if(menu_item('Toggle Comment',1,'/'))field_comment()
 			}
-			if(wid.f.style!='code'){
+			if(wid.f&&wid.f.style!='code'){
 				if(menu_item('Font...',!has_parent(card)&&wid.f.style!='plain'))modal_enter('fonts')
 			}
 		}
