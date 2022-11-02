@@ -396,7 +396,7 @@ lv* interface_image(lv*self,lv*i,lv*x){
 	if(i&&lil(i)){ // read/write pixels
 		pair p=getpair(i);int ib=p.x>=0&&p.y>=0&&p.x<s.x&&p.y<s.y;
 		if(x){if(ib)self->b->sv[p.x+p.y*s.x]=0xFF&(int)ln(x);return x;}
-		return ib?lmn(self->b->sv[p.x+p.y*s.x]):NONE;
+		return ib?lmn(0xFF&(self->b->sv[p.x+p.y*s.x])):NONE;
 	}
 	ikey("size"     ){if(x){image_resize(self,getpair(x));return x;}return lmpair(s);}
 	ikey("map"      )return lmnat(n_image_map,self);
