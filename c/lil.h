@@ -1074,7 +1074,7 @@ int frame_count=0;
 #define PLATFORM "other"
 #endif
 lv*interface_sys(lv*self,lv*i,lv*x){
-	if(x&&lis(i)){if(!strcmp(i->sv,"seed")){seed=(int)ln(x);return x;}}
+	if(x&&lis(i)){if(!strcmp(i->sv,"seed")){seed=0xFFFFFFFF&(long long int)ln(x);return x;}}
 	else if(lis(i)){
 		if(!strcmp(i->sv,"version")){return lmistr(VERSION);}
 		if(!strcmp(i->sv,"platform")){return lmistr(PLATFORM);}
