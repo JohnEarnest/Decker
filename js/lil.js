@@ -833,7 +833,7 @@ anchor=(r,a)=>{
 }
 unpack_rect=(z,size)=>{
 	let s=size||frame.image.size, v=rect(0,0,s.x,s.y)
-	if(z.length>=1){const a=getpair(z[0]),b=getpair(z[1]);if(b.x<0)a.x+=1+b.x,b.x*=-1;if(b.y<0)a.y+=1+b.y,b.y*=-1;v=rpair(a,b)}
+	if(z.length>=1){const a=rint(getpair(z[0])),b=rint(getpair(z[1]));if(b.x<0)a.x+=1+b.x,b.x*=-1;if(b.y<0)a.y+=1+b.y,b.y*=-1;v=rpair(a,b)}
 	return anchor(v,z[2])
 }
 unpack_poly=z=>{

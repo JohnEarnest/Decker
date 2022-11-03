@@ -1348,6 +1348,12 @@ assert_image["canvas merge"
 	c.copy[]
 ]
 
+deck:readdeck[]
+c:deck.card.add["canvas"]
+c.size:5,7
+c.rect[0,7 5,-2.3]
+assert["rect fill negative rounding" "%%IMG2AAUABwAeAQU=" c.copy[].encoded]
+
 #######################################
 #
 #  Deck
