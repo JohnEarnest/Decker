@@ -944,6 +944,7 @@ lv*n_printf(lv*a,int newline,FILE*out){
 	if(newline)fprintf(out,"\n");return a;
 }
 lv*n_error(lv*self,lv*a){(void)self;return n_printf(a,1,stderr);}
+#define fchar(x) (x=='I'?'i': x=='B'?'b': x=='L'?'s': x)
 lv*n_readcsv(lv*self,lv*a){
 	#define cm(x) t->sv[i]==x?(i++,1):0
 	#define css   while(cm(' ')){}
@@ -959,7 +960,7 @@ lv*n_readcsv(lv*self,lv*a){
 		css;str val=str_new();
 		if(cm('"'))while(i<t->c)if(cm('"')){if(cm('"'))str_addc(&val,'"');else break;}else str_addc(&val,t->sv[i++]);
 		else{while(i<t->c&&!strchr("\n\"",t->sv[i])&&t->sv[i]!=delim)str_addc(&val,t->sv[i++]);}
-		if(n<s->c&&s->sv[n]!='_'){char f[]={'%',s->sv[n],0};ll_add(r->lv[slot++],l_parse(lmcstr(f),lmstr(val)));}
+		if(n<s->c&&s->sv[n]!='_'){char f[]={'%',fchar(s->sv[n]),0};ll_add(r->lv[slot++],l_parse(lmcstr(f),lmstr(val)));}
 		else{free(val.sv);}n++;
 		if(i>=t->c||t->sv[i]=='\n'){
 			while(n<s->c){char u=s->sv[n++];if(u!='_'&&slot<slots)ll_add(r->lv[slot++],strchr("sluro",u)?lms(0):NONE);}
@@ -977,7 +978,7 @@ lv*n_writecsv(lv*self,lv*a){
 	for(int z=0;z<t->n;z++){
 		str_addc(&r,'\n');int n=0;EACH(c,s)if(s->sv[c]!='_'){
 			if(n++)str_addc(&r,delim);
-			str rc=str_new();format_type_simple(&rc,c>=t->c?lms(0):t->lv[c]->lv[z],s->sv[c]);lv*o=lmstr(rc);
+			str rc=str_new();format_type_simple(&rc,c>=t->c?lms(0):t->lv[c]->lv[z],fchar(s->sv[c]));lv*o=lmstr(rc);
 			int e=0;EACH(z,o)e|=(!!strchr("\n\"",o->sv[z]))||o->sv[z]==delim;
 			if(e)str_addc(&r,'"');EACH(z,o){if(o->sv[z]=='"')str_addc(&r,'"');str_addc(&r,o->sv[z]);}if(e)str_addc(&r,'"');
 		}

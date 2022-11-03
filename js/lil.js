@@ -530,6 +530,7 @@ runop=_=>{
 	}while(running()&&getpc()>=blk_here(getblock()))descope()
 }
 
+fchar=x=>x=='I'?'i': x=='B'?'b': x=='L'?'s': x
 n_writecsv=([x,y,d])=>{
 	let r='', spec=y?ls(y).split(''):[];const t=lt(x), c=Object.keys(t.v).length; d=d?ls(d)[0]:','
 	while(spec.length<c)spec.push('s')
@@ -537,7 +538,7 @@ n_writecsv=([x,y,d])=>{
 	rows(t).v.forEach(row=>{
 		r+='\n';let n=0, cols=Object.keys(row.v);spec.forEach((x,i)=>{
 			if(x=='_')return;if(n)r+=d;n++
-			const sv=dyad.format(lms('%'+x),row.v[cols[i]]).v; r+=(/["\n]/.test(sv)||sv.indexOf(d)>=0?`"${sv.replace(/"/g,'""')}"`:sv)
+			const sv=dyad.format(lms('%'+fchar(x)),row.v[cols[i]]).v; r+=(/["\n]/.test(sv)||sv.indexOf(d)>=0?`"${sv.replace(/"/g,'""')}"`:sv)
 		})
 	});return lms(r)
 }
@@ -556,7 +557,7 @@ n_readcsv=([x,y,d])=>{
 		if(spec[n]&&spec[n]!='_'){
 			const k=Object.keys(r.v)[slot], x=(val[0]||'').toLowerCase(), s=spec[n]
 			let sign=1,o=0; if(val[o]=='-')sign=-1,o++;if(val[o]=='$')o++;
-			r.v[k].push(dyad.parse(lms('%'+s),lms(val))),slot++
+			r.v[k].push(dyad.parse(lms('%'+fchar(s)),lms(val))),slot++
 		};n++
 		if(i>=text.length||text[i]=='\n'){
 			while(n<spec.length){const u=spec[n++];if(u!='_'&&slot<slots)r.v[Object.keys(r.v)[slot++]].push(u=='s'?lms(''):NONE);}
