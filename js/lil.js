@@ -615,7 +615,7 @@ interface_system=lmi((self,i,x)=>{
 	if(lis(i)&&i.v=='seed'     )return lmn(seed)
 	if(lis(i)&&i.v=='frame'    )return lmn(frame_count)
 	if(lis(i)&&i.v=='now'      )return lmn(0|(new Date().getTime()/1000))
-	if(lis(i)&&i.v=='ms'       )return lmn(Date.now())
+	if(lis(i)&&i.v=='ms'       )return lmn(0|(Date.now()))
 	if(lis(i)&&i.v=='workspace')return lmd(['allocs','depth'].map(lms),[allocs,calldepth].map(lmn))
 	return x?x:NONE
 },'system')
