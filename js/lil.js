@@ -2063,7 +2063,7 @@ n_go=([x,t],deck)=>{
 	}if(r!=null){go_notify(deck,r,t,x),deck.card=r;if(i!=r)deck.history.push(r)}else{go_notify(deck,-1,t,x)}return lmn(deck.card)
 }
 n_sleep=([z])=>{if(lis(z)&&ls(z)=='play'){sleep_play=1}else{sleep_frames=max(1,ln(z))};return z}
-n_transition=(f,deck)=>{const t=deck.transit;if(f.t=='on')dset(t,lms(f.n),f);return t}
+n_transition=(f,deck)=>{const t=deck.transit;if(lion(f))dset(t,lms(f.n),f);return t}
 
 constants=env=>{
 	env.local('sys'    ,interface_system)
