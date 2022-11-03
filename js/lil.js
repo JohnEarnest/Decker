@@ -1206,7 +1206,7 @@ image_paste=(r,clip,src,dst,opaque)=>{
 	for(let y=0;y<s.y;y++)for(let x=0;x<s.x;x++)if(rin(clip,rect(r.x+x,r.y+y))&&(opaque||src.pix[x+s.x*y]))dst.pix[r.x+x+ds.x*(r.y+y)]=src.pix[x+s.x*y]
 }
 image_paste_scaled=(r,clip,src,dst,opaque)=>{
-	if(r.w==0||r.h==0)return;const s=src.size,ds=dst.size;if(r.w==s.x&&r.h==s.y)return image_paste(r,clip,src,dst,opaque)
+	r=rint(r);if(r.w==0||r.h==0)return;const s=src.size,ds=dst.size;if(r.w==s.x&&r.h==s.y)return image_paste(r,clip,src,dst,opaque)
 	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
 		let sx=0|((b*1.0)/r.w)*s.x, sy=0|((a*1.0)/r.h)*s.y, c=src.pix[sx+sy*s.x]
 		if((opaque||c!=0)&&rin(clip,rect(r.x+b,r.y+a)))dst.pix[r.x+b+ds.x*(r.y+a)]=c
