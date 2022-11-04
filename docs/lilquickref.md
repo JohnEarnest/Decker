@@ -28,15 +28,15 @@ Flow
 ----
 - `if bool ... end` `if bool ... else ... end`
 - `each val key index in x ... end`
-- `while x ... end`
+- `while bool ... end`
 - `send name[args]`
 
 Queries
 -------
-- `select  n:x where a by b orderby c asc from d`
-- `update  n:x where a by b orderby c asc from d`
-- `extract n:x where a by b orderby c asc from d`
-- `insert  n:x into d` (into `0` to make new)
+- `select  n:x where a by b orderby c asc from d` reorder, compute, or filter a table
+- `update  n:x where a by b orderby c asc from d` modify rows/columns of a table in place
+- `extract n:x where a by b orderby c asc from d` like select, but yields non-tabular values
+- `insert  n:x into d` append to a table, or `into 0` to make a new table
 - `index`: original row number
 - `gindex`: original index within row's group
 - `group`: index of row's group (by appearance)
