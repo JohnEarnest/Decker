@@ -17,7 +17,7 @@ Primitives
 | :------ | :--------- | :-------------------------------------------------------------------------- |
 | monad   | arithmetic | `-` `!` `floor` `cos` `sin` `tan` `exp` `ln` `sqrt` `mag` `unit` `heading`  |
 | monad   | reducers   | `count` `first` `last` `sum` `min` `max` `raze`                             |
-| monad   | data       | `range` (0...n) `list` (enlist) `rows` `cols` `table` `typeof` `flip`       |
+| monad   | data       | `range` [0...n) `list` (enlist) `rows` `cols` `table` `typeof` `flip`       |
 | dyad    | arithmetic | `+` `-` `*` `/` `%` (y mod x) `^` (pow) `&` (min) <code>\|</code> (max)     |
 | dyad    | logical    | `<` `>` `=` (conforming equal) `~` (match) `unless` (x if y is `0`)         |
 | dyad    | string     | `fuse` `split` `parse` `format`                                             |
@@ -53,5 +53,4 @@ A format is `%*-0N.DX`: `*` skip, `0` pad, `N` width.<br/>
 | `ro`     | Matching | repeat (0 or more in char class), optional (0 or 1 in char class)    |
 | `sula`   | String   | string, uppercase string, lowercase string, ASCII chars              |
 | `bfichH` | Number   | bool, float, int, currency (`-$1.23`), hex lowercase, hex uppercase  |
-| `BIL`    | Grid     | bool, icon (number), locked (string)                                 |
 | `jep`    | Misc.    | JSON, unix epoch, time-parts dictionary                              |
