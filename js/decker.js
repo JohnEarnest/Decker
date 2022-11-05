@@ -1872,7 +1872,7 @@ bg_tools=_=>{
 	if(dr.fatbits){ev.pos=fat_to_card(ev.pos),ev.dpos=fat_to_card(ev.dpos),pointer.prev=fat_to_card(pointer.prev)}
 	if(dr.tool=='pencil'||dr.tool=='line'||dr.tool=='rect'||dr.tool=='fillrect'||dr.tool=='ellipse'||dr.tool=='fillellipse'){
 		let clear=0;if(!dr.scratch)bg_scratch()
-		if(ev.md){bg_scratch(),dr.erasing=ev.rdown}
+		if(ev.md){bg_scratch(),dr.erasing=ev.rdown||ev.shift}
 		else if(ev.mu||ev.drag){
 			const t=frame;frame=draw_frame(dr.scratch)
 			if(dr.tool=='pencil'||dr.erasing){

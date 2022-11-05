@@ -1948,7 +1948,7 @@ void bg_tools(){
 	if(dr.fatbits){ev.pos=fat_to_card(ev.pos),ev.dpos=fat_to_card(ev.dpos),pointer_prev=fat_to_card(pointer_prev);}
 	if(dr.tool==tool_pencil||dr.tool==tool_line||dr.tool==tool_rect||dr.tool==tool_fillrect||dr.tool==tool_ellipse||dr.tool==tool_fillellipse){
 		int clear=0;if(!dr.scratch)bg_scratch();
-		if(ev.md){bg_scratch();dr.erasing=ev.rdown;}
+		if(ev.md){bg_scratch();dr.erasing=ev.rdown||ev.shift;}
 		else if(ev.mu||ev.drag){
 			cstate t=frame;frame=draw_buffer(dr.scratch);
 			if(dr.tool==tool_pencil||dr.erasing){
