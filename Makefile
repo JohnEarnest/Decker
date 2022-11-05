@@ -1,12 +1,12 @@
-VERSION="1.0"
+VERSION="1.1"
 UNAME=$(shell uname)
 SDL=$(shell sdl2-config --cflags --libs)
 
 ifeq ($(UNAME),Darwin)
 	COMPILER=clang
 	FLAGS=-Wall -Werror -Wextra -Wpedantic -Os
-	# FLAGS:=$(FLAGS) -fsanitize=undefined
-	# FLAGS:=$(FLAGS) -fsanitize=address
+	FLAGS:=$(FLAGS) -fsanitize=undefined
+	FLAGS:=$(FLAGS) -fsanitize=address
 endif
 ifeq ($(UNAME),Linux)
 	COMPILER=gcc
@@ -59,7 +59,7 @@ rundecker: decker
 .PHONY: jsres
 js: jsres
 	@mkdir -p js/build/
-	@echo "VERSION=\"${VERSION}\"\n" > js/build/lilt.js
+	@echo "VERSION=\"${VERSION}\"" > js/build/lilt.js
 	@cat js/lil.js js/repl.js >> js/build/lilt.js
 
 testjs: js
@@ -79,3 +79,6 @@ docs:
 	@multimarkdown docs/lilt.md   > docs/lilt.html
 	@multimarkdown docs/decker.md > docs/decker.html
 	@multimarkdown docs/format.md > docs/format.html
+
+bundle: clean docs resources
+	./scripts/mac/bundle.sh $(VERSION)
