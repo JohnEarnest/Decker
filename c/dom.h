@@ -1827,7 +1827,7 @@ lv* interface_card(lv*self,lv*i,lv*x){
 		}
 		ikey("script"){dset(data,i,ls(x));return x;}
 		ikey("image" ){dset(data,i,image_is(x)?x:image_empty());return x;}
-		ikey("index" ){reorder(cards,dgeti(cards,name),ln(x));dset(deck->b,lmistr("history"),lml(0));return x;}
+		ikey("index" ){reorder(cards,dgeti(cards,name),ln(x));dset(deck->b,lmistr("history"),l_list(ifield(self,"index")));return x;}
 	}else{
 		ikey("name"    )return dget(data,i);
 		ikey("size"    )return dget(deck->b,i);
@@ -1938,10 +1938,11 @@ lv* n_deck_remove(lv*self,lv*z){
 	}
 	if(card_is(t)){
 		if(cards->c<=1)return NONE; // cannot delete the last card from a deck
-		dset(data,lmistr("history"),lml(0));
 		EACH(c,cards){lv*card=cards->lv[c];if(ifield(card,"parent")==t){dset(card->b,lmistr("parent"),NONE),widget_removeall(card);}}
 		dset(data,lmistr("cards"),cards=l_drop(dkey(cards,t),cards));dset(t->b,lmistr("dead"),ONE);
-		int n=ln(dget(data,lmistr("card")));if(n>=cards->c)dset(data,lmistr("card"),lmn(cards->c-1));return ONE;
+		int n=ln(dget(data,lmistr("card")));if(n>=cards->c)dset(data,lmistr("card"),lmn(cards->c-1));
+		dset(data,lmistr("history"),l_list(ifield(ifield(self,"card"),"index")));
+		return ONE;
 	}return NONE;
 }
 lv* n_deck_copy(lv*deck,lv*z){
@@ -2022,7 +2023,6 @@ lv* deck_read(lv*x){
 	// assemble the interface:
 	lv*r=lmd(),*ri=lmi(interface_deck,lmistr("deck"),r);
 	if(cards->c==0){lv*a=lmd(),*n=lmistr("home");dset(a,lmistr("name"),n);dset(cards,n,a);}
-	dset(r,lmistr("history"),lml(0));
 	dset(r,lmistr("fonts"  ),fonts);
 	dset(r,lmistr("sounds" ),sounds);
 	{lv*k=lmistr("patterns");dset(r,k,patterns_read(deck));}
@@ -2039,6 +2039,7 @@ lv* deck_read(lv*x){
 	MAP(mdata,modules)modules->lv[z];
 	{lv*k=lmistr("cards"   );cards  =lmd();dset(r,k,cards  );EACH(z,cdata){lv*v=card_read  (cdata->lv[z],ri,cdata);dset(cards  ,ifield(v,"name"),v);}}
 	{lv*k=lmistr("modules" );modules=lmd();dset(r,k,modules);EACH(z,mdata){lv*v=module_read(mdata->lv[z],ri      );dset(modules,ifield(v,"name"),v);}}
+	dset(r,lmistr("history"),l_list(ifield(ifield(ri,"card"),"index")));
 	return ri;
 }
 void esc_write(str*r,int id,lv*x){

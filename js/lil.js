@@ -1815,7 +1815,7 @@ card_read=(x,deck,cdata)=>{
 			}
 			if(ikey(i,'script'))return self.script=ls(x),x
 			if(ikey(i,'image' ))return self.image=image_is(x)?x:image_make(rect()),x
-			if(ikey(i,'index'))return reorder(self.deck.cards,dvix(self.deck.cards,self),ln(x)),self.deck.history=[],x
+			if(ikey(i,'index'))return reorder(self.deck.cards,dvix(self.deck.cards,self),ln(x)),self.deck.history=[ln(ifield(self,'index'))],x
 		}else{
 			if(ikey(i,'name'   ))return lms(self.name)
 			if(ikey(i,'size'   ))return lmpair(deck.size)
@@ -1907,10 +1907,12 @@ deck_remove=(deck,t)=>{
 			card.widgets.v.map(x=>x.dead=true),card.widgets=lmd()
 			card_children(card,child=>widget_removeall(child))
 		}
-		if(count(deck.cards)<=1)return NONE;deck.history=[]
+		if(count(deck.cards)<=1)return 0
 		deck.cards.v.map(card=>{if(ifield(card,'parent')==t){card.parent=0,widget_removeall(card)}})
 		deck.cards=dyad.drop(dkey(deck.cards,t)||NONE,deck.cards),t.dead=true
-		if(deck.card>=count(deck.cards))deck.card=count(deck.cards-1);return 1
+		if(deck.card>=count(deck.cards))deck.card=count(deck.cards-1)
+		deck.history=[ln(ifield(ifield(deck,'card'),'index'))]
+		return 1
 	}return 0
 }
 deck_copy=(deck,z)=>!card_is(z)?NONE: lms(`%%CRD0${fjson(card_write(z))}`)
@@ -1978,7 +1980,6 @@ deck_read=x=>{
 			if(ikey(i,'paste')&&state.external)return lmnat(([x])=>deck_paste(self,x))
 		}return x?x:NONE
 	},'deck')
-	ri.history =[]
 	ri.fonts   =fonts
 	ri.sounds  =sounds
 	ri.cards   =lmd()
@@ -1997,6 +1998,7 @@ deck_read=x=>{
 	pushstate(root),issue(root,parse(DEFAULT_TRANSITIONS));while(running())runop();popstate()
 	Object.keys(cards  ).map(k=>{const v=card_read(cards[k],ri,cards);dset(ri.cards,ifield(v,'name'),v)})
 	Object.keys(modules).map(k=>{const v=module_read(modules[k],ri);dset(ri.modules,ifield(v,'name'),v)})
+	ri.history=[ln(ifield(ifield(ri,'card'),'index'))]
 	return ri
 }
 deck_write=(x,html)=>{
