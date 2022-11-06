@@ -668,6 +668,48 @@ The `key` column makes the `flip` of a table a reversible operation. If you don'
 ```
 
 ---
+In some situations you may wish to construct or query tables containing columns which have names that are reserved keywords (like `count` or `range`) or are not valid Lil identifiers (like `a name with spaces`). To define such a column, enclose the name in double-quotes:
+```
+denormal: select "with \"escapes":index "count":value from "ABC"
+# +---------------+-------+
+# | with "escapes | count |
+# +---------------+-------+
+# | 0             | "A"   |
+# | 1             | "B"   |
+# | 2             | "C"   |
+# +---------------+-------+
+
+insert "pet name":"Galena","Pippi","Chester" "pet species":"Chicken","Chicken","Toad" into 0
+# +-----------+-------------+
+# | pet name  | pet species |
+# +-----------+-------------+
+# | "Galena"  | "Chicken"   |
+# | "Pippi"   | "Chicken"   |
+# | "Chester" | "Toad"      |
+# +-----------+-------------+
+```
+To _reference_ these columns in a query, every column expression has the variable `column` bound to the entire table (or subtable, when grouping) within column expressions. As usual, you can access specific columns by indexing this table with a string:
+```
+select where column["with \"escapes"]>0 from denormal
+# +---------------+-------+
+# | with "escapes | count |
+# +---------------+-------+
+# | 1             | "B"   |
+# | 2             | "C"   |
+# +---------------+-------+
+
+extract column from denormal
+# +---------------+-------+-------+--------+-------+
+# | with "escapes | count | index | gindex | group |
+# +---------------+-------+-------+--------+-------+
+# | 0             | "A"   | 0     | 0      | 0     |
+# | 1             | "B"   | 1     | 1      | 0     |
+# | 2             | "C"   | 2     | 2      | 0     |
+# +---------------+-------+-------+--------+-------+
+```
+Extracting `column` may occasionally be useful for debugging complex queries!
+
+---
 
 In general, use `select` for narrowing down or summarizing tables, `update` for making changes to a table while preserving or extending its existing structure, `extract` for pulling data out of a table for use elsewhere, and `insert` to make new tables or append to existing ones.
 
@@ -1065,8 +1107,8 @@ NAME    := (ALPHA|'_'|'?') (ALPHA|'_'|'?'|DIGIT)*
 ITER    := (( each' NAME* 'in' ) | 'while') EXPR* 'end'
 ON      := 'on' NAME+ 'do' EXPR* 'end'
 IF      := 'if' EXPR* ( 'else' EXPR* )? 'end'
-QUERY   := ('select'|'extract'|'update')((NAME ':')?EXPR)*('where'EXPR)?('by'EXPR)?('orderby'EXPR('asc'|'desc'))?'from' EXPR
-INSERT  := 'insert' (NAME ':' EXPR) 'into' EXPR
+QUERY   := ('select'|'extract'|'update')((NAME|STRING ':')?EXPR)*('where'EXPR)?('by'EXPR)?('orderby'EXPR('asc'|'desc'))?'from' EXPR
+INSERT  := 'insert' (NAME|STRING ':' EXPR) 'into' EXPR
 SEND    := 'send' NAME '[' EXPR* ']'
 INDEX   := ('.' NAME? | '[' EXPR* ']')*
 ACCESS  := NAME INDEX ( ':' EXPR )?

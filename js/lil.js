@@ -365,7 +365,8 @@ parse=text=>{
 	const iblock=r=>{let c=0;while(hasnext()){if(match('end')){if(!c)blk_lit(r,NONE);return}if(c)blk_op(r,op.DROP);expr(r),c++};er(`Expected 'end' for block.`)}
 	const parsequery=(b,func,dcol)=>{
 		const cols=lmd([],[]);while(!matchp('from')&&!matchp('where')&&!matchp('by')&&!matchp('orderby')){
-			let name=lms(peek().t=='name'?peek().v:''), set=peek2().t==':', get=ident(ls(name)), unique=ls(name).length&&dkix(cols,name)==-1
+			let set=peek2().t==':', lit=peek().t=='string', name=lms(lit?(set?peek().v:''):peek().t=='name'?peek().v:'')
+			let get=ident(ls(name)), unique=ls(name).length&&dkix(cols,name)==-1; if(set&&lit&&!unique)next(),next()
 			const x=set&&unique?(next(),next(),name): get&&unique&&dcol?name: lms(dcol?`c${cols.k.length}`: '')
 			cols.k.push(x),cols.v.push(quote())
 		}
@@ -428,7 +429,7 @@ parse=text=>{
 		if(match('extract')){parsequery(b,'@ext',0);return}
 		if(match('update' )){parsequery(b,'@upd',1);return}
 		if(match('insert')){
-			const n=lml([]);while(!match('into')){n.v.push(lms(name('column'))),expect(':'),expr(b)}
+			const n=lml([]);while(!match('into')){n.v.push(lms(peek().t=='string'?next().v:name('column'))),expect(':'),expr(b)}
 			blk_opa(b,op.BUND,count(n)),blk_lit(b,n),expr(b),blk_op3(b,'@ins');return
 		}
 		if(matchsp('(')){if(matchsp(')')){blk_lit(b,lml([]));return}expr(b),expect(')');return}
@@ -506,7 +507,10 @@ runop=_=>{
 			state.e.push(env_bind(getev(),n,v)),ret(s),ret(r);break
 		}
 		case op.NEXT :{const v=arg(),r=arg(),s=arg();state.e.pop();if(lid(r))r.k.push(s.k[r.v.length]);r.v.push(v),ret(s),ret(r),setpc(imm);break}
-		case op.COL  :{const ex=arg(),t=arg(),n=Object.keys(t.v),v=lml(Object.values(t.v).map(lml));ret(t),issue(env_bind(getev(),n,v),ex);break}
+		case op.COL  :{
+			const ex=arg(),t=arg(),n=Object.keys(t.v),v=lml(Object.values(t.v).map(lml));ret(t)
+			n.push('column'),v.v.push(t),issue(env_bind(getev(),n,v),ex);break
+		}
 		case op.QUERY:{
 			const order_dir=ln(arg()),t=arg(),ct=lmn(count(t))
 			const o=dyad.take(ct,lml(ll(arg()))),b=dyad.take(ct,lml(ll(arg()))),w=dyad.take(ct,lml(ll(arg()))),r=monad.rows(t)

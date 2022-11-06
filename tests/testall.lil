@@ -295,6 +295,17 @@ show[select c n orderby (c join n) asc from e] # orderby should lexicographicall
 e:insert n:((list 7,7,2),(list 9,0),(list list 2),(list 3,4),(list 7,7,1),(list 9,2)) into 0
 show[select index n orderby n asc from e] # tolerate mixed-length tuples
 
+# queries on tables with special names
+show[select "with some spaces" from 0]                                                   # a bare string should be implicitly named
+show[select "with \"specials":2*index value from "ABC"]                                  # creating columns (select/update/extract)
+show[select "count":range 5 from 0]                                                      # creating columns that are a reserved word
+show[select "with space":11 "with space":22 from 0]                                      # duplicate columns are disambiguated as usual
+show[t:insert "with spaces":("A","A","B","A","A","B","B") ord:13,8,2,1,5,7,3 into 0]     # creating columns (insert)
+show[insert "with \" escapes":1 into 0]                                                  # process normal escape characters
+show[select column["with spaces"] ord by column["with spaces"] orderby ord asc from t]   # reading special-name columns
+show[extract column from t]                                                              # the column magic variable is a table
+show[extract count column by column["with spaces"] from t]                               # the column magic variable is a *grouped* table in exprs
+
 # fun with queries as loops
 file: "foo 1 2\nbar 3 4\nbaz 5 6"
 cells: extract list " " split value by index from ("\n" split file)

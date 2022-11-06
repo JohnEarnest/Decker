@@ -605,6 +605,13 @@ str token_str(token*t){
 	if(t->a==0&&t->b==0){str_addc(&r,t->type);}else{str_add(&r,par.text+t->a,t->b-t->a);}
 	return str_term(&r),r;
 }
+str literal_str(token*t){
+	str r=str_new();for(int z=t->a;z<t->b;z++){
+		if(par.text[z]=='\\'){
+			char x=par.text[++z];str_addc(&r,x=='\\'?x: x=='"'?x: x=='n'?'\n':' ');
+		}else{str_addc(&r,par.text[z]);}
+	}return r;
+}
 token* next(){
 	if(par.next.type){par.here=par.next;par.next.type=0;}else{tok(&par.here);}
 	return &par.here;
@@ -650,8 +657,9 @@ void iblock(lv*r){
 lv* block(){lv*r=lmblk();iblock(r);return r;}
 void parsequery(lv*b,char*op,int dcol){
 	lv*cols=lmd();while(!perr()&&!matchp("from")&&!matchp("where")&&!matchp("by")&&!matchp("orderby")){
-		str x=str_new();lv* name=lmstr(token_str(peek()));
-		int set=peek2().type==':', get=ident(name->sv), unique=dgeti(cols,name)==-1;
+		str x=str_new();int set=peek2().type==':', lit=peek()->type=='s';
+		lv* name=lit?(set?lmstr(literal_str(peek())):lmistr("")):lmstr(token_str(peek()));
+		int get=ident(name->sv), unique=name->c&&dgeti(cols,name)==-1;if(set&&lit&&!unique)next(),next();
 		if     (set&&unique)      {str_addz(&x,name->sv),next();next();}
 		else if(get&&unique&&dcol){str_addz(&x,name->sv);}
 		else if(dcol)             {str_addc(&x,'c'),wnum(&x,cols->c);}
@@ -696,14 +704,7 @@ void parseindex(lv*b,lv*name){
 }
 void term(lv*b){
 	if(peek()->type=='d'){blk_lit(b,lmn(next()->nv));return;}
-	if(peek()->type=='s'){
-		token*t=next();str r=str_new();
-		for(int z=t->a;z<t->b;z++){
-			if(par.text[z]=='\\'){
-				char x=par.text[++z];str_addc(&r,x=='\\'?x: x=='"'?x: x=='n'?'\n':' ');
-			}else{str_addc(&r,par.text[z]);}
-		}blk_lit(b,lmstr(r));return;
-	}
+	if(peek()->type=='s'){blk_lit(b,lmstr(literal_str(next())));return;}
 	if(match("if")){
 		expr(b);int bail=blk_opa(b,JUMPF,0),e=0,c=0;
 		while(hasnext()&&!match("end")&&!(e=match("else"))){if(c)blk_op(b,DROP);expr(b),c++;}
@@ -732,7 +733,7 @@ void term(lv*b){
 	if(match("extract")){parsequery(b,"@ext",0);return;}
 	if(match("update" )){parsequery(b,"@upd",1);return;}
 	if(match("insert")){
-		lv*n=lml(0);while(!perr()&&!match("into")){ll_add(n,lmstr(name("column"))),expect(':',0),expr(b);}
+		lv*n=lml(0);while(!perr()&&!match("into")){ll_add(n,lmstr(peek()->type=='s'?literal_str(next()):name("column"))),expect(':',0),expr(b);}
 		blk_opa(b,BUND,n->c),blk_lit(b,n),expr(b),blk_op3(b,"@ins");return;
 	}
 	if(matchsp('(')){if(matchsp(')')){blk_lit(b,EMPTY);return;}expr(b);expect(')',0);return;}
@@ -835,8 +836,9 @@ void runop(){
 			if(lid(r)){ld_add(r,s->kv[r->c],v);}else{ll_add(r,v);}ret(s),ret(r),*pc=imm;break;
 		}
 		case COL:{
-			lv*ex=arg(),*t=arg();
-			GEN(n,t->c)t->kv[z];GEN(v,t->c)t->lv[z];ret(t);issue(env_bind(ev(),n,v),ex);break;
+			lv*ex=arg(),*t=arg();ret(t);
+			GEN(n,t->c)t->kv[z];GEN(v,t->c)t->lv[z];ll_add(n,lmistr("column")),ll_add(v,t);
+			issue(env_bind(ev(),n,v),ex);break;
 		}
 		case QUERY:{
 			order_dir=ln(arg());lv*t=arg(),*ct=lmn(t->n);
