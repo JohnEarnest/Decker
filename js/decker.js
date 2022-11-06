@@ -780,7 +780,7 @@ widget_field=(target,x,value)=>{
 		const i=layout_index(layout,rect(ev.pos.x-bi.x,ev.pos.y-bi.y+value.scroll))
 		if(ev.md){wid.cursor.x=wid.cursor.y=i}else{wid.cursor.y=i}
 		if(ev.dclick){ // double-click to select a word or whitespace span:
-			let a=0, w=/\s/g.test(layout.layout[min(wid.cursor.y,layout.layout.length-1)].char)
+			let a=0, w=layout.layout.length&&/\s/g.test(layout.layout[min(wid.cursor.y,layout.layout.length-1)].char)
 			a=wid.cursor.y;while(a>=0&&a<layout.layout.length&&(w^!/\s/g.test(layout.layout[a].char)))a--;wid.cursor.x=a+1
 			a=wid.cursor.y;while(      a<layout.layout.length&&(w^!/\s/g.test(layout.layout[a].char)))a++;wid.cursor.y=a
 		}
