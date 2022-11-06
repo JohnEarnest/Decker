@@ -1,12 +1,12 @@
-VERSION="1.1"
+VERSION=$(shell cat VERSION)
 UNAME=$(shell uname)
 SDL=$(shell sdl2-config --cflags --libs)
 
 ifeq ($(UNAME),Darwin)
 	COMPILER=clang
 	FLAGS=-Wall -Werror -Wextra -Wpedantic -Os
-	FLAGS:=$(FLAGS) -fsanitize=undefined
-	FLAGS:=$(FLAGS) -fsanitize=address
+	# FLAGS:=$(FLAGS) -fsanitize=undefined
+	# FLAGS:=$(FLAGS) -fsanitize=address
 endif
 ifeq ($(UNAME),Linux)
 	COMPILER=gcc
@@ -79,6 +79,3 @@ docs:
 	@multimarkdown docs/lilt.md   > docs/lilt.html
 	@multimarkdown docs/decker.md > docs/decker.html
 	@multimarkdown docs/format.md > docs/format.html
-
-bundle: clean docs resources
-	./scripts/mac/bundle.sh $(VERSION)
