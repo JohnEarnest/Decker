@@ -3,12 +3,14 @@ UNAME=$(shell uname)
 SDL=$(shell sdl2-config --cflags --libs)
 
 ifeq ($(UNAME),Darwin)
+	OPEN=open
 	COMPILER=clang
 	FLAGS=-Wall -Werror -Wextra -Wpedantic -Os
 	# FLAGS:=$(FLAGS) -fsanitize=undefined
 	# FLAGS:=$(FLAGS) -fsanitize=address
 endif
 ifeq ($(UNAME),Linux)
+	OPEN=xdg-open
 	COMPILER=gcc
 	# _BSD_SOURCE is required by older versions of GCC to find various posix extensions like realpath().
 	# _DEFAULT_SOURCE is the same deal, except newer versions of GCC need it
@@ -71,7 +73,9 @@ testjs: js
 web-decker: js
 	@chmod +x ./scripts/web_decker.sh
 	@./scripts/web_decker.sh examples/decks/tour.deck js/build/decker.html $(VERSION)
-	open js/build/decker.html
+
+runweb: web-decker
+	$(OPEN) js/build/decker.html
 
 .PHONY: docs
 docs:

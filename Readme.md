@@ -16,6 +16,7 @@ The [web version](http://beyondloom.com/decker/tour.html) of Decker (web-decker)
 ```
 make testjs
 make web-decker
+make runweb      # (optional) open in your default browser
 ```
 
 Periodic binary releases of the native version of Decker (c-decker) for OSX and Windows are available on [itch.io](https://internet-janitor.itch.io/decker). Building from source requires:
