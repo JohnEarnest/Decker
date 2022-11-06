@@ -40,6 +40,7 @@ Queries
 - `index`: original row number
 - `gindex`: original index within row's group
 - `group`: index of row's group (by appearance)
+- `column`: the entire current subtable, for referencing denormal columns
 
 Formatting
 ----------
