@@ -98,7 +98,12 @@ The _Style_ menu will be available whenever drawing tools are chosen:
 - _Brush..._: Select a brush shape used for most drawing tools.
 - _Transparency_: Toggle treating pattern 0 as transparent when moving selections. Also applies to imported and exported images!
 
-With any of the drawing tools selected, you can press `m` to toggle the visibility of Decker's main menu. Holding control or command while clicking will enter Fat Bits mode centered on the position you click. Right-clicking with any tool or holding shift before beginning a stroke will _erase_: this behaves like the pencil tool, but always draws using pattern 0.
+A number of shortcuts are available with any of the drawing tools selected:
+
+- Pressing `m` toggles the visibility of Decker's main menu.
+- Pressing `t` toggles transparency mode (_Style &#8594; Transparency_).
+- Holding control or command while clicking will enter Fat Bits mode centered on the position you click.
+- Right-clicking with any tool or holding shift before beginning a stroke will _erase_: this behaves like the pencil tool, but always draws using pattern 0.
 
 In fullscreen mode (see _Decker &#8594; Fullscreen_), if there's room on your monitor, Decker will display toolbars on the left and right edges of the display- use these interchangably with the _Tool_ and _Style_ menus. Or don't!
 

@@ -2763,6 +2763,7 @@ q('body').onkeyup=e=>{
 	if(e.key=='Enter'&&e.shiftKey)ev.eval=1
 	if(e.key=='Shift'||e.shiftKey)ev.shift=0
 	if(e.key=='m'&&uimode=='draw'&&in_layer())ev.hidemenu^=1
+	if(e.key=='t'&&uimode=='draw'&&in_layer())dr.trans^=1
 	if(e.key=='Escape')ev.exit=1
 	if(!wid.infield&&uimode=='interact'){
 		if(e.key=='ArrowUp'   )msg.target_navigate=ifield(deck,'card'),msg.arg_navigate=lms('up'   )

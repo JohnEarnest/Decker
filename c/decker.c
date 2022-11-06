@@ -2397,6 +2397,7 @@ void sync(){
 			if(c==SDLK_RETURN&&ev.shift)ev.eval=1;
 			if(c==SDLK_LSHIFT||c==SDLK_RSHIFT)ev.shift=0;
 			if(c==SDLK_m&&uimode==mode_draw&&in_layer())ev.hidemenu^=1;
+			if(c==SDLK_t&&uimode==mode_draw&&in_layer())dr.trans^=1;
 			if(c==SDLK_ESCAPE)ev.exit=1;
 			if(!wid.infield&&uimode==mode_interact){
 				if(c==SDLK_UP   )msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("up");
