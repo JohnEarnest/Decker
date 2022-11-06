@@ -3139,7 +3139,7 @@ void load_deck(lv*d){
 	gfx=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,size.x,size.y);
 	SDL_SetWindowPosition(win,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED);
 	if(!gtool){pair s=buff_size(TOOLB);gtool=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,s.x,s.y);}
-	msg.next_view=1;
+	msg.next_view=1;time_t now;time(&now);seed=0xFFFFFFFF&now;
 	validate_modules();
 	setmode(mode_interact);
 }

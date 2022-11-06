@@ -97,7 +97,7 @@ Built-in Functions
 | `exit[x]`        | Stop execution with exit code `x`.                                                                                          | System  |
 | `shell[x]`       | Execute string `x` as a shell command and block for its completion.(4)                                                      | System  |
 | `eval[x y]`      | Parse and execute a string `x` as a Lil program, using any variable bindings in dictionary `y`.(5)                          | System  |
-| `random[x y]`    | Choose `y` random elements from `x`.                                                                                        | System  |
+| `random[x y]`    | Choose `y` random elements from `x`. In Lilt, `sys.seed` is always pre-initialized to a constant.                           | System  |
 | `readcsv[x y d]` | Turn a [RFC-4180](https://datatracker.ietf.org/doc/html/rfc4180) CSV string `x` into a Lil table with column spec `y`.(6)   | Data    |
 | `writecsv[x y d]`| Turn a Lil table `x` into a CSV string with column spec `y`.(6)                                                             | Data    |
 | `readxml[x]`     | Turn a useful subset of XML/HTML into a Lil structure.(6)                                                                   | Data    |

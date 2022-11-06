@@ -526,7 +526,7 @@ The _system_ interface exposes information about the Lil runtime. It is availabl
 | `x.ms`                     | The current time in milliseconds- useful for timing intervals.                                        |
 | `x.workspace`              | Dictionary of information about Lil's runtime memory usage.(2)                                        |
 
-1) Assigning to `sys.seed` will initialize the random number generator behind the `random[]` function, causing it to produce consistent results thereafter. The `seed` is always pre-initialized, so without intervention programs which use `random[]` are still deterministic by default. (Some might argue that `arbitrary[]` would be a more accurate name for the function than `random[]`, but that's life.) `sys.seed:sys.ms` is a reasonable way to make random numbers vary between program runs.
+1) Assigning to `sys.seed` will initialize the random number generator behind the `random[]` function, causing it to produce consistent results thereafter.
 
 2) Workspace statistics can provide some insight into performance, but all values should be taken as approximate- the act of retrieving this information will itself result in several allocations. Lil's garbage collector only runs periodically, so the number of truly "live" values at any given time may be lower than shown here.  The workspace dictionary contains:
 - `allocs`: the number of Lil values which have been allocated.
