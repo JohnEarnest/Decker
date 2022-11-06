@@ -6,7 +6,7 @@ Decker is a multimedia platform for creating and sharing interactive documents, 
 
 You can learn more about Decker on [my website](http://beyondloom.com/decker/), or just dive in and [try it online](http://beyondloom.com/decker/tour.html).
 
-There is also a [community forum](https://internet-janitor.itch.io/decker) on itch.io.
+There is also a [community forum](https://internet-janitor.itch.io/decker/community) on itch.io.
 
 
 Building
