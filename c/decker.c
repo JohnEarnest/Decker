@@ -444,7 +444,13 @@ void widget_canvas(lv*target,canvas x,lv*image){
 	if(image&&x.show==show_transparent)draw_scaled(b,image->b,0);
 	if(image&&x.show==show_invert)draw_invert_scaled(pal,b,image->b);
 	if(x.border){if(x.show==show_invert){draw_boxinv(pal,b);}else{draw_box(b,0,1);}}
-	if(target&&in_layer()&&dover(b)){
+	if(!target||!in_layer())return;
+	if(x.draggable){
+		int sel=ob.sel->c&&ob.sel->lv[0]==target;
+		if     (ev.md&&dover(b))msg.target_click  =target,msg.arg_click  =(fpair){b.x,b.y},ob.sel=l_list(target),ob.prev=(pair){ev.pos.x-b.x,ev.pos.y-b.y};
+		else if(ev.mu     &&sel)msg.target_release=target,msg.arg_release=(fpair){ev.dpos.x-ob.prev.x,ev.dpos.y-ob.prev.y},ob.sel->c=0;
+		else if(ev.drag   &&sel)msg.target_drag   =target,msg.arg_drag   =(fpair){ev.dpos.x-ob.prev.x,ev.dpos.y-ob.prev.y};
+	}else if(dover(b)){
 		fpair p={(ev.pos.x-b.x)/x.scale,(ev.pos.y-b.y)/x.scale}; int dp=p.x!=msg.lastdrag.x||p.y!=msg.lastdrag.y, im=over(b);
 		if     (ev.md          )msg.target_click  =target,msg.arg_click  =p,msg.lastdrag=p;
 		else if(ev.mu          )msg.target_release=target,msg.arg_release=p;
@@ -1632,7 +1638,7 @@ void modals(){
 		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
 	else if(ms.type==modal_canvas_props){
-		rect b=draw_modalbox((pair){220,125});lv*canvas=ob.sel->lv[0];
+		rect b=draw_modalbox((pair){220,141});lv*canvas=ob.sel->lv[0];
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Canvas Properties",FONT_MENU,1);
 		draw_text((rect){b.x,b.y+22,42,20},"Name" ,FONT_MENU,1);
 		draw_text((rect){b.x,b.y+42,42,20},"Scale",FONT_MENU,1);
@@ -1640,8 +1646,9 @@ void modals(){
 		ui_field((rect){b.x+42,b.y+40,b.w-42,18},&ms.text);
 		iwrite(canvas,lmistr("name" ),rtext_all(ms.name.table));
 		iwrite(canvas,lmistr("scale"),rtext_all(ms.text.table));mark_dirty();
-		int border=lb(ifield(canvas,"border"));pair cb={b.x,b.y+50+20};
-		if(ui_checkbox((rect){cb.x,cb.y,b.w,16},"Border",1,border)){border^=1;iwrite(canvas,lmistr("border"),lmn(border)),mark_dirty();}
+		int border=lb(ifield(canvas,"border")),draggable=lb(ifield(canvas,"draggable"));pair cb={b.x,b.y+50+20};
+		if(ui_checkbox((rect){cb.x,cb.y,b.w,16},"Border"   ,1,border   )){border   ^=1;iwrite(canvas,lmistr("border"   ),lmn(border   )),mark_dirty();}cb.y+=16;
+		if(ui_checkbox((rect){cb.x,cb.y,b.w,16},"Draggable",1,draggable)){draggable^=1;iwrite(canvas,lmistr("draggable"),lmn(draggable)),mark_dirty();}
 		pair c={b.x,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))setscript(canvas),modal_exit(0);
 		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
@@ -3043,6 +3050,9 @@ void tick(lv*env){
 	gestures();
 	menu_finish();
 	if(uimode==mode_draw&&dr.fatbits)draw_icon((pair){frame.size.x-14,2},ZOOM,1);
+	if(uimode==mode_interact&&ev.drag&&ob.sel->c&&lb(ifield(ob.sel->lv[0],"draggable"))){
+		iwrite(ob.sel->lv[0],lmistr("pos"),lmpair((pair){ev.pos.x-ob.prev.x,ev.pos.y-ob.prev.y})),mark_dirty();
+	}
 	double used=interpret();
 	if(uimode==mode_interact&&profiler){
 		rect r={frame.size.x-60,2,50,12};

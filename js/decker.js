@@ -278,6 +278,7 @@ unpack_canvas=x=>({
 	size     :rpair(getpair(ifield(x,'pos')),getpair(ifield(x,'size'))),
 	scale    :ln(ifield(x,'scale'    )),
 	border   :lb(ifield(x,'border'   )),
+	draggable:lb(ifield(x,'draggable')),
 	show     :ls(ifield(x,'show'     )),
 	locked   :lb(ifield(x,'locked'   )),
 })
@@ -401,7 +402,7 @@ let msg={ // interpreter event messages
 	arg_click:rect(),arg_drag:rect(),lastdrag:rect(),arg_release:rect(),arg_order:null,arg_run:null,arg_link:null,arg_change:null,arg_navigate:null,
 }
 let li={hist:[],vars:{},scroll:0} // listener state
-let ob={sel:null,show_bounds:1,show_names:0,show_cursor:0,move:0,move_first:0,resize:0,resize_first:0,handle:-1,prev:rect(),orig:rect()} // object editor state
+let ob={sel:[],show_bounds:1,show_names:0,show_cursor:0,move:0,move_first:0,resize:0,resize_first:0,handle:-1,prev:rect(),orig:rect()} // object editor state
 let sc={target:null,others:[],next:null, f:null,prev_mode:null,status:''} // script editor state
 script_save=x=>{const k=lms('script');mark_dirty();if(sc.target)iwrite(sc.target,k,x);if(sc.others)sc.others.map(o=>iwrite(o,k,x))}
 
@@ -630,7 +631,13 @@ widget_canvas=(target,x,image)=>{
 	if(image&&x.show=='transparent')draw_scaled(b,image,0)
 	if(image&&x.show=='invert')draw_invert_scaled(pal,b,image)
 	if(x.border){if(x.show=='invert'){draw_boxinv(pal,b)}else{draw_box(b,0,1)}}
-	if(target&&in_layer()&&dover(b)){
+	if(!target||!in_layer())return
+	if(x.draggable){
+		const sel=ob.sel.length&&ob.sel[0]==target
+		if     (ev.md&&dover(b))msg.target_click  =target,msg.arg_click  =rect(b.x,b.y),ob.sel=[target],ob.prev=rint(rsub(ev.pos,b))
+		else if(ev.mu     &&sel)msg.target_release=target,msg.arg_release=rsub(ev.dpos,ob.prev),ob.sel=[]
+		else if(ev.drag   &&sel)msg.target_drag   =target,msg.arg_drag   =rsub(ev.dpos,ob.prev)
+	}else if(dover(b)){
 		const p=rint(rect((ev.pos.x-b.x)/x.scale,(ev.pos.y-b.y)/x.scale)), dp=p.x!=msg.lastdrag.x||p.y!=msg.lastdrag.y, im=over(b)
 		if     (ev.md          )msg.target_click  =target,msg.arg_click  =p,msg.lastdrag=p
 		else if(ev.mu          )msg.target_release=target,msg.arg_release=p
@@ -1616,7 +1623,7 @@ modals=_=>{
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='canvas_props'){
-		const b=draw_modalbox(rect(220,125)),canvas=ob.sel[0]
+		const b=draw_modalbox(rect(220,141)),canvas=ob.sel[0]
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Canvas Properties',FONT_MENU,1)
 		draw_text(rect(b.x,b.y+22,42,20),'Name' ,FONT_MENU,1)
 		draw_text(rect(b.x,b.y+42,42,20),'Scale',FONT_MENU,1)
@@ -1624,8 +1631,9 @@ modals=_=>{
 		ui_field(rect(b.x+42,b.y+40,b.w-42,18),ms.text)
 		iwrite(canvas,lms('name' ),rtext_string(ms.name.table))
 		iwrite(canvas,lms('scale'),rtext_string(ms.text.table)),mark_dirty()
-		let border=lb(ifield(canvas,'border')), cb=rect(b.x,b.y+50+20)
-		if(ui_checkbox(rect(cb.x,cb.y,b.w,16),'Border',1,border))border^=1,iwrite(canvas,lms('border'),lmn(border)),mark_dirty()
+		let border=lb(ifield(canvas,'border')),draggable=lb(ifield(canvas,'draggable')),cb=rect(b.x,b.y+50+20)
+		if(ui_checkbox(rect(cb.x,cb.y,b.w,16),'Border'   ,1,border   ))border   ^=1,iwrite(canvas,lms('border'   ),lmn(border   )),mark_dirty();cb.y+=16
+		if(ui_checkbox(rect(cb.x,cb.y,b.w,16),'Draggable',1,draggable))draggable^=1,iwrite(canvas,lms('draggable'),lmn(draggable)),mark_dirty()
 		const c=rect(b.x,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(canvas),modal_exit(0)
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
@@ -2662,6 +2670,7 @@ tick=_=>{
 	if(uimode=='script'){script_editor()}else{main_view()}
 	modals(),gestures(),menu_finish()
 	if(uimode=='draw'&&dr.fatbits)draw_icon(rect(frame.size.x-14,2),ZOOM,1)
+	if(uimode=='interact'&&ev.drag&&ob.sel.length&&lb(ifield(ob.sel[0],'draggable')))iwrite(ob.sel[0],lms('pos'),lmpair(rsub(ev.pos,ob.prev))),mark_dirty()
 	q('#display').style.cursor=uicursor||'default'
 	for(let x=0;x<=1;x++)for(let y=0;y<=1;y++)draw_icon(rect(x*(context.size.x-5),y*(context.size.y-5)),CORNERS[x+y*2],1)
 	const used=interpret()

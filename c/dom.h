@@ -110,7 +110,7 @@ char* default_handlers=""
 "	if x~\"left\"  go[\"Prev\"] end "
 "end\n"
 "on drag x do"
-"	if !me.locked me.line[(pointer.prev-me.pos)/me.scale x] end "
+"	if !me.locked|me.draggable me.line[(pointer.prev-me.pos)/me.scale x] end "
 "end\n"
 "on order x do"
 "	if !me.locked "
@@ -1098,12 +1098,13 @@ widget unpack_widget(lv*x){
 
 // Canvas interface
 
-typedef struct {rect size;float scale;int border,show,locked;} canvas;
+typedef struct {rect size;float scale;int border,draggable,show,locked;} canvas;
 canvas unpack_canvas(lv*x){
 	return (canvas){
 		rect_pair(getpair(ifield(x,"pos")),getpair(ifield(x,"size"))),
 		ln(ifield(x,"scale")),
 		lb(ifield(x,"border")),
+		lb(ifield(x,"draggable")),
 		ordinal_enum(ifield(x,"show"),widget_shows),
 		lb(ifield(x,"locked")),
 	};
@@ -1203,33 +1204,35 @@ lv* interface_canvas(lv*self,lv*i,lv*x){
 		ikey("font"   ){dset(data,i,normalize_font(fonts,x));return x;}
 		if(!lis(i)    ){return interface_image(canvas_image(self,1),i,x);}
 		if(has_parent(self)||dget(data,lmistr("free")))return x;
-		ikey("border" ){dset(data,i,lmn(lb(x)));return x;}
-		ikey("lsize"  ){float s=ln(ifield(self,"scale"));pair d=getpair(x);i=lmistr("size");x=lmpair((pair){d.x*s,d.y*s});} // falls through!
-		ikey("size"   ){canvas_size(self,getpair(x));}// falls through to widget.size!
-		ikey("scale"  ){dset(data,i,lmn(MAX(0.1,ln(x))));canvas_size(self,getpair(ifield(self,"size")));return x;}
+		ikey("border"   ){dset(data,i,lmn(lb(x)));return x;}
+		ikey("draggable"){dset(data,i,lmn(lb(x)));return x;}
+		ikey("lsize"    ){float s=ln(ifield(self,"scale"));pair d=getpair(x);i=lmistr("size");x=lmpair((pair){d.x*s,d.y*s});} // falls through!
+		ikey("size"     ){canvas_size(self,getpair(x));}// falls through to widget.size!
+		ikey("scale"    ){dset(data,i,lmn(MAX(0.1,ln(x))));canvas_size(self,getpair(ifield(self,"size")));return x;}
 	}else{
-		if(!lis(i)    ){lv*img=canvas_image(self,0);return img?interface_image(img,i,x):NONE;}
-		ikey("border" ){lv*r=widget_inherit(self,i);return r?r:ONE;}
-		ikey("brush"  ){lv*r=widget_inherit(self,i);return r?r:NONE;}
-		ikey("pattern"){lv*r=widget_inherit(self,i);return r?r:ONE;}
-		ikey("size"   ){lv*r=widget_inherit(self,i);return r?r:lmpair((pair){100,100});}
-		ikey("scale"  ){lv*r=widget_inherit(self,i);return r?r:lmn(1.0);}
-		ikey("lsize"  ){pair s=getpair(ifield(self,"size"));float z=ln(ifield(self,"scale"));return lmpair((pair){ceil(s.x/z),ceil(s.y/z)});}
-		ikey("clear"  )return lmnat(n_canvas_clear, self);
-		ikey("clip"   )return lmnat(n_canvas_clip,  self);
-		ikey("rect"   )return lmnat(n_canvas_rect,  self);
-		ikey("poly"   )return lmnat(n_canvas_poly,  self);
-		ikey("invert" )return lmnat(n_canvas_invert,self);
-		ikey("box"    )return lmnat(n_canvas_box,   self);
-		ikey("line"   )return lmnat(n_canvas_line,  self);
-		ikey("fill"   )return lmnat(n_canvas_fill,  self);
-		ikey("merge"  )return lmnat(n_canvas_merge, self);
-		ikey("text"   )return lmnat(n_canvas_text,  self);
-		ikey("copy"   )return lmnat(n_canvas_copy,  self);
-		ikey("paste"  )return lmnat(n_canvas_paste, self);
-		ikey("click"  )if(state.external)return lmnat(n_canvas_click,self);
-		ikey("drag"   )if(state.external)return lmnat(n_canvas_drag,self);
-		ikey("release")if(state.external)return lmnat(n_canvas_release,self);
+		if(!lis(i)      ){lv*img=canvas_image(self,0);return img?interface_image(img,i,x):NONE;}
+		ikey("border"   ){lv*r=widget_inherit(self,i);return r?r:ONE;}
+		ikey("draggable"){lv*r=widget_inherit(self,i);return r?r:NONE;}
+		ikey("brush"    ){lv*r=widget_inherit(self,i);return r?r:NONE;}
+		ikey("pattern"  ){lv*r=widget_inherit(self,i);return r?r:ONE;}
+		ikey("size"     ){lv*r=widget_inherit(self,i);return r?r:lmpair((pair){100,100});}
+		ikey("scale"    ){lv*r=widget_inherit(self,i);return r?r:lmn(1.0);}
+		ikey("lsize"    ){pair s=getpair(ifield(self,"size"));float z=ln(ifield(self,"scale"));return lmpair((pair){ceil(s.x/z),ceil(s.y/z)});}
+		ikey("clear"    )return lmnat(n_canvas_clear, self);
+		ikey("clip"     )return lmnat(n_canvas_clip,  self);
+		ikey("rect"     )return lmnat(n_canvas_rect,  self);
+		ikey("poly"     )return lmnat(n_canvas_poly,  self);
+		ikey("invert"   )return lmnat(n_canvas_invert,self);
+		ikey("box"      )return lmnat(n_canvas_box,   self);
+		ikey("line"     )return lmnat(n_canvas_line,  self);
+		ikey("fill"     )return lmnat(n_canvas_fill,  self);
+		ikey("merge"    )return lmnat(n_canvas_merge, self);
+		ikey("text"     )return lmnat(n_canvas_text,  self);
+		ikey("copy"     )return lmnat(n_canvas_copy,  self);
+		ikey("paste"    )return lmnat(n_canvas_paste, self);
+		ikey("click"    )if(state.external)return lmnat(n_canvas_click,self);
+		ikey("drag"     )if(state.external)return lmnat(n_canvas_drag,self);
+		ikey("release"  )if(state.external)return lmnat(n_canvas_release,self);
 	}return interface_widget(self,i,x);
 }
 lv* canvas_read(lv*x,lv*r){
@@ -1238,20 +1241,22 @@ lv* canvas_read(lv*x,lv*r){
 	{lv*k=lmistr("clip" ),*v=dget(x,k);if(v)n_canvas_clip(ri,l_list(x));}
 	{lv*k=lmistr("size" ),*v=dget(x,k);if(v)dset(ri->b,k,lmpair(getpair(v)));}
 	{lv*k=lmistr("scale"),*v=dget(x,k);if(v)dset(ri->b,k,lmn(MAX(0.1,ln(v))));}
-	init_field(ri,"border" ,x);
-	init_field(ri,"brush"  ,x);
-	init_field(ri,"pattern",x);
-	init_field(ri,"font"   ,x);
+	init_field(ri,"border"   ,x);
+	init_field(ri,"draggable",x);
+	init_field(ri,"brush"    ,x);
+	init_field(ri,"pattern"  ,x);
+	init_field(ri,"font"     ,x);
 	return ri;
 }
 lv* canvas_write(lv*x){
 	lv*data=x->b,*r=lmd();dset(r,lmistr("type"),lmistr("canvas"));pair lsize=getpair(ifield(x,"lsize"));
-	{lv*k=lmistr("border" ),*v=dget(data,k);if(v)dset(r,k,v);}
-	{lv*k=lmistr("image"  ),*v=dget(data,k);if(v)dset(r,k,image_write(v));}
-	{lv*k=lmistr("brush"  ),*v=dget(data,k);if(v&&ln(v)!=0)dset(r,k,v);}
-	{lv*k=lmistr("pattern"),*v=dget(data,k);if(v&&ln(v)!=1)dset(r,k,v);}
-	{lv*k=lmistr("scale"  ),*v=dget(data,k);if(v)dset(r,k,v);}
-	{lv*k=lmistr("clip"   ),*v=dget(data,k);if(v&&!matchr(v,lmrect((rect){0,0,lsize.x,lsize.y})))dset(r,k,v);}
+	{lv*k=lmistr("border"   ),*v=dget(data,k);if(v)dset(r,k,v);}
+	{lv*k=lmistr("image"    ),*v=dget(data,k);if(v)dset(r,k,image_write(v));}
+	{lv*k=lmistr("draggable"),*v=dget(data,k);if(v&&ln(v)!=0)dset(r,k,v);}
+	{lv*k=lmistr("brush"    ),*v=dget(data,k);if(v&&ln(v)!=0)dset(r,k,v);}
+	{lv*k=lmistr("pattern"  ),*v=dget(data,k);if(v&&ln(v)!=1)dset(r,k,v);}
+	{lv*k=lmistr("scale"    ),*v=dget(data,k);if(v)dset(r,k,v);}
+	{lv*k=lmistr("clip"     ),*v=dget(data,k);if(v&&!matchr(v,lmrect((rect){0,0,lsize.x,lsize.y})))dset(r,k,v);}
 	return r;
 }
 

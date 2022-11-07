@@ -219,7 +219,8 @@ Each `type` of widget has its own additional optional fields:
 
 - `"canvas"`:
 	Canvases are repositionable, stackable rectangles which can be drawn on- either by a user or through scripting. Canvases are useful for creating cards with animation, procedural drawing, or cards where parts of the background can be shown or hidden selectively.
-	- `"border"`: an integer; draw an outline for the canvas? Default is `1`.
+	- `border`: an integer; draw an outline for the canvas? Default is `1`.
+	- `draggable`: an integer; allow this canvas to be repositioned in interact mode? Default in `0`.
 	- `image`: an _Image Record_.
 	- `brush`: an integer brush-shape index used for drawing. Default is `0`.
 	- `pattern`: an integer pattern index used for drawing. Default is `1`.
@@ -303,3 +304,5 @@ Changelog
 ---------
 1.0:
 - Initial release.
+1.2
+- Introduced the `canvas.draggable` field.

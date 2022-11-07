@@ -645,7 +645,7 @@ FORMAT_VERSION=1, RTEXT_END=2147483647, SFX_RATE=8000, FRAME_QUOTA=MODULE_QUOTA=
 sleep_frames=0, sleep_play=0, pending_popstate=0
 DEFAULT_HANDLERS=`
 on link x do go[x] end
-on drag x do if !me.locked me.line[(pointer.prev-me.pos)/me.scale x] end end
+on drag x do if !me.locked|me.draggable me.line[(pointer.prev-me.pos)/me.scale x] end end
 on order x do if !me.locked me.value:select orderby me.value[x] asc from me.value end end
 on navigate x do if x~"right" go["Next"] end if x~"left" go["Prev"] end end
 `
@@ -1658,33 +1658,35 @@ canvas_read=(x,card)=>{
 	const ri=lmi((self,i,x)=>{
 		if(!is_rooted(self))return NONE
 		if(x){
-			if(ikey(i,'brush'  ))return self.brush=0|clamp(0,ln(x),23),x
-			if(ikey(i,'pattern'))return self.pattern=0|clamp(0,ln(x),47),x
-			if(ikey(i,'font'   ))return self.font=normalize_font(self.card.deck.fonts,x),x
+			if(ikey(i,'brush'    ))return self.brush=0|clamp(0,ln(x),23),x
+			if(ikey(i,'pattern'  ))return self.pattern=0|clamp(0,ln(x),47),x
+			if(ikey(i,'font'     ))return self.font=normalize_font(self.card.deck.fonts,x),x
 			if(!lis(i)){const img=canvas_image(self,1);return img.f(img,i,x)}
 			if(has_parent(self)||self.free)return x
-			if(ikey(i,'border' ))return self.border=lb(x),x
-			if(ikey(i,'lsize'  )){i=lms('size'),x=lmpair(rmul(getpair(x),ln(ifield(self,'scale'))))}
-			if(ikey(i,'size'   )){canvas_resize(self,getpair(x))}
-			if(ikey(i,'scale'  )){return self.scale=max(0.1,ln(x)),canvas_resize(self,getpair(ifield(self,'size'))),x}
+			if(ikey(i,'border'   ))return self.border=lb(x),x
+			if(ikey(i,'draggable'))return self.draggable=lb(x),x
+			if(ikey(i,'lsize'    )){i=lms('size'),x=lmpair(rmul(getpair(x),ln(ifield(self,'scale'))))}
+			if(ikey(i,'size'     )){canvas_resize(self,getpair(x))}
+			if(ikey(i,'scale'    )){return self.scale=max(0.1,ln(x)),canvas_resize(self,getpair(ifield(self,'size'))),x}
 		}else{
 			if(!lis(i)){const img=canvas_image(self,0);return img?img.f(img,i,x):NONE}
-			if(ikey(i,'border' ))return lmn(widget_inherit(self,ls(i),1))
-			if(ikey(i,'brush'  ))return lmn(widget_inherit(self,ls(i),0))
-			if(ikey(i,'pattern'))return lmn(widget_inherit(self,ls(i),1))
-			if(ikey(i,'size'   ))return lmpair(widget_inherit(self,ls(i),rect(100,100)))
-			if(ikey(i,'scale'  ))return lmn(widget_inherit(self,ls(i),1.0))
-			if(ikey(i,'lsize'  )){const s=getpair(ifield(self,'size')),z=ln(ifield(self,'scale'));return lmpair(rect(ceil(s.x/z),ceil(s.y/z)))}
-			if(ikey(i,'clip'   ))return lmnat(z=>(canvas_clip(self,z),NONE))
-			if(ikey(i,'clear'  ))return lmnat(z=>(canvas_pick(self),draw_rect(wid_crect(self,z),0            )           ,NONE))
-			if(ikey(i,'rect'   ))return lmnat(z=>(canvas_pick(self),draw_rect(wid_crect(self,z),frame.pattern)           ,NONE))
-			if(ikey(i,'invert' ))return lmnat(z=>(canvas_pick(self),draw_invert_raw(wid_pal(self),wid_crect(self,z))     ,NONE))
-			if(ikey(i,'box'    ))return lmnat(z=>(canvas_pick(self),draw_box(wid_rect(self,z),frame.brush,frame.pattern) ,NONE))
-			if(ikey(i,'poly'   ))return lmnat(z=>(canvas_pick(self),draw_poly(unpack_poly(z),frame.pattern)              ,NONE))
-			if(ikey(i,'line'   ))return lmnat(z=>(canvas_pick(self),draw_lines(unpack_poly(z),frame.brush,frame.pattern) ,NONE))
-			if(ikey(i,'fill'   ))return lmnat(([pos])=>(canvas_pick(self),draw_fill(rint(getpair(pos)),self.pattern)     ,NONE))
-			if(ikey(i,'copy'   ))return lmnat(z=>{const img=canvas_image(self,1);return image_copy(img,unpack_rect(z,img.size))})
-			if(ikey(i,'paste'  ))return lmnat(([img,pos,t])=>{
+			if(ikey(i,'border'   ))return lmn(widget_inherit(self,ls(i),1))
+			if(ikey(i,'draggable'))return lmn(widget_inherit(self,ls(i),0))
+			if(ikey(i,'brush'    ))return lmn(widget_inherit(self,ls(i),0))
+			if(ikey(i,'pattern'  ))return lmn(widget_inherit(self,ls(i),1))
+			if(ikey(i,'size'     ))return lmpair(widget_inherit(self,ls(i),rect(100,100)))
+			if(ikey(i,'scale'    ))return lmn(widget_inherit(self,ls(i),1.0))
+			if(ikey(i,'lsize'    )){const s=getpair(ifield(self,'size')),z=ln(ifield(self,'scale'));return lmpair(rect(ceil(s.x/z),ceil(s.y/z)))}
+			if(ikey(i,'clip'     ))return lmnat(z=>(canvas_clip(self,z),NONE))
+			if(ikey(i,'clear'    ))return lmnat(z=>(canvas_pick(self),draw_rect(wid_crect(self,z),0            )           ,NONE))
+			if(ikey(i,'rect'     ))return lmnat(z=>(canvas_pick(self),draw_rect(wid_crect(self,z),frame.pattern)           ,NONE))
+			if(ikey(i,'invert'   ))return lmnat(z=>(canvas_pick(self),draw_invert_raw(wid_pal(self),wid_crect(self,z))     ,NONE))
+			if(ikey(i,'box'      ))return lmnat(z=>(canvas_pick(self),draw_box(wid_rect(self,z),frame.brush,frame.pattern) ,NONE))
+			if(ikey(i,'poly'     ))return lmnat(z=>(canvas_pick(self),draw_poly(unpack_poly(z),frame.pattern)              ,NONE))
+			if(ikey(i,'line'     ))return lmnat(z=>(canvas_pick(self),draw_lines(unpack_poly(z),frame.brush,frame.pattern) ,NONE))
+			if(ikey(i,'fill'     ))return lmnat(([pos])=>(canvas_pick(self),draw_fill(rint(getpair(pos)),self.pattern)     ,NONE))
+			if(ikey(i,'copy'     ))return lmnat(z=>{const img=canvas_image(self,1);return image_copy(img,unpack_rect(z,img.size))})
+			if(ikey(i,'paste'    ))return lmnat(([img,pos,t])=>{
 				canvas_pick(self);const dst=canvas_image(self,1)
 				img=getimage(img),pos=(pos?ll(pos):[]).map(ln); let solid=t?!lb(t):1
 				// TODO: can we squash these calls together?
@@ -1711,17 +1713,19 @@ canvas_read=(x,card)=>{
 	{const v=dget(x,lms('clip' ));if(v)canvas_clip(ri,ll(v))}
 	{const v=dget(x,lms('size' ));if(v)ri.size=getpair(v)}
 	{const v=dget(x,lms('scale'));if(v)ri.scale=max(0.1,ln(v))}
-	init_field(ri,'border' ,x)
-	init_field(ri,'brush'  ,x)
-	init_field(ri,'pattern',x)
-	init_field(ri,'font'   ,x)
+	init_field(ri,'border'   ,x)
+	init_field(ri,'draggable',x)
+	init_field(ri,'brush'    ,x)
+	init_field(ri,'pattern'  ,x)
+	init_field(ri,'font'     ,x)
 	return ri
 }
 canvas_write=x=>{
 	const r=lmd([lms('type')],[lms('canvas')])
 	if(x.border!=undefined)dset(r,lms('border'),lmn(x.border))
-	if(x.image)dset(r,lms('image'),lms(image_write(x.image)))
-	if(x.brush)dset(r,lms('brush'),lmn(x.brush))
+	if(x.image    )dset(r,lms('image'),lms(image_write(x.image)))
+	if(x.draggable)dset(r,lms('brush'),lmn(x.draggable))
+	if(x.brush    )dset(r,lms('brush'),lmn(x.brush))
 	if(x.pattern!=undefined&&x.pattern!=1)dset(r,lms('pattern'),lmn(x.pattern))
 	if(x.scale)dset(r,lms('scale'),lmn(x.scale))
 	if(x.clip&&!requ(x.clip,rpair(rect(),getpair(ifield(x,'lsize')))))dset(r,lms('clip'),lml([x.clip.x,x.clip.y,x.clip.w,x.clip.h].map(lmn)))

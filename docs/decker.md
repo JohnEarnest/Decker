@@ -942,6 +942,7 @@ The canvas will scale _up_ logical pixels to display them on the card (resulting
 | `x.pos`                 | The `pos` of this widget on the card. r/w.                                                                        |
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.                          |
 | `x.border`              | Bool. Draw an outline around this widget? r/w.                                                                    |
+| `x.draggable`           | Bool. Allow the user to reposition this widget by dragging it in interact mode? r/w.                              |
 | `x.size`                | The `size` of the canvas widget in pixels. r/w.                                                                   |
 | `x.lsize`               | the _logical_ `size` (before scaling) of the canvas in pixels. r/w.                                               |
 | `x.scale`               | The scaling factor of the canvas. r/w.                                                                            |
@@ -1065,7 +1066,13 @@ Events are as follows:
 | card    | `navigate` | One of {`"up"`,`"down"`,`"left"`,`"right"`}. | The user performs a navigation input.                          |
 | card    | `view`     | None.                                        | The card is navigated to, or the user enters interaction mode. |
 
-The canvas will fire `click` only if the pointer is depressed within the bounds of the canvas. If a canvas is sent a `click`, it will receive a `release` when the pointer is released, even if the pointer is no longer over that canvas- the `pos` provided may be out of bounds. If a canvas is sent a `click`, it will be sent `drag` events every time the pointer is moved within the bounds of the canvas up until the `release`.
+If a canvas is not "draggable", events are relative to pointer movement on the canvas: The canvas will fire `click` only if the pointer is depressed within the bounds of the canvas. If a canvas is sent a `click`, it will receive a `release` when the pointer is released, even if the pointer is no longer over that canvas- the `pos` provided may be out of bounds. If a canvas is sent a `click`, it will be sent `drag` events every time the pointer is moved within the bounds of the canvas up until the `release`.
+
+If a canvas _is_ "draggable", tapping on the canvas will fire `click`, moving it will continuously fire `drag`, and releasing it will fire `release`. In all three cases, the provided `pos` will be the _original_ position of the canvas, before the drag operation began. Having this position makes it easy for a draggable canvas to "snap back" to its original position at the end of a drag, or make decisions based on where it came from. Since dragging and dropping often involves checking whether widgets overlap, the following routines may be handy:
+```
+on overlaps a b do min(a.pos<b.pos+b.size),b.pos<a.pos+a.size   end    # widget a overlaps widget b
+on inside   a b do min(a.pos>b.pos),(a.pos+a.size)<b.pos+b.size end    # widget a is fully inside widget b
+```
 
 The `navigate` event will fire when the user presses cursor keys on the keyboard without a field selected or performs a navigation gesture.
 
@@ -1081,7 +1088,7 @@ on navigate x do
 end
 
 on drag pos do
-	if !me.locked
+	if !me.locked|me.draggable
 		me.line[(pointer.prev-me.pos)/me.scale pos]
 	end
 end
