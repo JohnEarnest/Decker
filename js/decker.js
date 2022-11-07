@@ -2877,4 +2877,5 @@ q('body').ondrop=e=>{
 }
 
 pushstate(lmenv()),load_deck(deck_read(q('script[language="decker"]').innerText))
+const tag=decodeURI(document.URL.split('#')[1]||'');if(tag.length)iwrite(deck,lms('card'),lms(tag))
 resize(),(pump&&clearTimeout(pump)),loop()

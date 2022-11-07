@@ -135,6 +135,7 @@ Web-Decker has generally the same tools and functionality as Native-Decker, but 
 - Web-Decker will always report `sys.platform` as `"web"`, irrespective of the operating system the browser is running on.
 - The Web-Decker implementation of Lil uses the browser's garbage collector, so less information is available in `sys.workspace`.
 - Most web browsers do not allow programs to play audio until the user has interacted with a page, so any `play[]` commands issued before a user has clicked, tapped, or pressed a keyboard key will have no effect.
+- If Web-Decker is accessed via a URL containing a `#` suffix (as in a page anchor), it will attempt to `go[]` to the [URI-decoded](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURI) suffix, making it possible to link to a specific card within a deck.
 
 In a nutshell, Web-Decker provides an excellent way to share your decks with other people, and a convenient way to play with Decker when you're unable or unwilling to install the native application. If you're making new decks, Native-Decker's saving functionality and keyboard shortcuts may provide a better experience. You can use both however you please- a deck is a deck!
 
