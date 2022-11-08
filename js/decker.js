@@ -1976,8 +1976,8 @@ bg_tools=_=>{
 }
 bg_end_lasso=_=>{
 	if(uimode!='draw'||dr.tool!='lasso')return
-	const data=dr.mask&&dr.omask&&dr.limbo, diffrect=!requ(dr.sel_here,dr.sel_start)
-	let diffmask=0;for(let z=0;data&&z<dr.mask.pix.length;z++)if((dr.mask.pix[z]>0)!=(dr.omask.pix[z]>0)){diffmask=1;break}
+	const data=dr.mask&&dr.limbo, diffrect=!requ(dr.sel_here,dr.sel_start);let diffmask=dr.omask==null;
+	if(dr.omask)for(let z=0;data&&z<dr.mask.pix.length;z++)if((dr.mask.pix[z]>0)!=(dr.omask.pix[z]>0)){diffmask=1;break}
 	if(data&&(diffrect||diffmask)){
 		bg_scratch();const t=frame;frame=draw_frame(dr.scratch),bg_draw_lasso(dr.sel_here,0,dr.fill),frame=t,bg_edit(),bg_scratch_clear()
 	}dr.poly=[],dr.mask=null,dr.omask=null,dr.limbo=null,dr.sel_here=rect(),dr.sel_start=rect()
@@ -2049,6 +2049,26 @@ bg_select=_=>{
 		if(ev.exit){dr.limbo=null,dr.limbo_dither=0,bg_end_selection()}
 	}
 	ev=te;return card_to_fat(s)
+}
+bg_tighten=_=>{
+	const r=dr.sel_here
+	const set=(p,v)=>dr.mask.pix[p.x+p.y*dr.sel_here.w]=v
+	const get=p=>(p.x<0||p.y<0||p.x>=dr.sel_here.w||p.y>=dr.sel_here.h)?0:dr.mask.pix[p.x+p.y*dr.sel_here.w]
+	if(dr.tool=='select'){ // convert box selections into masked lasso selections
+		dr.tool='lasso',bg_scoop_selection();const s=dr.sel_start, l=dr.limbo, t=frame
+		dr.limbo=image_make(rect(r.w,r.h)),frame=draw_frame(dr.limbo)
+		if(dr.limbo_dither){draw_dithered(frame.clip,l,1),dr.limbo_dither=0}else{draw_scaled(frame.clip,l,1)}frame=t
+		dr.mask=image_make(rect(r.w,r.h)),dr.mask.pix.fill(1)
+		if(s.w>0&&s.h>0){dr.omask=image_make(rect(s.w,s.h)),dr.omask.pix.fill(1)}else{dr.omask=null}
+	}
+	let changed=1,background=bg_fill();while(changed){changed=0 // erode the mask, iterating to a fixed point
+		for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++)if(get(rect(b,a))&&dr.limbo.pix[b+a*r.w]==background){
+			const n=get(rect(b-1,a))&&get(rect(b,a-1))&&get(rect(b+1,a))&&get(rect(b,a+1));if(!n)set(rect(b,a),0),changed=1
+		}
+	}
+	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++)if(get(rect(b,a))){ // regenerate the ANTS outline
+		const n=get(rect(b-1,a))&&get(rect(b,a-1))&&get(rect(b+1,a))&&get(rect(b,a+1));if(!n)set(rect(b,a),ANTS)
+	}
 }
 
 // Object Edit Mode
@@ -2430,6 +2450,8 @@ all_menus=_=>{
 			if(menu_item('Clear',1)){const t=dr.tool;if(!sel){settool('select'),dr.sel_here=rcopy(frame.clip)}bg_delete_selection(),settool(t)}
 			menu_separator()
 			if(menu_item('Select All',1,'a')){settool('select'),dr.sel_here=rcopy(frame.clip)}
+			if(menu_item('Tight Selection',sel,'g'))bg_tighten()
+			menu_separator()
 			if(menu_item('Invert',sel&&!dr.limbo_dither,'i')){
 				if(bg_has_sel())bg_scoop_selection()
 				const s=dr.limbo.size, pal=deck.patterns.pal.pix

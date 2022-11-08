@@ -2066,8 +2066,8 @@ void bg_tools(){
 }
 void bg_end_lasso(){
 	if(uimode!=mode_draw||dr.tool!=tool_lasso)return;
-	int data=dr.mask&&dr.omask&&dr.limbo, diffrect=!rect_same(dr.sel_here,dr.sel_start), diffmask=0;
-	for(int z=0;data&&z<dr.mask->c;z++)if((dr.mask->sv[z]>0)!=(dr.omask->sv[z]>0)){diffmask=1;break;}
+	int data=dr.mask&&dr.limbo, diffrect=!rect_same(dr.sel_here,dr.sel_start), diffmask=dr.omask==NULL;
+	if(dr.omask)for(int z=0;data&&z<dr.mask->c;z++)if((dr.mask->sv[z]>0)!=(dr.omask->sv[z]>0)){diffmask=1;break;}
 	if(data&&(diffrect||diffmask)){
 		bg_scratch();cstate t=frame;frame=draw_buffer(dr.scratch);
 		bg_draw_lasso(dr.sel_here,0,dr.fill);frame=t;bg_edit();bg_scratch_clear();
@@ -2169,6 +2169,28 @@ rect bg_select(){
 		if(has_sel&&ev.dir==dir_down ){ev.dir=dir_none;bg_scoop_selection();dr.sel_here.y++;}
 		if(ev.exit){dr.limbo=NULL,dr.limbo_dither=0;bg_end_selection();}
 	}ev=te;return card_to_fat(s);
+}
+void bg_mask_set(pair p,int v){dr.mask->sv[p.x+p.y*dr.sel_here.w]=v;}
+int bg_mask_get(pair p){return (p.x<0||p.y<0||p.x>=dr.sel_here.w||p.y>=dr.sel_here.h)?0:dr.mask->sv[p.x+p.y*dr.sel_here.w];}
+void bg_tighten(){
+	rect r=dr.sel_here;
+	if(dr.tool==tool_select){ // convert box selections into masked lasso selections
+		dr.tool=tool_lasso;bg_scoop_selection();rect s=dr.sel_start;
+		lv*l=dr.limbo;dr.limbo=lmbuff((pair){r.w,r.h});cstate t=frame;frame=draw_buffer(dr.limbo);
+		if(dr.limbo_dither){draw_dithered(frame.clip,l,1),dr.limbo_dither=0;}else{draw_scaled(frame.clip,l,1);}frame=t;
+		dr.mask=lmbuff((pair){r.w,r.h}),memset(dr.mask->sv,1,r.w*r.h);
+		if(s.w>0&&s.h>0){dr.omask=lmbuff((pair){s.w,s.h}),memset(dr.omask->sv,1,s.w*s.h);}else{dr.omask=NULL;}
+	}
+	int changed=1,background=bg_fill();while(changed){changed=0; // erode the mask, iterating to a fixed point
+		for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++)if(bg_mask_get((pair){b,a})&&dr.limbo->sv[b+a*r.w]==background){
+			int n=bg_mask_get((pair){b-1,a})&&bg_mask_get((pair){b,a-1})&&bg_mask_get((pair){b+1,a})&&bg_mask_get((pair){b,a+1});
+			if(!n)bg_mask_set((pair){b,a},0),changed=1;
+		}
+	}
+	for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++)if(bg_mask_get((pair){b,a})){ // regenerate the ANTS outline
+		int n=bg_mask_get((pair){b-1,a})&&bg_mask_get((pair){b,a-1})&&bg_mask_get((pair){b+1,a})&&bg_mask_get((pair){b,a+1});
+		if(!n)bg_mask_set((pair){b,a},ANTS);
+	}
 }
 
 // Object Edit Mode
@@ -2715,6 +2737,8 @@ void tick(lv*env){
 				if(menu_item("Clear",1,'\0')){int t=dr.tool;if(!sel){settool(tool_select),dr.sel_here=frame.clip;}bg_delete_selection();settool(t);}
 				menu_separator();
 				if(menu_item("Select All",1,'a')){settool(tool_select),dr.sel_here=frame.clip;}
+				if(menu_item("Tight Selection",sel,'g'))bg_tighten();
+				menu_separator();
 				if(menu_item("Invert",sel&&!dr.limbo_dither,'i')){
 					if(bg_has_sel())bg_scoop_selection();
 					pair s=buff_size(dr.limbo);char*pal=patterns_pal(ifield(deck,"patterns"));
