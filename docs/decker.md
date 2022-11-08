@@ -102,7 +102,7 @@ A number of shortcuts are available with any of the drawing tools selected:
 
 - Pressing `m` toggles the visibility of Decker's main menu.
 - Pressing `t` toggles transparency mode (_Style &#8594; Transparency_).
-- Holding control or command while clicking will enter Fat Bits mode centered on the position you click.
+- Holding control or command while clicking will enter Fat Bits mode centered on the position you click, or exit Fat Bits mode.
 - Right-clicking with any tool or holding shift before beginning a stroke will _erase_: this behaves like the pencil tool, but always draws using pattern 0.
 
 In fullscreen mode (see _Decker &#8594; Fullscreen_), if there's room on your monitor, Decker will display toolbars on the left and right edges of the display- use these interchangably with the _Tool_ and _Style_ menus. Or don't!

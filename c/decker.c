@@ -1948,7 +1948,8 @@ void bg_lasso_preview(){
 	}else{bg_draw_lasso(r,1,dr.fill);}
 }
 void bg_tools(){
-	if(!dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=1;fat_offset(ev.pos);return;}if(ev.alt)return;
+	if     (!dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=1;fat_offset(ev.pos);return;}
+	else if( dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=0;return;}if(ev.alt)return;
 	if(ev.md)pointer_prev=ev.pos;
 	event_state te=ev;pair pp=pointer_prev;
 	if(ev.md&&!over(frame.clip))ev.md=0;
