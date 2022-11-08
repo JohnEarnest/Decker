@@ -304,5 +304,6 @@ Changelog
 ---------
 1.0:
 - Initial release.
-1.2
+
+1.2:
 - Introduced the `canvas.draggable` field.
