@@ -1723,9 +1723,9 @@ canvas_read=(x,card)=>{
 canvas_write=x=>{
 	const r=lmd([lms('type')],[lms('canvas')])
 	if(x.border!=undefined)dset(r,lms('border'),lmn(x.border))
-	if(x.image    )dset(r,lms('image'),lms(image_write(x.image)))
-	if(x.draggable)dset(r,lms('brush'),lmn(x.draggable))
-	if(x.brush    )dset(r,lms('brush'),lmn(x.brush))
+	if(x.image    )dset(r,lms('image'    ),lms(image_write(x.image)))
+	if(x.draggable)dset(r,lms('draggable'),lmn(x.draggable))
+	if(x.brush    )dset(r,lms('brush'    ),lmn(x.brush))
 	if(x.pattern!=undefined&&x.pattern!=1)dset(r,lms('pattern'),lmn(x.pattern))
 	if(x.scale)dset(r,lms('scale'),lmn(x.scale))
 	if(x.clip&&!requ(x.clip,rpair(rect(),getpair(ifield(x,'lsize')))))dset(r,lms('clip'),lml([x.clip.x,x.clip.y,x.clip.w,x.clip.h].map(lmn)))
