@@ -1256,9 +1256,7 @@ image_make=size=>{
 		if(ikey(i,'copy'))return lmnat(z=>image_copy(self,unpack_rect(z,self.size)))
 		if(ikey(i,'paste'))return lmnat(([img,pos,t])=>{
 			img=getimage(img), pos=(pos?ll(pos):[]).map(ln); let solid=t?!lb(t):1, cl=rect(0,0,self.size.x,self.size.y); if(img==self)img=image_copy(img)
-			// TODO: can we squash these calls together?
-			if(pos.length<=2){image_paste(rect(pos[0],pos[1],img.size.x,img.size.y),cl,img,self,solid)}
-			else{image_paste_scaled(getrect(pos),cl,img,self,solid)}return self
+			image_paste_scaled(pos.length<=2?rect(pos[0],pos[1],img.size.x,img.size.y):getrect(pos),cl,img,self,solid)
 		})
 		return x?x:NONE
 	};return {t:'int',f:f,n:'image',size:size,pix:new Uint8Array(size.x*size.y)}
@@ -1689,9 +1687,7 @@ canvas_read=(x,card)=>{
 			if(ikey(i,'paste'    ))return lmnat(([img,pos,t])=>{
 				canvas_pick(self);const dst=canvas_image(self,1)
 				img=getimage(img),pos=(pos?ll(pos):[]).map(ln); let solid=t?!lb(t):1
-				// TODO: can we squash these calls together?
-				if(pos.length<=2){image_paste(rect(pos[0],pos[1],img.size.x,img.size.y),frame.clip,img,dst,solid)}
-				else{image_paste_scaled(getrect(pos),frame.clip,img,dst,solid)}
+				image_paste_scaled(pos.length<=2?rect(pos[0],pos[1],img.size.x,img.size.y):getrect(pos),frame.clip,img,dst,solid)
 				return NONE
 			})
 			if(ikey(i,'merge'))return lmnat(z=>{
