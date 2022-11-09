@@ -2343,23 +2343,26 @@ void palbtn(pair pos,pair dn,rect b,int pattern){
 	if((dr.pickfill?dr.fill:dr.pattern)==pattern){draw_rect(inset(b,3),pattern),draw_box(inset(b,3),0,1);}else{draw_rect(b,pattern);}
 	if(box_in(b,pos)){uicursor=cursor_point;if(ev.mu&&box_in(b,dn)){if(dr.pickfill){dr.fill=pattern;}else{dr.pattern=pattern;}}}draw_box(b,0,1);
 }
+
+// 9 + 6
 #define tcellw 22
-#define tcellh 20
+#define tcellh 19
+#define tgap   1
 void ltoolbar(pair pos,pair dn){
 	pair size=buff_size(TOOLB);frame=draw_buffer(TOOLB);
-	draw_rect(frame.clip,0),draw_box((rect){0,0,size.x,size.y},0,1),draw_rect((rect){0,6*tcellh,size.x,8},1);
+	draw_rect(frame.clip,0),draw_box((rect){0,0,size.x,size.y},0,1),draw_rect((rect){0,6*tcellh,size.x,tgap},1);
 	if(toolbtn(pos,dn,(rect){0     ,0,tcellw+1,tcellh+1},0,uimode==mode_interact))setmode(mode_interact),ev.mu=ev.md=0;
 	if(toolbtn(pos,dn,(rect){tcellw,0,tcellw+1,tcellh+1},1,uimode==mode_object  ))setmode(mode_object  ),ev.mu=ev.md=0;
 	for(int z=0;z<10;z++){if(toolbtn(pos,dn,(rect){(z%2)*tcellw,(1+(z/2))*tcellh,tcellw+1,tcellh+1},z+2,uimode==mode_draw&&dr.tool==z))settool(z),ev.mu=ev.md=0;}
-	for(int z=0;z<2*12;z++)brushbtn(pos,dn,(rect){(z%2)*tcellw,(6+(z/2))*tcellh+8,tcellw+1,tcellh+1},((z*12)+(z/2))%24);
+	for(int z=0;z<2*12;z++)brushbtn(pos,dn,(rect){(z%2)*tcellw,(6+(z/2))*tcellh+tgap,tcellw+1,tcellh+1},((z*12)+(z/2))%24);
 }
 void rtoolbar(pair pos,pair dn){
 	int pp[]={0,1,4,5,8,9,16,17,12,13,18,19,20,21,22,23,24,25,26,27,2,6,3,7,10,11,14,15,28,29,30,31}; // pleasing visual ramps
 	pair size=buff_size(TOOLB);frame=draw_buffer(TOOLB);
-	draw_rect(frame.clip,0),draw_box((rect){0,0,size.x,size.y},0,1),draw_rect((rect){0,16*tcellh,size.x,8},1);
+	draw_rect(frame.clip,0),draw_box((rect){0,0,size.x,size.y},0,1),draw_rect((rect){0,16*tcellh,size.x,tgap},1);
 	if(modebtn(pos,dn,(rect){0,0     ,tcellw*2+1,tcellh+1},"Stroke",dr.pickfill==0))dr.pickfill=0;
 	if(modebtn(pos,dn,(rect){0,tcellh,tcellw*2+1,tcellh+1},"Fill"  ,dr.pickfill==1))dr.pickfill=1;
-	for(int z=0;z<4*8;z++)palbtn(pos,dn,(rect){(z%2)*tcellw,(2+(z/2))*tcellh+(z>=28?8:0),tcellw+1,tcellh+1},pp[z]);
+	for(int z=0;z<4*8;z++)palbtn(pos,dn,(rect){(z%2)*tcellw,(2+(z/2))*tcellh+(z>=28?tgap:0),tcellw+1,tcellh+1},pp[z]);
 }
 
 // Input and Events
@@ -3219,7 +3222,7 @@ int main(int argc,char**argv){
 	dset(env,lmistr("gest dn"  ),GESTURES[3]=image_read(lmistr("%%IMG2ABAAEAAFIAUACyABAQMgAQAHIAUBAyAFAAMgAQELIAEAAyABAQsgAQADIAIBCSACAAQgAQEJIAEABSACAQcgAgAGIAEBByABAAcgAgEFIAIACCABAQUgAQAJIAIBAyACAAogAQEDIAEACyACAQEgAgAMIAEBASABAA0gAwAH")));
 	dset(env,lmistr("tools"    ),TOOLS);
 	dset(env,lmistr("arrows"   ),ARROWS);
-	dset(env,lmistr("ltools"   ),TOOLB     =lmbuff((pair){tcellw*2+1,tcellh*18+8+1}));
+	dset(env,lmistr("ltools"   ),TOOLB     =lmbuff((pair){tcellw*2+1,tcellh*18+tgap+1}));
 	dset(env,lmistr("playing"  ),PLAYING   =l_take(lmn(SFX_SLOTS),NONE));
 	dset(env,lmistr("li hist"  ),li.hist   =lml(0));
 	dset(env,lmistr("li vars"  ),li.vars   =lmd());

@@ -2199,7 +2199,7 @@ object_editor=_=>{
 // Toolbars
 
 let toolbars_enable=0, tzoom=1 // should be off by default?
-const tcellw=22, tcellh=20, toolsize=rect(tcellw*2+1,tcellh*18+8+1), tfb=image_make(toolsize), tid=new ImageData(toolsize.x,toolsize.y)
+const tcellw=22, tcellh=19, tgap=1, toolsize=rect(tcellw*2+1,tcellh*18+tgap+1), tfb=image_make(toolsize), tid=new ImageData(toolsize.x,toolsize.y)
 const tooltypes=['select','pencil','lasso','line','fill','poly','rect','fillrect','ellipse','fillellipse']
 const patorder=[0,1,4,5,8,9,16,17,12,13,18,19,20,21,22,23,24,25,26,27,2,6,3,7,10,11,14,15,28,29,30,31] // pleasing visual ramps for 2 columns
 
@@ -2243,10 +2243,10 @@ toolbars=_=>{
 		if(rin(b,pos)){uicursor=cursor.point;if(ev.mu&&rin(b,dn)){if(dr.pickfill){dr.fill=pattern}else{dr.pattern=pattern}}}draw_box(b,0,1)
 	}
 	toolbar(q('#ltools'),q('#lrender'),(pos,dn)=>{
-		draw_rect(rect(0,6*tcellh,toolsize.x,8),1)
+		draw_rect(rect(0,6*tcellh,toolsize.x,tgap),1)
 		if(toolbtn(pos,dn,rect(0     ,0,tcellw+1,tcellh+1),0,uimode=='interact'))setmode('interact'),ev.mu=ev.md=0
 		if(toolbtn(pos,dn,rect(tcellw,0,tcellw+1,tcellh+1),1,uimode=='object'  ))setmode('object'  ),ev.mu=ev.md=0
-		for(let z=0;z<2*12;z++)brushbtn(pos,dn,rect((z%2)*tcellw,(6+(0|(z/2)))*tcellh+8,tcellw+1,tcellh+1),((z*12)+(0|(z/2)))%24)
+		for(let z=0;z<2*12;z++)brushbtn(pos,dn,rect((z%2)*tcellw,(6+(0|(z/2)))*tcellh+tgap,tcellw+1,tcellh+1),((z*12)+(0|(z/2)))%24)
 		for(let z=0;z<10;z++){
 			if(toolbtn(pos,dn,rect((z%2)*tcellw,(1+(0|(z/2)))*tcellh,tcellw+1,tcellh+1),z+2,uimode=='draw'&&dr.tool==tooltypes[z])){
 				settool(tooltypes[z]),ev.mu=ev.md=0
@@ -2254,10 +2254,10 @@ toolbars=_=>{
 		}
 	})
 	toolbar(q('#rtools'),q('#rrender'),(pos,dn)=>{
-		draw_rect(rect(0,16*tcellh,toolsize.x,8),1)
+		draw_rect(rect(0,16*tcellh,toolsize.x,tgap),1)
 		if(modebtn(pos,dn,rect(0,0     ,tcellw*2+1,tcellh+1),'Stroke',dr.pickfill==0))dr.pickfill=0
 		if(modebtn(pos,dn,rect(0,tcellh,tcellw*2+1,tcellh+1),'Fill'  ,dr.pickfill==1))dr.pickfill=1
-		for(let z=0;z<4*8;z++)palbtn(pos,dn,rect((z%2)*tcellw,(2+(0|(z/2)))*tcellh+(z>=28?8:0),tcellw+1,tcellh+1),patorder[z])
+		for(let z=0;z<4*8;z++)palbtn(pos,dn,rect((z%2)*tcellw,(2+(0|(z/2)))*tcellh+(z>=28?tgap:0),tcellw+1,tcellh+1),patorder[z])
 	})
 }
 
