@@ -2105,21 +2105,29 @@ rect keep_ratio(rect r,pair s){
 void draw_handles(rect r){
 	char*pal=patterns_pal(ifield(deck,"patterns"));
 	int h=5; // resize handle size
-	int x0=r.x+1-h, x2=r.x+r.w-1;
-	int y0=r.y+1-h, y2=r.y+r.h-1;
+	int x0=r.x+1-h, x2=r.x+r.w-1, x1=(x2-x0)/2+x0;
+	int y0=r.y+1-h, y2=r.y+r.h-1, y1=(y2-y0)/2+y0;
 	draw_invert(pal,box_intersect((rect){x0,y0,h,h},frame.clip));
 	draw_invert(pal,box_intersect((rect){x0,y2,h,h},frame.clip));
 	draw_invert(pal,box_intersect((rect){x2,y0,h,h},frame.clip));
 	draw_invert(pal,box_intersect((rect){x2,y2,h,h},frame.clip));
+	draw_invert(pal,box_intersect((rect){x2,y1,h,h},frame.clip));
+	draw_invert(pal,box_intersect((rect){x1,y2,h,h},frame.clip));
+	draw_invert(pal,box_intersect((rect){x1,y0,h,h},frame.clip));
+	draw_invert(pal,box_intersect((rect){x0,y1,h,h},frame.clip));
 }
 int in_handle(rect r){
 	int h=5; // resize handle size
-	int x0=r.x+1-h, x2=r.x+r.w-1;
-	int y0=r.y+1-h, y2=r.y+r.h-1;
+	int x0=r.x+1-h, x2=r.x+r.w-1, x1=(x2-x0)/2+x0;
+	int y0=r.y+1-h, y2=r.y+r.h-1, y1=(y2-y0)/2+y0;
 	if(over((rect){x0,y0,h,h}))return 4;
 	if(over((rect){x0,y2,h,h}))return 6;
 	if(over((rect){x2,y0,h,h}))return 2;
 	if(over((rect){x2,y2,h,h}))return 0;
+	if(over((rect){x2,y1,h,h}))return 1;
+	if(over((rect){x1,y0,h,h}))return 3;
+	if(over((rect){x0,y1,h,h}))return 5;
+	if(over((rect){x1,y2,h,h}))return 7;
 	return -1;
 }
 rect bg_select(){
@@ -2130,8 +2138,8 @@ rect bg_select(){
 	int ax=MIN(ev.dpos.x,ev.pos.x), bx=MAX(ev.dpos.x,ev.pos.x);
 	int ay=MIN(ev.dpos.y,ev.pos.y), by=MAX(ev.dpos.y,ev.pos.y);
 	int h=5; // resize handle size
-	int x0=s.x+1-h, x2=s.x+s.w-1;// x1=(x2-x0)/2+x0;
-	int y0=s.y+1-h, y2=s.y+s.h-1;// y1=(y2-y0)/2+y0;
+	int x0=s.x+1-h, x2=s.x+s.w-1, x1=(x2-x0)/2+x0;
+	int y0=s.y+1-h, y2=s.y+s.h-1, y1=(y2-y0)/2+y0;
 	int dx=ev.pos.x-ev.dpos.x;
 	int dy=ev.pos.y-ev.dpos.y;
 	pair sz=dr.limbo?buff_size(dr.limbo):(pair){dr.sel_start.w,dr.sel_start.h};
@@ -2142,6 +2150,10 @@ rect bg_select(){
 		else if handle(x0,y2, dx, 0,-dx, dy) // sw
 		else if handle(x2,y0,  0,dy, dx,-dy) // ne
 		else if handle(x0,y0, dx,dy,-dx,-dy) // nw
+		else if handle(x2,y1,  0, 0, dx,  0) // e
+		else if handle(x1,y0,  0,dy,  0,-dy) // n
+		else if handle(x0,y1, dx, 0,-dx,  0) // w
+		else if handle(x1,y2,  0, 0,  0, dy) // s
 		else if(ev.md&&in_sel){
 			// begin move selection
 			bg_scoop_selection();
@@ -3029,6 +3041,10 @@ void tick(lv*env){
 					if(ob.handle==2){r.w+=delta.x, r.h-=delta.y; r.y+=delta.y;}
 					if(ob.handle==6){r.w-=delta.x, r.h+=delta.y; r.x+=delta.x;}
 					if(ob.handle==4){r.w-=delta.x, r.h-=delta.y; r.x+=delta.x; r.y+=delta.y;}
+					if(ob.handle==1){r.w+=delta.x;}
+					if(ob.handle==3){r.h-=delta.y, r.y+=delta.y;}
+					if(ob.handle==5){r.w-=delta.x, r.x+=delta.x;}
+					if(ob.handle==7){r.h+=delta.y;}
 					r.w=MAX(8,r.w), r.h=MAX(8,r.h);
 					if(dragged){ob_resize(r,!ob.resize_first);ob.resize_first=0,ob.prev=ev.pos;}
 				}

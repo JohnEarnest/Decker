@@ -2005,18 +2005,26 @@ bg_paste=image=>{
 }
 draw_handles=r=>{
 	const h=5, pal=deck.patterns.pal.pix
-	const x0=r.x+1-h, x2=r.x+r.w-1, y0=r.y+1-h, y2=r.y+r.h-1
+	const x0=r.x+1-h, x2=r.x+r.w-1, y0=r.y+1-h, y2=r.y+r.h-1, x1=0|((x2-x0)/2+x0), y1=0|((y2-y0)/2+y0)
 	draw_invert(pal,rclip(rect(x0,y0,h,h),frame.clip))
 	draw_invert(pal,rclip(rect(x0,y2,h,h),frame.clip))
 	draw_invert(pal,rclip(rect(x2,y0,h,h),frame.clip))
 	draw_invert(pal,rclip(rect(x2,y2,h,h),frame.clip))
+	draw_invert(pal,rclip(rect(x2,y1,h,h),frame.clip))
+	draw_invert(pal,rclip(rect(x1,y2,h,h),frame.clip))
+	draw_invert(pal,rclip(rect(x1,y0,h,h),frame.clip))
+	draw_invert(pal,rclip(rect(x0,y1,h,h),frame.clip))
 }
 in_handle=r=>{
-	const h=5, x0=r.x+1-h, x2=r.x+r.w-1, y0=r.y+1-h, y2=r.y+r.h-1
+	const h=5, x0=r.x+1-h, x2=r.x+r.w-1, y0=r.y+1-h, y2=r.y+r.h-1, x1=0|((x2-x0)/2+x0), y1=0|((y2-y0)/2+y0)
 	if(over(rect(x0,y0,h,h)))return 4
 	if(over(rect(x0,y2,h,h)))return 6
 	if(over(rect(x2,y0,h,h)))return 2
-	if(over(rect(x2,y2,h,h)))return 0;return -1
+	if(over(rect(x2,y2,h,h)))return 0
+	if(over(rect(x2,y1,h,h)))return 1
+	if(over(rect(x1,y0,h,h)))return 3
+	if(over(rect(x0,y1,h,h)))return 5
+	if(over(rect(x1,y2,h,h)))return 7;return -1
 }
 bg_select=_=>{
 	if(uimode!='draw'||dr.tool!='select')return rect(0,0,0,0)
@@ -2024,7 +2032,7 @@ bg_select=_=>{
 	if(dr.fatbits){ev.pos=fat_to_card(ev.pos),ev.dpos=fat_to_card(ev.dpos),pointer.prev=fat_to_card(pointer.prev)}
 	let s=rcopy(dr.sel_here), has_sel=s.w>0||s.h>0, in_sel=has_sel&&dover(s)
 	const ax=min(ev.dpos.x,ev.pos.x), bx=max(ev.dpos.x,ev.pos.x), ay=min(ev.dpos.y,ev.pos.y), by=max(ev.dpos.y,ev.pos.y), h=5
-	const x0=s.x+1-h, x2=s.x+s.w-1, y0=s.y+1-h, y2=s.y+s.h-1, dx=ev.pos.x-ev.dpos.x, dy=ev.pos.y-ev.dpos.y
+	const x0=s.x+1-h, x2=s.x+s.w-1, y0=s.y+1-h, y2=s.y+s.h-1, x1=0|((x2-x0)/2+x0), y1=0|((y2-y0)/2+y0), dx=ev.pos.x-ev.dpos.x, dy=ev.pos.y-ev.dpos.y
 	const sz=dr.limbo?dr.limbo.size:rect(dr.sel_start.w,dr.sel_start.h)
 	handle=(rw,rh,ox,oy,ow,oh)=>{if(has_sel&&(ev.mu||ev.drag)&&dover(rect(rw,rh,h,h))){
 		s=rnorm(keep_ratio(rect(s.x+ox,s.y+oy,s.w+ow,s.h+oh),sz))
@@ -2035,6 +2043,10 @@ bg_select=_=>{
 		else if(handle(x0,y2, dx, 0,-dx, dy)){} // sw
 		else if(handle(x2,y0,  0,dy, dx,-dy)){} // ne
 		else if(handle(x0,y0, dx,dy,-dx,-dy)){} // nw
+		else if(handle(x2,y1,  0, 0, dx,  0)){} // e
+		else if(handle(x1,y0,  0,dy,  0,-dy)){} // n
+		else if(handle(x0,y1, dx, 0,-dx,  0)){} // w
+		else if(handle(x1,y2,  0, 0,  0, dy)){} // s
 		else if(ev.md&&in_sel){bg_scoop_selection()} // begin move
 		else if((ev.mu||ev.drag)&&in_sel){s.x+=dx, s.y+=dy;if(ev.mu)dr.sel_here=s} // move/finish
 		else if(ev.md&&!in_sel){if(has_sel){draw_limbo(card_to_fat(s),dr.fatbits),bg_end_selection(),has_sel=0}s=rcopy(dr.sel_here)} // begin create
@@ -2179,6 +2191,10 @@ object_editor=_=>{
 		if(ob.handle==2){r.w+=delta.x, r.h-=delta.y, r.y+=delta.y}
 		if(ob.handle==6){r.w-=delta.x, r.h+=delta.y, r.x+=delta.x}
 		if(ob.handle==4){r.w-=delta.x, r.h-=delta.y, r.x+=delta.x, r.y+=delta.y}
+		if(ob.handle==1){r.w+=delta.x}
+		if(ob.handle==3){r.h-=delta.y, r.y+=delta.y}
+		if(ob.handle==5){r.w-=delta.x, r.x+=delta.x}
+		if(ob.handle==7){r.h+=delta.y}
 		r.w=max(8,r.w), r.h=max(8,r.h)
 		if(dragged)ob_resize(r,!ob.resize_first),ob.resize_first=0,ob.prev=rcopy(ev.pos)
 	}
