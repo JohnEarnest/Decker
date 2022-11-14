@@ -21,6 +21,7 @@ lv*n_show (lv*self,lv*a); // user-supplied function which displays raw to stdout
 lv*n_print(lv*self,lv*a); // user-supplied function which formats/displays to stdout.
 lv*debug_show(lv*x);      // version of l_show() which _always_ goes to stdout, for internal use.
 
+#define NUM          512 // number parsing/formatting buffer size
 #define NONE         lmn(0)
 #define ONE          lmn(1)
 #define EMPTY        lml(0)
@@ -119,7 +120,7 @@ double rnum_len(char*x,int n,int*len){
 }
 double rnum(char*x,int n){int i=0;return rnum_len(x,n,&i);}
 void wnum(str*x,double y){
-	char t[64];int n=snprintf(t,sizeof(t),"%f",y)-1;
+	char t[NUM];int n=snprintf(t,sizeof(t),"%f",y)-1;
 	while(n>0&&t[n]=='0')n--;if(t[n]=='.')n--;str_add(x,t,n+1);
 }
 monad(l_rows);monad(l_cols);monad(l_range);monad(l_list);monad(l_first);
@@ -366,7 +367,7 @@ lv* pjson(char*t,int*i,int*f,int*n){
 	if(jm('{')){lv*r=lmd( );while(jc()){js();if(jm('}'))break;lv*k=pjson(t,i,f,n);js();jm(':');if(*f)dset(r,k,pjson(t,i,f,n));js();jm(',');}return r;}
 	if(jm('"')){str r=str_new();while(jc()&&!(jm('"'))){str_addc(&r,(jm('\\'))?esc(jn(),i,t,n):jn());}return lmstr(r);}
 	int ns=*i;jm('-');jd();jm('.');jd();if(jm('e')||jm('E')){jm('-')||jm('+');jd();}if(*i<=ns){*f=0;return NONE;}
-	char tb[64];snprintf(tb,MIN(*i-ns+1,64),"%s",t+ns);return lmn(atof(tb));
+	char tb[NUM];snprintf(tb,MIN(*i-ns+1,NUM),"%s",t+ns);return lmn(atof(tb));
 }
 dyad(l_parse){
 	if(lil(y)){MAP(r,y)l_parse(x,y->lv[z]);return r;}
@@ -425,24 +426,24 @@ void fjson(str*s,lv*x){
 	else{str_addz(s,"null");}
 }
 void format_type(str*r,lv*a,char t,int n,int d,int lf,int pz,int*f,char*c){
-	char o[64]={0},*op=o;
-	if     (t=='%')snprintf(o,64,"%%");
+	char o[NUM]={0},*op=o;
+	if     (t=='%')snprintf(o,NUM,"%%");
 	else if(t=='s'||t=='l'||t=='u'){op=ls(a)->sv;}
 	else if(t=='r'||t=='o'){op=ls(a)->sv,lf=1;d=MAX(1,d);while(d&&c[*f])d--,(*f)++;d=n;}
 	else if(t=='a'){str v=str_new();lv*l=ll(a);EACH(z,l)str_addc(&v,0xFF&((int)ln(l->lv[z])));op=lmstr(v)->sv;}
-	else if(t=='b')snprintf(o,64,"%s",lb(a)?"true":"false");
-	else if(t=='f'){if(d){snprintf(o,64,"%.*f",d,ln(a));}else{str v=str_new();wnum(&v,ln(a));op=lmstr(v)->sv;}}
-	else if(t=='c'){double v=ln(a);snprintf(o,64,"%s$%.*f",v<0?"-":"",d?d:2,fabs(v));}
-	else if(t=='i')snprintf(o,64,"%lld",(long long)ln(a));
-	else if(t=='h')snprintf(o,64,"%llx",(long long)ln(a));
-	else if(t=='H')snprintf(o,64,"%llX",(long long)ln(a));
+	else if(t=='b')snprintf(o,NUM,"%s",lb(a)?"true":"false");
+	else if(t=='f'){if(d){snprintf(o,NUM,"%.*f",d,ln(a));}else{str v=str_new();wnum(&v,ln(a));op=lmstr(v)->sv;}}
+	else if(t=='c'){double v=ln(a);snprintf(o,NUM,"%s$%.*f",v<0?"-":"",d?d:2,fabs(v));}
+	else if(t=='i')snprintf(o,NUM,"%lld",(long long)ln(a));
+	else if(t=='h')snprintf(o,NUM,"%llx",(long long)ln(a));
+	else if(t=='H')snprintf(o,NUM,"%llX",(long long)ln(a));
 	else if(t=='j'){str v=str_new();fjson(&v,a);op=lmstr(v)->sv;}
-	else if(t=='e'){time_t v=ln(a);strftime(o,64,"%FT%TZ",gmtime(&v));}
+	else if(t=='e'){time_t v=ln(a);strftime(o,NUM,"%FT%TZ",gmtime(&v));}
 	else if(t=='p'){
 		struct tm v={0};lv*d=ld(a);
 		#define pg(x,f,o) {lv*p=dget(d,lmcstr(x));v.tm_##f=p?ln(p)-o:0;}
 		pg("year",year,1900)pg("month",mon,1)pg("day",mday,0)pg("hour",hour,0)pg("minute",min,0)pg("second",sec,0)
-		strftime(o,64,"%FT%TZ",&v);
+		strftime(o,NUM,"%FT%TZ",&v);
 	}
 	int vn=strlen(op); if(d&&strchr("fc",t))d=0; if(d&&lf)vn=MIN(d,vn);
 	if(n&&!lf)for(int z=0;z<n-vn;z++)str_addc(r,pz?'0':' ');
@@ -577,7 +578,7 @@ char nc(){
 }
 void num(token*r,char x,int sign){
 	if(x=='.'&&!isdigit(tc())){init_tok(r,'.');return;}
-	int len=0;double v=sign*rnum_len(par.text+(par.i-1),64,&len);par.i+=(len-1);
+	int len=0;double v=sign*rnum_len(par.text+(par.i-1),NUM,&len);par.i+=(len-1);
 	init_tok(r,'d'),r->nv=v;
 }
 void tok(token*r){
