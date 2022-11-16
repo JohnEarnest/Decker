@@ -907,6 +907,7 @@ assert["pattern anim may not include animated colors" (27,0,0,32) p[29]]
 peachpuff:"%h" parse "FFDAB9"
 p[38]:peachpuff
 assert["pattern color write/read" peachpuff p[38]]
+assert["pattern tolerate bogus write" (list 420) p[3]:420]
 
 #######################################
 #
