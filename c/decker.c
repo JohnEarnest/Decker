@@ -2485,7 +2485,7 @@ void sync(){
 				au.target=n_deck_add(deck,l_list(lmistr("sound")));mark_dirty();modal_enter(modal_recording);
 				sound_edit(readwav(p));au.sel=(pair){0,0},au.head=0;
 			}
-			if(has_suffix(p,".csv")||has_suffix(p,".psv")){
+			if((has_suffix(p,".csv")||has_suffix(p,".psv"))&&!has_parent(ifield(deck,"card"))){
 				setmode(mode_object);lv*a=lmd();
 				lv* dat=n_read(NULL,l_list(lmcstr(p)));
 				lv* sep=lmistr(has_suffix(p,".csv")?",": "|");
@@ -2792,7 +2792,7 @@ void tick(lv*env){
 				}
 				paste_any();
 				menu_separator();
-				if(menu_item("Paste as new Canvas",has_clip("%%IMG"),'\0')){
+				if(menu_item("Paste as new Canvas",has_clip("%%IMG")&&!has_parent(card),'\0')){
 					lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas"));
 					char*t=SDL_GetClipboardText();dset(p,lmistr("image"),lmcstr(t));SDL_free(t);
 					ob_create(l_list(p));frame=context;

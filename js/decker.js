@@ -2498,7 +2498,7 @@ all_menus=_=>{
 			if(menu_item('Copy Image',ob.sel.length==1&&canvas_is(ob.sel[0]),0,copycanvasimg)){}
 			if(menu_item('Paste',1,'v',menupaste)){}
 			menu_separator()
-			if(menu_item('Paste as new Canvas',1,0,pasteascanvas)){}
+			if(menu_item('Paste as new Canvas',!has_parent(card),0,pasteascanvas)){}
 			if(menu_item('Paste into Canvas',ob.sel.length==1&&canvas_is(ob.sel[0]),0,pasteintocanvas)){}
 			menu_separator()
 			if(menu_item('Select All',!has_parent(card),'a'))ob.sel=card.widgets.v.slice(0)
@@ -2900,7 +2900,7 @@ document.onpaste=e=>{
 q('body').ondragover=e=>e.preventDefault()
 q('body').ondrop=e=>{
 	e.preventDefault();const file=e.dataTransfer.files.item(0);if(!file)return
-	if(/\.(psv|csv)$/i.test(file.name)){
+	if(/\.(psv|csv)$/i.test(file.name)&&!has_parent(ifield(deck,'card'))){
 		file.text().then(t=>{
 			const data=n_readcsv([lms(t),NONE,lms(file.type=='text/csv'?',':'|')])
 			setmode('object'),ob_create([lmd([lms('type'),lms('value')],[lms('grid'),monad.cols(data)])])
