@@ -2333,7 +2333,7 @@ lv* n_play(lv*self,lv*z){
 		if(audio_loop.clip&&matchr(audio_loop.clip,x)){} // don't re-trigger!
 		else if(sound_is(x)){audio_loop.clip=x,audio_loop.sample=0,audio_loop.volume=1.0;} // play
 		else{audio_loop.clip=NULL;} // stop the loop
-		return NONE
+		return NONE;
 	}
 	(void)self;lv*x=l_first(z),*sfx=sound_is(x)?x: dget(ifield(deck,"sounds"),ls(x));if(!sfx)return NONE;
 	int max_sample=0;int avail=-1;for(int z=0;z<SFX_SLOTS;z++){
