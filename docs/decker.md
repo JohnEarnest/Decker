@@ -385,53 +385,60 @@ Decker provides a number of useful pre-defined functions:
 | :--------------------- | :------------------------------------------------------------------------------------------------------------------------ | :--------- |
 | `show[x...]`           | Print a human-comprehensible representation of the value `x` to _stdout_ followed by a newline, and return `x`.           | Console    |
 | `print[x...]`          | Display a string `x` in the Listener. (1)                                                                                 | Console    |
-| `play[x]`              | Play a sound. `x` can be either the name of a sound or a sound interface.                                                 | Decker     |
-| `go[x y]`              | Navigate to another card by _name_, _value_, or _index_ `x` with transition `y`. (2)                                      | Decker     |
+| `play[x mode]`         | Play a sound. `x` can be either the name of a sound or a sound interface. (2)                                             | Decker     |
+| `go[x y]`              | Navigate to another card by _name_, _value_, or _index_ `x` with transition `y`. (3)                                      | Decker     |
 | `transition[x]`        | Install a [transition](#transitions) `x` for use with `go[]`, and return a dictionary of installed transitions.           | Decker     |
-| `sleep[x]`             | Wait for `x` 60hz frames before proceeding, minimum 1 frame. Allows for performing simple animation. (3)                  | Decker     |
+| `sleep[x]`             | Wait for `x` 60hz frames before proceeding, minimum 1 frame. Allows for performing simple animation. (4)                  | Decker     |
 | `array[x y]`           | Create a new [Array Interface](#arrayinterface) with size `x` and cast string `y`, or decode an array string `x`.         | Decker     |
 | `image[x]`             | Create a new [Image Interface](#imageinterface) with size `x` (`(width,height)`), or decode an image string.              | Decker     |
 | `sound[x]`             | Create a new [Sound Interface](#soundinterface) with a size or list of samples `x`, or decode a sound string.             | Decker     |
-| `eval[x y]`            | Parse and execute a string `x` as a Lil program, using any variable bindings in dictionary `y`. (4)                       | System     |
-| `random[x y]`          | Choose `y` random elements from `x`. (5)                                                                                  | System     |
-| `readcsv[x y d]`       | Turn a [RFC-4180](https://datatracker.ietf.org/doc/html/rfc4180) CSV string `x` into a Lil table with column spec `y`.(6) | Data       |
-| `writecsv[x y d]`      | Turn a Lil table `x` into a CSV string with column spec `y`.(6)                                                           | Data       |
-| `readxml[x]`           | Turn a useful subset of XML/HTML into a Lil structure.(7)                                                                 | Data       |
-| `writexml[x]`          | Turn a Lil structure `x` into an indented XML string.(8)                                                                  | Data       |
-| `alert[text type x y]` | Open a modal dialog with the string or rtext `text`, and potentially prompt for input.(9)                                 | Modal      |
-| `read[type hint]`      | Open a modal dialog prompting the user to open a document, and return its contents (or `""`).(10)                         | Modal      |
-| `write[x]`             | Open a modal dialog prompting the user to save `x`. Returns `1` if the file was saved successfully, `0` otherwise.(11)    | Modal      |
+| `eval[x y]`            | Parse and execute a string `x` as a Lil program, using any variable bindings in dictionary `y`. (5)                       | System     |
+| `random[x y]`          | Choose `y` random elements from `x`. (6)                                                                                  | System     |
+| `readcsv[x y d]`       | Turn a [RFC-4180](https://datatracker.ietf.org/doc/html/rfc4180) CSV string `x` into a Lil table with column spec `y`.(7) | Data       |
+| `writecsv[x y d]`      | Turn a Lil table `x` into a CSV string with column spec `y`.(7)                                                           | Data       |
+| `readxml[x]`           | Turn a useful subset of XML/HTML into a Lil structure.(8)                                                                 | Data       |
+| `writexml[x]`          | Turn a Lil structure `x` into an indented XML string.(9)                                                                  | Data       |
+| `alert[text type x y]` | Open a modal dialog with the string or rtext `text`, and potentially prompt for input.(10)                                | Modal      |
+| `read[type hint]`      | Open a modal dialog prompting the user to open a document, and return its contents (or `""`).(11)                         | Modal      |
+| `write[x]`             | Open a modal dialog prompting the user to save `x`. Returns `1` if the file was saved successfully, `0` otherwise.(12)    | Modal      |
 
 1) if `print[]` is provided more than one argument, the first argument will be interpreted as a _format string_, and each remaining argument will be treated as an element of a list of right arguments to `format`. The resulting string will then be printed on its own line. For example, `print["%s, %i" "first" 2]` is equivalent to `print["%s, %i" format ("first",2)]`.
 
-2) If the target of `go[]` is a number, move to that card by index, counting from 0. If it is an instance of the card interface, navigate to the indicated card. If it is a string, it is either a special string or the name of a card. An invalid card name will cause no navigation. The special string `Next` moves to the next card (wrapping), `Prev` moves to the previous card (wrapping), `First` moves to the first card in the deck, `Last` moves to the last card in the deck, and `Back` moves to card that was active before the current card (if any), rolling back an internal navigation history. Removing or reordering cards in the deck will invalidate the history used by `Back`.
+2) if the second argument of `play[]` is the string `"loop"`, this function controls a "background" sound which will repeat indefinitely until it is stopped. Only one background sound can play at a time. If the first argument is the background sound that is already playing, this function will have no effect; the loop will continue unaffected. If the first argument is not a sound or a string giving the name of a sound, the background sound will be stopped. To summarize:
+- `play[string]` play an ordinary sound once, looked up by name.
+- `play[sound]` play an ordinary sound once.
+- `play[string "loop"]` play a looped sound, looked up by name.
+- `play[sound  "loop"]` play a looped sound.
+- `play[0      "loop"]` stop the looped sound, if any.
+
+3) If the target of `go[]` is a number, move to that card by index, counting from 0. If it is an instance of the card interface, navigate to the indicated card. If it is a string, it is either a special string or the name of a card. An invalid card name will cause no navigation. The special string `Next` moves to the next card (wrapping), `Prev` moves to the previous card (wrapping), `First` moves to the first card in the deck, `Last` moves to the last card in the deck, and `Back` moves to card that was active before the current card (if any), rolling back an internal navigation history. Removing or reordering cards in the deck will invalidate the history used by `Back`.
 
 If the target of `go[]` begins with a URI protocol such as `http://`, `https://`, `ftp://`, `gopher://`, or `gemini://`, Decker will prompt the user for confirmation and then ask the operating system (or browser) to open an appropriate application (if any) to navigate to that URI. By design, there is no way to determine whether the user confirms, the OS finds an appropriate application, or the destination resouce is retrieved successfully. Opening a URI is strictly a _suggestion_, for user convenience, and not a means of accessing remote resources from a deck.
 
 The transition `y`, should be the name of a transition function installed with `transition[]`, or one of the built-in transition animations: {`"SlideRight"`, `"SlideLeft"`, `"SlideUp"`, `"SlideDown"`, `"WipeRight"`, `"WipeLeft"`, `"WipeUp"`, `"WipeDown"`, `"BoxIn"`, `"BoxOut"`}. Any other value will be ignored.
 
-3) If `sleep[]` is provided the string `"play"` as an argument, instead of waiting for some number of frames to pass, it will pause script execution until all sound clips triggered with `play[]` complete.
+4) If `sleep[]` is provided the string `"play"` as an argument, instead of waiting for some number of frames to pass, it will pause script execution until all sound clips triggered with `play[]` complete.
 
-4) `eval[]` returns a dictionary containing:
+5) `eval[]` returns a dictionary containing:
 - `error`: a string giving any error message produced during parsing, or the empty string.
 - `value`: the value of the last expression in the program. On a parse error, `value` will be the number `0`.
 - `vars`: a dictionary containing any variable bindings made while executing the program. (This also includes bindings from argument `y`.)
 
-5) The behavior of `random[]` depends on the type of `x` and whether or not `y` is provided:
+6) The behavior of `random[]` depends on the type of `x` and whether or not `y` is provided:
 - if `x` is a number, treat it as if it were `range x`.
 - if `x` is anything else, choose random elements from it.
 - if `y` is missing, the result will be a single random element.
 - if `y` is positive, choose a list of `y` random elements.
 - if `y` is negative, choose a list of `|y|` random elements _without repeats_, provided sufficient elements in `y`.
 
-6) Column specs are strings in which each character indicates the type of a CSV column. `readcsv[]` and `writecsv[]` will ignore excess columns if more exist in the source data than in the column spec. Missing columns are padded with an appropriate "null". If the column spec is not a string, these functions will read/write every column in the source data as strings. Any pattern type recognized by `parse` and `format` is permitted as a column spec character, but they are interpreted without flags or subsequent delimiters. Additionally, underscore (`_`) can be used in a column spec to skip a column. If a single-character delimiter `d` is provided, it is used instead of comma (`,`) between records.
+7) Column specs are strings in which each character indicates the type of a CSV column. `readcsv[]` and `writecsv[]` will ignore excess columns if more exist in the source data than in the column spec. Missing columns are padded with an appropriate "null". If the column spec is not a string, these functions will read/write every column in the source data as strings. Any pattern type recognized by `parse` and `format` is permitted as a column spec character, but they are interpreted without flags or subsequent delimiters. Additionally, underscore (`_`) can be used in a column spec to skip a column. If a single-character delimiter `d` is provided, it is used instead of comma (`,`) between records.
 
-7) `writexml[]` will convert anything which is not a dictionary or list into a string with the special characters (`"`,`'`,`<`,`>` and `&`) encoded as [XML entities](https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references#Predefined_entities_in_XML). Lists will be recursively converted and concatenated without inserting extra whitespace. Dictionaries will be interpreted as XML tags with the following keys:
+8) `writexml[]` will convert anything which is not a dictionary or list into a string with the special characters (`"`,`'`,`<`,`>` and `&`) encoded as [XML entities](https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references#Predefined_entities_in_XML). Lists will be recursively converted and concatenated without inserting extra whitespace. Dictionaries will be interpreted as XML tags with the following keys:
 - `tag`: the name of the XML tag.
 - `attr`: a dictionary from tag attributes to string values. Values are entity-escaped and double-quoted.
 - `children`: a list of child elements.
 
-8) `readxml[]` is a soft, mushy, tolerant parser for a subset of XML which may also be useful for scraping information out of HTML fragments. The result will always be a list of dictionaries and strings, each representing an XML value in the same fashion as `writexml[]`. All tag names and attribute keys are converted to lowercase during parsing, for consistency. The XML prolog (`<?xml ...?>`) and extension/templating features (`<!...>`) are ignored. Entities not listed here- including all numeric entities- are left unchanged. Improperly-nested tags are handled in a best-effort fashion. This parser understands:
+9) `readxml[]` is a soft, mushy, tolerant parser for a subset of XML which may also be useful for scraping information out of HTML fragments. The result will always be a list of dictionaries and strings, each representing an XML value in the same fashion as `writexml[]`. All tag names and attribute keys are converted to lowercase during parsing, for consistency. The XML prolog (`<?xml ...?>`) and extension/templating features (`<!...>`) are ignored. Entities not listed here- including all numeric entities- are left unchanged. Improperly-nested tags are handled in a best-effort fashion. This parser understands:
 
 - Tags with lone, bare, single- or double-quoted attributes (`<foo lone bare=1 single='2' double="3">`). Lone attributes are interpreted as containing the value `1`, to make them truthy.
 - Explicitly-closed or self-closing tags (`<foo></foo>`, `<bar/>`).
@@ -442,14 +449,14 @@ The transition `y`, should be the name of a transition function installed with `
 - Child tags (`<foo><bar/><quux/></foo>`).
 - Mixed body text and child tags (`<foo>one<bar/>two</foo>`).
 
-9) `alert[]` blocks all script execution until the user dismisses the modal. It can prompt the user in several ways depending on the `type` argument, if provided:
+10) `alert[]` blocks all script execution until the user dismisses the modal. It can prompt the user in several ways depending on the `type` argument, if provided:
 
 - `"none"` (the default): Don't prompt the user for input and always return `1`.
 - `"bool"`: Prompt the user with two buttons, "Cancel" and a verb given by `x` (or `"OK"`, by default). Return `1` if the verb-button is clicked, `0` on cancel.
 - `"string"`: Prompt the user to enter a string. If `x` is present, use it as a default value. Return the input string.
 - `"choose"`: Prompt the user to pick one element from a list or dictionary `x`, using `y` as a default value, if provided. If `x` is a dictionary. Return an element from `x`. If `x` is missing or empty, the user will _always_ be presented with the option `"0"`.
 
-10) `read[]` understands several types of file and will interpret each appropriately:
+11) `read[]` understands several types of file and will interpret each appropriately:
 
 - Image files (`.gif`, `.png`, `.bmp`, `.jpg`, `.jpeg`) are read as _image interfaces_.
 - Sound files (`.wav`) are read as _sound interfaces_.
@@ -467,7 +474,7 @@ If a sound file is unreadable (or the user cancels), it will be loaded as a soun
 
 If an image file is unreadable (or the user cancels), it will be loaded as an image with `size` `(0,0)`. Only the first frame of an animated GIF will be loaded. If the image contains transparent pixels, they will be read as pattern 0. By default, other pixels will be adapted to Decker's 16-color palette (patterns 32-47). If the `hint` argument is `"gray"`, they will instead be converted to 256 grays based on a perceptual weighting of their RGB channels. Note that a 256 gray image is not suitable for direct display on e.g. a canvas, but can be re-paletted or posterized in a variety of ways via `image.map[]` or dithered with `image.transform["dither"]`.
 
-11) `write[]` recognizes several types of Lil value and will serialize each appropriately:
+12) `write[]` recognizes several types of Lil value and will serialize each appropriately:
 - _array interfaces_ are written as binary files.
 - _sound interfaces_ are written as a .WAV audio file, and a `.wav` extension will be appended to any filename without it.
 - _image interfaces_ are written as GIF89a images, and a `.gif` extension will be appended to any filename without it. A list of _image interfaces_ is written as an animated gif.

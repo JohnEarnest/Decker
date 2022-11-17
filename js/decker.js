@@ -936,7 +936,7 @@ n_post_query=([a])=>{ms.grid=gridtab(lt(a));return a}
 
 // Audio
 
-let audio=null, samples_playing=0
+let audio=null, samples_playing=0, audio_loop=null, audio_loop_playing=null
 const audioContext=window.AudioContext||window.webkitAudioContext, offline=window.OfflineAudioContext||window.webkitOfflineAudioContext
 initaudio=_=>{if(!audio)audio=new audioContext({sampleRate:44100})}
 load_sound=(file,after)=>{
@@ -955,12 +955,24 @@ load_sound=(file,after)=>{
 	}
 	const r=new FileReader();r.onload=_=>import_sound(r.result),r.readAsArrayBuffer(file)
 }
-n_play=([x])=>{
+n_play=([x,hint])=>{
+	const prepare=sfx=>{
+		const playback=audio.createBuffer(1,sfx.data.length*8,64000),dest=playback.getChannelData(0)
+		for(let z=0;z<sfx.data.length;z++)for(let b=0;b<8;b++)dest[z*8+b]=MASTER_VOLUME*byte_to_sample(sfx.data[z])
+		const playing=audio.createBufferSource();playing.buffer=playback,playing.connect(audio.destination);return playing
+	}
+	if(hint&&ls(hint)=='loop'){
+		if(lis(x))x=dget(ifield(deck,"sounds"),x)
+		if(x&&audio_loop==x){} // don't re-trigger
+		else if(sound_is(x)){
+			if(audio_loop)audio_loop_playing.stop()
+			audio_loop=x,audio_loop_playing=prepare(x),audio_loop_playing.loop=true,audio_loop_playing.start()
+		}
+		else if(audio_loop){audio_loop_playing.stop(),audio_loop=audio_loop_playing=null} // stop the loop
+		return NONE
+	}
 	const sfx=!x?x: sound_is(x)?x: dget(deck.sounds,lms(ls(x)));if(!sfx)return NONE;initaudio()
-	const playback=audio.createBuffer(1,sfx.data.length*8,64000),dest=playback.getChannelData(0)
-	for(let z=0;z<sfx.data.length;z++)for(let b=0;b<8;b++)dest[z*8+b]=MASTER_VOLUME*byte_to_sample(sfx.data[z])
-	const playing=audio.createBufferSource();playing.buffer=playback,playing.connect(audio.destination)
-	playing.addEventListener('ended',_=>samples_playing--),playing.start(),samples_playing++;return NONE
+	const playing=prepare(sfx);playing.addEventListener('ended',_=>samples_playing--),playing.start(),samples_playing++;return NONE
 }
 stop_sound_pump=_=>{
 	if(au.clip)au.clip.stop();au.clip=null,clearInterval(au.tick),au.mode='stopped'

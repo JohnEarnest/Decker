@@ -2294,6 +2294,7 @@ void ob_resize(rect size,int coalesce){
 // Audio
 
 typedef struct {lv*clip; Uint32 sample; float volume;}clip_state;
+clip_state audio_loop={0};
 clip_state audio_slots[SFX_SLOTS]={{0}};
 float master_volume=1.0;
 SDL_AudioSpec audio;
@@ -2308,12 +2309,17 @@ void sfx_pump(void*user,Uint8*stream,int len){
 			audio_slots[z].sample++;
 			if(audio_slots[z].sample>=((Uint32)audio_slots[z].clip->c))audio_slots[z].clip=NULL;
 		}
+		lv*loop=audio_loop.clip;if(loop){
+			int s=audio_loop.sample;if(audio_loop.sample>=((Uint32)loop->b->c))s=audio_loop.sample=0;
+			int8_t*data=(int8_t*)loop->b->sv;int b=data[s++];samples+=(b/128.0)*audio_loop.volume;
+			audio_loop.sample=s;
+		}
 		if(au.mode==record_playing){
 			int len=au.target->b->c, sel=au.sel.x!=au.sel.y, start=sel?au.sel.x:0, end=sel?au.sel.y:len;
 			if(au.head>=end){au.head=start;au.mode=record_stopped;}
 			else{int8_t*data=(int8_t*)au.target->b->sv;int b=data[au.head++];samples+=(b/128.0)*1.0;}
 		}
-		stream[z]=0xFF&(int)((master_volume*(samples/SFX_SLOTS))*120);
+		stream[z]=0xFF&(int)((master_volume*(samples/(SFX_SLOTS+1)))*120);
 	}
 }
 int sfx_any(){if(nosound)return 0;for(int z=0;z<SFX_SLOTS;z++)if(audio_slots[z].clip!=NULL)return 1;return 0;}
@@ -2322,12 +2328,19 @@ void sfx_init(){
 	SDL_OpenAudio(&audio,NULL),SDL_PauseAudio(0);
 }
 lv* n_play(lv*self,lv*z){
-	(void)self;lv*x=l_first(z),*sfx=sound_is(x)?x: dget(ifield(deck,"sounds"),ls(x));if(!sfx)return x;
+	if(z->c>1&&matchr(z->lv[1],lmistr("loop"))){
+		lv*x=l_first(z);if(lis(x))x=dget(ifield(deck,"sounds"),x);
+		if(audio_loop.clip&&matchr(audio_loop.clip,x)){} // don't re-trigger!
+		else if(sound_is(x)){audio_loop.clip=x,audio_loop.sample=0,audio_loop.volume=1.0;} // play
+		else{audio_loop.clip=NULL;} // stop the loop
+		return NONE
+	}
+	(void)self;lv*x=l_first(z),*sfx=sound_is(x)?x: dget(ifield(deck,"sounds"),ls(x));if(!sfx)return NONE;
 	int max_sample=0;int avail=-1;for(int z=0;z<SFX_SLOTS;z++){
 		if(!audio_slots[z].clip){avail=z;break;}
 		if(audio_slots[z].sample>audio_slots[max_sample].sample)max_sample=z;
 	}audio_slots[avail!=-1?avail:max_sample]=(clip_state){sfx->b,0,1.0};
-	return x;
+	return NONE;
 }
 
 // Toolbars
@@ -3150,6 +3163,7 @@ void tick(lv*env){
 	track(sc.f.table)
 	track(ob.sel)
 	EACH(z,PLAYING)PLAYING->lv[z]=audio_slots[z].clip?audio_slots[z].clip:NONE;
+	track(audio_loop.clip)
 	lv_collect();
 }
 
