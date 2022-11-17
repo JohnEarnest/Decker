@@ -2331,11 +2331,12 @@ lv* n_play(lv*self,lv*z){
 	if(z->c>1&&matchr(z->lv[1],lmistr("loop"))){
 		lv*x=l_first(z);if(lis(x))x=dget(ifield(deck,"sounds"),x);
 		if(audio_loop.clip&&matchr(audio_loop.clip,x)){} // don't re-trigger!
-		else if(sound_is(x)){audio_loop.clip=x,audio_loop.sample=0,audio_loop.volume=1.0;} // play
+		else if(sound_is(x)&&ln(ifield(x,"size"))>0){audio_loop.clip=x,audio_loop.sample=0,audio_loop.volume=1.0;} // play
 		else{audio_loop.clip=NULL;} // stop the loop
 		return NONE;
 	}
 	(void)self;lv*x=l_first(z),*sfx=sound_is(x)?x: dget(ifield(deck,"sounds"),ls(x));if(!sfx)return NONE;
+	if(!sound_is(sfx)||ln(ifield(sfx,"size"))<1)return NONE;
 	int max_sample=0;int avail=-1;for(int z=0;z<SFX_SLOTS;z++){
 		if(!audio_slots[z].clip){avail=z;break;}
 		if(audio_slots[z].sample>audio_slots[max_sample].sample)max_sample=z;

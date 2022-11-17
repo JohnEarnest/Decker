@@ -964,14 +964,14 @@ n_play=([x,hint])=>{
 	if(hint&&ls(hint)=='loop'){
 		if(lis(x))x=dget(ifield(deck,"sounds"),x)
 		if(x&&audio_loop==x){} // don't re-trigger
-		else if(sound_is(x)){
+		else if(sound_is(x)&&ln(ifield(x,'size'))>0){
 			if(audio_loop)audio_loop_playing.stop()
 			audio_loop=x,audio_loop_playing=prepare(x),audio_loop_playing.loop=true,audio_loop_playing.start()
 		}
 		else if(audio_loop){audio_loop_playing.stop(),audio_loop=audio_loop_playing=null} // stop the loop
 		return NONE
 	}
-	const sfx=!x?x: sound_is(x)?x: dget(deck.sounds,lms(ls(x)));if(!sfx)return NONE;initaudio()
+	const sfx=!x?x: sound_is(x)?x: dget(deck.sounds,lms(ls(x)));if(!sfx||ln(ifield(sfx,'size'))<1)return NONE;initaudio()
 	const playing=prepare(sfx);playing.addEventListener('ended',_=>samples_playing--),playing.start(),samples_playing++;return NONE
 }
 stop_sound_pump=_=>{
