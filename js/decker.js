@@ -1709,12 +1709,13 @@ modals=_=>{
 	}
 	else if(ms.type=='trans'){
 		const now=new Date().getTime()/1000
-		const sofar=ms.time_start==-1?0:now-ms.time_start;if(ms.time_start==-1)ms.time_start=now;
-		const f=frame, tween=min(sofar*(ms.time_end/15),1.0)
+		const sofar=ms.time_start==-1?0:now-ms.time_start;if(ms.time_start==-1)ms.time_start=now
+		let f=frame, tween=min(sofar*(ms.time_end/15),1.0)
 		ms.canvas.image.pix=frame.image.pix;frame.image.pix.fill(0)
 		const a=lml([ms.canvas,ms.carda,ms.cardb,lmn(tween)]), p=lmblk();blk_lit(p,ms.trans),blk_lit(p,a),blk_op(p,op.CALL)
-		const e=lmenv();pushstate(e),issue(e,p);let quota=TRANS_QUOTA;while(quota&&running())runop(),quota--;popstate()
-		frame=f,sleep_play=0,sleep_frames=0;if(tween>=1)modal_exit(0)
+		const e=lmenv();pushstate(e),issue(e,p);let quota=TRANS_QUOTA;while(quota&&running())runop(),quota--
+		if(running()){listen_show(ALIGN.right,1,lms(`warning: transition ${ms.trans.n} exceeded quota and was halted.`)),tween=2}
+		popstate(),frame=f,sleep_play=0,sleep_frames=0;if(tween>=1)modal_exit(0)
 	}
 	ms.in_modal=0
 }

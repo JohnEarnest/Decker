@@ -1718,7 +1718,12 @@ void modals(){
 		cstate f=frame;float tween=(ms.time_curr*1.0)/ms.time_end;n_canvas_clear(ms.canvas,lml(0));
 		lv*a=lml(4);a->lv[0]=ms.canvas,a->lv[1]=ms.carda,a->lv[2]=ms.cardb,a->lv[3]=lmn(tween);
 		lv*p=lmblk();blk_lit(p,ms.trans),blk_lit(p,a),blk_op(p,CALL);
-		lv*e=lmenv(NULL);pushstate(e),issue(e,p);int quota=TRANS_QUOTA;while(quota&&running())runop(),quota--;popstate();
+		lv*e=lmenv(NULL);pushstate(e),issue(e,p);int quota=TRANS_QUOTA;while(quota&&running())runop(),quota--;
+		if(running()){
+			char e[4096];snprintf(e,sizeof(e),"warning: transition %s exceeded quota and was halted.",ms.trans->sv);
+			listen_show(align_right,1,lmcstr(e));ms.time_curr=ms.time_end;
+		}
+		popstate();
 		frame=f;lv*i=canvas_image(ms.canvas,1);buffer_paste(rect_pair((pair){0,0},frame.size),frame.clip,i->b,frame.buffer,1);
 		sleep_play=0,sleep_frames=0;ms.time_curr++;if(ms.time_curr>ms.time_end)modal_exit(0);
 	}
