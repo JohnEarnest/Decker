@@ -2480,6 +2480,8 @@ all_menus=_=>{
 			menu_separator()
 			if(menu_item('Select All',1,'a')){settool('select'),dr.sel_here=rcopy(frame.clip)}
 			if(menu_item('Tight Selection',sel,'g'))bg_tighten()
+			if(menu_item("Resize to Original",sel&&dr.tool=='select',0)){bg_scoop_selection();const s=dr.limbo.size;dr.sel_here.w=s.x,dr.sel_here.h=s.y}
+			if(menu_item("Resize to Card"    ,sel&&dr.tool=='select',0)){bg_scoop_selection(),dr.sel_here=rect(0,0,frame.size.x,frame.size.y)}
 			menu_separator()
 			if(menu_item('Invert',sel&&!dr.limbo_dither,'i')){
 				if(bg_has_sel())bg_scoop_selection()
