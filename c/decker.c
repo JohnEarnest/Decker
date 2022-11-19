@@ -1145,7 +1145,7 @@ void modal_exit(int value){
 	}
 	if((ms.subtype==modal_save_deck||ms.subtype==modal_save_locked)&&value){
 		lv*path=modal_save_path("");
-		if(directory_exists(path->sv)&&ms.type!=modal_confirm){modal_save_replace(modal_save_deck,"deck",path);return;}
+		if(directory_exists(path->sv)&&ms.type!=modal_confirm){modal_save_replace(modal_save_locked,"deck",path);return;}
 		if(ms.subtype==modal_save_locked)iwrite(deck,lmistr("locked"),ONE);
 		save_deck(path);
 		if(ms.subtype==modal_save_locked)iwrite(deck,lmistr("locked"),NONE);
