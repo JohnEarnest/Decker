@@ -1067,7 +1067,7 @@ lv* n_random(lv*self,lv*z){
 	for(int i=x->c-1;i>0;i--){int j=randint(i+1);int t=pv.iv[j];pv.iv[j]=pv.iv[i],pv.iv[i]=t;}
 	GEN(r,abs(y))x->lv[pv.iv[z%x->c]];idx_free(&pv);return r;
 }
-int frame_count=0;
+int frame_count=0,audio_playing=0;
 #if defined(__APPLE__) && defined(__MACH__)
 #define PLATFORM "mac"
 #elif defined(__unix__) || defined(__unix)
@@ -1084,6 +1084,7 @@ lv*interface_sys(lv*self,lv*i,lv*x){
 		if(!strcmp(i->sv,"platform")){return lmistr(PLATFORM);}
 		if(!strcmp(i->sv,"seed")){return lmn(seed);}
 		if(!strcmp(i->sv,"frame")){return lmn(frame_count);}
+		if(!strcmp(i->sv,"playing")){return lmn(audio_playing);}
 		if(!strcmp(i->sv,"now")){time_t now;time(&now);return lmn(now);}
 		if(!strcmp(i->sv,"ms")){return time_ms();}
 		if(!strcmp(i->sv,"workspace")){

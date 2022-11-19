@@ -972,7 +972,8 @@ n_play=([x,hint])=>{
 		return NONE
 	}
 	const sfx=!x?x: sound_is(x)?x: dget(deck.sounds,lms(ls(x)));if(!sfx||ln(ifield(sfx,'size'))<1)return NONE;initaudio()
-	const playing=prepare(sfx);playing.addEventListener('ended',_=>samples_playing--),playing.start(),samples_playing++;return NONE
+	const playing=prepare(sfx);playing.addEventListener('ended',_=>{samples_playing--,audio_playing=samples_playing>0})
+	playing.start(),samples_playing++,audio_playing=1;return NONE
 }
 stop_sound_pump=_=>{
 	if(au.clip)au.clip.stop();au.clip=null,clearInterval(au.tick),au.mode='stopped'

@@ -2305,9 +2305,9 @@ float master_volume=1.0;
 SDL_AudioSpec audio;
 
 void sfx_pump(void*user,Uint8*stream,int len){
-	(void)user;for(int z=0;z<len;z++){
+	(void)user;int play=0;for(int z=0;z<len;z++){
 		float samples=0;for(int z=0;z<SFX_SLOTS;z++){
-			if(audio_slots[z].clip==NULL)continue;
+			if(audio_slots[z].clip==NULL)continue;play=1;
 			int8_t*data=(int8_t*)audio_slots[z].clip->sv; // stored as uint, but samples are signed(!)
 			int b=data[audio_slots[z].sample];
 			samples+=(b/128.0)*audio_slots[z].volume;
@@ -2325,7 +2325,7 @@ void sfx_pump(void*user,Uint8*stream,int len){
 			else{int8_t*data=(int8_t*)au.target->b->sv;int b=data[au.head++];samples+=(b/128.0)*1.0;}
 		}
 		stream[z]=0xFF&(int)((master_volume*(samples/(SFX_SLOTS+1)))*120);
-	}
+	}audio_playing=play;
 }
 int sfx_any(){if(nosound)return 0;for(int z=0;z<SFX_SLOTS;z++)if(audio_slots[z].clip!=NULL)return 1;return 0;}
 void sfx_init(){
@@ -2350,7 +2350,7 @@ lv* n_play(lv*self,lv*z){
 		if(!audio_slots[z].clip){avail=z;break;}
 		if(audio_slots[z].sample>audio_slots[max_sample].sample)max_sample=z;
 	}
-	sfx_install(sfx,&audio_slots[avail!=-1?avail:max_sample]);
+	sfx_install(sfx,&audio_slots[avail!=-1?avail:max_sample]),audio_playing=1;
 	return NONE;
 }
 

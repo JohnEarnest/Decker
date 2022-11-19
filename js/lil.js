@@ -611,13 +611,14 @@ n_random=z=>{
 	for(let i=x.length-1;i>0;i--){const j=randint(i+1),t=p[j];p[j]=p[i],p[i]=t}
 	for(let z=0;z<abs(y);z++)r.push(x[p[z%x.length]]);return lml(r)
 }
-let frame_count=0
+let frame_count=0,audio_playing=0
 interface_system=lmi((self,i,x)=>{
 	if(!i)return NONE
 	if(x){if(lis(i)&&i.v=='seed'){seed=0|ln(x);return x}}
 	if(lis(i)&&i.v=='version'  )return lms(VERSION)
 	if(lis(i)&&i.v=='platform' )return lms('web')
 	if(lis(i)&&i.v=='seed'     )return lmn(seed)
+	if(lis(i)&&i.v=='playing'  )return lmn(audio_playing)
 	if(lis(i)&&i.v=='frame'    )return lmn(frame_count)
 	if(lis(i)&&i.v=='now'      )return lmn(0|(new Date().getTime()/1000))
 	if(lis(i)&&i.v=='ms'       )return lmn(0|(Date.now()))
