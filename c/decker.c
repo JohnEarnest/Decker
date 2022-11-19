@@ -2954,7 +2954,7 @@ void tick(lv*env){
 					ms.verb=lmcstr("Edit");
 				}
 			}
-			if(menu_item("Properties...",ob.sel->c==1,'\0')||(ob.sel->c==1&&ev.action))object_properties(ob.sel->lv[0]);
+			if(menu_item("Properties...",ob.sel->c==1,'\0')||(ob.sel->c==1&&ev.action&&ms.type==modal_none))object_properties(ob.sel->lv[0]);
 		}
 	}
 	widget_setup();

@@ -2630,7 +2630,7 @@ all_menus=_=>{
 					ms.verb=lms('Edit')
 			}
 		}
-		if(menu_item('Properties...',ob.sel.length==1)||(ob.sel.length==1&&ev.action))object_properties(ob.sel[0])
+		if(menu_item('Properties...',ob.sel.length==1)||(ob.sel.length==1&&ev.action&&ms.type==null))object_properties(ob.sel[0])
 	}
 }
 
