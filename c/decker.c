@@ -2339,7 +2339,7 @@ void sfx_install(lv*sfx,clip_state*target){
 lv* n_play(lv*self,lv*z){
 	if(z->c>1&&matchr(z->lv[1],lmistr("loop"))){
 		lv*x=l_first(z);if(lis(x))x=dget(ifield(deck,"sounds"),x);
-		if(orig_loop&&matchr(orig_loop,x)){} // don't re-trigger!
+		if(orig_loop&&orig_loop==x){} // don't re-trigger!
 		else if(sound_is(x)&&ln(ifield(x,"size"))>0){sfx_install(x,&audio_loop),orig_loop=x;} // play
 		else{audio_loop.clip=orig_loop=NULL;} // stop the loop
 		return NONE;
