@@ -155,7 +155,7 @@ Buttons are widgets that make something happen. They can have a variety of appea
 - _Checkbox_ buttons can be "on" or "off"; clicking them toggles the value.
 - _Invisible_ buttons have no appearance (apart from their label text, if present). You can use these to make parts of the background of the card "clickable".
 
-Double-clicking a newly created widget with the widgets tool or choosing _Widgets &#8594; Properties..._ will open the property dialog for that widget. Every widget has its own property dialog for tuning relevant parameters.
+Double-clicking a newly created widget with the widgets tool, pressing space/enter, or choosing _Widgets &#8594; Properties..._ will open the property dialog for that widget. Every widget has its own property dialog for tuning relevant parameters.
 
 ![](images/buttonprops.gif)
 
