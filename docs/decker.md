@@ -1311,6 +1311,68 @@ transition[on BoxOut     c a b t do  c.rect[c.size/2   c.size*1-t "center"]     
 
 Transitions can be defined in any script, at any time, but it probably makes the most sense to set them up at the top level of a deck script or a [module](#modules). If custom transitions are bundled into a module, it is very easy for other users to re-use them in their own decks!
 
+Playing Sound
+=============
+The `play[]` function is the main way of triggering audio playback in Decker. It can be called with a [Sound Interface](#soundinterface) or the name of a sound in the deck:
+```
+play["amen"]
+play[deck.sounds.amen]
+```
+
+There are two ways to wait for a sound to finish. The `sleep["play"]` function blocks execution until no sounds are playing, which may take many frames:
+```
+play["firstClip"]
+sleep["play"]
+play["secondClip"]
+```
+The `sys.playing` property is truthy if sound is playing. You can use this as a "non-blocking" way to wait for sounds to stop:
+```
+play["firstClip"]
+while sys.playing
+	doSomethingElse[]
+	sleep[1]
+end
+play["secondClip"]
+```
+
+So far, we've looked at "one-shot" sound effects. You can have several such sounds playing at one time. If you provide a second argument to `play[]`, you can instead control the "background loop", a single sound that can be easily repeated:
+```
+play["amen" "loop"]
+```
+
+By default, the background loop will repeat until it is explicitly stopped or replaced with another sound. If you repeatedly "loop-play" the same sound, it will not restart the sound- this is convenient for common applications. If you do wish to reset a looping sound mid-loop, you can stop it and then immediately restart it. To stop the background loop, provide an invalid sound to `play[]`:
+```
+play[0 "loop"]
+```
+
+It is also possible to control the background loop by providing a handler for the card-level `loop` event. This handler is called whenever cards are initially visited (as by `go[]`, for example) as well as each time the background loop completes. The loop handler is passed the previous background loop sound, if any, and the return value will become the new background loop. You can probably see now why the default loop handler is:
+```
+on loop prev do
+	prev
+end
+```
+
+The simplest way to use this event is to give cards a default background loop when you visit them:
+```
+on loop do
+	"amen"
+end
+```
+Or to silence any existing background loop when you visit the card:
+```
+on loop do
+	0
+end
+```
+But you might want to have other side effects, or choose the next background loop sound based on some algorithm:
+```
+on loop do
+	iteration_count.value:iteration_count+1
+	random["clip1","clip2","clip3"]
+end
+```
+The `loop` event handler _must_ complete quickly; if it exceeds a small quota, it will be halted along with the background loop.
+
 
 See Also
 ========

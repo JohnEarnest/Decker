@@ -2316,19 +2316,20 @@ void sfx_install(lv*sfx,clip_state*target){
 	lv*c=lms(sfx->b->c);memcpy(c->sv,sfx->b->sv,c->c); // clone the buffer so it can't be rewritten during playback (!)
 	target->clip=c,target->sample=0,target->volume=1.0;
 }
-void sfx_doloop(){
+void sfx_doloop(int clear){
 	SDL_LockMutex(gil);
 	lv*a=orig_loop?orig_loop:NONE,*b=lmblk(),*r=NONE;
 	blk_get(b,lmistr("loop")),blk_lit(b,l_list(a)),blk_op(b,CALL);
 	int pp=pending_popstate;fire_hunk_async(ifield(deck,"card"),b);
 	int quota=LOOP_QUOTA;while(quota>0&&running()){runop(),quota--;}
 	if(!running())r=arg();popstate();pending_popstate=pp;
+	if(clear)n_play(NULL,lml2(NONE,lmistr("loop")));
 	n_play(NULL,lml2(r,lmistr("loop"))),msg.pending_loop=0;
 	lv*loop=audio_loop.clip;if(loop&&audio_loop.sample>=((Uint32)loop->c))audio_loop.sample=0;
 	SDL_UnlockMutex(gil);
 }
 void sfx_pump(void*user,Uint8*stream,int len){
-	if(msg.pending_loop)sfx_doloop();
+	if(msg.pending_loop)sfx_doloop(0);
 	(void)user;int play=0;for(int z=0;z<len;z++){
 		float samples=0;for(int z=0;z<SFX_SLOTS;z++){
 			if(audio_slots[z].clip==NULL)continue;play=1;
@@ -2339,7 +2340,7 @@ void sfx_pump(void*user,Uint8*stream,int len){
 			if(audio_slots[z].sample>=((Uint32)audio_slots[z].clip->c))audio_slots[z].clip=NULL;
 		}
 		lv*loop=audio_loop.clip;
-		if(loop&&audio_loop.sample>=((Uint32)loop->c)){sfx_doloop(),loop=audio_loop.clip;}
+		if(loop&&audio_loop.sample>=((Uint32)loop->c)){sfx_doloop(1),loop=audio_loop.clip;}
 		if(loop){
 			int s=audio_loop.sample;
 			int8_t*data=(int8_t*)loop->sv;int b=data[s++];samples+=(b/128.0)*audio_loop.volume;
@@ -2675,6 +2676,7 @@ void text_edit_menu(){
 }
 
 void tick(lv*env){
+	SDL_LockMutex(gil);
 	msg.pending_drag=0;
 	msg.pending_halt=0;
 	if(dirty&&dirty_timer>0&&!running()){
@@ -3149,7 +3151,7 @@ void tick(lv*env){
 	if(uimode==mode_interact&&ev.drag&&ob.sel->c&&lb(ifield(ob.sel->lv[0],"draggable"))){
 		iwrite(ob.sel->lv[0],lmistr("pos"),lmpair((pair){ev.pos.x-ob.prev.x,ev.pos.y-ob.prev.y})),mark_dirty();
 	}
-	SDL_LockMutex(gil);double used=interpret();
+	double used=interpret();
 	if(uimode==mode_interact&&profiler){
 		rect r={frame.size.x-60,2,50,12};
 		char t[64];snprintf(t,sizeof(t),"%.02f%%",100*used/FRAME_QUOTA),draw_text(inset(r,2),t,FONT_BODY,1);

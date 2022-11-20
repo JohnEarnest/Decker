@@ -1774,7 +1774,7 @@ go_notify=(deck,x,t,url)=>{
 		ms.carda=draw_card(ifield(deck,'card')), ms.cardb=draw_card(ifield(deck,'cards').v[x])
 	}
 	const moved=x!=ln(ifield(ifield(deck,'card'),'index'))
-	if(moved&&uimode==mode_interact)msg.pending_loop=1
+	if(moved&&uimode=='interact')msg.pending_loop=1
 	if(moved||t){
 		grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel=[],wid.active=ms.type=='listen'?0:-1,mark_dirty()
 	}
