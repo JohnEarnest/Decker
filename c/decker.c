@@ -38,7 +38,7 @@ SDL_Window  *win;
 SDL_Renderer*ren;
 SDL_Texture *gfx,*gtool;
 SDL_Joystick*joy=NULL;
-SDL_mgiutex*gil=NULL;
+SDL_mutex*gil=NULL;
 int windowed=1, toggle_fullscreen=0, toolbars_enable=1;
 int autosave=0, nosound=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
 #define AUTOSAVE_DELAY (10*60)
@@ -265,6 +265,7 @@ void field_exit(){
 }
 void bg_end_selection();void bg_end_lasso(); // forward-ref
 void setmode(int mode){
+	n_play(NULL,lml2(NONE,lmistr("loop")));
 	grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel->c=0,wid.active=-1;poly_count=0;sc.others=NULL;
 	msg.next_view=(uimode!=mode)&&mode==mode_interact;uimode=mode;if(mode!=mode_interact)msg.pending_halt=1;
 	if(mode!=mode_draw)dr.fatbits=0;
