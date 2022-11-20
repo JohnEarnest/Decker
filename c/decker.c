@@ -38,9 +38,11 @@ SDL_Window  *win;
 SDL_Renderer*ren;
 SDL_Texture *gfx,*gtool;
 SDL_Joystick*joy=NULL;
+SDL_mgiutex*gil=NULL;
 int windowed=1, toggle_fullscreen=0, toolbars_enable=1;
 int autosave=0, nosound=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
 #define AUTOSAVE_DELAY (10*60)
+lv* deck_get(lv*text){SDL_LockMutex(gil);lv*r=deck_read(text);SDL_UnlockMutex(gil);return r;}
 void mark_dirty(){dirty=1,dirty_timer=AUTOSAVE_DELAY;}
 void set_path(char*path){
 	snprintf(document_path,PATH_MAX,"%s",path);
@@ -1073,12 +1075,12 @@ void modal_exit(int value){
 	if(ms.subtype==modal_import_image&&value){import_image(modal_open_path()->sv);}
 	if(ms.subtype==modal_open_deck&&value){
 		lv*path=modal_open_path();
-		load_deck(deck_read(n_read(NULL,l_list(path))));
+		load_deck(deck_get(n_read(NULL,l_list(path))));
 		set_path(path->sv);
 	}
 	if(ms.subtype==modal_import_deck){
 		lv*path=modal_open_path();modal_enter(modal_resources);
-		if(value){ms.message=deck_read(n_read(NULL,l_list(path))),ms.grid=(grid_val){res_enumerate(ms.message),0,-1};}
+		if(value){ms.message=deck_get(n_read(NULL,l_list(path))),ms.grid=(grid_val){res_enumerate(ms.message),0,-1};}
 		return;
 	}
 	if(ms.type==modal_gridcell&&value){
@@ -1170,7 +1172,7 @@ void modal_exit(int value){
 		);
 	}
 	if(ms.subtype==modal_confirm_quit&&value)exit(0);
-	if(ms.subtype==modal_confirm_new&&value)load_deck(deck_read(lmistr("")));
+	if(ms.subtype==modal_confirm_new&&value)load_deck(deck_get(lmistr("")));
 	if(ms.subtype==modal_confirm_script&&value)finish_script();
 	if(ms.subtype==modal_multiscript&&value)setscript(l_drop(NONE,ob.sel));
 	if(ms.subtype==modal_alert_lil  ){arg();ret(ONE);}
@@ -1717,13 +1719,13 @@ void modals(){
 	else if(ms.type==modal_trans){
 		cstate f=frame;float tween=(ms.time_curr*1.0)/ms.time_end;n_canvas_clear(ms.canvas,lml(0));
 		lv*a=lml(4);a->lv[0]=ms.canvas,a->lv[1]=ms.carda,a->lv[2]=ms.cardb,a->lv[3]=lmn(tween);
-		lv*p=lmblk();blk_lit(p,ms.trans),blk_lit(p,a),blk_op(p,CALL);
-		lv*e=lmenv(NULL);pushstate(e),issue(e,p);int quota=TRANS_QUOTA;while(quota&&running())runop(),quota--;
+		lv*p=lmblk();blk_lit(p,ms.trans),blk_lit(p,a),blk_op(p,CALL);lv*e=lmenv(NULL);
+		SDL_LockMutex(gil),pushstate(e),issue(e,p);int quota=TRANS_QUOTA;while(quota&&running())runop(),quota--;
 		if(running()){
 			char e[4096];snprintf(e,sizeof(e),"warning: transition %s exceeded quota and was halted.",ms.trans->sv);
 			listen_show(align_right,1,lmcstr(e));ms.time_curr=ms.time_end;
 		}
-		popstate();
+		popstate(),SDL_UnlockMutex(gil);
 		frame=f;lv*i=canvas_image(ms.canvas,1);buffer_paste(rect_pair((pair){0,0},frame.size),frame.clip,i->b,frame.buffer,1);
 		sleep_play=0,sleep_frames=0;ms.time_curr++;if(ms.time_curr>ms.time_end)modal_exit(0);
 	}
@@ -2498,7 +2500,7 @@ void sync(){
 			char*p=e.drop.file;
 			if(has_suffix(p,".html")||has_suffix(p,".deck")){
 				modal_enter(modal_resources);
-				ms.message=deck_read(n_read(NULL,l_list(lmcstr(p))));
+				ms.message=deck_get(n_read(NULL,l_list(lmcstr(p))));
 				ms.grid=(grid_val){res_enumerate(ms.message),0,-1};
 			}
 			if(has_suffix(p,".gif"))import_image(p);
@@ -2710,7 +2712,7 @@ void tick(lv*env){
 					modal_enter(modal_confirm_new);
 					ms.message=lmcstr("The current deck has unsaved changes.\nAre you sure you want to discard it?");
 					ms.verb=lmcstr("Discard");
-				}else{load_deck(deck_read(lmistr("")));set_path("");}
+				}else{load_deck(deck_get(lmistr("")));set_path("");}
 			}
 			menu_separator();
 			if(menu_item("Open...",1,'o'))modal_enter(modal_open_deck);
@@ -3127,7 +3129,7 @@ void tick(lv*env){
 	if(uimode==mode_interact&&ev.drag&&ob.sel->c&&lb(ifield(ob.sel->lv[0],"draggable"))){
 		iwrite(ob.sel->lv[0],lmistr("pos"),lmpair((pair){ev.pos.x-ob.prev.x,ev.pos.y-ob.prev.y})),mark_dirty();
 	}
-	double used=interpret();
+	SDL_LockMutex(gil);double used=interpret();SDL_UnlockMutex(gil);
 	if(uimode==mode_interact&&profiler){
 		rect r={frame.size.x-60,2,50,12};
 		char t[64];snprintf(t,sizeof(t),"%.02f%%",100*used/FRAME_QUOTA),draw_text(inset(r,2),t,FONT_BODY,1);
@@ -3236,7 +3238,7 @@ int main(int argc,char**argv){
 		if(!strcmp("--fullscreen" ,argv[z])){toggle_fullscreen=1;continue;}
 		file=argv[z],set_path(argv[z]);
 	}
-	init_interns();
+	init_interns();gil=SDL_CreateMutex();
 	if(file){directory_normalize(ms.path,file),directory_parent(ms.path);}else{directory_normalize(ms.path,getenv(HOME));}
 	env=lmenv(NULL);init(env);
 	{lv*i=image_read(lmcstr(TOOL_ICONS ));TOOLS =lml(12);EACH(z,TOOLS )TOOLS ->lv[z]=image_make(buffer_copy(i->b,(rect){0,z*16,16,16}));}
@@ -3282,8 +3284,8 @@ int main(int argc,char**argv){
 	CURSORS[2]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
 	CURSORS[3]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
 
-	if(file){load_deck(deck_read(n_read(NULL,l_list(lmcstr(file))))),set_path(file);}
-	else{str doc=str_new();str_add(&doc,(char*)examples_decks_tour_deck,examples_decks_tour_deck_len);load_deck(deck_read(lmstr(doc)));}
+	if(file){load_deck(deck_get(n_read(NULL,l_list(lmcstr(file))))),set_path(file);}
+	else{str doc=str_new();str_add(&doc,(char*)examples_decks_tour_deck,examples_decks_tour_deck_len);load_deck(deck_get(lmstr(doc)));}
 	SDL_JoystickEventState(SDL_ENABLE),SDL_AddTimer((1000/60),tick_pump,NULL);if(!nosound)sfx_init();
 	while(1){tick(env);sync();}
 }
