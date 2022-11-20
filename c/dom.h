@@ -9,6 +9,7 @@
 #define ANTS           255
 #define MODULE_QUOTA   (10*4096)
 #define TRANS_QUOTA    ( 2*4096)
+#define LOOP_QUOTA     ( 1*4096)
 #define FRAME_QUOTA    (10*4096)
 #define CLAMP(a,x,b)   ((x)<(a)?(a): (x)>(b)?(b): (x))
 #define ikey(name)     if(i&&lis(i)&&!strcmp(i->sv,name))
@@ -116,6 +117,9 @@ char* default_handlers=""
 "	if !me.locked "
 "		me.value:select orderby me.value[x] asc from me.value "
 "	end "
+"end\n"
+"on loop x do"
+"	x "
 "end\n";
 
 char* default_transitions=""

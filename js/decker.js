@@ -367,8 +367,11 @@ PANGRAM='How razorback jumping-frogs can level six piqued gymnasts.'
 
 let uimode='interact', uicursor=0, enable_gestures=0, profiler=0
 setmode=mode=>{
+	n_play([NONE,lms('loop')])
 	grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel=[],wid.active=-1,sc.others=[],dr.poly=[]
-	msg.next_view=(uimode!=mode)&&mode=='interact',uimode=mode;if(mode!='interact')msg.pending_halt=1;if(mode!='draw')dr.fatbits=0
+	msg.next_view   =(uimode!=mode)&&mode=='interact'
+	msg.pending_loop=(uimode!=mode)&&mode=='interact'
+	uimode=mode;if(mode!='interact')msg.pending_halt=1;if(mode!='draw')dr.fatbits=0
 }
 
 event_state=_=>({ // event state
@@ -397,7 +400,7 @@ let ms={ // modal state
 	time_curr:0,time_end:0,time_start:0, carda:null,cardb:null,trans:null,canvas:null,
 }
 let msg={ // interpreter event messages
-	pending_drag:0,pending_halt:0,pending_view:0,next_view:0,overshoot:0,
+	pending_drag:0,pending_halt:0,pending_view:0,pending_loop:0,next_view:0,overshoot:0,
 	target_click:null,target_drag:null,target_release:null,target_order:null,target_run:null,target_link:null,target_change:null,target_navigate:null,
 	arg_click:rect(),arg_drag:rect(),lastdrag:rect(),arg_release:rect(),arg_order:null,arg_run:null,arg_link:null,arg_change:null,arg_navigate:null,
 }
@@ -955,6 +958,16 @@ load_sound=(file,after)=>{
 	}
 	const r=new FileReader();r.onload=_=>import_sound(r.result),r.readAsArrayBuffer(file)
 }
+sfx_stoploop=_=>{audio_loop_playing.onended=null,audio_loop_playing.stop(),audio_loop=audio_loop_playing=null}
+sfx_doloop=clear=>{
+	const a=audio_loop||NONE,b=lmblk(),pp=pending_popstate;let r=NONE, quota=LOOP_QUOTA
+	blk_get(b,lms('loop')),blk_lit(b,lml([a])),blk_op(b,op.CALL)
+	fire_hunk_async(ifield(deck,'card'),b)
+	while(quota>0&&running()){runop(),quota--}
+	if(!running())r=arg();popstate(),pending_popstate=pp
+	if(clear&&audio_loop)sfx_stoploop()
+	n_play([r,lms('loop')]),msg.pending_loop=0
+}
 n_play=([x,hint])=>{
 	const prepare=sfx=>{
 		const playback=audio.createBuffer(1,sfx.data.length*8,64000),dest=playback.getChannelData(0)
@@ -965,10 +978,12 @@ n_play=([x,hint])=>{
 		if(lis(x))x=dget(ifield(deck,"sounds"),x)
 		if(x&&audio_loop==x){} // don't re-trigger
 		else if(sound_is(x)&&ln(ifield(x,'size'))>0){
-			if(audio_loop)audio_loop_playing.stop()
-			audio_loop=x,audio_loop_playing=prepare(x),audio_loop_playing.loop=true,audio_loop_playing.start()
+			if(audio_loop)sfx_stoploop()
+			audio_loop=x,audio_loop_playing=prepare(x)
+			audio_loop_playing.onended=_=>{sfx_doloop(1)}
+			audio_loop_playing.start()
 		}
-		else if(audio_loop){audio_loop_playing.stop(),audio_loop=audio_loop_playing=null} // stop the loop
+		else if(audio_loop){sfx_stoploop()}
 		return NONE
 	}
 	const sfx=!x?x: sound_is(x)?x: dget(deck.sounds,lms(ls(x)));if(!sfx||ln(ifield(sfx,'size'))<1)return NONE;initaudio()
@@ -1758,7 +1773,9 @@ go_notify=(deck,x,t,url)=>{
 		ms.trans=dget(deck.transit,lms(t)), ms.canvas=free_canvas(deck)
 		ms.carda=draw_card(ifield(deck,'card')), ms.cardb=draw_card(ifield(deck,'cards').v[x])
 	}
-	if(x!=ln(ifield(ifield(deck,'card'),'index'))||t){
+	const moved=x!=ln(ifield(ifield(deck,'card'),'index'))
+	if(moved&&uimode==mode_interact)msg.pending_loop=1
+	if(moved||t){
 		grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel=[],wid.active=ms.type=='listen'?0:-1,mark_dirty()
 	}
 	if(uimode=='interact')msg.next_view=1
@@ -2734,6 +2751,7 @@ tick=_=>{
 		draw_text(inset(r,2),ls(dyad.format(lms('%0.2f%%'),lmn(100*used/FRAME_QUOTA))),FONT_BODY,1)
 		draw_invert(deck.patterns.pal.pix,rect(r.x+1,r.y,ceil((r.w-2)*(used/FRAME_QUOTA)),r.h)),draw_box(r,0,1)
 	}
+	if(msg.pending_loop)sfx_doloop()
 }
 
 let id=null

@@ -57,6 +57,7 @@ typedef struct {
 	int pending_drag;
 	int pending_halt;
 	int pending_view, next_view, overshoot;
+	int pending_loop;
 	lv* target_click;    fpair arg_click;
 	lv* target_drag;     fpair arg_drag, lastdrag;
 	lv* target_release;  fpair arg_release;
@@ -267,7 +268,9 @@ void bg_end_selection();void bg_end_lasso(); // forward-ref
 void setmode(int mode){
 	n_play(NULL,lml2(NONE,lmistr("loop")));
 	grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel->c=0,wid.active=-1;poly_count=0;sc.others=NULL;
-	msg.next_view=(uimode!=mode)&&mode==mode_interact;uimode=mode;if(mode!=mode_interact)msg.pending_halt=1;
+	msg.next_view   =(uimode!=mode)&&mode==mode_interact;
+	msg.pending_loop=(uimode!=mode)&&mode==mode_interact;
+	uimode=mode;if(mode!=mode_interact)msg.pending_halt=1;
 	if(mode!=mode_draw)dr.fatbits=0;
 }
 void settool(int tool){setmode(mode_draw);dr.tool=tool;}
@@ -1777,7 +1780,9 @@ void go_notify(lv*deck,lv*args,int dest){
 		ms.trans=dget(trans,args->lv[1]), ms.canvas=free_canvas(deck);
 		ms.carda=draw_card(ifield(deck,"card"),0), ms.cardb=draw_card(ifield(deck,"cards")->lv[dest],0);
 	}
-	if(dest!=ln(ifield(ifield(deck,"card"),"index"))||args->c>1){
+	int moved=dest!=ln(ifield(ifield(deck,"card"),"index"));
+	if(moved&&uimode==mode_interact)msg.pending_loop=1;
+	if(moved||args->c>1){
 		grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel->c=0,wid.active=ms.type==modal_listen?0:-1;mark_dirty();
 	}
 	if(uimode==mode_interact)msg.next_view=1;
@@ -2307,7 +2312,23 @@ clip_state audio_slots[SFX_SLOTS]={{0}};
 float master_volume=1.0;
 SDL_AudioSpec audio;
 
+void sfx_install(lv*sfx,clip_state*target){
+	lv*c=lms(sfx->b->c);memcpy(c->sv,sfx->b->sv,c->c); // clone the buffer so it can't be rewritten during playback (!)
+	target->clip=c,target->sample=0,target->volume=1.0;
+}
+void sfx_doloop(){
+	SDL_LockMutex(gil);
+	lv*a=orig_loop?orig_loop:NONE,*b=lmblk(),*r=NONE;
+	blk_get(b,lmistr("loop")),blk_lit(b,l_list(a)),blk_op(b,CALL);
+	int pp=pending_popstate;fire_hunk_async(ifield(deck,"card"),b);
+	int quota=LOOP_QUOTA;while(quota>0&&running()){runop(),quota--;}
+	if(!running())r=arg();popstate();pending_popstate=pp;
+	n_play(NULL,lml2(r,lmistr("loop"))),msg.pending_loop=0;
+	lv*loop=audio_loop.clip;if(loop&&audio_loop.sample>=((Uint32)loop->c))audio_loop.sample=0;
+	SDL_UnlockMutex(gil);
+}
 void sfx_pump(void*user,Uint8*stream,int len){
+	if(msg.pending_loop)sfx_doloop();
 	(void)user;int play=0;for(int z=0;z<len;z++){
 		float samples=0;for(int z=0;z<SFX_SLOTS;z++){
 			if(audio_slots[z].clip==NULL)continue;play=1;
@@ -2317,8 +2338,10 @@ void sfx_pump(void*user,Uint8*stream,int len){
 			audio_slots[z].sample++;
 			if(audio_slots[z].sample>=((Uint32)audio_slots[z].clip->c))audio_slots[z].clip=NULL;
 		}
-		lv*loop=audio_loop.clip;if(loop){
-			int s=audio_loop.sample;if(audio_loop.sample>=((Uint32)loop->c))s=audio_loop.sample=0;
+		lv*loop=audio_loop.clip;
+		if(loop&&audio_loop.sample>=((Uint32)loop->c)){sfx_doloop(),loop=audio_loop.clip;}
+		if(loop){
+			int s=audio_loop.sample;
 			int8_t*data=(int8_t*)loop->sv;int b=data[s++];samples+=(b/128.0)*audio_loop.volume;
 			audio_loop.sample=s;
 		}
@@ -2334,10 +2357,6 @@ int sfx_any(){if(nosound)return 0;for(int z=0;z<SFX_SLOTS;z++)if(audio_slots[z].
 void sfx_init(){
 	audio.freq=SFX_RATE,audio.format=SFX_FORMAT,audio.channels=SFX_CHANNELS,audio.samples=(SFX_RATE/10),audio.callback=sfx_pump;
 	SDL_OpenAudio(&audio,NULL),SDL_PauseAudio(0);
-}
-void sfx_install(lv*sfx,clip_state*target){
-	lv*c=lms(sfx->b->c);memcpy(c->sv,sfx->b->sv,c->c); // clone the buffer so it can't be rewritten during playback (!)
-	target->clip=c,target->sample=0,target->volume=1.0;
 }
 lv* n_play(lv*self,lv*z){
 	if(z->c>1&&matchr(z->lv[1],lmistr("loop"))){
@@ -3130,7 +3149,7 @@ void tick(lv*env){
 	if(uimode==mode_interact&&ev.drag&&ob.sel->c&&lb(ifield(ob.sel->lv[0],"draggable"))){
 		iwrite(ob.sel->lv[0],lmistr("pos"),lmpair((pair){ev.pos.x-ob.prev.x,ev.pos.y-ob.prev.y})),mark_dirty();
 	}
-	SDL_LockMutex(gil);double used=interpret();SDL_UnlockMutex(gil);
+	SDL_LockMutex(gil);double used=interpret();
 	if(uimode==mode_interact&&profiler){
 		rect r={frame.size.x-60,2,50,12};
 		char t[64];snprintf(t,sizeof(t),"%.02f%%",100*used/FRAME_QUOTA),draw_text(inset(r,2),t,FONT_BODY,1);
@@ -3186,6 +3205,7 @@ void tick(lv*env){
 	track(audio_loop.clip)
 	track(orig_loop)
 	lv_collect();
+	SDL_UnlockMutex(gil);
 }
 
 void quit(){

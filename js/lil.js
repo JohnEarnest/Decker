@@ -642,13 +642,14 @@ show=(x,toplevel)=>linat(x)?'on native x do ... end':
 
 // dom + utilities
 
-FORMAT_VERSION=1, RTEXT_END=2147483647, SFX_RATE=8000, FRAME_QUOTA=MODULE_QUOTA=10*4096, TRANS_QUOTA=2*4096, ANTS=255
+FORMAT_VERSION=1, RTEXT_END=2147483647, SFX_RATE=8000, FRAME_QUOTA=MODULE_QUOTA=10*4096, TRANS_QUOTA=2*4096, LOOP_QUOTA=1*4096, ANTS=255
 sleep_frames=0, sleep_play=0, pending_popstate=0
 DEFAULT_HANDLERS=`
 on link x do go[x] end
 on drag x do if !me.locked|me.draggable me.line[(pointer.prev-me.pos)/me.scale x] end end
 on order x do if !me.locked me.value:select orderby me.value[x] asc from me.value end end
 on navigate x do if x~"right" go["Next"] end if x~"left" go["Prev"] end end
+on loop x do x end
 `
 DEFAULT_TRANSITIONS=`
 transition[on SlideRight c a b t do  c.paste[a c.size*t,0   ] c.paste[b c.size*(t-1),0]      end]
