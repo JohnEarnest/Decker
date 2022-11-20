@@ -1136,6 +1136,7 @@ void modal_exit(int value){
 	if(ms.subtype==modal_export_image&&value){
 		lv*path=modal_save_path(".gif");
 		if(directory_exists(path->sv)&&ms.type!=modal_confirm){modal_save_replace(modal_export_image,"GIF file",path);return;}
+		if(bg_has_sel()){rect s=dr.sel_here;bg_end_selection();dr.sel_here=s;}
 		lv*i=draw_card(ifield(deck,"card"),1);pair off={0,0};char*pal=patterns_pal(ifield(deck,"patterns"));
 		if(bg_has_sel()||bg_has_lasso()){i=image_make(buffer_copy(i->b,dr.sel_here));off=(pair){dr.sel_here.x,dr.sel_here.y};}
 		pair s=image_size(i);int f=1;for(int z=0;z<4&&dr.show_anim;z++){int c=anim_count(pal,z);if(c){f=lcm(f,c);}}

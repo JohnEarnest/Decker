@@ -1447,6 +1447,7 @@ modals=_=>{
 				dirty=0,save_text(name,d)
 			}
 			const save_image=_=>{
+				if(bg_has_sel()){const s=rcopy(dr.sel_here);bg_end_selection(),dr.sel_here=s}
 				let i=draw_card(ifield(deck,'card'),1),off=rect(),f=1,a=0, bg=dr.trans?0:32, frames=[]
 				const anim=deck.patterns.anim
 				const anim_pattern=(pix,x,y,f)=>pix<28||pix>31?pix: anim[pix-28][f%max(1,anim[pix-28].length)]
