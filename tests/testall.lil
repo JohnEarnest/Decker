@@ -59,8 +59,10 @@ show[flip insert jan:11,22,33,44 feb:55,66,77,88 key:"tax","gas","power","food" 
 show[!!(0,1,-23) !!("","0","foo") !!() !!()dict() !!table 1 !!on x do end]
 show[heading 3,5]
 show[mag ((list 9,0),(list 3,4),(list 0,7))]
+show[mag 8]
 show[unit 0,(pi/2),(pi/4)]
 show[heading unit 0,(pi/2),(pi/4)]
+show[heading 8]
 
 header["dyads"]
 show[2+3]

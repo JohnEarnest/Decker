@@ -191,7 +191,7 @@ lv* amendv(lv*x,lv*i,lv*y,int n,int*tla){
 	(n+1==i->c)?amend(x,l_first(i->lv[n]),y): y;
 }
 lv* perfuse(lv*x,lv*(f(lv*))){if(lil(x)){MAP(r,x)perfuse(x->lv[z],f);return r;}return f(x);}
-lv* nlperfuse(lv*x,lv*(f(lv*))){if(!lil(x))return f(x);int n=1;EACH(z,x)if(!lin(x->lv[z])){n=0;break;}if(n)return f(x);MAP(r,x)nlperfuse(x->lv[z],f);return r;}
+lv* nlperfuse(lv*x,lv*(f(lv*))){if(!lil(x))return f(ll(x));int n=1;EACH(z,x)if(!lin(x->lv[z])){n=0;break;}if(n)return f(x);MAP(r,x)nlperfuse(x->lv[z],f);return r;}
 lv* conform(lv*x,lv*y,lv*(f(lv*,lv*))){
 	if( lil(x)&& lil(y)){MAP(r,x)conform(x->lv[z],y->c==0?NONE:y->lv[z%y->c],f);return r;}
 	if( lil(x)&&!lil(y)){MAP(r,x)conform(x->lv[z],y,f);return r;}
