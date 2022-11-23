@@ -63,6 +63,10 @@ show[mag 8]
 show[unit 0,(pi/2),(pi/4)]
 show[heading unit 0,(pi/2),(pi/4)]
 show[heading 8]
+ma:1092455,430625591
+mm:16807,48271
+mod:2147483647
+show[mod%ma*mm 5%ma*mm 6%ma*mm]
 
 header["dyads"]
 show[2+3]
