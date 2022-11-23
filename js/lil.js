@@ -16,7 +16,11 @@ NONE=lmn(0), ONE=lmn(1), seed=0x12345, max=Math.max, min=Math.min, abs=Math.abs
 ISODATE=lms('%04i-%02i-%02iT%02i:%02i:%02iZ%n%m'), PARTS=['year','month','day','hour','minute','second'].map(lms)
 clchar=x=>{const c=x.charCodeAt(0);return (c>=32&&c<=126)||(x=='\n')?x:' '}
 clchars=x=>x.replace(/\r/g,'').replace(/[^ -~\n]/g,' ')
-wnum=x=>''+(Math.round(x*1000000)/1000000)
+wnum=y=>{
+	let w='',d='',s=y<0?(y=-y,'-'):'',i=Math.floor(y);while(i>0){w=(0|i%10)+w,i=i/10}
+	y=Math.round((y-Math.floor(y))*1000000);for(let z=0;z<6;z++){d=(0|y%10)+d,y=y/10}
+	return s+('0'+w).replace(/^(0+)(?=[^0])/,'')+('.'+d).replace(/(\.?0+)$/,'')
+}
 mod=(x,y)=>x-y*Math.floor(x/y)
 range=x=>Array.from(Array(x)).map((_,i)=>i)
 torect=t=>{const n=Object.values(t).reduce((x,y)=>max(x,lil(y)?count(y):1),0);Object.keys(t).map(k=>t[k]=take(n,lil(t[k])?t[k].v:[t[k]]))}
@@ -73,7 +77,7 @@ amendv=(x,i,y,n,tla)=>{
 }
 lb=x=>lin(x)?x.v!=0: lis(x)?x.v!='': lil(x)||lid(x)?x.v.length: true
 ln=x=>lin(x)?x.v: lis(x)?(isFinite(x.v)?+x.v:0): lil(x)||lid(x)?ln(x.v[0]): 0
-ls=x=>lin(x)?''+x.v: lis(x)?x.v: lil(x)?x.v.map(ls).join(''): ''
+ls=x=>lin(x)?wnum(x.v): lis(x)?x.v: lil(x)?x.v.map(ls).join(''): ''
 ll=x=>lis(x)?x.v.split('').map(lms): lil(x)||lid(x)?x.v: lit(x)?rows(x).v: [x]
 ld=x=>lid(x)?x:lit(x)?monad.cols(x):lil(x)||lis(x)?lmd(range(count(x)).map(lmn),lis(x)?ll(x):x.v):lmd()
 lt=x=>lit(x)?x: lid(x)||lil(x)?lmt((lid(x)?['key','value']:['value']).reduce((t,k,i)=>(t[k]=x[k[0]],t),{})): lmt({value:ll(x)})

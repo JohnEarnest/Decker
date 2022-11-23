@@ -1,0 +1,24 @@
+# test large number handling
+
+# note: lil numbers are ultimately backed by doubles, which are nothing but trouble.
+# this test is not necessarily about *accuracy*, it is about *consistency*.
+
+on testnum x do
+	show[x]
+	show[fmt:"%j" format x]
+	show[fus:"" fuse x]
+	show[fmt~fus]
+end
+
+# a very cool number
+testnum[-3.1337]
+
+# a pretty big number (bigger than an int, for example)
+testnum[100000000000]
+
+# the biggest precise int in an ieee-754
+testnum[9007199254740992]
+
+# a very large number that cannot be represented exactly:
+r:1 each x in 1+range 10 r:r*r*x end r
+testnum[r]

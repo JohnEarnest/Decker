@@ -120,9 +120,13 @@ double rnum_len(char*x,int n,int*len){
 	return (*len)=i,sign*r;
 }
 double rnum(char*x,int n){int i=0;return rnum_len(x,n,&i);}
+void cswap(char*t,int a,int b){char v=t[a];t[a]=t[b],t[b]=v;}
+void crev(char*t,int n){int i=0,j=n-1;while(i<j)cswap(t,i++,j--);}
 void wnum(str*x,double y){
-	char t[NUM];int n=snprintf(t,sizeof(t),"%f",y)-1;
-	while(n>0&&t[n]=='0')n--;if(t[n]=='.')n--;str_add(x,t,n+1);
+	if(y<0)y=-y,str_addc(x,'-');char t[NUM*2]={0};int n=0,s=0;
+	t[n++]='0';double i=floor(y);while(i>0){t[n++]=fmod(i,10)+'0',i=i/10;}crev(t+1,n-1);while(t[s]=='0'&&t[s+1])s++;t[n++]='.';
+	y=round((y-floor(y))*1000000.0);for(int z=0;z<6;z++){t[n+5-z]=fmod(y,10)+'0',y=y/10;}n+=5;while(n>0&&t[n]=='0')n--;if(t[n]=='.')n--;
+	str_add(x,t+s,n-s+1);
 }
 monad(l_rows);monad(l_cols);monad(l_range);monad(l_list);monad(l_first);
 dyad(l_dict);dyad(l_fuse);dyad(l_take);void dset(lv*d,lv*k,lv*x);
