@@ -739,16 +739,16 @@ void draw_fat_scaled(rect r,lv*buff,int opaque,char*pal,int frame_count,int scal
 	}
 }
 float*dither_err=NULL;int dither_err_size=0;
-void draw_dithered(rect r,lv*buff,int opaque){
+void draw_dithered(rect r,lv*buff,int opaque,lv*mask){
 	if(r.w==0||r.h==0)return;pair s=buff_size(buff);int stride=2*r.w, m[]={0,1,r.w-2,r.w-1,r.w,stride-1};
 	if(!dither_err)dither_err=calloc(stride,sizeof(float)),dither_err_size=stride;
 	if(dither_err_size<stride)dither_err=realloc(dither_err,sizeof(float)*stride),dither_err_size=stride;
 	for(int z=0;z<dither_err_size;z++)dither_err[z]=0.0;
 	for(int ei=0,a=0;a<r.h;a++)for(int b=0;b<r.w;b++){
-		int sx=((b*1.0)/r.w)*s.x, sy=((a*1.0)/r.h)*s.y, src=0xFF&buff->sv[sx+sy*s.x];
+		int sx=((b*1.0)/r.w)*s.x, sy=((a*1.0)/r.h)*s.y, src=0xFF&buff->sv[sx+sy*s.x], ms=mask?mask->sv[sx+sy*s.x]:1;
 		float pix=(src/256.0)+dither_err[ei], col=pix>.5?1:0, err=(pix-col)/8.0;
 		dither_err[ei]=0, ei=(ei+1)%stride; for(int z=0;z<6;z++)dither_err[(ei+m[z])%stride]+=err;
-		int c=!col;if((opaque||c!=0)&&inclip(r.x+b,r.y+a))PIX(r.x+b,r.y+a)=c;
+		int c=!col;if(ms&&(opaque||c!=0)&&inclip(r.x+b,r.y+a))PIX(r.x+b,r.y+a)=c;
 	}
 }
 fpair*poly;int poly_count=0,poly_size=0;

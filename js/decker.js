@@ -37,9 +37,12 @@ load_image=(file,hint,after)=>{
 	}
 	const import_image=_=>{
 		if(after){after(read_image(hint=='gray'));return}
-		let i=read_image(0);if(i.size.x==0||i.size.y==0)return
-		const color=i.pix.some(x=>x!=32&&x!=47&&x>2);if(color)i=read_image(1)
-		setmode('draw'),bg_paste(i);dr.limbo_dither=color,dr.fatbits=0
+		let i=read_image(0),m=null; if(i.size.x==0||i.size.y==0)return
+		let color=0,c=new Uint8Array(256);i.pix.forEach(p=>c[p]++)
+		let tw=c[0],ow=c[32];c[32]=0,c[47]=0;for(let z=0;z<256;z++)if(c[z]){color=1;break}
+		if(color&&tw)i.pix.forEach((p,z)=>i.pix[z]=p!=0),m=i
+		if(color){i=read_image(1)}else if(ow&&!tw){i.pix.forEach((p,z)=>i.pix[z]=p!=32)}
+		setmode('draw'),bg_paste(i);dr.limbo_dither=color,dr.fatbits=0,dr.omask=m
 	}
 	const r=new FileReader();r.onload=_=>{q('#loader').src=r.result;setTimeout(import_image,100)};r.readAsDataURL(file)
 }
@@ -188,13 +191,13 @@ draw_fat_scaled=(r,image,opaque,pal,frame_count,scale,offset)=>{
 		if(opaque||v!=0)draw_rect(rect((r.x-offset.x+x)*scale,(r.y-offset.y+y)*scale,scale,scale),c>=32?c: p?1:0)
 	}
 }
-draw_dithered=(r,image,opaque)=>{
+draw_dithered=(r,image,opaque,mask)=>{
 	if(r.w==0||r.h==0)return;const s=image.size, stride=2*r.w, m=[0,1,r.w-2,r.w-1,r.w,stride-1], dither_err=new Float32Array(stride)
 	for(let ei=0,a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
-		const sx=0|(((b*1.0)/r.w)*s.x), sy=0|(((a*1.0)/r.h)*s.y), src=0xFF&image.pix[sx+sy*s.x]
+		const sx=0|(((b*1.0)/r.w)*s.x), sy=0|(((a*1.0)/r.h)*s.y), src=0xFF&image.pix[sx+sy*s.x], ms=mask?mask.pix[sx+sy*s.x]:1
 		const p=(src/256.0)+dither_err[ei], col=p>.5?1:0, err=(p-col)/8.0
 		dither_err[ei]=0, ei=(ei+1)%stride; for(let z=0;z<6;z++)dither_err[(ei+m[z])%stride]+=err
-		const c=!col;if(opaque||c!=0){const h=rect(r.x+b,r.y+a);if(inclip(h))pix(h,c)}
+		const c=!col;if(ms&&(opaque||c!=0)){const h=rect(r.x+b,r.y+a);if(inclip(h))pix(h,c)}
 	}
 }
 draw_card=(card,active)=>{
@@ -1850,12 +1853,12 @@ draw_limbo=(clip,scale)=>{
 	if(!dr.limbo){/*nothing*/}
 	else if(scale&&dr.limbo_dither){draw_rect      (card_to_fat(clip),21)}
 	else if(scale                 ){draw_fat_scaled(clip,dr.limbo,!dr.trans,deck.patterns.pal.pix,frame_count,FAT,dr.offset)}
-	else if(       dr.limbo_dither){draw_dithered  (clip,dr.limbo,!dr.trans)}
+	else if(       dr.limbo_dither){draw_dithered  (clip,dr.limbo,!dr.trans,dr.omask)}
 	else                           {draw_scaled    (clip,dr.limbo,!dr.trans)}
 }
 bg_scaled_limbo=_=>{
 	const d=dr.sel_here, card=ifield(deck,'card'), back=ifield(card,'image')
-	const r=dr.trans?image_copy(back,d):image_make(rect(d.w,d.h)), s=r.size, t=frame;frame=draw_frame(r)
+	const r=dr.trans||dr.omask?image_copy(back,d):image_make(rect(d.w,d.h)), s=r.size, t=frame;frame=draw_frame(r)
 	if(dr.trans){const c=dr.sel_start;draw_rect(rect(c.x-d.x,c.y-d.y,c.w,c.h),dr.fill)}
 	draw_limbo(frame.clip,0),frame=t;return r
 }
@@ -2101,7 +2104,7 @@ bg_tighten=_=>{
 	if(dr.tool=='select'){ // convert box selections into masked lasso selections
 		dr.tool='lasso',bg_scoop_selection();const s=dr.sel_start, l=dr.limbo, t=frame
 		dr.limbo=image_make(rect(r.w,r.h)),frame=draw_frame(dr.limbo)
-		if(dr.limbo_dither){draw_dithered(frame.clip,l,1),dr.limbo_dither=0}else{draw_scaled(frame.clip,l,1)}frame=t
+		if(dr.limbo_dither){draw_dithered(frame.clip,l,1,dr.omask),dr.limbo_dither=0}else{draw_scaled(frame.clip,l,1)}frame=t
 		dr.mask=image_make(rect(r.w,r.h)),dr.mask.pix.fill(1)
 		if(s.w>0&&s.h>0){dr.omask=image_make(rect(s.w,s.h)),dr.omask.pix.fill(1)}else{dr.omask=null}
 	}

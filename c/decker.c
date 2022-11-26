@@ -1031,10 +1031,12 @@ lv* readimage(char*path,int grayscale){
 	}SDL_FreeSurface(c),SDL_FreeSurface(b);return image_make(i);
 }
 void import_image(char*path){
-	lv*i=readimage(path,0);if(is_empty(i))return;
+	lv*i=readimage(path,0),*m=NULL;if(is_empty(i))return;
 	int color=0,c[256]={0};EACH(z,i->b)c[0xFF&(i->b->sv[z])]++;
-	c[32]=0,c[47]=0;for(int z=2;z<256;z++)if(c[z]){color=1;break;}
-	if(color)i=readimage(path,1),NONE;setmode(mode_draw);bg_paste(i->b);if(color)dr.limbo_dither=1;dr.fatbits=0;
+	int tw=c[0],ow=c[32];c[32]=0,c[47]=0;for(int z=2;z<256;z++)if(c[z]){color=1;break;}
+	if(color&&tw){EACH(z,i->b)i->b->sv[z]=i->b->sv[z]!=0;m=i->b;}
+	if(color){i=readimage(path,1);}else if(ow&&!tw){EACH(z,i->b)i->b->sv[z]=i->b->sv[z]!=32;}
+	setmode(mode_draw),bg_paste(i->b);if(color)dr.limbo_dither=1;dr.fatbits=0;dr.omask=m;
 }
 lv* sfx_readwav(char*name){
 	Uint8* raw; Uint32 length; SDL_AudioSpec spec; SDL_AudioCVT cvt;
@@ -1890,14 +1892,14 @@ void draw_limbo(rect clip,int scale){
 	if(!dr.limbo){/*nothing*/}
 	else if(scale&&dr.limbo_dither){draw_rect      (card_to_fat(clip),21);}
 	else if(scale                 ){draw_fat_scaled(clip,dr.limbo,!dr.trans,patterns_pal(ifield(deck,"patterns")),frame_count,FAT,dr.offset);}
-	else if(       dr.limbo_dither){draw_dithered  (clip,dr.limbo,!dr.trans);}
+	else if(       dr.limbo_dither){draw_dithered  (clip,dr.limbo,!dr.trans,dr.omask);}
 	else                           {draw_scaled    (clip,dr.limbo,!dr.trans);}
 }
 lv* bg_scaled_limbo(){
 	rect d=dr.sel_here;
 	lv*card=ifield(deck,"card");
 	lv*back=ifield(card,"image")->b;
-	lv*r=dr.trans?buffer_copy(back,d):lmbuff((pair){d.w,d.h});
+	lv*r=dr.trans||dr.omask?buffer_copy(back,d):lmbuff((pair){d.w,d.h});
 	cstate t=frame;frame=draw_buffer(r);
 	if(dr.trans){rect c=dr.sel_start;draw_rect((rect){c.x-d.x,c.y-d.y,c.w,c.h},dr.fill);}
 	draw_limbo(frame.clip,0);
@@ -2204,7 +2206,7 @@ void bg_tighten(){
 	if(dr.tool==tool_select){ // convert box selections into masked lasso selections
 		dr.tool=tool_lasso;bg_scoop_selection();rect s=dr.sel_start;
 		lv*l=dr.limbo;dr.limbo=lmbuff((pair){r.w,r.h});cstate t=frame;frame=draw_buffer(dr.limbo);
-		if(dr.limbo_dither){draw_dithered(frame.clip,l,1),dr.limbo_dither=0;}else{draw_scaled(frame.clip,l,1);}frame=t;
+		if(dr.limbo_dither){draw_dithered(frame.clip,l,1,dr.omask),dr.limbo_dither=0;}else{draw_scaled(frame.clip,l,1);}frame=t;
 		dr.mask=lmbuff((pair){r.w,r.h}),memset(dr.mask->sv,1,r.w*r.h);
 		if(s.w>0&&s.h>0){dr.omask=lmbuff((pair){s.w,s.h}),memset(dr.omask->sv,1,s.w*s.h);}else{dr.omask=NULL;}
 	}
