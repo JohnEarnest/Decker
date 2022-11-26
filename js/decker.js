@@ -39,7 +39,7 @@ load_image=(file,hint,after)=>{
 		if(after){after(read_image(hint=='gray'));return}
 		let i=read_image(0),m=null; if(i.size.x==0||i.size.y==0)return
 		let color=0,c=new Uint8Array(256);i.pix.forEach(p=>c[p]++)
-		let tw=c[0],ow=c[32];c[32]=0,c[47]=0;for(let z=0;z<256;z++)if(c[z]){color=1;break}
+		let tw=c[0],ow=c[32];c[32]=0,c[47]=0;for(let z=2;z<256;z++)if(c[z]){color=1;break}
 		if(color&&tw)i.pix.forEach((p,z)=>i.pix[z]=p!=0),m=i
 		if(color){i=read_image(1)}else if(ow&&!tw){i.pix.forEach((p,z)=>i.pix[z]=p!=32)}
 		setmode('draw'),bg_paste(i);dr.limbo_dither=color,dr.fatbits=0,dr.omask=m
