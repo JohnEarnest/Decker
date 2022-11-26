@@ -1032,7 +1032,8 @@ lv* readimage(char*path,int grayscale){
 }
 void import_image(char*path){
 	lv*i=readimage(path,0);if(is_empty(i))return;
-	int color=0,c[256]={0};EACH(z,i->b)c[0xFF&(i->b->sv[z])]++;for(int z=2;z<256;z++)if(c[z]){color=1;break;}
+	int color=0,c[256]={0};EACH(z,i->b)c[0xFF&(i->b->sv[z])]++;
+	c[32]=0,c[47]=0;for(int z=2;z<256;z++)if(c[z]){color=1;break;}
 	if(color)i=readimage(path,1),NONE;setmode(mode_draw);bg_paste(i->b);if(color)dr.limbo_dither=1;dr.fatbits=0;
 }
 lv* sfx_readwav(char*name){

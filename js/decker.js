@@ -38,7 +38,7 @@ load_image=(file,hint,after)=>{
 	const import_image=_=>{
 		if(after){after(read_image(hint=='gray'));return}
 		let i=read_image(0);if(i.size.x==0||i.size.y==0)return
-		const color=i.pix.some(x=>x>2);if(color)i=read_image(1)
+		const color=i.pix.some(x=>x!=32&&x!=47&&x>2);if(color)i=read_image(1)
 		setmode('draw'),bg_paste(i);dr.limbo_dither=color,dr.fatbits=0
 	}
 	const r=new FileReader();r.onload=_=>{q('#loader').src=r.result;setTimeout(import_image,100)};r.readAsDataURL(file)
