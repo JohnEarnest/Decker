@@ -409,7 +409,7 @@ let msg={ // interpreter event messages
 }
 let li={hist:[],vars:{},scroll:0} // listener state
 let ob={sel:[],show_bounds:1,show_names:0,show_cursor:0,move:0,move_first:0,resize:0,resize_first:0,handle:-1,prev:rect(),orig:rect()} // object editor state
-let sc={target:null,others:[],next:null, f:null,prev_mode:null,status:''} // script editor state
+let sc={target:null,others:[],next:null, f:null,prev_mode:null,xray:0,status:''} // script editor state
 script_save=x=>{const k=lms('script');mark_dirty();if(sc.target)iwrite(sc.target,k,x);if(sc.others)sc.others.map(o=>iwrite(o,k,x))}
 
 draw_state=_=>({ // drawing tools state
@@ -916,7 +916,7 @@ ui_radio   =(r,label,    enable,value)=>widget_button(null,{text:label,size:r,fo
 ui_checkbox=(r,label,    enable,value)=>widget_button(null,{text:label,size:r,font:FONT_BODY,style:'check',show:             'solid',locked:!enable},value)
 ui_field   =(r,       value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:0,border:1,style:'plain',align:ALIGN.left,locked:0},value)
 ui_textedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:1,border  ,style:'plain',align:ALIGN.left,locked:0},value)
-ui_codeedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_MONO,show:'solid',scrollbar:1,border  ,style:'code' ,align:ALIGN.left,locked:running()},value)
+ui_codeedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_MONO,show:'transparent',scrollbar:1,border  ,style:'code' ,align:ALIGN.left,locked:running()},value)
 ui_table   =(r,widths,format,value)=>widget_grid(null,{size:r,font:FONT_BODY,widths   ,format   ,headers:2,scrollbar:1,lines:0,show:'solid',locked:1},value)
 ui_list    =(r,              value)=>widget_grid(null,{size:r,font:FONT_BODY,widths:[],format:'',headers:0,scrollbar:1,lines:0,show:'solid',locked:1},value)
 
@@ -2342,6 +2342,15 @@ script_editor=_=>{
 		return rect(l+1,c+1+e)
 	}
 	const mh=3+font_h(FONT_MENU), bb=rect(0,mh,frame.size.x+1,frame.size.y-2*mh)
+	if(sc.xray){
+		const card=ifield(deck,'card'),wids=ifield(card,'widgets');
+		for(let z=0;z<wids.v.length;z++){
+			const wid=wids.v[z],size=unpack_widget(wid).size
+			draw_textc(size,ls(ifield(wid,'name')),FONT_BODY,44),draw_box(size,0,44)
+			if(ls(ifield(wid,'script')).length)draw_icon(rect(size.x-1,size.y),ICONS[ICON.lil],44)
+			if(ev.alt&&ev.mu&&over(size)&&dover(size)){close_script(wid),ev.md=ev.mu=0;break}
+		}if(ev.alt&&ev.mu)close_script(card),ev.md=ev.mu=0
+	}
 	ui_codeedit(bb,0,sc.f),draw_hline(0,frame.size.x,frame.size.y-mh-1,1)
 	if(sc.status.length){draw_text_fit(rect(3,frame.size.y-mh+3,frame.size.x,mh-6),sc.status,FONT_BODY,1)}
 	else{
@@ -2434,6 +2443,7 @@ all_menus=_=>{
 		menu_separator()
 		if(menu_item('Go to Deck',!deck_is(sc.target)           ))close_script(deck)
 		if(menu_item('Go to Card',sc.target!=ifield(deck,'card')))close_script(ifield(deck,'card'))
+		if(menu_check('X-Ray Specs',1,sc.xray))sc.xray^=1
 	}
 	else if(ms.type=='recording'){
 		menu_item('Import Sound...',1,0,_=>open_file('audio/*',load_sound))

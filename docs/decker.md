@@ -175,6 +175,8 @@ The script editor is another feature that is common to every widget type. When y
 
 You can also edit scripts for the card itself from the card properties dialog or _Card &#8594; Script..._.
 
+If you enable "X-Ray Specs", you can see a simplified diagram of all the widgets on your card underneath the script. With X-Ray Specs on, holding Control or Command while clicking on a widget will switch to editing that widget's script, and clicking outside all widgets will switch to editing the card script.
+
 
 Fields
 ------

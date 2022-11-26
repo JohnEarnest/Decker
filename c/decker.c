@@ -137,9 +137,9 @@ typedef struct {
 
 typedef struct {
 	lv* target, *others, *next; field_val f;
-	int prev_mode;
+	int prev_mode, xray;
 	char status[4096];
-} script_state; script_state sc={NULL,NULL,NULL,{0},0,{0}};
+} script_state; script_state sc={NULL,NULL,NULL,{0},0,0,{0}};
 void script_save(lv*x){
 	lv*k=lmistr("script");mark_dirty();
 	if(sc.target)iwrite(sc.target,k,x);
@@ -728,7 +728,7 @@ int  ui_radio   (rect r,char*label,int enable,int value){return widget_button(NU
 int  ui_checkbox(rect r,char*label,int enable,int value){return widget_button(NULL,(button){label,r,FONT_BODY,button_check,show_solid,!enable},value);}
 void ui_field   (rect r,           field_val*value){widget_field(NULL,(field){r,FONT_BODY,show_solid,0,1     ,field_plain,align_left,0},value);}
 void ui_textedit(rect r,int border,field_val*value){widget_field(NULL,(field){r,FONT_BODY,show_solid,1,border,field_plain,align_left,0},value);}
-void ui_codeedit(rect r,int border,field_val*value){widget_field(NULL,(field){r,FONT_MONO,show_solid,1,border,field_code ,align_left,running()},value);}
+void ui_codeedit(rect r,int border,field_val*value){widget_field(NULL,(field){r,FONT_MONO,show_transparent,1,border,field_code ,align_left,running()},value);}
 int  ui_table   (rect r,int w0,int w1,int w2,char*fmt,grid_val*value){return widget_grid(NULL,(grid){r,FONT_BODY,{w0,w1,w2,0,0},fmt,2,1,0,show_solid,1},value);}
 int  ui_list    (rect r,                              grid_val*value){return widget_grid(NULL,(grid){r,FONT_BODY,{0 },"" ,0,1,0,show_solid,1},value);}
 
@@ -2725,6 +2725,7 @@ void tick(lv*env){
 			menu_separator();
 			if(menu_item("Go to Deck",!deck_is(sc.target)           ,'\0'))close_script(deck);
 			if(menu_item("Go to Card",sc.target!=ifield(deck,"card"),'\0'))close_script(ifield(deck,"card"));
+			if(menu_check("X-Ray Specs",1,sc.xray,'r'))sc.xray^=1;
 		}
 		else if(ms.type==modal_recording){
 			if(menu_item("Import Sound...",1,'\0'))modal_enter(modal_import_sound);
@@ -2990,6 +2991,14 @@ void tick(lv*env){
 	char*pal=patterns_pal(ifield(deck,"patterns"));
 	if(uimode==mode_script){
 		int mh=3+font_h(FONT_MENU);rect b={0,mh,frame.size.x+1,frame.size.y-2*mh};
+		if(sc.xray){
+			lv*card=ifield(deck,"card"),*wids=ifield(card,"widgets");EACH(z,wids){
+				lv*wid=wids->lv[z];rect size=unpack_widget(wid).size;
+				draw_textc(size,ifield(wid,"name")->sv,FONT_BODY,44),draw_box(size,0,44);
+				if(ifield(wid,"script")->c)draw_icon((pair){size.x-1,size.y},ICONS[icon_lil],44);
+				if(ev.alt&&ev.mu&&over(size)&&dover(size)){close_script(wid);ev.md=ev.mu=0;break;}
+			}if(ev.alt&&ev.mu)close_script(card),ev.md=ev.mu=0;
+		}
 		ui_codeedit(b,0,&sc.f),draw_hline(0,frame.size.x,frame.size.y-mh-1,1);
 		if(strlen(sc.status)){draw_text_fit((rect){3,frame.size.y-mh+3,frame.size.x,mh-6},sc.status,FONT_BODY,1);}
 		else{
