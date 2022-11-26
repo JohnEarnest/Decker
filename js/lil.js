@@ -31,8 +31,8 @@ coltab=x=>{
 	return lmt(x.k.reduce((r,k,i)=>(r[ls(k)]=dyad.take(n,lil(x.v[i])?x.v[i]:lml([x.v[i]])).v,r),{}))
 }
 rowtab=x=>{
-	const t=x.v.reduce((r,x)=>x.k.reduce((r,k)=>(r[ls(k)]=[],r),r),{})
-	x.v.map(x=>Object.keys(t).map(k=>t[k].push(dget(x,lms(k))||NONE)));return lmt(t)
+	const ok=[],t={};x.v.map(r=>r.k.map(k=>{if(!t[ls(k)])ok.push(k);t[ls(k)]=[]}))
+	x.v.map(x=>Object.keys(t).map((k,i)=>t[k].push(dget(x,ok[i])||NONE)));return lmt(t)
 }
 listab=x=>{
 	const m=x.v.reduce((r,x)=>max(r,count(x)),0);const t={};for(let z=0;z<m;z++)t['c'+z]=[]

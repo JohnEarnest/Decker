@@ -67,6 +67,9 @@ ma:1092455,430625591
 mm:16807,48271
 mod:2147483647
 show[mod%ma*mm 5%ma*mm 6%ma*mm]
+show[table      (3,4,5) dict 4,5,6]
+show[table list (3,4,5) dict 4,5,6]
+show[table list ("1",1) dict 22,33]
 
 header["dyads"]
 show[2+3]
