@@ -54,7 +54,10 @@ lv*runstring(char*t,lv*env){
 	lv* prog=parse(t);if(perr())return fprintf(stderr,"(%d:%d) %s\n",par.r+1,par.c+1,par.error),NONE;
 	return run(prog,env);
 }
-lv*runfile(char*path,lv*env){return runstring(n_read(NULL,l_list(lmcstr(path)))->sv,env);}
+lv*runfile(char*path,lv*env){
+	struct stat st;if(stat(path,&st)){fprintf(stderr,"unable to open '%s'\n",path);return NONE;}
+	return runstring(n_read(NULL,l_list(lmcstr(path)))->sv,env);
+}
 extern char **environ;
 
 void go_notify(lv*deck,lv*args,int dest){(void)deck,(void)args,(void)dest;}
