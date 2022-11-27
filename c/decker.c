@@ -2991,15 +2991,17 @@ void tick(lv*env){
 	char*pal=patterns_pal(ifield(deck,"patterns"));
 	if(uimode==mode_script){
 		int mh=3+font_h(FONT_MENU);rect b={0,mh,frame.size.x+1,frame.size.y-2*mh};
-		if(sc.xray){
+		lv*overw=NULL;if(sc.xray){
 			lv*card=ifield(deck,"card"),*wids=ifield(card,"widgets");EACH(z,wids){
 				lv*wid=wids->lv[z];rect size=unpack_widget(wid).size;
-				draw_textc(size,ifield(wid,"name")->sv,FONT_BODY,44),draw_box(size,0,44);
-				if(ifield(wid,"script")->c)draw_icon((pair){size.x-1,size.y},ICONS[icon_lil],44);
+				int o=ev.alt&&over(size), col=o?(overw=wid,13):44;
+				draw_textc(size,ifield(wid,"name")->sv,FONT_BODY,o?-1:col),draw_box(size,0,col);
+				if(ifield(wid,"script")->c)draw_icon((pair){size.x-1,size.y},ICONS[icon_lil],o?1:col);
 				if(ev.alt&&ev.mu&&over(size)&&dover(size)){close_script(wid);ev.md=ev.mu=0;break;}
 			}if(ev.alt&&ev.mu)close_script(card),ev.md=ev.mu=0;
 		}
 		ui_codeedit(b,0,&sc.f),draw_hline(0,frame.size.x,frame.size.y-mh-1,1);
+		if(overw){uicursor=cursor_point;draw_textc(unpack_widget(overw).size,ifield(overw,"name")->sv,FONT_BODY,-1);}
 		if(strlen(sc.status)){draw_text_fit((rect){3,frame.size.y-mh+3,frame.size.x,mh-6},sc.status,FONT_BODY,1);}
 		else{
 			char stat[4096]={0};

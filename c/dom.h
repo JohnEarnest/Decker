@@ -812,7 +812,8 @@ void draw_text_fit(rect r,char*text,lv*f,int pattern){
 }
 void draw_textc(rect r,char*text,lv*font,int pattern){
 	pair size=font_textsize(font,text);
-	if(size.x<r.w){draw_text(box_center(r,size),text,font,pattern);}else{draw_text_fit(r,text,font,pattern);}
+	if(pattern==-1){draw_text_outlined(box_center(r,size),text,font);}
+	else if(size.x<r.w){draw_text(box_center(r,size),text,font,pattern);}else{draw_text_fit(r,text,font,pattern);}
 }
 rect draw_modalbox(pair s){
 	int menu=16; rect r=box_center((rect){0,menu,frame.size.x,frame.size.y-menu},s), o=inset(r,-5);

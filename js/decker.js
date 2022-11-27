@@ -141,7 +141,9 @@ draw_text_outlined=(pos,text,f)=>{
 	draw_text(pos,text,f,1)
 }
 draw_textc=(r,text,font,pattern)=>{
-	const size=font_textsize(font,text);if(size.x<r.w){draw_text(rcenter(r,size),text,font,pattern)}else{draw_text_fit(r,text,font,pattern)}
+	const size=font_textsize(font,text);
+	if(pattern==-1){draw_text_outlined(rcenter(r,size),text,font)}
+	else if(size.x<r.w){draw_text(rcenter(r,size),text,font,pattern)}else{draw_text_fit(r,text,font,pattern)}
 }
 draw_text_fit=(r,text,font,pattern)=>{
 	const glyphs=[], glyph_push=(pos,c)=>glyphs.push({pos,c})
@@ -2342,16 +2344,17 @@ script_editor=_=>{
 		return rect(l+1,c+1+e)
 	}
 	const mh=3+font_h(FONT_MENU), bb=rect(0,mh,frame.size.x+1,frame.size.y-2*mh)
-	if(sc.xray){
+	let overw=null;if(sc.xray){
 		const card=ifield(deck,'card'),wids=ifield(card,'widgets');
 		for(let z=0;z<wids.v.length;z++){
-			const wid=wids.v[z],size=unpack_widget(wid).size
-			draw_textc(size,ls(ifield(wid,'name')),FONT_BODY,44),draw_box(size,0,44)
-			if(ls(ifield(wid,'script')).length)draw_icon(rect(size.x-1,size.y),ICONS[ICON.lil],44)
+			const wid=wids.v[z],size=unpack_widget(wid).size, o=ev.alt&&over(size), col=o?(overw=wid,13):44
+			draw_textc(size,ls(ifield(wid,'name')),FONT_BODY,o?-1:col),draw_box(size,0,col)
+			if(count(ifield(wid,'script')))draw_icon(rect(size.x-1,size.y),ICONS[ICON.lil],o?1:col)
 			if(ev.alt&&ev.mu&&over(size)&&dover(size)){close_script(wid),ev.md=ev.mu=0;break}
 		}if(ev.alt&&ev.mu)close_script(card),ev.md=ev.mu=0
 	}
 	ui_codeedit(bb,0,sc.f),draw_hline(0,frame.size.x,frame.size.y-mh-1,1)
+	if(overw){uicursor=cursor.point;draw_textc(unpack_widget(overw).size,ls(ifield(overw,'name')),FONT_BODY,-1)}
 	if(sc.status.length){draw_text_fit(rect(3,frame.size.y-mh+3,frame.size.x,mh-6),sc.status,FONT_BODY,1)}
 	else{
 		let stat='';if(in_layer()&&wid.infield){
