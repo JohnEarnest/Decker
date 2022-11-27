@@ -645,6 +645,12 @@ patterns[28]:35,36,37,38,37,36                         # a sequence of pattern i
 patterns[38]:"%h" parse "FFDAB9"                       # a hex-encoded 24-bit RGB color (peachpuff)
 ```
 
+It is also possible to write to custom patterns (2-27) using an _image interface_ instead of a byte-list. The source image should consist entirely of patterns 0 and 1. If the source image is larger than 8x8 pixels, excess is ignored:
+```
+patterns[12]:image["%%IMG0AAgACH6BpaWBmcN+"]
+```
+
+
 Array Interface
 ---------------
 Arrays are dynamically created interfaces, each representing a mutable buffer of bytes that can be interpreted as a variety of machine-oriented integer _casts_. The `array[]` built-in function can be used to make a new array from scratch. Arrays are suitable for representing and manipulating binary files or as temporary storage when Lil's immutable collections are ill-suited to the task at hand.

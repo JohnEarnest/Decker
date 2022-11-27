@@ -574,10 +574,12 @@ char*DEFAULT_PATTERNS=
 #define pal_pat(pal,p,x,y)  pal[(x%8)+(8*(y%8))+(8*8*p)]
 
 char* patterns_pal(lv*patterns){return patterns->b->b->sv;} // patterns -> image -> buffer -> pixels
+lv* image_pat(lv*i){lv*r=lml(8);EACH(y,r){int b=0;for(int x=0;x<8;x++)b=(b<<1)|lb(iwrite(i,lmpair((pair){x,y}),NULL));r->lv[y]=lmn(b);}return r;}
 lv* interface_patterns(lv*self,lv*i,lv*x){
 	char*pal=patterns_pal(self);
 	lv*r=NULL;int t=i&&ln(i)?ln(i):0;
 	if(x){
+		if(image_is(x))return interface_patterns(self,i,image_pat(x));
 		if(t>= 2&&t<=27){r=ll(x);for(int y=0;y<8;y++){int b=y>=r->c?0:0xFF&(int)ln(r->lv[y]);for(int x=0;x<8;x++)pal_pat(pal,t,x,y)=(b>>(7-x))&1;}}
 		if(t>=28&&t<=31){r=ll(x);int c=anim_count(pal,t-28)=MIN(8,r->c);for(int z=0;z<c;z++){int f=CLAMP(0,ln(r->lv[z]),47);anim_frame(pal,t-28,z)=f>=28&&f<=31?0:f;}}
 		if(t>=32&&t<=47){COLORS[t-32]=0xFF000000|(int)ln(x);r=x;}

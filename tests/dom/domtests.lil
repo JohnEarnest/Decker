@@ -898,6 +898,25 @@ assert_image["custom pattern fill"
 	c.copy[]
 ]
 
+p[13]:image["%%IMG0AAcACPz48PhsRgIA"]
+c.size:10,9
+c.clear[]
+c.pattern:13
+c.fill[1,1]
+c.invert[] c.invert[]
+assert_image["custom pattern fill from an image"
+	((list 1,1,1,1,1,1,0,0,1,1),
+	 (list 1,1,1,1,1,0,0,0,1,1),
+	 (list 1,1,1,1,0,0,0,0,1,1),
+	 (list 1,1,1,1,1,0,0,0,1,1),
+	 (list 0,1,1,0,1,1,0,0,0,1),
+	 (list 0,1,0,0,0,1,1,0,0,1),
+	 (list 0,0,0,0,0,0,1,0,0,0),
+	 (list 0,0,0,0,0,0,0,0,0,0),
+	 (list 1,1,1,1,1,1,0,0,1,1))
+	c.copy[]
+]
+
 assert["pattern anim default" (13,9,5,1,5,9) p[28]]
 p[28]:range 20
 assert["pattern anim write" (0,1,2,3,4,5,6,7) p[28]]
