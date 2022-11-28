@@ -655,6 +655,13 @@ Array Interface
 ---------------
 Arrays are dynamically created interfaces, each representing a mutable buffer of bytes that can be interpreted as a variety of machine-oriented integer _casts_. The `array[]` built-in function can be used to make a new array from scratch. Arrays are suitable for representing and manipulating binary files or as temporary storage when Lil's immutable collections are ill-suited to the task at hand.
 
+```
+a:array[4 "u8"] # make a new unsigned byte array of size 4
+a[0,4]:65       # spread assignment of 65 to 4 bytes, starting at index 0
+a.cast:"char"   # change interpretation of array to characters
+a[0,4]          # read 4 characters, starting at index 0: "AAAA"
+```
+
 Every array has a _cast_ which controls how it is interpreted: signed or unsigned, 8-, 16- or 32-bit, and big- or little-endian packing, where appropriate:
 
 | Cast     | Range                     | Description                        |
