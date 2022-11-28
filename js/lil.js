@@ -1319,16 +1319,14 @@ n_sound=([x])=>!x?sound_read(0): lis(x)?sound_read(ls(x)): lin(x)?sound_read(ln(
 
 patterns_read=x=>{
 	const set=(pal,p,x,y,v)=>pal[(x%8)+(8*(y%8))+(8*8*p)]=v
-	const ipat=i=>{const r=[];for(let y=0;y<8;y++){let b=0;for(let x=0;x<8;x++)b=(b<<1)|lb(iwrite(i,lmpair(rect(x,y))));r.push(lmn(b))}return lml(r)}
 	const ri=lmi((self,i,x)=>{
 		let r=null, t=i&&ln(i)?ln(i):0
 		if(x){
-			if(image_is(x))return iwrite(self,i,ipat(x))
-			if(t>= 2&&t<=27){r=ll(x);for(let y=0;y<8;y++){let b=y>=r.length?0:0xFF&ln(r[y]);for(let x=0;x<8;x++)set(self.pal.pix,t,x,y,(b>>(7-x))&1)};r=lml(r)}
-			if(t>=28&&t<=31){r=ll(x);if(r.length>8)r=r.slice(0,8);self.anim[t-28]=r.map(x=>{const f=clamp(0,ln(x),47);return f>=28&&f<=31?0:f})      ;r=lml(r)}
+			if(t>= 2&&t<=27&&image_is(x)){for(let a=0;a<8;a++)for(let b=0;b<8;b++)set(self.pal.pix,t,b,a,lb(iwrite(x,lmpair(rect(b,a)))))}
+			if(t>=28&&t<=31){r=ll(x);if(r.length>8)r=r.slice(0,8);self.anim[t-28]=r.map(x=>{const f=clamp(0,ln(x),47);return f>=28&&f<=31?0:f});r=lml(r)}
 			if(t>=32&&t<=47){COLORS[t-32]=0xFF000000|ln(x);r=x}
 		}else{
-			if(t>= 0&&t<=27){r=lml([]);for(let y=0;y<8;y++){let b=0;for(let x=0;x<8;x++)b|=pal_pat(self.pal.pix,t,x,y)<<(7-x);r.v.push(lmn(b));}}
+			if(t>= 0&&t<=27){r=image_copy(self.pal,rect(0,t*8,8,8))}
 			if(t>=28&&t<=31){r=lml(self.anim[t-28].map(lmn))}
 			if(t>=32&&t<=47){r=lmn(0xFFFFFF&COLORS[t-32])}
 		}return r?r:x?x:NONE

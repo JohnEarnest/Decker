@@ -877,9 +877,9 @@ deck:readdeck[]
 p:deck.patterns
 c:deck.card.add["canvas"]
 
-smile:"%h" parse "|" split "7E|81|A5|A5|81|99|C3|7E"
-p[12]:smile
-assert["pattern write/read" smile p[12]]
+smile:"%%IMG0AAgACH6BpaWBmcN+"
+p[12]:image[smile]
+assert["pattern write/read" smile p[12].encoded]
 c.size:10,10
 c.pattern:12
 c.fill[1,5]
@@ -898,25 +898,6 @@ assert_image["custom pattern fill"
 	c.copy[]
 ]
 
-p[13]:image["%%IMG0AAcACPz48PhsRgIA"]
-c.size:10,9
-c.clear[]
-c.pattern:13
-c.fill[1,1]
-c.invert[] c.invert[]
-assert_image["custom pattern fill from an image"
-	((list 1,1,1,1,1,1,0,0,1,1),
-	 (list 1,1,1,1,1,0,0,0,1,1),
-	 (list 1,1,1,1,0,0,0,0,1,1),
-	 (list 1,1,1,1,1,0,0,0,1,1),
-	 (list 0,1,1,0,1,1,0,0,0,1),
-	 (list 0,1,0,0,0,1,1,0,0,1),
-	 (list 0,0,0,0,0,0,1,0,0,0),
-	 (list 0,0,0,0,0,0,0,0,0,0),
-	 (list 1,1,1,1,1,1,0,0,1,1))
-	c.copy[]
-]
-
 assert["pattern anim default" (13,9,5,1,5,9) p[28]]
 p[28]:range 20
 assert["pattern anim write" (0,1,2,3,4,5,6,7) p[28]]
@@ -926,7 +907,7 @@ assert["pattern anim may not include animated colors" (27,0,0,32) p[29]]
 peachpuff:"%h" parse "FFDAB9"
 p[38]:peachpuff
 assert["pattern color write/read" peachpuff p[38]]
-assert["pattern tolerate bogus write" (list 420) p[3]:420]
+assert["pattern tolerate bogus write" 420 p[3]:420]
 
 #######################################
 #
@@ -1492,7 +1473,7 @@ glyph:image[2,3]
 glyph[0,0]:1 glyph[1,1]:1 glyph[0,2]:1
 f["A"]:glyph
 deck.patterns[28]:10,20,5
-deck.patterns[2]:11,12,13,14,15,16,17,18
+deck.patterns[2]:image["%%IMG0AAgACAsMDQ4PEBES"]
 writedeck["temp.deck" deck]
 assert_file["write a basic kitchen sink." "tests/dom/sink1.deck" "temp.deck"]
 
@@ -1515,8 +1496,8 @@ assert_image["read a deck: custom font glyph"
 	 (list 1,0))
 	deck.fonts.dingus["A"]
 ]
-assert["read a deck: custom animated pattern:" (10,20,5)                 deck.patterns[28]]
-assert["read a deck: custom regular pattern:"  (11,12,13,14,15,16,17,18) deck.patterns[ 2]]
+assert["read a deck: custom animated pattern:" (10,20,5)                 deck.patterns[28]        ]
+assert["read a deck: custom regular pattern:"  "%%IMG0AAgACAsMDQ4PEBES"  deck.patterns[ 2].encoded]
 
 deck:readdeck["tests/dom/bare.deck"]
 assert["read a bare deck" "deck" typeof deck]

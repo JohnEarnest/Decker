@@ -631,7 +631,7 @@ The patterns interface stores a global palette and set of 1-bit textures used by
 | Name       | Description                                                   |
 | :--------- | :------------------------------------------------------------ |
 | `typeof x` | `"patterns"`                                                  |
-| `x[2-27]`  | A list of 8 bytes representing bit patterns. r/w.             |
+| `x[2-27]`  | An 8x8 _image interface_ comprised of patterns 0 and 1. r/w.  |
 | `x[28-31]` | A list of up to 8 pattern indices for animated patterns. r/w. |
 | `x[32-47]` | A 24-bit `RRGGBB` color represented as an int. r/w.           |
 
@@ -641,14 +641,9 @@ The default patterns and colors are as follows:
 
 The following example overrides one of each type of palette entry:
 ```
-patterns[12]:(24 take "%2h") parse "7E81A5A58199C37E"  # a hex-encoded 8x8 pixel pattern
-patterns[28]:35,36,37,38,37,36                         # a sequence of pattern indices
-patterns[38]:"%h" parse "FFDAB9"                       # a hex-encoded 24-bit RGB color (peachpuff)
-```
-
-It is also possible to write to custom patterns (2-27) using an _image interface_ instead of a byte-list. The source image should consist entirely of patterns 0 and 1. If the source image is larger than 8x8 pixels, excess is ignored:
-```
-patterns[12]:image["%%IMG0AAgACH6BpaWBmcN+"]
+patterns[12]:image["%%IMG0AAgACH6BpaWBmcN+"]    # a custom pattern from an image
+patterns[28]:35,36,37,38,37,36                  # a sequence of pattern indices
+patterns[38]:"%h" parse "FFDAB9"                # a hex-encoded 24-bit RGB color (peachpuff)
 ```
 
 
