@@ -740,7 +740,7 @@ void draw_fat_scaled(rect r,lv*buff,int opaque,char*pal,int frame_count,int scal
 		if(opaque||v!=0)draw_rect((rect){(r.x-offset.x+x)*scale,(r.y-offset.y+y)*scale,scale,scale},c>=32?c: p?1:0);
 	}
 }
-float*dither_err=NULL;int dither_err_size=0;
+float*dither_err=NULL;int dither_err_size=0;float dither_threshold=0.5;
 void draw_dithered(rect r,lv*buff,int opaque,lv*mask){
 	if(r.w==0||r.h==0)return;pair s=buff_size(buff);int stride=2*r.w, m[]={0,1,r.w-2,r.w-1,r.w,stride-1};
 	if(!dither_err)dither_err=calloc(stride,sizeof(float)),dither_err_size=stride;
@@ -748,7 +748,7 @@ void draw_dithered(rect r,lv*buff,int opaque,lv*mask){
 	for(int z=0;z<dither_err_size;z++)dither_err[z]=0.0;
 	for(int ei=0,a=0;a<r.h;a++)for(int b=0;b<r.w;b++){
 		int sx=((b*1.0)/r.w)*s.x, sy=((a*1.0)/r.h)*s.y, src=0xFF&buff->sv[sx+sy*s.x], ms=mask?mask->sv[sx+sy*s.x]:1;
-		float pix=(src/256.0)+dither_err[ei], col=pix>.5?1:0, err=(pix-col)/8.0;
+		float pix=(src/256.0)+dither_err[ei], col=pix>dither_threshold?1:0, err=(pix-col)/8.0;
 		dither_err[ei]=0, ei=(ei+1)%stride; for(int z=0;z<6;z++)dither_err[(ei+m[z])%stride]+=err;
 		int c=!col;if(ms&&(opaque||c!=0)&&inclip(r.x+b,r.y+a))PIX(r.x+b,r.y+a)=c;
 	}

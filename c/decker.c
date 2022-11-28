@@ -1036,7 +1036,7 @@ void import_image(char*path){
 	int tw=c[0],ow=c[32];c[32]=0,c[47]=0;for(int z=2;z<256;z++)if(c[z]){color=1;break;}
 	if(color&&tw){EACH(z,i->b)i->b->sv[z]=i->b->sv[z]!=0;m=i->b;}
 	if(color){i=readimage(path,1);}else if(ow&&!tw){EACH(z,i->b)i->b->sv[z]=i->b->sv[z]!=32;}
-	setmode(mode_draw),bg_paste(i->b);if(color)dr.limbo_dither=1;dr.fatbits=0;dr.omask=m;
+	setmode(mode_draw),bg_paste(i->b);if(color)dr.limbo_dither=1,dither_threshold=0.5;dr.fatbits=0;dr.omask=m;
 }
 lv* sfx_readwav(char*name){
 	Uint8* raw; Uint32 length; SDL_AudioSpec spec; SDL_AudioCVT cvt;
@@ -2486,6 +2486,8 @@ void sync(){
 			if(c==SDLK_RETURN)ev.action=1;
 			if(c==SDLK_TAB   )ev.tab=1;
 			if(c==SDLK_l&&ms.type==modal_none&&!wid.ingrid&&!wid.infield)ev.shortcuts['l']=1;
+			if(c==SDLK_j&&!cmd&&dr.limbo_dither&&dither_threshold>-2.0)dither_threshold-=.1;
+			if(c==SDLK_k&&!cmd&&dr.limbo_dither&&dither_threshold< 2.0)dither_threshold+=.1;
 		}
 		if(e.type==SDL_KEYUP){
 			int c=e.key.keysym.sym;
@@ -2837,6 +2839,11 @@ void tick(lv*env){
 					dr.limbo=buffer_transpose(dr.limbo),buffer_flip_h(dr.limbo);
 					if(dr.mask)dr.mask=buffer_transpose(dr.mask),buffer_flip_h(dr.mask);
 					pair s=buff_size(dr.limbo);dr.sel_here.w=s.x,dr.sel_here.h=s.y;
+				}
+				if(dr.limbo_dither&&sel){
+					menu_separator();
+					if(menu_item("Lighten Image",dither_threshold>-2.0,'j'))dither_threshold-=.1;
+					if(menu_item("Darken  Image",dither_threshold< 2.0,'k'))dither_threshold+=.1;
 				}
 			}
 			lv*card=ifield(deck,"card");

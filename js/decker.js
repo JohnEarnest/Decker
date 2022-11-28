@@ -42,7 +42,7 @@ load_image=(file,hint,after)=>{
 		let tw=c[0],ow=c[32];c[32]=0,c[47]=0;for(let z=2;z<256;z++)if(c[z]){color=1;break}
 		if(color&&tw)i.pix.forEach((p,z)=>i.pix[z]=p!=0),m=i
 		if(color){i=read_image(1)}else if(ow&&!tw){i.pix.forEach((p,z)=>i.pix[z]=p!=32)}
-		setmode('draw'),bg_paste(i);dr.limbo_dither=color,dr.fatbits=0,dr.omask=m
+		setmode('draw'),bg_paste(i);dr.limbo_dither=color,dr.dither_threshold=0.5,dr.fatbits=0,dr.omask=m
 	}
 	const r=new FileReader();r.onload=_=>{q('#loader').src=r.result;setTimeout(import_image,100)};r.readAsDataURL(file)
 }
@@ -193,11 +193,11 @@ draw_fat_scaled=(r,image,opaque,pal,frame_count,scale,offset)=>{
 		if(opaque||v!=0)draw_rect(rect((r.x-offset.x+x)*scale,(r.y-offset.y+y)*scale,scale,scale),c>=32?c: p?1:0)
 	}
 }
-draw_dithered=(r,image,opaque,mask)=>{
+draw_dithered=(r,image,opaque,mask,threshold)=>{
 	if(r.w==0||r.h==0)return;const s=image.size, stride=2*r.w, m=[0,1,r.w-2,r.w-1,r.w,stride-1], dither_err=new Float32Array(stride)
 	for(let ei=0,a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
 		const sx=0|(((b*1.0)/r.w)*s.x), sy=0|(((a*1.0)/r.h)*s.y), src=0xFF&image.pix[sx+sy*s.x], ms=mask?mask.pix[sx+sy*s.x]:1
-		const p=(src/256.0)+dither_err[ei], col=p>.5?1:0, err=(p-col)/8.0
+		const p=(src/256.0)+dither_err[ei], col=p>threshold?1:0, err=(p-col)/8.0
 		dither_err[ei]=0, ei=(ei+1)%stride; for(let z=0;z<6;z++)dither_err[(ei+m[z])%stride]+=err
 		const c=!col;if(ms&&(opaque||c!=0)){const h=rect(r.x+b,r.y+a);if(inclip(h))pix(h,c)}
 	}
@@ -415,7 +415,7 @@ let sc={target:null,others:[],next:null, f:null,prev_mode:null,xray:0,status:''}
 script_save=x=>{const k=lms('script');mark_dirty();if(sc.target)iwrite(sc.target,k,x);if(sc.others)sc.others.map(o=>iwrite(o,k,x))}
 
 draw_state=_=>({ // drawing tools state
-	tool:'pencil',brush:3,pattern:1,fill:0,erasing:0,
+	tool:'pencil',brush:3,pattern:1,fill:0,erasing:0, dither_threshold:0,
 	show_widgets:1,show_anim:1,trans:0,trans_mask:0,fatbits:0,offset:rect(),
 	show_grid:0,grid_size:rect(32,32), sel_here:rect(),sel_start:rect(),limbo:null,limbo_dither:0,
 	scratch:null,mask:null,omask:null, pickfill:0, poly:[]
@@ -1855,7 +1855,7 @@ draw_limbo=(clip,scale)=>{
 	if(!dr.limbo){/*nothing*/}
 	else if(scale&&dr.limbo_dither){draw_rect      (card_to_fat(clip),21)}
 	else if(scale                 ){draw_fat_scaled(clip,dr.limbo,!dr.trans,deck.patterns.pal.pix,frame_count,FAT,dr.offset)}
-	else if(       dr.limbo_dither){draw_dithered  (clip,dr.limbo,!dr.trans,dr.omask)}
+	else if(       dr.limbo_dither){draw_dithered  (clip,dr.limbo,!dr.trans,dr.omask,dr.dither_threshold)}
 	else                           {draw_scaled    (clip,dr.limbo,!dr.trans)}
 }
 bg_scaled_limbo=_=>{
@@ -2106,7 +2106,7 @@ bg_tighten=_=>{
 	if(dr.tool=='select'){ // convert box selections into masked lasso selections
 		dr.tool='lasso',bg_scoop_selection();const s=dr.sel_start, l=dr.limbo, t=frame
 		dr.limbo=image_make(rect(r.w,r.h)),frame=draw_frame(dr.limbo)
-		if(dr.limbo_dither){draw_dithered(frame.clip,l,1,dr.omask),dr.limbo_dither=0}else{draw_scaled(frame.clip,l,1)}frame=t
+		if(dr.limbo_dither){draw_dithered(frame.clip,l,1,dr.omask,dr.dither_threshold),dr.limbo_dither=0}else{draw_scaled(frame.clip,l,1)}frame=t
 		dr.mask=image_make(rect(r.w,r.h)),dr.mask.pix.fill(1)
 		if(s.w>0&&s.h>0){dr.omask=image_make(rect(s.w,s.h)),dr.omask.pix.fill(1)}else{dr.omask=null}
 	}
@@ -2537,6 +2537,11 @@ all_menus=_=>{
 				if(dr.mask)image_flip(dr.mask),image_flip_h(dr.mask)
 				const s=dr.limbo.size;dr.sel_here.w=s.x,dr.sel_here.h=s.y
 			}
+			if(dr.limbo_dither&&sel){
+				menu_separator()
+				if(menu_item('Lighten Image',dr.dither_threshold>-2.0))dr.dither_threshold-=.1
+				if(menu_item('Darken  Image',dr.dither_threshold< 2.0))dr.dither_threshold+=.1
+			}
 		}
 		const card=ifield(deck,'card')
 		if(ms.type==null&&uimode=='object'){
@@ -2854,6 +2859,8 @@ q('body').onkeydown=e=>{
 	if(e.key=='Enter')ev.action=1
 	if(e.key=='Tab')ev.tab=1
 	if(e.key=='l'&&ms.type==null&&!wid.ingrid&&!wid.infield)ev.shortcuts['l']=1
+	if(e.key=='j'&&dr.limbo_dither&&dr.dither_threshold>-2.0)dr.dither_threshold-=.1
+	if(e.key=='k'&&dr.limbo_dither&&dr.dither_threshold< 2.0)dr.dither_threshold+=.1
 	if((e.metaKey||e.ctrlKey)&&e.key in {c:1,x:1,v:1}){}
 	else{e.preventDefault()}
 }

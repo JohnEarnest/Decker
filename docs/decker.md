@@ -102,6 +102,7 @@ A number of shortcuts are available with any of the drawing tools selected:
 
 - Pressing `m` toggles the visibility of Decker's main menu.
 - Pressing `t` toggles transparency mode (_Style &#8594; Transparency_).
+- If you have imported a color image, you can press `j` or `k` to lighten or darken the image, respectively. This adjustment can only be performed while the box selection remains active.
 - Holding control or command while clicking will enter Fat Bits mode centered on the position you click, or exit Fat Bits mode.
 - Right-clicking with any tool or holding shift before beginning a stroke will _erase_: this behaves like the pencil tool, but always draws using pattern 0.
 
