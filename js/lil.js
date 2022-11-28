@@ -1664,8 +1664,8 @@ canvas_read=(x,card)=>{
 	const ri=lmi((self,i,x)=>{
 		if(!is_rooted(self))return NONE
 		if(x){
-			if(ikey(i,'brush'    ))return self.brush=0|clamp(0,ln(x),23),x
-			if(ikey(i,'pattern'  ))return self.pattern=0|clamp(0,ln(x),47),x
+			if(ikey(i,'brush'    ))return self.brush  =0|clamp(0,ln(x), 23),x
+			if(ikey(i,'pattern'  ))return self.pattern=0|clamp(0,ln(x),255),x
 			if(ikey(i,'font'     ))return self.font=normalize_font(self.card.deck.fonts,x),x
 			if(!lis(i)){const img=canvas_image(self,1);return img.f(img,i,x)}
 			if(has_parent(self)||self.free)return x

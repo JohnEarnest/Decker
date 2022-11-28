@@ -1206,8 +1206,8 @@ lv* interface_canvas(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	lv*data=self->b;lv*card=dget(data,lmistr("card")),*deck=dget(card->b,lmistr("deck")),*fonts=dget(deck->b,lmistr("fonts"));
 	if(x){
-		ikey("brush"  ){int n=CLAMP(0,ln(x),23);dset(data,i,lmn(n));return x;}
-		ikey("pattern"){int n=CLAMP(0,ln(x),47);dset(data,i,lmn(n));return x;}
+		ikey("brush"  ){int n=CLAMP(0,ln(x), 23);dset(data,i,lmn(n));return x;}
+		ikey("pattern"){int n=CLAMP(0,ln(x),255);dset(data,i,lmn(n));return x;}
 		ikey("font"   ){dset(data,i,normalize_font(fonts,x));return x;}
 		if(!lis(i)    ){return interface_image(canvas_image(self,1),i,x);}
 		if(has_parent(self)||dget(data,lmistr("free")))return x;
