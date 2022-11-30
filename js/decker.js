@@ -2811,7 +2811,7 @@ up=(x,y,alt)=>{
 	move(x,y),pointer.held=ev.drag=0,pointer.end=pointer.pos,ev.mu=1;if(alt)ev.rup=1
 	if(ev.clicktime)ev.click=1;ev.clicktime=0;if(ev.clicklast)ev.dclick=1;ev.clicklast=DOUBLE_CLICK_DELAY
 	if(ev.callback&&ev.callback_rect&&over(ev.callback_rect)&&(ev.callback_drag||dover(ev.callback_rect)))ev.callback()
-	ev.callback=null,ev.callback_rect=null,ev.callback_drag=0
+	ev.callback=null,ev.callback_rect=null,ev.callback_drag=0;if(audio)audio.resume()
 }
 mouse=(e,f)=>{
 	ev.rawpos=rect(e.pageX,e.pageY);const c=q('#display').getBoundingClientRect()
