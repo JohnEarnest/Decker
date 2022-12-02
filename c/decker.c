@@ -2822,23 +2822,27 @@ void tick(lv*env){
 				}
 				if(menu_item("Flip Horizontal",sel,'\0')){
 					if(bg_has_sel())bg_scoop_selection();
-					buffer_flip_h(dr.limbo);if(dr.mask)buffer_flip_h(dr.mask);
+					buffer_flip_h(dr.limbo);if(dr.mask)buffer_flip_h(dr.mask);if(dr.omask&&dr.limbo_dither)buffer_flip_h(dr.omask);
 				}
 				if(menu_item("Flip Vertical",sel,'\0')){
 					if(bg_has_sel())bg_scoop_selection();
-					buffer_flip_v(dr.limbo);if(dr.mask)buffer_flip_v(dr.mask);
+					buffer_flip_v(dr.limbo);if(dr.mask)buffer_flip_v(dr.mask);if(dr.omask&&dr.limbo_dither)buffer_flip_v(dr.omask);
 				}
 				if(menu_item("Rotate Left",sel,',')){
+					pair s={dr.sel_here.w,dr.sel_here.h};
 					if(bg_has_sel())bg_scoop_selection();
 					buffer_flip_h(dr.limbo),dr.limbo=buffer_transpose(dr.limbo);
 					if(dr.mask)buffer_flip_h(dr.mask),dr.mask=buffer_transpose(dr.mask);
-					pair s=buff_size(dr.limbo);dr.sel_here.w=s.x,dr.sel_here.h=s.y;
+					if(dr.omask&&dr.limbo_dither)buffer_flip_h(dr.omask),dr.omask=buffer_transpose(dr.omask);
+					dr.sel_here.w=s.y,dr.sel_here.h=s.x;
 				}
 				if(menu_item("Rotate Right",sel,'.')){
+					pair s={dr.sel_here.w,dr.sel_here.h};
 					if(bg_has_sel())bg_scoop_selection();
 					dr.limbo=buffer_transpose(dr.limbo),buffer_flip_h(dr.limbo);
 					if(dr.mask)dr.mask=buffer_transpose(dr.mask),buffer_flip_h(dr.mask);
-					pair s=buff_size(dr.limbo);dr.sel_here.w=s.x,dr.sel_here.h=s.y;
+					if(dr.omask&&dr.limbo_dither)dr.omask=buffer_transpose(dr.omask),buffer_flip_h(dr.omask);
+					dr.sel_here.w=s.y,dr.sel_here.h=s.x;
 				}
 				if(dr.limbo_dither&&sel){
 					menu_separator();

@@ -2523,19 +2523,29 @@ all_menus=_=>{
 				const s=dr.limbo.size, pal=deck.patterns.pal.pix
 				for(let z=0;z<dr.limbo.pix.length;z++)dr.limbo.pix[z]=1^draw_pattern(dr.limbo.pix[z],(z%s.x),0|(z/s.x))
 			}
-			if(menu_item('Flip Horizontal',sel)){if(bg_has_sel())bg_scoop_selection();image_flip_h(dr.limbo);if(dr.mask)image_flip_h(dr.mask)}
-			if(menu_item('Flip Vertical'  ,sel)){if(bg_has_sel())bg_scoop_selection();image_flip_v(dr.limbo);if(dr.mask)image_flip_v(dr.mask)}
+			if(menu_item('Flip Horizontal',sel)){
+				if(bg_has_sel())bg_scoop_selection()
+				image_flip_h(dr.limbo);if(dr.mask)image_flip_h(dr.mask);if(dr.omask&&dr.limbo_dither)image_flip_h(dr.omask);
+			}
+			if(menu_item('Flip Vertical'  ,sel)){
+				if(bg_has_sel())bg_scoop_selection()
+				image_flip_v(dr.limbo);if(dr.mask)image_flip_v(dr.mask);if(dr.omask&&dr.limbo_dither)image_flip_v(dr.omask);
+			}
 			if(menu_item('Rotate Left',sel,',')){
+				const s=rect(dr.sel_here.w,dr.sel_here.h)
 				if(bg_has_sel())bg_scoop_selection()
 				image_flip_h(dr.limbo),image_flip(dr.limbo)
 				if(dr.mask)image_flip_h(dr.mask),image_flip(dr.mask)
-				const s=dr.limbo.size;dr.sel_here.w=s.x,dr.sel_here.h=s.y
+				if(dr.omask&&dr.limbo_dither)image_flip_h(dr.omask),image_flip(dr.omask)
+				dr.sel_here.w=s.y,dr.sel_here.h=s.x
 			}
 			if(menu_item('Rotate Right',sel,'.')){
+				const s=rect(dr.sel_here.w,dr.sel_here.h)
 				if(bg_has_sel())bg_scoop_selection()
 				image_flip(dr.limbo),image_flip_h(dr.limbo)
 				if(dr.mask)image_flip(dr.mask),image_flip_h(dr.mask)
-				const s=dr.limbo.size;dr.sel_here.w=s.x,dr.sel_here.h=s.y
+				if(dr.omask&&dr.limbo_dither)image_flip(dr.omask),image_flip_h(dr.omask)
+				dr.sel_here.w=s.y,dr.sel_here.h=s.x
 			}
 			if(dr.limbo_dither&&sel){
 				menu_separator()
