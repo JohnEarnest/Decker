@@ -393,7 +393,7 @@ dyad(l_parse){
 		else if(t=='i'){long long r=0,s=hc=='-'?(h++,-1):1;m&=!!isdigit(hc);while(hn&&isdigit(hc))r=r*10+hc-'0',h++;v=lmn(r*s);}
 		else if(t=='h'||t=='H'){long long r=0;m&=!!isxdigit(hc);while(hn&&isxdigit(hc))r=r*16+(hc>'9'?tolower(hc)-'a'+10:hc-'0'),h++;v=lmn(r);}
 		else if(strchr("slu",t)){str r=str_new();while(hn&&(n?1:hc!=fc))str_addc(&r,ulc(hc)),h++;v=lmstr(r);}
-		else if(t=='a'){v=lml(n);while(hn&&(n?1:hc!=fc))ll_add(v,lmn(hc)),h++;}
+		else if(t=='a'){v=lml(0);while(hn&&(n?1:hc!=fc))ll_add(v,lmn(hc)),h++;}
 		else if(t=='b'){v=strchr("tTyYx1",hc)?ONE:NONE;while(hn&&n?1:hc!=fc)h++;}
 		else if(t=='j'){int f=1,c=n?n:y->c;v=m?pjson(y->sv,&h,&f,&c):NONE;}
 		else if(t=='r'||t=='o'){

@@ -24,6 +24,8 @@ show["%*f%n,%*f%n%m"  parse ".3,1.2"                ] # skip floats
 show["%s,%s,%s"       parse "one,two,three"         ] # basics
 show["%3s%10s"        parse "ABCDE"                 ] # fixed-width
 show["%a"             parse "ABCDE"                 ] # ascii decode
+show["%3a"            parse 97                      ] # ascii decode w/ length
+show["%1a"            parse 97                      ] # ascii decode w/ length (trunc)
 show["%b,%b,%b"       parse "true,false,yes"        ] # booleans
 show["%*s,%s,%*s"     parse "one,two,three"         ] # skip strings
 # case conversion
@@ -68,6 +70,9 @@ show["%-2.2rAB%2r!%r!"format "one","b","anylength"  ] # char class
 show["%-2.2oAB%2o!%o!"format "one","b","anylength"  ] # char class
 show["%a"             format list 65,66,67          ] # ascii chars
 show["%a"             format list 65,10,127,-5,67   ] # invalid ascii chars become space
+show["%2.2a"          format list 65,66,67          ] # fit ascii chars (trunc)
+show["%2a"            format list 65                ] # fit ascii chars (extend)
+show["%a"             format 65                     ] # widen scalar to ascii list if needed
 show["%e"             format 1609556697             ] # epoch
 show["%p" format "%p" parse  "2021-02-03T04:05:58Z" ] # parts
 d.year:1984 d.month:5 d.day:25
