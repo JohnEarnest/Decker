@@ -3035,8 +3035,9 @@ void tick(lv*env){
 		lv*card=ifield(deck,"card");
 		lv*back=ifield(card,"image");pair bsize=image_size(back);
 		if(!is_empty(back)&&ms.type!=modal_trans){
+			if(bsize.x!=frame.size.x||bsize.y!=frame.size.y)image_resize(back,frame.size),mark_dirty();
 			if(dr.fatbits){draw_fat(back->b,pal,frame_count,0,FAT,dr.offset);}
-			else{buffer_paste(rect_pair((pair){0,0},bsize),frame.clip,back->b,frame.buffer,1);}
+			else{memcpy(frame.buffer->sv,back->b->sv,frame.buffer->c);}
 		}
 		if(uimode==mode_draw&&in_layer())bg_tools();
 		if(dr.tool==tool_select&&(dr.sel_start.w>0||dr.sel_start.h>0))draw_rect(card_to_fat(dr.sel_start),dr.fill);
