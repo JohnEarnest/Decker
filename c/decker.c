@@ -189,17 +189,17 @@ int no_menu(){return menu.active==-1&&menu.stick==-1;}
 int in_layer(){return no_menu()&&(ms.type?ms.in_modal:1)&&((!running()&&!msg.overshoot)||ms.type!=modal_none);}
 int in_widgets(){return ms.type!=modal_none?ms.in_modal:1;}
 
+char*clip_stash=NULL;
 int has_clip(char*type){
-	if(!SDL_HasClipboardText())return 0;
-	char*t=SDL_GetClipboardText();if(strlen(t)<strlen(type))return 0;
-	int m=memcmp(t,type,strlen(type))==0;SDL_free(t);return m;
+	if(strlen(clip_stash)<strlen(type))return 0;
+	int m=memcmp(clip_stash,type,strlen(type))==0;return m;
 }
 
 // Menus
 
 int menus_off(){return lb(ifield(deck,"locked"))||(uimode==mode_draw&&ev.hidemenu&&ms.type==modal_none);}
 void menus_clear(){menu.active=-1,menu.stick=-1;}
-void menu_setup(){menu.x=10,menu.head_count=0,menu.sz=(rect){0,0,0,0},menu.active=-1;}
+void menu_setup(){menu.x=10,menu.head_count=0,menu.sz=(rect){0,0,0,0},menu.active=-1;clip_stash=SDL_GetClipboardText();}
 void menu_bar(char*name,int enabled){
 	if(menus_off())enabled=0;
 	rect t=rect_pair((pair){menu.x,2},font_textsize(FONT_MENU,name)), b={t.x-5,0,t.w+10,t.h+3}; int i=menu.head_count;
@@ -225,6 +225,7 @@ int menu_check(char*name,int enabled,int check,char shortcut){
 int menu_item(char*name,int enabled,char shortcut){return menu_check(name,enabled,-1,shortcut);}
 void menu_separator(){menu_check(NULL,0,0,'\0');}
 void menu_finish(){
+	if(clip_stash)SDL_free(clip_stash);
 	if(menus_off())return;
 	rect b={0,0,context.size.x,3+font_h(FONT_MENU)};
 	draw_rect(b,32),draw_hline(0,b.w,b.h,1); char*pal=patterns_pal(ifield(deck,"patterns"));
@@ -2673,7 +2674,7 @@ void text_edit_menu(){
 	if(has_clip("%%IMG")&&rich&&menu_item("Paste Inline Image",wid.fv!=NULL,'v')){
 		char*t=SDL_GetClipboardText();field_edit(lmistr(""),image_read(lmcstr(t)),"i",wid.cursor);SDL_free(t);
 	}
-	else if(menu_item("Paste",wid.fv!=NULL&&SDL_HasClipboardText(),'v')){
+	else if(menu_item("Paste",wid.fv!=NULL&&strlen(clip_stash),'v')){
 		char*t=SDL_GetClipboardText();field_input(t);SDL_free(t);
 	}
 	if(menu_item("Clear",wid.fv!=NULL,0)){wid.cursor=(pair){0,RTEXT_END};field_keys(SDLK_DELETE,0);}
@@ -2773,7 +2774,7 @@ void tick(lv*env){
 				if(menu_item("Copy Table",1,'c')){
 					SDL_SetClipboardText(n_writecsv(NULL,lml2(wid.gv->table,grid_format()))->sv);
 				}
-				if(menu_item("Paste Table",mutable&&SDL_HasClipboardText(),'v')){
+				if(menu_item("Paste Table",mutable&&strlen(clip_stash),'v')){
 					char*t=SDL_GetClipboardText();
 					grid_edit(n_readcsv(NULL,lml2(lmcstr(t),lmcstr(wid.g.format))));
 					SDL_free(t);
