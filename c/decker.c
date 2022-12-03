@@ -190,10 +190,7 @@ int in_layer(){return no_menu()&&(ms.type?ms.in_modal:1)&&((!running()&&!msg.ove
 int in_widgets(){return ms.type!=modal_none?ms.in_modal:1;}
 
 char clip_stash[16]={0};
-int has_clip(char*type){
-	if(strlen(clip_stash)<strlen(type))return 0;
-	int m=memcmp(clip_stash,type,strlen(type))==0;return m;
-}
+int has_clip(char*type){return strlen(clip_stash)>=strlen(type)&&memcmp(clip_stash,type,strlen(type))==0;}
 
 // Menus
 
