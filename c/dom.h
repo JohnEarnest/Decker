@@ -656,14 +656,20 @@ char BRUSHES[]={
 };
 
 void draw_pix(int x,int y,int pattern){if(inclip(x,y))PIX(x,y)=pattern;}
-void draw_hline(int x0,int x1,int y,int pattern){for(int z=x0;z<x1;z++)if(inclip(z,y))PIX(z,y)=pattern;}
-void draw_vline(int x,int y0,int y1,int pattern){for(int z=y0;z<y1;z++)if(inclip(x,z))PIX(x,z)=pattern;}
+void draw_hline(int x0,int x1,int y,int pattern){
+	if(y<frame.clip.y||y>frame.clip.y+frame.clip.h)return;
+	x0=MAX(frame.clip.x,x0),x1=MIN(frame.clip.x+frame.clip.w,x1);for(int z=x0;z<x1;z++)PIX(z,y)=pattern;
+}
+void draw_vline(int x,int y0,int y1,int pattern){
+	if(x<frame.clip.x||x>frame.clip.x+frame.clip.w)return;
+	y0=MAX(frame.clip.y,y0),y1=MIN(frame.clip.y+frame.clip.h,y1);for(int z=y0;z<y1;z++)PIX(x,z)=pattern;
+}
+void draw_rect(rect r,int pattern   ){r=box_intersect(r,frame.clip);for(int a=r.y;a<r.y+r.h;a++)for(int b=r.x;b<r.x+r.w;b++)PIX(b,a)=pattern;}
+void draw_invert_raw(char*pal,rect r){r=box_intersect(r,frame.clip);for(int a=r.y;a<r.y+r.h;a++)for(int b=r.x;b<r.x+r.w;b++)PIX(b,a)=1^draw_pattern(pal,0xFF&PIX(b,a),b,a);}
 void draw_icon(pair pos,lv*i,int pattern){
 	pair s=image_size(i);
 	for(int a=0;a<s.y;a++)for(int b=0;b<s.x;b++)if(i->b->sv[b+(a*s.x)]&&inclip(pos.x+b,pos.y+a))PIX(pos.x+b,pos.y+a)=pattern;
 }
-void draw_rect(rect r,int pattern){for(int a=r.y;a<r.y+r.h;a++)for(int b=r.x;b<r.x+r.w;b++)if(inclip(b,a))PIX(b,a)=pattern;}
-void draw_invert_raw(char*pal,rect r){for(int a=r.y;a<r.y+r.h;a++)for(int b=r.x;b<r.x+r.w;b++)if(inclip(b,a))PIX(b,a)=1^draw_pattern(pal,0xFF&PIX(b,a),b,a);}
 void draw_line(rect r,int brush,int pattern){
 	int dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1; while(1){
 		for(int b=0;b<8;b++)for(int a=0;a<8;a++)if(BSH(brush,a,b)&&inclip(r.x+a-3,r.y+b-3))PIX(r.x+a-3,r.y+b-3)=pattern;
