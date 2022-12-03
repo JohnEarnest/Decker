@@ -189,7 +189,7 @@ int no_menu(){return menu.active==-1&&menu.stick==-1;}
 int in_layer(){return no_menu()&&(ms.type?ms.in_modal:1)&&((!running()&&!msg.overshoot)||ms.type!=modal_none);}
 int in_widgets(){return ms.type!=modal_none?ms.in_modal:1;}
 
-char*clip_stash=NULL;
+char clip_stash[16]={0};
 int has_clip(char*type){
 	if(strlen(clip_stash)<strlen(type))return 0;
 	int m=memcmp(clip_stash,type,strlen(type))==0;return m;
@@ -199,7 +199,10 @@ int has_clip(char*type){
 
 int menus_off(){return lb(ifield(deck,"locked"))||(uimode==mode_draw&&ev.hidemenu&&ms.type==modal_none);}
 void menus_clear(){menu.active=-1,menu.stick=-1;}
-void menu_setup(){menu.x=10,menu.head_count=0,menu.sz=(rect){0,0,0,0},menu.active=-1;clip_stash=SDL_GetClipboardText();}
+void menu_setup(){
+	menu.x=10,menu.head_count=0,menu.sz=(rect){0,0,0,0},menu.active=-1;
+	if(0==(frame_count%8)){char*t=SDL_GetClipboardText();snprintf(clip_stash,sizeof(clip_stash),"%s",t);SDL_free(t);}
+}
 void menu_bar(char*name,int enabled){
 	if(menus_off())enabled=0;
 	rect t=rect_pair((pair){menu.x,2},font_textsize(FONT_MENU,name)), b={t.x-5,0,t.w+10,t.h+3}; int i=menu.head_count;
@@ -225,7 +228,6 @@ int menu_check(char*name,int enabled,int check,char shortcut){
 int menu_item(char*name,int enabled,char shortcut){return menu_check(name,enabled,-1,shortcut);}
 void menu_separator(){menu_check(NULL,0,0,'\0');}
 void menu_finish(){
-	if(clip_stash)SDL_free(clip_stash);
 	if(menus_off())return;
 	rect b={0,0,context.size.x,3+font_h(FONT_MENU)};
 	draw_rect(b,32),draw_hline(0,b.w,b.h,1); char*pal=patterns_pal(ifield(deck,"patterns"));
