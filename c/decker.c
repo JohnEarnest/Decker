@@ -2413,7 +2413,7 @@ void palbtn(pair pos,pair dn,rect b,int pattern){
 #define tgap   1
 void ltoolbar(pair pos,pair dn){
 	pair size=buff_size(TOOLB);frame=draw_buffer(TOOLB);
-	draw_rect(frame.clip,0),draw_box((rect){0,0,size.x,size.y},0,1),draw_rect((rect){0,6*tcellh,size.x,tgap},1);
+	memset(frame.buffer->sv,0,frame.buffer->c),draw_box((rect){0,0,size.x,size.y},0,1),draw_rect((rect){0,6*tcellh,size.x,tgap},1);
 	if(toolbtn(pos,dn,(rect){0     ,0,tcellw+1,tcellh+1},0,uimode==mode_interact))setmode(mode_interact),ev.mu=ev.md=0;
 	if(toolbtn(pos,dn,(rect){tcellw,0,tcellw+1,tcellh+1},1,uimode==mode_object  ))setmode(mode_object  ),ev.mu=ev.md=0;
 	for(int z=0;z<10;z++){if(toolbtn(pos,dn,(rect){(z%2)*tcellw,(1+(z/2))*tcellh,tcellw+1,tcellh+1},z+2,uimode==mode_draw&&dr.tool==z))settool(z),ev.mu=ev.md=0;}
@@ -2422,7 +2422,7 @@ void ltoolbar(pair pos,pair dn){
 void rtoolbar(pair pos,pair dn){
 	int pp[]={0,1,4,5,8,9,16,17,12,13,18,19,20,21,22,23,24,25,26,27,2,6,3,7,10,11,14,15,28,29,30,31}; // pleasing visual ramps
 	pair size=buff_size(TOOLB);frame=draw_buffer(TOOLB);
-	draw_rect(frame.clip,0),draw_box((rect){0,0,size.x,size.y},0,1),draw_rect((rect){0,16*tcellh,size.x,tgap},1);
+	memset(frame.buffer->sv,0,frame.buffer->c),draw_box((rect){0,0,size.x,size.y},0,1),draw_rect((rect){0,16*tcellh,size.x,tgap},1);
 	if(modebtn(pos,dn,(rect){0,0     ,tcellw*2+1,tcellh+1},"Stroke",dr.pickfill==0))dr.pickfill=0;
 	if(modebtn(pos,dn,(rect){0,tcellh,tcellw*2+1,tcellh+1},"Fill"  ,dr.pickfill==1))dr.pickfill=1;
 	for(int z=0;z<4*8;z++)palbtn(pos,dn,(rect){(z%2)*tcellw,(2+(z/2))*tcellh+(z>=28?tgap:0),tcellw+1,tcellh+1},pp[z]);
@@ -2998,7 +2998,7 @@ void tick(lv*env){
 		}
 	}
 	widget_setup();
-	draw_rect(frame.clip,0);
+	memset(frame.buffer->sv,0,frame.buffer->c);
 	char*pal=patterns_pal(ifield(deck,"patterns"));
 	if(uimode==mode_script){
 		int mh=3+font_h(FONT_MENU);rect b={0,mh,frame.size.x+1,frame.size.y-2*mh};
