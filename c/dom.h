@@ -604,27 +604,21 @@ lv* patterns_read(lv*x){
 	anims_read(patterns_pal(r),dget(x,lmistr("animations")));
 	return r;
 }
-int draw_pattern(char*pal,int pix,int x,int y){
-	if(pix< 2)return pix?1:0;     // base colors are always solid
-	if(pix>31)return pix==32?0:1; // color slots are always solid
-	return pal_pat(pal,pix,x,y)&1;
-}
-int anim_pattern(char*pal,int pix,int frame){
-	return pix<28||pix>31?pix: anim_frame(pal,pix-28,(frame/4)%MAX(1,anim_count(pal,pix-28)));
-}
-int anim_ants(int x,int y){return ((x+y+(frame_count/2))/3)%2?15:0;}
-int draw_color(char*pal,int pix,int frame,int x,int y){
-	pix=anim_pattern(pal,pix,frame);return pix==ANTS?anim_ants(x,y): pix>47?0: pix>31?pix-32: draw_pattern(pal,pix,x,y)?15:0;
-}
-int draw_color_trans(char*pal,int pix,int frame,int x,int y){
-	pix=anim_pattern(pal,pix,frame);return pix==ANTS?anim_ants(x,y): pix==0?16: pix>47?0: pix>31?pix-32: draw_pattern(pal,pix,x,y)?15:0;
-}
+
+#define anim_ants(x,y)                (((x+y+(frame_count/2))/3)%2?15:0)
+#define get_pattern(pal,pix,x,y)      (pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1)
+#define get_anim(pal,pix,frame)       (pix<28||pix>31?pix: anim_frame(pal,pix-28,(frame/4)%MAX(1,anim_count(pal,pix-28))))
+#define get_color(pal,pix,frame,x,y)  (pix==ANTS?anim_ants(x,y):            pix>47?0: pix>31?pix-32: draw_pattern(pal,pix,x,y)?15:0)
+#define get_colort(pal,pix,frame,x,y) (pix==ANTS?anim_ants(x,y): pix==0?16: pix>47?0: pix>31?pix-32: draw_pattern(pal,pix,x,y)?15:0)
+int draw_pattern(char*pal,int pix,int x,int y){return get_pattern(pal,pix,x,y);}
+int anim_pattern(char*pal,int pix,int frame){return get_anim(pal,pix,frame);}
+int draw_color      (char*pal,int pix,int frame,int x,int y){pix=anim_pattern(pal,pix,frame);return get_color (pal,pix,frame,x,y);}
+int draw_color_trans(char*pal,int pix,int frame,int x,int y){pix=anim_pattern(pal,pix,frame);return get_colort(pal,pix,frame,x,y);}
 void draw_frame(char*pal,lv*buffer,int*p,int pitch,int frame,int mask){
-	(void)mask;
-	pair size=buff_size(buffer);
-	for(int y=0;y<size.y;y++)for(int x=0;x<size.x;x++){
-		int stride=pitch/sizeof(int), pix=0xFF&buffer->sv[x+y*size.x];
-		p[x+y*stride]=COLORS[pix==0&&mask?13:draw_color(pal,pix,frame,x,y)];
+	pair size=buff_size(buffer);for(int y=0;y<size.y;y++)for(int x=0;x<size.x;x++){
+		int stride=pitch/sizeof(int), pix=0xFF&buffer->sv[x+y*size.x], ci=13;
+		if(pix||!mask){pix=anim_pattern(pal,pix,frame),ci=get_color(pal,pix,frame,x,y);}
+		p[x+y*stride]=COLORS[ci];
 	}
 }
 
