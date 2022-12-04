@@ -40,7 +40,7 @@ SDL_Texture *gfx,*gtool;
 SDL_Joystick*joy=NULL;
 SDL_mutex*gil=NULL;
 int windowed=1, toggle_fullscreen=0, toolbars_enable=1;
-int autosave=0, nosound=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
+int autosave=0, nosound=0, noscale=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
 #define AUTOSAVE_DELAY (10*60)
 lv* deck_get(lv*text){SDL_LockMutex(gil);lv*r=deck_read(text);SDL_UnlockMutex(gil);return r;}
 void mark_dirty(){dirty=1,dirty_timer=AUTOSAVE_DELAY;}
@@ -2442,7 +2442,7 @@ void sync(){
 	pair disp={0,0};
 	SDL_GetWindowSize(win,&disp.x,&disp.y);
 	pair size=buff_size(context.buffer);
-	int scale=MIN(disp.x/size.x,disp.y/size.y);
+	int scale=noscale?1: MIN(disp.x/size.x,disp.y/size.y);
 	ev.mu=ev.md=ev.click=ev.dclick=ev.tab=ev.action=ev.dir=ev.exit=ev.eval=ev.scroll=ev.rdown=ev.rup=0;
 	if(ev.clicktime)ev.clicktime--;
 	if(ev.clicklast)ev.clicklast--;
@@ -2566,7 +2566,7 @@ void sync(){
 	SDL_SetRenderDrawColor(ren,0x00,0x00,0x00,0xFF);
 	SDL_RenderClear(ren);
 	SDL_RenderCopy(ren,gfx,&src,&dst);
-	pair tsize=buff_size(TOOLB);int tscale=MIN((disp.x-scale*size.x)/(2*tsize.x),disp.y/tsize.y);
+	pair tsize=buff_size(TOOLB);int tscale=MIN((disp.x-scale*size.x)/(2*tsize.x),disp.y/tsize.y);if(tscale&&noscale)tscale=1;
 	int showwings=toolbars_enable&&tscale>0&&!(lb(ifield(deck,"locked")))&&ms.type==modal_none&&uimode!=mode_script;
 	if(showwings){
 		SDL_Rect src={0,0,tsize.x,tsize.y},dst={0,(disp.y-tscale*tsize.y)/2,tscale*tsize.x,tscale*tsize.y};
@@ -3269,7 +3269,7 @@ void load_deck(lv*d){
 	dset(env,lmistr("buff"),context.buffer);
 	#define serr(x) {if(x==NULL)printf("SDL error: %s\n",SDL_GetError()),exit(1);}
 	SDL_DisplayMode dis;SDL_GetDesktopDisplayMode(0,&dis);
-	int minscale=(size.x*2<=dis.w&&size.y*2<=dis.h)?2:1;
+	int minscale=noscale?1: (size.x*2<=dis.w&&size.y*2<=dis.h)?2:1;
 	if(win){SDL_SetWindowSize(win,size.x*minscale,size.y*minscale),SDL_DestroyTexture(gfx);}
 	else{
 		win=SDL_CreateWindow("Decker",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,size.x*minscale,size.y*minscale,SDL_WINDOW_SHOWN|SDL_WINDOW_ALLOW_HIGHDPI);serr(win);
@@ -3285,6 +3285,7 @@ void load_deck(lv*d){
 int main(int argc,char**argv){
 	char*file=NULL;for(int z=1;z<argc;z++){
 		if(!strcmp("--no-sound"   ,argv[z])){nosound=1;continue;}
+		if(!strcmp("--no-scale"   ,argv[z])){noscale=1;continue;}
 		if(!strcmp("--fullscreen" ,argv[z])){toggle_fullscreen=1;continue;}
 		file=argv[z],set_path(argv[z]);
 	}
