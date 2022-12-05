@@ -225,7 +225,7 @@ Grids store tabular data.
 
 ![](images/gridtypes.gif)
 
-Grids can be drawn with or without column headers, with or without a scrollbar, and with or without grid lines. The "format" string is a sequence of characters which control how values in each column will be displayed. These correspond to codes used by the `format` primitive in the Lil programming language. The most useful are as follows:
+Grids can be drawn with or without column headers, with or without a scrollbar, and with or without grid lines. The "format" string is a sequence of characters which each control how values in one column will be displayed. The characters correspond to codes used by the `format` primitive in the Lil programming language, but take no parameters. The most useful are as follows:
 
 - `s`: Plain string. The default.
 - `u`: Uppercase string.
@@ -244,7 +244,9 @@ Additionally, grids support a few special format codes:
 
 ![](images/icons.gif)
 
-In interact mode, you can select a particular row by clicking on it. If the grid is unlocked, you can additionally sort columns by clicking a header or edit a specific cell's value by double-clicking it. Double-clicking a boolean column (formatted as `b` or `B`) will directly toggle the value. Double-clicking a column formatted as `L` or `I` will have no effect. If the grid has headers and more than one column is displayed, you can drag the space between column headings to resize the columns. By default, every column is given equal horizontal space. You can restore default spacing by clicking "Reset Widths" in the grid properties dialog.
+For example, a grid containing a table with four columns given the format string `sfL` would display the first column as strings (`s`), the second column as floating-point numbers (`f`), the third column as a "locked" string column that cannot be edited (`L`), and since the fourth column does not have a format character specified it would _implicitly_ be formatted as a string column.
+
+In interact mode, you can select a particular row by clicking on it. If the grid is unlocked, you can additionally sort columns by clicking a header or edit a specific cell's value by double-clicking it. The user's input will be parsed based on the column's format type, if any. Double-clicking a boolean column (formatted as `b` or `B`) will directly toggle the value. Double-clicking a column formatted as `L` or `I` will have no effect. If the grid has headers and more than one column is displayed, you can drag the space between column headings to resize the columns. By default, every column is given equal horizontal space. You can restore default spacing by clicking "Reset Widths" in the grid properties dialog.
 
 The _File_ menu offers options for importing or exporting [Comma Separated Value](https://en.wikipedia.org/wiki/Comma-separated_values) (CSV) data, respecting the grid's format string, when a grid is selected.
 
