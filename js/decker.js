@@ -949,7 +949,7 @@ const audioContext=window.AudioContext||window.webkitAudioContext, offline=windo
 initaudio=_=>{if(!audio)audio=new audioContext({sampleRate:44100})}
 load_sound=(file,after)=>{
 	decode_sound=data=>{
-		const r=[];for(let z=0;z<data.length;z+=8)r.push(sample_to_byte(data[z]));
+		const r=[];for(let z=0;z<data.length&&r.length<10*SFX_RATE;z+=8)r.push(sample_to_byte(data[z]));
 		if(after){after(sound_make(Uint8Array.from(r)));return;}
 		au.target=deck_add(deck,sound_read(ln(0))),mark_dirty()
 		sound_edit(sound_make(Uint8Array.from(r))),au.sel=rect(),au.head=0,modal_enter('recording')

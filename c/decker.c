@@ -1038,18 +1038,6 @@ void import_image(char*path){
 	if(color){i=readimage(path,1);}else if(ow&&!tw){EACH(z,i->b)i->b->sv[z]=i->b->sv[z]!=32;}
 	setmode(mode_draw),bg_paste(i->b);if(color)dr.limbo_dither=1,dither_threshold=0.5;dr.fatbits=0;dr.omask=m;
 }
-lv* sfx_readwav(char*name){
-	Uint8* raw; Uint32 length; SDL_AudioSpec spec; SDL_AudioCVT cvt;
-	if(SDL_LoadWAV(name,&spec,&raw,&length)==NULL)return NULL;
-	if(SDL_BuildAudioCVT(&cvt, spec.format,spec.channels,spec.freq, SFX_FORMAT,SFX_CHANNELS,SFX_RATE)){
-		cvt.len=length;
-		cvt.buf=malloc(cvt.len * cvt.len_mult);
-		memcpy(cvt.buf,raw,length);
-		SDL_FreeWAV(raw);
-		SDL_ConvertAudio(&cvt);
-		raw=cvt.buf, length=cvt.len_cvt;
-	}lv*r=lmv(1);r->c=length;r->sv=(char*)raw;return sound_make(r);
-}
 lv* modal_open_path(){
 	char t[PATH_MAX]={0};directory_cat(t,ms.path,ms.grid.table->lv[1]->lv[ms.grid.row]->sv);return lmcstr(t);
 }
@@ -1164,7 +1152,7 @@ void modal_exit(int value){
 		lv*hint=ms.verb,*name=modal_open_path();lv*type=arg();ret(
 			array_is(type)?readbin(name):
 			has_suffix(name->sv,".gif")?n_readgif(NULL,lml2(name,hint)):
-			has_suffix(name->sv,".wav")?sfx_readwav(name->sv):
+			has_suffix(name->sv,".wav")?readwav(name->sv):
 			n_read(NULL,l_list(name))
 		);
 	}
