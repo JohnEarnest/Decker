@@ -218,7 +218,7 @@ draw_card=(card,active)=>{
 draw_thumbnail=(card,r)=>{
 	const back=ifield(card,'image');r=inset(r,1),draw_rect(r,0);if(back.size.x>0||back.size.y>0)draw_scaled(r,back,1)
 	const wids=ifield(card,'widgets'),s=getpair(ifield(card,'size')), xr=r.w*(1.0/s.x), yr=r.h*(1.0/s.y)
-	wids.v.map(wid=>{const w=unpack_widget(wid);draw_box(rect(r.x+w.size.x*xr,r.y+w.size.y*yr,w.size.w*xr,w.size.h*yr),0,w.show=='invert'?0:1)})
+	wids.v.map(wid=>{const w=unpack_widget(wid);draw_box(rclip(rect(r.x+w.size.x*xr,r.y+w.size.y*yr,w.size.w*xr,w.size.h*yr),r),0,w.show=='invert'?0:1)})
 }
 draw_lil=(size,align,bare,x)=>{
 	const GAP=50, w=size.x-GAP; let xo=align==ALIGN.right?GAP: align==ALIGN.left?0: 0|(GAP/2)

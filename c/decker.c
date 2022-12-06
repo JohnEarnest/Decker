@@ -869,7 +869,7 @@ void draw_thumbnail(lv*card,rect r){
 	lv*wids=ifield(card,"widgets");pair s=getpair(ifield(card,"size"));float xr=r.w*(1.0/s.x), yr=r.h*(1.0/s.y);
 	EACH(z,wids){
 		widget w=unpack_widget(wids->lv[z]);
-		draw_box((rect){r.x+w.size.x*xr,r.y+w.size.y*yr,w.size.w*xr,w.size.h*yr},0,w.show==show_invert?0:1);
+		draw_box(box_intersect((rect){r.x+w.size.x*xr,r.y+w.size.y*yr,w.size.w*xr,w.size.h*yr},r),0,w.show==show_invert?0:1);
 	}
 }
 lv* draw_card(lv*card,int active){
