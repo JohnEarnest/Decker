@@ -642,7 +642,7 @@ str expect(char t,int alloc){
 }
 int ident(char*n){
 	char*kws[]={
-		"while","each","send","on","if","else","end","with",
+		"while","each","send","on","if","else","end","with","local",
 		"select","extract","update","insert","into","from","where","by","orderby","asc","desc"
 	};for(size_t z=0;z<(sizeof(kws)/sizeof(kws[0]));z++)if(strcmp(n,kws[z])==0)return 0;
 	return findop(n,monads)<0&&findop(n,dyads)<0;
@@ -735,6 +735,7 @@ void term(lv*b){
 		blk_lit(b,lmnat(n_uplevel,NULL)),blk_lit(b,lmstr(name("function"))),blk_op(b,CALL);
 		expect('[',0),blk_cat(b,quotesub()),blk_op(b,CALL);return;
 	}
+	if(match("local")){str n=name("variable");expect(':',0),expr(b),blk_loc(b,lmstr(n));return;}
 	if(match("select" )){parsequery(b,"@sel",1);return;}
 	if(match("extract")){parsequery(b,"@ext",0);return;}
 	if(match("update" )){parsequery(b,"@upd",1);return;}

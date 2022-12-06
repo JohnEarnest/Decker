@@ -358,7 +358,7 @@ parse=text=>{
 	const expect=t=>peek().t==t?next().v:er(`Expected ${t}, but found ${peek().t}.`)
 	const ident=n=>{
 		const kw={for:1,while:1,on:1,if:1,else:1,end:1,do:1,select:1,extract:1,update:1,insert:1,into:1,from:1,where:1,by:1,
-			orderby:1,asc:1,desc:1,each:1,send:1,with:1};return !(n in kw||n in monad||n in dyad)
+			orderby:1,asc:1,desc:1,each:1,send:1,with:1,local:1};return !(n in kw||n in monad||n in dyad)
 	}
 	const name=n=>{const r=expect('name');if(!ident(r)&&n!='member')er(`'${r}' is a keyword, and cannot be used for a ${n} name.`);return r}
 	const names=(x,n)=>{const r=[];while(!match(x))r.push(name(n));return r}
@@ -429,6 +429,7 @@ parse=text=>{
 			blk_lit(b,lmnat(n_uplevel)),blk_lit(b,lml([lms(name('function'))])),blk_op(b,op.CALL)
 			expect('['),blk_cat(b,quotesub()),blk_op(b,op.CALL);return
 		}
+		if(match('local')){const n=lms(name('variable'));expect(':'),expr(b),blk_loc(b,n);return}
 		if(match('select' )){parsequery(b,'@sel',1);return}
 		if(match('extract')){parsequery(b,'@ext',0);return}
 		if(match('update' )){parsequery(b,'@upd',1);return}

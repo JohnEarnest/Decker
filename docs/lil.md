@@ -257,13 +257,13 @@ Lil uses _lexical scope_: variables will resolve to the closest nested binding a
 ```
 global:333
 on quux x do
-	local:99
+	v:99
 	x[77]
-	print[local]           # 99
+	print[v]           # 99
 end
 on zami x do
-	local:23
-	print[global,local,x]  # 333,23,77
+	v:23
+	print[global,v,x]  # 333,23,77
 end
 quux[zami]
 ```
@@ -284,6 +284,17 @@ print[a[]]        # 103
 print[x  ]        # 0
 ```
 Whenever an assignment is carried out, if the variable name in question has been assigned to in any surrounding lexical scope, the assignment will update the _closest_ definition. If the name has never been assigned to before, a new local variable will be created at the current scope. The `on`, `each`, and query (`select`, `update`, `extract`) statements always create new local variables for their arguments, loop variables, or columns, and can thus _shadow_ (take precedence over) outer local variables of the same name. When in doubt, use unique names; it's much less confusing!
+
+It is also possible to _explicitly_ define a local variable by using the keyword `local`, a name, a colon (`:`), and an expression giving the local's initial value:
+```
+duplicate:"Alpha"
+on func do
+	local duplicate:"Beta"
+	show[duplicate] # "Beta"
+end
+func[]
+show[duplicate] # "Alpha"
+```
 
 Finally, if you're mentally wed to the idea of expressing algorithms recursively, you may be pleased to discover that Lil supports _tail-call elimination_. If a recursive function calls itself (or another function) as the final operation in the function, it will not consume extra stack space:
 ```
@@ -1112,7 +1123,8 @@ INSERT  := 'insert' (NAME|STRING ':' EXPR) 'into' EXPR
 SEND    := 'send' NAME '[' EXPR* ']'
 INDEX   := ('.' NAME? | '[' EXPR* ']')*
 ACCESS  := NAME INDEX ( ':' EXPR )?
-TERM    := LITERAL | ITER | ON | IF | QUERY | INSERT | SEND | '(' EXPR ')' | MONAD EXPR | ACCESS
+LOCAL   := 'local' NAME ':' EXPR
+TERM    := LITERAL | ITER | ON | IF | QUERY | INSERT | SEND | '(' EXPR ')' | MONAD EXPR | ACCESS | LOCAL
 EXPR    := TERM ( INDEX ( ':' EXPR )? | DYAD EXPR )?
 PROGRAM := EXPR*
 ```

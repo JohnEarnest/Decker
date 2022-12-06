@@ -95,3 +95,13 @@ on saddle x do
 end
 show[saddle[1]]
 show[saddle[0]]
+
+# explicitly create a local, to avoid clobbering outer definitions:
+duplicate:"Alpha"
+on func do
+	local duplicate:"Beta"
+	show[duplicate] # "Beta"
+	show[local temp:"Chained"] # locals return their right expression, just like any other plain assignment
+end
+func[]
+show[duplicate] # "Alpha"
