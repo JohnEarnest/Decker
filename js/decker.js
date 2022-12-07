@@ -2869,8 +2869,8 @@ q('body').onkeydown=e=>{
 	if(e.key=='Enter')ev.action=1
 	if(e.key=='Tab')ev.tab=1
 	if(e.key=='l'&&ms.type==null&&!wid.ingrid&&!wid.infield)ev.shortcuts['l']=1
-	if(e.key=='j'&&dr.limbo_dither&&dr.dither_threshold>-2.0)dr.dither_threshold-=.1
-	if(e.key=='k'&&dr.limbo_dither&&dr.dither_threshold< 2.0)dr.dither_threshold+=.1
+	if(e.key=='j'&&ms.type==null&&dr.limbo_dither&&dr.dither_threshold>-2.0)dr.dither_threshold-=.1
+	if(e.key=='k'&&ms.type==null&&dr.limbo_dither&&dr.dither_threshold< 2.0)dr.dither_threshold+=.1
 	if((e.metaKey||e.ctrlKey)&&e.key in {c:1,x:1,v:1}){}
 	else{e.preventDefault()}
 }

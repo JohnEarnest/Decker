@@ -2474,8 +2474,8 @@ void sync(){
 			if(c==SDLK_RETURN)ev.action=1;
 			if(c==SDLK_TAB   )ev.tab=1;
 			if(c==SDLK_l&&ms.type==modal_none&&!wid.ingrid&&!wid.infield)ev.shortcuts['l']=1;
-			if(c==SDLK_j&&!cmd&&dr.limbo_dither&&dither_threshold>-2.0)dither_threshold-=.1;
-			if(c==SDLK_k&&!cmd&&dr.limbo_dither&&dither_threshold< 2.0)dither_threshold+=.1;
+			if(c==SDLK_j&&ms.type==modal_none&&!cmd&&dr.limbo_dither&&dither_threshold>-2.0)dither_threshold-=.1;
+			if(c==SDLK_k&&ms.type==modal_none&&!cmd&&dr.limbo_dither&&dither_threshold< 2.0)dither_threshold+=.1;
 		}
 		if(e.type==SDL_KEYUP){
 			int c=e.key.keysym.sym;
