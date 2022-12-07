@@ -457,7 +457,7 @@ menu_bar=(name,enabled)=>{
 		if(ev.drag&&enabled&&over(b)&&ev.dpos.y<b.h)ev.dpos=ev.pos,menu.lw=0
 		if((ev.drag||ev.mu)&&enabled&&rin(b,ev.dpos))menu.active=i
 	}if(i==menu.active||i==menu.stick)menu.sz=rect(b.x,b.h,max(b.w,menu.lw),0),menu.items=[]
-	if(ev.md&&over(b))ev.md=0
+	if(ev.md&&over(b)&&enabled)ev.md=0
 }
 shortcut_w=c=>!c?0: 10+font_textsize(FONT_MENU,'^'+c).x
 menu_check=(name,enabled,check,shortcut,func)=>{

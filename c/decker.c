@@ -210,7 +210,7 @@ void menu_bar(char*name,int enabled){
 		if(ev.drag&&enabled&&over(b)&&ev.dpos.y<b.h)ev.dpos=ev.pos,menu.lw=0;
 		if((ev.drag||ev.mu)&&enabled&&dover(b))menu.active=i;
 	}if(i==menu.active||i==menu.stick)menu.sz=(rect){b.x,b.h,MAX(b.w,menu.lw),0},menu.item_count=0;
-	if(ev.md&&over(b))ev.md=0;
+	if(ev.md&&over(b)&&enabled)ev.md=0;
 }
 int shortcut_w(char c){if(!c)return 0;char tn[8];snprintf(tn,8,"^%c",c);pair s=font_textsize(FONT_MENU,tn);return 10+s.x;}
 int menu_check(char*name,int enabled,int check,char shortcut){
