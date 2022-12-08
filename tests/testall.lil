@@ -17,6 +17,13 @@ show[-48.9]
 show[.23]
 show["some\ntext"]
 show[()]
+show[4=-1+5]  # minus adjacent to dyad
+show[4= -1+5] # minus adjacent to dyad, with whitespace
+alpha:5
+show[alpha-1+5]  # minus adjacent to name
+show[alpha -1+5] # minus adjacent to name, with whitespace
+show["12"-5]     # minus adjacent to string literal
+show["12" -5]    # minus adjacent to string literal, with whitespace
 
 header["monads"]
 show[- 33]

@@ -571,7 +571,7 @@ typedef struct{int i,r,c,tl;char*text;token here,next;char error[1024];}parser;p
 //         ! "#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
 char*tcc=" s\" sss ()ssssdsdddddddddd: sssn@nnnnnnnnnnnnnnnnnnnnnnnnnn[ ]sn nnnnnnnnnnnnnnnnnnnnnnnnnn s s";
 char*ncc= "                nnnnnnnnnn     n nnnnnnnnnnnnnnnnnnnnnnnnnn    n nnnnnnnnnnnnnnnnnnnnnnnnnn    ";
-char*mcc= " x   xx x xxxx x          x                                x                                x  ";
+char*mcc= "     xx x xxxx x          x xxx x                          x  x                             x x";
 char tc(){return (par.i>=par.tl)?' ':par.text[par.i];}
 char ccc(){char x=tc();return x>=32&&x<=126?tcc[x-32]:' ';}
 char ccn(){char x=tc();return x>=32&&x<=126?ncc[x-32]:' ';}

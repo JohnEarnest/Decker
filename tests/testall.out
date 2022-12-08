@@ -6,6 +6,12 @@ literals:
 0.23
 "some\ntext"
 ()
+1
+1
+-1
+5 4
+7
+"12" -5
 
 monads:
 =======

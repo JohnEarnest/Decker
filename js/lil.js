@@ -329,7 +329,7 @@ parse=text=>{
 	//          !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
 	const tcc=' s" sss ()ssssdsdddddddddd: sssn@nnnnnnnnnnnnnnnnnnnnnnnnnn[ ]sn nnnnnnnnnnnnnnnnnnnnnnnnnn s s'
 	const ncc='                nnnnnnnnnn     n nnnnnnnnnnnnnnnnnnnnnnnnnn    n nnnnnnnnnnnnnnnnnnnnnnnnnn    '
-	const mcc=' x   xx x xxxx x          x                                x                                x  ';
+	const mcc='     xx x xxxx x          x xxx x                          x  x                             x x'
 	const esc={'\\':'\\','"':'"','n':'\n'}
 	const ne=_=>{const e=nc();return e in esc?esc[e]: er(`Invalid escape character '\\${e}' in string.`)}
 	const nw=x=>{let v=+x;    while(id())v=(v*10)+(+nc());  return v} 
