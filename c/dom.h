@@ -935,11 +935,11 @@ lv* interface_sound(lv*self,lv*i,lv*x){
 	ikey("encoded")return sound_write(self);
 	return x?x:NONE;
 }
-lv* sound_make(lv*buffer){return lmi(interface_sound,lmistr("sound"),buffer);}
+lv* sound_make(lv*buffer){buffer->c=MIN(buffer->c,10*SFX_RATE);return lmi(interface_sound,lmistr("sound"),buffer);}
 lv* sound_read(lv*x){char f=0;lv*r=data_read("SND",&f,x);return r&&f=='0'?sound_make(r):NULL;}
 lv* n_sound(lv*self,lv*z){
 	(void)self;z=l_first(z);if(lis(z))return sound_read(z);if(!lil(z)){int n=ln(z);return sound_make(lms(CLAMP(0,n,10*SFX_RATE)));}
-	lv*r=sound_make(lms(CLAMP(0,z->c,10*SFX_RATE)));EACH(i,z)r->b->sv[i]=0xFF&(int)ln(z->lv[i]);return r;
+	lv*r=sound_make(lms(CLAMP(0,z->c,10*SFX_RATE)));EACH(i,r->b)r->b->sv[i]=0xFF&(int)ln(z->lv[i]);return r;
 }
 
 // Array interface

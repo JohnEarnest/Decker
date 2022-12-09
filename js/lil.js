@@ -1311,6 +1311,7 @@ sound_make=data=>{
 		if(ikey(i,'duration'))return lmn(self.data.length/SFX_RATE)
 		return x?x:NONE
 	},'sound')
+	if(data&&data.length>10*SFX_RATE)data=data.slice(0,10*SFX_RATE)
 	ri.data=data||new Uint8Array(0)
 	return ri
 }
