@@ -1143,7 +1143,7 @@ void modal_exit(int value){
 	}
 	if((ms.subtype==modal_save_deck||ms.subtype==modal_save_locked)&&value){
 		lv*path=modal_save_path("");
-		if(directory_exists(path->sv)&&ms.type!=modal_confirm){modal_save_replace(modal_save_locked,"deck",path);return;}
+		if(directory_exists(path->sv)&&ms.type!=modal_confirm){modal_save_replace(ms.subtype,"deck",path);return;}
 		if(ms.subtype==modal_save_locked)iwrite(deck,lmistr("locked"),ONE);
 		save_deck(path);
 		if(ms.subtype==modal_save_locked)iwrite(deck,lmistr("locked"),NONE);
@@ -2673,10 +2673,9 @@ void tick(lv*env){
 	SDL_LockMutex(gil);
 	msg.pending_drag=0;
 	msg.pending_halt=0;
-	if(dirty&&dirty_timer>0&&!running()){
+	if(dirty&&dirty_timer>0&&!running()&&autosave&&strlen(document_path)){
 		dirty_timer--;
-		if(dirty_timer==0)dirty=0;
-		if(dirty_timer==0&&autosave&&strlen(document_path))save_deck(lmcstr(document_path));
+		if(dirty_timer==0)dirty=0,save_deck(lmcstr(document_path));
 	}
 	frame=context;
 	uicursor=0;
