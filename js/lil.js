@@ -553,7 +553,7 @@ n_writecsv=([x,y,d])=>{
 }
 n_readcsv=([x,y,d])=>{
 	let i=0,n=0, spec=y&&lis(y)?ls(y):null, text=count(x)?ls(x):'', r=lmt({}); d=d?ls(d)[0]:','
-	const nv=_=>{let r='';while(text[i]&&!(/[\n ]/.test(text[i])||text[i]==d))r+=text[i++];return r}, match=x=>text[i]==x?(i++,1):0
+	const nv=_=>{let r='';while(text[i]&&text[i]!='\n'&&text[i]!=d)r+=text[i++];return r}, match=x=>text[i]==x?(i++,1):0
 	while(i<text.length&&text[i]!='\n'){
 		while(match(' '));const v=nv();if(!spec||(n<spec.length&&spec[n]!='_'))r.v[v]=[];n++;if(match('\n'))break;while(match(' '));match(d)
 	}

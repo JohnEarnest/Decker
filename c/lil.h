@@ -960,7 +960,7 @@ lv*n_readcsv(lv*self,lv*a){
 	(void)self;lv*t=a->c>0?ls(a->lv[0]):lms(0);lv*r=lmt(),*s=(a->c>=2&&lis(a->lv[1]))?a->lv[1]:NULL;
 	char delim=a->c>=3?ls(a->lv[2])->sv[0]:',';
 	int i=0,n=0,slots=0,slot=0;;char b[32];while(i<t->c&&t->sv[i]!='\n'){
-		css;str name=str_new();while(i<t->c&&!strchr("\n ",t->sv[i])&&t->sv[i]!=delim)str_addc(&name,t->sv[i++]);
+		css;str name=str_new();while(i<t->c&&t->sv[i]!='\n'&&t->sv[i]!=delim)str_addc(&name,t->sv[i++]);
 		if(!s||(n<s->c&&s->sv[n]!='_'))dset(r,lmstr(name),lml(0));else free(name.sv);n++;
 		if(t->sv[i++]=='\n')break;css;cm(delim);
 	}while(s&&n<s->c)if(s->sv[n++]!='_')snprintf(b,32,"c%d",n-1),dset(r,lmcstr(b),lml(0));

@@ -80,3 +80,9 @@
 | 2      | "Banana" | 0    |
 +--------+----------+------+
 "number,fruit,bool\n1,Apple,true\n2,Banana,false"
++------------+-----------------+
+| Multi Word | another         |
++------------+-----------------+
+| "-1337.5"  | "quoted string" |
++------------+-----------------+
+"Multi Word,another\n-1337.5,quoted string"
