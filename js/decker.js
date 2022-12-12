@@ -398,7 +398,7 @@ wid_state=_=>({ // widget state
 })
 let wid=wid_state()
 let ms={ // modal state
-	type:null,subtype:null,in_modal:0,old_wid:null,
+	type:null,subtype:null,in_modal:0,edit_json:0,old_wid:null,
 	filter:0, grid:null,grid2:null, text:null,name:null,form0:null,form1:null,form2:null,
 	desc:'',path:'',filter:'', message:null,verb:null, cell:rect(),
 	from_listener:0,from_action:0, act_go:0,act_card:0,act_gomode:0,act_trans:0,act_transo:0,act_sound:0,
@@ -1074,6 +1074,7 @@ sound_record=_=>{
 
 // Modal Helpers
 
+table_decode=(text,format)=>ms.edit_json?monad.table(dyad.parse(lms('%j'),text)): n_readcsv(count(format)?[text,format]:[text])
 transit_enumerate=_=>monad.table(monad.range(deck.transit))
 sounds_enumerate=_=>{
 	const r={icon:[],name:[],bytes:[],secs:[]};deck.sounds.v.map((sn,i)=>{
@@ -1135,6 +1136,7 @@ modal_enter=type=>{
 	if(type=='button_props')ms.name=fieldstr(ifield(ob.sel[0],'name')),ms.text=fieldstr(ifield(ob.sel[0],'text'  ))
 	if(type=='field_props' )ms.name=fieldstr(ifield(ob.sel[0],'name')),ms.text=fieldstr(ifield(ob.sel[0],'value' ))
 	if(type=='grid_props'  )ms.name=fieldstr(ifield(ob.sel[0],'name')),ms.text=fieldstr(ifield(ob.sel[0],'format'))
+	if(type=='grid_props'  )ms.form0=fieldstr(lms(fjson(monad.cols(ifield(ob.sel[0],'value'))))),ms.edit_json=1
 	if(type=='canvas_props')ms.name=fieldstr(ifield(ob.sel[0],'name')),ms.text=fieldstr(ifield(ob.sel[0],'scale' ))
 	if(type=='slider_props'){
 		ms.name =fieldstr(   ifield(ob.sel[0],'name'    )    )
@@ -1171,6 +1173,10 @@ modal_exit=value=>{
 	wid=ms.old_wid
 	if(ms.type=='gridcell'&&value)grid_edit_cell(ms.cell,dyad.parse(lms(`%${ls(grid_format())[ms.cell.x]||'s'}`),rtext_string(ms.text.table)))
 	if(ms.type=='card_props'){iwrite(ifield(deck,'card'),lms('name'),rtext_string(ms.name.table)),mark_dirty()}
+	if(ms.type=='grid_props'){
+		const t=table_decode(rtext_string(ms.form0.table),rtext_string(ms.text.table))
+		if(!match(t,ifield(ob.sel[0],'value')))ob_edit_prop('value',t)
+	}
 	if(ms.type=='action'&&value){
 		let r='on click do\n'
 		if(ms.act_sound)r+=`  play[${show(ms.message)}]\n`
@@ -1673,18 +1679,25 @@ modals=_=>{
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='grid_props'){
-		const b=draw_modalbox(rect(220,140)),grid=ob.sel[0]
+		const b=draw_modalbox(rect(220,140+70)),grid=ob.sel[0]
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Grid Properties',FONT_MENU,1)
 		draw_text(rect(b.x,b.y+22,47,20),'Name'  ,FONT_MENU,1)
 		draw_text(rect(b.x,b.y+42,47,20),'Format',FONT_MENU,1)
-		ui_field(rect(b.x+47,b.y+20,b.w-47,18),ms.name)
-		ui_field(rect(b.x+47,b.y+40,b.w-47,18),ms.text)
+		draw_text(rect(b.x,b.y+62,47,20),'Value' ,FONT_MENU,1)
+		ui_field   (rect(b.x+47,b.y+20,b.w-47,18),ms.name)
+		ui_field   (rect(b.x+47,b.y+40,b.w-47,18),ms.text)
+		ui_codeedit(rect(b.x+47,b.y+60,b.w-47,58),1,ms.form0)
+		const etext=rtext_string(ms.form0.table),format=rtext_string(ms.text.table),val=table_decode(etext,format),cn=Object.keys(val.v).length,rn=count(val)
+		draw_text(rect(b.x+47,b.y+60+60,b.w-47,18),`${cn} column${cn==1?'':'s'}, ${rn} row${rn==1?'':'s'}.`,FONT_BODY,1)
 		iwrite(grid,lms('name'  ),rtext_string(ms.name.table))
-		iwrite(grid,lms('format'),rtext_string(ms.text.table)),mark_dirty()
-		let headers=lb(ifield(grid,'headers')), scrollbar=lb(ifield(grid,'scrollbar')), lines=lb(ifield(grid,'lines')), cb=rect(b.x,b.y+70)
-		if(ui_checkbox(rect(cb.x,cb.y,b.w,16),'Column Headers',1,headers  )){headers  ^=1,iwrite(grid,lms('headers'  ),lmn(headers  )),mark_dirty()}cb.y+=16
-		if(ui_checkbox(rect(cb.x,cb.y,b.w,16),'Scrollbar'     ,1,scrollbar)){scrollbar^=1,iwrite(grid,lms('scrollbar'),lmn(scrollbar)),mark_dirty()}cb.y+=16
-		if(ui_checkbox(rect(cb.x,cb.y,b.w,16),'Grid Lines'    ,1,lines    )){lines    ^=1,iwrite(grid,lms('lines'    ),lmn(lines    )),mark_dirty()}cb.y+=16
+		iwrite(grid,lms('format'),format),mark_dirty()
+		let headers=lb(ifield(grid,'headers')), scrollbar=lb(ifield(grid,'scrollbar')), lines=lb(ifield(grid,'lines')), cb=rect(b.x,b.y+70+70)
+		if(ui_checkbox(rint(rect(cb.x,cb.y,b.w/2,16)),'Column Headers',1,headers  )){headers  ^=1,iwrite(grid,lms('headers'  ),lmn(headers  )),mark_dirty()}cb.y+=16
+		if(ui_checkbox(rint(rect(cb.x,cb.y,b.w/2,16)),'Scrollbar'     ,1,scrollbar)){scrollbar^=1,iwrite(grid,lms('scrollbar'),lmn(scrollbar)),mark_dirty()}cb.y+=16
+		if(ui_checkbox(rint(rect(cb.x,cb.y,b.w/2,16)),'Grid Lines'    ,1,lines    )){lines    ^=1,iwrite(grid,lms('lines'    ),lmn(lines    )),mark_dirty()}cb.y+=16
+		const eb=rint(rect(b.x+(b.w/2),b.y+70+70))
+		if(ui_radio(rint(rect(eb.x,eb.y,b.w/2,16)),'Edit as JSON',1,ms.edit_json==1)){ms.form0=fieldstr(lms(fjson(monad.cols(val)))),ms.edit_json=1}eb.y+=16
+		if(ui_radio(rint(rect(eb.x,eb.y,b.w/2,16)),'Edit as CSV' ,1,ms.edit_json==0))ms.form0=fieldstr(n_writecsv(count(format)?[val,format]:[val])),ms.edit_json=0
 		const c=rect(b.x,b.y+b.h-20), w=ll(ifield(grid,'widths'))
 		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(grid),modal_exit(0);c.x+=65
 		if(ui_button(rect(c.x,c.y,90,20),'Reset Widths',w.length))iwrite(grid,lms('widths'),lml([])),mark_dirty()

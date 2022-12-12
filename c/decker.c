@@ -176,7 +176,7 @@ enum modal_type{
 	modal_cards,modal_sounds,modal_recording,modal_fonts,modal_resources,modal_action,modal_pick_card,modal_trans,modal_grid,
 };
 typedef struct {
-	int type, subtype, filter, in_modal;
+	int type, subtype, filter, in_modal, edit_json;
 	widget_state old_wid;
 	grid_val grid,grid2;field_val text,name,form0,form1,form2;
 	char*desc;char path[PATH_MAX];
@@ -975,6 +975,8 @@ void modal_enter(int type){
 		lv*w=ob.sel->lv[0];
 		ms.name=(field_val){rtext_cast(ifield(w,"name")),0};
 		ms.text=(field_val){rtext_cast(ifield(w,"format")),0};
+		str r=str_new();fjson(&r,l_cols(ifield(w,"value")));ms.edit_json=1;
+		ms.form0=(field_val){rtext_cast(lmstr(r)),0};
 	}
 	if(type==modal_slider_props){
 		lv*w=ob.sel->lv[0];
@@ -1038,6 +1040,7 @@ void import_image(char*path){
 	if(color){i=readimage(path,1);}else if(ow&&!tw){EACH(z,i->b)i->b->sv[z]=i->b->sv[z]!=32;}
 	setmode(mode_draw),bg_paste(i->b);if(color)dr.limbo_dither=1,dither_threshold=0.5;dr.fatbits=0;dr.omask=m;
 }
+lv* table_decode(lv*text,lv*format){return ms.edit_json?l_table(l_parse(lmistr("%j"),text)): n_readcsv(NULL,format->c?lml2(text,format):l_list(text));}
 lv* modal_open_path(){
 	char t[PATH_MAX]={0};directory_cat(t,ms.path,ms.grid.table->lv[1]->lv[ms.grid.row]->sv);return lmcstr(t);
 }
@@ -1090,6 +1093,11 @@ void modal_exit(int value){
 		lv*f=ob.sel->lv[0];
 		iwrite(f,lmistr("interval"),lml2(rtext_all(ms.form0.table),rtext_all(ms.form1.table)));
 		iwrite(f,lmistr("step"),rtext_all(ms.form2.table));mark_dirty();
+	}
+	if(ms.type==modal_grid_props){
+		lv*g=ob.sel->lv[0];
+		lv*t=table_decode(rtext_all(ms.form0.table),rtext_all(ms.text.table));
+		if(!matchr(t,ifield(g,"value")))ob_edit_prop("value",t);
 	}
 	if(ms.type==modal_action&&value){
 		str r=str_new();str_addz(&r,"on click do\n");
@@ -1652,18 +1660,30 @@ void modals(){
 		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
 	else if(ms.type==modal_grid_props){
-		rect b=draw_modalbox((pair){220,140});lv*grid=ob.sel->lv[0];
+		rect b=draw_modalbox((pair){220,140+70});lv*grid=ob.sel->lv[0];
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Grid Properties",FONT_MENU,1);
-		draw_text((rect){b.x,b.y+22,47,20},"Name",FONT_MENU,1);
+		draw_text((rect){b.x,b.y+22,47,20},"Name"  ,FONT_MENU,1);
 		draw_text((rect){b.x,b.y+42,47,20},"Format",FONT_MENU,1);
-		ui_field((rect){b.x+47,b.y+20,b.w-47,18},&ms.name);
-		ui_field((rect){b.x+47,b.y+40,b.w-47,18},&ms.text);
+		draw_text((rect){b.x,b.y+62,47,20},"Value" ,FONT_MENU,1);
+		ui_field   ((rect){b.x+47,b.y+20,b.w-47,18},  &ms.name);
+		ui_field   ((rect){b.x+47,b.y+40,b.w-47,18},  &ms.text);
+		ui_codeedit((rect){b.x+47,b.y+60,b.w-47,58},1,&ms.form0);
+		lv*etext=rtext_all(ms.form0.table),*format=rtext_all(ms.text.table),*eval=table_decode(etext,format);
+		char desc[4096];snprintf(desc,sizeof(desc),"%d column%s, %d row%s.",eval->c,eval->c==1?"":"s",eval->n,eval->n==1?"":"s");
+		draw_text((rect){b.x+47,b.y+60+60,b.w-47,18},desc,FONT_BODY,1);
 		iwrite(grid,lmistr("name"  ),rtext_all(ms.name.table));
-		iwrite(grid,lmistr("format"),rtext_all(ms.text.table));mark_dirty();
-		int headers=lb(ifield(grid,"headers")), scrollbar=lb(ifield(grid,"scrollbar")), lines=lb(ifield(grid,"lines")); pair cb={b.x,b.y+70};
-		if(ui_checkbox((rect){cb.x,cb.y,b.w,16},"Column Headers",1,headers  )){headers  ^=1;iwrite(grid,lmistr("headers"  ),lmn(headers  )),mark_dirty();}cb.y+=16;
-		if(ui_checkbox((rect){cb.x,cb.y,b.w,16},"Scrollbar"     ,1,scrollbar)){scrollbar^=1;iwrite(grid,lmistr("scrollbar"),lmn(scrollbar)),mark_dirty();}cb.y+=16;
-		if(ui_checkbox((rect){cb.x,cb.y,b.w,16},"Grid Lines"    ,1,lines    )){lines    ^=1;iwrite(grid,lmistr("lines"    ),lmn(lines    )),mark_dirty();}
+		iwrite(grid,lmistr("format"),format);mark_dirty();
+		int headers=lb(ifield(grid,"headers")), scrollbar=lb(ifield(grid,"scrollbar")), lines=lb(ifield(grid,"lines")); pair cb={b.x,b.y+70+70};
+		if(ui_checkbox((rect){cb.x,cb.y,b.w/2,16},"Column Headers",1,headers  )){headers  ^=1;iwrite(grid,lmistr("headers"  ),lmn(headers  )),mark_dirty();}cb.y+=16;
+		if(ui_checkbox((rect){cb.x,cb.y,b.w/2,16},"Scrollbar"     ,1,scrollbar)){scrollbar^=1;iwrite(grid,lmistr("scrollbar"),lmn(scrollbar)),mark_dirty();}cb.y+=16;
+		if(ui_checkbox((rect){cb.x,cb.y,b.w/2,16},"Grid Lines"    ,1,lines    )){lines    ^=1;iwrite(grid,lmistr("lines"    ),lmn(lines    )),mark_dirty();}
+		pair eb={b.x+(b.w/2),b.y+70+70};
+		if(ui_radio((rect){eb.x,eb.y,b.w/2,16},"Edit as JSON",1,ms.edit_json==1)){
+			str r=str_new();fjson(&r,l_cols(eval));ms.form0=(field_val){rtext_cast(lmstr(r)),0};ms.edit_json=1;
+		}eb.y+=16;
+		if(ui_radio((rect){eb.x,eb.y,b.w/2,16},"Edit as CSV",1,ms.edit_json==0)){
+			ms.form0=(field_val){rtext_cast(n_writecsv(NULL,format->c?lml2(eval,format):l_list(eval))),0};ms.edit_json=0;
+		}
 		pair c={b.x,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))setscript(grid),modal_exit(0);c.x+=65;
 		lv*w=ifield(grid,"widths");
