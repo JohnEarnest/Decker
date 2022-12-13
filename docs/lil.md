@@ -1,3 +1,5 @@
+title:Lil: A Scripting Language
+
 <style>
 /* general prose */
 body{margin:1em 5em 5em 3em;}
@@ -11,6 +13,7 @@ table{margin:0 .5em;border-collapse:collapse;border:1px solid #aaa;}
 td{padding:5px;}th{padding:10px;border-bottom:1px solid #aaa;background-color:Gainsboro;}
 td,th:not(:first-child){border-left:1px solid #aaa;}
 figure{display:block;text-align:center;}
+.TOC li{margin:0;}
 </style>
 
 Lil: A Scripting Language
@@ -34,6 +37,11 @@ mode[1,2,2,3,4,2,1]
 Lil's implementation needs to be fairly small, as an interpreter is shipped with every standalone Decker document along with the rest of the runtime. At the same time, Lil should be prepared for the everyday needs of Decker users, with primitives to handle common use-cases and a minimum of boilerplate.
 
 The language therefore tries to thread the needle between a design which is simple and a design which is ergonomically pleasant. There is a small number of datatypes, features and primitives, which compose in many useful ways. The query syntax generalizes to manipulation of dictionaries, lists, and strings, and replaces many individual primitive operations in other languages with a single algorithmic framework. Simple things are easy, and complex things are possible.
+
+Table of Contents
+-----------------
+
+{{TOC}}
 
 Types and Conversions
 ---------------------
