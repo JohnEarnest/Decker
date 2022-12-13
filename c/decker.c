@@ -2652,6 +2652,7 @@ void gestures(){
 	if(!enable_gestures)return;
 	lv*card=ifield(deck,"card"),*wids=ifield(card,"widgets");
 	if(!in_layer()||uimode!=mode_interact||(!ev.drag&&!ev.mu))return;                              // must be in the right state of mind
+	if(ev.drag&&ob.sel->c&&lb(ifield(ob.sel->lv[0],"draggable")))return;                           // must not be dragging a canvas
 	int outside=1;EACH(z,wids)outside&=!dover(unpack_widget(wids->lv[z]).size);if(!outside)return; // must touch grass
 	int dx=ev.pos.x-ev.dpos.x,dy=ev.pos.y-ev.dpos.y;if(sqrt(dx*dx+dy*dy)<50)return;                // must be emphatic
 	if(abs(dx)<2*abs(dy)&&abs(dy)<2*abs(dx))return;                                                // must be highly directional

@@ -2762,6 +2762,7 @@ gestures=_=>{
 	if(!enable_gestures)return
 	const card=ifield(deck,'card')
 	if(!in_layer()||uimode!='interact'||(!ev.drag&&!ev.mu))return          // must be in the right state of mind
+	if(ev.drag&&ob.sel.length&&lb(ifield(ob.sel[0],'draggable')))return    // must not be dragging a canvas
 	if(card.widgets.v.some(x=>dover(unpack_widget(x).size)))return         // must touch grass
 	const d=rsub(ev.pos,ev.dpos);if(Math.sqrt(d.x*d.x+d.y*d.y)<50)return   // must be emphatic
 	if(Math.abs(d.x)<2*Math.abs(d.y)&&Math.abs(d.y)<2*Math.abs(d.x))return // must be highly directional
