@@ -79,6 +79,8 @@ All of other tools relate to drawing on the card:
 - _Filled Oval_: like the oval tool, but use the fill color for the interior.
 - _Polygon_: draw a filled shape, using the selected brush shape, pattern, and fill color. Note that if you don't want an outline you could simply make a selection with the Lasso tool and press "delete".
 
+The F-keys on your keyboard are another way to switch between tools: F1 for Interact, F2 for Widgets, F3 for Select, and so on up to F12. Note that your operating system may reserve or overload some F-keys!
+
 The _View_ menu will be available when the _Widgets_ or drawing tools are chosen:
 
 - _Show Widgets_: Toggle displaying widgets on top of the card background while drawing.
