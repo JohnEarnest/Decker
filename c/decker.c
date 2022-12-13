@@ -2511,7 +2511,7 @@ void sync(){
 				if(c==SDLK_LEFT )msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("left");
 				if(c==SDLK_RIGHT)msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("right");
 			}
-			if(uimode==mode_interact||uimode==mode_object||uimode==mode_draw){
+			if((uimode==mode_interact||uimode==mode_object||uimode==mode_draw)&&ms.type==modal_none){
 				if(c==SDLK_F1)setmode(mode_interact);
 				if(c==SDLK_F2)setmode(mode_object);
 				int f[]={SDLK_F3,SDLK_F4,SDLK_F5,SDLK_F6,SDLK_F7,SDLK_F8,SDLK_F9,SDLK_F10,SDLK_F11,SDLK_F12};
