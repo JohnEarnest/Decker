@@ -2695,6 +2695,13 @@ all_menus=_=>{
 		}
 		if(menu_item('Properties...',ob.sel.length==1)||(ob.sel.length==1&&ev.action&&ms.type==null))object_properties(ob.sel[0])
 	}
+	if(ms.type=='listen'){
+		menu_bar('Listener',1)
+		if(menu_item('Clear History',1))li.hist=[],li.scroll=0
+		if(menu_item('Clear Locals' ,1))li.vars={}
+		menu_separator()
+		if(menu_item('Show Locals',1))listen_show(ALIGN.right,0,lmd(Object.keys(li.vars).map(lms),Object.values(li.vars)))
+	}
 }
 
 main_view=_=>{

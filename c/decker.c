@@ -3014,6 +3014,13 @@ void tick(lv*env){
 			}
 			if(menu_item("Properties...",ob.sel->c==1,'\0')||(ob.sel->c==1&&ev.action&&ms.type==modal_none))object_properties(ob.sel->lv[0]);
 		}
+		if(ms.type==modal_listen){
+			menu_bar("Listener",1);
+			if(menu_item("Clear History",1,'\0')){li.hist->c=0,li.scroll=0;}
+			if(menu_item("Clear Locals" ,1,'\0')){li.vars->c=0;}
+			menu_separator();
+			if(menu_item("Show Locals"  ,1,'\0')){listen_show(align_right,0,li.vars);}
+		}
 	}
 	widget_setup();
 	memset(frame.buffer->sv,0,frame.buffer->c);
