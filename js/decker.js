@@ -2383,7 +2383,7 @@ script_editor=_=>{
 		stat=`script of ${sc.target.n}  '${ls(ifield(sc.target,'name'))}'${sc.others.length?` and ${sc.others.length} more`:''}`
 		const t=layout_plaintext(stat,FONT_BODY,ALIGN.right,rect(frame.size.x-6-20-l.x,font_h(FONT_BODY)))
 		draw_text_wrap(rect(3+l.x+20,frame.size.y-mh+3,t.size.x,t.size.y),t,1)
-	}if(in_layer()&&ev.exit)close_script()
+	}if(in_layer()&&ev.exit)close_script(),ev.exit=0
 }
 
 // Runtime

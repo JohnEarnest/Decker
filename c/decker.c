@@ -3046,7 +3046,7 @@ void tick(lv*env){
 			else{snprintf(stat,sizeof(stat),"script of %s  '%s'",sc.target->a->sv,ifield(sc.target,"name")->sv);}
 			pair t=layout_plaintext(stat,FONT_BODY,align_right,(pair){frame.size.x-6-20-l.x,font_h(FONT_BODY)});
 			draw_text_wrap((rect){3+l.x+20,frame.size.y-mh+3,t.x,t.y},1);
-		}if(in_layer()&&ev.exit)close_script(NULL);
+		}if(in_layer()&&ev.exit)close_script(NULL),ev.exit=0;
 	}
 	else{
 		lv*card=ifield(deck,"card");
