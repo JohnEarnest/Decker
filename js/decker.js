@@ -2474,6 +2474,7 @@ all_menus=_=>{
 				ms.verb=lms('Discard')
 			}else{load_deck(deck_read(''))}
 		}
+		if(menu_item('New Card',1)){const c=deck_add(deck,lms('card')), n=ln(ifield(ifield(deck,'card'),'index'));iwrite(c,lms('index'),lmn(n+1)),n_go([c],deck)}
 		menu_separator()
 		menu_item('Open...',1,0,_=>open_text('.html,.deck',text=>{load_deck(deck_read(text))}))
 		if(menu_item('Save As...',1))modal_enter('save_deck')

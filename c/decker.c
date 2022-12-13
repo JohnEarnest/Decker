@@ -2750,6 +2750,10 @@ void tick(lv*env){
 					ms.verb=lmcstr("Discard");
 				}else{load_deck(deck_get(lmistr("")));set_path("");}
 			}
+			if(menu_item("New Card",1,'\0')){
+				lv*c=n_deck_add(deck,l_list(lmistr("card")));int n=ln(ifield(ifield(deck,"card"),"index"));
+				iwrite(c,lmistr("index"),lmn(n+1)),n_go(deck,l_list(c));
+			}
 			menu_separator();
 			if(menu_item("Open...",1,'o'))modal_enter(modal_open_deck);
 			if(menu_item("Save",dirty&&strlen(document_path),'s'))save_deck(lmcstr(document_path));
