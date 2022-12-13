@@ -1057,7 +1057,7 @@ The unary aggregation primitives `sum`, `raze`, `min`, and `max` take a list and
 
 Appendix 2: Binary Primitives
 -----------------------------
-The binary arithmetic and comparison primitives `+`, `-`, `*`, `/`, `%` (modulus), `^` (exponentiation), `<`, `>`, `=`, `&` (minimum), and `|` (maximum) _conform_, and generalize to both lists and numbers.
+The binary arithmetic and comparison primitives `+`, `-`, `*`, `/`, `%` (modulus), `^` (exponentiation/power), `<`, `>`, `=`, `&` (minimum), and `|` (maximum) _conform_, and generalize to both lists and numbers.
 
 The modulus operator `%` takes its arguments in the opposite order of common notation- the divisor is the left argument. Thus, `5 % 3,4,5,6,7` is `(3,4,0,1,2)`. In common usage, this order will require fewer parentheses given Lil's right-to-left precedence rule.
 
@@ -1067,7 +1067,7 @@ The `&` and `|` operator calculate the minimum or maximum of their arguments. As
 
 `x ~ y` is the match operator. It produces the number 1 if `x` and `y` are identical values. Unlike `=`, match does _not_ convert arguments or automatically "spread" to list elements; `x` and `y` must have identical types to begin with. This is particularly important if you want to e.g. check whether an item is the empty list: `()=1,2` yields `()`, but `()~1,2` yields `0`.
 
-`x , y` is the concatenation operator. It is used for joining items together into lists. If `x` is a dictionary, `y` will be converted to a dictionary, and the operator will take the union of their key-value mappings, preferring any bindings in `y` over `x` when both are present. If applied to two tables, their rows will be concatenated, with any missing columns supplied as 0. Note that using `,` on two strings will result in a list of two strings.
+`x , y` is the concatenation operator. It is used for joining items together into lists. If `x` is a dictionary, `y` will be converted to a dictionary, and the operator will take the union of their key-value mappings, preferring any bindings in `y` over `x` when both are present. If applied to two tables, their rows will be concatenated, with any missing columns supplied as 0. Note that using `,` on two strings will result in a list of two strings, whereas `"" fuse x,y` will concatenate the strings together.
 
 `x @ y` is spread-indexing: `x` is indexed with each element of `y`. For example, `(11,22,33) @ 0,1,0,1,0` is `(11,22,11,22,11)`. With an appropriate index `y`, this operator can be used to reorder, duplicate, or filter elements of a list `x`. The expression `x @ y` is essentially equivalent to `each v k i in y (x[v k i]) end`, and so it can also be used as shorthand for any `each` loop that would otherwise simply be applying a function to each element of its source.
 
