@@ -1905,8 +1905,21 @@ void rename_sound(lv*deck,lv*sound,lv*name){
 	lv*sounds=dget(deck->b,lmistr("sounds")),*oldname=dkey(sounds,sound);
 	sounds->kv[dgeti(sounds,oldname)]=ukey(sounds,ls(name),ls(name)->sv,oldname);
 }
+lv* n_deck_copy(lv*deck,lv*z){
+	(void)deck;z=l_first(z);if(!card_is(z))return NONE;
+	str r=str_new();str_addz(&r,"%%CRD0");fjson(&r,card_write(z));return lmstr(r);
+}
+lv* deck_paste_named(lv*deck,lv*z,lv*name){
+	z=l_first(z);if(!lis(z)||!has_prefix(z->sv,"%%crd0"))return NONE;
+	int f=1,i=6,n=z->c-i;lv*payload=ld(pjson(z->sv,&i,&f,&n));
+	lv*w=dget(payload,lmistr("widgets"));if(w&&lid(w)){EACH(z,w)dset(w->lv[z],lmistr("name"),w->kv[z]);}
+	lv*r=card_read(payload,deck,NULL);dset(dget(deck->b,lmistr("cards")),name?name:ifield(r,"name"),r);
+	return r;
+}
+lv* n_deck_paste(lv*deck,lv*z){return deck_paste_named(deck,z,NULL);}
 lv* n_deck_add(lv*self,lv*z){
 	lv*sounds=ivalue(self,"sounds"),*fonts=ivalue(self,"fonts"),*modules=ivalue(self,"modules"),*cards=ivalue(self,"cards"),*t=l_first(z);
+	if(card_is(t)){return deck_paste_named(self,l_list(n_deck_copy(self,t)),z->c>1?ls(z->lv[1]):NULL);}
 	if(font_is(t)){lv*r=font_make((pair){font_w(t),font_h(t)});memcpy(r->b->sv,t->b->sv,r->b->c);return uset(fonts,unpack_str(z,1),"font",r);}
 	if(sound_is(t)){lv*b=lms(t->b->c);memcpy(b->sv,t->b->sv,b->c);return uset(sounds,unpack_name(z,1),"sound",sound_make(b));}
 	if(module_is(t)){
@@ -1954,17 +1967,6 @@ lv* n_deck_remove(lv*self,lv*z){
 		dset(data,lmistr("history"),l_list(ifield(ifield(self,"card"),"index")));
 		return ONE;
 	}return NONE;
-}
-lv* n_deck_copy(lv*deck,lv*z){
-	(void)deck;z=l_first(z);if(!card_is(z))return NONE;
-	str r=str_new();str_addz(&r,"%%CRD0");fjson(&r,card_write(z));return lmstr(r);
-}
-lv* n_deck_paste(lv*deck,lv*z){
-	z=l_first(z);if(!lis(z)||!has_prefix(z->sv,"%%crd0"))return NONE;
-	int f=1,i=6,n=z->c-i;lv*payload=ld(pjson(z->sv,&i,&f,&n));
-	lv*w=dget(payload,lmistr("widgets"));if(w&&lid(w)){EACH(z,w)dset(w->lv[z],lmistr("name"),w->kv[z]);}
-	lv*r=card_read(payload,deck,NULL);dset(dget(deck->b,lmistr("cards")),ifield(r,"name"),r);
-	return r;
 }
 lv* interface_deck(lv*self,lv*i,lv*x){
 	lv*data=self->b,*cards=ivalue(self,"cards");

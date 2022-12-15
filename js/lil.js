@@ -1900,6 +1900,7 @@ deck_add=(deck,type,y,z)=>{
 	if(ikey(type,'sound'))return uset(deck.sounds,unpack_name(z),'sound',sound_read(y?ln(y):0))
 	if(module_is(type)){const a=module_write(type);if(y)dset(a,lms('name'),lms(ls(y)));const r=module_read(a,deck);return dset(deck.modules,ifield(r,'name'),r),r}
 	if(ikey(type,'module')){const a=lmd();if(y)dset(a,lms('name'),lms(ls(y)));const r=module_read(a,deck);return dset(deck.modules,ifield(r,'name'),r),r}
+	if(card_is(type))return deck_paste(deck,deck_copy(deck,type),y?lms(ls(y)):null)
 	if(ikey(type,'card')){
 		const a=lmd();if(y)dset(a,lms('name'),lms(ls(y)))
 		if(z&&card_is(z)){if(!dkey(deck.cards,z))return NONE;dset(a,lms('parent'),ifield(z,'name'))}
@@ -1928,12 +1929,12 @@ deck_remove=(deck,t)=>{
 	}return 0
 }
 deck_copy=(deck,z)=>!card_is(z)?NONE: lms(`%%CRD0${fjson(card_write(z))}`)
-deck_paste=(deck,z)=>{
+deck_paste=(deck,z,name)=>{
 	if(!lis(z)||!ls(z).startsWith('%%CRD0'))return NONE
 	const payload=ld(pjson(ls(z),6,count(z)-6).value)
 	const w=dget(payload,lms('widgets'));
 	if(w&&lid(w)){w.v.map((v,i)=>{dset(v,lms('name'),w.k[i])})}
-	const r=card_read(payload,deck);dset(deck.cards,ifield(r,'name'),r)
+	const r=card_read(payload,deck);dset(deck.cards,name||ifield(r,'name'),r)
 	return r
 }
 deck_read=x=>{

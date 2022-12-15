@@ -624,7 +624,7 @@ The deck interface represents the global attributes of a Decker document.
 
 `deck.add[x y z]` can add new cards, sounds, and fonts to the deck:
 
-- If `x` is a sound, module, or font interface, insert an exact copy of it using `y` as a name (or an appropriate default name).
+- If `x` is a card, sound, module, or font interface, insert an exact copy of it using `y` as a name (or an appropriate default name).
 - If `x` is `"card"`, insert a new blank card at the end of the deck, using `y` as a name (or an appropriate default name). If `z` is a card, use `z` as the _parent_ of the new card.
 - If `x` is `"sound"`, insert a new sound, using an int `y` as a length (if present), and `z` as a name (or an appropriate default name).
 - If `x` is `"font"`, insert a new font, using an int pair `y` as a size (if present), and `z` as a name (or an appropriate default name).

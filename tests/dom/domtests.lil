@@ -1545,6 +1545,15 @@ assert["move widget identity" ("field1","unique","unique1") (range card.widgets)
 f2.index:99
 assert["move widget boundary" ("field1","unique1","unique") (range card.widgets)]
 
+deck:readdeck[]
+c1:deck.card
+c1.add["button" "clickme"]
+c2:deck.add[c1]
+assert["add card to deck: cardlist" ("home","card1") (range deck.cards)]
+assert["add card to deck: wids"     (list "clickme") (range c2.widgets)]
+c3:deck.add[c1 "named"]
+assert["add card to deck with name" ("home","card1","named") (range deck.cards)]
+
 #######################################
 #
 #  Inheritance
