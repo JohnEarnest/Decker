@@ -2383,7 +2383,7 @@ script_editor=_=>{
 		stat=`script of ${sc.target.n}  '${ls(ifield(sc.target,'name'))}'${sc.others.length?` and ${sc.others.length} more`:''}`
 		const t=layout_plaintext(stat,FONT_BODY,ALIGN.right,rect(frame.size.x-6-20-l.x,font_h(FONT_BODY)))
 		draw_text_wrap(rect(3+l.x+20,frame.size.y-mh+3,t.size.x,t.size.y),t,1)
-	}if(in_layer()&&ev.exit)close_script()
+	}if(in_layer()&&ev.exit)close_script(),ev.exit=0
 }
 
 // Runtime
@@ -2694,6 +2694,13 @@ all_menus=_=>{
 			}
 		}
 		if(menu_item('Properties...',ob.sel.length==1)||(ob.sel.length==1&&ev.action&&ms.type==null))object_properties(ob.sel[0])
+	}
+	if(ms.type=='listen'){
+		menu_bar('Listener',1)
+		if(menu_item('Clear History',1))li.hist=[],li.scroll=0
+		if(menu_item('Clear Locals' ,1))li.vars={}
+		menu_separator()
+		if(menu_item('Show Locals',1))listen_show(ALIGN.right,0,lmd(Object.keys(li.vars).map(lms),Object.values(li.vars)))
 	}
 }
 

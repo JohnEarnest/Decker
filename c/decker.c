@@ -3014,6 +3014,13 @@ void tick(lv*env){
 			}
 			if(menu_item("Properties...",ob.sel->c==1,'\0')||(ob.sel->c==1&&ev.action&&ms.type==modal_none))object_properties(ob.sel->lv[0]);
 		}
+		if(ms.type==modal_listen){
+			menu_bar("Listener",1);
+			if(menu_item("Clear History",1,'\0')){li.hist->c=0,li.scroll=0;}
+			if(menu_item("Clear Locals" ,1,'\0')){li.vars->c=0;}
+			menu_separator();
+			if(menu_item("Show Locals"  ,1,'\0')){listen_show(align_right,0,li.vars);}
+		}
 	}
 	widget_setup();
 	memset(frame.buffer->sv,0,frame.buffer->c);
@@ -3046,7 +3053,7 @@ void tick(lv*env){
 			else{snprintf(stat,sizeof(stat),"script of %s  '%s'",sc.target->a->sv,ifield(sc.target,"name")->sv);}
 			pair t=layout_plaintext(stat,FONT_BODY,align_right,(pair){frame.size.x-6-20-l.x,font_h(FONT_BODY)});
 			draw_text_wrap((rect){3+l.x+20,frame.size.y-mh+3,t.x,t.y},1);
-		}if(in_layer()&&ev.exit)close_script(NULL);
+		}if(in_layer()&&ev.exit)close_script(NULL),ev.exit=0;
 	}
 	else{
 		lv*card=ifield(deck,"card");

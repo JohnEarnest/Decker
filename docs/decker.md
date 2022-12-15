@@ -1,3 +1,5 @@
+title:Decker: A Multimedia Sketchpad
+
 <style>
 /* general prose */
 body{margin:1em 5em 5em 3em;}
@@ -356,7 +358,7 @@ The Listener automatically has access to a number of variables as context, depen
 - If the script editor is open for any widget, card, or the deck, the widget, card, or deck, respectively, will be `me`.
 - Otherwise, `me` will be the current card.
 
-The expressions you enter will be evaluated as if they were a suffix to the script of the target: they have access to `deck`, `card`, and any functions and variables defined in the target's script. As demonstrated in the examples above, the name `_` will be automatically bound to the value of the preceding expression, allowing you to chain together several step-by-step operations.
+The expressions you enter will be evaluated as if they were a suffix to the script of the target: they have access to `deck`, `card`, and any functions and variables defined in the target's script. As demonstrated in the examples above, the name `_` will be automatically bound to the value of the preceding expression, allowing you to chain together several step-by-step operations. You can view the contents of `_` as well as any local variables you've bound in the current Listener session by using the _Listener &#8594; Show Locals_ menu item.
 
 If you are using the widget tool, the variable `selected` will contain a list of widget interfaces that are currently selected, allowing you to use code to manipulate parts of the deck programmatically. Consider, for example, re-titling the buttons in a selection with ascending numerals:
 
