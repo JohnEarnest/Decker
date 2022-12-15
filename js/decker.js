@@ -1455,7 +1455,7 @@ modals=_=>{
 			const savedeck=_=>{
 				let d=deck_write(deck)
 				if(/\.html$/i.test(name)){q('script[language="decker"]').innerHTML='\n'+d,d=q('body').innerHTML}
-				dirty=0,save_text(name,d)
+				dirty=0,save_text(name,`<body>${d}</body>`)
 			}
 			const save_image=_=>{
 				if(bg_has_sel()){const s=rcopy(dr.sel_here);bg_end_selection(),dr.sel_here=s}
