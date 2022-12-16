@@ -2210,10 +2210,10 @@ object_editor=_=>{
 	})
 	if(has_parent(card)||!in_layer())return
 	if(ob.sel.length>0){
-		if(ev.dir=='left' )ob_move(rect(-1, 0),1)
-		if(ev.dir=='right')ob_move(rect( 1, 0),1)
-		if(ev.dir=='up'   )ob_move(rect( 0,-1),1)
-		if(ev.dir=='down' )ob_move(rect( 0, 1),1)
+		if(ev.dir=='left' )ob_move(rect(-1*(ev.shift?dr.grid_size.x:1), 0),1)
+		if(ev.dir=='right')ob_move(rect( 1*(ev.shift?dr.grid_size.x:1), 0),1)
+		if(ev.dir=='up'   )ob_move(rect( 0,-1*(ev.shift?dr.grid_size.y:1)),1)
+		if(ev.dir=='down' )ob_move(rect( 0, 1*(ev.shift?dr.grid_size.y:1)),1)
 	}
 	const ish=ob.sel.length==1?in_handle(unpack_widget(ob.sel[0]).size):-1
 	const isw=wids.v.some(w=>over(unpack_widget(w).size)&&ob.sel.some(x=>x==w))

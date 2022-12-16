@@ -3116,10 +3116,10 @@ void tick(lv*env){
 			}
 			if(!has_parent(card)&&in_layer()){
 				if(ob.sel->c>0){
-					if(ev.dir==dir_left )ob_move((pair){-1, 0},1);
-					if(ev.dir==dir_right)ob_move((pair){ 1, 0},1);
-					if(ev.dir==dir_up   )ob_move((pair){ 0,-1},1);
-					if(ev.dir==dir_down )ob_move((pair){ 0, 1},1);
+					if(ev.dir==dir_left )ob_move((pair){-1*(ev.shift?dr.grid_size.x:1), 0},1);
+					if(ev.dir==dir_right)ob_move((pair){ 1*(ev.shift?dr.grid_size.x:1), 0},1);
+					if(ev.dir==dir_up   )ob_move((pair){ 0,-1*(ev.shift?dr.grid_size.y:1)},1);
+					if(ev.dir==dir_down )ob_move((pair){ 0, 1*(ev.shift?dr.grid_size.y:1)},1);
 				}
 				int ish=ob.sel->c==1?in_handle(unpack_widget(ob.sel->lv[0]).size):-1;
 				int isw=0;EACH(w,wids){rect wid=unpack_widget(wids->lv[w]).size;EACH(z,ob.sel)if(ob.sel->lv[z]==wids->lv[w]&&over(wid))isw=1;}
