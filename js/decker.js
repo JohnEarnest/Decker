@@ -1699,7 +1699,7 @@ modals=_=>{
 		if(ui_radio(rint(rect(eb.x,eb.y,b.w/2,16)),'Edit as JSON',1,ms.edit_json==1)){ms.form0=fieldstr(lms(fjson(monad.cols(val)))),ms.edit_json=1}eb.y+=16
 		if(ui_radio(rint(rect(eb.x,eb.y,b.w/2,16)),'Edit as CSV' ,1,ms.edit_json==0))ms.form0=fieldstr(n_writecsv(count(format)?[val,format]:[val])),ms.edit_json=0
 		const c=rect(b.x,b.y+b.h-20), w=ll(ifield(grid,'widths'))
-		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(grid),modal_exit(0);c.x+=65
+		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))modal_exit(0),setscript(grid);c.x+=65
 		if(ui_button(rect(c.x,c.y,90,20),'Reset Widths',w.length))iwrite(grid,lms('widths'),lml([])),mark_dirty()
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}

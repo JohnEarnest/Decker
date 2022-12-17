@@ -1685,7 +1685,7 @@ void modals(){
 			ms.form0=(field_val){rtext_cast(n_writecsv(NULL,format->c?lml2(eval,format):l_list(eval))),0};ms.edit_json=0;
 		}
 		pair c={b.x,b.y+b.h-20};
-		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))setscript(grid),modal_exit(0);c.x+=65;
+		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))modal_exit(0),setscript(grid);c.x+=65;
 		lv*w=ifield(grid,"widths");
 		if(ui_button((rect){c.x,c.y,90,20},"Reset Widths",w->c))iwrite(grid,lmistr("widths"),lml(0)),mark_dirty();
 		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
