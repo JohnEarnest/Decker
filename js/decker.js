@@ -417,7 +417,7 @@ script_save=x=>{const k=lms('script');mark_dirty();if(sc.target)iwrite(sc.target
 draw_state=_=>({ // drawing tools state
 	tool:'pencil',brush:3,pattern:1,fill:0,erasing:0, dither_threshold:0,
 	show_widgets:1,show_anim:1,trans:0,trans_mask:0,fatbits:0,offset:rect(),
-	show_grid:0,grid_size:rect(32,32), sel_here:rect(),sel_start:rect(),limbo:null,limbo_dither:0,
+	show_grid:0,snap:0,grid_size:rect(32,32), sel_here:rect(),sel_start:rect(),limbo:null,limbo_dither:0,
 	scratch:null,mask:null,omask:null, pickfill:0, poly:[]
 })
 let dr=draw_state()
@@ -426,6 +426,10 @@ bg_pat=_=>(dr.trans_mask&&dr.pattern==0)?32:dr.pattern
 bg_fill=_=>(dr.trans_mask&&dr.fill==0)?32:dr.fill
 bg_has_sel=_=>dr.tool=='select'&&(dr.sel_here.w>0||dr.sel_here.h>0)
 bg_has_lasso=_=>dr.tool=='lasso'&&dr.mask!=null
+sint=(x,a)=>a*(0|((0|(x+a/2))/a))
+snap=p=>!dr.snap?p:rect(sint(p.x,dr.grid_size.x),sint(p.y,dr.grid_size.y),p.w,p.h) // position only
+snapr=r=>rpair(snap(r),snap(rect(r.w,r.h))) // position + dimensions
+snap_delta=p=>{const a=snap(p);return rect(a.x-p.x,a.y-p.y)}
 fat_offset=p=>{const d=rect(frame.size.x/FAT,frame.size.y/FAT);dr.offset=rint(rect(p.x-d.x/2,p.y-d.y/2))}
 fat_clip=_=>dr.fatbits?rint(rect(dr.offset.x,dr.offset.y,frame.size.x/FAT,frame.size.y/FAT)): frame.clip
 fat_to_card=a=>rint(rect((a.x/FAT)+dr.offset.x,(a.y/FAT)+dr.offset.y))
@@ -1938,23 +1942,23 @@ bg_tools=_=>{
 				draw_line(rpair(pointer.prev,ev.pos),dr.brush,dr.erasing?0:bg_pat())
 			}
 			else if(dr.tool=='line'){
-				let t=rcopy(ev.pos);if(ev.shift){ // snap to isometric angles
-					const d=rsub(t,ev.dpos);t=rcopy(ev.dpos)
+				let b=rcopy(snap(ev.dpos)),t=rcopy(snap(ev.pos));if(ev.shift){ // snap to isometric angles
+					const d=rsub(t,b);t=b
 					if     (Math.abs(d.x)*4<Math.abs(d.y)){t.y+=d.y;}
 					else if(Math.abs(d.y)*4<Math.abs(d.x)){t.x+=d.x;}
 					else if(Math.abs(d.x)*2<Math.abs(d.y)){t.x+=sign(d.x)*Math.abs(d.y)/2,t.y+=d.y}
 					else if(Math.abs(d.y)*2<Math.abs(d.x)){t.y+=sign(d.y)*Math.abs(d.x)/2,t.x+=d.x}
 					else {t.x+=sign(d.x)*Math.abs(max(d.x,d.y)),t.y+=sign(d.y)*Math.abs(max(d.x,d.y))}
-				}bg_scratch_clear(),draw_line(rpair(ev.dpos,rint(t)),dr.brush,bg_pat())
+				}bg_scratch_clear(),draw_line(rpair(rint(b),rint(t)),dr.brush,bg_pat())
 			}
 			else if(dr.tool=='rect'||dr.tool=='fillrect'){
-				const t=rsub(ev.pos,ev.dpos);if(ev.shift){t.x=t.y=max(t.x,t.y)} // snap to square
-				bg_scratch_clear();const r=rnorm(rpair(ev.dpos,t))
+				const b=snap(ev.dpos),a=snap(ev.pos),t=rsub(a,b);if(ev.shift){t.x=t.y=max(t.x,t.y)} // snap to square
+				bg_scratch_clear();const r=rnorm(rpair(b,t));r.w++,r.h++
 				if(dr.tool=='fillrect')draw_rect(r,bg_fill());draw_box(r,dr.brush,bg_pat())
 			}
 			else if(dr.tool=='ellipse'||dr.tool=='fillellipse'){
-				const t=rsub(ev.pos,ev.dpos);if(ev.shift){t.x=t.y=max(t.x,t.y)} // snap to circle
-				bg_scratch_clear();const r=rnorm(rpair(ev.dpos,t))
+				const b=snap(ev.dpos),a=snap(ev.pos),t=rsub(a,b);if(ev.shift){t.x=t.y=max(t.x,t.y)} // snap to circle
+				bg_scratch_clear();const r=rnorm(rpair(radd(b,rect(1,1)),t));r.w--,r.h--
 				const c=rect(r.x+(r.w/2.0),r.y+(r.h/2.0)), divs=100, poly=range(divs).map(z=>{
 					const a=z*(2*Math.PI)/divs;return rint(rect(c.x+(0.5+r.w/2.0)*Math.cos(a),c.y+(0.5+r.h/2.0)*Math.sin(a)))
 				});poly.push(poly[0])
@@ -2010,10 +2014,10 @@ bg_tools=_=>{
 	}
 	if(!bg_has_sel()&&!bg_has_lasso()){
 		if(dr.fatbits){
-			if(ev.dir=='left' )dr.offset.x--
-			if(ev.dir=='right')dr.offset.x++
-			if(ev.dir=='up'   )dr.offset.y--
-			if(ev.dir=='down' )dr.offset.y++
+			if(ev.dir=='left' )dr.offset.x-=ev.shift?dr.grid_size.x:1
+			if(ev.dir=='right')dr.offset.x+=ev.shift?dr.grid_size.x:1
+			if(ev.dir=='up'   )dr.offset.y-=ev.shift?dr.grid_size.y:1
+			if(ev.dir=='down' )dr.offset.y+=ev.shift?dr.grid_size.y:1
 			dr.offset=rint(rect(max(0,min(dr.offset.x,frame.size.x-(frame.size.x/8))),max(0,min(dr.offset.y,frame.size.y-(frame.size.y/8)))))
 			if(ev.exit)dr.fatbits=0
 		}
@@ -2086,7 +2090,7 @@ bg_select=_=>{
 	const sz=dr.limbo?dr.limbo.size:rect(dr.sel_start.w,dr.sel_start.h)
 	handle=(rw,rh,ox,oy,ow,oh)=>{if(has_sel&&(ev.mu||ev.drag)&&dover(rect(rw,rh,h,h))){
 		s=rnorm(keep_ratio(rect(s.x+ox,s.y+oy,s.w+ow,s.h+oh),sz))
-		if(ev.mu)dr.sel_here=s;bg_scoop_selection(),uicursor=cursor.drag;return 1
+		if(ev.mu)dr.sel_here=snapr(s);bg_scoop_selection(),uicursor=cursor.drag;return 1
 	};return 0}
 	if(in_layer()){
 		if     (handle(x2,y2,  0, 0, dx, dy)){} // se
@@ -2098,16 +2102,18 @@ bg_select=_=>{
 		else if(handle(x0,y1, dx, 0,-dx,  0)){} // w
 		else if(handle(x1,y2,  0, 0,  0, dy)){} // s
 		else if(ev.md&&in_sel){bg_scoop_selection()} // begin move
-		else if((ev.mu||ev.drag)&&in_sel){s.x+=dx, s.y+=dy;if(ev.mu)dr.sel_here=s} // move/finish
+		else if((ev.mu||ev.drag)&&in_sel){s.x+=dx, s.y+=dy;if(ev.mu)dr.sel_here=snap(s)} // move/finish
 		else if(ev.md&&!in_sel){if(has_sel){draw_limbo(card_to_fat(s),dr.fatbits),bg_end_selection(),has_sel=0}s=rcopy(dr.sel_here)} // begin create
-		else if(ev.mu||ev.drag){s=rect(ax,ay,bx-ax,by-ay);if(ev.mu)dr.sel_here=s} // size/finish
+		else if(ev.mu||ev.drag){s=snapr(rect(ax,ay,bx-ax,by-ay));if(ev.mu)dr.sel_here=s} // size/finish
 	}
 	if(has_sel)draw_limbo(s,dr.fatbits)
 	if(in_layer()){
-		if(has_sel&&ev.dir=='left' ){ev.dir=0,bg_scoop_selection(),dr.sel_here.x--}
-		if(has_sel&&ev.dir=='up'   ){ev.dir=0,bg_scoop_selection(),dr.sel_here.y--}
-		if(has_sel&&ev.dir=='right'){ev.dir=0,bg_scoop_selection(),dr.sel_here.x++}
-		if(has_sel&&ev.dir=='down' ){ev.dir=0,bg_scoop_selection(),dr.sel_here.y++}
+		let nudge=0
+		if(has_sel&&ev.dir=='left' ){ev.dir=0,bg_scoop_selection(),dr.sel_here.x-=ev.shift?dr.grid_size.x:1,nudge=1}
+		if(has_sel&&ev.dir=='up'   ){ev.dir=0,bg_scoop_selection(),dr.sel_here.y-=ev.shift?dr.grid_size.y:1,nudge=1}
+		if(has_sel&&ev.dir=='right'){ev.dir=0,bg_scoop_selection(),dr.sel_here.x+=ev.shift?dr.grid_size.x:1,nudge=1}
+		if(has_sel&&ev.dir=='down' ){ev.dir=0,bg_scoop_selection(),dr.sel_here.y+=ev.shift?dr.grid_size.y:1,nudge=1}
+		if(nudge&&ev.shift)dr.sel_here=snap(dr.sel_here)
 		if(ev.exit){dr.limbo=null,dr.limbo_dither=0,bg_end_selection()}
 	}
 	ev=te;return card_to_fat(s)
@@ -2210,10 +2216,12 @@ object_editor=_=>{
 	})
 	if(has_parent(card)||!in_layer())return
 	if(ob.sel.length>0){
-		if(ev.dir=='left' )ob_move(rect(-1*(ev.shift?dr.grid_size.x:1), 0),1)
-		if(ev.dir=='right')ob_move(rect( 1*(ev.shift?dr.grid_size.x:1), 0),1)
-		if(ev.dir=='up'   )ob_move(rect( 0,-1*(ev.shift?dr.grid_size.y:1)),1)
-		if(ev.dir=='down' )ob_move(rect( 0, 1*(ev.shift?dr.grid_size.y:1)),1)
+		let nudge=0
+		if(ev.dir=='left' )ob_move(rect(-1*(ev.shift?dr.grid_size.x:1), 0),1),nudge=1
+		if(ev.dir=='right')ob_move(rect( 1*(ev.shift?dr.grid_size.x:1), 0),1),nudge=1
+		if(ev.dir=='up'   )ob_move(rect( 0,-1*(ev.shift?dr.grid_size.y:1)),1),nudge=1
+		if(ev.dir=='down' )ob_move(rect( 0, 1*(ev.shift?dr.grid_size.y:1)),1),nudge=1
+		if(nudge&&ev.shift&&ob.sel.length==1)ob_move(snap_delta(getpair(ifield(ob.sel[0],'pos'))),1)
 	}
 	const ish=ob.sel.length==1?in_handle(unpack_widget(ob.sel[0]).size):-1
 	const isw=wids.v.some(w=>over(unpack_widget(w).size)&&ob.sel.some(x=>x==w))
@@ -2234,9 +2242,12 @@ object_editor=_=>{
 	else if(ish!=-1&&ev.md){ob.resize=1,ob.resize_first=1,ob.handle=ish,ob.prev=rcopy(ev.pos),ob.orig=unpack_widget(ob.sel[0]).size}
 	else if(isw    &&ev.md){ob.move  =1,ob.move_first  =1,ob.prev=rcopy(ev.pos)}
 	else if(ob.resize&&(!ev.drag||!ob.sel.length)){ob.resize=0,ob.resize_first=0}
-	else if(ob.move&&(!ev.drag||!ob.sel.length)){ob.move=0,ob.move_first=0}
+	else if(ob.move&&(!ev.drag||!ob.sel.length)){
+		if(ob.sel.length==1)ob_move(snap_delta(getpair(ifield(ob.sel[0],'pos'))),!ob.move_first)
+		ob.move=0,ob.move_first=0
+	}
 	else if(ob.resize){
-		const delta=rsub(ev.pos,ev.dpos), r=rcopy(ob.orig)
+		let delta=rsub(ev.pos,ev.dpos), r=rcopy(ob.orig)
 		if(ob.handle==0){r.w+=delta.x, r.h+=delta.y}
 		if(ob.handle==2){r.w+=delta.x, r.h-=delta.y, r.y+=delta.y}
 		if(ob.handle==6){r.w-=delta.x, r.h+=delta.y, r.x+=delta.x}
@@ -2245,7 +2256,7 @@ object_editor=_=>{
 		if(ob.handle==3){r.h-=delta.y, r.y+=delta.y}
 		if(ob.handle==5){r.w-=delta.x, r.x+=delta.x}
 		if(ob.handle==7){r.h+=delta.y}
-		r.w=max(8,r.w), r.h=max(8,r.h)
+		r=snapr(r), r.w=max(8,r.w), r.h=max(8,r.h)
 		if(dragged)ob_resize(r,!ob.resize_first),ob.resize_first=0,ob.prev=rcopy(ev.pos)
 	}
 	else if(ob.move){
@@ -2652,6 +2663,7 @@ all_menus=_=>{
 		if(menu_check('Show Cursor Info'  ,1,ob.show_cursor ))ob.show_cursor ^=1
 		menu_separator()
 		if(menu_check('Show Grid Overlay',1,dr.show_grid))dr.show_grid^=1
+		if(menu_check('Snap to Grid'     ,1,dr.snap     ))dr.snap     ^=1
 		if(menu_item('Grid Size...',1))modal_enter('grid')
 		menu_separator()
 		if(menu_check('Show Animation'   ,1,dr.show_anim ))dr.show_anim ^=1
@@ -2715,8 +2727,8 @@ main_view=_=>{
 	bg_lasso_preview()
 	const livesel=bg_select()
 	if(((uimode=='object'||uimode=='draw')&&dr.show_grid)||ms.type=='grid'){
-		for(let x=0;x<frame.size.x;x++){const r=card_to_fat(rect(x*dr.grid_size.x,0,1,frame.size.y));draw_vline(r.x,r.y,r.y+r.h,13)}
-		for(let y=0;y<frame.size.y;y++){const r=card_to_fat(rect(0,y*dr.grid_size.y,frame.size.x,1));draw_hline(r.x,r.x+r.w,r.y,13)}
+		for(let x=0;x<frame.size.x;x++){const r=card_to_fat(rect(x*dr.grid_size.x,0,1,frame.size.y));draw_vline(r.x,r.y,r.y+r.h,44)}
+		for(let y=0;y<frame.size.y;y++){const r=card_to_fat(rect(0,y*dr.grid_size.y,frame.size.x,1));draw_hline(r.x,r.x+r.w,r.y,44)}
 	}
 	const eb=ev;if(uimode!='interact')ev=event_state()
 	if(uimode=='interact'||(dr.show_widgets&&!dr.fatbits))wids.v.map(w=>{

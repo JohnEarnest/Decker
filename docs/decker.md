@@ -64,13 +64,13 @@ If you're exploring an existing deck, you will usually want to have the _Interac
 
 With the _Interact_ tool chosen, pressing the left and right cursor keys will cycle between cards in the deck, as shortcuts for using _Card &#8594; Go To Previous_ and _Card &#8594; Go To Next_. Pressing tab or shift-tab will cycle forward or backward, respectively, between widgets on the current card. Pressing space or return with a button highlighted will have the same effect as clicking it. Fields and grids will offer additional menu options if they are selected.
 
-With the _Widgets_ tool chosen, you can reposition and resize widgets, and create new widgets or modify their properties via options in the _Widgets_ menu. Click a widget to select it, or drag out a rectangle to select multiple widgets. Holding shift while clicking widgets will toggle their selection. Dragging selected widgets or will reposition them. You can also use the cursor keys to move selected widgets a single pixel at a time. With a single widget selected, you can adjust its size with drag handles.
+With the _Widgets_ tool chosen, you can reposition and resize widgets, and create new widgets or modify their properties via options in the _Widgets_ menu. Click a widget to select it, or drag out a rectangle to select multiple widgets. Holding shift while clicking widgets will toggle their selection. Dragging selected widgets or will reposition them. You can also use the cursor keys to move selected widgets a single pixel at a time, or, in combination with shift, in grid steps. With a single widget selected, you can adjust its size with drag handles.
 
 ![](images/position.gif)
 
 All of other tools relate to drawing on the card:
 
-- _Select_: make rectangular selections to copy and paste images. Like the widgets tool, you can use the cursor keys to move a selection a single pixel at a time. Hold shift while resizing selections to retain their original aspect ratio.
+- _Select_: make rectangular selections to copy and paste images. Like the widgets tool, you can use the cursor keys to move a selection a single pixel at a time, or, in combination with shift, in grid steps. Hold shift while resizing selections to retain their original aspect ratio.
 - _Lasso_: draw an arbitrarily-shaped selection to copy, paste, and reposition images. Like the widgets tool, you can use the cursor keys to move a selection a pixel at a time.
 - _Pencil_: draw freehand, using the selected brush shape and pattern. (See _Style &#8594; Stroke..._ and _Style &#8594; Brush..._).
 - _Line_: draw a straight line using the selected brush shape and pattern. Holding shift will snap to 45 degree angles.
@@ -90,6 +90,7 @@ The _View_ menu will be available when the _Widgets_ or drawing tools are chosen
 - _Show Widget Names_: Toggle displaying the `name` property of each widget above it while editing.
 - _Show Cursor Info_: Toggle displaying live numerical overlay of mouse position, offset, and selection bounds while editing.
 - _Show Grid Overlay_: Toggle displaying a configurable "graph paper" overlay while editing.
+- _Snap to Grid_: Toggle making a number of tools discretize to the grid. This impacts the Select, Line, Box, Filled Box, Oval, and Filled Oval tools, as well as moving and resizing one widget at a time with the _Widgets_ tool.
 - _Grid Size..._: Change the width and height of the "cells" in the _Grid Overlay_.
 - _Show Animation_: Toggle animating the special patterns 28-31.
 - _Transparency Mask_: Toggle displaying pattern 0 in a distinct color, revealing transparent elements. While the transparency mask is shown, using drawing tools with the first pattern will use pattern index 32 (opaque white) instead of the "true" pattern 0 (transparent white). Erasing with the pencil tool and deleting selections will still result in transparency.
