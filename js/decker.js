@@ -1567,8 +1567,8 @@ modals=_=>{
 		draw_text(rect(b.x,b.y+42,42,20),'Height',FONT_MENU,1)
 		ui_field(rect(b.x+42,b.y+20,b.w-42,18),ms.name)
 		ui_field(rect(b.x+42,b.y+40,b.w-42,18),ms.text)
-		dr.grid_size.x=ln(rtext_string(ms.name.table)),dr.grid_size.x=max(1,dr.grid_size.x)
-		dr.grid_size.y=ln(rtext_string(ms.text.table)),dr.grid_size.y=max(1,dr.grid_size.y)
+		dr.grid_size.x=ln(rtext_string(ms.name.table)),dr.grid_size.x=0|max(1,dr.grid_size.x)
+		dr.grid_size.y=ln(rtext_string(ms.text.table)),dr.grid_size.y=0|max(1,dr.grid_size.y)
 		const c=rect(b.x,b.y+b.h-20)
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
