@@ -837,7 +837,7 @@ reorder=(dict,a,b)=>{
 }
 anchors={top_left:0,top_center:1,top_right:2,center_left:3,center:4,center_right:5,bottom_left:6,bottom_center:7,bottom_right:8}
 anchor=(r,a)=>{
-	if(a==undefined)return r;a=anchors[ls(a)]||0
+	if(a==undefined)return rint(r);a=anchors[ls(a)]||0
 	if(a==1||a==4||a==7)r.x-=r.w/2; if(a==2||a==5||a==8)r.x-=r.w
 	if(a==3||a==4||a==5)r.y-=r.h/2; if(a==6||a==7||a==8)r.y-=r.h
 	return rint(r)
@@ -1650,9 +1650,9 @@ canvas_read=(x,card)=>{
 	const text=(t,pos,a)=>{
 		const font=ifield(frame,'font')
 		if(pos&&lil(pos)&&count(pos)>=4){
-			a=anchors[ls(a)]||0;const r=getrect(ll(pos).map(ln)), align=(a==0||a==3||a==6)?ALIGN.left:(a==2||a==5||a==8)?ALIGN.right:ALIGN.center
+			a=anchors[ls(a)]||0;const r=rint(getrect(ll(pos).map(ln))), align=(a==0||a==3||a==6)?ALIGN.left:(a==2||a==5||a==8)?ALIGN.right:ALIGN.center
 			const valign=s=>rect(align==ALIGN.left?0:align==ALIGN.right?r.w-s.x:0|((r.w-s.x)/2), y=(a==0||a==1||a==2)?0:(a==6||a==7||a==8)?r.h-s.y:0|((r.h-s.y)/2))
-			const rbox=s=>{const a=valign(s);return rclip(rect(r.x+a.x,r.y+a.y,s.x,s.y),frame.clip)}
+			const rbox=s=>{const a=valign(s);return rclip(rint(rect(r.x+a.x,r.y+a.y,s.x,s.y)),frame.clip)}
 			if(lit(t)){const l=layout_richtext(frame.card.deck,t,font,align,r.w);draw_text_rich(rbox(l.size),l,frame.pattern,0)}
 			else      {const l=layout_plaintext(ls(t),font,align,rect(r.w,r.h)) ;draw_text_wrap(rbox(l.size),l,frame.pattern  )}
 		}else{
