@@ -1745,8 +1745,8 @@ interface_widget=(self,i,x)=>{
 		if(ikey(i,'font'  ))return self.font=normalize_font(self.card.deck.fonts,x),x
 		if(ikey(i,'script'))return self.script=ls(x),x
 		if(ikey(i,'locked'))return self.locked=lb(x),x
-		if(ikey(i,'size'  ))return self.size=rclamp(rect(),getpair(x),rect(4096,4096)),x
-		if(ikey(i,'pos'   ))return self.pos=getpair(x),x
+		if(ikey(i,'size'  ))return self.size=rint(rclamp(rect(),getpair(x),rect(4096,4096))),x
+		if(ikey(i,'pos'   ))return self.pos=rint(getpair(x)),x
 		if(ikey(i,'show'  ))return self.show=normalize_enum(widget_shows,ls(x)),x
 	}else{
 		if(ikey(i,'name'  ))return lms(self.name)

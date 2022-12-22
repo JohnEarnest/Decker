@@ -565,6 +565,10 @@ dattr.value:1               b.value:"anything"
 dattr.style:"round"         b.style:0
 assert["button attribute sanitizing" dattr buttonattrs[b]]
 
+b.pos:13.5,7.9
+b.size:13.7,15.9999
+assert["widget size and position are integers" (13,7,13,15) b.pos,b.size]
+
 deck:readdeck[]
 card:deck.card
 b:card.add["button"]
