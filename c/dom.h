@@ -651,11 +651,11 @@ char BRUSHES[]={
 
 void draw_pix(int x,int y,int pattern){if(inclip(x,y))PIX(x,y)=pattern;}
 void draw_hline(int x0,int x1,int y,int pattern){
-	if(y<frame.clip.y||y>frame.clip.y+frame.clip.h)return;
+	if(y<frame.clip.y||y>=frame.clip.y+frame.clip.h)return;
 	x0=MAX(frame.clip.x,x0),x1=MIN(frame.clip.x+frame.clip.w,x1);for(int z=x0;z<x1;z++)PIX(z,y)=pattern;
 }
 void draw_vline(int x,int y0,int y1,int pattern){
-	if(x<frame.clip.x||x>frame.clip.x+frame.clip.w)return;
+	if(x<frame.clip.x||x>=frame.clip.x+frame.clip.w)return;
 	y0=MAX(frame.clip.y,y0),y1=MIN(frame.clip.y+frame.clip.h,y1);for(int z=y0;z<y1;z++)PIX(x,z)=pattern;
 }
 void draw_rect(rect r,int pattern   ){r=box_intersect(r,frame.clip);for(int a=r.y;a<r.y+r.h;a++)for(int b=r.x;b<r.x+r.w;b++)PIX(b,a)=pattern;}

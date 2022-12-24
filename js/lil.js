@@ -873,11 +873,11 @@ pix=(p,v)=>frame.image.pix[p.x+p.y*frame.image.size.x]=v
 pal_pat=(pal,p,x,y)=>pal[(x%8)+(8*(y%8))+(8*8*p)]
 draw_pattern=(pal,pix,pos)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,pos.x,pos.y)&1
 draw_hline=(x0,x1,y,pattern)=>{
-	if(y<frame.clip.y||y>frame.clip.y+frame.clip.h)return
+	if(y<frame.clip.y||y>=frame.clip.y+frame.clip.h)return
 	x0=max(frame.clip.x,x0),x1=min(frame.clip.x+frame.clip.w,x1);for(let z=x0;z<x1;z++)pix(rect(z,y),pattern)
 }
 draw_vline=(x,y0,y1,pattern)=>{
-	if(x<frame.clip.x||x>frame.clip.x+frame.clip.w)return
+	if(x<frame.clip.x||x>=frame.clip.x+frame.clip.w)return
 	y0=max(frame.clip.y,y0),y1=min(frame.clip.y+frame.clip.h,y1);for(let z=y0;z<y1;z++)pix(rect(x,z),pattern)
 }
 draw_rect=(r,pattern)=>{r=rclip(r,frame.clip);for(let a=r.y;a<r.y+r.h;a++)for(let b=r.x;b<r.x+r.w;b++)pix(rect(b,a),pattern)}
