@@ -810,10 +810,10 @@ widget_field=(target,x,value)=>{
 	if(sel&&in_layer()&&!over(b)&&ev.md)sel=0,wid.active=-1,field_exit()
 	if(sel){if(wid.gv)grid_exit();wid.infield=1,wid.f=x,wid.fv=value,wid.ft=target}
 	// render
-	bi=rclip(frame.clip,bi); const oc=frame.clip;frame.clip=bi
+	const bc=rclip(frame.clip,bi); const oc=frame.clip;frame.clip=bc
 	for(let z=0;z<layout.layout.length;z++){
 		const g=layout.layout[z], pos=rcopy(g.pos);if(pos.w<1)continue // skip squashed spaces/newlines
-		pos.y-=value.scroll;if(pos.y+pos.h<0||pos.y>bi.h)continue; pos.x+=bi.x, pos.y+=bi.y // coarse clip
+		pos.y-=value.scroll;if(pos.y+pos.h<0||pos.y>bc.h)continue; pos.x+=bi.x, pos.y+=bi.y // coarse clip
 		if(lis(g.arg)&&count(g.arg)){
 			draw_hline(pos.x,pos.x+pos.w,pos.y+pos.h-1,alink==g.arg?fcol:19)
 			const a=x.locked&&in_layer()&&over(pos)&&target;if(a&&!ev.drag)uicursor=cursor.point

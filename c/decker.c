@@ -614,10 +614,10 @@ void widget_field(lv*target,field x,field_val*value){
 	if(sel&&in_layer()&&!over(b)&&ev.md){sel=0;wid.active=-1;field_exit();}
 	if(sel){if(wid.gv)grid_exit();wid.infield=1,wid.f=x,wid.fv=value,wid.ft=target;}
 	// render
-	bi=box_intersect(frame.clip,bi); rect oc=frame.clip;frame.clip=bi; char*pal=patterns_pal(ifield(deck,"patterns"));
+	rect bc=box_intersect(frame.clip,bi); rect oc=frame.clip;frame.clip=bc; char*pal=patterns_pal(ifield(deck,"patterns"));
 	for(int z=0;z<layout_count;z++){
 		glyph_box g=layout[z] ;if(g.pos.w<1)continue; // skip squashed spaces/newlines
-		g.pos.y-=value->scroll;if(g.pos.y+g.pos.h<0||g.pos.y>bi.h)continue; g.pos.x+=bi.x, g.pos.y+=bi.y; // coarse clip
+		g.pos.y-=value->scroll;if(g.pos.y+g.pos.h<0||g.pos.y>bc.h)continue; g.pos.x+=bi.x, g.pos.y+=bi.y; // coarse clip
 		if(lis(g.arg)&&g.arg->c){
 			draw_hline(g.pos.x,g.pos.x+g.pos.w,g.pos.y+g.pos.h-1,alink==g.arg?fcol:19);
 			int a=x.locked&&in_layer()&&over(g.pos)&&target;if(a&&!ev.drag)uicursor=cursor_point;
