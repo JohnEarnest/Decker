@@ -1458,8 +1458,8 @@ modals=_=>{
 			const name=ls(rtext_string(ms.text.table))
 			const savedeck=_=>{
 				let d=deck_write(deck)
-				if(/\.html$/i.test(name)){q('script[language="decker"]').innerHTML='\n'+d,d=q('body').innerHTML}
-				dirty=0,save_text(name,`<body>${d}</body>`)
+				if(/\.html$/i.test(name)){q('script[language="decker"]').innerHTML='\n'+d,d=`<body>${q('body').innerHTML}</body>`}
+				dirty=0,save_text(name,d)
 			}
 			const save_image=_=>{
 				if(bg_has_sel()){const s=rcopy(dr.sel_here);bg_end_selection(),dr.sel_here=s}
