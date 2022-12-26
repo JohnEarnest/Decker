@@ -2447,6 +2447,17 @@ all_menus=_=>{
 	if(menu_item('About...',1))modal_enter('about')
 	if(menu_check('Listener',canlisten,ms.type=='listen','l')){if(ms.type!='listen'){modal_enter('listen')}else{modal_exit(0)}}
 	menu_separator()
+	const fullscreen=_=>(document.fullscreenElement||document.webkitFullscreenElement)!=null
+	const enter=_=>{
+		const e=q('body'), o={navigationUI:'hide'}
+		if(e.requestFullscreen)e.requestFullscreen(o)
+		if(e.webkitRequestFullscreen)e.webkitRequestFullscreen(o)
+	}
+	const exit=_=>{
+		if(document.exitFullscreen)document.exitFullscreen()
+		if(document.webkitExitFullscreen)document.webkitExitFullscreen()
+	}
+	menu_check('Fullscreen',1,fullscreen(),null,_=>{if(fullscreen()){exit()}else{enter()}setTimeout(resize,500)})
 	if(menu_check('Nav Gestures',1,enable_gestures))enable_gestures^=1
 	if(menu_check('Script Profiler',1,profiler))profiler^=1
 	if(menu_check('Toolbars',tzoom>0,toolbars_enable))toolbars_enable^=1,resize()

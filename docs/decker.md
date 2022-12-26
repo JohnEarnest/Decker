@@ -137,7 +137,7 @@ Web-Decker has generally the same tools and functionality as Native-Decker, but 
 - Importing, reading, dragging and dropping, or pasting images and sounds supports _any_ graphics or audio formats understood by the web browser, which may include several formats Native-Decker does not understand.
 - Opening or importing files uses the browser's native "Open" dialog instead of Decker's UI.
 - Saving or exporting files _cannot_ display a file browser to choose a destination, so Web-Decker provides a simplified dialog which only prompts for a filename. For similar reasons there is no "Autosave" functionality.
-- Web-Decker always fills the browser window, so there is no "Fullscreen" toggle. The toolbars are hidden by default, but can be toggled on (if space is available) from the _Decker_ menu.
+- Web-Decker always fills the browser window. The toolbars are hidden by default, but can be toggled on (if space is available) from the _Decker_ menu.
 - Web-Decker will always report `sys.platform` as `"web"`, irrespective of the operating system the browser is running on.
 - The Web-Decker implementation of Lil uses the browser's garbage collector, so less information is available in `sys.workspace`.
 - Most web browsers do not allow programs to play audio until the user has interacted with a page, so any `play[]` commands issued before a user has clicked, tapped, or pressed a keyboard key will have no effect.
