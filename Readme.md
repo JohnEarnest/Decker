@@ -45,6 +45,20 @@ brew install multimarkdown
 make docs
 ```
 
+As a fun bonus, you can also build Lilt against [Cosmopolitan Libc](https://github.com/jart/cosmopolitan), producing a single binary that will run on most popular operating systems:
+```
+$ ./apelilt.sh
+successfully compiled lilt.com
+running tests against ./lilt.com...
+all interpreter tests passed.
+all dom tests passed.
+all roundtrip tests passed.
+
+$ sh ./lilt.com
+  range 10
+(0,1,2,3,4,5,6,7,8,9)
+```
+
 Contributing
 ------------
 The Decker project is released under the MIT license. Any contributions to this repository are understood to fall under the same license.

@@ -2882,7 +2882,7 @@ void tick(lv*env){
 				if(menu_item("Cut Widgets" ,ob.sel->c,'x' )){ob_order();SDL_SetClipboardText(n_card_copy(card,l_list(ob.sel))->sv);ob_destroy();}
 				if(menu_item("Copy Widgets",ob.sel->c,'c' )){ob_order();SDL_SetClipboardText(n_card_copy(card,l_list(ob.sel))->sv);}
 				if(menu_item("Copy Image",ob.sel->c==1&&canvas_is(ob.sel->lv[0]),'\0')){
-					SDL_SetClipboardText(image_write(n_canvas_copy(ob.sel->lv[0],EMPTY))->sv);frame=context;
+					SDL_SetClipboardText(image_write(n_canvas_copy(ob.sel->lv[0],lml(0)))->sv);frame=context;
 				}
 				paste_any();
 				menu_separator();

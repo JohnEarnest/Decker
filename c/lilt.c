@@ -1,8 +1,10 @@
 // Lil Terminal
 #include "lil.h"
 #include "dom.h"
+#ifndef __COSMOPOLITAN__
 #include <sys/wait.h>
 #include <unistd.h>
+#endif
 
 lv*n_exit(lv*self,lv*a){(void)self;exit(ln(l_first(a)));}
 lv*n_input(lv*self,lv*a){

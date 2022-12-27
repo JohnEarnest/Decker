@@ -1,12 +1,11 @@
 // Learning in Layers
+#ifndef __COSMOPOLITAN__
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
-#ifdef _WIN32
-#define timegm _mkgmtime
 #endif
 
 typedef struct{int c,size;char*sv;}str;
@@ -24,7 +23,6 @@ lv*debug_show(lv*x);      // version of l_show() which _always_ goes to stdout, 
 #define NUM          512 // number parsing/formatting buffer size
 #define NONE         lmn(0)
 #define ONE          lmn(1)
-#define EMPTY        lml(0)
 #define NOSTR        (str){0,0,NULL}
 #define MAX(a,b)     ((a)<(b)?(b):(a))
 #define MIN(a,b)     ((a)<(b)?(a):(b))
@@ -374,6 +372,10 @@ lv* pjson(char*t,int*i,int*f,int*n){
 	int ns=*i;jm('-');jd();jm('.');jd();if(jm('e')||jm('E')){jm('-')||jm('+');jd();}if(*i<=ns){*f=0;return NONE;}
 	char tb[NUM];snprintf(tb,MIN(*i-ns+1,NUM),"%s",t+ns);return lmn(atof(tb));
 }
+time_t parts_to_epoch(struct tm *p){
+	return p->tm_sec+p->tm_min*60+p->tm_hour*3600+
+	       (p->tm_mday-1)*86400+(p->tm_year-70)*31536000+((p->tm_year-69)/4)*86400-((p->tm_year-1)/100)*86400+((p->tm_year+299)/400)*86400;
+}
 dyad(l_parse){
 	if(lil(y)){MAP(r,y)l_parse(x,y->lv[z]);return r;}
 	#define fc x->sv[f]
@@ -416,7 +418,7 @@ dyad(l_parse){
 				if(lb(e->lv[7])){h+=ln(e->lv[6]);}else{m=0;}
 			}
 			#define ps(x,f,o) dset(v,lmcstr(x),lmn(m?tm.tm_##f+o:0));
-			if(t=='e'){v=lmn(m?timegm(&tm):0);}
+			if(t=='e'){v=lmn(m?parts_to_epoch(&tm):0);}
 			else{v=lmd();ps("year",year,1900)ps("month",mon,1)ps("day",mday,0)ps("hour",hour,0)ps("minute",min,0)ps("second",sec,0)}
 		}
 		else{m=0;}while(n&&hc&&h-si<n)h++,m=0;if(!sk&&v)ll_add(r,v);
@@ -477,7 +479,7 @@ lv* l_tab(lv*t){t=lt(t);TMAP(r,t,t->lv[z]);torect(r);dset(r,lmistr("index"),l_ra
 lv* merge(lv*vals,lv*keys,int widen,lv**ix){
 	lv*i=lmistr("@index");
 	if(!widen){*ix=lml(0);EACH(z,vals){lv*x=dget(vals->lv[z],i);EACH(z,x)ll_add(*ix,x->lv[z]);}}
-	if(vals->c==0){lv*d=lmd();EACH(z,keys)dset(d,keys->lv[z],EMPTY);ll_add(vals,d);}
+	if(vals->c==0){lv*d=lmd();EACH(z,keys)dset(d,keys->lv[z],lml(0));ll_add(vals,d);}
 	GEN(r,vals->c)l_table(widen?vals->lv[z]:l_drop(i,vals->lv[z]));r=l_raze(r);
 	if(widen){*ix=dget(r,i);r=l_drop(i,r);}return r;
 }
@@ -743,7 +745,7 @@ void term(lv*b){
 		lv*n=lml(0);while(!perr()&&!match("into")){ll_add(n,lmstr(peek()->type=='s'?literal_str(next()):name("column"))),expect(':',0),expr(b);}
 		blk_opa(b,BUND,n->c),blk_lit(b,n),expr(b),blk_op3(b,"@ins");return;
 	}
-	if(matchsp('(')){if(matchsp(')')){blk_lit(b,EMPTY);return;}expr(b);expect(')',0);return;}
+	if(matchsp('(')){if(matchsp(')')){blk_lit(b,lml(0));return;}expr(b);expect(')',0);return;}
 	str s=token_str(peek());
 	if(findop(s.sv,monads)>=0&&strchr("mn",peek()->type)){next(),expr(b),blk_op1(b,s.sv),free(s.sv);return;}
 	free(s.sv);lv* n=lmstr(name("variable"));
@@ -1057,7 +1059,9 @@ lv* time_ms(){
 	return lmn(i.QuadPart*1e-4);
 }
 #else
+#ifndef __COSMOPOLITAN__
 #include <sys/time.h>
+#endif
 lv* time_ms(){
 	struct timeval now;gettimeofday(&now,NULL);
 	return lmn((((long long)now.tv_sec)*1000)+(now.tv_usec/1000));

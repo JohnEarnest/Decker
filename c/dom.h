@@ -1,5 +1,4 @@
 
-#include <assert.h>
 #include "resources.h"
 
 // Decker document object model
@@ -179,12 +178,12 @@ void fire_async(lv*target,lv*name,lv*arg,lv*hunk){
 		blk_cat(b,scopes->lv[z]);
 		if(!core&&hunk){
 			str n=str_new();str_addz(&n,"!hunk");
-			blk_lit(b,lmon(n,EMPTY,blk_end(hunk))),blk_op(b,BIND);
-			name=lmistr("!hunk"),arg=EMPTY;
+			blk_lit(b,lmon(n,lml(0),blk_end(hunk))),blk_op(b,BIND);
+			name=lmistr("!hunk"),arg=lml(0);
 		}else if(core){
 			str n=str_new();str_addz(&n,sname);
-			blk_lit(b,lmon(n,EMPTY,blk_end(core))),blk_op(b,BIND);
-			name=lmistr(sname),arg=EMPTY;
+			blk_lit(b,lmon(n,lml(0),blk_end(core))),blk_op(b,BIND);
+			name=lmistr(sname),arg=lml(0);
 		}
 		blk_get(b,name),blk_lit(b,arg),blk_op(b,CALL);if(!hunk)blk_op(b,DROP);core=b;
 	}
@@ -236,7 +235,7 @@ fpair unpack_fpair(lv*z,int index){return index>=z->c?(fpair){0,0}: getfpair(ll(
 lv* normalize_pair(lv*x){pair p=getpair(x);p.x=CLAMP(0,p.x,4096),p.y=CLAMP(0,p.y,4096);return lmpair(p);}
 lv* normalize_enum(lv*x,char**v){int i=0;if(x)x=ls(x);while(x&&v[i]){if(!strcmp(v[i],x->sv))return lmistr(v[i]);i++;}return lmistr(v[0]);}
 int ordinal_enum  (lv*x,char**v){int i=0;if(x)x=ls(x);while(x&&v[i]){if(!strcmp(v[i],x->sv))return i;i++;}return 0;}
-lv* normalize_ints(lv*x,int n){if(!x)return EMPTY;x=ll(x);lv*r=lml(MIN(x->c,n));EACH(z,r)r->lv[z]=lmn((int)ln(x->lv[z]));return r;}
+lv* normalize_ints(lv*x,int n){if(!x)return lml(0);x=ll(x);lv*r=lml(MIN(x->c,n));EACH(z,r)r->lv[z]=lmn((int)ln(x->lv[z]));return r;}
 lv* str_read(lv*x,char*d){return x?ls(x):lmistr(d);}
 lv* bool_read(lv*x,int d){return (x?lb(x):d)?ONE:NONE;}
 char*anchor[]={"top_left","top_center","top_right","center_left","center","center_right","bottom_left","bottom_center","bottom_right",NULL};
@@ -829,7 +828,6 @@ line_box*lines;int lines_count=0,lines_size=0;
 void layout_push(rect pos,int line,char c,lv*font,lv*arg){grower(layout,glyph_box);layout[layout_count++]=(glyph_box){pos,line,c,font,arg};}
 void lines_push (rect pos,pair range                    ){grower(lines ,line_box );lines [lines_count++]=(line_box){pos,range};}
 pair layout_plaintext(char*text,lv*font,int align,pair max){
-	assert(text!=NULL);
 	#define lnl() cursor=(pair){0,cursor.y+1}
 	layout_count=lines_count=0; pair cursor={0,0}; int fh=font_h(font),fs=font_sw(font);
 	for(int z=0;text[z]!='\0';z++){
@@ -1119,7 +1117,7 @@ void canvas_size(lv*self,pair size){
 	lv*i=dget(self->b,lmistr("image"));if(!i)return;
 	float scale=ln(ifield(self,"scale"));
 	image_resize(i,(pair){ceil(size.x/scale),ceil(size.y/scale)});
-	n_canvas_clip(self,EMPTY);
+	n_canvas_clip(self,lml(0));
 }
 lv* canvas_image(lv*self,int build){
 	pair size=getpair(ifield(self,"size"));lv*image=dget(self->b,lmistr("image"));
@@ -1599,7 +1597,7 @@ lv* interface_grid(lv*self,lv*i,lv*x){
 		ikey("scrollbar"){lv*r=widget_inherit(self,i);return r?r:ONE;}
 		ikey("headers"  ){lv*r=widget_inherit(self,i);return r?r:ONE;}
 		ikey("lines"    ){lv*r=widget_inherit(self,i);return r?r:ONE;}
-		ikey("widths"   ){lv*r=widget_inherit(self,i);return r?r:EMPTY;}
+		ikey("widths"   ){lv*r=widget_inherit(self,i);return r?r:lml(0);}
 		ikey("format"   ){lv*r=widget_inherit(self,i);return r?r:lmistr("");}
 		ikey("size"     ){lv*r=widget_inherit(self,i);return r?r:lmpair((pair){100,50});}
 		ikey("row"      ){
@@ -2251,7 +2249,9 @@ char* writewav(lv*data,int*len){
 	return *len=r.c, r.sv;
 }
 
+#ifndef __COSMOPOLITAN__
 #include <sys/stat.h>
+#endif
 lv* n_readgif(lv*self,lv*a){
 	(void)self;lv*name=ls(l_first(a));lv*m=a->c>1?a->lv[1]:NONE;
 	struct stat st;if(stat(name->sv,&st)||st.st_size<13)return image_empty();
@@ -2290,7 +2290,9 @@ lv* n_write(lv*self,lv*a){
 
 // Filesystem Traversal
 
+#ifndef PATH_MAX
 #define PATH_MAX 4096
+#endif
 typedef struct {int dir;char name[PATH_MAX];} dir_item;
 dir_item*directory;int directory_count=0,directory_size=0;
 enum file_filter{filter_none,filter_deck,filter_data,filter_code,filter_sound,filter_image,filter_gif};
@@ -2334,7 +2336,9 @@ void directory_parent(char*x){
 	char t[PATH_MAX];snprintf(t,PATH_MAX,"%s%s..",x,SEPARATOR);directory_normalize(x,t);
 }
 #else
+#ifndef __COSMOPOLITAN__
 #include <dirent.h>
+#endif
 #define SEPARATOR "/"
 #define HOME      "HOME"
 void directory_fetch(char*path,int filter){
