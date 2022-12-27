@@ -8,7 +8,7 @@ on roundtrip path do
 	s:shell["cmp -s temp.deck %s" format path] # exit code { 0:matched, 1:differed, 2:error }
 	if s.exit
 		print["round trip for %s failed:" path]
-		print[shell["diff temp.deck %s" format path].out]
+		print[shell["diff temp.deck %s | cut -c 1-80" format path].out]
 		exit[1]
 	end
 	shell["rm temp.deck"]

@@ -105,6 +105,7 @@ print["json:"]
 show["%j" format 42                              ]
 show["%j" format list 11,22,33                   ]
 show["%j" format "string\n with\"/escapes\\!"    ]
+show["%j" format "</script < /script < / script" ]
 show["%j" format ().foo:999                      ]
 show["%j" format table 11,22,33                  ]
 # parsing

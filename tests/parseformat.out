@@ -82,7 +82,8 @@ tabular:
 json:
 "42"
 "[11,22,33]"
-"\"string\\n with\\\"\\/escapes\\\\!\""
+"\"string\\n with\\\"/escapes\\\\!\""
+"\"<\\/script < \\/script < \\/ script\""
 "{\"foo\":999}"
 "null"
 (1,0,0)

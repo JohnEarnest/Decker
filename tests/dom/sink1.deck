@@ -6,7 +6,7 @@ locked:1
 script:"0"
 name:"everything but the sink"
 author:"just some guy"
-patterns:"%%IMG0AAgA4AAAAAAAAAAA\/\/\/\/\/\/\/\/\/\/8LDA0ODxAREiBAgMEiHAgQgAAIAIAACAD\/d\/\/d\/3f\/3XEiF49HInT4iFAgAgWIiIiIACIAiAAiAHfdd9133XfdQIAACAQCACABAQOESDAMAogiiCKIIogiqlWqVapVqlWABEAIASACEMAMjbEwAxvYqgCqAKoAqgD\/Vf9V\/1X\/Vf8A\/wD\/AP8AqqqqqqqqqqpEiBEiRIgRIt27d+7du3fuQIABAgQIECC\/f\/79+\/fv3wgAqgAIAIgAj493mPj4d4mqAIgUIkGIALCwsL8Av7+w"
+patterns:"%%IMG0AAgA4AAAAAAAAAAA//////////8LDA0ODxAREiBAgMEiHAgQgAAIAIAACAD/d//d/3f/3XEiF49HInT4iFAgAgWIiIiIACIAiAAiAHfdd9133XfdQIAACAQCACABAQOESDAMAogiiCKIIogiqlWqVapVqlWABEAIASACEMAMjbEwAxvYqgCqAKoAqgD/Vf9V/1X/Vf8A/wD/AP8AqqqqqqqqqqpEiBEiRIgRIt27d+7du3fuQIABAgQIECC/f/79+/fv3wgAqgAIAIgAj493mPj4d4mqAIgUIkGIALCwsL8Av7+w"
 animations:[[10,20,5],[4,4,8,14,14,8],[18,18,20,19,19,20],[0,0,0,0,1,1,1,1]]
 
 {script:0}
@@ -28,6 +28,6 @@ widget with {c}, {l} and {r} in the name:{"type":"button","size":[60,20],"pos":[
 
 {card:other}
 {widgets}
-drawring:{"type":"canvas","size":[30,30],"pos":[0,0],"image":"%%IMG0AB4AHgABAAAAAQAAAAOAAAAHgAAAB8AAAA\/AAAAf4AAAP+AAAD\/wAAB\/8AAA\/\/gAAf\/4AAH\/\/AAD\/\/wAB\/\/+AA\/\/\/gAD\/\/8AAP\/\/AAA\/\/4AAD\/+AAAP\/wAAA\/8AAAD\/gAAAf4AAAB\/AAAAHwAAAAeAAAABgAAAAEAAAAAA=="}
+drawring:{"type":"canvas","size":[30,30],"pos":[0,0],"image":"%%IMG0AB4AHgABAAAAAQAAAAOAAAAHgAAAB8AAAA/AAAAf4AAAP+AAAD/wAAB/8AAA//gAAf/4AAH//AAD//wAB//+AA///gAD//8AAP//AAA//4AAD/+AAAP/wAAA/8AAAD/gAAAf4AAAB/AAAAHwAAAAeAAAABgAAAAEAAAAAA=="}
 things:{"type":"grid","size":[100,50],"pos":[0,0],"value":{"a":[11,22],"b":["One","Two"]}}
 

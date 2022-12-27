@@ -94,9 +94,14 @@ tcat=(x,y)=>{
 	Object.keys(y.v).map(k=>r[k]=(x.v[k]?x.v[k]:range(count(x)).map(x=>NONE)).concat(y.v[k]))
 	return lmt(r)
 }
+fstr=x=>{
+	let ct=0;return x.split('').map(x=>{
+		let e=0;if(x=='<'){ct=1}else if(x=='/'&&ct){e=1}else if(x!=' '&&x!='\n'){ct=0}
+		return e?'\\/':({'\n':'\\n','\\':'\\\\','"':'\\"'})[x]||x
+	}).join('')
+}
 fjson=x=>lin(x)?wnum(x.v): lil(x)?`[${x.v.map(fjson).join(',')}]`:
-         lis(x)?`"${x.v.split('').map(x=>({'\n':'\\n','\\':'\\\\','"':'\\"','/':'\\/'})[x]||x).join('')}"`:
-         lid(x)?`{${x.k.map((k,i)=>`${fjson(lms(ls(k)))}:${fjson(x.v[i])}`).join(',')}}`:'null'
+         lis(x)?`"${fstr(x.v)}"`:lid(x)?`{${x.k.map((k,i)=>`${fjson(lms(ls(k)))}:${fjson(x.v[i])}`).join(',')}}`:'null'
 pjson=(y,h,n)=>{
 	const si=h, hn=_=>m&&y[h]&&(n?h-si<n:1), hnn=x=>m&&h+x<=y.length&&(n?h+x-si<n:1)
 	const jd=_=>{while(hn()&&/[0-9]/.test(y[h]))h++}, jm=x=>hn()&&y[h]==x?(h++,1):0, iw=_=>/[ \n]/.test(y[h]), ws=_=>{while(hn()&&iw())h++}

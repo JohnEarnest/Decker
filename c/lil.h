@@ -429,8 +429,12 @@ void fjson(str*s,lv*x){
 	#define wrap(a,b,c) str_addc(s,a);EACH(z,x)c;str_addc(s,b);
 	else if(lil(x)){wrap('[',']',{if(z)str_addc(s,',');fjson(s,x->lv[z]);})}
 	else if(lid(x)){wrap('{','}',{if(z)str_addc(s,',');fjson(s,ls(x->kv[z]));str_addc(s,':');fjson(s,x->lv[z]);})}
-	else if(lis(x)){wrap('"','"',{char c=x->sv[z];if(c=='\n'?(c='n',1):!!strchr("\"\\/",c))str_addc(s,'\\');str_addc(s,c);})}
-	else{str_addz(s,"null");}
+	else if(lis(x)){
+		str_addc(s,'"');int ct=0;EACH(z,x){
+			char c=x->sv[z],e=0;if(c=='<'){ct=1;}else if(c=='/'&&ct){e=1;}else if(c!=' '&&c!='\n'){ct=0;}
+			if(c=='\n'?(c='n',1):e||!!strchr("\"\\",c))str_addc(s,'\\');str_addc(s,c);
+		}str_addc(s,'"');
+	}else{str_addz(s,"null");}
 }
 void format_type(str*r,lv*a,char t,int n,int d,int lf,int pz,int*f,char*c){
 	char o[NUM]={0},*op=o;
