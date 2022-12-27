@@ -1931,6 +1931,7 @@ bg_lasso_preview=_=>{
 bg_tools=_=>{
 	if     (!dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=1,fat_offset(ev.pos);return}
 	else if( dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=0;return}if(ev.alt)return
+	if(ev.md)pointer.prev=ev.pos
 	const pp=rcopy(pointer.prev), te=copy_object(ev)
 	if(!dover(frame.clip))ev.md=ev.mu=ev.drag=0
 	if(dr.fatbits){ev.pos=fat_to_card(ev.pos),ev.dpos=fat_to_card(ev.dpos),pointer.prev=fat_to_card(pointer.prev)}
