@@ -371,6 +371,7 @@ PANGRAM='How razorback jumping-frogs can level six piqued gymnasts.'
 // State
 
 let uimode='interact', uicursor=0, enable_gestures=0, profiler=0
+is_fullscreen=_=>(document.fullscreenElement||document.webkitFullscreenElement)!=null
 setmode=mode=>{
 	n_play([NONE,lms('loop')])
 	grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel=[],wid.active=-1,sc.others=[],dr.poly=[]
@@ -2297,7 +2298,7 @@ toolbars=_=>{
 			data[d++]=0xFF&(cv>>16),data[d++]=0xFF&(cv>>8),data[d++]=0xFF&(cv),data[d++]=0xFF
 		}
 		render.getContext('2d').putImageData(tid,0,0)
-		const g=element.getContext('2d');g.imageSmoothingEnabled=false,g.save(),g.scale(tzoom,tzoom),g.drawImage(render,0,0),g.restore()
+		const g=element.getContext('2d');g.imageSmoothingEnabled=tzoom!=(0|tzoom),g.save(),g.scale(tzoom,tzoom),g.drawImage(render,0,0),g.restore()
 	}
 	const toolbtn=(pos,dn,b,icon,active)=>{
 		const i=rcenter(b,rect(16,16))
@@ -2447,7 +2448,6 @@ all_menus=_=>{
 	if(menu_item('About...',1))modal_enter('about')
 	if(menu_check('Listener',canlisten,ms.type=='listen','l')){if(ms.type!='listen'){modal_enter('listen')}else{modal_exit(0)}}
 	menu_separator()
-	const fullscreen=_=>(document.fullscreenElement||document.webkitFullscreenElement)!=null
 	const enter=_=>{
 		const e=q('body'), o={navigationUI:'hide'}
 		if(e.requestFullscreen)e.requestFullscreen(o)
@@ -2457,7 +2457,7 @@ all_menus=_=>{
 		if(document.exitFullscreen)document.exitFullscreen()
 		if(document.webkitExitFullscreen)document.webkitExitFullscreen()
 	}
-	menu_check('Fullscreen',1,fullscreen(),null,_=>{if(fullscreen()){exit()}else{enter()}setTimeout(resize,500)})
+	menu_check('Fullscreen',1,is_fullscreen(),null,_=>{if(is_fullscreen()){exit()}else{enter()}setTimeout(resize,500)})
 	if(menu_check('Nav Gestures',1,enable_gestures))enable_gestures^=1
 	if(menu_check('Script Profiler',1,profiler))profiler^=1
 	if(menu_check('Toolbars',tzoom>0,toolbars_enable))toolbars_enable^=1,resize()
@@ -2854,7 +2854,7 @@ sync=_=>{
 		id.data[d+3]=0xFF
 	}
 	const r=q('#render');r.getContext('2d').putImageData(id,0,0)
-	const g=q('#display').getContext('2d');g.imageSmoothingEnabled=false,g.save(),g.scale(zoom,zoom),g.drawImage(r,0,0),g.restore()
+	const g=q('#display').getContext('2d');g.imageSmoothingEnabled=zoom!=(0|zoom),g.save(),g.scale(zoom,zoom),g.drawImage(r,0,0),g.restore()
 	pending_tick=1,frame_count++
 }
 
@@ -2875,8 +2875,8 @@ mouse=(e,f)=>{
 touch=(e,f)=>{const t=e.targetTouches[0]||{}; mouse({pageX:t.clientX, pageY:t.clientY, preventDefault:_=>e.preventDefault,button:0},f)}
 loop=_=>{tick(),sync(),pump=setTimeout(loop,1000/60)} // 60fps
 resize=_=>{
-	const b=q('body'), screen=rect(b.clientWidth,b.clientHeight)
-	zoom=max(1,0|min(screen.x/fb.size.x,screen.y/fb.size.y))
+	const b=q('body'), screen=rect(b.clientWidth,b.clientHeight), fs=min(screen.x/fb.size.x,screen.y/fb.size.y)
+	zoom=max(1,is_fullscreen()?fs:(0|fs))
 	tzoom=0|min((screen.x-(zoom*fb.size.x))/(2*toolsize.x),screen.y/toolsize.y)
 	const tz=tzoom*toolbars_enable
 	const c =q('#display');c .width=fb.size .x*zoom,c.height =fb.size .y*zoom
