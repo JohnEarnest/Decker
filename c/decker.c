@@ -876,6 +876,16 @@ void draw_thumbnail(lv*card,rect r){
 		draw_box(box_intersect((rect){r.x+w.size.x*xr,r.y+w.size.y*yr,w.size.w*xr,w.size.h*yr},r),0,w.show==show_invert?0:1);
 	}
 }
+lv* draw_widget(lv*w){
+	if(canvas_is(w))return n_canvas_copy(w,lml(0));
+	pair rsize=getpair(ifield(w,"size"));lv*buff=lmbuff(rsize),*r=image_make(buff);
+	cstate t=frame;frame=draw_buffer(buff);event_state eb=ev;ev=(event_state){0};menus_clear(); // !!!
+	if     (button_is(w)){                button p=unpack_button(w)  ;p.size.x=0,p.size.y=0;widget_button(w,p,lb(ifield(w,"value")));}
+	else if(slider_is(w)){                slider p=unpack_slider(w)  ;p.size.x=0,p.size.y=0;widget_slider(w,p);}
+	else if(grid_is  (w)){grid_val  v={0};grid   p=unpack_grid (w,&v);p.size.x=0,p.size.y=0;widget_grid (w,p,&v);}
+	else if(field_is (w)){field_val v={0};field  p=unpack_field(w,&v);p.size.x=0,p.size.y=0;widget_field(w,p,&v);}
+	return ev=eb,frame=t,r;
+}
 lv* draw_card(lv*card,int active){
 	int im=ms.in_modal;ms.in_modal=active;
 	pair rsize=getpair(ifield(card,"size"));lv*buff=lmbuff(rsize),*r=image_make(buff);
@@ -2881,9 +2891,7 @@ void tick(lv*env){
 				menu_separator();
 				if(menu_item("Cut Widgets" ,ob.sel->c,'x' )){ob_order();SDL_SetClipboardText(n_card_copy(card,l_list(ob.sel))->sv);ob_destroy();}
 				if(menu_item("Copy Widgets",ob.sel->c,'c' )){ob_order();SDL_SetClipboardText(n_card_copy(card,l_list(ob.sel))->sv);}
-				if(menu_item("Copy Image",ob.sel->c==1&&canvas_is(ob.sel->lv[0]),'\0')){
-					SDL_SetClipboardText(image_write(n_canvas_copy(ob.sel->lv[0],lml(0)))->sv);frame=context;
-				}
+				if(menu_item("Copy Image",ob.sel->c==1,'\0')){SDL_SetClipboardText(image_write(draw_widget(ob.sel->lv[0]))->sv);frame=context;}
 				paste_any();
 				menu_separator();
 				if(menu_item("Paste as new Canvas",has_clip("%%IMG")&&!has_parent(card),'\0')){

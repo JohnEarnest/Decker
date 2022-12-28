@@ -202,6 +202,15 @@ draw_dithered=(r,image,opaque,mask,threshold)=>{
 		const c=!col;if(ms&&(opaque||c!=0)){const h=rect(r.x+b,r.y+a);if(inclip(h))pix(h,c)}
 	}
 }
+draw_widget=w=>{
+	if(canvas_is(w))return canvas_image(w,1)
+	const rsize=getpair(ifield(w,'size')),r=image_make(rsize),t=frame,te=copy_object(ev);frame=draw_frame(r),ev=event_state(),menus_clear() // !!!
+	if     (button_is(w)){const p=unpack_button(w);p.size.x=0,p.size.y=0;widget_button(w,p,lb(ifield(w,'value')))}
+	else if(slider_is(w)){const p=unpack_slider(w);p.size.x=0,p.size.y=0;widget_slider(w,p)}
+	else if(grid_is  (w)){const p=unpack_grid  (w);p.size.x=0,p.size.y=0;widget_grid  (w,p,unpack_grid_value(w))}
+	else if(field_is (w)){const p=unpack_field (w);p.size.x=0,p.size.y=0;widget_field (w,p,unpack_field_value(w))}
+	return ev=te,frame=t,r
+}
 draw_card=(card,active)=>{
 	const im=ms.in_modal;ms.in_modal=active
 	const rsize=getpair(ifield(card,'size')),r=image_make(rsize),t=frame,te=copy_object(ev);frame=draw_frame(r),ev=event_state()
@@ -2597,7 +2606,7 @@ all_menus=_=>{
 			menu_separator()
 			if(menu_item('Cut Widgets',ob.sel.length,'x',menucut)){}
 			if(menu_item('Copy Widgets',ob.sel.length,'c',menucopy)){}
-			if(menu_item('Copy Image',ob.sel.length==1&&canvas_is(ob.sel[0]),0,copycanvasimg)){}
+			if(menu_item('Copy Image',ob.sel.length==1,0,copywidgetimg)){}
 			if(menu_item('Paste',1,'v',menupaste)){}
 			menu_separator()
 			if(menu_item('Paste as new Canvas',!has_parent(card),0,pasteascanvas)){}
@@ -2994,7 +3003,7 @@ dopaste=x=>{
 }
 cutcard=_=>{const c=ifield(deck,'card');setclipboard(ls(deck_copy(deck,c))),deck_remove(deck,c),mark_dirty()}
 copycard=_=>{const c=ifield(deck,'card');setclipboard(ls(deck_copy(deck,c)))}
-copycanvasimg=_=>{setclipboard(image_write(canvas_image(ob.sel[0],1))),frame=context}
+copywidgetimg=_=>{setclipboard(image_write(draw_widget(ob.sel[0]))),frame=context}
 pasteascanvas=_=>getclipboard(t=>{ob_create([lmd([lms('type'),lms('image')],[lms('canvas'),lms(t)])]),frame=context})
 pasteintocanvas=_=>getclipboard(t=>{const i=image_read(t),c=ob.sel[0];iwrite(c,lms('size'),ifield(i,'size')),c.image=i})
 menucut=_=>{const r=docut();if(r)setclipboard(r)}
