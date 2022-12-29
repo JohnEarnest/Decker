@@ -1202,7 +1202,7 @@ The script in a module is only executed _once_, when a deck is loaded. For large
 
 It's a great idea to provide documentation and examples for your new module in the deck it's packaged within. You might also want to perform automated tests of your module while developing it. That's where the "Lilt" command-line utility comes in. Using Lilt, you can read and write decks "headlessly", and interact with them as if you were using Decker's listener:
 ```
-% rlwrap lilt
+% lilt
   d:readdeck["logger.deck"]
 <deck>
   d.modules

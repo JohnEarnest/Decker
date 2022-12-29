@@ -53,7 +53,7 @@ test: lilt
 	@./c/build/lilt tests/dom/test_roundtrip.lil
 
 run: lilt
-	@rlwrap ./c/build/lilt
+	@./c/build/lilt
 
 rundecker: decker
 	./c/build/decker

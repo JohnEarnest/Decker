@@ -6,10 +6,13 @@
 #include <unistd.h>
 #endif
 
+#include "lib/bestline.h"
+#include "lib/bestline.c"
+
 lv*n_exit(lv*self,lv*a){(void)self;exit(ln(l_first(a)));}
 lv*n_input(lv*self,lv*a){
-	(void)self;n_printf(a,0,stdout);fflush(stdout);str r=str_new();char b[1];
-	while(read(0,b,sizeof(b))>0&&b[0]!='\n')str_addc(&r,b[0]);return lmstr(r);
+	(void)self;char*line=bestline((a->c<2?ls(l_first(a)): l_format(ls(l_first(a)),l_drop(ONE,a)))->sv);
+	lv*r=lmcstr(line);free(line);return r;
 }
 lv*n_dir(lv*self,lv*a){(void)self;lv*r=directory_enumerate(ls(l_first(a))->sv,filter_none,1);r->kv[0]=lmistr("dir");return r;}
 lv*n_path(lv*self,lv*a){
@@ -129,10 +132,8 @@ int main(int argc,char**argv){
 		}
 		else if(has_suffix(argv[z],".lil")){repl=0;runfile(argv[z],env),z++;}
 	}if(!repl){exit(0);}
-	str r=str_new();while(1){
-		printf("  ");fflush(stdout);
-		r.c=0;char b[1];while(read(0,b,sizeof(b))>0&&b[0]!='\n')str_addc(&r,b[0]);
-		str_term(&r);lv*prog=parse(r.sv);
+	while(1){
+		char*line=bestlineWithHistory(" ","lilt");lv*prog=parse(line);free(line);
 		if(perr()){for(int z=0;z<par.c+2;z++)printf(" ");printf("^\n%s\n",par.error);}
 		else{lv*x=run(prog,env);dset(env,lmistr("_"),x);debug_show(x);}
 	}

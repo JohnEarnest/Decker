@@ -46,9 +46,9 @@ $ lilt -e "print[sys.version]"
 0.6
 ```
 
-If a `FILE` or `EXPR` argument has not been provided, Lilt will run in interactive "REPL" mode, which can be exited with Ctrl+C or the `exit[]` function. You may find it more comfortable to run the `lilt` REPL under the `rlwrap` utility (available in a \*nix package manager near you), which provides command history and line editing features.
+If a `FILE` or `EXPR` argument has not been provided, Lilt will run in interactive "REPL" mode, which can be exited with Ctrl+C or the `exit[]` function.
 ```
-$ rlwrap lilt
+$ lilt
   2+3
 5
   exit[]
