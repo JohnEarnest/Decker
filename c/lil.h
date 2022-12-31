@@ -658,7 +658,7 @@ str expect(char t,int alloc){
 }
 int ident(char*n){
 	char*kws[]={
-		"while","each","send","on","if","else","end","with","local",
+		"while","each","send","on","if","else","end","do","with","local",
 		"select","extract","update","insert","into","from","where","by","orderby","asc","desc"
 	};for(size_t z=0;z<(sizeof(kws)/sizeof(kws[0]));z++)if(strcmp(n,kws[z])==0)return 0;
 	return findop(n,monads)<0&&findop(n,dyads)<0;
