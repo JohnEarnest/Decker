@@ -69,7 +69,7 @@ show["%l:%u"          format "One","Two"            ] # case conversion
 show["%-2.2rAB%2r!%r!"format "one","b","anylength"  ] # char class
 show["%-2.2oAB%2o!%o!"format "one","b","anylength"  ] # char class
 show["%a"             format list 65,66,67          ] # ascii chars
-show["%a"             format list 65,10,127,-5,67   ] # invalid ascii chars become space
+show["%a"             format list 65,10,127,-5,67   ] # invalid ascii chars become '?'
 show["%2.2a"          format list 65,66,67          ] # fit ascii chars (trunc)
 show["%2a"            format list 65                ] # fit ascii chars (extend)
 show["%a"             format 65                     ] # widen scalar to ascii list if needed

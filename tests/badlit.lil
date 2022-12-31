@@ -1,0 +1,4 @@
+
+print["string literal with ‘single’ curly-quotes,
+a tab:	,
+and a horrifying abomination:☺"]

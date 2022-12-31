@@ -1,7 +1,7 @@
 
 readBinaryFile=path=>{const b=require('fs').readFileSync(path);return array_make(b.length,'u8',0,new Uint8Array(b))}
 writeBinaryFile=(path,x)=>require('fs').writeFileSync(path,Buffer.from(x.data))
-readTextFile=path=>require('fs').readFileSync(path,{encoding:'utf8'}).replace(/\uFEFF/g, '')
+readTextFile=path=>clchars(require('fs').readFileSync(path,{encoding:'utf8'}).replace(/\uFEFF/g, ''))
 writeTextFile=(path,text)=>require('fs').writeFileSync(path,text,{encoding:'utf8'})
 go_notify=(deck,x,t)=>{/*console.log('go notify',x,t)*/}
 const env=lmenv()

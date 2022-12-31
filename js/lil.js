@@ -14,8 +14,8 @@ lmenv=p      =>{allocs++;const r={t:'env',v:{},p:p};r.local=(n,x)=>env_local(r,l
 
 NONE=lmn(0), ONE=lmn(1), seed=0x12345, max=Math.max, min=Math.min, abs=Math.abs
 ISODATE=lms('%04i-%02i-%02iT%02i:%02i:%02iZ%n%m'), PARTS=['year','month','day','hour','minute','second'].map(lms)
-clchar=x=>{const c=x.charCodeAt(0);return (c>=32&&c<=126)||(x=='\n')?x:' '}
-clchars=x=>x.replace(/\r/g,'').replace(/[^ -~\n]/g,' ')
+clchar=x=>{const c=x.charCodeAt(0);return x=='\t'?' ':(c>=32&&c<=126)||(x=='\n')?x:'?'}
+clchars=x=>x.replace(/\r/g,'').replace(/\t/g,' ').replace(/[\u201C\u201D]/g,'"').replace(/[\u2018\u2019]/g,"'").replace(/[^ -~\n]/g,'?')
 wnum=y=>{
 	let w='',d='',s=y<0?(y=-y,'-'):'',i=Math.floor(y);while(i>0){w=(0|i%10)+w,i=i/10}
 	y=Math.round((y-Math.floor(y))*1000000);for(let z=0;z<6;z++){d=(0|y%10)+d,y=y/10}
@@ -1133,7 +1133,11 @@ array_make=(size,cast,base,buffer)=>{
 	}
 	const get=(a,index,len)=>{
 		if(a.cast=='char'&&len<0)len=1
-		if(a.cast=='char'){let r='';for(let z=0;z<len;z++)r+=get_raw(a,index+z);return lms(clchars(r))}
+		if(a.cast=='char'){
+			const t=a.cast;a.cast='u8';
+			const r=(new TextDecoder('utf-8')).decode(new Uint8Array(range(len).map(x=>get_raw(a,index+x))))
+			return a.cast=t,lms(clchars(r))
+		}
 		return len<0?lmn(get_raw(a,index)): lml(range(len).map(x=>lmn(get_raw(a,index+x))))
 	}
 	const set=(a,index,len,v)=>{

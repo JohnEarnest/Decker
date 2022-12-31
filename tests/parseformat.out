@@ -52,7 +52,7 @@ format:
 "onb anylength"
 "onb anylength"
 "ABC"
-"A\n  C"
+"A\n??C"
 "BC"
 " A"
 "A"

@@ -1,0 +1,10 @@
+{deck}
+version:1
+script:"0"
+
+{script:0}
+text with “double” and ‘single’ curly-quotes,
+a tab:	,
+and a horrifying abomination:☺
+
+{end}

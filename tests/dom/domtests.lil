@@ -104,7 +104,11 @@ assert["array string read" "ABCD" a[0,4]]
 a.cast:"i8"
 a[0,4]:(0,10,65,13)
 a.cast:"char"
-assert["array read denormal chars" " \nA" a[0,4]]
+assert["array read denormal chars" "?\nA" a[0,4]]
+a.cast:"u8"
+a[0,4]:(226,128,156,65)
+a.cast:"char"
+assert["array read utf-surrogate" "\"A" a[0,4]]
 
 a:array[2 "i16l"]
 a[0,2]:"AB"
@@ -450,6 +454,12 @@ assert["rich text span from empty end"   (rtext.cat[]) (rtext.span[rtext.make[""
 f:read["tests/dom/bom.txt"]
 assert["read text files with a UTF-8 BOM" "Some ASCII contents after the bom!" f]
 assert["correct string length given BOM" 34 (count f)]
+
+r:"text with \"double\" and 'single' curly-quotes,\na tab: ,\nand a horrifying abomination:?\n"
+f:read["tests/dom/quotes.txt"]
+assert["read text files with illegal characters" r f]
+d:readdeck["tests/dom/badchars.deck"]
+assert["read deck with illegal characters in a script" r d.script]
 
 #######################################
 #

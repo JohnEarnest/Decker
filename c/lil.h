@@ -43,11 +43,20 @@ int* idx_peek(idx*x){if(x->c<1)printf("peek empty idx stack!\n");return &x->iv[x
 int  idx_pop (idx*x){if(x->c<1)printf("pop empty idx stack!\n");return x->iv[--(x->c)];}
 void idx_push(idx*x,int n){if(x->size<x->c+1)x->iv=realloc(x->iv,(x->size+=32)*sizeof(int));x->iv[x->c++]=n;}
 str str_new(){return(str){0,32,calloc(32,1)};}
-char cl(char x){return(x>=32&&x<=126)||x=='\n'?x:' ';}
+char cl(char x){return x=='\t'?' ':(x>=32&&x<=126)||x=='\n'?x:'?';}
 void str_addraw(str*s,int x){if(s->c+1>=s->size)s->sv=realloc(s->sv,s->size+=32);s->sv[s->c++]=x;}
 void str_term(str*s){str_addraw(s,'\0');}
 void str_addc(str*s,char x){if(x!='\r')str_addraw(s,cl(x));}
-void str_add(str*s,char*x,int n){for(int z=0;z<n;z++)str_addc(s,x[z]);}
+void str_add(str*s,char*x,int n){
+	for(int z=0;z<n;z++){unsigned char c=x[z];
+		if(c==0xE2&&(unsigned char)x[z+1]==0x80&&((unsigned char)x[z+2]==0x98||(unsigned char)x[z+2]==0x99))c='\'',z+=2;
+		if(c==0xE2&&(unsigned char)x[z+1]==0x80&&((unsigned char)x[z+2]==0x9C||(unsigned char)x[z+2]==0x9D))c='"' ,z+=2;
+		if((c&0xF0)==0xF0)c=1,z+=3; // skip 4-byte codepoints
+		if((c&0xE0)==0xE0)c=1,z+=2; // skip 3-byte codepoints
+		if((c&0xC0)==0xC0)c=1,z+=1; // skip 2-byte codepoints
+		str_addc(s,c);
+	}
+}
 void str_addz(str*s,char*x){str_add(s,x,strlen(x));} // null-terminated c-string
 void str_addl(str*s,lv*x){str_add(s,x->sv,x->c);}    // counted lil string
 lv*  ll_peek(lv*x){return x->c?x->lv[x->c-1]:NULL;}
@@ -104,6 +113,7 @@ lm(env,8)(lv*p)            {lv*r=lmd();r->t=8;r->env=p;                         
 lm(nat,9)(lv*(*f)(lv*,lv*),lv*c){lv*r=lmv(9);r->f=(void*)f,r->a=c;                       return r;}
 lv* lmstr(str x){lv*r=lmv(1);str_term(&x),r->c=strlen(x.sv);r->sv=x.sv;return r;}
 lv* lmcstr(char*x){lv*r=lmv(1);r->c=strlen(x),r->sv=calloc(r->c+1,1),memcpy(r->sv,x,r->c);return r;}
+lv* lmutf8(char*x){str r=str_new();str_addz(&r,x);return lmstr(r);}
 lv* lmistr(char*x){
 	for(int z=0;z<intern_count;z++)if(interned[z].sv==x)return &interned[z];
 	lv*r=&interned[intern_count++];r->t=1,r->c=strlen(x),r->sv=x;

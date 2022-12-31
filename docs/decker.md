@@ -472,7 +472,7 @@ The transition `y`, should be the name of a transition function installed with `
 
 - Image files (`.gif`, `.png`, `.bmp`, `.jpg`, `.jpeg`) are read as _image interfaces_.
 - Sound files (`.wav`) are read as _sound interfaces_.
-- anything else is read as a text file.
+- anything else is treated as a UTF-8 text file and read as a string. A Byte-Order Mark, if present, is skipped. ASCII `\r` (Carriage-Return) characters are removed, tabs become a single space, "smart-quotes" are straightened, and anything else outside the range of valid Lil characters becomes a question mark (`?`).
 
 The `type` argument allows you to specify the type of file(s) the user should be allowed to choose:
 
@@ -700,7 +700,7 @@ While arrays do not benefit from the full range of operators Lil can bring to be
 
 Several parts of the array interface take an `offset` argument. An `offset` may be either a single number (an index from the beginning of the array), or a pair of numbers (an index from the beginning of the array and a length). A single index refers to reading or writing a single value, whereas an index and length refer to reading or writing multiple values. For reads, multiple numbers will be read as a list, and any number of `char`s will be read as a Lil string. For writes, any sort of listy value (list, string, or _array_) will be truncated or padded with 0 to fit the specified length, and a single number will be replicated to fill the specified length.
 
-When reading or writing data interpreted as `char`, it will be converted into valid Lil strings, which are unable to represent many ASCII values, so some information will be lost: ASCII `\r` (Carriage-Return) characters are removed, and anything else outside the Lil range becomes a single space. If you need to preserve or generate arbitrary ASCII bytes, or any other string encoding, use the `u8` or `i8` casts instead!
+When reading or writing data interpreted as `char`, it will be converted into valid Lil strings, which are unable to represent many ASCII values, so some information will be lost, using the same UTF-8 conversions as `read[]` applied to a text file. If you need to preserve or generate arbitrary ASCII bytes, or any other string encoding, use the `u8` or `i8` casts instead!
 
 The `struct[]` function is designed for progressively building or parsing a binary format. The `shape` argument is a dictionary from string names to _Type Specs_:
 

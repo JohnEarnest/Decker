@@ -12,13 +12,13 @@
 lv*n_exit(lv*self,lv*a){(void)self;exit(ln(l_first(a)));}
 lv*n_input(lv*self,lv*a){
 	(void)self;char*line=bestline((a->c<2?ls(l_first(a)): l_format(ls(l_first(a)),l_drop(ONE,a)))->sv);
-	lv*r=lmcstr(line);free(line);return r;
+	lv*r=lmutf8(line);free(line);return r;
 }
 lv*n_dir(lv*self,lv*a){(void)self;lv*r=directory_enumerate(ls(l_first(a))->sv,filter_none,1);r->kv[0]=lmistr("dir");return r;}
 lv*n_path(lv*self,lv*a){
 	(void)self;lv*x=a->c>0?ls(a->lv[0]):lms(0),*y=a->c>1?ls(a->lv[1]):lms(0);str t=str_new();char out[4096];
 	str_add(&t,x->sv,x->c);if(y->c)str_addc(&t,'/');str_add(&t,y->sv,y->c),str_term(&t);
-	char*e=realpath(t.sv,out);free(t.sv);return e!=NULL?lmcstr(out):lmistr("");
+	char*e=realpath(t.sv,out);free(t.sv);return e!=NULL?lmutf8(out):lmistr("");
 }
 lv*n_readwav(lv*self,lv*a){
 	(void)self;lv*name=ls(l_first(a));int offset=a->c>1?MAX(0,ln(a->lv[1])):0, size=0;
@@ -52,8 +52,8 @@ lv*n_writedeck(lv*self,lv*a){
 }
 lv*n_shell(lv*self,lv*a){
 	(void)self;lv*x=ls(l_first(a)),*r=lmd();FILE*child=popen(x->sv,"r");str o=str_new();
-	while(1){int c=fgetc(child);if(feof(child))break;str_addc(&o,c);}int e=pclose(child);
-	return dset(r,lmistr("out"),lmstr(o)),dset(r,lmistr("exit"),lmn(WIFEXITED(e)?WEXITSTATUS(e): -1)),r;
+	while(1){int c=fgetc(child);if(feof(child))break;str_addraw(&o,c);}int e=pclose(child);lv*os=lmstr(o);
+	return dset(r,lmistr("out"),lmutf8(os->sv)),dset(r,lmistr("exit"),lmn(WIFEXITED(e)?WEXITSTATUS(e): -1)),r;
 }
 lv*runstring(char*t,lv*env){
 	lv* prog=parse(t);if(perr())return fprintf(stderr,"(%d:%d) %s\n",par.r+1,par.c+1,par.error),NONE;
@@ -109,11 +109,11 @@ int main(int argc,char**argv){
 	dset(env,lmistr("readdeck" ),lmnat(n_readdeck,NULL));
 	dset(env,lmistr("writedeck"),lmnat(n_writedeck,NULL));
 	constants(env);
-	lv* a=lml(argc);for(int z=0;z<argc;z++)a->lv[z]=lmcstr(argv[z]);
+	lv* a=lml(argc);for(int z=0;z<argc;z++)a->lv[z]=lmutf8(argv[z]);
 	dset(env,lmistr("args"),a);
 	lv* e=lmd();for(int z=0;environ[z];z++){
 		int i=0;while(environ[z][i]&&environ[z][i]!='=')i++;
-		lv*k=lms(i);memcpy(k->sv,environ[z],i),dset(e,k,lmcstr(environ[z]+i+1));
+		lv*k=lms(i);memcpy(k->sv,environ[z],i),dset(e,k,lmutf8(environ[z]+i+1));
 	}dset(env,lmistr("env"),e);
 	char*home=getenv("LIL_HOME");if(home){
 		struct dirent*find;DIR*dir=opendir(home);if(dir){while((find=readdir(dir))){

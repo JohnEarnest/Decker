@@ -1,0 +1,3 @@
+text with “double” and ‘single’ curly-quotes,
+a tab:	,
+and a horrifying abomination:☺

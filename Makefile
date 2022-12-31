@@ -14,8 +14,9 @@ ifeq ($(UNAME),Linux)
 	COMPILER=gcc
 	# _BSD_SOURCE is required by older versions of GCC to find various posix extensions like realpath().
 	# _DEFAULT_SOURCE is the same deal, except newer versions of GCC need it
+	# _POSIX_C_SOURCE is also needed by bestline on older versions of GCC
 	# -lm is required for math.h
-	FLAGS=-std=c99 -D _BSD_SOURCE -D _DEFAULT_SOURCE -lm -Wall -Wextra -O2
+	FLAGS=-std=c99 -D _BSD_SOURCE -D _DEFAULT_SOURCE _POSIX_C_SOURCE -lm -Wall -Wextra -O2
 	# -Wno-misleading-indentation silences warnings which are entirely spurious.
 	# -Wno-format-truncation likewise silences spurious warnings regarding snprintf() truncation.
 	FLAGS:=$(FLAGS) -Wno-misleading-indentation -Wno-format-truncation

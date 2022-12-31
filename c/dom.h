@@ -988,7 +988,10 @@ void array_set_raw(array a,int index,long long int v){
 }
 lv* array_get(array a,int index,int len){
 	if(a.cast==10&&len<0)len=1;
-	if(a.cast==10){str r=str_new();for(int z=0;z<len;z++)str_addc(&r,array_get_raw(a,index+z));return lmstr(r);}
+	if(a.cast==10){
+		str r=str_new(),s=str_new();a.cast=0;for(int z=0;z<len;z++)str_addraw(&r,array_get_raw(a,index+z));
+		str_add(&s,r.sv,len),lmstr(r),a.cast=10;return lmstr(s);
+	}
 	if(len<0)return lmn(array_get_raw(a,index));GEN(r,len)lmn(array_get_raw(a,index+z));return r;
 }
 void array_set(array a,int index,int len,lv*v){
@@ -1376,11 +1379,11 @@ lv* rtext_cast(lv*x){
 	}return torect(r);
 }
 lv* rtext_splice(lv*table,lv*font,lv*arg,char*text,pair cursor,pair*endcursor){
-	int a=MIN(cursor.x,cursor.y),b=MAX(cursor.x,cursor.y); lv*r=rtext_cast(NULL);
+	int a=MIN(cursor.x,cursor.y),b=MAX(cursor.x,cursor.y); lv*r=rtext_cast(NULL),*t=lmutf8(text);
 	rtext_appendr(r,rtext_span(table,(pair){0,a}));
-	rtext_append (r,lmcstr(text),font,arg);
+	rtext_append (r,t,font,arg);
 	rtext_appendr(r,rtext_span(table,(pair){b,RTEXT_END}));
-	endcursor->x=endcursor->y=a+strlen(text); return r;
+	endcursor->x=endcursor->y=a+t->c; return r;
 }
 lv* rtext_read(lv*x){
 	if(lis(x))return x; x=ld(x);
@@ -2369,13 +2372,13 @@ lv* directory_enumerate(char*root,int filter,int type){
 	dset(r,lmistr("icon"),d),dset(r,lmistr("name"),n);
 	for(int z=0;z<directory_count;z++){
 		d->lv[z]=lmn((directory[z].dir?0:1)^type);
-		n->lv[z]=lmcstr(directory[z].name);
+		n->lv[z]=lmutf8(directory[z].name);
 	}if(!type)return torect(r);
 	lv*t=lml(directory_count);dset(r,lmistr("type"),t);
 	for(int z=0;z<directory_count;z++){
 		char*path=directory[z].name;
 		int i=strlen(path);while(i>=0&&path[i]!='.')path[i]=tolower(path[i]),i--;
-		t->lv[z]=lmcstr(!directory[z].dir&&path[i]=='.'?path+i:"");
+		t->lv[z]=lmutf8(!directory[z].dir&&path[i]=='.'?path+i:"");
 	}return torect(r);
 }
 void directory_cat(char*x,char*a,char*b){if(strlen(a)==0){snprintf(x,PATH_MAX,"%s",b);}else{snprintf(x,PATH_MAX,"%s%s%s",a,SEPARATOR,b);}}
