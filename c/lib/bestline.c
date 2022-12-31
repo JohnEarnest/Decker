@@ -132,7 +132,7 @@
 #include "bestline.h"
 
 #ifndef __COSMOPOLITAN__
-#define _POSIX_C_SOURCE  1 /* so GCC builds in ANSI mode */
+//#define _POSIX_C_SOURCE  1 /* so GCC builds in ANSI mode */
 #define _XOPEN_SOURCE  700 /* so GCC builds in ANSI mode */
 #define _DARWIN_C_SOURCE 1 /* so SIGWINCH / IUTF8 on XNU */
 #include <termios.h>
@@ -1607,7 +1607,7 @@ static char *GetLineChar(int fin, int fout) {
                     break;
                 }
             } else {
-                write(fout, "\n", 1);
+                size_t err=write(fout, "\n", 1); (void)err;
                 break;
             }
         } else if (seq[0] == Ctrl('D')) {

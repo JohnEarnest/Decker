@@ -23,7 +23,8 @@ lv*n_path(lv*self,lv*a){
 lv*n_readwav(lv*self,lv*a){
 	(void)self;lv*name=ls(l_first(a));int offset=a->c>1?MAX(0,ln(a->lv[1])):0, size=0;
 	struct stat st;if(stat(name->sv,&st)||st.st_size<13)return sound_make(lms(size));
-	char*data=calloc(size=st.st_size,1);FILE*f=fopen(name->sv,"rb");fread(data,1,st.st_size,f),fclose(f);
+	char*data=calloc(size=st.st_size,1);FILE*f=fopen(name->sv,"rb");
+	if(fread(data,1,st.st_size,f)!=(unsigned)st.st_size)return fclose(f),free(data),sound_make(lms(0));fclose(f);
 	char HEAD[]={'R','I','F','F',0xFF,0xFF,0xFF,0xFF,'W','A','V','E','f','m','t',' ',16,0,0,0,1,0,1,0,64,31,0,0,64,31,0,0,1,0,8,0,'d','a','t','a'};
 	for(int z=0;z<40&&z<size;z++)if(0xFF!=(0xFF&HEAD[z])&&HEAD[z]!=data[z])return free(data),sound_make(lms(0));
 	int samples=((0xFF&data[43])<<24)|((0xFF&data[42])<<16)|((0xFF&data[41])<<8)|(0xFF&data[40]);
