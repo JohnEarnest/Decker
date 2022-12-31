@@ -169,45 +169,57 @@ end
 
 {card:Transitions A}
 image:"%%IMG2AgABVgT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8EowEMBP8E6gEXBP8E5wEaBP8E4wEeBP8E1gErBP8E1QEiAgUBBQT/BNUBFwIQAQYE/wTUARQCEwEGBP8E1AEQAhgBBgT/BNMBBQIjAQYE/wTTAQUCJAEFBP8E0wEFAiQBBgT/BNIBBQIkAQYE/wTRAQYCJQEGBP8E0AEGAiUBBgT/BNABBgImAQUE/wTQAQUCJwEGBP8EzwEFAicBBgT/BM4BBgIoAQYE/wTNAQYCKAEGBP8EzQEFAioBBgT/BMwBBQIqAQcE/wTKAQYCKwEGBP8EygEGAiwBBgT/BMkBBQItAQYE/wTIAQYCLgEGBP8ExwEGAi4BBwT/BMUBBgIwAQYE/wTFAQYCMQEGBP8ExAEFAjIBBgT/BMMBBgIzAQYE/wTCAQYCMwEGBP8EwgEFAhABAwIiAQYE/wTBAQUCDwEFAiEBBgT/BMEBBQIPAQUCIgEGBP8EvwEGAg8BBgIhAQYE/wS/AQYCDwEGAiIBBgT/BL4BBQIPAQgCIQEGBP8EvgEFAg8BCAIiAQYE/wS8AQYCDwEJAiEBBgT/BLwBBgIPAQkCIgEGBP8EuwEFAhABCgIhAQcE/wS6AQUCEAEKAiIBBgT/BLoBBQIQAQsCIgEGBP8EuAEGAhABCwIiAQYE/wS4AQYCEAEFBAEBBgIiAQYE/wS3AQUCEQEFBAEBBgIiAQYE/wS3AQUCEAEGBAIBBQIjAQYE/wS2AQUCEAEGBAIBBgIiAQYE/wS1AQYCEAEFBAMBBgIjAQYE/wS0AQYCEAEFBAQBBgIiAQYE/wS0AQUCEQEFBAQBBgIjAQYE/wSzAQUCEQEFBAUBBgIiAQYE/wSzAQUCEQEFBAUBBwIiAQYE/wSxAQYCEQEFBAYBBgIiAQYE/wSxAQYCEAEGBAcBBQIjAQYE/wSwAQUCEQEGBAcBBQIjAQYE/wSvAQYCEQEFBAgBBgIjAQYE/wSuAQYCEAEGBAgBBwIiAQYE/wSuAQUCEQEGBAkBBgIjAQUE/wSuAQUCEQEFBAsBBgIiAQYE/wStAQUCEQEFBAsBBgIiAQYE/wSsAQYCEQEFBAwBBgIiAQUE/wSsAQYCEQEFBAgBCwIhAQUE/wSsAQUCEgEYAiEBBgT/BKsBBQISARgCIQEGBP8EqwEFAhEBGQIiAQUE/wSqAQYCEQEYAiMBBgT/BKkBBgIRARACKwEGBP8EqQEFAhMBBwI0AQYE/wSoAQUCTgEGBP8EpwEGAk8BBgT/BKYBBgJPAQYE/wSmAQUCUQEFBP8EpQEGAlEBBgT/BKQBBgJRAQYE/wSkAQUCUwEGBP8EogEGAlMBBgT/BKIBBgJUAQUE/wSiAQUCVQEGBP8EoAEGAlUBBgT/BKABBgJWAQYE/wSfAQUCVwEGBP8EnwEFAlgBBQT/BJ8BBQJYAQYE/wSeAQUCWAEGBP8EnQEGAlkBBQT/BJ0BBgJZAQYE/wScAQUCOgEFAhsBBgT/BJwBBQI3AQkCGwEGBP8EmwEFAjUBCwIbAQYE/wSbAQUCMwENAhwBBgT/BJoBBQIwARACHAEGBP8EmgEFAhABBwIUARUCHQEGBP8EmQEFAg8BDgIKARIEAgEGAhwBBgT/BJgBBgIPASgEBAEGAh0BBQT/BJgBBgIPASYEBwEFAh0BBgT/BJcBBQIQASMECgEGAhwBBgT/BJcBBQIQAR4EDwEGAh0BBgT/BJYBBQIRAQUEBgEOBBQBBQIdAQYE/wSWAQUCEQEFBCgBBgIdAQUE/wSWAQUCEQEFBCgBBgIdAQYE/wSUAQYCEQEFBCkBBgIcAQYE/wSUAQYCEQEFBCkBBgIdAQYE/wSTAQUCEgEFBCoBBgIcAQYE/wSTAQUCEgEFBCoBBgIdAQUE/wSTAQUCEgEFBCsBBgIcAQYE/wSSAQUCEgEFBCsBBgIcAQcE/wSRAQUCEgEFBCwBBgIcAQYE/wSQAQYCEgEFBCwBBwIbAQcE/wSPAQYCEgEFBC0BBgIcAQYE/wSPAQUCEwEFBC4BBgIcAQYE/wSOAQUCEwEFBC4BBgIcAQcE/wSNAQUCEwEFBC8BBQIdAQcE/wSMAQUCEwEFBC8BBQIeAQcE/wSKAQYCEwEFBC8BBQIfAQYE/wSKAQYCEwEFBC8BBQIcAQoE/wSJAQUCFAEFBC8BBgITARIE/wSJAQUCFAEFBC8BBgIOARcE/wSJAQUCFAEFBDABBQIHAR0E/wSKAQUCFAEFBDABBQIFARsE/wSNAQYCFAEFBDABBQIEARkE/wSQAQYCFAEFBDABBQIBARQE/wSYAQUCFQEFBDABFQT/BJ0BBQIVAQUEMAEOBP8EpAEFAhUBBQQwAQwE/wSlAQYCFQEFBDABCwT/BKYBBgIVAQUEMQEHBP8EqQEFAhYBBQT/BOABBgIWAQUE/wTdARACDwEFBP8E3AElBP8E2wEmBP8E2wEmBP8E2wEmBP8E3AEDBAEBBgQFARUE/wTiAQQE/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8E/wT/BP8ELgAB"
-script:"Transitions A.0"
 {widgets}
-button1:{"type":"button","size":[68,20],"pos":[427,131],"script":"Transitions A.1","text":"SlideRight"}
-button2:{"type":"button","size":[68,20],"pos":[427,156],"script":"Transitions A.1","text":"WipeRight"}
-button3:{"type":"button","size":[68,20],"pos":[14,132],"script":"Transitions A.1","text":"SlideLeft"}
-button4:{"type":"button","size":[68,20],"pos":[14,157],"script":"Transitions A.1","text":"WipeLeft"}
-button5:{"type":"button","size":[68,20],"pos":[213,28],"script":"Transitions A.1","text":"SlideUp"}
-button6:{"type":"button","size":[68,20],"pos":[213,53],"script":"Transitions A.1","text":"WipeUp"}
-button7:{"type":"button","size":[68,20],"pos":[205,288],"script":"Transitions A.1","text":"SlideDown"}
-button8:{"type":"button","size":[68,20],"pos":[205,313],"script":"Transitions A.1","text":"WipeDown"}
-button9:{"type":"button","size":[68,20],"pos":[317,229],"script":"Transitions A.1","text":"BoxIn"}
-button10:{"type":"button","size":[68,20],"pos":[317,254],"script":"Transitions A.1","text":"BoxOut"}
-button11:{"type":"button","size":[68,20],"pos":[424,26],"script":"Transitions A.1","text":"StarIn"}
-button12:{"type":"button","size":[68,20],"pos":[424,51],"script":"Transitions A.1","text":"StarOut"}
-button13:{"type":"button","size":[68,20],"pos":[26,27],"script":"Transitions A.1","text":"HeartIn"}
-button14:{"type":"button","size":[68,20],"pos":[26,52],"script":"Transitions A.1","text":"HeartOut"}
-button15:{"type":"button","size":[68,20],"pos":[395,229],"script":"Transitions A.1","text":"Dissolve"}
-button16:{"type":"button","size":[93,21],"pos":[394,255],"script":"Transitions A.1","text":"CircleInClick"}
-button17:{"type":"button","size":[93,21],"pos":[395,283],"script":"Transitions A.1","text":"CircleOutClick"}
+button1:{"type":"button","size":[68,20],"pos":[427,131],"script":"Transitions A.0","text":"SlideRight"}
+button2:{"type":"button","size":[68,20],"pos":[427,156],"script":"Transitions A.0","text":"WipeRight"}
+button3:{"type":"button","size":[68,20],"pos":[14,132],"script":"Transitions A.0","text":"SlideLeft"}
+button4:{"type":"button","size":[68,20],"pos":[14,157],"script":"Transitions A.0","text":"WipeLeft"}
+button5:{"type":"button","size":[68,20],"pos":[213,28],"script":"Transitions A.0","text":"SlideUp"}
+button6:{"type":"button","size":[68,20],"pos":[213,53],"script":"Transitions A.0","text":"WipeUp"}
+button7:{"type":"button","size":[68,20],"pos":[205,288],"script":"Transitions A.0","text":"SlideDown"}
+button8:{"type":"button","size":[68,20],"pos":[205,313],"script":"Transitions A.0","text":"WipeDown"}
+button9:{"type":"button","size":[68,20],"pos":[317,229],"script":"Transitions A.0","text":"BoxIn"}
+button10:{"type":"button","size":[68,20],"pos":[317,254],"script":"Transitions A.0","text":"BoxOut"}
+button11:{"type":"button","size":[68,20],"pos":[424,26],"script":"Transitions A.0","text":"StarIn"}
+button12:{"type":"button","size":[68,20],"pos":[424,51],"script":"Transitions A.0","text":"StarOut"}
+button13:{"type":"button","size":[68,20],"pos":[26,27],"script":"Transitions A.0","text":"HeartIn"}
+button14:{"type":"button","size":[68,20],"pos":[26,52],"script":"Transitions A.0","text":"HeartOut"}
+button15:{"type":"button","size":[68,20],"pos":[395,229],"script":"Transitions A.0","text":"Dissolve"}
+button16:{"type":"button","size":[93,21],"pos":[394,255],"script":"Transitions A.0","text":"CircleInClick"}
+button17:{"type":"button","size":[93,21],"pos":[395,283],"script":"Transitions A.0","text":"CircleOutClick"}
 
 {script:Transitions A.0}
-on target x do
- if deck.card.name~"Transitions A"
-  deck.cards["Transitions B"]
- else
-  deck.cards["Transitions A"]
- end
-end
-{end}
-
-{script:Transitions A.1}
 on click do
-  go[target[] me.text]
+  go["Transitions B" me.text]
 end
 {end}
 
 {card:Transitions B}
-parent:"Transitions A"
 image:"%%IMG2AgABVgX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8FKgQBBf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wVaAQMF/wX9AQUF/wX8AQgF/wX4AQ8F/wXyARQF/wXtASEF/wXgASgF/wXZAQUGAgEpBf8F0QEFBggBLAX/BccBBgYNAS8F/wW/AQYGGgEpBf8FuAEFBiIBJgX/BbQBBQYqASIF/wWvAQYGMwEeBf8FqgEGBjsBGQX/BacBBQZDARQF/wWkAQYGRwERBf8FowEGBksBDwX/BaABBgZRAQsF/wWfAQYGVAEKBf8FnQEFBhkBAwY7AQkF/wWbAQYGGAEHBjkBCQX/BZoBBgYXAQwGNwEIBf8FmAEGBhgBDgY2AQcF/wWYAQYGGAEPBjcBBgX/BZYBBgYYAREGNgEGBf8FlgEGBhgBBgUBAQsGNgEGBf8FlAEGBhkBBQUGAQgGNQEGBf8FlAEGBhkBBQUIAQcGNQEGBf8FkwEFBhoBBQUJAQcGNAEGBf8FkgEGBhoBBQUKAQYGNQEFBf8FkgEGBhoBBQULAQYGNAEGBf8FkAEGBhsBBQULAQcGMwEGBf8FkAEGBhsBBQUMAQYGNAEFBf8FkAEFBhwBBQUNAQUGNAEGBf8FjgEGBhwBBQULAQcGNAEGBf8FjgEGBhwBBQUKAQgGNQEFBf8FjgEFBh0BBQUJAQgGNgEFBf8FjgEFBh0BBQUHAQkGNwEGBf8FjAEGBh0BBQUCAQ0GOAEGBf8FjAEGBhsBFAY7AQUF/wWMAQUGGwEUBjwBBQX/BYsBBgYbARMGPQEFBf8FiwEGBhsBEQY/AQUF/wWKAQYGHQELBkQBBQX/BYoBBgZsAQUF/wWKAQUGbQEFBf8FigEFBm0BBQX/BYoBBQZtAQUF/wWJAQYGbQEFBf8FiQEGBm0BBQX/BYkBBQZuAQUF/wWJAQUGbgEFBf8FiQEFBm4BBQX/BYkBBQZuAQUF/wWIAQYGbgEFBf8FiAEGBm4BBQX/BYgBBQZvAQUF/wWIAQUGbwEFBf8FiAEFBm8BBQX/BYcBBgZvAQUF/wWHAQYGQQEIBiYBBQX/BYcBBQZBARAGHAEIBf8FhwEFBkEBFAYRAQ8F/wWHAQUGQQEzBf8FhwEGBkIBMQX/BYgBBgZDAS8F/wWJAQUGRQEJAAIBIAX/BYwBBQZGAQoFBAEVBf8FkwEFBkgBCQX/BasBBQZKAQgF/wWqAQUGSwEIBf8FqQEFBkwBCAX/BagBBQZOAQgF/wWmAQUGTwEIBf8FpAEGBlABCAX/BaMBBgZRAQgF/wWiAQUGUwEJBf8FoAEFBlUBCAX/BZ8BBQZWAQgF/wWeAQUGVwEIBf8FnQEFBlgBCAX/BZwBBQZaAQcF/wWbAQUGWwEHBf8FmgEFBlwBBwX/BZkBBQZdAQcF/wWYAQUGXgEHBf8FlwEFBl8BBwX/BZYBBQYVAQwGPwEHBf8FlAEGBhQBEAY9AQcF/wWTAQYGFAETBjsBBwX/BZIBBQYVARUGOgEHBf8FkQEFBhUBFwY5AQcF/wWQAQUGFQEFBQYBDQY5AQcF/wWPAQUGFQEFBQkBCwY5AQYF/wWPAQUGFQEFBQwBCQY5AQYF/wWOAQUGFQEFBQ4BCQY3AQcF/wWNAQUGFQEFBRABCAY3AQcF/wWMAQUGFQEFBREBCAY3AQYF/wWMAQUGFQEFBRIBCAY3AQYF/wWLAQUGFQEFBRMBCAY2AQcF/wWKAQUGFQEFBRUBBgY3AQYF/wWKAQUGFQEFBRYBBgY3AQYF/wWJAQUGFQEFBRYBBwY2AQYF/wWJAQUGFQEFBRcBBgY3AQYF/wWIAQUGFQEFBRgBBgY2AQcF/wWHAQUGFQEFBRgBBwY2AQcF/wWFAQYGFQEFBRkBBgY3AQcF/wWEAQYGFQEFBRoBBQY4AQcF/wWDAQUGFgEFBRoBBQY5AQYF/wWDAQUGFgEFBRoBBQY6AQUF/wWDAQUGFgEFBRoBBgY5AQUF/wWDAQUGFgEFBRoBBgY5AQUF/wWDAQUGFgEFBRsBBQY5AQUF/wWDAQUGFQEGBRsBBQY5AQUF/wWDAQUGFAEHBRsBBQY5AQUF/wWDAQUGFAEJBRgBBgY5AQUF/wWDAQUGFAEKBRcBBgY5AQYF/wWCAQUGFQELBRMBBwY6AQYF/wWCAQUGFgEMBQ0BCwY7AQUF/wWBAQYGFwEiBjwBBQX/BYEBBgYbAR0GPQEFBf8FgQEFBh0BGwY+AQUF/wWBAQUGHwEXBkABBQX/BYEBBQYhAREGRAEGBf8FgAEFBnYBBgX/BX8BBgZ3AQUF/wV/AQYGdwEFBf8FfwEFBngBBQX/BX8BBQZ4AQYF/wV+AQUGeAEGBf8FfQEGBnkBBQX/BX0BBgZ5AQUF/wV9AQUGegEFBf8FfAEGBnoBBQX/BXwBBgZ6AQUF/wV8AQUGewEFBf8FewEGBnsBBQX/BXsBEgZvAQUF/wV6ARcGawEFBf8FegEaBmgBBQX/BXkBHQZlAQYF/wV5AR8GYwEGBf8FeQEKBQgBEAZfAQYF/wV6AQUFEQEPBlwBBgX/BXsBAwUVAQ4GWQEGBf8FlgEOBlYBBwX/BZgBDgZTAQcF/wWcAQ4GTwEHBf8FoAEPBkoBBwX/BaMBEQZFAQcF/wWmARIGQAEIBf8FqQETBjwBCAX/Ba0BEgY5AQgF/wWyAREGNAEJBf8FtwESBiwBCwX/BbsBFAYlAQsF/wXAARYGHQENBf8FwwEZBgkBGwX/BccBOAX/Bc4BMAX/BdYBKQX/Bd0BIQX/BeUBDQX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wX/Bf8F/wWeAAE="
+{widgets}
+button1:{"type":"button","size":[68,20],"pos":[427,131],"script":"Transitions B.0","text":"SlideRight"}
+button2:{"type":"button","size":[68,20],"pos":[427,156],"script":"Transitions B.0","text":"WipeRight"}
+button3:{"type":"button","size":[68,20],"pos":[14,132],"script":"Transitions B.0","text":"SlideLeft"}
+button4:{"type":"button","size":[68,20],"pos":[14,157],"script":"Transitions B.0","text":"WipeLeft"}
+button5:{"type":"button","size":[68,20],"pos":[213,28],"script":"Transitions B.0","text":"SlideUp"}
+button6:{"type":"button","size":[68,20],"pos":[213,53],"script":"Transitions B.0","text":"WipeUp"}
+button7:{"type":"button","size":[68,20],"pos":[205,288],"script":"Transitions B.0","text":"SlideDown"}
+button8:{"type":"button","size":[68,20],"pos":[205,313],"script":"Transitions B.0","text":"WipeDown"}
+button9:{"type":"button","size":[68,20],"pos":[317,229],"script":"Transitions B.0","text":"BoxIn"}
+button10:{"type":"button","size":[68,20],"pos":[317,254],"script":"Transitions B.0","text":"BoxOut"}
+button11:{"type":"button","size":[68,20],"pos":[424,26],"script":"Transitions B.0","text":"StarIn"}
+button12:{"type":"button","size":[68,20],"pos":[424,51],"script":"Transitions B.0","text":"StarOut"}
+button13:{"type":"button","size":[68,20],"pos":[26,27],"script":"Transitions B.0","text":"HeartIn"}
+button14:{"type":"button","size":[68,20],"pos":[26,52],"script":"Transitions B.0","text":"HeartOut"}
+button15:{"type":"button","size":[68,20],"pos":[395,229],"script":"Transitions B.0","text":"Dissolve"}
+button16:{"type":"button","size":[93,21],"pos":[394,255],"script":"Transitions B.0","text":"CircleInClick"}
+button17:{"type":"button","size":[93,21],"pos":[395,283],"script":"Transitions B.0","text":"CircleOutClick"}
+
+{script:Transitions B.0}
+on click do
+  go["Transitions A" me.text]
+end
+{end}
 
 {card:Draggables}
 image:"%%IMG2AgABVgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wA7AV8A/wChAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wCgAWEA/wChAV8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AFc="
