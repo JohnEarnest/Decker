@@ -145,6 +145,13 @@ ffmpeg -i input.mp3 -bitexact -map_metadata -1 -ac 1 -ar 8000 -acodec pcm_u8 out
 - `value`: the value of the last expression in the program. On a parse error, `value` will be the number `0`.
 - `vars`: a dictionary containing any variable bindings made while executing the program. (This also includes bindings from argument `y`.)
 
+Code executed within `eval[]` does not have access to any variables from the caller that are not explicitly passed in via the second argument, including global functions and constants, nor can it modify variables of the caller; the code is executed in its own isolated scope. In the following example, we provide our `eval[]`ed code with the `show[]` function and a constant:
+```
+d.show:show
+d.a:2
+eval["show[a+3]" d]
+```
+
 6) See the [Decker Manual](decker.html) for details of `readcsv[]`, `writecsv[]`, `readxml[]`, and `writexml[]`.
 
 7) If the path given to `writedeck[]` ends in a `.html` suffix, the deck will be written as a "standalone" deck with a bundled HTML+JS runtime. Otherwise, the deck will be written as a "bare" deck, which is smaller.
