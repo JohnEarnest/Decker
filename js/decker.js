@@ -2869,9 +2869,9 @@ up=(x,y,alt)=>{
 }
 mouse=(e,f)=>{
 	ev.rawpos=rect(e.pageX,e.pageY);const c=q('#display').getBoundingClientRect()
-	f(0|((e.pageX-c.x)/zoom),0|((e.pageY-c.y)/zoom),e.button!=0); e.preventDefault()
+	f(0|((e.pageX-c.x)/zoom),0|((e.pageY-c.y)/zoom),e.button!=0)
 }
-touch=(e,f)=>{const t=e.targetTouches[0]||{}; mouse({pageX:t.clientX, pageY:t.clientY, preventDefault:_=>e.preventDefault,button:0},f)}
+touch=(e,f)=>{const t=e.targetTouches[0]||{}; mouse({pageX:t.clientX, pageY:t.clientY, button:0},f)}
 loop=_=>{tick(),sync(),pump=setTimeout(loop,1000/60)} // 60fps
 resize=_=>{
 	const b=q('body'), screen=rect(b.clientWidth,b.clientHeight), fs=min(screen.x/fb.size.x,screen.y/fb.size.y)
@@ -2891,7 +2891,7 @@ q('body').addEventListener('mouseup'    ,e=>mouse(e,up  ))
 q('body').addEventListener('mousemove'  ,e=>mouse(e,move))
 q('body').addEventListener('contextmenu',e=>e.preventDefault())
 q('body').addEventListener('touchstart' ,e=>{e.preventDefault(),touch(e,down)},{passive:false})
-q('body').addEventListener('touchend'   ,e=>touch({targetTouches:e.changedTouches,preventDefault:e.preventDefault},up))
+q('body').addEventListener('touchend'   ,e=>touch({targetTouches:e.changedTouches},up))
 q('body').addEventListener('touchmove'  ,e=>touch(e,move))
 q('body').onwheel=e=>ev.scroll=e.deltaY<0?-1:e.deltaY>0?1:0
 q('body').onkeydown=e=>{
