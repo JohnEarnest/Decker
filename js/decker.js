@@ -2693,11 +2693,11 @@ all_menus=_=>{
 	}
 	if(uimode=='object'){
 		menu_bar('Widgets',ms.type==null)
-		if(menu_item('New Button...',ob.sel.length==0))ob_create([lmd([lms('type')],[lms('button')])])
-		if(menu_item('New Field...' ,ob.sel.length==0))ob_create([lmd([lms('type')],[lms('field' )])])
-		if(menu_item('New Slider...',ob.sel.length==0))ob_create([lmd([lms('type')],[lms('slider')])])
-		if(menu_item('New Canvas...',ob.sel.length==0))ob_create([lmd([lms('type')],[lms('canvas')])])
-		if(menu_item('New Grid...'  ,ob.sel.length==0))ob_create([lmd([lms('type')],[lms('grid'  )])])
+		if(menu_item('New Button...',1))ob_create([lmd([lms('type')],[lms('button')])])
+		if(menu_item('New Field...' ,1))ob_create([lmd([lms('type')],[lms('field' )])])
+		if(menu_item('New Slider...',1))ob_create([lmd([lms('type')],[lms('slider')])])
+		if(menu_item('New Canvas...',1))ob_create([lmd([lms('type')],[lms('canvas')])])
+		if(menu_item('New Grid...'  ,1))ob_create([lmd([lms('type')],[lms('grid'  )])])
 		menu_separator()
 		let al=1,as=1,at=1,ai=1,an=1
 		ob.sel.map(unpack_widget).map(w=>{al&=w.locked, as&=w.show=='solid', at&=w.show=='transparent', ai&=w.show=='invert', an&=w.show=='none'})

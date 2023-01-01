@@ -2990,11 +2990,11 @@ void tick(lv*env){
 		}
 		if(uimode==mode_object){
 			menu_bar("Widgets",ms.type==modal_none);
-			if(menu_item("New Button...",ob.sel->c==0,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("button"));ob_create(l_list(p));}
-			if(menu_item("New Field..." ,ob.sel->c==0,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("field" ));ob_create(l_list(p));}
-			if(menu_item("New Slider...",ob.sel->c==0,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("slider"));ob_create(l_list(p));}
-			if(menu_item("New Canvas...",ob.sel->c==0,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas"));ob_create(l_list(p));}
-			if(menu_item("New Grid..."  ,ob.sel->c==0,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("grid"  ));ob_create(l_list(p));}
+			if(menu_item("New Button...",1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("button"));ob_create(l_list(p));}
+			if(menu_item("New Field..." ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("field" ));ob_create(l_list(p));}
+			if(menu_item("New Slider...",1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("slider"));ob_create(l_list(p));}
+			if(menu_item("New Canvas...",1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas"));ob_create(l_list(p));}
+			if(menu_item("New Grid..."  ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("grid"  ));ob_create(l_list(p));}
 			menu_separator();
 			int al=1,as=1,at=1,ai=1,an=1;EACH(z,ob.sel){
 				widget w=unpack_widget(ob.sel->lv[z]);al&=w.locked;
