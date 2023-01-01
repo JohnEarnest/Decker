@@ -115,7 +115,7 @@ Built-in Functions
 - `name`: the filename of the item.
 - `type`: the extension including a dot (like `.txt`), if any, always converted to lowercase.
 
-2) `read[]` recognizes several types of file by extension and will interpret each appropriately:
+2) `read[x hint]` recognizes several types of file by extension and will interpret each appropriately:
 
 - if the `hint` argument is the string `"array"`, the file will be read as an _array interface_ with a default `cast` of `u8`.
 - `.gif` files are read as _image interfaces_.
@@ -140,7 +140,7 @@ ffmpeg -i input.mp3 -bitexact -map_metadata -1 -ac 1 -ar 8000 -acodec pcm_u8 out
 - `exit`: the exit code of the process, as a number. If the process halted abnormally (i.e. due to a signal), this will be -1.
 - `out`: _stdout_ of the process, as a string.
 
-5) `eval[]` returns a dictionary containing:
+5) `eval[x y]` returns a dictionary containing:
 - `error`: a string giving any error message produced during parsing, or the empty string.
 - `value`: the value of the last expression in the program. On a parse error, `value` will be the number `0`.
 - `vars`: a dictionary containing any variable bindings made while executing the program. (This also includes bindings from argument `y`.)

@@ -1247,8 +1247,7 @@ void modals(){
 			rect c={bb.x,bb.y+(z*slot)-ms.grid.scroll,bb.w,slot}; lv*card=cards->lv[z];
 			if(c.y>bb.y+bb.h||c.y+c.h<bb.y)continue; rect cb=box_intersect(c,bb); // coarse clip
 			rect p={c.x+2,c.y+1,40,28}, t={p.x+p.w+5,p.y,bb.w-(2+p.w+5+5),font_h(FONT_MENU)}, s={t.x,t.y+t.h+2,t.w,font_h(FONT_BODY)};
-			if(has_parent(card)){snprintf(temp,sizeof(temp),"child of '%s'",ifield(ifield(card,"parent"),"name")->sv);}
-			else{snprintf(temp,sizeof(temp),"%d widgets",ifield(card,"widgets")->c);}
+			snprintf(temp,sizeof(temp),"%d widgets",ifield(card,"widgets")->c);
 			if(ev.md&&dover(cb)){m=1,n_go(deck,l_list(card));curr=card;ms.grid.row=z;}if(ev.dclick&&over(cb))props=1;
 			int col=ev.drag&&ms.grid.row==z?13:1;
 			draw_text_fit(t,ifield(card,"name")->sv,FONT_MENU,col),draw_text_fit(s,temp,FONT_BODY,col);draw_box(p,0,col);
@@ -1265,12 +1264,6 @@ void modals(){
 			int n=ln(ifield(curr,"index"));iwrite(c,lmistr("index"),lmn(n+1));
 			m=1,n_go(deck,l_list(c));
 		}c.x+=65;
-		if(ui_button((rect){c.x,c.y,80,20},"New Child",1)){
-			lv*a=lml(3);a->lv[0]=lmistr("card"),a->lv[1]=ifield(curr,"name"),a->lv[2]=curr;
-			lv*c=n_deck_add(deck,a);
-			int n=ln(ifield(curr,"index"));iwrite(c,lmistr("index"),lmn(n+1));
-			m=1,n_go(deck,l_list(c));
-		}
 		if(ev.mu){
 			if(ms.grid.row!=-1&&gutter!=-1){
 				lv*s=cards->lv[ms.grid.row];int oi=ln(ifield(s,"index"));
@@ -1583,10 +1576,6 @@ void modals(){
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Card Properties",FONT_MENU,1);
 		draw_text((rect){b.x,b.y+22,42,20},"Name",FONT_MENU,1);
 		ui_field((rect){b.x+42,b.y+20,b.w-42,18},&ms.name);
-		lv*parent=ifield(card,"parent");if(card_is(parent)){
-			char t[4096];snprintf(t,sizeof(t),"This card is a child of \"%s\"",ifield(parent,"name")->sv);
-			layout_plaintext(t,FONT_BODY,align_left,(pair){b.w,30});draw_text_wrap((rect){b.x,b.y+45,b.w,30},1);
-		}
 		pair c={b.x,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))setscript(card),modal_exit(0);
 		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
@@ -2568,7 +2557,7 @@ void sync(){
 				au.target=n_deck_add(deck,l_list(lmistr("sound")));mark_dirty();modal_enter(modal_recording);
 				sound_edit(readwav(p));au.sel=(pair){0,0},au.head=0;
 			}
-			if((has_suffix(p,".csv")||has_suffix(p,".psv"))&&!has_parent(ifield(deck,"card"))){
+			if(has_suffix(p,".csv")||has_suffix(p,".psv")){
 				setmode(mode_object);lv*a=lmd();
 				lv* dat=n_read(NULL,l_list(lmcstr(p)));
 				lv* sep=lmistr(has_suffix(p,".csv")?",": "|");
@@ -2894,7 +2883,7 @@ void tick(lv*env){
 				if(menu_item("Copy Image",ob.sel->c==1,'\0')){SDL_SetClipboardText(image_write(draw_widget(ob.sel->lv[0]))->sv);frame=context;}
 				paste_any();
 				menu_separator();
-				if(menu_item("Paste as new Canvas",has_clip("%%IMG")&&!has_parent(card),'\0')){
+				if(menu_item("Paste as new Canvas",has_clip("%%IMG"),'\0')){
 					lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas"));
 					char*t=SDL_GetClipboardText();dset(p,lmistr("image"),lmcstr(t));SDL_free(t);
 					ob_create(l_list(p));frame=context;
@@ -2904,7 +2893,7 @@ void tick(lv*env){
 					lv*c=ob.sel->lv[0];iwrite(c,lmistr("size"),ifield(i,"size")),dset(c->b,lmistr("image"),i);
 				}
 				menu_separator();
-				if(menu_item("Select All",!has_parent(card),'a')){lv*wids=ifield(card,"widgets");ob.sel->c=0;EACH(z,wids)ll_add(ob.sel,wids->lv[z]);}
+				if(menu_item("Select All",1,'a')){lv*wids=ifield(card,"widgets");ob.sel->c=0;EACH(z,wids)ll_add(ob.sel,wids->lv[z]);}
 				if(menu_item("Move to Front",ob.sel->c,'\0')){ob_order();EACH(z,ob.sel){iwrite(ob.sel->lv[z],lmistr("index"),lmn(RTEXT_END));}mark_dirty();}
 				if(menu_item("Move to Back",ob.sel->c,'\0')){ob_order();EACHR(z,ob.sel){iwrite(ob.sel->lv[z],lmistr("index"),NONE);};mark_dirty();}
 			}
@@ -2923,7 +2912,7 @@ void tick(lv*env){
 					if(menu_item("Toggle Comment",1,'/' ))field_comment();
 				}
 				if(wid.f.style!=field_code){
-					if(menu_item("Font...",!has_parent(card)&&wid.f.style!=field_plain,'\0'))modal_enter(modal_fonts);
+					if(menu_item("Font...",wid.f.style!=field_plain,'\0'))modal_enter(modal_fonts);
 				}
 			}
 		}
@@ -2947,17 +2936,16 @@ void tick(lv*env){
 		}
 		if(uimode==mode_interact||uimode==mode_draw||uimode==mode_object){
 			menu_bar("Card",ms.type==modal_none);
-			lv*card=ifield(deck,"card"),*parent=ifield(card,"parent");
+			lv*card=ifield(deck,"card");
 			if(menu_item("Go to First"   ,1,'\0'))n_go(deck,l_list(lmistr("First")));
 			if(menu_item("Go to Previous",1,'\0'))n_go(deck,l_list(lmistr("Prev")));
 			if(menu_item("Go to Next"    ,1,'\0'))n_go(deck,l_list(lmistr("Next")));
 			if(menu_item("Go to Last"    ,1,'\0'))n_go(deck,l_list(lmistr("Last")));
-			if(menu_item("Go to Parent",has_parent(card),'\0'))n_go(deck,l_list(parent));
 			menu_separator();
 			if(menu_item("Cut Card" ,1,'\0')){SDL_SetClipboardText(n_deck_copy(deck,l_list(card))->sv);n_deck_remove(deck,l_list(card));mark_dirty();}
 			if(menu_item("Copy Card",1,'\0')){SDL_SetClipboardText(n_deck_copy(deck,l_list(card))->sv);}
 			menu_separator();
-			if(menu_item("Script..."    ,!has_parent(card),'e'))setscript(card);
+			if(menu_item("Script..."    ,1,'e'))setscript(card);
 			if(menu_item("Properties...",1,'\0'))modal_enter(modal_card_props);
 			menu_bar("Tool",ms.type==modal_none);
 			if(menu_check("Interact",1,uimode==mode_interact,0))setmode(mode_interact);
@@ -3001,7 +2989,7 @@ void tick(lv*env){
 			if(menu_check("Transparency",1,dr.trans,0))dr.trans^=1;
 		}
 		if(uimode==mode_object){
-			menu_bar("Widgets",ms.type==modal_none&&!has_parent(ifield(deck,"card")));
+			menu_bar("Widgets",ms.type==modal_none);
 			if(menu_item("New Button...",ob.sel->c==0,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("button"));ob_create(l_list(p));}
 			if(menu_item("New Field..." ,ob.sel->c==0,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("field" ));ob_create(l_list(p));}
 			if(menu_item("New Slider...",ob.sel->c==0,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("slider"));ob_create(l_list(p));}
@@ -3124,12 +3112,11 @@ void tick(lv*env){
 			EACH(z,wids){ // forward pass for rendering
 				lv*wid=wids->lv[z];widget w=unpack_widget(wid);
 				int sel=0;EACH(z,ob.sel)if(ob.sel->lv[z]==wid){sel=1;break;}
-				if(has_parent(card))draw_rect(w.size,23);
 				if(sel){draw_box(inset(w.size,-1),0,ANTS);}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1));}
 				if(sel&&ob.sel->c==1){draw_handles(w.size);}
 				if(w.locked&&ob.show_bounds){draw_rect((rect){w.size.x+w.size.w-10,w.size.y,10,10},1),draw_icon((pair){w.size.x+w.size.w-8,w.size.y+1},LOCK,32);}
 			}
-			if(!has_parent(card)&&in_layer()){
+			if(in_layer()){
 				if(ob.sel->c>0){
 					int nudge=0;
 					if(ev.dir==dir_left )ob_move((pair){-1*(ev.shift?dr.grid_size.x:1), 0},1),nudge=1;

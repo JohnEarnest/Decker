@@ -787,6 +787,7 @@ patterns_is=x=>lii(x)&&x.n=='patterns'
 module_is  =x=>lii(x)&&x.n=='module'
 widget_is  =x=>lii(x)&&x.n in {button:1,field:1,grid:1,slider:1,canvas:1}
 ikey  =(x,k)=>lis(x)&&x.v==k
+ivalue=(x,k,d)=>k in x?x[k]:d
 ifield=(x,k)  =>x.f(x,lms(k))
 iindex=(x,k,v)=>x.f(x,lmn(k),v)
 iwrite=(x,k,v)=>x.f(x,k,v)
@@ -796,13 +797,7 @@ normalize_font=(x,v)=>ls(dkey(x,v)||x.k[dkix(x,v)]||lms('body'))
 data_enc=x=>x[5]==undefined?-1:+x[5]
 data_read=(type,x)=>(x.slice(0,2)!='%%'||x.slice(2,5)!=type)?null:new Uint8Array(atob(x.slice(6)).split('').map(x=>x.charCodeAt(0)))
 data_write=(type,x)=>`%%${type}${btoa(Array.from(x).map(x=>String.fromCharCode(x)).join(''))}`
-has_parent=x=>card_is(x)?card_is(ifield(x,'parent')): has_parent(x.card)
 is_rooted=x=>card_is(x)?!x.dead: widget_is(x)?(is_rooted(x.card)&&!x.dead): 1
-card_inherit=(self,key)=>!lii(self)?null: self[ls(key)]||card_inherit(ifield(self,'parent'),key)
-widget_inherit=(self,key,def)=>{
-	if(card_is(self))return card_inherit(self,key);if(!lii(self))return def;if(key in self)return self[key]
-	const p=ifield(self.card,'parent');return lii(p)?widget_inherit(dget(p.widgets,ifield(self,'name')),key,def):def
-}
 
 ceil=Math.ceil, clamp=(a,x,b)=>x<a?a:x>b?b:x, sign=x=>x>0?1:-1
 last=x=>x[x.length-1]
@@ -1463,14 +1458,13 @@ button_read=(x,card)=>{
 		if(!is_rooted(self))return NONE
 		if(x){
 			if(ikey(i,'value'))return self.value=lb(x),x
-			if(has_parent(self))return x
 			if(ikey(i,'text' ))return self.text=ls(x),x
 			if(ikey(i,'style'))return self.style=normalize_enum(button_styles,ls(x)),x
 		}else{
-			if(ikey(i,'value'))return lmn(widget_inherit(self,ls(i),0))
-			if(ikey(i,'text' ))return lms(widget_inherit(self,ls(i),''))
-			if(ikey(i,'style'))return lms(widget_inherit(self,ls(i),'round'))
-			if(ikey(i,'size' ))return lmpair(widget_inherit(self,ls(i),rect(60,20)))
+			if(ikey(i,'value'))return lmn(ivalue(self,ls(i),0))
+			if(ikey(i,'text' ))return lms(ivalue(self,ls(i),''))
+			if(ikey(i,'style'))return lms(ivalue(self,ls(i),'round'))
+			if(ikey(i,'size' ))return lmpair(ivalue(self,ls(i),rect(60,20)))
 			if(ikey(i,'click')&&state.external)return lmnat(([x])=>fire_event(self,i,NONE))
 		}return interface_widget(self,i,x)
 	},'button');ri.card=card
@@ -1498,21 +1492,20 @@ field_read=(x,card)=>{
 				if(ls(ifield(self,'style'))!='rich'&&!rtext_is_plain(x))x=rtext_string(rtext_cast(x))
 				return self.value=rtext_cast(x),x
 			}
-			if(has_parent(self))return x
 			if(ikey(i,'border'   ))return self.border=lb(x),x
 			if(ikey(i,'scrollbar'))return self.scrollbar=lb(x),x
 			if(ikey(i,'style'    ))return self.style=normalize_enum(field_styles,ls(x)),iwrite(self,lms('value'),ifield(self,'value')),x
 			if(ikey(i,'align'    ))return self.align=normalize_enum(field_aligns,ls(x)),x
 		}else{
-			if(ikey(i,'text'     )){const v=widget_inherit(self,'value');return v!=undefined?rtext_string(v):lms('')}
-			if(ikey(i,'border'   ))return lmn(widget_inherit(self,ls(i),1))
-			if(ikey(i,'value'    ))return widget_inherit(self,ls(i))||rtext_cast()
-			if(ikey(i,'scroll'   ))return lmn(widget_inherit(self,ls(i),0))
-			if(ikey(i,'scrollbar'))return lmn(widget_inherit(self,ls(i),0))
-			if(ikey(i,'style'    ))return lms(widget_inherit(self,ls(i),'rich'))
-			if(ikey(i,'align'    ))return lms(widget_inherit(self,ls(i),'left'))
-			if(ikey(i,'size'     ))return lmpair(widget_inherit(self,ls(i),rect(100,20)))
-			if(ikey(i,'font'     ))return dget(self.card.deck.fonts,lms(widget_inherit(self,ls(i))||(widget_inherit(self,'style')=='code'?'mono':'body')))
+			if(ikey(i,'text'     )){const v=ivalue(self,'value');return v!=undefined?rtext_string(v):lms('')}
+			if(ikey(i,'border'   ))return lmn(ivalue(self,ls(i),1))
+			if(ikey(i,'value'    ))return ivalue(self,ls(i))||rtext_cast()
+			if(ikey(i,'scroll'   ))return lmn(ivalue(self,ls(i),0))
+			if(ikey(i,'scrollbar'))return lmn(ivalue(self,ls(i),0))
+			if(ikey(i,'style'    ))return lms(ivalue(self,ls(i),'rich'))
+			if(ikey(i,'align'    ))return lms(ivalue(self,ls(i),'left'))
+			if(ikey(i,'size'     ))return lmpair(ivalue(self,ls(i),rect(100,20)))
+			if(ikey(i,'font'     ))return dget(self.card.deck.fonts,lms(self.font||(self.style=='code'?'mono':'body')))
 			if(ikey(i,'run'   )&&state.external)return lmnat(([x])=>fire_event(self,i,lms(ls(x))))
 			if(ikey(i,'link'  )&&state.external)return lmnat(([x])=>fire_event(self,i,lms(ls(x))))
 			if(ikey(i,'change')&&state.external)return lmnat(([x])=>fire_event(self,i,lms(ls(x))))
@@ -1549,18 +1542,17 @@ slider_read=(x,card)=>{
 		if(!is_rooted(self))return NONE
 		if(x){
 			if(ikey(i,'value'   ))return self.value=slider_normalize(self,ln(x)),x
-			if(has_parent(self))return x
 			if(ikey(i,'step'    ))return self.step=max(0.000001,ln(x)),update(self),x
 			if(ikey(i,'format'  ))return self.format=ls(x),x
 			if(ikey(i,'style'   ))return self.style=normalize_enum(slider_styles,ls(x)),x
 			if(ikey(i,'interval')){const v=getpair(x);return self.interval=rect(min(v.x,v.y),max(v.x,v.y)),update(self),x}
 		}else{
-			if(ikey(i,'value'   )){const v=getpair(ifield(self,'interval'));return lmn(widget_inherit(self,ls(i),clamp(v.x,0,v.y)))}
-			if(ikey(i,'format'  ))return lms(widget_inherit(self,ls(i),'%f'))
-			if(ikey(i,'step'    ))return lmn(widget_inherit(self,ls(i),1))
-			if(ikey(i,'interval'))return lmpair(widget_inherit(self,ls(i),rect(0,100)))
-			if(ikey(i,'style'   ))return lms(widget_inherit(self,ls(i),'horiz'))
-			if(ikey(i,'size'    ))return lmpair(widget_inherit(self,ls(i),rect(100,25)))
+			if(ikey(i,'value'   )){const v=getpair(ifield(self,'interval'));return lmn(ivalue(self,ls(i),clamp(v.x,0,v.y)))}
+			if(ikey(i,'format'  ))return lms(ivalue(self,ls(i),'%f'))
+			if(ikey(i,'step'    ))return lmn(ivalue(self,ls(i),1))
+			if(ikey(i,'interval'))return lmpair(ivalue(self,ls(i),rect(0,100)))
+			if(ikey(i,'style'   ))return lms(ivalue(self,ls(i),'horiz'))
+			if(ikey(i,'size'    ))return lmpair(ivalue(self,ls(i),rect(100,25)))
 			if(ikey(i,'change'&&state.external))return lmnat(([x])=>fire_event(self,i,lmn(ln(x))))
 		}return interface_widget(self,i,x)
 	},'slider');ri.card=card
@@ -1588,22 +1580,21 @@ grid_read=(x,card)=>{
 			if(ikey(i,'value'    ))return self.value=lt(x),x
 			if(ikey(i,'scroll'   ))return self.scroll=max(0,ln(x)),x
 			if(ikey(i,'row'      ))return self.row=max(-1,ln(x)),x
-			if(has_parent(self))return x
 			if(ikey(i,'scrollbar'))return self.scrollbar=lb(x),x
 			if(ikey(i,'headers'  ))return self.headers=lb(x),x
 			if(ikey(i,'lines'    ))return self.lines=lb(x),x
 			if(ikey(i,'widths'   ))return self.widths=ints(ll(x),255),x
 			if(ikey(i,'format'   ))return self.format=ls(x),x
 		}else{
-			if(ikey(i,'value'    ))return widget_inherit(self,ls(i),lmt({}))
-			if(ikey(i,'scroll'   ))return lmn(widget_inherit(self,ls(i),0))
-			if(ikey(i,'scrollbar'))return lmn(widget_inherit(self,ls(i),1))
-			if(ikey(i,'headers'  ))return lmn(widget_inherit(self,ls(i),1))
-			if(ikey(i,'lines'    ))return lmn(widget_inherit(self,ls(i),1))
-			if(ikey(i,'widths'   ))return lml((widget_inherit(self,ls(i),[])).map(lmn))
-			if(ikey(i,'format'   ))return lms(widget_inherit(self,ls(i),''))
-			if(ikey(i,'size'     ))return lmpair(widget_inherit(self,ls(i),rect(100,50)))
-			if(ikey(i,'row'      ))return lmn(clamp(-1,widget_inherit(self,ls(i),-1),count(ifield(self,'value'))-1))
+			if(ikey(i,'value'    ))return ivalue(self,ls(i),lmt({}))
+			if(ikey(i,'scroll'   ))return lmn(ivalue(self,ls(i),0))
+			if(ikey(i,'scrollbar'))return lmn(ivalue(self,ls(i),1))
+			if(ikey(i,'headers'  ))return lmn(ivalue(self,ls(i),1))
+			if(ikey(i,'lines'    ))return lmn(ivalue(self,ls(i),1))
+			if(ikey(i,'widths'   ))return lml((ivalue(self,ls(i),[])).map(lmn))
+			if(ikey(i,'format'   ))return lms(ivalue(self,ls(i),''))
+			if(ikey(i,'size'     ))return lmpair(ivalue(self,ls(i),rect(100,50)))
+			if(ikey(i,'row'      ))return lmn(clamp(-1,ivalue(self,ls(i),-1),count(ifield(self,'value'))-1))
 			if(ikey(i,'rowvalue' )){const r=ln(ifield(self,'row')),v=ifield(self,'value');return r<0||r>=count(v)?lmd():l_at(v,lmn(r))}
 			if(ikey(i,'click' )&&state.external)return lmnat(([x])=>fire_event(self,i,lmn(clamp(-1,ln(x),count(ifield(self,'value'))))))
 			if(ikey(i,'order' )&&state.external)return lmnat(([x])=>fire_event(self,i,lms(ls(x))))
@@ -1645,7 +1636,7 @@ canvas_pick=canvas=>{
 }
 canvas_image=(canvas,build)=>{
 	if(canvas.image||!build)return canvas.image
-	const i=widget_inherit(canvas,'image'),scale=card_is(canvas)?1.0:ln(ifield(canvas,'scale')),size=getpair(ifield(canvas,'size'))
+	const i=canvas.image,scale=card_is(canvas)?1.0:ln(ifield(canvas,'scale')),size=getpair(ifield(canvas,'size'))
 	canvas.image=i?image_copy(i):image_make(rect(ceil(size.x/scale),ceil(size.y/scale))),canvas_clip(canvas);return canvas.image
 }
 canvas_resize=(canvas,size)=>{
@@ -1677,7 +1668,7 @@ canvas_read=(x,card)=>{
 			if(ikey(i,'pattern'  ))return self.pattern=0|clamp(0,ln(x),255),x
 			if(ikey(i,'font'     ))return self.font=normalize_font(self.card.deck.fonts,x),x
 			if(!lis(i)){const img=canvas_image(self,1);return img.f(img,i,x)}
-			if(has_parent(self)||self.free)return x
+			if(self.free)return x
 			if(ikey(i,'border'   ))return self.border=lb(x),x
 			if(ikey(i,'draggable'))return self.draggable=lb(x),x
 			if(ikey(i,'lsize'    )){i=lms('size'),x=lmpair(rmul(getpair(x),ln(ifield(self,'scale'))))}
@@ -1685,12 +1676,12 @@ canvas_read=(x,card)=>{
 			if(ikey(i,'scale'    )){return self.scale=max(0.1,ln(x)),canvas_resize(self,getpair(ifield(self,'size'))),x}
 		}else{
 			if(!lis(i)){const img=canvas_image(self,0);return img?img.f(img,i,x):NONE}
-			if(ikey(i,'border'   ))return lmn(widget_inherit(self,ls(i),1))
-			if(ikey(i,'draggable'))return lmn(widget_inherit(self,ls(i),0))
-			if(ikey(i,'brush'    ))return lmn(widget_inherit(self,ls(i),0))
-			if(ikey(i,'pattern'  ))return lmn(widget_inherit(self,ls(i),1))
-			if(ikey(i,'size'     ))return lmpair(widget_inherit(self,ls(i),rect(100,100)))
-			if(ikey(i,'scale'    ))return lmn(widget_inherit(self,ls(i),1.0))
+			if(ikey(i,'border'   ))return lmn(ivalue(self,ls(i),1))
+			if(ikey(i,'draggable'))return lmn(ivalue(self,ls(i),0))
+			if(ikey(i,'brush'    ))return lmn(ivalue(self,ls(i),0))
+			if(ikey(i,'pattern'  ))return lmn(ivalue(self,ls(i),1))
+			if(ikey(i,'size'     ))return lmpair(ivalue(self,ls(i),rect(100,100)))
+			if(ikey(i,'scale'    ))return lmn(ivalue(self,ls(i),1.0))
 			if(ikey(i,'lsize'    )){const s=getpair(ifield(self,'size')),z=ln(ifield(self,'scale'));return lmpair(rect(ceil(s.x/z),ceil(s.y/z)))}
 			if(ikey(i,'clip'     ))return lmnat(z=>(canvas_clip(self,z),NONE))
 			if(ikey(i,'clear'    ))return lmnat(z=>(canvas_pick(self),draw_rect(wid_crect(self,z),0            )           ,NONE))
@@ -1746,11 +1737,10 @@ canvas_write=x=>{
 }
 widget_shows={solid:1,invert:1,transparent:1,none:1}
 interface_widget=(self,i,x)=>{
-	widget_renamer=(card,a,b)=>{const w=card.widgets,i=dkix(w,a);w.k[i]=b,w.v[i].name=ls(b),card_children(card,child=>widget_renamer(child,a,b))}
-	widget_reorder=(card,a,b)=>{reorder(card.widgets,a,b),card_children(card,child=>widget_reorder(child,a,b))}
+	widget_rename=(card,a,b)=>{const w=card.widgets,i=dkix(w,a);w.k[i]=b,w.v[i].name=ls(b)}
 	if(x){
-		if(ikey(i,'name'  ))return widget_renamer(self.card,lms(self.name),ukey(self.card.widgets,lms(ls(x)),ls(x),lms(self.name))),x
-		if(ikey(i,'index' ))return widget_reorder(self.card,dvix(self.card.widgets,self),ln(x)),x
+		if(ikey(i,'name'  ))return widget_rename(self.card,lms(self.name),ukey(self.card.widgets,lms(ls(x)),ls(x),lms(self.name))),x
+		if(ikey(i,'index' ))return reorder(self.card.widgets,dvix(self.card.widgets,self),ln(x)),x
 		if(ikey(i,'font'  ))return self.font=normalize_font(self.card.deck.fonts,x),x
 		if(ikey(i,'script'))return self.script=ls(x),x
 		if(ikey(i,'locked'))return self.locked=lb(x),x
@@ -1760,11 +1750,11 @@ interface_widget=(self,i,x)=>{
 	}else{
 		if(ikey(i,'name'  ))return lms(self.name)
 		if(ikey(i,'index' ))return lmn(dvix(self.card.widgets,self))
-		if(ikey(i,'script'))return lms(widget_inherit(self,ls(i),''))
-		if(ikey(i,'locked'))return lmn(widget_inherit(self,ls(i),0))
-		if(ikey(i,'pos'   ))return lmpair(widget_inherit(self,ls(i),rect()))
-		if(ikey(i,'show'  ))return lms(widget_inherit(self,ls(i),'solid'))
-		if(ikey(i,'font'  ))return dget(self.card.deck.fonts,lms(widget_inherit(self,ls(i))||(button_is(self)?'menu':'body')))
+		if(ikey(i,'script'))return lms(ivalue(self,ls(i),''))
+		if(ikey(i,'locked'))return lmn(ivalue(self,ls(i),0))
+		if(ikey(i,'pos'   ))return lmpair(ivalue(self,ls(i),rect()))
+		if(ikey(i,'show'  ))return lms(ivalue(self,ls(i),'solid'))
+		if(ikey(i,'font'  ))return dget(self.card.deck.fonts,lms(ivalue(self,ls(i),button_is(self)?'menu':'body')))
 	}return x?x:NONE
 }
 widget_read=(x,card)=>{
@@ -1783,8 +1773,8 @@ widget_write=x=>{
 	const r=lmd()
 	dset(r,lms('name'),lms(x.name))
 	dset(r,lms('type'),lms(x.n))
-	if(!has_parent(x))dset(r,lms('size'),ifield(x,'size'))
-	if(!has_parent(x))dset(r,lms('pos' ),ifield(x,'pos' ))
+	dset(r,lms('size'),ifield(x,'size'))
+	dset(r,lms('pos' ),ifield(x,'pos' ))
 	if(x.size  )dset(r,lms('size'  ),lmpair(x.size))
 	if(x.pos   )dset(r,lms('pos'   ),lmpair(x.pos))
 	if(x.locked)dset(r,lms('locked'),lmn(x.locked))
@@ -1795,35 +1785,23 @@ widget_write=x=>{
 	                   grid_is  (x)?grid_write  (x): canvas_is(x)?canvas_write(x):lmd())
 }
 
-card_children=(card,f)=>card.deck.cards.v.map(c=>{if(card.name==c.parent)f(c)})
 widget_strip=x=>dyad.take(lml([lms('name'),lms('type')]),x)
-widget_addr=(card,x)=>{
-	const r=widget_read(x,card);dset(card.widgets,ifield(r,'name'),r)
-	card_children(card,child=>widget_addr(child,widget_strip(x)));return r
-}
+widget_add=(card,x)=>{const r=widget_read(x,card);return dset(card.widgets,ifield(r,'name'),r),r}
 card_add=(card,type,name)=>{
-	if(has_parent(card))return NONE
 	if(lis(type)){
 		if(!ls(type)in{button:1,field:1,slider:1,canvas:1,grid:1})return NONE
-		const a=lmd([lms('type')],[type]);if(name)dset(a,lms('name'),lms(ls(name)))
-		return widget_addr(card,a)
+		const a=lmd([lms('type')],[type]);if(name)dset(a,lms('name'),lms(ls(name)));return widget_add(card,a)
 	}
-	if(widget_is(type)){
-		const a=widget_write(type);if(name)dset(a,lms('name'),name);
-		return widget_addr(card,a)}
+	if(widget_is(type)){const a=widget_write(type);if(name)dset(a,lms('name'),name);return widget_add(card,a)}
 	return NONE
 }
 card_remove=(card,x)=>{
-	const widget_remover=(card,name)=>{
-		dget(card.widgets,name).dead=true,card.widgets=dyad.drop(name,card.widgets)
-		card_children(card,child=>widget_remover(child,name))
-	}
-	if(!widget_is(x)||has_parent(card)||!dkey(card.widgets,x))return 0
-	widget_remover(card,ifield(x,'name'));return 1
+	if(!widget_is(x)||!dkey(card.widgets,x))return 0
+	const name=ifield(x,'name');dget(card.widgets,name).dead=true,card.widgets=dyad.drop(name,card.widgets);return 1
 }
 card_copy_raw=(card,z)=>z.filter(w=>widget_is(w)&&w.card==card).map(widget_write)
-card_paste_raw=(card,payload)=>payload.map(p=>widget_addr(card,ld(p)))
-card_copy=(card,z)=>has_parent(card)?NONE:lms(`%%WGT0${fjson(lml(card_copy_raw(card,lil(z)?ll(z):[z])))}`)
+card_paste_raw=(card,payload)=>payload.map(p=>widget_add(card,ld(p)))
+card_copy=(card,z)=>lms(`%%WGT0${fjson(lml(card_copy_raw(card,lil(z)?ll(z):[z])))}`)
 card_paste=(card,z)=>!lis(z)||!z.v.startsWith('%%WGT0')?NONE:lml(card_paste_raw(card,ll(pjson(ls(z),6,count(z)-6).value)))
 card_read=(x,deck,cdata)=>{
 	x=ld(x);const nav_dirs={right:1,left:1,up:1,down:1},ri=lmi((self,i,x)=>{
@@ -1831,7 +1809,6 @@ card_read=(x,deck,cdata)=>{
 		if(x){
 			if(ikey(i,'name')){
 				if(ls(x).length==0)return x;const n=ukey(deck.cards,lms(ls(x)),ls(x),lms(self.name))
-				deck.cards.v.map(c=>{if(ifield(c,'parent')==self)c.parent=ls(n)})
 				deck.cards.k[dvix(deck.cards,self)]=n,self.name=ls(n);return x
 			}
 			if(ikey(i,'script'))return self.script=ls(x),x
@@ -1841,10 +1818,9 @@ card_read=(x,deck,cdata)=>{
 			if(ikey(i,'name'   ))return lms(self.name)
 			if(ikey(i,'size'   ))return lmpair(deck.size)
 			if(ikey(i,'index'  ))return lmn(dvix(deck.cards,self))
-			if(ikey(i,'script' ))return lms(card_inherit(self,i)||'')
+			if(ikey(i,'script' ))return lms(self.script||'')
 			if(ikey(i,'widgets'))return self.widgets
-			if(ikey(i,'parent' ))return dget(deck.cards,lms(self.parent))||NONE
-			if(ikey(i,'image'  ))return card_inherit(self,i)||image_make(rect())
+			if(ikey(i,'image'  ))return self.image||image_make(rect())
 			if(ikey(i,'add'    ))return lmnat(([t,n])=>card_add(self,t,n))
 			if(ikey(i,'remove' ))return lmnat(([x])=>lmn(card_remove(self,x)))
 			if(ikey(i,'navigate')&&state.external)return lmnat(([x])=>fire_event(self,i,lms(normalize_enum(nav_dirs,ls(x)))))
@@ -1857,43 +1833,18 @@ card_read=(x,deck,cdata)=>{
 	ri.widgets=lmd()
 	ri.name=ls(ukey(deck.cards,n&&lis(n)&&count(n)==0?null:n,'card'))
 	ri.script=ls(dget(x,lms('script'))||lms(''))
-	ri.parent=ls(dget(x,lms('parent'))||lms(''))
 	{const v=dget(x,lms('image'));if(v)ri.image=image_read(ls(v))}
-	parent_widgets_fuse=(pw,locals)=>{
-		return pw.map(w=>{
-			let a=widget_strip(w),n=dget(a,lms('name'))
-			locals.map(l=>{const ln=dget(l,lms('name'));if(ln&&match(n,ln))a=dyad[','](l,a)})
-			return a
-		})
-	}
-	parent_widgets_raw=(name,cdata,locals)=>{
-		const keys=Object.keys(cdata)
-		for(let z=0;z<keys.length;z++){
-			const k=keys[z],n=dget(cdata[k],lms('name'))
-			if(!n||!match(name,n))continue
-			const p=dget(cdata[k],lms('parent'))
-			if(p)return parent_widgets_raw(p,cdata,locals)
-			return parent_widgets_fuse(ll(dget(cdata[k],lms('widgets'))),locals)
-		}return []
-	}
-	const parent_widgets_cooked=(parent,locals)=>{
-		const c=ll(ifield(parent,'widgets')).map(x=>widget_strip(widget_write(x)))
-		return parent_widgets_fuse(c,locals)
-	}
-	let w=ll(dget(x,lms('widgets'))||lml([]))
-	w=!has_parent(ri)?w: cdata?parent_widgets_raw(lms(ri.parent),cdata,w): parent_widgets_cooked(ifield(ri,'parent'),w)
-	w.filter(w=>dget(w,lms('name'))).map(w=>{const i=widget_read(w,ri);if(lii(i))dset(ri.widgets,ifield(i,'name'),i)})
+	ll(dget(x,lms('widgets'))||lml([])).filter(w=>dget(w,lms('name'))).map(w=>{const i=widget_read(w,ri);if(lii(i))dset(ri.widgets,ifield(i,'name'),i)})
 	return ri
 }
 card_write=card=>{
 	const r=lmd(),wids=lmd()
 	dset(r,lms('name'),lms(card.name)),dset(r,lms('widgets'),wids)
-	if(card.parent.length)dset(r,lms('parent'),lms(card.parent))
 	if(card.script.length)dset(r,lms('script'),lms(card.script))
 	if(card.image)dset(r,lms('image'),lms(image_write(card.image)))
 	card.widgets.k.map((k,i)=>{
 		let wid=widget_write(card.widgets.v[i]),n=dget(wid,lms('name'))
-		if(has_parent(card))wid=dyad.drop(lms('type'),wid);wid=dyad.drop(lms('name'),wid)
+		wid=dyad.drop(lms('name'),wid)
 		if(count(wid))dset(wids,n,wid)
 	});return r
 }
@@ -1910,11 +1861,8 @@ deck_add=(deck,type,y,z)=>{
 	if(module_is(type)){const a=module_write(type);if(y)dset(a,lms('name'),lms(ls(y)));const r=module_read(a,deck);return dset(deck.modules,ifield(r,'name'),r),r}
 	if(ikey(type,'module')){const a=lmd();if(y)dset(a,lms('name'),lms(ls(y)));const r=module_read(a,deck);return dset(deck.modules,ifield(r,'name'),r),r}
 	if(card_is(type))return deck_paste(deck,deck_copy(deck,type),y?lms(ls(y)):null)
-	if(ikey(type,'card')){
-		const a=lmd();if(y)dset(a,lms('name'),lms(ls(y)))
-		if(z&&card_is(z)){if(!dkey(deck.cards,z))return NONE;dset(a,lms('parent'),ifield(z,'name'))}
-		const r=card_read(a,deck);dset(deck.cards,ifield(r,'name'),r);return r
-	}return NONE
+	if(ikey(type,'card')){const a=lmd();if(y)dset(a,lms('name'),lms(ls(y)));const r=card_read(a,deck);return dset(deck.cards,ifield(r,'name'),r),r}
+	return NONE
 }
 deck_remove=(deck,t)=>{
 	if(module_is(t)){const k=dkey(deck.modules,t);if(k)return deck.modules=dyad.drop(k,deck.modules),1}
@@ -1925,12 +1873,7 @@ deck_remove=(deck,t)=>{
 		return deck.fonts=dyad.drop(k,deck.fonts),1
 	}
 	if(card_is(t)){
-		const widget_removeall=card=>{
-			card.widgets.v.map(x=>x.dead=true),card.widgets=lmd()
-			card_children(card,child=>widget_removeall(child))
-		}
 		if(count(deck.cards)<=1)return 0
-		deck.cards.v.map(card=>{if(ifield(card,'parent')==t){card.parent=0,widget_removeall(card)}})
 		deck.cards=dyad.drop(dkey(deck.cards,t)||NONE,deck.cards),t.dead=true
 		if(deck.card>=count(deck.cards))deck.card=count(deck.cards-1)
 		deck.history=[ln(ifield(ifield(deck,'card'),'index'))]
@@ -2054,7 +1997,6 @@ deck_write=(x,html)=>{
 	deck.cards.v.map(c=>{
 		const data=card_write(c),wids=dget(data,lms('widgets')),base=ls(dget(data,lms('name')));sci=0
 		r+=`\n{card:${esc_write(1,base)}}\n`
-		write_key(data,'parent',x=>x ,x=>x                 )
 		write_key(data,'image' ,x=>x ,x=>x                 )
 		write_key(data,'script',count,x=>script_ref(base,x))
 		wids.v.map(wid=>{const k=lms('script'),v=dget(wid,k);if(v)dset(wid,k,script_ref(base,v))})
@@ -2126,7 +2068,7 @@ fire_async=(target,name,arg,hunk)=>{
 	ancestors=target=>{
 		if(deck_is(target))deck=target
 		if(widget_is(target))ancestors(target.card)
-		if(card_is(target)){const p=ifield(target,'parent');ancestors(card_is(p)?p:target.deck)}
+		if(card_is(target))ancestors(target.deck)
 		try{dset(scopes,target,parse(ls(ifield(target,'script'))))}
 		catch(e){dset(scopes,target,lmblk());}
 	}

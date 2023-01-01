@@ -1259,10 +1259,9 @@ modals=_=>{
 			const c=rect(bb.x,bb.y+(z*slot)-ms.grid.scroll,bb.w,slot), card=deck.cards.v[z]
 			if(c.y>bb.y+bb.h||c.y+c.h<bb.y)continue; const cb=rclip(c,bb) // coarse clip
 			const p=rect(c.x+2,c.y+1,40,28), t=rect(p.x+p.w+5,p.y,bb.w-(2+p.w+5+5),font_h(FONT_MENU)), s=rect(t.x,t.y+t.h+2,t.w,font_h(FONT_BODY))
-			const desc=has_parent(card)?`child of '${ls(ifield(ifield(card,'parent'),'name'))}'`:`${count(card.widgets)} widgets`
 			if(ev.md&&dover(cb)){m=1,n_go([card],deck),curr=card,ms.grid.row=z}if(ev.dclick&&over(cb))props=1
 			const col=ev.drag&&ms.grid.row==z?13:1
-			draw_text_fit(t,ls(ifield(card,'name')),FONT_MENU,col),draw_text_fit(s,desc,FONT_BODY,col),draw_box(p,0,col)
+			draw_text_fit(t,ls(ifield(card,'name')),FONT_MENU,col),draw_text_fit(s,`${count(card.widgets)} widgets`,FONT_BODY,col),draw_box(p,0,col)
 			if(card==curr&&col==1)draw_invert(pal,c);draw_thumbnail(card,p)
 			if((ev.drag||ev.mu)&&ms.grid.row!=-1){
 				{const g=rect(c.x,c.y-3    ,c.w,7);if(over(g)){draw_hline(c.x,c.x+c.w,c.y      ,13),gutter=z  }}
@@ -1275,10 +1274,6 @@ modals=_=>{
 			const c=deck_add(deck,lms('card')),n=ln(ifield(curr,'index'))
 			iwrite(c,lms('index'),lmn(n+1)),m=1,n_go([c],deck)
 		}c.x+=65
-		if(ui_button(rect(c.x,c.y,80,20),'New Child',1)){
-			const c=deck_add(deck,lms('card'),ifield(curr,'name'),curr),n=ln(ifield(curr,"index"))
-			iwrite(c,lms('index'),lmn(n+1)),m=1,n_go([c],deck)
-		}
 		if(ev.mu){
 			if(ms.grid.row!=-1&&gutter!=-1){
 				const s=deck.cards.v[ms.grid.row], oi=ln(ifield(s,'index'))
@@ -1600,10 +1595,6 @@ modals=_=>{
 		const b=draw_modalbox(rect(220,100)),card=ifield(deck,'card')
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Card Properties',FONT_MENU,1)
 		draw_text(rect(b.x,b.y+22,42,20),'Name',FONT_MENU,1),ui_field(rect(b.x+42,b.y+20,b.w-42,18),ms.name)
-		const parent=ifield(card,'parent');if(card_is(parent)){
-			const t=`This card is a child of \"${ls(ifield(parent,'name'))}\"`
-			const l=layout_plaintext(t,FONT_BODY,ALIGN.left,rect(b.w,30));draw_text_wrap(rect(b.x,b.y+45,b.w,30),l,1)
-		}
 		const c=rect(b.x,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(card),modal_exit(0)
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
@@ -2220,12 +2211,11 @@ object_editor=_=>{
 	}
 	wids.v.map(wid=>{
 		const w=unpack_widget(wid), sel=ob.sel.some(x=>x==wid)
-		if(has_parent(card))draw_rect(w.size,23)
 		if(sel){draw_box(inset(w.size,-1),0,ANTS)}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1))}
 		if(sel&&ob.sel.length==1){draw_handles(w.size)}
 		if(w.locked&&ob.show_bounds){draw_rect(rect(w.size.x+w.size.w-10,w.size.y,10,10),1),draw_icon(rect(w.size.x+w.size.w-8,w.size.y+1),LOCK,32)}
 	})
-	if(has_parent(card)||!in_layer())return
+	if(!in_layer())return
 	if(ob.sel.length>0){
 		let nudge=0
 		if(ev.dir=='left' )ob_move(rect(-1*(ev.shift?dr.grid_size.x:1), 0),1),nudge=1
@@ -2609,10 +2599,10 @@ all_menus=_=>{
 			if(menu_item('Copy Image',ob.sel.length==1,0,copywidgetimg)){}
 			if(menu_item('Paste',1,'v',menupaste)){}
 			menu_separator()
-			if(menu_item('Paste as new Canvas',!has_parent(card),0,pasteascanvas)){}
+			if(menu_item('Paste as new Canvas',1,0,pasteascanvas)){}
 			if(menu_item('Paste into Canvas',ob.sel.length==1&&canvas_is(ob.sel[0]),0,pasteintocanvas)){}
 			menu_separator()
-			if(menu_item('Select All',!has_parent(card),'a'))ob.sel=card.widgets.v.slice(0)
+			if(menu_item('Select All',1,'a'))ob.sel=card.widgets.v.slice(0)
 			if(menu_item('Move to Front',ob.sel.length))ob_order(),ob.sel                   .map(w=>iwrite(w,lms('index'),lmn(RTEXT_END))),mark_dirty()
 			if(menu_item('Move to Back' ,ob.sel.length))ob_order(),ob.sel.slice(0).reverse().map(w=>iwrite(w,lms('index'),NONE          )),mark_dirty()
 		}
@@ -2631,7 +2621,7 @@ all_menus=_=>{
 				if(menu_item('Toggle Comment',1,'/'))field_comment()
 			}
 			if(wid.f&&wid.f.style!='code'){
-				if(menu_item('Font...',!has_parent(card)&&wid.f.style!='plain'))modal_enter('fonts')
+				if(menu_item('Font...',wid.f.style!='plain'))modal_enter('fonts')
 			}
 		}
 	}
@@ -2649,17 +2639,16 @@ all_menus=_=>{
 	}
 	if(uimode=='interact'||uimode=='draw'||uimode=='object'){
 		menu_bar('Card',ms.type==null)
-		const card=ifield(deck,'card'), parent=ifield(card,'parent')
+		const card=ifield(deck,'card')
 		if(menu_item('Go to First'   ,1))n_go([lms('First')],deck)
 		if(menu_item('Go to Previous',1))n_go([lms('Prev' )],deck)
 		if(menu_item('Go to Next'    ,1))n_go([lms('Next' )],deck)
 		if(menu_item('Go to Last'    ,1))n_go([lms('Last' )],deck)
-		if(menu_item('Go to Parent',has_parent(card)))n_go([parent],deck)
 		menu_separator()
 		if(menu_item('Cut Card',1,0,cutcard)){}
 		if(menu_item('Copy Card',1,0,copycard)){}
 		menu_separator()
-		if(menu_item('Script...'    ,!has_parent(card)))setscript(card)
+		if(menu_item('Script...'    ,1))setscript(card)
 		if(menu_item('Properties...',1))modal_enter('card_props')
 		menu_bar('Tool',ms.type==null)
 		if(menu_check('Interact',1,uimode=='interact',0))setmode('interact')
@@ -2703,7 +2692,7 @@ all_menus=_=>{
 		if(menu_check('Transparency',1,dr.trans))dr.trans^=1
 	}
 	if(uimode=='object'){
-		menu_bar('Widgets',ms.type==null&&!has_parent(ifield(deck,'card')))
+		menu_bar('Widgets',ms.type==null)
 		if(menu_item('New Button...',ob.sel.length==0))ob_create([lmd([lms('type')],[lms('button')])])
 		if(menu_item('New Field...' ,ob.sel.length==0))ob_create([lmd([lms('type')],[lms('field' )])])
 		if(menu_item('New Slider...',ob.sel.length==0))ob_create([lmd([lms('type')],[lms('slider')])])
@@ -3023,7 +3012,7 @@ document.onpaste=e=>{
 q('body').ondragover=e=>e.preventDefault()
 q('body').ondrop=e=>{
 	e.preventDefault();const file=e.dataTransfer.files.item(0);if(!file)return
-	if(/\.(psv|csv)$/i.test(file.name)&&!has_parent(ifield(deck,'card'))){
+	if(/\.(psv|csv)$/i.test(file.name)){
 		file.text().then(t=>{
 			const data=n_readcsv([lms(t),NONE,lms(file.type=='text/csv'?',':'|')])
 			setmode('object'),ob_create([lmd([lms('type'),lms('value')],[lms('grid'),monad.cols(data)])])

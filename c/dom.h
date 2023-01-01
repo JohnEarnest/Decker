@@ -137,10 +137,7 @@ char* default_transitions=""
 void ancestors(lv*target,lv*found,lv**deck){
 	if(deck_is(target))*deck=target;
 	if(widget_is(target))ancestors(ivalue(target,"card"),found,deck);
-	if(card_is(target)){
-		lv*p=ifield(target,"parent");
-		ancestors(card_is(p)?p:ivalue(target,"deck"),found,deck);
-	}
+	if(card_is(target))ancestors(ivalue(target,"deck"),found,deck);
 	lv*s=ifield(target,"script");
 	if(s&&s->c){
 		lv*block=parse(s->sv);
@@ -264,26 +261,10 @@ void reorder(lv*dict,int old,int n){
 	else     {for(int z=old;z<n;z++)dict->kv[z]=dict->kv[z+1],dict->lv[z]=dict->lv[z+1];}
 	dict->kv[n]=k,dict->lv[n]=v;
 }
-int has_parent(lv*self){
-	if(card_is(self))return card_is(ifield(self,"parent"));
-	return has_parent(ivalue(self,"card"));
-}
 int is_rooted(lv*self){
 	if(card_is  (self))return ivalue(self,"dead")==NULL;
 	if(widget_is(self))return is_rooted(ivalue(self,"card"))&&ivalue(self,"dead")==NULL;
 	return 1;
-}
-lv* card_inherit(lv*self,lv*key){
-	if(!lii(self))return NULL;
-	lv*v=dget(self->b,key);if(v)return v;
-	return card_inherit(ifield(self,"parent"),key);
-}
-lv* widget_inherit(lv*self,lv*key){
-	if(card_is(self))return card_inherit(self,key);
-	if(!lii(self))return NULL;
-	lv*v=dget(self->b,key);if(v)return v;
-	lv*p=ifield(ivalue(self,"card"),"parent");if(lin(p))return NULL;
-	return widget_inherit(dget(ifield(p,"widgets"),ifield(self,"name")),key);
 }
 
 // Data Blocks
@@ -1125,13 +1106,13 @@ void canvas_size(lv*self,pair size){
 lv* canvas_image(lv*self,int build){
 	pair size=getpair(ifield(self,"size"));lv*image=dget(self->b,lmistr("image"));
 	if(!image&&build){
-		lv*i=widget_inherit(self,lmistr("image"));float scale=card_is(self)?1.0:ln(ifield(self,"scale"));
+		lv*i=ivalue(self,"image");float scale=card_is(self)?1.0:ln(ifield(self,"scale"));
 		image=i?image_clone(i):image_make(lmbuff((pair){ceil(size.x/scale),ceil(size.y/scale)}));
 		dset(self->b,lmistr("image"),image);
 	}return image;
 }
 void pick_canvas(lv*self){
-	lv*image=canvas_image(self,1),*clip=widget_inherit(self,lmistr("clip"));pair size=image_size(image);
+	lv*image=canvas_image(self,1),*clip=ivalue(self,"clip");pair size=image_size(image);
 	frame=(cstate){
 		ln(ifield(self,"brush")),
 		ln(ifield(self,"pattern")),
@@ -1209,7 +1190,7 @@ lv* interface_canvas(lv*self,lv*i,lv*x){
 		ikey("pattern"){int n=CLAMP(0,ln(x),255);dset(data,i,lmn(n));return x;}
 		ikey("font"   ){dset(data,i,normalize_font(fonts,x));return x;}
 		if(!lis(i)    ){return interface_image(canvas_image(self,1),i,x);}
-		if(has_parent(self)||dget(data,lmistr("free")))return x;
+		if(dget(data,lmistr("free")))return x;
 		ikey("border"   ){dset(data,i,lmn(lb(x)));return x;}
 		ikey("draggable"){dset(data,i,lmn(lb(x)));return x;}
 		ikey("lsize"    ){float s=ln(ifield(self,"scale"));pair d=getpair(x);i=lmistr("size");x=lmpair((pair){d.x*s,d.y*s});} // falls through!
@@ -1217,12 +1198,12 @@ lv* interface_canvas(lv*self,lv*i,lv*x){
 		ikey("scale"    ){dset(data,i,lmn(MAX(0.1,ln(x))));canvas_size(self,getpair(ifield(self,"size")));return x;}
 	}else{
 		if(!lis(i)      ){lv*img=canvas_image(self,0);return img?interface_image(img,i,x):NONE;}
-		ikey("border"   ){lv*r=widget_inherit(self,i);return r?r:ONE;}
-		ikey("draggable"){lv*r=widget_inherit(self,i);return r?r:NONE;}
-		ikey("brush"    ){lv*r=widget_inherit(self,i);return r?r:NONE;}
-		ikey("pattern"  ){lv*r=widget_inherit(self,i);return r?r:ONE;}
-		ikey("size"     ){lv*r=widget_inherit(self,i);return r?r:lmpair((pair){100,100});}
-		ikey("scale"    ){lv*r=widget_inherit(self,i);return r?r:lmn(1.0);}
+		ikey("border"   ){lv*r=dget(data,i);return r?r:ONE;}
+		ikey("draggable"){lv*r=dget(data,i);return r?r:NONE;}
+		ikey("brush"    ){lv*r=dget(data,i);return r?r:NONE;}
+		ikey("pattern"  ){lv*r=dget(data,i);return r?r:ONE;}
+		ikey("size"     ){lv*r=dget(data,i);return r?r:lmpair((pair){100,100});}
+		ikey("scale"    ){lv*r=dget(data,i);return r?r:lmn(1.0);}
 		ikey("lsize"    ){pair s=getpair(ifield(self,"size"));float z=ln(ifield(self,"scale"));return lmpair((pair){ceil(s.x/z),ceil(s.y/z)});}
 		ikey("clear"    )return lmnat(n_canvas_clear, self);
 		ikey("clip"     )return lmnat(n_canvas_clip,  self);
@@ -1286,14 +1267,13 @@ lv* interface_button(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	if(x){
 		ikey("value"){dset(self->b,i,lmn(lb(x)));return x;}
-		if(has_parent(self))return x;
 		ikey("text" ){dset(self->b,i,ls(x));return x;}
 		ikey("style"){dset(self->b,i,normalize_enum(x,button_styles));return x;}
 	}else{
-		ikey("value"){lv*r=widget_inherit(self,i);return r?r:NONE;}
-		ikey("text" ){lv*r=widget_inherit(self,i);return r?r:lmistr("");}
-		ikey("style"){lv*r=widget_inherit(self,i);return r?r:lmistr(button_styles[0]);}
-		ikey("size"  ){lv*r=widget_inherit(self,i);return r?r:lmpair((pair){60,20});}
+		ikey("value"){lv*r=dget(self->b,i);return r?r:NONE;}
+		ikey("text" ){lv*r=dget(self->b,i);return r?r:lmistr("");}
+		ikey("style"){lv*r=dget(self->b,i);return r?r:lmistr(button_styles[0]);}
+		ikey("size" ){lv*r=dget(self->b,i);return r?r:lmpair((pair){60,20});}
 		ikey("click")if(state.external)return lmnat(n_button_click,self);
 	}return interface_widget(self,i,x);
 }
@@ -1442,28 +1422,27 @@ lv* interface_field(lv*self,lv*i,lv*x){
 		ikey("text"     ){dset(data,lmistr("value"),rtext_cast(ls(x)));return x;}
 		ikey("scroll"   ){int n=MAX(0,ln(x));dset(data,i,lmn(n));return x;}
 		ikey("value"    ){
-			lv*style=widget_inherit(self,lmistr("style"));int plain=style&&strcmp(ls(style)->sv,"rich");
+			lv*style=ivalue(self,"style");int plain=style&&strcmp(ls(style)->sv,"rich");
 			if(plain&&!rtext_is_plain(x)){x=rtext_all(rtext_cast(x));}
 			dset(data,i,rtext_cast(x));return x;
 		}
-		if(has_parent(self))return x;
 		ikey("border"   ){dset(data,i,lmn(lb(x)));return x;}
 		ikey("scrollbar"){dset(data,i,lmn(lb(x)));return x;}
 		ikey("style"    ){dset(data,i,normalize_enum(x,field_styles));iwrite(self,lmistr("value"),dget(data,lmistr("value")));return x;}
 		ikey("align"    ){dset(data,i,normalize_enum(x,field_aligns));return x;}
 	}else{
-		ikey("text"     ){lv*r=widget_inherit(self,lmistr("value"));return r?rtext_all(r):lmistr("");}
-		ikey("value"    ){lv*r=widget_inherit(self,i);return r?r:rtext_cast(NULL);}
-		ikey("scroll"   ){lv*r=widget_inherit(self,i);return r?r:NONE;}
-		ikey("scrollbar"){lv*r=widget_inherit(self,i);return r?r:NONE;}
-		ikey("border"   ){lv*r=widget_inherit(self,i);return r?r:ONE;}
-		ikey("style"    ){lv*r=widget_inherit(self,i);return r?r:lmistr(field_styles[0]);}
-		ikey("align"    ){lv*r=widget_inherit(self,i);return r?r:lmistr(field_aligns[0]);}
-		ikey("size"     ){lv*r=widget_inherit(self,i);return r?r:lmpair((pair){100,20});}
+		ikey("text"     ){lv*r=dget(data,lmistr("value"));return r?rtext_all(r):lmistr("");}
+		ikey("value"    ){lv*r=dget(data,i);return r?r:rtext_cast(NULL);}
+		ikey("scroll"   ){lv*r=dget(data,i);return r?r:NONE;}
+		ikey("scrollbar"){lv*r=dget(data,i);return r?r:NONE;}
+		ikey("border"   ){lv*r=dget(data,i);return r?r:ONE;}
+		ikey("style"    ){lv*r=dget(data,i);return r?r:lmistr(field_styles[0]);}
+		ikey("align"    ){lv*r=dget(data,i);return r?r:lmistr(field_aligns[0]);}
+		ikey("size"     ){lv*r=dget(data,i);return r?r:lmpair((pair){100,20});}
 		ikey("font"     ){
 			lv*card=ivalue(self,"card"),*deck=ivalue(card,"deck"),*fonts=ifield(deck,"fonts");
-			lv*style=widget_inherit(self,lmistr("style")); int code=style&&!strcmp(ls(style)->sv,"code");
-			lv*r=widget_inherit(self,i);return r?dget(fonts,r): code?dget(fonts,lmistr("mono")): fonts->lv[0];
+			lv*style=ivalue(self,"style"); int code=style&&!strcmp(ls(style)->sv,"code");
+			lv*r=dget(data,i);return r?dget(fonts,r): code?dget(fonts,lmistr("mono")): fonts->lv[0];
 		}
 		ikey("run"      )if(state.external)return lmnat(n_field_run,self);
 		ikey("link"     )if(state.external)return lmnat(n_field_link,self);
@@ -1517,8 +1496,7 @@ lv* interface_slider(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	lv*data=self->b;
 	if(x){
-		ikey("value"){dset(data,i,lmn(slider_normalize(getfpair(ifield(self,"interval")),ln(ifield(self,"step")),ln(x))));return x;}
-		if(has_parent(self))return x;
+		ikey("value"    ){dset(data,i,lmn(slider_normalize(getfpair(ifield(self,"interval")),ln(ifield(self,"step")),ln(x))));return x;}
 		ikey("step"     ){double n=ln(x);dset(data,i,lmn(n<=0?0.000001:n));iwrite(self,lmistr("value"),dget(data,lmistr("value")));return x;}
 		ikey("format"   ){dset(data,i,ls(x));return x;}
 		ikey("style"    ){dset(data,i,normalize_enum(x,slider_styles));return x;}
@@ -1527,12 +1505,12 @@ lv* interface_slider(lv*self,lv*i,lv*x){
 			iwrite(self,lmistr("value"),ifield(self,"value"));return x;
 		}
 	}else{
-		ikey("value"    ){lv*r=widget_inherit(self,i);pair v=getpair(ifield(self,"interval"));return r?r:lmn(CLAMP(v.x,0,v.y));}
-		ikey("step"     ){lv*r=widget_inherit(self,i);return r?r:ONE;}
-		ikey("interval" ){lv*r=widget_inherit(self,i);return r?r:lml2(NONE,lmn(100));}
-		ikey("format"   ){lv*r=widget_inherit(self,i);return r?r:lmistr("%f");}
-		ikey("style"    ){lv*r=widget_inherit(self,i);return r?r:lmistr(slider_styles[0]);}
-		ikey("size"     ){lv*r=widget_inherit(self,i);return r?r:lmpair((pair){100,25});}
+		ikey("value"    ){lv*r=dget(data,i);pair v=getpair(ifield(self,"interval"));return r?r:lmn(CLAMP(v.x,0,v.y));}
+		ikey("step"     ){lv*r=dget(data,i);return r?r:ONE;}
+		ikey("interval" ){lv*r=dget(data,i);return r?r:lml2(NONE,lmn(100));}
+		ikey("format"   ){lv*r=dget(data,i);return r?r:lmistr("%f");}
+		ikey("style"    ){lv*r=dget(data,i);return r?r:lmistr(slider_styles[0]);}
+		ikey("size"     ){lv*r=dget(data,i);return r?r:lmpair((pair){100,25});}
 		ikey("change"   )if(state.external)return lmnat(n_slider_change,self);
 	}return interface_widget(self,i,x);
 }
@@ -1588,23 +1566,22 @@ lv* interface_grid(lv*self,lv*i,lv*x){
 		ikey("value"    ){dset(data,i,lt(x));return x;}
 		ikey("scroll"   ){int n=MAX(0,ln(x));dset(data,i,lmn(n));return x;}
 		ikey("row"      ){int n=MAX(-1,ln(x));dset(data,i,lmn(n));return x;}
-		if(has_parent(self))return x;
 		ikey("scrollbar"){dset(data,i,lmn(lb(x)));return x;}
 		ikey("headers"  ){dset(data,i,lmn(lb(x)));return x;}
 		ikey("lines"    ){dset(data,i,lmn(lb(x)));return x;}
 		ikey("widths"   ){dset(data,i,normalize_ints(x,255));return x;}
 		ikey("format"   ){dset(data,i,ls(x));return x;}
 	}else{
-		ikey("value"    ){lv*r=widget_inherit(self,i);return r?r:lmt();}
-		ikey("scroll"   ){lv*r=widget_inherit(self,i);return r?r:NONE;}
-		ikey("scrollbar"){lv*r=widget_inherit(self,i);return r?r:ONE;}
-		ikey("headers"  ){lv*r=widget_inherit(self,i);return r?r:ONE;}
-		ikey("lines"    ){lv*r=widget_inherit(self,i);return r?r:ONE;}
-		ikey("widths"   ){lv*r=widget_inherit(self,i);return r?r:lml(0);}
-		ikey("format"   ){lv*r=widget_inherit(self,i);return r?r:lmistr("");}
-		ikey("size"     ){lv*r=widget_inherit(self,i);return r?r:lmpair((pair){100,50});}
+		ikey("value"    ){lv*r=dget(data,i);return r?r:lmt();}
+		ikey("scroll"   ){lv*r=dget(data,i);return r?r:NONE;}
+		ikey("scrollbar"){lv*r=dget(data,i);return r?r:ONE;}
+		ikey("headers"  ){lv*r=dget(data,i);return r?r:ONE;}
+		ikey("lines"    ){lv*r=dget(data,i);return r?r:ONE;}
+		ikey("widths"   ){lv*r=dget(data,i);return r?r:lml(0);}
+		ikey("format"   ){lv*r=dget(data,i);return r?r:lmistr("");}
+		ikey("size"     ){lv*r=dget(data,i);return r?r:lmpair((pair){100,50});}
 		ikey("row"      ){
-			lv*r=widget_inherit(self,i),*v=ifield(self,"value");
+			lv*r=dget(data,i),*v=ifield(self,"value");
 			if(!r)return lmn(-1); int n=ln(r); return lmn(CLAMP(-1,n,v->n-1));
 		}
 		ikey("rowvalue" ){int r=ln(ifield(self,"row"));lv*v=ifield(self,"value");return r<0||r>=v->n?lmd():l_at(v,lmn(r));}
@@ -1641,51 +1618,17 @@ lv* grid_write(lv*x){
 // Widget interface
 
 lv* widget_read(lv*x,lv*card); // forward ref
-#define EACH_CHILD(c) lv*n=ivalue(c,"name"),*v=ivalue(ivalue(c,"deck"),"cards");EACH(z,v)if(matchr(n,ivalue(v->lv[z],"parent")))
-lv* widget_strip(lv*x){return l_take(lml2(lmistr("name"),lmistr("type")),x);}
-void widget_addvr(lv*card,lv*src){
-	EACH_CHILD(card){
-		lv*child=v->lv[z];
-		lv*wname=dget(src,lmistr("name")),*wids=ivalue(child,"widgets");if(dget(wids,wname))continue;
-		lv*r=widget_read(src,child);
-		dset(wids,ivalue(r,"name"),r);
-		widget_addvr(child,src);
-	}
-}
-lv* widget_addr(lv*card,lv*x){
-	lv*r=widget_read(x,card);
-	dset(ivalue(card,"widgets"),ifield(r,"name"),r);
-	EACH_CHILD(card)widget_addr(v->lv[z],widget_strip(x));
-	return r;
-}
-void widget_remover(lv*card,lv*name){
-	lv*widgets=ivalue(card,"widgets"),*target=dget(widgets,name);
-	dset(card->b,lmistr("widgets"),l_drop(name,widgets));
-	dset(target->b,lmistr("dead"),ONE);
-	EACH_CHILD(card)widget_remover(v->lv[z],name);
-}
-void widget_removeall(lv*card){
-	lv*widgets=ivalue(card,"widgets");
-	EACH(z,widgets)dset(widgets->lv[z]->b,lmistr("dead"),ONE);
-	dset(card->b,lmistr("widgets"),lmd());
-	EACH_CHILD(card)widget_removeall(v->lv[z]);
-}
-void widget_renamer(lv*card,lv*old,lv*name){
-	lv*widgets=ivalue(card,"widgets");
-	int i=dgeti(widgets,old);widgets->kv[i]=name;dset(widgets->lv[i]->b,lmistr("name"),name);
-	EACH_CHILD(card)widget_renamer(v->lv[z],old,name);
-}
-void widget_reorder(lv*card,int a,int b){
-	reorder(ivalue(card,"widgets"),a,b);
-	EACH_CHILD(card)widget_reorder(v->lv[z],a,b);
-}
+lv* widget_add(lv*card,lv*x){lv*r=widget_read(x,card);dset(ivalue(card,"widgets"),ifield(r,"name"),r);return r;}
 
 lv* interface_widget(lv*self,lv*i,lv*x){
 	lv*data=self->b;lv*card=ivalue(self,"card"),*deck=ivalue(card,"deck"),*fonts=ifield(deck,"fonts");
 	lv*widgets=ivalue(card,"widgets"),*name=ivalue(self,"name");
 	if(x){
-		ikey("name"  ){widget_renamer(card,name,ukey(widgets,ls(x),ls(x)->sv,dget(data,i)));return x;}
-		ikey("index" ){widget_reorder(card,dgeti(widgets,name),ln(x));return x;}
+		ikey("name"  ){
+			int ix=dgeti(widgets,name);lv*n=ukey(widgets,ls(x),ls(x)->sv,dget(data,i));
+			widgets->kv[ix]=n;dset(widgets->lv[ix]->b,lmistr("name"),n);return x;
+		}
+		ikey("index" ){reorder(widgets,dgeti(widgets,name),ln(x));return x;}
 		ikey("font"  ){dset(data,i,normalize_font(fonts,x));return x;}
 		ikey("script"){dset(data,i,ls(x));return x;}
 		ikey("locked"){dset(data,i,lmn(lb(x)));return x;}
@@ -1695,11 +1638,11 @@ lv* interface_widget(lv*self,lv*i,lv*x){
 	}else{
 		ikey("name"  )return dget(data,i);
 		ikey("index" )return lmn(dgeti(widgets,name));
-		ikey("script"){lv*r=widget_inherit(self,i);return r?r:lmistr("");}
-		ikey("locked"){lv*r=widget_inherit(self,i);return r?r:NONE;}
-		ikey("pos"   ){lv*r=widget_inherit(self,i);return r?r:lmpair((pair){0,0});}
-		ikey("show"  ){lv*r=widget_inherit(self,i);return r?r:lmistr(widget_shows[0]);}
-		ikey("font"  ){lv*r=widget_inherit(self,i);return r?dget(fonts,r): fonts->lv[button_is(self)?1:0];}
+		ikey("script"){lv*r=dget(data,i);return r?r:lmistr("");}
+		ikey("locked"){lv*r=dget(data,i);return r?r:NONE;}
+		ikey("pos"   ){lv*r=dget(data,i);return r?r:lmpair((pair){0,0});}
+		ikey("show"  ){lv*r=dget(data,i);return r?r:lmistr(widget_shows[0]);}
+		ikey("font"  ){lv*r=dget(data,i);return r?dget(fonts,r): fonts->lv[button_is(self)?1:0];}
 	}return x?x:NONE;
 }
 lv* widget_read(lv*x,lv*card){
@@ -1722,8 +1665,8 @@ lv* widget_write(lv*x){
 	lv*data=x->b,*r=lmd();
 	{lv*k=lmistr("name"  ),*v=dget(data,k);dset(r,k,v);}
 	{lv*k=lmistr("type"  ),*v=dget(data,k);dset(r,k,v);}
-	{lv*k=lmistr("size"  );if(!has_parent(x))dset(r,k,ifield(x,"size"));}
-	{lv*k=lmistr("pos"   );if(!has_parent(x))dset(r,k,ifield(x,"pos" ));}
+	{lv*k=lmistr("size"  );dset(r,k,ifield(x,"size"));}
+	{lv*k=lmistr("pos"   );dset(r,k,ifield(x,"pos" ));}
 	{lv*k=lmistr("locked"),*v=dget(data,k);if(v&&lb(v))dset(r,k,v);}
 	{lv*k=lmistr("script"),*v=dget(data,k);if(v&&v->c)dset(r,k,v);}
 	{lv*k=lmistr("font"  ),*v=dget(data,k);if(v&&strcmp(button_is(x)?"menu":"body",v->sv))dset(r,k,v);}
@@ -1796,30 +1739,28 @@ lv* module_write(lv*x){
 
 char*nav_dirs[]={"right","left","up","down",NULL};
 lv* n_card_add(lv*self,lv*z){
-	if(has_parent(self))return NONE;lv*t=l_first(z);
+	lv*t=l_first(z);
 	if(lis(t)){
 		if(strcmp("button",t->sv)&&strcmp("field",t->sv)&&strcmp("slider",t->sv)&&strcmp("canvas",t->sv)&&strcmp("grid",t->sv))return NONE;
-		lv*a=lmd();dset(a,lmistr("type"),t);if(z->c>1)dset(a,lmistr("name"),unpack_str(z,1));
-		return widget_addr(self,a);
+		lv*a=lmd();dset(a,lmistr("type"),t);if(z->c>1)dset(a,lmistr("name"),unpack_str(z,1));return widget_add(self,a);
 	}
-	if(widget_is(t)){
-		lv*a=widget_write(t);if(z->c>1)dset(a,lmistr("name"),unpack_str(z,1));
-		return widget_addr(self,a);
-	}
+	if(widget_is(t)){lv*a=widget_write(t);if(z->c>1)dset(a,lmistr("name"),unpack_str(z,1));return widget_add(self,a);}
 	return NONE;
 }
 lv* n_card_remove(lv*self,lv*z){
-	z=l_first(z);if(!widget_is(z)||has_parent(self)||lin(dkey(ivalue(self,"widgets"),z)))return NONE;
-	widget_remover(self,ifield(z,"name"));return ONE;
+	z=l_first(z);if(!widget_is(z)||lin(dkey(ivalue(self,"widgets"),z)))return NONE;
+	lv*name=ifield(z,"name"),*widgets=ivalue(self,"widgets"),*target=dget(widgets,name);
+	dset(self->b,lmistr("widgets"),l_drop(name,widgets));
+	dset(target->b,lmistr("dead"),ONE);return ONE;
 }
 lv* card_copy_raw(lv*card,lv*z){
 	lv*r=lml(0);EACH(i,z){lv*w=z->lv[i];if(widget_is(w)&&dget(w->b,lmistr("card"))==card)ll_add(r,widget_write(w));}return r;
 }
 lv* card_paste_raw(lv*card,lv*payload){
-	lv*r=lml(0);EACH(z,payload){lv*a=ld(payload->lv[z]);ll_add(r,widget_addr(card,a));}return r;
+	lv*r=lml(0);EACH(z,payload){lv*a=ld(payload->lv[z]);ll_add(r,widget_add(card,a));}return r;
 }
 lv* n_card_copy(lv*card,lv*z){
-	if(has_parent(card))return NONE;z=l_first(z);if(!lil(z))z=l_list(z);
+	z=l_first(z);if(!lil(z))z=l_list(z);
 	str r=str_new();str_addz(&r,"%%WGT0");fjson(&r,card_copy_raw(card,z));return lmstr(r);
 }
 lv* n_card_paste(lv*card,lv*z){
@@ -1833,7 +1774,6 @@ lv* interface_card(lv*self,lv*i,lv*x){
 	if(x){
 		ikey("name"){
 			if(ls(x)->c==0){return x;}lv*n=ukey(cards,ls(x),ls(x)->sv,dget(data,i));
-			EACH(z,cards)if(ifield(cards->lv[z],"parent")==self)dset(cards->lv[z]->b,lmistr("parent"),n);
 			cards->kv[dgeti(cards,name)]=n;dset(data,i,n);return x;
 		}
 		ikey("script"){dset(data,i,ls(x));return x;}
@@ -1842,10 +1782,9 @@ lv* interface_card(lv*self,lv*i,lv*x){
 	}else{
 		ikey("name"    )return dget(data,i);
 		ikey("size"    )return dget(deck->b,i);
-		ikey("parent"  )return dgetv(cards,dgetv(data,lmistr("parent")));
 		ikey("index"   )return lmn(dgeti(cards,name));
-		ikey("script"  ){lv*r=card_inherit(self,i);return r?r:lmistr("");}
-		ikey("image"   ){lv*r=card_inherit(self,i);return r?r:image_empty();}
+		ikey("script"  ){lv*r=dget(data,i);return r?r:lmistr("");}
+		ikey("image"   ){lv*r=dget(data,i);return r?r:image_empty();}
 		ikey("widgets" )return dget(data,i);
 		ikey("add"     )return lmnat(n_card_add,self);
 		ikey("remove"  )return lmnat(n_card_remove,self);
@@ -1857,45 +1796,19 @@ lv* interface_card(lv*self,lv*i,lv*x){
 lv* card_write(lv*card){
 	lv*data=card->b, *r=lmd();
 	{lv*k=lmistr("name"  ),*v=dget(data,k);dset(r,k,v);}
-	{lv*k=lmistr("parent"),*v=dget(data,k);if(v&&lis(v)&&v->c)dset(r,k,v);}
 	{lv*k=lmistr("script"),*v=dget(data,k);if(v&&lis(v)&&v->c)dset(r,k,v);}
 	{lv*k=lmistr("image" ),*v=dget(data,k);if(v&&!is_empty(v))dset(r,k,image_write(v));}
 	lv*w=dget(data,lmistr("widgets")),*wids=lmd();EACH(z,w){
 		lv*wid=widget_write(w->lv[z]),*n=dget(wid,lmistr("name"));
-		if(has_parent(card))wid=l_drop(lmistr("type"),wid);wid=l_drop(lmistr("name"),wid);
-		if(wid->c)dset(wids,n,wid);
+		wid=l_drop(lmistr("name"),wid);if(wid->c)dset(wids,n,wid);
 	}dset(r,lmistr("widgets"),wids);return r;
 }
-lv* parent_widgets_fuse(lv*pw,lv*locals){
-	lv*r=lml(0);EACH(z,pw){
-		lv*a=widget_strip(pw->lv[z]),*n=dget(a,lmistr("name"));
-		EACH(i,locals){lv*ln=dget(locals->lv[i],lmistr("name"));if(ln&&matchr(n,ln))a=l_comma(locals->lv[i],a);}
-		ll_add(r,a);
-	}return r;
-}
-lv* parent_widgets_raw(lv*name,lv*cdata,lv*locals){
-	EACH(z,cdata){
-		lv*n=dget(cdata->lv[z],lmistr("name"));
-		if(!n||!matchr(name,n))continue;
-		lv*p=dget(cdata->lv[z],lmistr("parent"));
-		if(p)return parent_widgets_raw(p,cdata,locals);
-		return parent_widgets_fuse(dget(cdata->lv[z],lmistr("widgets")),locals);
-	}return lml(0);
-}
-lv* parent_widgets_cooked(lv*parent,lv*locals){
-	lv*w=ifield(parent,"widgets");MAP(pw,w)widget_strip(widget_write(w->lv[z]));
-	return parent_widgets_fuse(pw,locals);
-}
-lv* card_read(lv*x,lv*deck,lv*cdata){
+lv* card_read(lv*x,lv*deck){
 	x=ld(x);lv*r=lmd(),*widgets=lmd(),*ri=lmi(interface_card,lmistr("card"),r),*cards=ivalue(deck,"cards");
 	dset(r,lmistr("deck"),deck),dset(r,lmistr("widgets"),widgets);
 	{lv*k=lmistr("name"  );lv*v=dget(x,k);dset(r,k,ukey(cards,v&&lis(v)&&v->c==0?NULL:v,"card",NULL));}
-	{lv*k=lmistr("parent");dset(r,k,str_read(dget(x,k),""));}
 	{lv*k=lmistr("image" ),*v=dget(x,k);if(v)dset(r,k,image_read(v));} // heritable
 	init_field(ri,"script",x);lv*w=dget(x,lmistr("widgets"));w=w?ll(w):lml(0);
-	if(!has_parent(ri)){/*nothing*/}
-	else if(cdata){w=parent_widgets_raw(dget(r,lmistr("parent")),cdata,w);}
-	else          {w=parent_widgets_cooked(ifield(ri,"parent"),w);}
 	EACH(z,w){lv*n=dget(w->lv[z],lmistr("name"));if(n){lv*i=widget_read(w->lv[z],ri);if(lii(i))dset(widgets,ifield(i,"name"),i);}}
 	return ri;
 }
@@ -1914,7 +1827,7 @@ lv* deck_paste_named(lv*deck,lv*z,lv*name){
 	z=l_first(z);if(!lis(z)||!has_prefix(z->sv,"%%crd0"))return NONE;
 	int f=1,i=6,n=z->c-i;lv*payload=ld(pjson(z->sv,&i,&f,&n));
 	lv*w=dget(payload,lmistr("widgets"));if(w&&lid(w)){EACH(z,w)dset(w->lv[z],lmistr("name"),w->kv[z]);}
-	lv*r=card_read(payload,deck,NULL);dset(dget(deck->b,lmistr("cards")),name?name:ifield(r,"name"),r);
+	lv*r=card_read(payload,deck);dset(dget(deck->b,lmistr("cards")),name?name:ifield(r,"name"),r);
 	return r;
 }
 lv* n_deck_paste(lv*deck,lv*z){return deck_paste_named(deck,z,NULL);}
@@ -1935,8 +1848,7 @@ lv* n_deck_add(lv*self,lv*z){
 	}
 	if(lis(t)&&!strcmp("card",t->sv)){
 		lv*a=lmd();if(z->c>1)dset(a,lmistr("name"),unpack_str(z,1));
-		if(z->c>2&&card_is(z->lv[2])){lv*p=z->lv[2];if(lin(dkey(cards,p)))return NONE;dset(a,lmistr("parent"),ifield(p,"name"));}
-		lv*r=card_read(a,self,NULL);dset(cards,ifield(r,"name"),r);return r;
+		lv*r=card_read(a,self);dset(cards,ifield(r,"name"),r);return r;
 	}return NONE;
 }
 lv* n_deck_remove(lv*self,lv*z){
@@ -1962,7 +1874,6 @@ lv* n_deck_remove(lv*self,lv*z){
 	}
 	if(card_is(t)){
 		if(cards->c<=1)return NONE; // cannot delete the last card from a deck
-		EACH(c,cards){lv*card=cards->lv[c];if(ifield(card,"parent")==t){dset(card->b,lmistr("parent"),NONE),widget_removeall(card);}}
 		dset(data,lmistr("cards"),cards=l_drop(dkey(cards,t),cards));dset(t->b,lmistr("dead"),ONE);
 		int n=ln(dget(data,lmistr("card")));if(n>=cards->c)dset(data,lmistr("card"),lmn(cards->c-1));
 		dset(data,lmistr("history"),l_list(ifield(ifield(self,"card"),"index")));
@@ -2050,8 +1961,8 @@ lv* deck_read(lv*x){
 	pushstate(root),issue(root,parse(default_transitions));while(running())runop();arg();popstate();
 	MAP(cdata,cards  )cards  ->lv[z];
 	MAP(mdata,modules)modules->lv[z];
-	{lv*k=lmistr("cards"   );cards  =lmd();dset(r,k,cards  );EACH(z,cdata){lv*v=card_read  (cdata->lv[z],ri,cdata);dset(cards  ,ifield(v,"name"),v);}}
-	{lv*k=lmistr("modules" );modules=lmd();dset(r,k,modules);EACH(z,mdata){lv*v=module_read(mdata->lv[z],ri      );dset(modules,ifield(v,"name"),v);}}
+	{lv*k=lmistr("cards"   );cards  =lmd();dset(r,k,cards  );EACH(z,cdata){lv*v=card_read  (cdata->lv[z],ri);dset(cards  ,ifield(v,"name"),v);}}
+	{lv*k=lmistr("modules" );modules=lmd();dset(r,k,modules);EACH(z,mdata){lv*v=module_read(mdata->lv[z],ri);dset(modules,ifield(v,"name"),v);}}
 	dset(r,lmistr("history"),l_list(ifield(ifield(ri,"card"),"index")));
 	return ri;
 }
@@ -2101,7 +2012,6 @@ lv* deck_write(lv*x,int html){
 	lv*c=dget(data,lmistr("cards"));EACH(z,c){
 		lv*card=c->lv[z],*data=card_write(card),*wids=dget(data,lmistr("widgets"));lv*base=dget(data,lmistr("name"));sci=0;
 		str_addz(&r,"\n{card:"),esc_write(&r,1,base);str_addz(&r,"}\n");
-		write_line("parent",v,v                              )
 		write_line("image" ,v,v                              )
 		write_line("script",v,script_ref(scripts,base,&sci,v))
 		EACH(w,wids){lv*k=lmistr("script"),*v=dget(wids->lv[w],k);if(v)dset(wids->lv[w],k,script_ref(scripts,base,&sci,v));}

@@ -475,7 +475,6 @@ dattr.name:    "home"
 dattr.script:  ""
 dattr.size:    512,342
 dattr.image:   "image"
-dattr.parent:  0
 dattr.widgets: "dict"
 on cardattrs x do
 	r:()
@@ -483,7 +482,6 @@ on cardattrs x do
 	r.script:  x.script
 	r.size:    x.size
 	r.image:   typeof x.image
-	r.parent:  x.parent
 	r.widgets: typeof x.widgets
 end
 assert["card default attributes and types" dattr cardattrs[card]]
@@ -1570,143 +1568,6 @@ assert["add card to deck with name" ("home","card1","named") (range deck.cards)]
 
 #######################################
 #
-#  Inheritance
-#
-#######################################
-
-deck:readdeck[]
-root:deck.cards.home
-root.add["button" "go"]
-
-child:deck.add["card" "child" root]
-assert["cannot create child from invalid card" 0 deck.add["card" "brother" c2]]
-assert["created child card" ("card","card") (typeof root),(typeof child)]
-assert["parent child relationship" root child.parent]
-assert["inherit parent widgets" (list "go") (range child.widgets)]
-
-b1:child.add["button"]
-assert["cannot add widgets to a child card" (list "go") (range child.widgets)]
-
-root.name:"root"
-assert["changing root name" "root" root.name]
-assert["changing a name updates child refs to it" root child.parent]
-
-f1:root.add["field" "one"]
-f2:root.add[f1 "two"]
-assert["adding widgets to a parent adds them to the child" ("go","one","two") (range child.widgets)]
-
-root.remove[f1]
-assert["removing widgets from a parent removes them from the child" ("go","two") (range child.widgets)]
-
-cf2:child.widgets.two
-f2.name:"snarf"
-assert["renaming widgets on a parent renames them for the child" "snarf" cf2.name]
-assert["renaming widgets on a parent renames the child widget collection" ("go","snarf") (range child.widgets)]
-
-root.widgets.snarf.index:0
-assert["reordering widgets on a parent reorders them for the child" ("snarf","go") (range child.widgets)]
-
-deck.remove[root]
-assert["removing a parent recursively destroys widgets in child cards" 0 (count child.widgets)]
-assert["recursively removed child widgets are inert" 0 b1.name]
-
-deck:readdeck[]
-root:deck.cards.home
-root.add["button" "plain"]
-b:root.add["button" "pusher"]
-dattr:()
-dattr.name:   "pusher"
-dattr.font:   deck.fonts.menu
-dattr.script: b.script:"nuffing"
-dattr.locked: b.locked:1
-dattr.size:   b.size:40,60
-dattr.pos:    b.pos:10,35
-dattr.show:   b.show:"transparent"
-dattr.text:   b.text:"Push Me!"
-dattr.value:  b.value:1
-dattr.style:  b.style:"check"
-child:deck.add["card" "child" root]
-assert["buttons inherit properties" dattr buttonattrs[child.widgets.pusher]]
-child.widgets.pusher.value:0
-assert["buttons can override values" 0 child.widgets.pusher.value]
-child.widgets.pusher.style:"rect"
-assert["child buttons cannot mutate properties" "check" child.widgets.pusher.style]
-b.style:"rect"
-assert["parent buttons can mutate properties" "rect" child.widgets.pusher.style]
-
-f:root.add["field" "outfield"]
-f.text:"some text"
-f.border:1
-cf:child.widgets.outfield
-assert["fields inherit properties" 1 cf.border]
-assert["fields inherit values" "some text" cf.text]
-cf.text:"something else"
-assert["fields can override values" "something else" cf.text]
-assert["parent field unchanged" "some text" f.text]
-cf.border:0
-assert["child fields cannot mutate properties" 1 cf.border]
-
-g:root.add["grid" "expenses"]
-g.value:tab:insert a:11,22 b:33,44 into 0
-g.format:"i$"
-cg:child.widgets.expenses
-assert["grids inherit properties" "i$" cg.format]
-assert["grids inherit values" tab cg.value]
-cg.value:update c:a+b from cg.value
-assert["grids can override values" (insert a:11,22 b:33,44 c:44,66 into 0) cg.value]
-assert["parent grid unchanged" tab g.value]
-cg.format:"fj"
-assert["child grids cannot mutate properties" "i$" cg.format]
-
-c:root.add["canvas" "frame"]
-c.size:10,8
-c.pattern:2
-c.fill[1,1]
-cc:child.widgets.frame
-assert["canvases inherit properties" (10,8) cc.size]
-assert["canvases inherit values" 2 cc.pattern]
-cc.pattern:3
-cc.line[1,1 8,6]
-assert["child grids can override values" 3 cc.pattern]
-assert["parent canvas unchanged" 2 c.pattern]
-cc.size:99,99
-assert["child grids cannot mutate properties" 10,8 cc.size]
-assert_image["child canvases can mutate the image"
-	((list 2,2,2,2,2,2,2,2,2,2),
-	 (list 2,3,2,2,2,2,2,2,2,2),
-	 (list 2,2,3,3,2,2,2,2,2,2),
-	 (list 2,2,2,2,3,2,2,2,2,2),
-	 (list 2,2,2,2,2,3,2,2,2,2),
-	 (list 2,2,2,2,2,2,3,3,2,2),
-	 (list 2,2,2,2,2,2,2,2,3,2),
-	 (list 2,2,2,2,2,2,2,2,2,2))
-	cc.copy[]
-]
-assert_image["parent canvas image unchanged"
-	((list 2,2,2,2,2,2,2,2,2,2),
-	 (list 2,2,2,2,2,2,2,2,2,2),
-	 (list 2,2,2,2,2,2,2,2,2,2),
-	 (list 2,2,2,2,2,2,2,2,2,2),
-	 (list 2,2,2,2,2,2,2,2,2,2),
-	 (list 2,2,2,2,2,2,2,2,2,2),
-	 (list 2,2,2,2,2,2,2,2,2,2),
-	 (list 2,2,2,2,2,2,2,2,2,2))
-	c.copy[]
-]
-
-writedeck["temp.deck" deck]
-assert_file["write a deck with inheritance." "tests/dom/inheritance.deck" "temp.deck"]
-
-deck:readdeck["tests/dom/inheritance.deck"]
-child:deck.cards.child
-assert["child elements are populated"
-	(extract plain:"button" pusher:"button" outfield:"field" expenses:"grid" frame:"canvas" from 0)
-	(each w in child.widgets typeof w end)
-]
-assert["child elements get values" "something else" child.widgets.outfield.text]
-
-#######################################
-#
 #  Events
 #
 #######################################
@@ -1800,21 +1661,6 @@ assert["copy widgets: return value" "field"                      (typeof first v
 assert["copy widgets: added widget" ("thing","field1")           (range v.widgets)]
 assert["copy widgets: added value"  "Some Nice Text"             vv[0].text]
 assert["copy widgets: no sharing"   ("another","Some Nice Text") (v.widgets.thing.text, v.widgets.field1.text)]
-
-deck:readdeck[]
-home:deck.card
-f:home.add["field" "canary"]
-c1:deck.add["card" "son" home]
-c1.widgets.canary.text:"Alpha"
-copied:deck.copy[c1]
-c1.widgets.canary.text:"Beta"
-c2:deck.paste[copied]
-assert["copy child card: return value" "card"           (typeof c2)]
-assert["copy child card: parent"       home             c2.parent]
-assert["copy child card: widgets"      (list "canary")  (range c2.widgets)]
-assert["copy child card: locals"       ("Beta","Alpha") (c1.widgets.canary.text,c2.widgets.canary.text)]
-f.size:33,44
-assert["copy child card: inherit"      (33,44)          c2.widgets.canary.size]
 
 #######################################
 #

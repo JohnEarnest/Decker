@@ -310,12 +310,6 @@ The cards dialog can be found in _File &#8594; Cards..._, and provides an overvi
 
 Clicking a card in the list will navigate to it immediately, and double-clicking will drill into its properties, allowing you to edit the card's name or script. You can also drag cards in the list or press shift and arrow keys together to reorder them.
 
-Newly created cards can be a "child" of an existing card. Child cards have all the same widgets, with the same appearance and positioning, but they can contain different data. Making a change to the parent will be immediately reflected on all children.
-
-![](images/inheritance.gif)
-
-For more detail on child cards, see [Inheritance](#inheritance).
-
 Sound
 =====
 Buttons and scripts can play sound using the `play[]` built-in function. Several sounds can play at the same time. Sound is always stored at an 8khz sample rate, in mono, and individual sounds are capped at 10 seconds.
@@ -431,7 +425,7 @@ The transition `y`, should be the name of a transition function installed with `
 
 4) If `sleep[]` is provided the string `"play"` as an argument, instead of waiting for some number of frames to pass, it will pause script execution until all sound clips triggered with `play[]` complete.
 
-5) `eval[]` returns a dictionary containing:
+5) `eval[x y]` returns a dictionary containing:
 - `error`: a string giving any error message produced during parsing, or the empty string.
 - `value`: the value of the last expression in the program. On a parse error, `value` will be the number `0`.
 - `vars`: a dictionary containing any variable bindings made while executing the program. (This also includes bindings from argument `y`.)
@@ -443,7 +437,7 @@ d.a:2
 eval["show[a+3]" d]
 ```
 
-6) The behavior of `random[]` depends on the type of `x` and whether or not `y` is provided:
+6) The behavior of `random[x y]` depends on the type of `x` and whether or not `y` is provided:
 - if `x` is a number, treat it as if it were `range x`.
 - if `x` is anything else, choose random elements from it.
 - if `y` is missing, the result will be a single random element.
@@ -468,14 +462,14 @@ eval["show[a+3]" d]
 - Child tags (`<foo><bar/><quux/></foo>`).
 - Mixed body text and child tags (`<foo>one<bar/>two</foo>`).
 
-10) `alert[]` blocks all script execution until the user dismisses the modal. It can prompt the user in several ways depending on the `type` argument, if provided:
+10) `alert[text type x y]` blocks all script execution until the user dismisses the modal. It can prompt the user in several ways depending on the `type` argument, if provided:
 
 - `"none"` (the default): Don't prompt the user for input and always return `1`.
 - `"bool"`: Prompt the user with two buttons, "Cancel" and a verb given by `x` (or `"OK"`, by default). Return `1` if the verb-button is clicked, `0` on cancel.
 - `"string"`: Prompt the user to enter a string. If `x` is present, use it as a default value. Return the input string.
 - `"choose"`: Prompt the user to pick one element from a list or dictionary `x`, using `y` as a default value, if provided. If `x` is a dictionary. Return an element from `x`. If `x` is missing or empty, the user will _always_ be presented with the option `"0"`.
 
-11) `read[]` understands several types of file and will interpret each appropriately:
+11) `read[type hint]` understands several types of file and will interpret each appropriately:
 
 - Image files (`.gif`, `.png`, `.bmp`, `.jpg`, `.jpeg`) are read as _image interfaces_.
 - Sound files (`.wav`) are read as _sound interfaces_.
@@ -633,7 +627,7 @@ The deck interface represents the global attributes of a Decker document.
 `deck.add[x y z]` can add new cards, sounds, and fonts to the deck:
 
 - If `x` is a card, sound, module, or font interface, insert an exact copy of it using `y` as a name (or an appropriate default name).
-- If `x` is `"card"`, insert a new blank card at the end of the deck, using `y` as a name (or an appropriate default name). If `z` is a card, use `z` as the _parent_ of the new card.
+- If `x` is `"card"`, insert a new blank card at the end of the deck, using `y` as a name (or an appropriate default name).
 - If `x` is `"sound"`, insert a new sound, using an int `y` as a length (if present), and `z` as a name (or an appropriate default name).
 - If `x` is `"font"`, insert a new font, using an int pair `y` as a size (if present), and `z` as a name (or an appropriate default name).
 - if `x` is `"module"`, insert a new module, using `y` as a name (or an appropriate default name).
@@ -858,7 +852,6 @@ The card interface gives access to the contents of a given card.
 | `x.script`    | String. The Lil source code of the card's script, or `""`. r/w.                                   |
 | `x.size`      | The `size` of this card in pixels.                                                                |
 | `x.image`     | An _image_ interface representing the card's background. r/w.                                     |
-| `x.parent`    | This card's parent card, or `0`.                                                                  |
 | `x.widgets`   | A dictionary of widget interfaces on this card (button, field, canvas, or grid), keyed by name.   |
 | `x.index`     | The ordinal position of this card in the deck, counting from 0. r/w.                              |
 | `x.add[x y]`  | Add a widget to this card, and return it.                                                         |
@@ -1066,7 +1059,7 @@ A keystore is subject to several constraints:
 
 Events
 ======
-When processing an event, Decker first executes scripts (if present) for all of the _ancestors_ of the event _target_. The deck is always first. If a card has a _parent_, the script of the parent card is executed before that of the card. If the target is a widget, its script is executed after the card which contains it. If any scripts are malformed and do not parse correctly (as could be verified with `sys.eval[]`), they will be ignored. Each successive script runs in a nested environment chained to the previous, such that `send` may be used to access any definitions made in ancestor scripts which are shadowed by the current script.
+When processing an event, Decker first executes scripts (if present) for all of the _ancestors_ of the event _target_. The deck is always first. If the target is a widget, its script is executed after the card which contains it. If any scripts are malformed and do not parse correctly (as could be verified with `sys.eval[]`), they will be ignored. Each successive script runs in a nested environment chained to the previous, such that `send` may be used to access any definitions made in ancestor scripts which are shadowed by the current script.
 
 When the deck script executes, the following constants will be defined:
 
@@ -1082,7 +1075,7 @@ When a card or widget script executes, the following constants will be defined i
 - `card`: the card interface for the current card.
 - All widgets on the current card will be available as variables by their `name`.
 
-Finally, Decker will find the most recent function definition which matches the event name and execute it with an appropriate argument. Thus, if a button's script does not define a `click[]` function, Decker will effectively look for a definition in the containing card, and then any parent cards, and then finally the deck. If no definition is found, the event will be discarded harmlessly.
+Finally, Decker will find the most recent function definition which matches the event name and execute it with an appropriate argument. Thus, if a button's script does not define a `click[]` function, Decker will effectively look for a definition in the containing card, and then finally the deck. If no definition is found, the event will be discarded harmlessly.
 
 Events are as follows:
 
@@ -1144,26 +1137,6 @@ end
 ```
 
 While a script is executing (or performing a `sleep[]`), no additional events can be fired until it completes. The `pointer` interface will, however, continue to update to reflect the current state of the pointing device.
-
-Inheritance
-===========
-Decker provides a mechanism for using one card as a template for several "instances" of similar-looking cards which vary only in the values stored in the each instance's widgets. For example, a deck containing a presentation might use a shared template for each title card. The background image for each title card is the same, as is the font, alignment, and positioning of the title, but each title card contains different text. By using a template card, it is easy to make changes in one place and have them reflected everywhere in your presentation.
-
-Cards have a _parent_ attribute set when they are created (as by `deck.add["card" "instancename" parent]`). For cards that do not have a template (or are themselves a template), `card.parent` will be `0`; otherwise it is a card interface. We will say that a card with another card as a parent is a _child_.
-
-Child cards _inherit_ the `image` and `script` attributes of the _parent_ card: if they have never been set on the child, accessing the attribute of the child will return the attribute of the parent. Explicitly setting these attributes on the child will _override_ this inherited value, but will not change the attribute on the parent.
-
-Child cards also inherit all of their `widgets` from their parent. A child card may not explicitly `add[]` or `remove[]` widgets. Adding, removing, reordering, and renaming widgets from the parent card will be reflected automatically for all child cards. If the parent card is ever removed from the deck, all widgets will be removed from all child cards, and any attributes the child cards inherited from the parent will revert to their default values.
-
-The attributes of widgets on a child card, like some attributes of the card itself, are inherited from corresponding widgets (with the same `name`) on the parent card. Most attributes of such a _child widget_ are rendered read-only, with specific exceptions:
-
-- The `button` widget's `value` attribute.
-- The `field` widget's `value`/`text` and `scroll` attributes.
-- The `slider` widget's `value` attribute.
-- The `grid` widget's `value`, `scroll`, and `row` attributes.
-- The `canvas` widget's `brush`, `pattern`, and `font` attributes.
-
-Like the `image` attribute of the parent card, the values of these mutable widget attributes will be inherited from the parent widget unless/until they are overridden. Calling any of the drawing methods on the canvas widget (including `canvas.copy[]` and `canvas.clip[]`) will clone the image drawn on the parent widget at that time and henceforth work from that copy, without disturbing the image drawn on the parent widget.
 
 Modules
 =======

@@ -23,9 +23,7 @@ General Concepts
 ----------------
 Decker documents are called _Decks_, and consist of a series of _Cards_. Cards in turn contain _Widgets_. The Decker environment can broadly be in "editing" mode, where widget properties are manipulated interactively, and an "interaction" mode where widgets respond to clicks and other interactions by emitting _events_ and running scripts as applicable.
 
-Widgets, cards, or the deck itself may contain scripts written in the [Lil programming language](lil.html). Scripts have a mechanism for "bubbling" events up along the container hierarchy from a source widget to its containing card, any _parents_ of that card (see below), and perhaps to the deck itself. In response to events, Lil scripts can inspect and manipulate properties of the deck via a series of Interfaces furnished by the application. For more detail on this, see the [Decker manual](decker.html). Lil scripts are not _persistent_- their local variable bindings are discarded between events. Everything that is persistent about a deck- especially widget values- is captured in the representation described in this guide.
-
-Cards can have a _Parent_ card. If so, they inherit all the properties and widgets of their parent (and its parents, and so on, recursively) unless those properties are overridden. Many cards in a deck may re-use the widgets, scripts, and other properties of a handful of "template" parent cards.
+Widgets, cards, or the deck itself may contain scripts written in the [Lil programming language](lil.html). Scripts have a mechanism for "bubbling" events up along the container hierarchy from a source widget to its containing card, and perhaps to the deck itself. In response to events, Lil scripts can inspect and manipulate properties of the deck via a series of Interfaces furnished by the application. For more detail on this, see the [Decker manual](decker.html). Lil scripts are not _persistent_- their local variable bindings are discarded between events. Everything that is persistent about a deck- especially widget values- is captured in the representation described in this guide.
 
 Lil code intended to be reusable across projects can be organized into _Modules_. From a programming perspective, modules execute once when a deck is loaded (or the module is modified) and each return a dictionary which will be mounted as a global for use by ordinary event-triggered scripts. Modules do not have direct access to the deck or its components, nor do they have direct access to one another. Each module has an independent key-value store which can furnish static data used by the module or allow the module to explicitly preserve its state.
 
@@ -159,7 +157,6 @@ The `{card:ID}` Chunk
 ---------------------
 Card chunks always have an ID, which serves as the `name` of the card. They also may have additional optional properties:
 
-- `parent`: a string which corresponds to the ID of a parent card, if any.
 - `image`: an _Image Record_ used as the background of this card.
 - `script`: a number or string corresponding to a `{script:ID}` chunk, representing event handlers applying to this card.
 
@@ -309,3 +306,6 @@ Changelog
 
 1.2:
 - Introduced the `canvas.draggable` field.
+
+1.10:
+- Deprecated the `card.parent` field, a mechanism for inheriting the widgets and properties of a "template" card.
