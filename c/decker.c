@@ -1190,7 +1190,7 @@ void modal_exit(int value){
 		);
 	}
 	if(ms.subtype==modal_confirm_quit&&value)exit(0);
-	if(ms.subtype==modal_confirm_new&&value)load_deck(deck_get(lmistr("")));
+	if(ms.subtype==modal_confirm_new&&value)load_deck(deck_get(lmistr(""))),set_path("");
 	if(ms.subtype==modal_confirm_script&&value)finish_script();
 	if(ms.subtype==modal_multiscript&&value)setscript(l_drop(NONE,ob.sel));
 	if(ms.subtype==modal_alert_lil  ){arg();ret(ONE);}
