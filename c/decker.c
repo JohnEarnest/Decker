@@ -2884,7 +2884,7 @@ void tick(lv*env){
 				paste_any();
 				menu_separator();
 				if(menu_item("Paste as new Canvas",has_clip("%%IMG"),'\0')){
-					lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas"));
+					lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas")),dset(p,lmistr("locked"),ONE);
 					char*t=SDL_GetClipboardText();dset(p,lmistr("image"),lmcstr(t));SDL_free(t);
 					ob_create(l_list(p));frame=context;
 				}

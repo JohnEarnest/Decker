@@ -2993,7 +2993,7 @@ dopaste=x=>{
 cutcard=_=>{const c=ifield(deck,'card');setclipboard(ls(deck_copy(deck,c))),deck_remove(deck,c),mark_dirty()}
 copycard=_=>{const c=ifield(deck,'card');setclipboard(ls(deck_copy(deck,c)))}
 copywidgetimg=_=>{setclipboard(image_write(draw_widget(ob.sel[0]))),frame=context}
-pasteascanvas=_=>getclipboard(t=>{ob_create([lmd([lms('type'),lms('image')],[lms('canvas'),lms(t)])]),frame=context})
+pasteascanvas=_=>getclipboard(t=>{ob_create([lmd([lms('type'),lms('locked'),lms('image')],[lms('canvas'),ONE,lms(t)])]),frame=context})
 pasteintocanvas=_=>getclipboard(t=>{const i=image_read(t),c=ob.sel[0];iwrite(c,lms('size'),ifield(i,'size')),c.image=i})
 menucut=_=>{const r=docut();if(r)setclipboard(r)}
 menucopy=_=>{const r=docopy();if(r)setclipboard(r)}
