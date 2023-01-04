@@ -190,7 +190,6 @@ void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
 void fire_event_async(lv*target,lv*name,lv*arg){fire_async(target,name,l_list(arg),NULL,1);}
 void fire_hunk_async(lv*target,lv*hunk){fire_async(target,NULL,lml(0),hunk,1);}
 lv* n_event(lv*self,lv*x){fire_async(self,ls(l_first(x)),l_drop(ONE,x),NULL,0);return NONE;}
-lv* fire_event(lv*target,lv*name,lv*arg){fire_event_async(target,name,arg);while(running())runop();arg();popstate();pending_popstate=0;return NONE;}
 
 typedef struct {int x,y;} pair;
 typedef struct {double x,y;} fpair;
@@ -1174,9 +1173,6 @@ lv* n_canvas_merge(lv*self,lv*z){
 		PIX(x,y)=c;
 	}return NONE;
 }
-lv* n_canvas_click  (lv*self,lv*z){return fire_event(self,lmistr("click"  ),lmpair(getpair(l_first(z))));}
-lv* n_canvas_drag   (lv*self,lv*z){return fire_event(self,lmistr("drag"   ),lmpair(getpair(l_first(z))));}
-lv* n_canvas_release(lv*self,lv*z){return fire_event(self,lmistr("release"),lmpair(getpair(l_first(z))));}
 lv* interface_canvas(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	lv*data=self->b;lv*card=dget(data,lmistr("card")),*deck=dget(card->b,lmistr("deck")),*fonts=dget(deck->b,lmistr("fonts"));
@@ -1212,9 +1208,6 @@ lv* interface_canvas(lv*self,lv*i,lv*x){
 		ikey("text"     )return lmnat(n_canvas_text,  self);
 		ikey("copy"     )return lmnat(n_canvas_copy,  self);
 		ikey("paste"    )return lmnat(n_canvas_paste, self);
-		ikey("click"    )if(state.external)return lmnat(n_canvas_click,self);
-		ikey("drag"     )if(state.external)return lmnat(n_canvas_drag,self);
-		ikey("release"  )if(state.external)return lmnat(n_canvas_release,self);
 	}return interface_widget(self,i,x);
 }
 lv* canvas_read(lv*x,lv*r){
@@ -1257,7 +1250,6 @@ button unpack_button(lv*x){
 		lb(ifield(x,"locked")),
 	};
 }
-lv* n_button_click(lv*self,lv*z){return (void)z,fire_event(self,lmistr("click"),NONE);}
 lv* interface_button(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	if(x){
@@ -1269,7 +1261,6 @@ lv* interface_button(lv*self,lv*i,lv*x){
 		ikey("text" ){lv*r=dget(self->b,i);return r?r:lmistr("");}
 		ikey("style"){lv*r=dget(self->b,i);return r?r:lmistr(button_styles[0]);}
 		ikey("size" ){lv*r=dget(self->b,i);return r?r:lmpair((pair){60,20});}
-		ikey("click")if(state.external)return lmnat(n_button_click,self);
 	}return interface_widget(self,i,x);
 }
 lv* button_read(lv*x,lv*r){
@@ -1407,9 +1398,6 @@ field unpack_field(lv*x,field_val*value){
 		lb(ifield(x,"locked")),
 	};
 }
-lv* n_field_run(lv*self,lv*z){return fire_event(self,lmistr("run"),ls(l_first(z)));}
-lv* n_field_link(lv*self,lv*z){return fire_event(self,lmistr("link"),ls(l_first(z)));}
-lv* n_field_change(lv*self,lv*z){return fire_event(self,lmistr("change"),ls(l_first(z)));}
 lv* interface_field(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	lv*data=self->b;
@@ -1439,9 +1427,6 @@ lv* interface_field(lv*self,lv*i,lv*x){
 			lv*style=ivalue(self,"style"); int code=style&&!strcmp(ls(style)->sv,"code");
 			lv*r=dget(data,i);return r?dget(fonts,r): code?dget(fonts,lmistr("mono")): fonts->lv[0];
 		}
-		ikey("run"      )if(state.external)return lmnat(n_field_run,self);
-		ikey("link"     )if(state.external)return lmnat(n_field_link,self);
-		ikey("change"   )if(state.external)return lmnat(n_field_change,self);
 	}return interface_widget(self,i,x);
 }
 lv* field_read(lv*x,lv*r){
@@ -1486,7 +1471,6 @@ slider unpack_slider(lv*x){
 		ln(ifield(x,"value")),
 	};
 }
-lv* n_slider_change(lv*self,lv*z){return fire_event(self,lmistr("change"),lmn(ln(l_first(z))));}
 lv* interface_slider(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	lv*data=self->b;
@@ -1506,7 +1490,6 @@ lv* interface_slider(lv*self,lv*i,lv*x){
 		ikey("format"   ){lv*r=dget(data,i);return r?r:lmistr("%f");}
 		ikey("style"    ){lv*r=dget(data,i);return r?r:lmistr(slider_styles[0]);}
 		ikey("size"     ){lv*r=dget(data,i);return r?r:lmpair((pair){100,25});}
-		ikey("change"   )if(state.external)return lmnat(n_slider_change,self);
 	}return interface_widget(self,i,x);
 }
 lv* slider_read(lv*x,lv*r){
@@ -1548,12 +1531,6 @@ grid unpack_grid(lv*x,grid_val*value){
 	lv*w=ifield(x,"widths");r.widths[0]=w->c;EACH(z,w)r.widths[1+z]=ln(w->lv[z]);
 	return r;
 }
-lv* n_grid_click(lv*self,lv*z){
-	int n=ln(l_first(z)),r=ifield(self,"value")->n;
-	return fire_event(self,lmistr("click"),lmn(CLAMP(-1,n,r)));
-}
-lv* n_grid_order(lv*self,lv*z){return fire_event(self,lmistr("order"),ls(l_first(z)));}
-lv* n_grid_change(lv*self,lv*z){return fire_event(self,lmistr("change"),lt(l_first(z)));}
 lv* interface_grid(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	lv*data=self->b;
@@ -1580,9 +1557,6 @@ lv* interface_grid(lv*self,lv*i,lv*x){
 			if(!r)return lmn(-1); int n=ln(r); return lmn(CLAMP(-1,n,v->n-1));
 		}
 		ikey("rowvalue" ){int r=ln(ifield(self,"row"));lv*v=ifield(self,"value");return r<0||r>=v->n?lmd():l_at(v,lmn(r));}
-		ikey("click"    )if(state.external)return lmnat(n_grid_click,self);
-		ikey("order"    )if(state.external)return lmnat(n_grid_order,self);
-		ikey("change"   )if(state.external)return lmnat(n_grid_change,self);
 	}return interface_widget(self,i,x);
 }
 lv* grid_read(lv*x,lv*r){
@@ -1763,7 +1737,6 @@ lv* n_card_paste(lv*card,lv*z){
 	z=l_first(z);if(!lis(z)||!has_prefix(z->sv,"%%wgt0"))return NONE;
 	int f=1,i=6,n=z->c-i;return card_paste_raw(card,ll(pjson(z->sv,&i,&f,&n)));
 }
-lv* n_card_navigate(lv*self,lv*z){return fire_event(self,lmistr("navigate"),normalize_enum(l_first(z),nav_dirs));}
 lv* interface_card(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	lv*data=self->b,*deck=ivalue(self,"deck"),*cards=ivalue(deck,"cards"),*name=ivalue(self,"name");
@@ -1785,7 +1758,6 @@ lv* interface_card(lv*self,lv*i,lv*x){
 		ikey("add"     )return lmnat(n_card_add,self);
 		ikey("remove"  )return lmnat(n_card_remove,self);
 		ikey("event"   )return lmnat(n_event,self);
-		ikey("navigate")if(state.external)return lmnat(n_card_navigate,self);
 		ikey("copy"    )if(state.external)return lmnat(n_card_copy,self);
 		ikey("paste"   )if(state.external)return lmnat(n_card_paste,self);
 	}return x?x:NONE;

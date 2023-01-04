@@ -1576,21 +1576,15 @@ deck:readdeck[]
 card:deck.card
 f:card.add["field" "quantity"]
 b:card.add["button" "go"]
-assert["external fields are exposed" "function" (typeof b.click)]
-
-b.script:"on click do quantity.text: go.click end"
-b.click[]
-assert["external fields are protected from the DOM" "0" f.text]
-
 b.script:"on click do quantity.text:3*quantity.text end"
 f.text:2
-b.click[]
+b.event["click"]
 assert["update field by button click" "6" f.text]
-b.click[]
+b.event["click"]
 assert["ensure events are repeatable" "18" f.text]
 
 card.script:"on navigate x do quantity.text:\"%s???\" format x end"
-card.navigate["left"]
+card.event["navigate" "left"]
 assert["update field by card navigate" "left???" f.text]
 
 deck:readdeck[]
@@ -1600,7 +1594,7 @@ deck.script:"on fetch do typeof sharedname end"
 b:c.add["button" "sharedname"]
 f:c.add["field" "output"]
 b.script:"on click do output.text: (typeof sharedname),\",\",fetch[] end"
-b.click[]
+b.event["click"]
 assert["shadowing autobound variables" "button,card" f.text]
 
 deck:readdeck[]
@@ -1608,7 +1602,7 @@ card:deck.card
 field:card.add["field" "target"]
 card.script:"on change x do target.text:\"one\",x end"
 field.script:"on change x do target.text:\"nope\" send change[x,\"two\"] end"
-field.change["three"]
+field.event["change" "three"]
 assert["event bubbling updates" "onethreetwo" field.text]
 
 deck:readdeck[]
@@ -1616,7 +1610,7 @@ card:deck.card
 deck.add["card" "other"]
 field:card.add["field" "output"]
 field.script:"on go x do output.text:\"worked!\",x send go[1] end    on change do go[0] end"
-field.change[]
+field.event["change"]
 assert["builtin shadowing: side-effect" "worked!0" field.text]
 assert["builtin shadowing: forwarding"  "other" deck.card.name]
 
@@ -1625,13 +1619,13 @@ card:deck.card
 card.script:"on click do home.name:\"zeppo\" end"
 button:card.add["button" "boop"]
 button.script:"on syntax error ignore me" # this will not execute!
-button.click[]
+button.event["click"]
 assert["ignore invalid scripts" "zeppo" card.name]
 
 deck:readdeck[]
 f:deck.card.add["field" "out"]
 f.script:"on change do sleep[1] out.text:typeof sleep end"
-f.change[]
+f.event["change"]
 assert["in lilt, sleep[] is present but has no effect." "function" f.text]
 
 deck:readdeck[]
@@ -1716,7 +1710,7 @@ assert["module data, external" 1.01              ld.modules.logger.data.version]
 assert["module data, keys"     ("version","log") ld.modules.logger.data.keys   ]
 ld.modules.logger.data.version:0
 assert["module data, delete zero"   (list "log") ld.modules.logger.data.keys   ]
-ld.card.widgets.push.click[]
+ld.card.widgets.push.event["click"]
 assert["module logger demo"
 	(insert time:0,1,2,3 message:"zeroth","first","second","third" into 0)
 	ld.card.widgets.pull.value

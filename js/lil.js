@@ -1465,7 +1465,6 @@ button_read=(x,card)=>{
 			if(ikey(i,'text' ))return lms(ivalue(self,ls(i),''))
 			if(ikey(i,'style'))return lms(ivalue(self,ls(i),'round'))
 			if(ikey(i,'size' ))return lmpair(ivalue(self,ls(i),rect(60,20)))
-			if(ikey(i,'click')&&state.external)return lmnat(([x])=>fire_event(self,i,NONE))
 		}return interface_widget(self,i,x)
 	},'button');ri.card=card
 	init_field(ri,'text' ,x)
@@ -1506,9 +1505,6 @@ field_read=(x,card)=>{
 			if(ikey(i,'align'    ))return lms(ivalue(self,ls(i),'left'))
 			if(ikey(i,'size'     ))return lmpair(ivalue(self,ls(i),rect(100,20)))
 			if(ikey(i,'font'     ))return dget(self.card.deck.fonts,lms(self.font||(self.style=='code'?'mono':'body')))
-			if(ikey(i,'run'   )&&state.external)return lmnat(([x])=>fire_event(self,i,lms(ls(x))))
-			if(ikey(i,'link'  )&&state.external)return lmnat(([x])=>fire_event(self,i,lms(ls(x))))
-			if(ikey(i,'change')&&state.external)return lmnat(([x])=>fire_event(self,i,lms(ls(x))))
 		}return interface_widget(self,i,x)
 	},'field');ri.card=card
 	const rtext_read=x=>{
@@ -1553,7 +1549,6 @@ slider_read=(x,card)=>{
 			if(ikey(i,'interval'))return lmpair(ivalue(self,ls(i),rect(0,100)))
 			if(ikey(i,'style'   ))return lms(ivalue(self,ls(i),'horiz'))
 			if(ikey(i,'size'    ))return lmpair(ivalue(self,ls(i),rect(100,25)))
-			if(ikey(i,'change'&&state.external))return lmnat(([x])=>fire_event(self,i,lmn(ln(x))))
 		}return interface_widget(self,i,x)
 	},'slider');ri.card=card
 	init_field(ri,'interval',x)
@@ -1596,9 +1591,6 @@ grid_read=(x,card)=>{
 			if(ikey(i,'size'     ))return lmpair(ivalue(self,ls(i),rect(100,50)))
 			if(ikey(i,'row'      ))return lmn(clamp(-1,ivalue(self,ls(i),-1),count(ifield(self,'value'))-1))
 			if(ikey(i,'rowvalue' )){const r=ln(ifield(self,'row')),v=ifield(self,'value');return r<0||r>=count(v)?lmd():l_at(v,lmn(r))}
-			if(ikey(i,'click' )&&state.external)return lmnat(([x])=>fire_event(self,i,lmn(clamp(-1,ln(x),count(ifield(self,'value'))))))
-			if(ikey(i,'order' )&&state.external)return lmnat(([x])=>fire_event(self,i,lms(ls(x))))
-			if(ikey(i,'change')&&state.external)return lmnat(([x])=>fire_event(self,i,lt(x)))
 		}return interface_widget(self,i,x)
 	},'grid');ri.card=card
 	init_field(ri,'scrollbar',x)
@@ -1706,10 +1698,7 @@ canvas_read=(x,card)=>{
 					pix(h,c)
 				}return NONE
 			})
-			if(ikey(i,'text'   ))return lmnat(([x,pos,a])=>(canvas_pick(self),text(x=lit(x)?rtext_cast(x):lms(ls(x)),pos,a)))
-			if(ikey(i,'click'  )&&state.external)return lmnat(([x])=>fire_event(self,i,lmpair(getpair(x))))
-			if(ikey(i,'drag'   )&&state.external)return lmnat(([x])=>fire_event(self,i,lmpair(getpair(x))))
-			if(ikey(i,'release')&&state.external)return lmnat(([x])=>fire_event(self,i,lmpair(getpair(x))))
+			if(ikey(i,'text'))return lmnat(([x,pos,a])=>(canvas_pick(self),text(x=lit(x)?rtext_cast(x):lms(ls(x)),pos,a)))
 		}return interface_widget(self,i,x)
 	},'canvas');ri.card=card
 	ri.card=card
@@ -1825,7 +1814,6 @@ card_read=(x,deck,cdata)=>{
 			if(ikey(i,'add'    ))return lmnat(([t,n])=>card_add(self,t,n))
 			if(ikey(i,'remove' ))return lmnat(([x])=>lmn(card_remove(self,x)))
 			if(ikey(i,'event'  ))return lmnat(args=>n_event(self,args))
-			if(ikey(i,'navigate')&&state.external)return lmnat(([x])=>fire_event(self,i,lms(normalize_enum(nav_dirs,ls(x)))))
 			if(ikey(i,'copy'    )&&state.external)return lmnat(([z])=>card_copy(self,z))
 			if(ikey(i,'paste'   )&&state.external)return lmnat(([z])=>card_paste(self,z))
 		}return x?x:NONE
@@ -2106,4 +2094,3 @@ fire_async=(target,name,arg,hunk,nest)=>{
 fire_event_async=(target,name,x)=>fire_async(target,name,lml([x]),null,1)
 fire_hunk_async=(target,hunk)=>fire_async(target,null,lml([]),hunk,1)
 n_event=(self,args)=>{fire_async(self,ls(args[0]),lml(args.slice(1)),null,0);return NONE}
-fire_event=(target,name,x)=>{fire_event_async(target,ls(name),x);while(running())runop();return arg(),popstate(),pending_popstate=0,NONE}

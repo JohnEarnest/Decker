@@ -160,24 +160,14 @@ Working With Decks
 ------------------
 The `readdeck[]` and `writedeck[]` functions allow Lilt to operate on [Decker](decker.html) documents. Lilt can load, create, and manipulate multiple decks simultaneously, providing options for automated testing, data import/export, accessibility, and interacting with other technology from outside the Decker ecosystem.
 
-In addition to the fields and methods available to Decker for the deck interface and each of its sub-interfaces, Lilt has access to _event injector_ members which behave as if the corresponding event was produced by a user interacting with the deck, running the appropriate scripts to completion and producing any appropriate side-effects on the deck. These injectors are as follows:
+Just as in Decker, you can simulate "injecting" events into widgets, cards, or the deck with the `x.event[name args...]` function they provide, running the appropriate scripts to completion and producing any appropriate side-effects on the deck. For example, clicking on the first widget on the active card:
 
-| Name                  | Description                                                                                                |
-| :-------------------- | :--------------------------------------------------------------------------------------------------------- |
-| `button.click[]`      | Simulate clicking a button.                                                                                |
-| `grid.click[row]`     | Simulate selecting a row in a grid.                                                                        |
-| `grid.order[col]`     | Simulate clicking a column header in a grid.                                                               |
-| `grid.change[table]`  | Simulate editing the data in a grid. (Does not actually change `grid.value` unless the script does!)       |
-| `canvas.click[pos]`   | Simulate depressing the pointer on a canvas.                                                               |
-| `canvas.drag[pos]`    | Simulate dragging the pointer on a canvas.                                                                 |
-| `canvas.release[pos]` | Simulate releasing a held pointer on a canvas.                                                             |
-| `field.link[text]`    | Simulate clicking a link in a rich-text field.                                                             |
-| `field.run[text]`     | Simulate pressing shift+return with `text` selected in the field.                                          |
-| `field.change[text]`  | Simulate editing a field. (Does not actually change `field.text` or `field.value` unless the script does!) |
-| `slider.change[text]` | Simulate manipulating a slider. (Does not actually change `slider.value` unless the script does!)          |
-| `card.navigate[dir]`  | Simulate the user pressing navigation/cursor keys.                                                         |
+```
+d:readdeck["demo.deck"]
+(first d.card.widgets).event["click"]
+```
 
-Furthermore, Lilt can "copy" and "paste" entire cards from a deck or lists of widgets within a card:
+Lilt can also "copy" and "paste" entire cards from a deck or lists of widgets within a card:
 
 | Name                  | Description                                                                                                |
 | :-------------------- | :--------------------------------------------------------------------------------------------------------- |
