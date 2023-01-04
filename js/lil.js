@@ -2093,4 +2093,4 @@ fire_async=(target,name,arg,hunk,nest)=>{
 }
 fire_event_async=(target,name,x)=>fire_async(target,name,lml([x]),null,1)
 fire_hunk_async=(target,hunk)=>fire_async(target,null,lml([]),hunk,1)
-n_event=(self,args)=>{fire_async(self,ls(args[0]),lml(args.slice(1)),null,0);return NONE}
+n_event=(self,args)=>{fire_async(self,ls(args[0]),lml(args.slice(1)),null,0);return self}

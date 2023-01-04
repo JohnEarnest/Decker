@@ -1645,7 +1645,7 @@ assert["custom events from cards" "called by home" f.text]
 deck.event["another"]
 assert["custom events from decks" "called by synthetic event tests" f.text]
 r:deck.event["another"]
-assert["custom event rvalue" 0 r]
+assert["custom event rvalue" deck r]
 
 d:readdeck["examples/decks/enchilada.deck"]
 c:d.cards["Sound Loops"]

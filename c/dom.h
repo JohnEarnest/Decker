@@ -185,7 +185,7 @@ void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
 }
 void fire_event_async(lv*target,lv*name,lv*arg){fire_async(target,name,l_list(arg),NULL,1);}
 void fire_hunk_async(lv*target,lv*hunk){fire_async(target,NULL,lml(0),hunk,1);}
-lv* n_event(lv*self,lv*x){fire_async(self,ls(l_first(x)),l_drop(ONE,x),NULL,0);return NONE;}
+lv* n_event(lv*self,lv*x){fire_async(self,ls(l_first(x)),l_drop(ONE,x),NULL,0);return self;}
 
 typedef struct {int x,y;} pair;
 typedef struct {double x,y;} fpair;
