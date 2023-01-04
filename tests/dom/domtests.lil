@@ -1647,6 +1647,11 @@ assert["custom events from decks" "called by synthetic event tests" f.text]
 r:deck.event["another"]
 assert["custom event rvalue" 0 r]
 
+d:readdeck["examples/decks/enchilada.deck"]
+c:d.cards["Sound Loops"]
+b:c.widgets["button1"]
+b.event["click"]
+
 #######################################
 #
 #  Copying and Pasting

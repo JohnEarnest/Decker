@@ -921,7 +921,8 @@ lv*run(lv*x,lv*rootenv){
 // Standard Library
 
 void show(str*s,lv*x,int toplevel){
-	if(lin(x)){wnum(s,x->nv);}
+	if(!x){str_addz(s,"<NULL>");}
+	else if(lin(x)){wnum(s,x->nv);}
 	else if(lil(x)){
 		str_addc(s,'(');EACH(z,x){if(z)str_addc(s,',');show(s,x->lv[z],0);}str_addc(s,')');
 	}

@@ -138,12 +138,8 @@ void ancestors(lv*target,lv*found,lv**deck){
 	if(deck_is(target))*deck=target;
 	if(widget_is(target))ancestors(ivalue(target,"card"),found,deck);
 	if(card_is(target))ancestors(ivalue(target,"deck"),found,deck);
-	lv*s=ifield(target,"script");
-	if(s&&s->c){
-		lv*block=parse(s->sv);
-		if(perr()){/*printf("warning: error in ancestor script: %s\n",par.error);*/block=lmblk();}
-		dset(found,target,block);
-	}else{dset(found,target,lmblk());}
+	lv*s=ifield(target,"script"),*block=parse(s&&s->c?s->sv:"");
+	if(perr()){block=parse("");}dset(found,target,block);
 }
 int pending_popstate=0;
 void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){

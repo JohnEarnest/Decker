@@ -71,12 +71,7 @@ lv* n_print(lv*self,lv*a){(void)self;return n_printf(a,1,stdout);}
 lv* n_alert(lv*self,lv*z){(void)self,(void)z;return ONE;}
 lv* n_open (lv*self,lv*z){(void)self,(void)z;return lmistr("");}
 lv* n_save (lv*self,lv*z){(void)self,(void)z;return NONE;}
-lv* n_play(lv*self,lv*z){
-	lv*x=l_first(z);char*n=ls(dget(self->b,lmistr("title")))->sv;
-	if(sound_is(z)){printf("deck %s played sound.",n);}
-	else{printf("deck %s played sound '%s'.",n,ls(x)->sv);}
-	return x;
-}
+lv* n_play (lv*self,lv*z){(void)self;lv*x=l_first(z);return x;}
 lv* n_show(lv*self,lv*a){
 	(void)self;str s=str_new();EACH(z,a){if(z)str_addc(&s,' ');show(&s,a->lv[z],a->c==1);}
 	printf("%s\n",lmstr(s)->sv);return l_first(a);
