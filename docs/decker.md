@@ -608,21 +608,22 @@ Deck Interface
 --------------
 The deck interface represents the global attributes of a Decker document.
 
-| Name            | Description                                                                     |
-| :-------------- | :------------------------------------------------------------------------------ |
-| `typeof x`      | `"deck"`                                                                        |
-| `x.version`     | Number. The version of the deck file format.                                    |
-| `x.locked`      | Bool. Is this deck _locked_ (editing and drawing mode disabled)? r/w.           |
-| `x.name`        | String. A descriptive title for the deck. r/w.                                  |
-| `x.author`      | String. The name of the author of the deck. r/w.                                |
-| `x.script`      | String. The Lil source code of the deck's script, or `""`. r/w.                 |
-| `x.patterns`    | An instance of the _patterns_ interface.                                        |
-| `x.sounds`      | A dictionary of _sound_ interfaces stored in this deck, keyed by name.          |
-| `x.fonts`       | A dictionary of _font_ interfaces stored in this deck, keyed by name.           |
-| `x.cards`       | A dictionary of _card_ interfaces stored in this deck, keyed by name.           |
-| `x.card`        | The current _card_. Writing this attribute behaves the same as calling `go[x]`. |
-| `x.add[x y z]`  | Add a resource to this deck, and return it.                                     |
-| `x.remove[x]`   | Remove a resource from this deck. Returns 1 on success.                         |
+| Name              | Description                                                                     |
+| :---------------- | :------------------------------------------------------------------------------ |
+| `typeof x`        | `"deck"`                                                                        |
+| `x.version`       | Number. The version of the deck file format.                                    |
+| `x.locked`        | Bool. Is this deck _locked_ (editing and drawing mode disabled)? r/w.           |
+| `x.name`          | String. A descriptive title for the deck. r/w.                                  |
+| `x.author`        | String. The name of the author of the deck. r/w.                                |
+| `x.script`        | String. The Lil source code of the deck's script, or `""`. r/w.                 |
+| `x.patterns`      | An instance of the _patterns_ interface.                                        |
+| `x.sounds`        | A dictionary of _sound_ interfaces stored in this deck, keyed by name.          |
+| `x.fonts`         | A dictionary of _font_ interfaces stored in this deck, keyed by name.           |
+| `x.cards`         | A dictionary of _card_ interfaces stored in this deck, keyed by name.           |
+| `x.card`          | The current _card_. Writing this attribute behaves the same as calling `go[x]`. |
+| `x.add[x y z]`    | Add a resource to this deck, and return it.                                     |
+| `x.remove[x]`     | Remove a resource from this deck. Returns 1 on success.                         |
+| `x.event[n x...]` | Issue an event named `n` at this deck with argument(s) `x`, and return 0.       |
 
 `deck.add[x y z]` can add new cards, sounds, and fonts to the deck:
 
@@ -845,17 +846,18 @@ Card Interface
 --------------
 The card interface gives access to the contents of a given card.
 
-| Name          | Description                                                                                       |
-| :------------ | :------------------------------------------------------------------------------------------------ |
-| `typeof x`    | `"card"`                                                                                          |
-| `x.name`      | String. The name of the card. r/w.                                                                |
-| `x.script`    | String. The Lil source code of the card's script, or `""`. r/w.                                   |
-| `x.size`      | The `size` of this card in pixels.                                                                |
-| `x.image`     | An _image_ interface representing the card's background. r/w.                                     |
-| `x.widgets`   | A dictionary of widget interfaces on this card (button, field, canvas, or grid), keyed by name.   |
-| `x.index`     | The ordinal position of this card in the deck, counting from 0. r/w.                              |
-| `x.add[x y]`  | Add a widget to this card, and return it.                                                         |
-| `x.remove[x]` | Remove a widget `x` from this card. Returns 1 on success.                                         |
+| Name              | Description                                                                                       |
+| :---------------- | :------------------------------------------------------------------------------------------------ |
+| `typeof x`        | `"card"`                                                                                          |
+| `x.name`          | String. The name of the card. r/w.                                                                |
+| `x.script`        | String. The Lil source code of the card's script, or `""`. r/w.                                   |
+| `x.size`          | The `size` of this card in pixels.                                                                |
+| `x.image`         | An _image_ interface representing the card's background. r/w.                                     |
+| `x.widgets`       | A dictionary of widget interfaces on this card (button, field, canvas, or grid), keyed by name.   |
+| `x.index`         | The ordinal position of this card in the deck, counting from 0. r/w.                              |
+| `x.add[x y]`      | Add a widget to this card, and return it.                                                         |
+| `x.remove[x]`     | Remove a widget `x` from this card. Returns 1 on success.                                         |
+| `x.event[n x...]` | Issue an event named `n` at this card with argument(s) `x`, and return 0.                         |
 
 `card.add[x y]` can add a new button, field, canvas, or grid to the card. If `x` is a string {`"button"`, `"field"`, `"canvas"`, or `"grid"`}, insert a new widget of the appropriate type using `y` as a name (or an appropriate default name). If `x` is a widget interface, insert a copy of it, again using `y` as a name or an appropriate default.
 
@@ -879,6 +881,7 @@ The button widget is a clickable button, possibly with a stateful checkbox.
 | `x.text`                | String. The label shown on this button. r/w.                                                          |
 | `x.value`               | Bool. Is this checkbox checked? r/w.                                                                  |
 | `x.style`               | The style of button; one of {`"round"`, `"rect"`, `"check"`, `"invisible"`}. r/w.                     |
+| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`, and return 0.                           |
 
 Field Interface
 ---------------
@@ -902,6 +905,7 @@ The field widget displays and possibly allows the editing of text.
 | `x.scrollbar`           | Bool. Draw a scrollbar for this widget? r/w.                                                          |
 | `x.style`               | The style of field; one of {`"rich"`, `"plain"`, `"code"`}. r/w.                                      |
 | `x.align`               | The text alignment of the field; one of {`"left"`, `"center"`, `"right"`}. r/w.                       |
+| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`, and return 0.                           |
 
 If a field has a `style` other than `rich`, any rtext written to the `value` attribute will be coalesced into a single run of ordinary text with the default font.
 
@@ -927,6 +931,7 @@ The slider widget represents a single number, constrained within a configurable 
 | `x.interval`            | A list of numbers giving a minimum and maximum for the value, inclusive. r/w.                         |
 | `x.format`              | A `format` string controlling how the value is shown in `"bar"` or `"compact"` styles. r/w.           |
 | `x.style`               | The style of slider; one of {`"horiz"`, `"vert"`, `"bar"`, `"compact"`}. r/w.                         |
+| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`, and return 0.                           |
 
 Grid Interface
 --------------
@@ -952,6 +957,7 @@ The grid widget represents an interactive spreadsheet-style view of a table.
 | `x.row`                 | Int. The index of the selected row of the table, or -1 for no selection. r/w.                         |
 | `x.rowvalue`            | Dict. The selected row of the table, or an empty dictionary for no selection.                         |
 | `x.format`              | String. A column spec for formatting columns of the table. See `writecsv[]`. r/w.                     |
+| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`, and return 0.                           |
 
 Canvas Interface
 ----------------
@@ -991,6 +997,7 @@ The canvas will scale _up_ logical pixels to display them on the card (resulting
 | `x.text[x pos a]`       | Draw a string or rtext `x` at `pos`, from an anchor position `a`.                                                 |
 | `x.copy[pos size a]`    | Grab an _image_ at `pos`/`size`.                                                                                  |
 | `x.paste[image pos t]`  | Draw an _image_ at `pos`. If `t` is truthy, treat pattern 0 as transparent.                                       |
+| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`, and return 0.                                       |
 
 The `canvas.line[]` and `canvas.poly[]` functions can take any number of arguments, which may `(x,y)` points, or lists of `(x,y)` points. For example, either of the following would draw an identical small triangle:
 ```
@@ -1137,6 +1144,9 @@ end
 ```
 
 While a script is executing (or performing a `sleep[]`), no additional events can be fired until it completes. The `pointer` interface will, however, continue to update to reflect the current state of the pointing device.
+
+Widgets, Cards, and the Deck itself all expose a function called `event[name args...]`, which can be used to issue synthetic events at that target. The `name` may be the name of an existing event or any function in that target's script. When calling an event handler via `event[]` it will have all of the normal "magic" constants available as when called by Decker itself.
+
 
 Modules
 =======

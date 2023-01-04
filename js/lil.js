@@ -1755,6 +1755,7 @@ interface_widget=(self,i,x)=>{
 		if(ikey(i,'pos'   ))return lmpair(ivalue(self,ls(i),rect()))
 		if(ikey(i,'show'  ))return lms(ivalue(self,ls(i),'solid'))
 		if(ikey(i,'font'  ))return dget(self.card.deck.fonts,lms(ivalue(self,ls(i),button_is(self)?'menu':'body')))
+		if(ikey(i,'event' ))return lmnat(args=>n_event(self,args))
 	}return x?x:NONE
 }
 widget_read=(x,card)=>{
@@ -1823,6 +1824,7 @@ card_read=(x,deck,cdata)=>{
 			if(ikey(i,'image'  ))return self.image||image_make(rect())
 			if(ikey(i,'add'    ))return lmnat(([t,n])=>card_add(self,t,n))
 			if(ikey(i,'remove' ))return lmnat(([x])=>lmn(card_remove(self,x)))
+			if(ikey(i,'event'  ))return lmnat(args=>n_event(self,args))
 			if(ikey(i,'navigate')&&state.external)return lmnat(([x])=>fire_event(self,i,lms(normalize_enum(nav_dirs,ls(x)))))
 			if(ikey(i,'copy'    )&&state.external)return lmnat(([z])=>card_copy(self,z))
 			if(ikey(i,'paste'   )&&state.external)return lmnat(([z])=>card_paste(self,z))
@@ -1941,6 +1943,7 @@ deck_read=x=>{
 			if(ikey(i,'card'    ))return self.cards.v[min(count(self.cards)-1,self.card)]
 			if(ikey(i,'add'     ))return lmnat(([x,y,z])=>deck_add(self,x,y,z))
 			if(ikey(i,'remove'  ))return lmnat(([x])=>lmn(deck_remove(self,x)))
+			if(ikey(i,'event'   ))return lmnat(args=>n_event(self,args))
 			if(ikey(i,'copy' )&&state.external)return lmnat(([x])=>deck_copy(self,x))
 			if(ikey(i,'paste')&&state.external)return lmnat(([x])=>deck_paste(self,x))
 		}return x?x:NONE
@@ -2063,7 +2066,7 @@ primitives=(env,deck)=>{
 	env.local('read'      ,lmnat(n_open    ))
 	env.local('write'     ,lmnat(n_save    ))
 }
-fire_async=(target,name,arg,hunk)=>{
+fire_async=(target,name,arg,hunk,nest)=>{
 	const scopes=lmd([NONE],[parse(DEFAULT_HANDLERS)]), root=lmenv(); let deck=null
 	ancestors=target=>{
 		if(deck_is(target))deck=target
@@ -2077,8 +2080,7 @@ fire_async=(target,name,arg,hunk)=>{
 	root.local('me',target)
 	root.local('deck',deck)
 	root.local('patterns',ifield(deck,'patterns'))
-	constants(root)
-	let core=null; arg=lml([arg])
+	constants(root);let core=null
 	for(let z=scopes.v.length-1;z>=0;z--){
 		let t=scopes.k[z], b=lmblk(), sname='!widget_scope'
 		const bind=(n,v)=>{blk_lit(b,v),blk_loc(b,n),blk_op(b,op.DROP)}
@@ -2094,17 +2096,14 @@ fire_async=(target,name,arg,hunk)=>{
 			t.widgets.v.map((v,i)=>bind(t.widgets.k[i],v))
 			sname='!card_scope'
 		}
-		blk_cat(b,scopes.v[z])
+		blk_cat(b,scopes.v[z]),blk_op(b,op.DROP)
 		if(!core&&hunk){func('!hunk',hunk)}
 		else if(core){func(sname,core)}
 		blk_get(b,lms(name)),blk_lit(b,arg),blk_op(b,op.CALL);if(!hunk)blk_op(b,op.DROP);core=b
 	}
-	pushstate(root),issue(root,core),pending_popstate=1
+	if(nest)pushstate(root),pending_popstate=1;issue(root,core)
 }
-fire_event_async=(target,name,x)=>fire_async(target,name,x,null)
-fire_hunk_async=(target,hunk)=>fire_async(target,null,null,hunk)
-fire_event=(target,name,x)=>{
-	fire_event_async(target,ls(name),x)
-	while(running())runop()
-	return arg(),popstate(),pending_popstate=0,NONE
-}
+fire_event_async=(target,name,x)=>fire_async(target,name,lml([x]),null,1)
+fire_hunk_async=(target,hunk)=>fire_async(target,null,lml([]),hunk,1)
+n_event=(self,args)=>{fire_async(self,ls(args[0]),lml(args.slice(1)),null,0);return NONE}
+fire_event=(target,name,x)=>{fire_event_async(target,ls(name),x);while(running())runop();return arg(),popstate(),pending_popstate=0,NONE}

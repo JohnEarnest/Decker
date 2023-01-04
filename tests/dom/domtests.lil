@@ -1634,6 +1634,25 @@ f.script:"on change do sleep[1] out.text:typeof sleep end"
 f.change[]
 assert["in lilt, sleep[] is present but has no effect." "function" f.text]
 
+deck:readdeck[]
+deck.name:"synthetic event tests"
+deck.author:"hamilton butters"
+f:deck.card.add["field" "out"]
+b:deck.card.add["button" "doit"]
+b.script:"on custom a b do out.text:\"%s : %i, %s!\" format a,b,deck.author end"
+b.event["custom" "str" 42]
+assert["custom event injection" "str : 42, hamilton butters!" f.text]
+
+deck.script:"on another do home.widgets.out.text:\"called by %s\" format me.name end"
+b.event["another"]
+assert["custom event inheritance" "called by doit" f.text]
+deck.cards.home.event["another"]
+assert["custom events from cards" "called by home" f.text]
+deck.event["another"]
+assert["custom events from decks" "called by synthetic event tests" f.text]
+r:deck.event["another"]
+assert["custom event rvalue" 0 r]
+
 #######################################
 #
 #  Copying and Pasting

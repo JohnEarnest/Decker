@@ -146,7 +146,7 @@ void ancestors(lv*target,lv*found,lv**deck){
 	}else{dset(found,target,lmblk());}
 }
 int pending_popstate=0;
-void fire_async(lv*target,lv*name,lv*arg,lv*hunk){
+void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
 	lv*scopes=lmd();dset(scopes,NONE,parse(default_handlers));
 	lv*deck=NULL;ancestors(target,scopes,&deck);
 	if(!deck){printf("failed to retrieve root deck!\n");return;}
@@ -156,7 +156,7 @@ void fire_async(lv*target,lv*name,lv*arg,lv*hunk){
 	dset(root,lmistr("deck"),deck);
 	dset(root,lmistr("patterns"),ifield(deck,"patterns"));
 	constants(root);
-	lv*core=NULL;arg=l_list(arg);
+	lv*core=NULL;
 	for(int z=scopes->c-1;z>=0;z--){
 		lv*t=scopes->kv[z],*b=lmblk();char*sname="!widget_scope";
 		if(lin(t))sname="!default_handlers";
@@ -172,7 +172,7 @@ void fire_async(lv*target,lv*name,lv*arg,lv*hunk){
 			EACH(z,widgets)blk_lit(b,widgets->lv[z]),blk_loc(b,widgets->kv[z]),blk_op(b,DROP);
 			sname="!card_scope";
 		}
-		blk_cat(b,scopes->lv[z]);
+		blk_cat(b,scopes->lv[z]),blk_op(b,DROP);
 		if(!core&&hunk){
 			str n=str_new();str_addz(&n,"!hunk");
 			blk_lit(b,lmon(n,lml(0),blk_end(hunk))),blk_op(b,BIND);
@@ -184,18 +184,13 @@ void fire_async(lv*target,lv*name,lv*arg,lv*hunk){
 		}
 		blk_get(b,name),blk_lit(b,arg),blk_op(b,CALL);if(!hunk)blk_op(b,DROP);core=b;
 	}
-	pushstate(root);
+	if(nest)pushstate(root),pending_popstate=1;
 	issue(root,core);
-	pending_popstate=1;
 }
-void fire_event_async(lv*target,lv*name,lv*arg){fire_async(target,name,arg,NULL);}
-void fire_hunk_async(lv*target,lv*hunk){fire_async(target,NULL,NULL,hunk);}
-lv* fire_event(lv*target,lv*name,lv*arg){
-	fire_event_async(target,name,arg);
-	while(running())runop();arg();
-	popstate();pending_popstate=0;
-	return NONE;
-}
+void fire_event_async(lv*target,lv*name,lv*arg){fire_async(target,name,l_list(arg),NULL,1);}
+void fire_hunk_async(lv*target,lv*hunk){fire_async(target,NULL,lml(0),hunk,1);}
+lv* n_event(lv*self,lv*x){fire_async(self,ls(l_first(x)),l_drop(ONE,x),NULL,0);return NONE;}
+lv* fire_event(lv*target,lv*name,lv*arg){fire_event_async(target,name,arg);while(running())runop();arg();popstate();pending_popstate=0;return NONE;}
 
 typedef struct {int x,y;} pair;
 typedef struct {double x,y;} fpair;
@@ -1643,6 +1638,7 @@ lv* interface_widget(lv*self,lv*i,lv*x){
 		ikey("pos"   ){lv*r=dget(data,i);return r?r:lmpair((pair){0,0});}
 		ikey("show"  ){lv*r=dget(data,i);return r?r:lmistr(widget_shows[0]);}
 		ikey("font"  ){lv*r=dget(data,i);return r?dget(fonts,r): fonts->lv[button_is(self)?1:0];}
+		ikey("event" )return lmnat(n_event,self);
 	}return x?x:NONE;
 }
 lv* widget_read(lv*x,lv*card){
@@ -1788,6 +1784,7 @@ lv* interface_card(lv*self,lv*i,lv*x){
 		ikey("widgets" )return dget(data,i);
 		ikey("add"     )return lmnat(n_card_add,self);
 		ikey("remove"  )return lmnat(n_card_remove,self);
+		ikey("event"   )return lmnat(n_event,self);
 		ikey("navigate")if(state.external)return lmnat(n_card_navigate,self);
 		ikey("copy"    )if(state.external)return lmnat(n_card_copy,self);
 		ikey("paste"   )if(state.external)return lmnat(n_card_paste,self);
@@ -1901,6 +1898,7 @@ lv* interface_deck(lv*self,lv*i,lv*x){
 		ikey("modules" )return dget(data,i);
 		ikey("add"     )return lmnat(n_deck_add,self);
 		ikey("remove"  )return lmnat(n_deck_remove,self);
+		ikey("event"   )return lmnat(n_event,self);
 		ikey("card"    ){int n=ln(dget(data,lmistr("card")));return cards->lv[MIN(cards->c-1,n)];}
 		ikey("copy"    )if(state.external)return lmnat(n_deck_copy,self);
 		ikey("paste"   )if(state.external)return lmnat(n_deck_paste,self);
