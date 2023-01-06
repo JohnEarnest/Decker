@@ -181,4 +181,11 @@ All of these operations work with a serialized form of the corresponding deck co
 
 Changelog
 ---------
-- v1.0 : initial release.
+v1.0:
+- initial release.
+
+v1.9:
+- integrated readline functionality into Lilt, removing the need for `rlwrap`.
+
+v1.10:
+- deprecated specialized widget event injectors in favor of `x.event[]`.
