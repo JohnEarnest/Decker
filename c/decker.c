@@ -3310,9 +3310,9 @@ void load_deck(lv*d){
 	gfx=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,size.x,size.y);
 	SDL_SetWindowPosition(win,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED);
 	if(!gtool){pair s=buff_size(TOOLB);gtool=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,s.x,s.y);}
-	msg.next_view=1;time_t now;time(&now);seed=0xFFFFFFFF&now;
+	time_t now;time(&now);seed=0xFFFFFFFF&now;
 	validate_modules();
-	setmode(mode_interact);n_play(NULL,lml2(NONE,lmistr("loop")));
+	setmode(mode_interact);n_play(NULL,lml2(NONE,lmistr("loop")));msg.next_view=1;
 }
 int main(int argc,char**argv){
 	char*file=NULL;for(int z=1;z<argc;z++){
