@@ -1552,8 +1552,8 @@ slider_read=(x,card)=>{
 		}return interface_widget(self,i,x)
 	},'slider');ri.card=card
 	init_field(ri,'interval',x)
-	init_field(ri,'value'   ,x)
 	init_field(ri,'step'    ,x)
+	init_field(ri,'value'   ,x)
 	init_field(ri,'format'  ,x)
 	init_field(ri,'style'   ,x)
 	return ri

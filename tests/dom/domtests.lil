@@ -684,6 +684,13 @@ assert["slider write value respects step" 40.5 s.value]
 s.step:2
 assert["slider change step reclamps value" 40 s.value]
 
+s.interval:-2,3.5
+s.step:.001
+s.value:-1.32
+writedeck["temp.deck" deck]
+deck:readdeck["temp.deck"]
+assert["slider round-trips with custom step" -1.32 deck.card.widgets.slider1.value]
+
 #######################################
 #
 #  Grid

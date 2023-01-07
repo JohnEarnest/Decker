@@ -1491,8 +1491,8 @@ lv* interface_slider(lv*self,lv*i,lv*x){
 lv* slider_read(lv*x,lv*r){
 	x=ld(x),r=lmi(interface_slider,lmistr("slider"),r);
 	init_field(r,"interval",x);
-	init_field(r,"value"   ,x);
 	init_field(r,"step"    ,x);
+	init_field(r,"value"   ,x);
 	init_field(r,"format"  ,x);
 	init_field(r,"style"   ,x);
 	return r;
