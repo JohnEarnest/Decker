@@ -624,15 +624,19 @@ n_random=z=>{
 let frame_count=0,audio_playing=0
 interface_system=lmi((self,i,x)=>{
 	if(!i)return NONE
-	if(x){if(lis(i)&&i.v=='seed'){seed=0|ln(x);return x}}
-	if(lis(i)&&i.v=='version'  )return lms(VERSION)
-	if(lis(i)&&i.v=='platform' )return lms('web')
-	if(lis(i)&&i.v=='seed'     )return lmn(seed)
-	if(lis(i)&&i.v=='playing'  )return lmn(audio_playing)
-	if(lis(i)&&i.v=='frame'    )return lmn(frame_count)
-	if(lis(i)&&i.v=='now'      )return lmn(0|(new Date().getTime()/1000))
-	if(lis(i)&&i.v=='ms'       )return lmn(0|(Date.now()))
-	if(lis(i)&&i.v=='workspace')return lmd(['allocs','depth'].map(lms),[allocs,calldepth].map(lmn))
+	if(x){
+		if(lis(i)&&i.v=='seed'){seed=0|ln(x);return x}
+		if(lis(i)&&i.v=='fullscreen')return set_fullscreen(lb(x)),x
+	}
+	if(lis(i)&&i.v=='version'   )return lms(VERSION)
+	if(lis(i)&&i.v=='platform'  )return lms('web')
+	if(lis(i)&&i.v=='seed'      )return lmn(seed)
+	if(lis(i)&&i.v=='fullscreen')return lmn(is_fullscreen())
+	if(lis(i)&&i.v=='playing'   )return lmn(audio_playing)
+	if(lis(i)&&i.v=='frame'     )return lmn(frame_count)
+	if(lis(i)&&i.v=='now'       )return lmn(0|(new Date().getTime()/1000))
+	if(lis(i)&&i.v=='ms'        )return lmn(0|(Date.now()))
+	if(lis(i)&&i.v=='workspace' )return lmd(['allocs','depth'].map(lms),[allocs,calldepth].map(lmn))
 	return x?x:NONE
 },'system')
 showt=(x,toplevel)=>{

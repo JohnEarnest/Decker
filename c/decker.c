@@ -39,8 +39,7 @@ SDL_Renderer*ren;
 SDL_Texture *gfx,*gtool;
 SDL_Joystick*joy=NULL;
 SDL_mutex*gil=NULL;
-int windowed=1, toggle_fullscreen=0, toolbars_enable=1;
-int autosave=0, nosound=0, noscale=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
+int toolbars_enable=1, autosave=0, nosound=0, noscale=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
 #define AUTOSAVE_DELAY (10*60)
 lv* deck_get(lv*text){SDL_LockMutex(gil);lv*r=deck_read(text);SDL_UnlockMutex(gil);return r;}
 void mark_dirty(){dirty=1,dirty_timer=AUTOSAVE_DELAY;}

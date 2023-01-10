@@ -547,6 +547,7 @@ The _system_ interface exposes information about the Lil runtime. It is availabl
 | `x.version`                | Decker's version number as a string in `x.y` format.                                                  |
 | `x.platform`               | The host operating system; one of {`"mac"`,`"unix"`,`"win"`,`"web"`,`"other"`}.                       |
 | `x.seed`                   | The `random[]` number generator's numeric seed.(1)                                                    |
+| `x.fullscreen`             | Is Decker in fullscreen mode? On write, attempt to switch if possible; may not succeed. (r/w)         |
 | `x.playing`                | If any audio is currently playing (not counting a background `loop`), `1`. Otherwise, `0`.            |
 | `x.frame`                  | An integer that counts up every time a frame is rendered, at 60hz.                                    |
 | `x.now`                    | The current GMT as a Unix epoch.                                                                      |

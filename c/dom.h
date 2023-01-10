@@ -11,7 +11,6 @@
 #define LOOP_QUOTA     ( 1*4096)
 #define FRAME_QUOTA    (10*4096)
 #define CLAMP(a,x,b)   ((x)<(a)?(a): (x)>(b)?(b): (x))
-#define ikey(name)     if(i&&lis(i)&&!strcmp(i->sv,name))
 #define ivalue(x,k)    dget(x->b,lmistr(k))
 #define ifield(x,k)    ((lv*(*)(lv*,lv*,lv*))x->f)(x,lmistr(k),NULL)
 #define iindex(x,k,v)  ((lv*(*)(lv*,lv*,lv*))x->f)(x,lmn(k),v)

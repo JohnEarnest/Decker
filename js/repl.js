@@ -11,6 +11,8 @@ n_print=x=>{console.log(ls(x.length>1?dyad.format(x[0],lml(x.slice(1))):x[0]));r
 n_alert  =([x])=>ONE
 n_save   =([x])=>NONE
 n_open   =(   )=>lms('')
+is_fullscreen=_=>0
+set_fullscreen=_=>0
 run      =prog=>{pushstate(env),state.external=1,issue(env,prog);while(running())runop();const r=arg();return popstate(),r}
 env.local('read',lmnat(([x,y])=>y&&ls(y)=='array'?readBinaryFile(ls(x)):lms(readTextFile(ls(x)))))
 env.local('write',lmnat(([x,y])=>array_is(y)?writeBinaryFile(ls(x),y):writeTextFile(ls(x),ls(y))))

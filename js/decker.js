@@ -381,6 +381,21 @@ PANGRAM='How razorback jumping-frogs can level six piqued gymnasts.'
 
 let uimode='interact', uicursor=0, enable_gestures=0, profiler=0
 is_fullscreen=_=>(document.fullscreenElement||document.webkitFullscreenElement)!=null
+toggle_fullscreen=_=>{
+	if(is_fullscreen()){
+		if(document.exitFullscreen)document.exitFullscreen()
+		if(document.webkitExitFullscreen)document.webkitExitFullscreen()
+	}else{
+		const e=q('body'), o={navigationUI:'hide'}
+		if(e.requestFullscreen)e.requestFullscreen(o)
+		if(e.webkitRequestFullscreen)e.webkitRequestFullscreen(o)
+	}setTimeout(resize,500)
+}
+set_fullscreen=x=>{
+	const i=is_fullscreen()
+	if(i&&!x){toggle_fullscreen()}
+	else if(!i&&x){modal_enter('fullscreen_lil')}
+}
 setmode=mode=>{
 	n_play([NONE,lms('loop')])
 	grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel=[],wid.active=-1,sc.others=[],dr.poly=[]
@@ -1531,6 +1546,13 @@ modals=_=>{
 		}),c.x-=65
 		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_exit(0)
 	}
+	else if(ms.type=='fullscreen_lil'){
+		const b=draw_modalbox(rect(150,45))
+		draw_textc(rect(b.x,b.y,b.w,16),'Click to enter fullscreen mode:',FONT_BODY,1)
+		const c=rect(b.x+b.w-80,b.y+b.h-20)
+		ui_button(rect(c.x,c.y,80,20),'Fullscreen',1,_=>{toggle_fullscreen(),modal_exit(1)}),c.x-=65
+		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_exit(0)
+	}
 	else if(ms.type=='brush'){
 		const grid=rect(6,4), ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY)
 		const b=draw_modalbox(rect(m+(grid.x*gs)+m,m+(grid.y*gs)+lh+m))
@@ -2448,16 +2470,7 @@ all_menus=_=>{
 	if(menu_item('About...',1))modal_enter('about')
 	if(menu_check('Listener',canlisten,ms.type=='listen','l')){if(ms.type!='listen'){modal_enter('listen')}else{modal_exit(0)}}
 	menu_separator()
-	const enter=_=>{
-		const e=q('body'), o={navigationUI:'hide'}
-		if(e.requestFullscreen)e.requestFullscreen(o)
-		if(e.webkitRequestFullscreen)e.webkitRequestFullscreen(o)
-	}
-	const exit=_=>{
-		if(document.exitFullscreen)document.exitFullscreen()
-		if(document.webkitExitFullscreen)document.webkitExitFullscreen()
-	}
-	menu_check('Fullscreen',1,is_fullscreen(),null,_=>{if(is_fullscreen()){exit()}else{enter()}setTimeout(resize,500)})
+	menu_check('Fullscreen',1,is_fullscreen(),null,toggle_fullscreen)
 	if(menu_check('Nav Gestures',1,enable_gestures))enable_gestures^=1
 	if(menu_check('Script Profiler',1,profiler))profiler^=1
 	if(menu_check('Toolbars',tzoom>0,toolbars_enable))toolbars_enable^=1,resize()
@@ -2913,6 +2926,7 @@ q('body').onkeydown=e=>{
 	if(e.key=='Enter')ev.action=1
 	if(e.key=='Tab')ev.tab=1
 	if(e.key=='l'&&ms.type==null&&!wid.ingrid&&!wid.infield)ev.shortcuts['l']=1
+	if(e.key=='f'&&ms.type==null&&!wid.ingrid&&!wid.infield)toggle_fullscreen
 	if(e.key=='j'&&ms.type==null&&dr.limbo_dither&&dr.dither_threshold>-2.0)dr.dither_threshold-=.1
 	if(e.key=='k'&&ms.type==null&&dr.limbo_dither&&dr.dither_threshold< 2.0)dr.dither_threshold+=.1
 	if((e.metaKey||e.ctrlKey)&&e.key in {c:1,x:1,v:1}){}
