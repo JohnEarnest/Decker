@@ -100,12 +100,12 @@ Built-in Functions
 | `shell[x]`       | Execute string `x` as a shell command and block for its completion.(4)                                                      | System  |
 | `eval[x y]`      | Parse and execute a string `x` as a Lil program, using any variable bindings in dictionary `y`.(5)                          | System  |
 | `random[x y]`    | Choose `y` random elements from `x`. In Lilt, `sys.seed` is always pre-initialized to a constant.                           | System  |
-| `readcsv[x y d]` | Turn a [RFC-4180](https://datatracker.ietf.org/doc/html/rfc4180) CSV string `x` into a Lil table with column spec `y`.(6)   | Data    |
-| `writecsv[x y d]`| Turn a Lil table `x` into a CSV string with column spec `y`.(6)                                                             | Data    |
-| `readxml[x]`     | Turn a useful subset of XML/HTML into a Lil structure.(6)                                                                   | Data    |
-| `writexml[x]`    | Turn a Lil structure `x` into an indented XML string.(6)                                                                    | Data    |
+| `readcsv[x y d]` | Turn a [RFC-4180](https://datatracker.ietf.org/doc/html/rfc4180) CSV string `x` into a Lil table with column spec `y`.(5)   | Data    |
+| `writecsv[x y d]`| Turn a Lil table `x` into a CSV string with column spec `y`.(5)                                                             | Data    |
+| `readxml[x]`     | Turn a useful subset of XML/HTML into a Lil structure.(5)                                                                   | Data    |
+| `writexml[x]`    | Turn a Lil structure `x` into an indented XML string.(5)                                                                    | Data    |
 | `readdeck[x]`    | Produce a _deck_ interface from a file at path `x`. If no path is given, produce a new _deck_ from scratch.                 | Decker  |
-| `writedeck[x y]` | Serialize a _deck_ interface `y` to a file at path `x`. Returns `1` on success.(7)                                          | Decker  |
+| `writedeck[x y]` | Serialize a _deck_ interface `y` to a file at path `x`. Returns `1` on success.(6)                                          | Decker  |
 | `array[x y]`     | Create a new _array_ with size `x` and cast string `y`, or decode an encoded array string `x`.                              | Decker  |
 | `image[x]`       | Create a new _image_ interface with size `x` (`(width,height)`) or decode an encoded image string.                          | Decker  |
 | `sound[x]`       | Create a new _sound_ interface with size `x` (sample count) or decode an encoded sound string.                              | Decker  |
@@ -140,21 +140,9 @@ ffmpeg -i input.mp3 -bitexact -map_metadata -1 -ac 1 -ar 8000 -acodec pcm_u8 out
 - `exit`: the exit code of the process, as a number. If the process halted abnormally (i.e. due to a signal), this will be -1.
 - `out`: _stdout_ of the process, as a string.
 
-5) `eval[x y]` returns a dictionary containing:
-- `error`: a string giving any error message produced during parsing, or the empty string.
-- `value`: the value of the last expression in the program. On a parse error, `value` will be the number `0`.
-- `vars`: a dictionary containing any variable bindings made while executing the program. (This also includes bindings from argument `y`.)
+5) See the [Decker Manual](decker.html) for details of `eval[]`, `readcsv[]`, `writecsv[]`, `readxml[]`, and `writexml[]`.
 
-Code executed within `eval[]` does not have access to any variables from the caller that are not explicitly passed in via the second argument, including global functions and constants, nor can it modify variables of the caller; the code is executed in its own isolated scope. In the following example, we provide our `eval[]`ed code with the `show[]` function and a constant:
-```
-d.show:show
-d.a:2
-eval["show[a+3]" d]
-```
-
-6) See the [Decker Manual](decker.html) for details of `readcsv[]`, `writecsv[]`, `readxml[]`, and `writexml[]`.
-
-7) If the path given to `writedeck[]` ends in a `.html` suffix, the deck will be written as a "standalone" deck with a bundled HTML+JS runtime. Otherwise, the deck will be written as a "bare" deck, which is smaller.
+6) If the path given to `writedeck[]` ends in a `.html` suffix, the deck will be written as a "standalone" deck with a bundled HTML+JS runtime. Otherwise, the deck will be written as a "bare" deck, which is smaller.
 
 Working With Decks
 ------------------
