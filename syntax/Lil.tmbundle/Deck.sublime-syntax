@@ -36,3 +36,8 @@ contexts:
       scope: markup.heading
       captures:
         1: meta.annotation.identifier
+
+    - match: "^\\{contraption:([^\\}]+)\\}"
+      scope: markup.heading
+      captures:
+        1: meta.annotation.identifier

@@ -1736,6 +1736,84 @@ assert["module copy with name" (extract namedcopy:m2 from 0) (deck.modules)]
 
 #######################################
 #
+#  Contraptions
+#
+#######################################
+
+deck:readdeck[]
+
+def:deck.add["contraption" "spinner"]
+defaults:def @ "type","description","script","size"
+assert["condef default attributes" ("condef","","",(list 100,100)) defaults]
+assert["deck contraptions"        "dict"               (typeof deck.contraptions)]
+assert["deck contraption content" ("condef","spinner") (typeof deck.contraptions.spinner),(range deck.contraptions)]
+
+def.description:"unbounded numeric picker"
+def.size:150,50
+def.attributes:insert name:"value","step" type:"number","number" into 0
+def.script:"
+on set_value x do value.text:0+x end
+on get_value   do 0+value.text   end
+on set_step  x do step.text:0+x  end
+on get_step    do 0+step.text    end"
+down:def.add["button" "down"]
+down.text:"<"
+down.script:"on click do
+  value.text:value.text-step.text
+end"
+up:def.add["button" "up"]
+up.text:">"
+up.script:"on click do
+  value.text:value.text+step.text
+end"
+value:def.add["field" "value"]
+value.value:0
+value.locked:1
+step:def.add["field" "step"]
+step.value:1
+step.show:"none"
+
+a:deck.card.add["contraption" "spinner" "a"]
+b:deck.card.add[a "b"]
+c:deck.card.add["contraption" "bogus" "ishouldnotexist"]
+assert["contraption add bogus type" 0 c]
+defaults:b @ "type","name","index","locked"
+assert["contraption default attributes" ("contraption","b",1,0) defaults]
+assert["contraption def" def b.def]
+b.size:300,12
+assert["contraption size is immutable" 150,50 b.size]
+b.value:42
+assert["contraption custom attrs get/set" (42,1) (b.value,b.step)]
+
+writedeck["temp.deck" deck]
+assert_file["write a deck with contraptions/condefs." "tests/dom/contraptions.deck" "temp.deck"]
+deck.remove[def]
+assert["contraption deletion" 0 (count deck.contraptions)]
+assert["contraption deletion scrubs instances" () (range deck.card.widgets)]
+
+deck:readdeck["tests/dom/contraptions.deck"]
+def:deck.contraptions.spinner
+assert["read contraption def" ("condef","spinner",150,50) (def.type,def.name,def.size)]
+assert["read contraption instances" ("a","b","contraption","contraption") ((range deck.card.widgets),(deck.card.widgets..type))]
+assert["read contraption base attr"      1 deck.card.widgets.a.step ]
+assert["read contraption instance attr" 42 deck.card.widgets.b.value]
+
+def.widgets.step.text:"15"
+def.widgets.up.event["click"]
+def.widgets.up.event["click"]
+assert["events to a condef" "30" def.widgets.value.text]
+def.size:200,25
+def.update[]
+assert["condef update instance properties"             (200,25) deck.card.widgets.a.size ]
+assert["condef update instances preserve local state"        42 deck.card.widgets.b.value]
+
+def.script:"won't parse"
+assert["read contraption instance attr with broken script" 0 deck.card.widgets.b.value]
+def.script:"on get_value do 34567 end"
+assert["read contraption instance attr with fixed script" 34567 deck.card.widgets.b.value]
+
+#######################################
+#
 #  Wrap Up
 #
 #######################################

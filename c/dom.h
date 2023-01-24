@@ -9,6 +9,7 @@
 #define MODULE_QUOTA   (10*4096)
 #define TRANS_QUOTA    ( 2*4096)
 #define LOOP_QUOTA     ( 1*4096)
+#define ATTR_QUOTA     (   1024)
 #define FRAME_QUOTA    (10*4096)
 #define CLAMP(a,x,b)   ((x)<(a)?(a): (x)>(b)?(b): (x))
 #define ivalue(x,k)    dget(x->b,lmistr(k))
@@ -19,7 +20,8 @@
 #define init_field(dst,key,src) {lv*k=lmistr(key),*v=dget(src,k);if(v)iwrite(dst,k,v);}
 
 itype(image)itype(sound)itype(font)itype(button)itype(field)itype(slider)itype(grid)itype(canvas)itype(deck)itype(card)itype(patterns)itype(module)itype(array)
-int widget_is(lv*x){return button_is(x)||field_is(x)||slider_is(x)||grid_is(x)||canvas_is(x);}
+itype(condef)itype(contraption)
+int widget_is(lv*x){return button_is(x)||field_is(x)||slider_is(x)||grid_is(x)||canvas_is(x)||contraption_is(x);}
 
 int sleep_frames=0, sleep_play=0;
 lv* n_sleep(lv*self,lv*z){(void)self;z=l_first(z);if(matchr(z,lmistr("play"))){sleep_play=1;}else{sleep_frames=MAX(1,ln(z));}return z;}
@@ -133,23 +135,28 @@ char* default_transitions=""
 "transition[on BoxOut     c a b t do  c.rect[c.size/2   c.size*1-t \"center\"]   c.merge[b a] end]\n"
 ;
 
-void ancestors(lv*target,lv*found,lv**deck){
-	if(deck_is(target))*deck=target;
-	if(widget_is(target))ancestors(ivalue(target,"card"),found,deck);
-	if(card_is(target))ancestors(ivalue(target,"deck"),found,deck);
+void ancestors(lv*target,lv*found,lv**deck,int*isolate){
+	if(deck_is(target)){*deck=target;if(*isolate)return;}
+	if(widget_is(target)){
+		lv*c=ivalue(target,"card");
+		if(condef_is(c)||contraption_is(c))*isolate=1;
+		ancestors(c,found,deck,isolate);
+	}
+	if(card_is(target)||condef_is(target))ancestors(ivalue(target,"deck"),found,deck,isolate);
 	lv*s=ifield(target,"script"),*block=parse(s&&s->c?s->sv:"");
 	if(perr()){block=parse("");}dset(found,target,block);
 }
 int pending_popstate=0;
 void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
 	lv*scopes=lmd();dset(scopes,NONE,parse(default_handlers));
-	lv*deck=NULL;ancestors(target,scopes,&deck);
-	if(!deck){printf("failed to retrieve root deck!\n");return;}
+	lv*deck=NULL;int isolate=0;ancestors(target,scopes,&deck,&isolate);
 	lv*root=lmenv(NULL);
 	primitives(root,deck);
 	dset(root,lmistr("me"),target);
-	dset(root,lmistr("deck"),deck);
-	dset(root,lmistr("patterns"),ifield(deck,"patterns"));
+	if(!isolate){
+		dset(root,lmistr("deck"),deck);
+		dset(root,lmistr("patterns"),ifield(deck,"patterns"));
+	}
 	constants(root);
 	lv*core=NULL;
 	for(int z=scopes->c-1;z>=0;z--){
@@ -161,7 +168,7 @@ void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
 			EACH(z,cards  )blk_lit(b,       cards  ->lv[z]         ),blk_loc(b,cards  ->kv[z]),blk_op(b,DROP);
 			sname="!deck_scope";
 		}
-		if(card_is(t)){
+		if(card_is(t)||condef_is(t)){
 			blk_lit(b,t),blk_loc(b,lmistr("card")),blk_op(b,DROP);
 			lv*widgets=ifield(t,"widgets");
 			EACH(z,widgets)blk_lit(b,widgets->lv[z]),blk_loc(b,widgets->kv[z]),blk_op(b,DROP);
@@ -184,6 +191,13 @@ void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
 }
 void fire_event_async(lv*target,lv*name,lv*arg){fire_async(target,name,l_list(arg),NULL,1);}
 void fire_hunk_async(lv*target,lv*hunk){fire_async(target,NULL,lml(0),hunk,1);}
+lv* fire_attr_sync(lv*target,char*prefix,lv*name,lv*arg){
+	lv*root=lmenv(NULL);primitives(root,ivalue(target,"deck")),constants(root),dset(root,lmistr("me"),target);
+	lv*b=lmblk();lv*widgets=ivalue(target,"widgets");EACH(z,widgets)blk_lit(b,widgets->lv[z]),blk_loc(b,widgets->kv[z]),blk_op(b,DROP);
+	lv*s=ifield(ivalue(target,"def"),"script"),*sb=parse(s&&s->c?s->sv:"");if(perr()){sb=parse("");}blk_cat(b,sb),blk_op(b,DROP);
+	str n=str_new();str_addz(&n,prefix),str_addz(&n,name->sv);blk_get(b,lmstr(n)),blk_lit(b,arg?l_list(arg):lml(0)),blk_op(b,CALL);
+	pushstate(root);issue(root,b);int q=ATTR_QUOTA;while(running()&&q>0)runop(),q--;lv*r=running()?NONE:arg();popstate();return r;
+}
 lv* n_event(lv*self,lv*x){fire_async(self,ls(l_first(x)),l_drop(ONE,x),NULL,0);return self;}
 
 typedef struct {int x,y;} pair;
@@ -197,6 +211,7 @@ int has_prefix(char*x,char*px){for(int z=0;px[z];z++)if(px[z]!=tolower(x[z]))ret
 int has_suffix(char*x,char*sx){int a=strlen(x),b=strlen(sx);if(b>a)return 0;for(int z=0;z<b;z++)if(sx[z]!=tolower(x[a-b+z]))return 0;return 1;}
 int read2(char*src,int off){int a=0xFF&src[off],b=0xFF&src[off+1];return (a<<8)|b;}
 lv* lml2(lv*x,lv*y){lv*r=lml(2);r->lv[0]=x,r->lv[1]=y;return r;}
+lv* lml3(lv*x,lv*y,lv*z){lv*r=lml(3);r->lv[0]=x,r->lv[1]=y,r->lv[2]=z;return r;}
 lv* lmpair(pair x){return lml2(lmn(x.x),lmn(x.y));}
 lv* lmfpair(fpair x){return lml2(lmn(x.x),lmn(x.y));}
 lv* lmrect(rect x){lv*r=lml(4);r->lv[0]=lmn(x.x),r->lv[1]=lmn(x.y),r->lv[2]=lmn(x.w),r->lv[3]=lmn(x.h);return r;}
@@ -251,7 +266,7 @@ void reorder(lv*dict,int old,int n){
 	dict->kv[n]=k,dict->lv[n]=v;
 }
 int is_rooted(lv*self){
-	if(card_is  (self))return ivalue(self,"dead")==NULL;
+	if(card_is(self)||condef_is(self))return ivalue(self,"dead")==NULL;
 	if(widget_is(self))return is_rooted(ivalue(self,"card"))&&ivalue(self,"dead")==NULL;
 	return 1;
 }
@@ -1579,13 +1594,50 @@ lv* grid_write(lv*x){
 	return r;
 }
 
+// Contraption interface
+
+lv* interface_contraption(lv*self,lv*i,lv*x){
+	lv*data=self->b;char*masks[]={"name","index","script","locked","pos","show","font","event",NULL};
+	if(!is_rooted(self))return NONE;
+	if(x){
+		ikey("def" )return x; // not mutable!
+		ikey("size")return x; // not mutable!
+		if(lis(i))for(int z=0;masks[z];z++)if(!strcmp(i->sv,masks[z]))return interface_widget(self,i,x);
+		fire_attr_sync(self,"set_",ls(i),x);return x;
+	}else{
+		ikey("def" )return dget(data,i);
+		ikey("size")return ifield(dget(data,lmistr("def")),"size");
+		if(lis(i))for(int z=0;masks[z];z++)if(!strcmp(i->sv,masks[z]))return interface_widget(self,i,NULL);
+		return fire_attr_sync(self,"get_",ls(i),NULL);
+	}
+}
+lv*widget_write(lv*x);lv*widget_read(lv*x,lv*card); // forward refs
+lv*dict_delta(lv*a,lv*b){lv*r=lmd();EACH(z,b){lv*v=dget(a,b->kv[z]);if(!v||!matchr(v,b->lv[z]))dset(r,b->kv[z],b->lv[z]);}return r;}
+lv* contraption_write(lv*x){
+	lv*data=x->b,*def=ifield(x,"def"),*r=lmd();
+	dset(r,lmistr("type"),lmistr("contraption")),dset(r,lmistr("def"),ifield(def,"name"));
+	lv*o=ifield(def,"widgets"),*w=dget(data,lmistr("widgets")),*wids=lmd();EACH(z,w){
+		lv*wid=widget_write(w->lv[z]),*n=dget(wid,lmistr("name"));
+		lv*src=dget(o,n);if(src)wid=dict_delta(widget_write(src),wid);
+		wid=l_drop(lmistr("name"),wid);dset(wids,n,wid);
+	}dset(r,lmistr("widgets"),wids);return r;
+}
+lv* contraption_read(lv*x,lv*r){
+	x=ld(x);lv*card=dget(r,lmistr("card")),*deck=dget(card->b,lmistr("deck")),*condefs=ifield(deck,"contraptions");
+	lv*dname=dget(x,lmistr("def")),*def=dname?dget(condefs,dname):NULL;if(!def)return NULL;dset(r,lmistr("def"),def);
+	lv*widgets=lmd(),*ri=lmi(interface_contraption,lmistr("contraption"),r);dset(r,lmistr("widgets"),widgets),dset(r,lmistr("deck"),deck);
+	lv*d=ifield(def,"widgets"),*w=dget(x,lmistr("widgets"));if(w){w=ld(w);}else{w=lmd();EACH(z,d)dset(w,d->kv[z],lmd());}
+	EACH(z,w){
+		lv*a=w->lv[z],*o=dget(d,w->kv[z]);if(o)a=l_comma(widget_write(o),a);
+		lv*i=widget_read(a,ri);if(lii(i))dset(widgets,ifield(i,"name"),i);
+	}return ri;
+}
+
 // Widget interface
 
-lv* widget_read(lv*x,lv*card); // forward ref
-lv* widget_add(lv*card,lv*x){lv*r=widget_read(x,card);dset(ivalue(card,"widgets"),ifield(r,"name"),r);return r;}
-
+lv* widget_add(lv*card,lv*x){lv*r=widget_read(x,card);if(lii(r))dset(ivalue(card,"widgets"),ifield(r,"name"),r);return r;}
 lv* interface_widget(lv*self,lv*i,lv*x){
-	lv*data=self->b;lv*card=ivalue(self,"card"),*deck=ivalue(card,"deck"),*fonts=ifield(deck,"fonts");
+	lv*data=self->b,*card=ivalue(self,"card"),*deck=ivalue(card,"deck"),*fonts=ifield(deck,"fonts");
 	lv*widgets=ivalue(card,"widgets"),*name=ivalue(self,"name");
 	if(x){
 		ikey("name"  ){
@@ -1614,10 +1666,12 @@ lv* widget_read(lv*x,lv*card){
 	x=ld(x);lv*r=lmd();dset(r,lmistr("card"),card);
 	lv*widgets=ivalue(card,"widgets"),*type=dget(x,lmistr("type"));if(!type)type=lmistr("button");
 	{lv*k=lmistr("name");dset(r,k,ukey(widgets,dget(x,k),type->sv,NULL));}
-	lv*ri=(type&&!strcmp(type->sv,"field" ))?field_read (x,r):
-	      (type&&!strcmp(type->sv,"grid"  ))?grid_read  (x,r):
-	      (type&&!strcmp(type->sv,"canvas"))?canvas_read(x,r):
-	      (type&&!strcmp(type->sv,"slider"))?slider_read(x,r): button_read(x,r);
+	lv*ri=(type&&!strcmp(type->sv,"field"      ))?field_read (x,r):
+	      (type&&!strcmp(type->sv,"grid"       ))?grid_read  (x,r):
+	      (type&&!strcmp(type->sv,"canvas"     ))?canvas_read(x,r):
+	      (type&&!strcmp(type->sv,"slider"     ))?slider_read(x,r):
+	      (type&&!strcmp(type->sv,"contraption"))?contraption_read(x,r): button_read(x,r);
+	if(!lii(ri))return NULL;
 	init_field(ri,"size"  ,x);
 	init_field(ri,"script",x);
 	init_field(ri,"font"  ,x);
@@ -1637,7 +1691,7 @@ lv* widget_write(lv*x){
 	{lv*k=lmistr("font"  ),*v=dget(data,k);if(v&&strcmp(button_is(x)?"menu":"body",v->sv))dset(r,k,v);}
 	{lv*k=lmistr("show"  ),*v=dget(data,k);if(v&&strcmp(widget_shows[0],v->sv))dset(r,k,v);}
 	return l_comma(r,button_is(x)?button_write(x): field_is (x)?field_write (x):slider_is(x)?slider_write(x):
-	                 grid_is  (x)?grid_write  (x): canvas_is(x)?canvas_write(x):lmd());
+	                 grid_is  (x)?grid_write  (x): canvas_is(x)?canvas_write(x):contraption_is(x)?contraption_write(x): lmd());
 }
 
 // Keystore interface
@@ -1705,7 +1759,13 @@ lv* module_write(lv*x){
 char*nav_dirs[]={"right","left","up","down",NULL};
 lv* n_card_add(lv*self,lv*z){
 	lv*t=l_first(z);
+	if(condef_is(self)&&(contraption_is(t)||!strcmp("contraption",ls(t)->sv)))return NONE;
 	if(lis(t)){
+		if(!strcmp("contraption",t->sv)){
+			lv*condefs=ivalue(ivalue(self,"deck"),"contraptions"),*ct=z->c>1?ls(z->lv[1]):lmistr(""),*def=dget(condefs,ct);if(!def)return NONE;
+			lv*a=lmd();dset(a,lmistr("type"),lmistr("contraption")),dset(a,lmistr("def"),ct);
+			if(z->c>2)dset(a,lmistr("name"),unpack_str(z,2));return widget_add(self,a);
+		}
 		if(strcmp("button",t->sv)&&strcmp("field",t->sv)&&strcmp("slider",t->sv)&&strcmp("canvas",t->sv)&&strcmp("grid",t->sv))return NONE;
 		lv*a=lmd();dset(a,lmistr("type"),t);if(z->c>1)dset(a,lmistr("name"),unpack_str(z,1));return widget_add(self,a);
 	}
@@ -1777,6 +1837,99 @@ lv* card_read(lv*x,lv*deck){
 	return ri;
 }
 
+// ConDef interface
+
+lv* contraption_strip(lv*x){
+	lv*r=lmd(),*widgets=dget(x->b,lmistr("widgets"));EACH(z,widgets){
+		lv*w=widgets->lv[z];
+		lv*p=widget_write(w);
+		if(button_is(w))p=l_take(lmistr("value"),p);
+		if(slider_is(w))p=l_take(lmistr("value"),p);
+		if(field_is (w))p=l_take(lml2(lmistr("value"),lmistr("scroll")),p);
+		if(grid_is  (w))p=l_take(lml3(lmistr("value"),lmistr("scroll"),lmistr("row")),p);
+		if(canvas_is(w))p=l_take(lmistr("image"),p);
+		dset(r,ifield(w,"name"),p);
+	}return r;
+}
+void contraption_update(lv*def){
+	lv*deck=dget(def->b,lmistr("deck")),*cards=ifield(deck,"cards");EACH(c,cards){
+		lv*card=cards->lv[c],*widgets=ifield(card,"widgets");EACH(w,widgets){
+			lv*widget=widgets->lv[w];if(!contraption_is(widget)||ifield(widget,"def")!=def)continue;
+			lv*d=contraption_write(widget);
+			dset(d,lmistr("image"  ),image_clone(ifield(def,"image")));
+			dset(d,lmistr("size"   ),ifield(def,"size"));
+			dset(d,lmistr("widgets"),contraption_strip(widget));
+			widget->b=widget_read(d,card)->b;
+		}
+	}
+}
+lv* n_condef_add(lv*self,lv*z){lv*r=n_card_add(self,z);if(widget_is(r))contraption_update(self);return r;}
+lv* n_condef_remove(lv*self,lv*z){lv*r=n_card_remove(self,z);if(lb(r))contraption_update(self);return r;}
+lv* n_condef_update(lv*self,lv*z){(void)z;contraption_update(self);return NONE;}
+char*attribute_types[]={"","bool","number","string","code","rtext",NULL};
+lv* normalize_attributes(lv*x){
+	lv*r=lmt(),*n=lml(0),*t=lml(0),*nk=lmistr("name"),*tk=lmistr("type");dset(r,nk,n),dset(r,tk,t);
+	if(lit(x)){
+		lv*sn=dget(x,nk),*st=dget(x,tk);if(sn&&st)EACH(z,sn){
+			if(!lis(sn->lv[z])||!sn->lv[z]->c)continue;
+			lv*type=normalize_enum(st->lv[z],attribute_types);
+			if(type->c)ll_add(n,sn->lv[z]),ll_add(t,type);
+		}
+	}return torect(r),r;
+}
+lv* interface_condef(lv*self,lv*i,lv*x){
+	if(!is_rooted(self))return NONE;
+	lv*data=self->b,*deck=dget(data,lmistr("deck")),*condefs=ivalue(deck,"contraptions");
+	if(x){
+		ikey("name"){
+			lv*o=dget(data,i),*n=ukey(condefs,ls(x),ls(x)->sv,o);
+			condefs->kv[dgeti(condefs,o)]=n;dset(data,i,n);return x;
+		}
+		ikey("description"){dset(data,i,ls(x));return x;}
+		ikey("size"       ){dset(data,i,normalize_pair(x))          ,contraption_update(self);return x;}
+		ikey("image"      ){dset(data,i,image_is(x)?x:image_empty()),contraption_update(self);return x;}
+		ikey("script"     ){dset(data,i,ls(x));return x;}
+		ikey("attributes" ){dset(data,i,normalize_attributes(x));return x;}
+	}else{
+		ikey("name"       )return dget(data,i);
+		ikey("description"){lv*r=dget(data,i);return r?r:lmistr("");}
+		ikey("script"     ){lv*r=dget(data,i);return r?r:lmistr("");}
+		ikey("size"       ){lv*r=dget(data,i);return r?r:lmpair((pair){100,100});}
+		ikey("image"      ){lv*r=dget(data,i);return r?r:image_empty();}
+		ikey("widgets"    )return dget(data,i);
+		ikey("attributes" ){lv*r=dget(data,i);return r?r:normalize_attributes(NONE);}
+		ikey("add"        )return lmnat(n_condef_add,self);
+		ikey("remove"     )return lmnat(n_condef_remove,self);
+		ikey("update"     )return lmnat(n_condef_update,self);
+	}return x?x:NONE;
+}
+lv* condef_write(lv*condef){
+	lv*data=condef->b, *r=lmd();
+	{lv*k=lmistr("name"       ),*v=dget(data,k);dset(r,k,v);}
+	{lv*k=lmistr("size"       ),*v=dget(data,k);dset(r,k,v);}
+	{lv*k=lmistr("description"),*v=dget(data,k);if(v&&lis(v)&&v->c)dset(r,k,v);}
+	{lv*k=lmistr("script"     ),*v=dget(data,k);if(v&&lis(v)&&v->c)dset(r,k,v);}
+	{lv*k=lmistr("image"      ),*v=dget(data,k);if(v&&!is_empty(v))dset(r,k,image_write(v));}
+	{lv*k=lmistr("attributes" ),*v=dget(data,k);if(v)dset(r,k,l_cols(v));}
+	lv*w=dget(data,lmistr("widgets")),*wids=lmd();EACH(z,w){
+		lv*wid=widget_write(w->lv[z]),*n=dget(wid,lmistr("name"));
+		wid=l_drop(lmistr("name"),wid);if(wid->c)dset(wids,n,wid);
+	}dset(r,lmistr("widgets"),wids);return r;
+}
+lv* condef_read(lv*x,lv*deck){
+	x=ld(x);lv*r=lmd(),*widgets=lmd(),*ri=lmi(interface_condef,lmistr("condef"),r),*condefs=ivalue(deck,"contraptions");
+	dset(r,lmistr("deck"),deck),dset(r,lmistr("widgets"),widgets);
+	{lv*k=lmistr("name"       ),*v=dget(x,k);dset(r,k,ukey(condefs,v&&lis(v)&&v->c==0?NULL:v,"condef",NULL));}
+	{lv*k=lmistr("image"      ),*v=dget(x,k);dset(r,k,v?image_read(v):image_empty());}
+	{lv*k=lmistr("attributes" ),*v=dget(x,k);if(v)iwrite(ri,k,l_table(v));}
+	{lv*k=lmistr("size"       ),*v=dget(x,k);if(v)dset(r,k,normalize_pair(v));}
+	lv*w=dget(x,lmistr("widgets"));w=w?ll(w):lml(0);
+	EACH(z,w){lv*n=dget(w->lv[z],lmistr("name"));if(n){lv*i=widget_read(w->lv[z],ri);if(lii(i))dset(widgets,ifield(i,"name"),i);}}
+	init_field(ri,"description",x)
+	init_field(ri,"script"     ,x)
+	return ri;
+}
+
 // Deck interface
 
 void rename_sound(lv*deck,lv*sound,lv*name){
@@ -1797,6 +1950,7 @@ lv* deck_paste_named(lv*deck,lv*z,lv*name){
 lv* n_deck_paste(lv*deck,lv*z){return deck_paste_named(deck,z,NULL);}
 lv* n_deck_add(lv*self,lv*z){
 	lv*sounds=ivalue(self,"sounds"),*fonts=ivalue(self,"fonts"),*modules=ivalue(self,"modules"),*cards=ivalue(self,"cards"),*t=l_first(z);
+	lv*condefs=ivalue(self,"contraptions");
 	if(card_is(t)){return deck_paste_named(self,l_list(n_deck_copy(self,t)),z->c>1?ls(z->lv[1]):NULL);}
 	if(font_is(t)){lv*r=font_make((pair){font_w(t),font_h(t)});memcpy(r->b->sv,t->b->sv,r->b->c);return uset(fonts,unpack_str(z,1),"font",r);}
 	if(sound_is(t)){lv*b=lms(t->b->c);memcpy(b->sv,t->b->sv,b->c);return uset(sounds,unpack_name(z,1),"sound",sound_make(b));}
@@ -1804,11 +1958,19 @@ lv* n_deck_add(lv*self,lv*z){
 		lv*a=module_write(t);if(z->c>1)dset(a,lmistr("name"),unpack_str(z,1));
 		lv*r=module_read(a,self);dset(modules,ifield(r,"name"),r);return r;
 	}
+	if(condef_is(t)){
+		lv*a=condef_write(t);if(z->c>1)dset(a,lmistr("name"),unpack_str(z,1));
+		lv*r=condef_read(a,self);dset(condefs,ifield(r,"name"),r);return r;
+	}
 	if(lis(t)&&!strcmp("sound" ,t->sv))return uset(sounds,unpack_name(z,2),"sound",sound_make(lms(MAX(0,z->c>1?ln(z->lv[1]):0))));
 	if(lis(t)&&!strcmp("font"  ,t->sv))return uset(fonts,unpack_name(z,2),"font",font_make(unpack_pair(z,1)));
 	if(lis(t)&&!strcmp("module",t->sv)){
 		lv*a=lmd();if(z->c>1)dset(a,lmistr("name"),unpack_str(z,1));
 		lv*r=module_read(a,self);dset(modules,ifield(r,"name"),r);return r;
+	}
+	if(lis(t)&&!strcmp("contraption",t->sv)){
+		lv*a=lmd();if(z->c>1)dset(a,lmistr("name"),unpack_str(z,1));
+		lv*r=condef_read(a,self);dset(condefs,ifield(r,"name"),r);return r;
 	}
 	if(lis(t)&&!strcmp("card",t->sv)){
 		lv*a=lmd();if(z->c>1)dset(a,lmistr("name"),unpack_str(z,1));
@@ -1835,6 +1997,15 @@ lv* n_deck_remove(lv*self,lv*z){
 			lv*w=ifield(cards->lv[c],"widgets");
 			EACH(z,w){lv*widget=w->lv[z];if(ifield(widget,"font")==t)dset(widget->b,lmistr("font"),def);}
 		}dset(data,k,l_drop(n,fonts));return ONE;
+	}
+	if(condef_is(t)){
+		lv*k=lmistr("contraptions"),*m=dget(data,k);
+		lv*n=dkey(m,t);if(lin(n))return NONE; // this contraption isn't part of the deck
+		lv*cards=ifield(self,"cards");EACH(c,cards){ // scrub instances from every card:
+			lv*card=cards->lv[c],*widgets=ifield(card,"widgets");EACH(w,widgets){
+				lv*widget=widgets->lv[w];if(contraption_is(widget)&&ifield(widget,"def")==t)n_card_remove(card,widget);
+			}
+		}dset(data,k,l_drop(n,m));dset(t->b,lmistr("dead"),ONE);return ONE;
 	}
 	if(card_is(t)){
 		if(cards->c<=1)return NONE; // cannot delete the last card from a deck
@@ -1863,6 +2034,7 @@ lv* interface_deck(lv*self,lv*i,lv*x){
 		ikey("fonts"   )return l_drop(NONE,dget(data,i)); // expose a shallow copy
 		ikey("cards"   )return dget(data,i);
 		ikey("modules" )return dget(data,i);
+		ikey("contraptions")return dget(data,i);
 		ikey("add"     )return lmnat(n_deck_add,self);
 		ikey("remove"  )return lmnat(n_deck_remove,self);
 		ikey("event"   )return lmnat(n_event,self);
@@ -1872,7 +2044,7 @@ lv* interface_deck(lv*self,lv*i,lv*x){
 	}return x?x:NONE;
 }
 lv* deck_read(lv*x){
-	x=ls(x);lv*deck=lmd(),*fonts=lmd(),*sounds=lmd(),*scripts=lmd(),*cards=lmd(),*modules=lmd();int i=0,m=0,md=0;
+	x=ls(x);lv*deck=lmd(),*fonts=lmd(),*sounds=lmd(),*scripts=lmd(),*cards=lmd(),*modules=lmd(),*condefs=lmd();int i=0,m=0,md=0,lc=0;
 	dset(fonts,lmistr("body"),font_read(lmistr(FONT_BLOCK_BODY)));
 	dset(fonts,lmistr("menu"),font_read(lmistr(FONT_BLOCK_MENU)));
 	dset(fonts,lmistr("mono"),font_read(lmistr(FONT_BLOCK_MONO)));
@@ -1890,25 +2062,29 @@ lv* deck_read(lv*x){
 		else if(dmatch("{card:")){
 			did(k,"}");lv*v=lmd();
 			dset(v,lmistr("name"),k),dset(v,lmistr("widgets"),lml(0));
-			dset(cards,k,v);m=5;
+			dset(cards,k,v);m=5,lc=0;
 		}
 		else if(dmatch("{script:")){did(k,"}\n");did(v,"\n{end}");dset(scripts,ls(k),v);}
 		else if(m==6&&dmatch("{data}\n")){md=1;}
 		else if(m==6&&dmatch("{script}\n")){did(v,"\n{end}");dset(l_last(modules),lmistr("script"),v);m=1;}
 		else if(dmatch("{module:")){
 			did(k,"}");lv*v=lmd();dset(v,lmistr("name"),k),dset(v,lmistr("script"),lmistr("")),dset(v,lmistr("data"),lmd());dset(modules,k,v);m=6,md=0;}
+		else if(dmatch("{contraption:")){did(k,"}");lv*v=lmd();dset(v,lmistr("name"),k),dset(v,lmistr("widgets"),lml(0));dset(condefs,k,v);m=7,lc=1;}
 		else{
 			did(k,":");int f=1,n=x->c-i;lv*v=pjson(x->sv,&i,&f,&n);
 			if(m==1)dset(deck,k,v);
 			if(m==2){v=font_read (v);if(v)dset(fonts ,k,v);}
 			if(m==3){v=sound_read(v);if(v)dset(sounds,k,v);}
-			if(m==4){v=ld(v);dset(v,lmistr("name"),k);if(cards->c)ll_add(dget(l_last(cards),lmistr("widgets")),v);}
+			if(m==4&&!lc){v=ld(v);dset(v,lmistr("name"),k);if(cards  ->c)ll_add(dget(l_last(cards  ),lmistr("widgets")),v);}
+			if(m==4&& lc){v=ld(v);dset(v,lmistr("name"),k);if(condefs->c)ll_add(dget(l_last(condefs),lmistr("widgets")),v);}
 			if(m==5)dset(l_last(cards),k,v);
 			if(m==6)dset(md?dget(l_last(modules),lmistr("data")):l_last(modules),k,v);
+			if(m==7)dset(l_last(condefs),k,v);
 		}
 	}
 	#define dscript(x) {if(x){lv*i=dget(x,lmistr("script"));if(i){lv*v=dget(scripts,ls(i));if(v)dset(x,lmistr("script"),v);}}}
-	dscript(deck);EACH(z,cards){dscript(cards->lv[z]);lv*wids=dget(cards->lv[z],lmistr("widgets"));EACH(w,wids)dscript(wids->lv[w]);}
+	dscript(deck);EACH(z,cards){dscript(cards  ->lv[z]);lv*wids=dget(cards  ->lv[z],lmistr("widgets"));EACH(w,wids)dscript(wids->lv[w]);}
+	EACH(z,condefs)            {dscript(condefs->lv[z]);lv*wids=dget(condefs->lv[z],lmistr("widgets"));EACH(w,wids)dscript(wids->lv[w]);}
 	// assemble the interface:
 	lv*r=lmd(),*ri=lmi(interface_deck,lmistr("deck"),r);
 	if(cards->c==0){lv*a=lmd(),*n=lmistr("home");dset(a,lmistr("name"),n);dset(cards,n,a);}
@@ -1924,10 +2100,12 @@ lv* deck_read(lv*x){
 	{lv*k=lmistr("card"    ),*f=dget(deck,k);int n=f?ln(f):0;dset(r,k,lmn(CLAMP(0,n,cards->c-1)));}
 	lv*trans=lmd();dset(r,lmistr("transit"),trans);lv*root=lmenv(NULL);constants(root);dset(root,lmistr("transition"),lmnat(n_transition,ri));
 	pushstate(root),issue(root,parse(default_transitions));while(running())runop();arg();popstate();
+	MAP(ddata,condefs)condefs->lv[z];
 	MAP(cdata,cards  )cards  ->lv[z];
 	MAP(mdata,modules)modules->lv[z];
-	{lv*k=lmistr("cards"   );cards  =lmd();dset(r,k,cards  );EACH(z,cdata){lv*v=card_read  (cdata->lv[z],ri);dset(cards  ,ifield(v,"name"),v);}}
-	{lv*k=lmistr("modules" );modules=lmd();dset(r,k,modules);EACH(z,mdata){lv*v=module_read(mdata->lv[z],ri);dset(modules,ifield(v,"name"),v);}}
+	{lv*k=lmistr("contraptions");condefs=lmd();dset(r,k,condefs);EACH(z,ddata){lv*v=condef_read(ddata->lv[z],ri);dset(condefs,ifield(v,"name"),v);}}
+	{lv*k=lmistr("cards"       );cards  =lmd();dset(r,k,cards  );EACH(z,cdata){lv*v=card_read  (cdata->lv[z],ri);dset(cards  ,ifield(v,"name"),v);}}
+	{lv*k=lmistr("modules"     );modules=lmd();dset(r,k,modules);EACH(z,mdata){lv*v=module_read(mdata->lv[z],ri);dset(modules,ifield(v,"name"),v);}}
 	dset(r,lmistr("history"),l_list(ifield(ifield(ri,"card"),"index")));
 	return ri;
 }
@@ -1989,6 +2167,18 @@ lv* deck_write(lv*x,int html){
 		write_line("description",v,v)
 		lv*mdata=dget(data,lmistr("data"));write_dict("{data}\n",mdata,)
 		str_addz(&r,"{script}\n"),esc_write(&r,0,ifield(module,"script")),str_addz(&r,"\n{end}\n");
+	}
+	lv*d=dget(data,lmistr("contraptions"));EACH(z,d){
+		lv*condef=d->lv[z],*data=condef_write(condef),*wids=dget(data,lmistr("widgets"));lv*base=dget(data,lmistr("name"));sci=0;
+		str_addz(&r,"\n{contraption:"),esc_write(&r,1,base),str_addz(&r,"}\n");
+		write_line("size"       ,1   ,v                              )
+		write_line("description",v   ,v                              )
+		write_line("image"      ,v   ,v                              )
+		write_line("script"     ,v->c,script_ref(scripts,base,&sci,v))
+		write_line("attributes" ,v->c,v                              )
+		EACH(w,wids){lv*k=lmistr("script"),*v=dget(wids->lv[w],k);if(v)dset(wids->lv[w],k,script_ref(scripts,base,&sci,v));}
+		write_dict("{widgets}\n",wids,)
+		scripts_write(scripts,&r,&si);
 	}
 	str_addz(&r,"\n");
 	if(html){

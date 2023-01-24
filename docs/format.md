@@ -27,6 +27,8 @@ Widgets, cards, or the deck itself may contain scripts written in the [Lil progr
 
 Lil code intended to be reusable across projects can be organized into _Modules_. From a programming perspective, modules execute once when a deck is loaded (or the module is modified) and each return a dictionary which will be mounted as a global for use by ordinary event-triggered scripts. Modules do not have direct access to the deck or its components, nor do they have direct access to one another. Each module has an independent key-value store which can furnish static data used by the module or allow the module to explicitly preserve its state.
 
+In addition to the built-in selection of widgets, it is possible to define custom widgets called _Contraptions_. Internally, a contraption behaves like a card, containing widgets (representing its state and interactive elements) and a background image. Externally, it behaves like a single widget. Many contraption instances can be created from a single definition, which is called a _ConDef_.
+
 Rationale
 ---------
 The deck format is designed around several constraints and considerations:
@@ -99,9 +101,10 @@ A _Chunk_ begins with a line that begins and ends with curly braces `{}`, indica
 - `{sounds}`: a dictionary of _Sound Records_. Every property line has an ID and an `SND0` data block.
 - `{fonts}`: a dictionary of _Font Records_. Every property line has an ID and an `FNT0` data block. The built-in fonts `menu`, `body`, and `mono` are provided by Decker itself, but _could_ be overridden by definitions in this chunk.
 - `{card:ID}`: contains properties pertaining to a card, and is followed by a `{widgets}` chunk (optional).
-- `{widgets}`: a collection of a card's _Widget Records_.
+- `{widgets}`: a collection of a card or condef's _Widget Records_.
 - `{script:ID}`: contains a Lil script.
 - `{module:ID}`: contains a Lil module and its metadata.
+- `{contraption:ID}`: contains a contraption definition (ConDef).
 - `{data}`: contains a Lil module's key-value store.
 - `{end}`: terminates a `{script}` chunk.
 
@@ -171,11 +174,11 @@ two:{"type":"button",text:"Check Me Out","style":"check","value":1}
 
 The `{widgets}` Chunk
 ---------------------
-The `{widgets}` chunk is a dictionary of widgets belonging to the preceding `{card:ID}` chunk, in their drawing order, back-to-front. Each widget is a JSON object with one or more properties.
+The `{widgets}` chunk is a dictionary of widgets belonging to the preceding `{card:ID}` or `{contraption:ID}` chunk, in their drawing order, back-to-front. Each widget is a JSON object with one or more properties.
 
 Some properties are common to all widgets:
 
-- `type` a widget type; one of { `"button"`, `"field"`, `"slider"`, `"canvas"`, `"grid"` }.
+- `type` a widget type; one of { `"button"`, `"field"`, `"slider"`, `"canvas"`, `"grid"`, `"contraption"` }.
 - `pos` an array of 2 integers providing the x and y position of the widget, respectively, in pixels.
 - `size` an array of 2 integers providing the width and height of the widget, respectively, in pixels.
 - `show` control how the widget is drawn. One of:
@@ -237,8 +240,12 @@ Each `type` of widget has its own additional optional fields:
 	- `scroll`: an integer; the scroll offset in rows.
 	- `row`: an integer; the selected row index, or -1.
 
+- `"contraption"`:
+	- `def`: a string; the ID of a contraption definition (ConDef).
+	- `widgets`: a dictionary of JSON objects representing the widgets contained in this contraption instance. The properties given here override any properties from the corresponding `widgets` of the contraption's definition. Note that the `pos` of any "inner" widget is relative to the `pos` of the contraption which contains it.
+
 The `{module:ID}` Chunk
----------------------
+-----------------------
 Module chunks always have an ID, which serves as the `name` of the module. They also may have additional optional properties:
 
 - `description`: a string giving a human-readable description of the purpose of the module.
@@ -267,6 +274,68 @@ end
 
 mod.get:on _ do
 	log
+end
+{end}
+```
+
+The `{contraption:ID}` Chunk
+----------------------------
+Contraption chunks always have an ID, which serves as the `name` of the ConDef. They may have additional optional properties:
+
+- `size`: an array of 2 integers providing the width and height of instances of the ConDef, respectively, in pixels.
+- `description`: a string giving a human-readable description of the purpose of the ConDef.
+- `image`: an _Image Record_ used as the background of instances of the ConDef.
+- `script`: a number or string corresponding to a `{script:ID}` chunk, analogous to the script of a card from the perspective of contained widgets.
+- `attributes`: a rectangular dictionary with the following columns:
+	- `name`: the name of an editable property for instances of this ConDef.
+	- `type`: the type of this editable property, for the purpose of supplying a sensible user interface for editing. An invalid `type` will cause the current row to be ignored.
+
+Attribute `type`s may be one of the following:
+
+- `bool`: A boolean 0/1 value, editable with a checkbox.
+- `number`: A numeric value, editable with a field.
+- `string`: A string value, editable with a field.
+- `code`: A string value, editable with a larger field in "code" editing mode.
+- `rtext`: A string value, editable with a larger field in "rich" editing mode.
+
+An example of a complete `{contraption:ID}` chunk and its associated `{widgets}` and `{script:ID}` chunks:
+```
+{contraption:spinner}
+size:[150,50]
+description:"unbounded numeric field that can be incremented or decremented by a configurable step"
+attributes:{"name":["value","step"],"type":["number","number"]}
+script:"spinner.root"
+
+{widgets}
+down:{"type":"button","text":"<","script":"spinner.0"}
+up:{"type":"button","text":">","script":"spinner.1"}
+value:{"type":"field","value":"0","locked":1}
+step:{"type":"field","value":"1","show":"none"}
+
+{script:spinner.root}
+on set_value x do
+  value.text:0+x
+end
+on get_value do
+  0+value.text
+end
+on set_step x do
+  step.text:0+x
+end
+on get_step do
+  0+step.text
+end
+{end}
+
+{script:spinner.0}
+on click do
+  value.text:value.text-step.text
+end
+{end}
+
+{script:spinner.1}
+on click do
+  value.text:value.text+step.text
 end
 {end}
 ```

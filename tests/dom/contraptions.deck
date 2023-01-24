@@ -1,0 +1,41 @@
+{deck}
+version:1
+card:0
+size:[512,342]
+
+{card:home}
+{widgets}
+a:{"type":"contraption","size":[150,50],"pos":[0,0],"def":"spinner","widgets":{"down":{},"up":{},"value":{},"step":{}}}
+b:{"type":"contraption","size":[150,50],"pos":[0,0],"def":"spinner","widgets":{"down":{},"up":{},"value":{"value":"42"},"step":{}}}
+
+{contraption:spinner}
+size:[150,50]
+description:"unbounded numeric picker"
+script:"spinner.0"
+attributes:{"name":["value","step"],"type":["number","number"]}
+{widgets}
+down:{"type":"button","size":[60,20],"pos":[0,0],"script":"spinner.1","text":"<"}
+up:{"type":"button","size":[60,20],"pos":[0,0],"script":"spinner.2","text":">"}
+value:{"type":"field","size":[100,20],"pos":[0,0],"locked":1,"value":"0"}
+step:{"type":"field","size":[100,20],"pos":[0,0],"show":"none","value":"1"}
+
+{script:spinner.0}
+
+on set_value x do value.text:0+x end
+on get_value   do 0+value.text   end
+on set_step  x do step.text:0+x  end
+on get_step    do 0+step.text    end
+{end}
+
+{script:spinner.1}
+on click do
+  value.text:value.text-step.text
+end
+{end}
+
+{script:spinner.2}
+on click do
+  value.text:value.text+step.text
+end
+{end}
+
