@@ -11,7 +11,7 @@ void quit();
 // Assets
 
 lv*CHECK,*LOCK,*ZOOM,*CHECKS[4],*CORNERS[4],*RADIOS[4],*ICONS[8],*GESTURES[4];
-lv*FONT_BODY,*FONT_MENU,*FONT_MONO,*TOOLS,*ARROWS,*TOOLB,*PLAYING;
+lv*FONT_BODY,*FONT_MENU,*FONT_MONO,*TOOLS,*ARROWS,*TOOLB,*PLAYING,*ATTRS;
 enum mini_icons {icon_dir,icon_doc,icon_sound,icon_font,icon_app,icon_lil,icon_pat,icon_chek,icon_none};
 enum cursor_styles {cursor_default,cursor_point,cursor_ibeam,cursor_drag};
 SDL_Cursor*CURSORS[4]; int uicursor=0, enable_gestures=0, profiler=0;
@@ -175,8 +175,9 @@ enum modal_type{
 	modal_import_deck,
 	modal_open_deck,modal_save_deck,modal_save_locked,modal_confirm_quit,modal_confirm_new,modal_confirm_script,modal_multiscript,
 	modal_brush,modal_pattern,modal_fill,
-	modal_deck_props,modal_card_props,modal_button_props,modal_field_props,modal_slider_props,modal_canvas_props,modal_grid_props,
-	modal_cards,modal_sounds,modal_recording,modal_fonts,modal_resources,modal_action,modal_pick_card,modal_trans,modal_grid,
+	modal_deck_props,modal_card_props,modal_button_props,modal_field_props,modal_slider_props,modal_canvas_props,modal_grid_props,modal_contraption_props,
+	modal_cards,modal_sounds,modal_recording,modal_fonts,modal_contraptions,modal_resources,
+	modal_action,modal_pick_card,modal_pick_contraption,modal_trans,modal_grid,
 };
 typedef struct {
 	int type, subtype, filter, in_modal, edit_json;
@@ -287,6 +288,7 @@ void setscript(lv*x){
 		       field_is (sc.target)?(p=1,lmistr("on change val do\n \nend")):
 		       slider_is(sc.target)?(p=1,lmistr("on change val do\n \nend")):
 		       canvas_is(sc.target)?(p=1,lmistr("on click pos do\n \nend\n\non drag pos do\n \nend\n\non release pos do\n \nend")):v;
+	if(!v->c&&contraption_is(sc.target)){lv*t=ifield(ifield(sc.target,"def"),"template");if(t->c)p=1,v=t;}
 	if(p)snprintf(sc.status,sizeof(sc.status),"No existing script; populated a template.");
 	sc.f=(field_val){rtext_cast(v),0};
 }
@@ -724,6 +726,37 @@ void field_keys(int code,int shift){
 	wid.cursor.y=MAX(0,MIN(wid.cursor.y,layout_count)); if(!m)return;
 	wid.cursor_timer=0; if(!shift)wid.cursor.x=wid.cursor.y; field_showcursor();
 }
+void widget_contraption(lv*x);// forward def
+void handle_widgets(lv*x,pair offset){
+	EACH(z,x){
+		lv*w=x->lv[z];
+		if(button_is(w)){
+			int v=lb(ifield(w,"value")); button p=unpack_button(w);p.size=rect_add(p.size,offset);
+			if(widget_button(w,p,v)&&p.style==button_check)iwrite(w,lmistr("value"),lmn(!v)),mark_dirty();
+		}
+		if(slider_is(w)){slider p=unpack_slider(w);p.size=rect_add(p.size,offset),widget_slider(w,p);}
+		if(canvas_is(w)){lv* v=canvas_image(w,0);canvas p=unpack_canvas(w);p.size=rect_add(p.size,offset);widget_canvas(w,p,v);}
+		if(grid_is(w)){grid_val v={0};grid p=unpack_grid(w,&v);p.size=rect_add(p.size,offset);widget_grid(w,p,&v);if(wid.gt==w)wid.gv_slot=v,wid.gv=&wid.gv_slot;}
+		if(field_is(w)){
+			if(wid.ft==w){widget_field(w,wid.f,wid.fv);}
+			else{
+				field_val v={0};field p=unpack_field(w,&v);p.size=rect_add(p.size,offset);widget_field(w,p,&v);
+				if(wid.ft==w)wid.fv_slot=v,wid.fv=&wid.fv_slot;
+			}
+		}
+		if(contraption_is(w))widget_contraption(w);
+	}
+}
+void widget_contraption(lv*x){
+	int show=ordinal_enum(ifield(x,"show"),widget_shows);if(show==show_none)return;
+	rect b=rect_pair(getpair(ifield(x,"pos")),getpair(ifield(x,"size")));lv* image=ifield(x,"image");pair s=image_size(image);
+	rect bc=box_intersect(frame.clip,b); rect oc=frame.clip;frame.clip=bc;
+	if(show==show_solid){if(s.x<b.w||s.y<b.h)draw_rect(b,32);buffer_paste(b,frame.clip,image->b,frame.buffer,1);}
+	if(show==show_transparent){buffer_paste(b,frame.clip,image->b,frame.buffer,0);}
+	if(show==show_invert){char*pal=patterns_pal(ifield(deck,"patterns"));draw_invert_scaled(pal,(rect){b.x,b.y,s.x,s.y},image->b);}
+	handle_widgets(ivalue(x,"widgets"),(pair){b.x,b.y});
+	frame.clip=oc;
+}
 
 int  ui_button  (rect r,char*label,int enable          ){return widget_button(NULL,(button){label,r,FONT_MENU,button_round,show_solid,!enable},0);}
 int  ui_toggle  (rect r,char*label,int inv,int enable  ){return widget_button(NULL,(button){label,r,FONT_MENU,button_round,inv?show_invert:show_solid,!enable},0);}
@@ -734,6 +767,25 @@ void ui_textedit(rect r,int border,field_val*value){widget_field(NULL,(field){r,
 void ui_codeedit(rect r,int border,field_val*value){widget_field(NULL,(field){r,FONT_MONO,show_transparent,1,border,field_code ,align_left,running()},value);}
 int  ui_table   (rect r,int w0,int w1,int w2,char*fmt,grid_val*value){return widget_grid(NULL,(grid){r,FONT_BODY,{w0,w1,w2,0,0},fmt,2,1,0,show_solid,1},value);}
 int  ui_list    (rect r,                              grid_val*value){return widget_grid(NULL,(grid){r,FONT_BODY,{0 },"" ,0,1,0,show_solid,1},value);}
+
+typedef struct {int type,bval;char label[1024];field_val value;} attr_item; attr_item* attrs=NULL;int attrs_count=0,attrs_size=0,attrs_scroll=0;
+int attr_heights[]={0,16,20,20,80,80}; // nil,bool,number,string,code,rtext
+void attr_push(attr_item x){grower(attrs,attr_item);attrs[attrs_count++]=x;}
+void widget_attributes(rect b){
+	draw_box(b,0,1);
+	int h=5,lw=0;for(int z=0;z<attrs_count;z++){h+=attr_heights[attrs[z].type]+5;if(attrs[z].type!=attr_bool)lw=MAX(lw,font_textsize(FONT_MENU,attrs[z].label).x);}
+	rect bi=scrollbar(b,MAX(0,h-b.h),10,b.h,&attrs_scroll,1,0);bi.y+=1;rect oc=frame.clip;frame.clip=bi;lw=MIN(lw+10,bi.w*.6);
+	pair bp=ev.pos,bd=ev.dpos;int bs=ev.scroll;ev.scroll=0;if(!over(bi))ev.pos=(pair){-1,-1};if(!dover(bi))ev.dpos=(pair){-1,-1};
+	int y=5;for(int z=0;z<attrs_count;z++){
+		rect lb={bi.x+5,bi.y+y-attrs_scroll,lw,attr_heights[attrs[z].type]}, wb={lb.x+lb.w+5,lb.y,(bi.w-15)-lb.w,lb.h};y+=lb.h+5;
+		if(attrs[z].type==attr_bool){lb.w=bi.w-10;if(ui_checkbox(lb,attrs[z].label,1,attrs[z].bval))attrs[z].bval^=1;continue;}
+		else{draw_text_fit(lb,attrs[z].label,FONT_MENU,1);}
+		if(attrs[z].type==attr_number)ui_field(wb,&attrs[z].value);
+		if(attrs[z].type==attr_string)ui_field(wb,&attrs[z].value);
+		if(attrs[z].type==attr_code  )ui_codeedit(wb,1,&attrs[z].value);
+		if(attrs[z].type==attr_rich  )ui_textedit(wb,1,&attrs[z].value);
+	}frame.clip=oc,ev.pos=bp,ev.dpos=bd,ev.scroll=bs;
+}
 
 lv* draw_lil(pair size,int align,int bare,lv*x){
 	int GAP=50, w=size.x-GAP, xo=align==align_right?GAP: align==align_left?0: GAP/2;
@@ -844,6 +896,11 @@ lv* sounds_enumerate(){
 		ll_add(s,l_format(lmistr("%.2fs" ),ifield(sn,"duration")));
 	}return torect(r);
 }
+lv* contraptions_enumerate(){
+	lv*r=lmt(),*i=lml(0),*n=lml(0),*condefs=ifield(deck,"contraptions");dset(r,lmistr("icon"),i),dset(r,lmistr("name"),n);
+	EACH(z,condefs){ll_add(i,lmn(icon_app)),ll_add(n,condefs->kv[z]);}
+	return torect(r);
+}
 lv* readwav(char*name){
 	Uint8* raw; Uint32 length; SDL_AudioSpec spec; SDL_AudioCVT cvt;
 	if(SDL_LoadWAV(name,&spec,&raw,&length)==NULL)return sound_make(lms(0));
@@ -865,6 +922,7 @@ lv* res_enumerate(lv*source){
 	EACH(z,fonts )ll_add(i,lmn(icon_font )),ll_add(n,fonts ->kv[z]),ll_add(v,fonts ->lv[z]);
 	lv*sounds=ifield(source,"sounds");EACH(z,sounds)ll_add(i,lmn(icon_sound)),ll_add(n,sounds->kv[z]),ll_add(v,sounds->lv[z]);
 	lv*modules=ifield(source,"modules");EACH(z,modules)ll_add(i,lmn(icon_lil)),ll_add(n,modules->kv[z]),ll_add(v,modules->lv[z]);
+	lv*condefs=ifield(source,"contraptions");EACH(z,condefs)ll_add(i,lmn(icon_app)),ll_add(n,condefs->kv[z]),ll_add(v,condefs->lv[z]);
 	return torect(r);
 }
 void draw_thumbnail(lv*card,rect r){
@@ -879,10 +937,11 @@ lv* draw_widget(lv*w){
 	if(canvas_is(w))return n_canvas_copy(w,lml(0));
 	pair rsize=getpair(ifield(w,"size"));lv*buff=lmbuff(rsize),*r=image_make(buff);
 	cstate t=frame;frame=draw_buffer(buff);event_state eb=ev;ev=(event_state){0};menus_clear(); // !!!
-	if     (button_is(w)){                button p=unpack_button(w)  ;p.size.x=0,p.size.y=0;widget_button(w,p,lb(ifield(w,"value")));}
-	else if(slider_is(w)){                slider p=unpack_slider(w)  ;p.size.x=0,p.size.y=0;widget_slider(w,p);}
-	else if(grid_is  (w)){grid_val  v={0};grid   p=unpack_grid (w,&v);p.size.x=0,p.size.y=0;widget_grid (w,p,&v);}
-	else if(field_is (w)){field_val v={0};field  p=unpack_field(w,&v);p.size.x=0,p.size.y=0;widget_field(w,p,&v);}
+	if     (button_is     (w)){                button p=unpack_button(w)  ;p.size.x=0,p.size.y=0;widget_button(w,p,lb(ifield(w,"value")));}
+	else if(slider_is     (w)){                slider p=unpack_slider(w)  ;p.size.x=0,p.size.y=0;widget_slider(w,p);}
+	else if(grid_is       (w)){grid_val  v={0};grid   p=unpack_grid (w,&v);p.size.x=0,p.size.y=0;widget_grid (w,p,&v);}
+	else if(field_is      (w)){field_val v={0};field  p=unpack_field(w,&v);p.size.x=0,p.size.y=0;widget_field(w,p,&v);}
+	else if(contraption_is(w)){pair o=getpair(ifield(w,"pos"));iwrite(w,lmistr("pos"),lmpair((pair){0,0}));widget_contraption(w);iwrite(w,lmistr("pos"),lmpair(o));}
 	return ev=eb,frame=t,r;
 }
 lv* draw_card(lv*card,int active){
@@ -893,11 +952,12 @@ lv* draw_card(lv*card,int active){
 	if(bsize.x!=0&&bsize.y!=0)buffer_paste(rect_pair((pair){0,0},bsize),frame.clip,back->b,frame.buffer,1);
 	lv*wids=ifield(card,"widgets");if(uimode!=mode_draw||dr.show_widgets)EACH(z,wids){
 		lv*w=wids->lv[z];
-		if     (button_is(w)){widget_button(w,unpack_button(w),lb(ifield(w,"value")));}
-		else if(slider_is(w)){widget_slider(w,unpack_slider(w));}
-		else if(canvas_is(w)){widget_canvas(w,unpack_canvas(w),canvas_image(w,0));}
-		else if(grid_is  (w)){grid_val  v={0};grid  p=unpack_grid (w,&v);widget_grid (w,p,&v);}
-		else if(field_is (w)){field_val v={0};field p=unpack_field(w,&v);widget_field(w,p,&v);}
+		if     (button_is     (w)){widget_button(w,unpack_button(w),lb(ifield(w,"value")));}
+		else if(slider_is     (w)){widget_slider(w,unpack_slider(w));}
+		else if(canvas_is     (w)){widget_canvas(w,unpack_canvas(w),canvas_image(w,0));}
+		else if(grid_is       (w)){grid_val  v={0};grid  p=unpack_grid (w,&v);widget_grid (w,p,&v);}
+		else if(field_is      (w)){field_val v={0};field p=unpack_field(w,&v);widget_field(w,p,&v);}
+		else if(contraption_is(w)){widget_contraption(w);}
 	}return ev=eb,frame=t,ms.in_modal=im,r;
 }
 rect modal_rtext(pair extra){
@@ -949,6 +1009,7 @@ void modal_enter(int type){
 	}
 	if(type==modal_cards){ms.grid=(grid_val){NULL,0,-1};}
 	if(type==modal_sounds){ms.grid=(grid_val){sounds_enumerate(),0,-1};}
+	if(type==modal_contraptions||type==modal_pick_contraption){ms.grid=(grid_val){contraptions_enumerate(),0,-1};}
 	if(type==modal_fonts){
 		lv*r=lmt(),*i=lml(0),*n=lml(0),*fonts=ifield(deck,"fonts");dset(r,lmistr("icon"),i),dset(r,lmistr("name"),n);
 		int fi=-1;EACH(z,fonts){
@@ -1003,6 +1064,20 @@ void modal_enter(int type){
 		lv*w=ob.sel->lv[0];
 		ms.name=(field_val){rtext_cast(ifield(w,"name")),0};
 		ms.text=(field_val){rtext_cast(ifield(w,"scale")),0};
+	}
+	if(type==modal_contraption_props){
+		lv*w=ob.sel->lv[0];
+		ms.name=(field_val){rtext_cast(ifield(w,"name")),0};
+		attrs_count=attrs_scroll=0;lv*a=ifield(ifield(w,"def"),"attributes");
+		for(int z=0;z<a->n;z++){
+			attr_item i={0};lv*v=iwrite(w,a->lv[0]->lv[z],NULL);
+			i.type=ordinal_enum(a->lv[2]->lv[z],attribute_types);
+			snprintf(i.label,sizeof(i.label),"%s",a->lv[1]->lv[z]->sv);
+			if     (i.type==attr_bool){i.bval=lb(v);}
+			else if(i.type==attr_rich){i.value=(field_val){v,0};}
+			else {i.value=(field_val){rtext_cast(ls(v)),0};}
+			attr_push(i);
+		}
 	}
 	if(type==modal_action){
 		sc.target=ob.sel->lv[0],sc.others=lml(0);
@@ -1066,7 +1141,7 @@ void modal_save_replace(int type,char*name,lv*path){
 	char m[2*PATH_MAX];snprintf(m,sizeof(m),"The %s \"%s\" already exists. Replace it?",name,path->sv);
 	ms.message=lmcstr(m);ms.verb=lmistr("Replace");
 }
-void ob_edit_prop(char*key,lv*value);void validate_modules(); // forward refs
+void ob_edit_prop(char*key,lv*value);void ob_create(lv*props);void validate_modules(); // forward refs
 void modal_exit(int value){
 	wid=ms.old_wid;
 	if(wid.gv==&ms.old_wid.gv_slot)wid.gv=&wid.gv_slot;
@@ -1111,6 +1186,17 @@ void modal_exit(int value){
 		lv*g=ob.sel->lv[0];
 		lv*t=table_decode(rtext_all(ms.form0.table),rtext_all(ms.text.table));
 		if(!matchr(t,ifield(g,"value")))ob_edit_prop("value",t);
+	}
+	if(ms.type==modal_contraption_props){
+		lv*w=ob.sel->lv[0],*a=ifield(ifield(w,"def"),"attributes");;
+		for(int z=0;z<a->n;z++){
+			int t=attrs[z].type;lv*v=attrs[z].bval?ONE:NONE;
+			if(t==attr_number)v=lmn(ln(rtext_all(attrs[z].value.table)));
+			if(t==attr_string)v=rtext_all(attrs[z].value.table);
+			if(t==attr_code  )v=rtext_all(attrs[z].value.table);
+			if(t==attr_rich  )v=attrs[z].value.table;
+			iwrite(w,a->lv[0]->lv[z],v);
+		}attrs_count=0;
 	}
 	if(ms.type==modal_action&&value){
 		str r=str_new();str_addz(&r,"on click do\n");
@@ -1297,6 +1383,21 @@ void modals(){
 		c.x+=65;
 		if(ui_button((rect){c.x,c.y,60,20},"Delete",s!=NULL)){n_deck_remove(deck,l_list(s));mark_dirty();ms.grid=(grid_val){sounds_enumerate(),0,-1};}
 	}
+	else if(ms.type==modal_contraptions){
+		rect b=draw_modalbox((pair){250,170});
+		draw_textc((rect){b.x,b.y-5,b.w,20},"Contraptions",FONT_MENU,1);
+		rect gsize={b.x,b.y+15,b.w,b.h-20-50-25};
+		int choose=ui_table(gsize,1,16,0,"Is",&ms.grid);
+		rect psize={b.x,gsize.y+gsize.h+5,b.w,50};draw_box(psize,0,1);psize=inset(psize,2);
+		if(ms.grid.row>=0){
+			char*desc=ifield(ifield(deck,"contraptions")->lv[ms.grid.row],"description")->sv;
+			layout_plaintext(desc,FONT_BODY,align_left,(pair){psize.w,psize.h});draw_text_wrap(psize,1);
+		}
+		pair c={b.x+b.w-60,b.y+b.h-20};
+		if(ui_button((rect){c.x,c.y,60,20},"OK",1)||ev.exit){modal_exit(0);};c.x=b.x;
+		if(ui_button((rect){c.x,c.y,60,20},"New....",1)){modal_exit(1);}c.x+=65; // TODO!
+		if(ui_button((rect){c.x,c.y,60,20},"Edit...",ms.grid.row>=0)||choose){modal_exit(2);}; // TODO!
+	}
 	else if(ms.type==modal_recording){
 		rect b=draw_modalbox((pair){frame.size.x-50,130}); int samples=MAX(1,ln(ifield(au.target,"size")));
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Audio Editor",FONT_MENU,1);
@@ -1373,11 +1474,11 @@ void modals(){
 		}cb.y+=25;
 		if(ui_button(cb,"Remove",ms.grid2.row>-1)){
 			if(patterns_is(sel)){dset(deck->b,lmistr("patterns"),patterns_read(lmd()));}
-			else{n_deck_remove(deck,l_list(rvalue(grid2,"value")));}ms.grid2=(grid_val){res_enumerate(deck),0,-1},mark_dirty();
+			else{n_deck_remove(deck,l_list(rvalue(grid2,"value")));}ms.grid2=(grid_val){res_enumerate(deck),0,-1},mark_dirty();sel=NULL;
 		}cb.y+=25;
 		rect pre={cb.x,cb.y,cb.w,b.h-(cb.y-b.y)};
 		if(sel&&font_is(sel)){layout_plaintext(pangram,sel,align_center,(pair){pre.w,pre.h}),draw_text_wrap(pre,1);}
-		if(sel&&module_is(sel)){layout_plaintext(ifield(sel,"description")->sv,FONT_BODY,align_center,(pair){pre.w,pre.h}),draw_text_wrap(pre,1);}
+		if(sel&&(module_is(sel)||condef_is(sel))){layout_plaintext(ifield(sel,"description")->sv,FONT_BODY,align_center,(pair){pre.w,pre.h}),draw_text_wrap(pre,1);}
 		if(sel&&sound_is(sel)){if(ui_button(cb,"Play",1))n_play(deck,l_list(sel));}
 		if(sel&&patterns_is(sel)){
 			rect c=frame.clip;frame.clip=pre;char*pal=patterns_pal(sel);for(int z=0;z<32;z++)for(int y=0;y<16;y++)for(int x=0;x<16;x++){
@@ -1692,6 +1793,19 @@ void modals(){
 		if(ui_button((rect){c.x,c.y,90,20},"Reset Widths",w->c))iwrite(grid,lmistr("widths"),lml(0)),mark_dirty();
 		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
+	else if(ms.type==modal_contraption_props){
+		rect b=draw_modalbox((pair){240,240});lv*contraption=ob.sel->lv[0];
+		char title[4096];snprintf(title,sizeof(title),"%s Properties",ifield(ifield(contraption,"def"),"name")->sv);
+		draw_textc((rect){b.x,b.y-5,b.w,20},title,FONT_MENU,1);
+		draw_text((rect){b.x,b.y+22,47,20},"Name",FONT_MENU,1);
+		ui_field ((rect){b.x+47  ,b.y+20  ,b.w-47,18},&ms.name);
+		iwrite(contraption,lmistr("name"),rtext_all(ms.name.table));
+		widget_attributes((rect){b.x,b.y+42,b.w,b.h-42-25});
+		pair c={b.x,b.y+b.h-20};
+		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))modal_exit(0),setscript(contraption);c.x+=65;
+		if(ui_button((rect){c.x,c.y,60,20},"Edit...",0))modal_exit(1); // TODO!
+		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
+	}
 	else if(ms.type==modal_action){
 		rect b=draw_modalbox((pair){220,180});
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Button Action",FONT_MENU,1);
@@ -1733,6 +1847,23 @@ void modals(){
 			n_go(deck,l_list(lmn(ms.act_card)));ms.type=modal_action;
 		}c.x+=65;
 		if(ui_button((rect){c.x,c.y,60,20},"Next",1)||ev.dir==dir_right){n_go(deck,l_list(lmistr("Next")));}
+	}
+	else if(ms.type==modal_pick_contraption){
+		rect b=draw_modalbox((pair){250,170});
+		draw_textc((rect){b.x,b.y-5,b.w,20},"New Contraption",FONT_MENU,1);
+		rect gsize={b.x,b.y+15,b.w,b.h-20-50-25};
+		int choose=ui_table(gsize,1,16,0,"Is",&ms.grid);
+		rect psize={b.x,gsize.y+gsize.h+5,b.w,50};draw_box(psize,0,1);psize=inset(psize,2);
+		if(ms.grid.row>=0){
+			char*desc=ifield(ifield(deck,"contraptions")->lv[ms.grid.row],"description")->sv;
+			layout_plaintext(desc,FONT_BODY,align_left,(pair){psize.w,psize.h});draw_text_wrap(psize,1);
+		}
+		pair c={b.x+b.w-60,b.y+b.h-20};
+		if(ui_button((rect){c.x,c.y,60,20},"Create",ms.grid.row>=0)||choose){
+			lv*p=lmd();dset(p,lmistr("type"),lmistr("contraption"));dset(p,lmistr("def"),ms.grid.table->lv[1]->lv[ms.grid.row]);
+			ob_create(l_list(p));modal_exit(1);
+		};c.x-=65;
+		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_exit(0);
 	}
 	else if(ms.type==modal_trans){
 		cstate f=frame;float tween=(ms.time_curr*1.0)/ms.time_end;n_canvas_clear(ms.canvas,lml(0));
@@ -2672,11 +2803,12 @@ void gestures(){
 }
 void object_properties(lv*x){
 	ob.sel->c=0;ll_add(ob.sel,x);
-	if(button_is(x))modal_enter(modal_button_props);
-	if(field_is (x))modal_enter(modal_field_props );
-	if(slider_is(x))modal_enter(modal_slider_props);
-	if(canvas_is(x))modal_enter(modal_canvas_props);
-	if(grid_is  (x))modal_enter(modal_grid_props  );
+	if(button_is     (x))modal_enter(modal_button_props     );
+	if(field_is      (x))modal_enter(modal_field_props      );
+	if(slider_is     (x))modal_enter(modal_slider_props     );
+	if(canvas_is     (x))modal_enter(modal_canvas_props     );
+	if(grid_is       (x))modal_enter(modal_grid_props       );
+	if(contraption_is(x))modal_enter(modal_contraption_props);
 }
 void text_edit_menu(){
 	int selection=wid.fv!=NULL&&wid.cursor.x!=wid.cursor.y;
@@ -2780,10 +2912,11 @@ void tick(lv*env){
 				if(menu_item("Export Image..."   ,1,'\0'))modal_enter(modal_export_image);
 			}
 			menu_separator();
-			if(menu_item("Cards..."     ,1,'C' ))modal_enter(modal_cards);
-			if(menu_item("Sounds..."    ,1,'S' ))modal_enter(modal_sounds);
-			if(menu_item("Resources..." ,1,'\0'))modal_enter(modal_resources);
-			if(menu_item("Properties...",1,'\0'))modal_enter(modal_deck_props);
+			if(menu_item("Cards..."       ,1,'C' ))modal_enter(modal_cards);
+			if(menu_item("Sounds..."      ,1,'S' ))modal_enter(modal_sounds);
+			if(menu_item("Contraptions...",1,'T' ))modal_enter(modal_contraptions);
+			if(menu_item("Resources..."   ,1,'\0'))modal_enter(modal_resources);
+			if(menu_item("Properties..."  ,1,'\0'))modal_enter(modal_deck_props);
 		}
 		if(ms.type==modal_none||wid.gv||wid.fv){
 			menu_bar("Edit",wid.gv||wid.fv||(ms.type==modal_none&&uimode==mode_interact)||uimode==mode_draw||uimode==mode_object);
@@ -2989,11 +3122,12 @@ void tick(lv*env){
 		}
 		if(uimode==mode_object){
 			menu_bar("Widgets",ms.type==modal_none);
-			if(menu_item("New Button...",1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("button"));ob_create(l_list(p));}
-			if(menu_item("New Field..." ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("field" ));ob_create(l_list(p));}
-			if(menu_item("New Slider...",1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("slider"));ob_create(l_list(p));}
-			if(menu_item("New Canvas...",1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas"));ob_create(l_list(p));}
-			if(menu_item("New Grid..."  ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("grid"  ));ob_create(l_list(p));}
+			if(menu_item("New Button..."     ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("button"));ob_create(l_list(p));}
+			if(menu_item("New Field..."      ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("field" ));ob_create(l_list(p));}
+			if(menu_item("New Slider..."     ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("slider"));ob_create(l_list(p));}
+			if(menu_item("New Canvas..."     ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas"));ob_create(l_list(p));}
+			if(menu_item("New Grid..."       ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("grid"  ));ob_create(l_list(p));}
+			if(menu_item("New Contraption...",1,'\0'))modal_enter(modal_pick_contraption);
 			menu_separator();
 			int al=1,as=1,at=1,ai=1,an=1;EACH(z,ob.sel){
 				widget w=unpack_widget(ob.sel->lv[z]);al&=w.locked;
@@ -3075,30 +3209,7 @@ void tick(lv*env){
 		}
 		lv*wids=ifield(card,"widgets");
 		event_state eb=ev;if(uimode!=mode_interact)ev=(event_state){0};
-		if(uimode==mode_interact||(dr.show_widgets&&!dr.fatbits))EACH(z,wids){
-			lv*w=wids->lv[z];
-			if(button_is(w)){
-				int v=lb(ifield(w,"value")); button p=unpack_button(w);
-				if(widget_button(w,p,v)&&p.style==button_check)iwrite(w,lmistr("value"),lmn(!v)),mark_dirty();
-			}
-			if(slider_is(w)){
-				slider s=unpack_slider(w);widget_slider(w,s);
-			}
-			if(canvas_is(w)){
-				lv* v=canvas_image(w,0);canvas p=unpack_canvas(w);widget_canvas(w,p,v);
-			}
-			if(grid_is(w)){
-				grid_val v={0};grid p=unpack_grid(w,&v);widget_grid(w,p,&v);
-				if(wid.gt==w)wid.gv_slot=v,wid.gv=&wid.gv_slot;
-			}
-			if(field_is(w)){
-				if(wid.ft==w){widget_field(w,wid.f,wid.fv);}
-				else{
-					field_val v={0};field p=unpack_field(w,&v);widget_field(w,p,&v);
-					if(wid.ft==w)wid.fv_slot=v,wid.fv=&wid.fv_slot;
-				}
-			}
-		}
+		if(uimode==mode_interact||(dr.show_widgets&&!dr.fatbits)){handle_widgets(wids,(pair){0,0});}
 		else if(dr.show_widgets&&dr.fatbits)EACH(z,wids){draw_boxinv(pal,card_to_fat(unpack_widget(wids->lv[z]).size));}
 		ev=eb;
 		if(uimode==mode_draw){if(bg_has_sel())draw_handles(livesel);draw_box(livesel,0,ANTS);}
@@ -3112,7 +3223,7 @@ void tick(lv*env){
 				lv*wid=wids->lv[z];widget w=unpack_widget(wid);
 				int sel=0;EACH(z,ob.sel)if(ob.sel->lv[z]==wid){sel=1;break;}
 				if(sel){draw_box(inset(w.size,-1),0,ANTS);}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1));}
-				if(sel&&ob.sel->c==1){draw_handles(w.size);}
+				if(sel&&ob.sel->c==1&&!contraption_is(ob.sel->lv[0])){draw_handles(w.size);}
 				if(w.locked&&ob.show_bounds){draw_rect((rect){w.size.x+w.size.w-10,w.size.y,10,10},1),draw_icon((pair){w.size.x+w.size.w-8,w.size.y+1},LOCK,32);}
 			}
 			if(in_layer()){
@@ -3262,6 +3373,7 @@ void tick(lv*env){
 	track(sc.f.table)
 	track(ob.sel)
 	EACH(z,PLAYING)PLAYING->lv[z]=audio_slots[z].clip?audio_slots[z].clip:NONE;
+	ATTRS->c=0;for(int z=0;z<attrs_count;z++)if(attrs[z].value.table)ll_add(ATTRS,attrs[z].value.table);
 	track(audio_loop.clip)
 	track(orig_loop)
 	lv_collect();
@@ -3356,6 +3468,7 @@ int main(int argc,char**argv){
 	dset(env,lmistr("arrows"   ),ARROWS);
 	dset(env,lmistr("ltools"   ),TOOLB     =lmbuff((pair){tcellw*2+1,tcellh*18+tgap+1}));
 	dset(env,lmistr("playing"  ),PLAYING   =l_take(lmn(SFX_SLOTS),NONE));
+	dset(env,lmistr("attribs"  ),ATTRS     =lml(0));
 	dset(env,lmistr("li hist"  ),li.hist   =lml(0));
 	dset(env,lmistr("li vars"  ),li.vars   =lmd());
 	ob.sel=lml(0);

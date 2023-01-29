@@ -12,7 +12,8 @@ b:{"type":"contraption","size":[150,50],"pos":[0,0],"def":"spinner","widgets":{"
 size:[150,50]
 description:"unbounded numeric picker"
 script:"spinner.0"
-attributes:{"name":["value","step"],"type":["number","number"]}
+template:"on change do\n \nend"
+attributes:{"name":["value","step"],"label":["Value","Step"],"type":["number","number"]}
 {widgets}
 down:{"type":"button","size":[60,20],"pos":[0,0],"script":"spinner.1","text":"<"}
 up:{"type":"button","size":[60,20],"pos":[0,0],"script":"spinner.2","text":">"}

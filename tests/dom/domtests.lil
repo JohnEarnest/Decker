@@ -1750,12 +1750,13 @@ assert["deck contraption content" ("condef","spinner") (typeof deck.contraptions
 
 def.description:"unbounded numeric picker"
 def.size:150,50
-def.attributes:insert name:"value","step" type:"number","number" into 0
+def.attributes:insert name:"value","step" label:"Value","Step" type:"number","number" into 0
 def.script:"
 on set_value x do value.text:0+x end
 on get_value   do 0+value.text   end
 on set_step  x do step.text:0+x  end
 on get_step    do 0+step.text    end"
+def.template:"on change do\n \nend"
 down:def.add["button" "down"]
 down.text:"<"
 down.script:"on click do
@@ -1806,6 +1807,10 @@ def.size:200,25
 def.update[]
 assert["condef update instance properties"             (200,25) deck.card.widgets.a.size ]
 assert["condef update instances preserve local state"        42 deck.card.widgets.b.value]
+deck.card.widgets.a.pos:35,37
+def.update[]
+assert["condef update instances preserve instance state" (35,37) deck.card.widgets.a.pos ]
+assert["condef update instances preserve name"               "a" deck.card.widgets.a.name]
 
 def.script:"won't parse"
 assert["read contraption instance attr with broken script" 0 deck.card.widgets.b.value]

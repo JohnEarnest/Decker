@@ -205,10 +205,11 @@ draw_dithered=(r,image,opaque,mask,threshold)=>{
 draw_widget=w=>{
 	if(canvas_is(w))return canvas_image(w,1)
 	const rsize=getpair(ifield(w,'size')),r=image_make(rsize),t=frame,te=copy_object(ev);frame=draw_frame(r),ev=event_state(),menus_clear() // !!!
-	if     (button_is(w)){const p=unpack_button(w);p.size.x=0,p.size.y=0;widget_button(w,p,lb(ifield(w,'value')))}
-	else if(slider_is(w)){const p=unpack_slider(w);p.size.x=0,p.size.y=0;widget_slider(w,p)}
-	else if(grid_is  (w)){const p=unpack_grid  (w);p.size.x=0,p.size.y=0;widget_grid  (w,p,unpack_grid_value(w))}
-	else if(field_is (w)){const p=unpack_field (w);p.size.x=0,p.size.y=0;widget_field (w,p,unpack_field_value(w))}
+	if     (button_is     (w)){const p=unpack_button(w);p.size.x=0,p.size.y=0;widget_button(w,p,lb(ifield(w,'value')))}
+	else if(slider_is     (w)){const p=unpack_slider(w);p.size.x=0,p.size.y=0;widget_slider(w,p)}
+	else if(grid_is       (w)){const p=unpack_grid  (w);p.size.x=0,p.size.y=0;widget_grid  (w,p,unpack_grid_value(w))}
+	else if(field_is      (w)){const p=unpack_field (w);p.size.x=0,p.size.y=0;widget_field (w,p,unpack_field_value(w))}
+	else if(contraption_is(w)){const o=w.pos;w.pos=rect(0,0);widget_contraption(w);w.pos=o}
 	return ev=te,frame=t,r
 }
 draw_card=(card,active)=>{
@@ -217,11 +218,12 @@ draw_card=(card,active)=>{
 	const back=ifield(card,'image'), bsize=back.size, wids=ifield(card,'widgets')
 	if(bsize.x!=0&&bsize.y!=0)image_paste(rpair(rect(),bsize),frame.clip,back,frame.image,1)
 	if(uimode!='draw'||dr.show_widgets)wids.v.map(w=>{
-		if(button_is(w))widget_button(w,unpack_button(w),lb(ifield(w,'value')))
-		if(slider_is(w))widget_slider(w,unpack_slider(w))
-		if(canvas_is(w))widget_canvas(w,unpack_canvas(w),canvas_image(w,0))
-		if(grid_is  (w))widget_grid  (w,unpack_grid  (w),unpack_grid_value(w))
-		if(field_is (w))widget_field (w,unpack_field (w),unpack_field_value(w))
+		if(button_is     (w))widget_button(w,unpack_button(w),lb(ifield(w,'value')))
+		if(slider_is     (w))widget_slider(w,unpack_slider(w))
+		if(canvas_is     (w))widget_canvas(w,unpack_canvas(w),canvas_image(w,0))
+		if(grid_is       (w))widget_grid  (w,unpack_grid  (w),unpack_grid_value(w))
+		if(field_is      (w))widget_field (w,unpack_field (w),unpack_field_value(w))
+		if(contraption_is(w))widget_contraption(w)
 	});return ev=te,frame=t,ms.in_modal=im,r
 }
 draw_thumbnail=(card,r)=>{
@@ -941,6 +943,51 @@ field_keys=(code,shift)=>{
 	wid.cursor_timer=0; if(!shift)wid.cursor.x=wid.cursor.y; field_showcursor()
 }
 
+widget_contraption=x=>{
+	const show=ls(ifield(x,'show'));if(show=='none')return
+	const b=rpair(getpair(ifield(x,'pos')),getpair(ifield(x,'size'))), image=ifield(x,'image'), s=image.size
+	const bc=rclip(frame.clip,b), oc=frame.clip;frame.clip=bc
+	if(show=='solid'){if(s.x<b.w||s.y<b.h)draw_rect(b,32);image_paste(b,frame.clip,image,frame.image,1)}
+	if(show=='transparent'){image_paste(b,frame.clip,image,frame.image,0)}
+	if(show=='invert'){draw_invert_scaled(deck.patterns.pal.pix,rect(b.x,b.y,s.x,s.y),image)}
+	handle_widgets(x.widgets,rect(b.x,b.y))
+	frame.clip=oc
+}
+
+let attrs=[], attrs_scroll=0
+widget_attributes=b=>{
+	const attr_heights={bool:16,number:20,string:20,code:80,rich:80}
+	draw_box(b,0,1)
+	let h=5,lw=0;attrs.map(a=>{h+=attr_heights[a.type]+5;if(a.type!='bool')lw=max(lw,font_textsize(FONT_MENU,a.label).x)})
+	const sbar=scrollbar(b,max(0,h-b.h),10,b.h,attrs_scroll,1,0), bi=sbar.size;attrs_scroll=sbar.scroll,bi.y+=1
+	const oc=frame.clip;frame.clip=bi,lw=0|min(lw+10,bi.w*.6)
+	const bp=ev.pos,bd=ev.dpos,bs=ev.scroll;ev.scroll=0;if(!over(bi))ev.pos=rect(-1,-1);if(!dover(bi))ev.dpos=rect(-1,-1)
+	let y=5;attrs.map(a=>{
+		const lb=rect(bi.x+5,bi.y+y-attrs_scroll,lw,attr_heights[a.type]), wb=rect(lb.x+lb.w+5,lb.y,(bi.w-15)-lb.w,lb.h);y+=lb.h+5
+		if(a.type=='bool'){lb.w=bi.w-10;if(ui_checkbox(lb,a.label,1,a.bval))a.bval^=1;return}else{draw_text_fit(lb,a.label,FONT_MENU,1)}
+		if(a.type=='number')ui_field(wb,a.value)
+		if(a.type=='string')ui_field(wb,a.value)
+		if(a.type=='code'  )ui_codeedit(wb,1,a.value)
+		if(a.type=='rich'  )ui_textedit(wb,1,a.value)
+	});frame.clip=oc,ev.pos=bp,ev.dpos=bd,ev.scroll=bs
+}
+handle_widgets=(x,offset)=>{
+	x.v.map(w=>{
+		if(button_is(w)){
+			const v=lb(ifield(w,'value')), p=unpack_button(w);p.size=radd(p.size,offset)
+			if(widget_button(w,p,v)&&p.style=='check')iwrite(w,lms('value'),lmn(!v)),mark_dirty()
+		}
+		if(slider_is(w)){const p=unpack_slider(w);p.size=radd(p.size,offset);widget_slider(w,p)}
+		if(canvas_is(w)){const p=unpack_canvas(w);p.size=radd(p.size,offset);widget_canvas(w,p,canvas_image(w,0))}
+		if(grid_is  (w)){const p=unpack_grid(w),v=unpack_grid_value(w);p.size=radd(p.size,offset);widget_grid(w,p,v);if(wid.gt==w)wid.gv=v}
+		if(field_is(w)){
+			if(wid.ft==w){widget_field(w,wid.f,wid.fv)}
+			else{const p=unpack_field(w),v=unpack_field_value(w);p.size=radd(p.size,offset);widget_field(w,p,v);if(wid.ft==w)wid.fv=v}
+		}
+		if(contraption_is(w))widget_contraption(w)
+	})
+}
+
 ui_button  =(r,label,    enable,func )=>widget_button(null,{text:label,size:r,font:FONT_MENU,style:'round',show:             'solid',locked:!enable},0,func)
 ui_toggle  =(r,label,inv,enable,func )=>widget_button(null,{text:label,size:r,font:FONT_MENU,style:'round',show:inv?'invert':'solid',locked:!enable},0,func)
 ui_radio   =(r,label,    enable,value)=>widget_button(null,{text:label,size:r,font:FONT_BODY,style:'radio',show:             'solid',locked:!enable},value)
@@ -1112,6 +1159,7 @@ sounds_enumerate=_=>{
 		r.secs .push(dyad.format(lms('%.2fs' ),ifield(sn,'duration')))
 	});return lmt(r)
 }
+contraptions_enumerate=_=>{const r={icon:[],name:[]};deck.contraptions.k.map(k=>{r.icon.push(lmn(ICON.app)),r.name.push(k)});return lmt(r)}
 res_enumerate=(source)=>{
 	const r={icon:[],name:[],value:[]}
 	const pat=source.patterns,pp=patterns_write(pat),pa=anims_write(pat),da=dyad.parse(lms('%j'),lms(DEFAULT_ANIMS))
@@ -1122,6 +1170,8 @@ res_enumerate=(source)=>{
 	sounds.v.map((sound,i)=>{r.icon.push(lmn(ICON.sound)),r.name.push(sounds.k[i]),r.value.push(sound)})
 	const modules=source.modules
 	modules.v.map((mod,i)=>{r.icon.push(lmn(ICON.lil)),r.name.push(modules.k[i]),r.value.push(mod)})
+	const condefs=source.contraptions
+	condefs.v.map((def,i)=>{r.icon.push(lmn(ICON.app)),r.name.push(condefs.k[i]),r.value.push(def)})
 	return lmt(r)
 }
 
@@ -1147,6 +1197,7 @@ modal_enter=type=>{
 	}
 	if(type=='cards')ms.grid=gridtab(null)
 	if(type=='sounds')ms.grid=gridtab(sounds_enumerate())
+	if(type=='contraptions'||type=='pick_contraption')ms.grid=gridtab(contraptions_enumerate())
 	if(type=='fonts'){
 		const r=lmt({icon:[],name:[]});let fi=-1
 		deck.fonts.v.map((font,z)=>{
@@ -1173,6 +1224,16 @@ modal_enter=type=>{
 		ms.form0=fieldstr(ll(ifield(ob.sel[0],'interval'))[0])
 		ms.form1=fieldstr(ll(ifield(ob.sel[0],'interval'))[1])
 		ms.form2=fieldstr(   ifield(ob.sel[0],'step'    )    )
+	}
+	if(type=='contraption_props'){
+		const w=ob.sel[0],a=ifield(w.def,'attributes');ms.name=fieldstr(ifield(w,'name'))
+		attrs=[],attrs_scroll=0;a.v.name.map((n,i)=>{
+			const v=iwrite(w,n), item={type:ls(a.v.type[i]), label:ls(a.v.label[i]), bval:0, value:fieldstr('')}
+			if     (item.type=='bool'){item.bval=lb(v)}
+			else if(item.type=='rich'){item.value.table=v}
+			else {item.value.table=rtext_cast(v)}
+			attrs.push(item)
+		})
 	}
 	if(type=='action'){
 		sc.target=ob.sel[0],sc.others=[]
@@ -1205,6 +1266,16 @@ modal_exit=value=>{
 	if(ms.type=='grid_props'){
 		const t=table_decode(rtext_string(ms.form0.table),rtext_string(ms.text.table))
 		if(!match(t,ifield(ob.sel[0],'value')))ob_edit_prop('value',t)
+	}
+	if(ms.type=='contraption_props'){
+		const w=ob.sel[0],a=ifield(w.def,'attributes');a.v.name.map((n,i)=>{
+			const t=ls(a.v.type[i]);let v=lmn(attrs[i].bval)
+			if(t=='number')v=lmn(ln(rtext_string(attrs[i].value.table)))
+			if(t=='string')v=rtext_string(attrs[i].value.table)
+			if(t=='code'  )v=rtext_string(attrs[i].value.table)
+			if(t=='rich'  )v=attrs[i].value.table
+			iwrite(w,n,v)
+		})
 	}
 	if(ms.type=='action'&&value){
 		let r='on click do\n'
@@ -1372,6 +1443,41 @@ modals=_=>{
 		};c.x-=65
 		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_exit(0)
 	}
+	else if(ms.type=='contraptions'||ms.type=='pick_contraption'){
+		const b=draw_modalbox(rect(250,170))
+		draw_textc(rect(b.x,b.y-5,b.w,20),ms.type=='contraptions'?'Contraptions':'New Contraption',FONT_MENU,1)
+		const gsize=rect(b.x,b.y+15,b.w,b.h-20-50-25)
+		const choose=ui_table(gsize,[16],'Is',ms.grid)
+		let psize=rect(b.x,gsize.y+gsize.h+5,b.w,50);draw_box(psize,0,1),psize=inset(psize,2)
+		if(ms.grid.row>=0){
+			const desc=deck.contraptions.v[ms.grid.row].description
+			const l=layout_plaintext(desc,FONT_BODY,ALIGN.left,rect(psize.w,psize.h));draw_text_wrap(psize,l,1)
+		}
+		const c=rect(b.x+b.w-60,b.y+b.h-20)
+		if(ms.type=='contraptions'){
+			if(ui_button(rect(c.x,c.y,60,20),'OK',1)||ev.exit){modal_exit(0)};c.x=b.x
+			if(ui_button(rect(c.x,c.y,60,20),'New....',1)){modal_exit(1)}c.x+=65
+			if(ui_button(rect(c.x,c.y,60,20),'Edit...',ms.grid.row>=0)||choose){modal_exit(2)}
+		}
+		if(ms.type=='pick_contraption'){
+			if(ui_button(rect(c.x,c.y,60,20),'Create',ms.grid.row>=0)||choose){
+				ob_create([lmd(['type','def'].map(lms),[lms('contraption'),ms.grid.table.v.name[ms.grid.row]])]),modal_exit(1)
+			};c.x-=65
+			if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_exit(0)
+		}
+	}
+	else if(ms.type=='contraption_props'){
+		const b=draw_modalbox(rect(240,240)),contraption=ob.sel[0]
+		draw_textc(rect(b.x,b.y-5,b.w,20),`${contraption.def.name} Properties`,FONT_MENU,1)
+		draw_text(rect(b.x,b.y+22,47,20),'Name',FONT_MENU,1)
+		ui_field (rect(b.x+47  ,b.y+20  ,b.w-47,18),ms.name)
+		iwrite(contraption,lms('name'),rtext_string(ms.name.table))
+		widget_attributes(rect(b.x,b.y+42,b.w,b.h-42-25))
+		const c=rect(b.x,b.y+b.h-20)
+		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))modal_exit(0),setscript(contraption);c.x+=65
+		if(ui_button(rect(c.x,c.y,60,20),'Edit...',0))modal_exit(1)
+		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
+	}
 	else if(ms.type=='resources'){
 		const b=draw_modalbox(rect(280,190))
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Font/Deck Accessory Mover',FONT_MENU,1)
@@ -1386,7 +1492,7 @@ modals=_=>{
 		draw_textc(rect(rgrid.x,rgrid.y+rgrid.h+3,rgrid.w,15),ls(ifield(deck,'name')),FONT_BODY,1)
 		const cb=rect(lgrid.x+lgrid.w+5,lgrid.y+5,b.w-(lgrid.w+5+5+rgrid.w),20)
 		const rvalue=(g,k)=>g.table.v[k][g.row]
-		const sel=(ms.grid.table&&ms.grid.row>-1)?rvalue(ms.grid,'value'): ms.grid2.row>-1?rvalue(ms.grid2,'value'): null
+		let sel=(ms.grid.table&&ms.grid.row>-1)?rvalue(ms.grid,'value'): ms.grid2.row>-1?rvalue(ms.grid2,'value'): null
 		if(ui_button(cb,'>> Copy >>',ms.grid.row>-1)){
 			if(patterns_is(sel)){const dst=ifield(deck,'patterns');for(let z=2;z<=31;z++)iindex(dst,z,iindex(sel,z))}
 			else{deck_add(deck,sel,rvalue(ms.grid,'name'))}
@@ -1395,11 +1501,11 @@ modals=_=>{
 		if(ui_button(cb,'Remove',ms.grid2.row>-1)){
 			if(patterns_is(sel)){deck.patterns=patterns_read(lmd())}
 			else{deck_remove(deck,rvalue(ms.grid2,'value'))}
-			ms.grid2=gridtab(res_enumerate(deck)),mark_dirty()
+			ms.grid2=gridtab(res_enumerate(deck)),mark_dirty(),sel=null
 		}cb.y+=25
 		const pre=rect(cb.x,cb.y,cb.w,b.h-(cb.y-b.y))
 		if(sel&&font_is(sel)){const l=layout_plaintext(PANGRAM,sel,ALIGN.center,rect(pre.w,pre.h));draw_text_wrap(pre,l,1)}
-		if(sel&&module_is(sel)){const l=layout_plaintext(ls(ifield(sel,'description')),FONT_BODY,ALIGN.center,rect(pre.w,pre.h));draw_text_wrap(pre,l,1)}
+		if(sel&&(module_is(sel)||condef_is(sel))){const l=layout_plaintext(ls(ifield(sel,'description')),FONT_BODY,ALIGN.center,rect(pre.w,pre.h));draw_text_wrap(pre,l,1)}
 		if(sel&&sound_is(sel)){if(ui_button(cb,'Play',1))n_play([sel])}
 		if(sel&&patterns_is(sel)){
 			const c=frame.clip,pal=sel.pal.pix;frame.clip=pre;
@@ -2219,11 +2325,12 @@ ob_resize=(size,coalesce)=>{
 }
 object_properties=x=>{
 	ob.sel=[x]
-	if(button_is(x))modal_enter('button_props')
-	if(field_is (x))modal_enter('field_props' )
-	if(slider_is(x))modal_enter('slider_props')
-	if(canvas_is(x))modal_enter('canvas_props')
-	if(grid_is  (x))modal_enter('grid_props'  )
+	if(button_is     (x))modal_enter('button_props')
+	if(field_is      (x))modal_enter('field_props' )
+	if(slider_is     (x))modal_enter('slider_props')
+	if(canvas_is     (x))modal_enter('canvas_props')
+	if(grid_is       (x))modal_enter('grid_props'  )
+	if(contraption_is(x))modal_enter('contraption_props')
 }
 object_editor=_=>{
 	const card=ifield(deck,'card'), wids=ifield(card,'widgets'), pal=deck.patterns.pal.pix
@@ -2234,7 +2341,7 @@ object_editor=_=>{
 	wids.v.map(wid=>{
 		const w=unpack_widget(wid), sel=ob.sel.some(x=>x==wid)
 		if(sel){draw_box(inset(w.size,-1),0,ANTS)}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1))}
-		if(sel&&ob.sel.length==1){draw_handles(w.size)}
+		if(sel&&ob.sel.length==1&&!contraption_is(ob.sel[0])){draw_handles(w.size)}
 		if(w.locked&&ob.show_bounds){draw_rect(rect(w.size.x+w.size.w-10,w.size.y,10,10),1),draw_icon(rect(w.size.x+w.size.w-8,w.size.y+1),LOCK,32)}
 	})
 	if(!in_layer())return
@@ -2373,6 +2480,7 @@ setscript=x=>{
 	               field_is (sc.target)?(p=1,lms('on change val do\n \nend')):
 	               slider_is(sc.target)?(p=1,lms('on change val do\n \nend')):
 	               canvas_is(sc.target)?(p=1,lms('on click pos do\n \nend\n\non drag pos do\n \nend\n\non release pos do\n \nend')):v
+	if(!count(v)&&contraption_is(sc.target)){const t=sc.target.def.template;if(t&&t.length)p=1,v=lms(t)}
 	sc.status=p?'No existing script; populated a template.':'',sc.f=fieldstr(v)
 }
 finish_script=_=>{if(sc.next){setscript(sc.next),sc.next=null}else{setmode(sc.prev_mode)}}
@@ -2526,10 +2634,11 @@ all_menus=_=>{
 			if(menu_item("Export Image...",1))modal_enter('export_image')
 		}
 		menu_separator()
-		if(menu_item('Cards...'     ,1,'C'))modal_enter('cards')
-		if(menu_item('Sounds...'    ,1,'S'))modal_enter('sounds')
-		if(menu_item('Resources...' ,1,   ))modal_enter('resources')
-		if(menu_item('Properties...',1,   ))modal_enter('deck_props')
+		if(menu_item('Cards...'       ,1,'C'))modal_enter('cards')
+		if(menu_item('Sounds...'      ,1,'S'))modal_enter('sounds')
+		if(menu_item('Contraptions...',1,'T'))modal_enter('contraptions')
+		if(menu_item('Resources...'   ,1,   ))modal_enter('resources')
+		if(menu_item('Properties...'  ,1,   ))modal_enter('deck_props')
 	}
 	if(ms.type==null||wid.gv||wid.fv){
 		menu_bar("Edit",wid.gv||wid.fv||(ms.type==null&&uimode=='interact')||uimode=='draw'||uimode=='object')
@@ -2706,11 +2815,12 @@ all_menus=_=>{
 	}
 	if(uimode=='object'){
 		menu_bar('Widgets',ms.type==null)
-		if(menu_item('New Button...',1))ob_create([lmd([lms('type')],[lms('button')])])
-		if(menu_item('New Field...' ,1))ob_create([lmd([lms('type')],[lms('field' )])])
-		if(menu_item('New Slider...',1))ob_create([lmd([lms('type')],[lms('slider')])])
-		if(menu_item('New Canvas...',1))ob_create([lmd([lms('type')],[lms('canvas')])])
-		if(menu_item('New Grid...'  ,1))ob_create([lmd([lms('type')],[lms('grid'  )])])
+		if(menu_item('New Button...'     ,1))ob_create([lmd([lms('type')],[lms('button')])])
+		if(menu_item('New Field...'      ,1))ob_create([lmd([lms('type')],[lms('field' )])])
+		if(menu_item('New Slider...'     ,1))ob_create([lmd([lms('type')],[lms('slider')])])
+		if(menu_item('New Canvas...'     ,1))ob_create([lmd([lms('type')],[lms('canvas')])])
+		if(menu_item('New Grid...'       ,1))ob_create([lmd([lms('type')],[lms('grid'  )])])
+		if(menu_item('New Contraption...',1))modal_enter('pick_contraption')
 		menu_separator()
 		let al=1,as=1,at=1,ai=1,an=1
 		ob.sel.map(unpack_widget).map(w=>{al&=w.locked, as&=w.show=='solid', at&=w.show=='transparent', ai&=w.show=='invert', an&=w.show=='none'})
@@ -2754,22 +2864,7 @@ main_view=_=>{
 		for(let y=0;y<frame.size.y;y++){const r=card_to_fat(rect(0,y*dr.grid_size.y,frame.size.x,1));draw_hline(r.x,r.x+r.w,r.y,44)}
 	}
 	const eb=ev;if(uimode!='interact')ev=event_state()
-	if(uimode=='interact'||(dr.show_widgets&&!dr.fatbits))wids.v.map(w=>{
-		if(button_is(w)){
-			const v=lb(ifield(w,'value')), p=unpack_button(w)
-			if(widget_button(w,p,v)&&p.style=='check')iwrite(w,lms('value'),lmn(!v)),mark_dirty()
-		}
-		if(slider_is(w)){widget_slider(w,unpack_slider(w))}
-		if(canvas_is(w)){const v=canvas_image(w,0);widget_canvas(w,unpack_canvas(w),v)}
-		if(grid_is(w)){
-			const p=unpack_grid(w),v=unpack_grid_value(w);widget_grid(w,p,v)
-			if(wid.gt==w)wid.gv=v
-		}
-		if(field_is(w)){
-			if(wid.ft==w){widget_field(w,wid.f,wid.fv)}
-			else{const p=unpack_field(w),v=unpack_field_value(w);widget_field(w,p,v);if(wid.ft==w)wid.fv=v}
-		}
-	})
+	if(uimode=='interact'||(dr.show_widgets&&!dr.fatbits)){handle_widgets(wids,rect(0,0))}
 	else if(dr.show_widgets&&dr.fatbits)wids.v.map(w=>{draw_boxinv(pal,card_to_fat(unpack_widget(w).size))})
 	ev=eb
 	if(uimode=='draw'){if(bg_has_sel())draw_handles(livesel);draw_box(livesel,0,ANTS)}

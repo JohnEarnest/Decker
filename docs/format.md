@@ -286,8 +286,10 @@ Contraption chunks always have an ID, which serves as the `name` of the ConDef. 
 - `description`: a string giving a human-readable description of the purpose of the ConDef.
 - `image`: an _Image Record_ used as the background of instances of the ConDef.
 - `script`: a number or string corresponding to a `{script:ID}` chunk, analogous to the script of a card from the perspective of contained widgets.
+- `template`: a string containing a Lil script that will be used as the default script for newly-created instances of this ConDef.
 - `attributes`: a rectangular dictionary with the following columns:
-	- `name`: the name of an editable property for instances of this ConDef.
+	- `name`: the attribute name of an editable property for instances of this ConDef.
+	- `label`: the display label of an editable property for instances of this ConDef. If missing, the `name` will be used.
 	- `type`: the type of this editable property, for the purpose of supplying a sensible user interface for editing. An invalid `type` will cause the current row to be ignored.
 
 Attribute `type`s may be one of the following:
@@ -296,14 +298,14 @@ Attribute `type`s may be one of the following:
 - `number`: A numeric value, editable with a field.
 - `string`: A string value, editable with a field.
 - `code`: A string value, editable with a larger field in "code" editing mode.
-- `rtext`: A string value, editable with a larger field in "rich" editing mode.
+- `rich`: A string value, editable with a larger field in "rich" editing mode.
 
 An example of a complete `{contraption:ID}` chunk and its associated `{widgets}` and `{script:ID}` chunks:
 ```
 {contraption:spinner}
 size:[150,50]
 description:"unbounded numeric field that can be incremented or decremented by a configurable step"
-attributes:{"name":["value","step"],"type":["number","number"]}
+attributes:{"name":["value","step"],"label":["Value","Step"],"type":["number","number"]}
 script:"spinner.root"
 
 {widgets}

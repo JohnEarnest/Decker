@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:10
+card:11
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -361,6 +361,18 @@ on click do
 end
 {end}
 
+{card:contraptions}
+{widgets}
+a:{"type":"contraption","size":[150,50],"pos":[40,50],"script":"contraptions.0","def":"Spinner","widgets":{"down":{},"up":{},"value":{},"step":{}}}
+b:{"type":"contraption","size":[150,50],"pos":[40,150],"def":"Spinner","widgets":{"down":{},"up":{},"value":{"value":"42"},"step":{}}}
+contraption1:{"type":"contraption","size":[200,140],"pos":[276,89],"def":"Enchilada","widgets":{"bool":{},"number":{},"string":{},"code":{},"rich":{}}}
+
+{script:contraptions.0}
+on change do
+ alert["changed spinner!"]
+end
+{end}
+
 {card:anime 1}
 script:"anime 1.0"
 {widgets}
@@ -491,5 +503,63 @@ transition[on CircleOutClick c a b t do
 end]
 
 
+{end}
+
+{contraption:Spinner}
+size:[150,50]
+description:"unbounded numeric picker"
+script:"Spinner.0"
+template:"on change do\n \nend"
+attributes:{"name":["value","step"],"label":["value","step"],"type":["number","number"]}
+{widgets}
+down:{"type":"button","size":[40,40],"pos":[5,5],"script":"Spinner.1","text":"<"}
+up:{"type":"button","size":[40,40],"pos":[105,5],"script":"Spinner.2","text":">"}
+value:{"type":"field","size":[40,40],"pos":[55,5],"locked":1,"value":"0"}
+step:{"type":"field","size":[8,8],"pos":[0,0],"show":"none","value":"1"}
+
+{script:Spinner.0}
+on set_value x do value.text:0+x end
+on get_value   do 0+value.text   end
+on set_step  x do step.text:0+x  end
+on get_step    do 0+step.text    end
+{end}
+
+{script:Spinner.1}
+on click do
+  value.text:value.text-step.text
+  card.event["change"]
+end
+{end}
+
+{script:Spinner.2}
+on click do
+  value.text:value.text+step.text
+  card.event["change"]
+end
+{end}
+
+{contraption:Enchilada}
+size:[200,140]
+description:"Demo of every attribute type."
+script:"Enchilada.0"
+attributes:{"name":["bool","number","string","code","rich"],"label":["Boolean","Number","String","Code","Rich Text"],"type":["bool","number","string","code","rich"]}
+{widgets}
+bool:{"type":"button","size":[190,20],"pos":[5,5],"text":"boolean value","style":"check","value":1}
+number:{"type":"slider","size":[190,20],"pos":[5,30],"value":47,"style":"bar"}
+string:{"type":"field","size":[190,20],"pos":[5,55],"value":"some string"}
+code:{"type":"field","size":[190,20],"pos":[5,80],"value":"some code"}
+rich:{"type":"field","size":[190,20],"pos":[5,105],"value":"some rich text"}
+
+{script:Enchilada.0}
+on set_bool   x do bool.value:x   end
+on get_bool     do bool.value     end
+on set_number x do number.value:x end
+on get_number   do number.value   end
+on set_string x do string.text:x  end
+on get_string   do string.text    end
+on set_code   x do code.text:x    end
+on get_code     do code.text      end
+on set_rich   x do rich.value:x  end
+on get_rich     do rich.value    end
 {end}
 

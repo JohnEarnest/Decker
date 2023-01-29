@@ -294,7 +294,7 @@ All widgets can be "shown" in one of four ways, configurable with the _Widgets_ 
 - _Show Transparent_ widgets are drawn without a background, allowing other widgets or the card background to show through.
 - _Show Invert_ widgets are generally drawn as white-on-black instead of black-on-white, making them suitable for display on top of a dark background.
 
-The canvas widget has a special behavior for _Show Invert_: instead of being drawn in black-on-white, the pixels of the canvas will _invert_ the color of anything beneath them as by the Exclusive-OR (XOR) logical operation.
+The canvas widget has a special behavior for _Show Invert_: instead of being drawn in black-on-white, the pixels of the canvas will _invert_ the color of anything beneath them as by the Exclusive-OR (XOR) logical operation. Contraptions are similar: their background image is drawn like a canvas, and then any widgets that are part of the contraption are drawn on top, respecting their own internal `show` properties.
 
 (Keep in mind that a "Show None" widget is not the same thing as an "Invisible" button- invisible buttons are shown and interactive, they just don't look like anything!)
 
@@ -342,6 +342,7 @@ Resources consist of:
 
 - sounds.
 - fonts, excluding the built-in fonts `menu`, `body`, and `mono`.
+- contraption definitions.
 - the pattern palette of the deck, if it has been customized from defaults.
 - lil [modules](#modules) which extend Decker's capabilities.
 
@@ -1042,6 +1043,7 @@ Contraptions are custom widgets, defined in a [ConDef](#condefinterface). See th
 | `typeof x`              | `"contraption"`                                                                                       |
 | `x.name`                | String. The name of this widget. r/w.                                                                 |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
+| `x.image`               | An _image_ interface representing the contraption's background. r/w.                                  |
 | `x.locked`              | Bool. Behavior of this property is entirely up to the ConDef. r/w.                                    |
 | `x.pos`                 | The `pos` of this widget on the card. r/w.                                                            |
 | `x.size`                | The `size` of the widget in pixels.                                                                   |
@@ -1102,6 +1104,7 @@ ConDefs are definitions from which [Contraptions](#contraptioninterface) are mad
 | `x.name`                | String. The name of the condef. r/w.                                                                   |
 | `x.description`         | String. A human-readable description of the purpose of this condef. r/w.                               |
 | `x.script`              | String. The Lil source code of the condef's script, or `""`. r/w.                                      |
+| `x.template`            | String. The Lil source code that can be used as a default for newly-created condef instances. r/w.     |
 | `x.size`                | The `size` of this condef in pixels. r/w.                                                              |
 | `x.image`               | An _image_ interface representing the condef's background. r/w.                                        |
 | `x.widgets`             | A dictionary of widget interfaces in this condef, keyed by name.                                       |
@@ -1114,7 +1117,7 @@ ConDefs are definitions from which [Contraptions](#contraptioninterface) are mad
 
 When a widget is removed from its ConDef, the interface becomes inert: it will ignore all reads and writes of attributes.
 
-The `attributes` table provides information about the attributes of contraption instances based on this ConDef which should be editable by users. It contains a `name` column with (string) attribute names, and a `type` column indicating the editor that should be provided for that attribute:
+The `attributes` table provides information about the attributes of contraption instances based on this ConDef which should be editable by users. It contains a `name` column with (string) attribute names, a `label` column with (string) display names for attributes, and a `type` column indicating the editor that should be provided for that attribute:
 
 | Attribute Type | Description           | Editor                              |
 | :------------- | :-------------------- | :---------------------------------- |
@@ -1122,7 +1125,7 @@ The `attributes` table provides information about the attributes of contraption 
 | `"number"`     | A Lil number          | Field.                              |
 | `"string"`     | A Lil string          | Field.                              |
 | `"code"`       | A Lil string          | Large field in "code" editing mode. |
-| `"rtext"`      | An RText table        | Large field in "rich" editing mode. |
+| `"rich"`       | An rtext table        | Large field in "rich" editing mode. |
 
 Modifying the attributes of a ConDef will automatically update Contraption instances in the current deck. Modifying the attributes of widgets contained in this ConDef will require explicitly calling `condef.update[]`. In either case, when a definition is updated, the `name`, `pos`, `show`, `locked`, `font`, and `script` attributes of Contraptions will be preserved, as well the `value`, `scroll`, `row` and `image` attributes of the widgets they contain (as applicable), but everything else will be regenerated from the definition. The _state_ of contraptions is kept, and the _behavior and appearance_ is changed.
 

@@ -1732,17 +1732,19 @@ canvas_write=x=>{
 }
 contraption_read=(x,card)=>{
 	x=ld(x);const dname=dget(x,lms('def')), def=dname?dget(card.deck.contraptions,dname):null;if(!def)return null
-	const masks={name:1,index:1,script:1,locked:1,pos:1,show:1,font:1,event:1}
+	const masks={name:1,index:1,image:1,script:1,locked:1,pos:1,show:1,font:1,event:1}
 	const ri=lmi((self,i,x)=>{
 		if(!is_rooted(self))return NONE
 		if(x){
-			if(ikey(i,'def' ))return x // not mutable!
-			if(ikey(i,'size'))return x // not mutable!
+			if(ikey(i,'def'  ))return x // not mutable!
+			if(ikey(i,'size' ))return x // not mutable!
+			if(ikey(i,'image'))return self.image=image_is(x)?x:image_make(rect()),x
 			if(lis(i)&&ls(i) in masks)return interface_widget(self,i,x)
 			return fire_attr_sync(self,'set_'+ls(i),x),x
 		}else{
-			if(ikey(i,'def' ))return self.def
-			if(ikey(i,'size'))return ifield(self.def,'size')
+			if(ikey(i,'def'  ))return self.def
+			if(ikey(i,'size' ))return ifield(self.def,'size')
+			if(ikey(i,'image'))return self.image
 			if(lis(i)&&ls(i) in masks)return interface_widget(self,i,x)
 			return fire_attr_sync(self,'get_'+ls(i),null)
 		}
@@ -1751,12 +1753,14 @@ contraption_read=(x,card)=>{
 	ri.deck   =card.deck
 	ri.def    =def
 	ri.widgets=lmd()
+	{const v=dget(x,lms('image'));ri.image=v?image_read(ls(v)):image_make(rect())}
 	let w=dget(x,lms('widgets'));if(w){w=ld(w)}else{w=lmd();def.widgets.k.map(k=>dset(w,k,lmd()))}
 	w.k.map((k,i)=>{const a=w.v[i],o=dget(def.widgets,k);widget_add(ri,o?dyad[','](widget_write(o),a):a);})
 	return ri
 }
 contraption_write=x=>{
 	const wids=lmd(), r=lmd(['type','def','widgets'].map(lms),[lms('contraption'),ifield(x.def,'name'),wids])
+	if(x.image&&x.image.size.x>0&&x.image.size.y>0)dset(r,lms('image'),lms(image_write(x.image)))
 	const dict_delta=(a,b)=>{const r=lmd();b.k.map((k,i)=>{const av=dget(a,k),bv=b.v[i];if(!av||!match(av,bv))dset(r,k,bv)});return r}
 	x.widgets.v.map(w=>{
 		let wid=widget_write(w), n=ifield(w,'name'), src=dget(x.def.widgets,n)
@@ -1899,20 +1903,20 @@ condef_read=(x,deck)=>{
 	const contraption_update=def=>{
 		deck.cards.v.map(card=>{
 			card.widgets.v.filter(x=>contraption_is(x)&&x.def==def).map(widget=>{
-				const d=contraption_write(widget)
+				const d=widget_write(widget), n=widget.name
 				dset(d,lms('image'  ),image_copy(ifield(def,'image')))
 				dset(d,lms('size'   ),ifield(def,'size'))
 				dset(d,lms('widgets'),contraption_strip(widget))
-				for(var k in widget)delete widget[k];Object.assign(widget,widget_read(d,card))
+				for(var k in widget)delete widget[k];Object.assign(widget,widget_read(d,card));widget.name=n
 			})
 		})
 	}
-	const attribute_types={'':1,bool:1,number:1,string:1,code:1,rtext:1}
+	const attribute_types={'':1,bool:1,number:1,string:1,code:1,rich:1}
 	const normalize_attributes=x=>{
-		const r=lmt({name:[],type:[]});if(!lit(x))return r
-		const sn=x.v.name,st=x.v.type;if(sn&&st)sn.filter(n=>lis(n)&&count(n)).map((n,i)=>{
+		const r=lmt({name:[],label:[],type:[]});if(!lit(x))return r
+		const sn=x.v.name,sl=x.v.label||sn,st=x.v.type;if(sn&&st)sn.filter(n=>lis(n)&&count(n)).map((n,i)=>{
 			const type=normalize_enum(attribute_types,ls(st[i]))
-			if(type.length)r.v.name.push(n),r.v.type.push(lms(type))
+			if(type.length)r.v.name.push(n),r.v.label.push(lms(ls(sl[i]))),r.v.type.push(lms(type))
 		});return r
 	}
 	const ri=lmi((self,i,x)=>{
@@ -1926,11 +1930,13 @@ condef_read=(x,deck)=>{
 			if(ikey(i,'size'       ))return self.size=rint(getpair(x)),contraption_update(self),x
 			if(ikey(i,'image'      ))return self.image=image_is(x)?x:image_make(rect(0,0)),contraption_update(self),x
 			if(ikey(i,'script'     ))return self.script=ls(x),x
+			if(ikey(i,'template'   ))return self.template=ls(x),x
 			if(ikey(i,'attributes' ))return self.attributes=normalize_attributes(x),x
 		}else{
 			if(ikey(i,'name'       ))return lms(self.name)
 			if(ikey(i,'description'))return lms(self.description||'')
 			if(ikey(i,'script'     ))return lms(self.script||'')
+			if(ikey(i,'template'   ))return lms(self.template||'')
 			if(ikey(i,'size'       ))return lmpair(self.size||rect(100,100))
 			if(ikey(i,'image'      ))return self.image
 			if(ikey(i,'widgets'    ))return self.widgets
@@ -1949,16 +1955,18 @@ condef_read=(x,deck)=>{
 	ll(dget(x,lms('widgets'))||lml([])).map(w=>{const n=dget(w,lms('name'));if(n){const i=widget_read(w,ri);if(lii(i))dset(ri.widgets,ifield(i,'name'),i)}})
 	init_field(ri,'description',x)
 	init_field(ri,'script'     ,x)
+	init_field(ri,'template'   ,x)
 	return ri
 }
 condef_write=x=>{
 	const r=lmd(), wids=lmd(), nice=x=>x&&image_is(x)&&x.size.x>0&&x.size.y>0
 	dset(r,lms('name'),lms(x.name))
 	dset(r,lms('size'),ifield(x,'size'))
-	if(x.description.length)dset(r,lms('description'),lms(x.description))
-	if(x.script.length     )dset(r,lms('script'     ),lms(x.script     ))
-	if(nice(x.image)       )dset(r,lms('image'      ),lms(image_write(x.image)))
-	if(x.attributes        )dset(r,lms('attributes' ),monad.cols(x.attributes))
+	if(x.description&&x.description.length)dset(r,lms('description'),lms(x.description))
+	if(x.script     &&x.script.length     )dset(r,lms('script'     ),lms(x.script     ))
+	if(x.template   &&x.template.length   )dset(r,lms('template'   ),lms(x.template   ))
+	if(nice(x.image)                      )dset(r,lms('image'      ),lms(image_write(x.image)))
+	if(x.attributes                       )dset(r,lms('attributes' ),monad.cols(x.attributes))
 	x.widgets.v.map(v=>{
 		let wid=widget_write(v),n=dget(wid,lms('name'))
 		wid=dyad.drop(lms('name'),wid);if(count(wid))dset(wids,n,wid)
@@ -1987,7 +1995,9 @@ deck_remove=(deck,t)=>{
 	if(sound_is(t)){const k=dkey(deck.sounds,t);if(k)return deck.sounds=dyad.drop(k,deck.sounds),1}
 	if(font_is(t)){
 		const k=dkey(deck.fonts,t);if(!k||ls(k)in{body:1,menu:1,mono:1})return 0
-		deck.cards.v.map(c=>c.widgets.v.map(w=>{if(w.font==ls(k))w.font='body'}))
+		const remove=w=>w.v.map(w=>{if(w.font==ls(k))w.font='body';if(contraption_is(w))remove(w.widgets)})
+		deck.cards.v.map(c=>remove(c.widgets))
+		deck.contraptions.v.map(c=>remove(c.widgets))
 		return deck.fonts=dyad.drop(k,deck.fonts),1
 	}
 	if(condef_is(t)){
@@ -2148,6 +2158,7 @@ deck_write=(x,html)=>{
 		write_key(data,'description',x=>x       ,x=>x)
 		write_key(data,'image'      ,x=>x       ,x=>x)
 		write_key(data,'script'     ,x=>count(x),x=>script_ref(base,x))
+		write_key(data,'template'   ,x=>count(x),x=>x)
 		write_key(data,'attributes' ,x=>count(x),x=>x)
 		wids.v.map(wid=>{const k=lms('script'),v=dget(wid,k);if(v)dset(wid,k,script_ref(base,v))})
 		write_dict('{widgets}\n',wids,x=>x)
@@ -2217,7 +2228,8 @@ fire_async=(target,name,arg,hunk,nest)=>{
 	const scopes=lmd([NONE],[parse(DEFAULT_HANDLERS)]), root=lmenv(); let deck=null,isolate=0
 	ancestors=target=>{
 		if(deck_is(target)){deck=target;if(isolate)return}
-		if(widget_is(target)){
+		if(contraption_is(target)){deck=target.card.deck}
+		if(widget_is(target)&&!contraption_is(target)){
 			if(condef_is(target.card)||contraption_is(target.card))isolate=1
 			ancestors(target.card)
 		}
@@ -2243,7 +2255,7 @@ fire_async=(target,name,arg,hunk,nest)=>{
 			t.cards  .v.map((v,i)=>bind(t.cards  .k[i],v                ))
 			sname='!deck_scope'
 		}
-		if(card_is(t)||condef_is(t)){
+		if(card_is(t)||condef_is(t)||contraption_is(t)){
 			bind(lms('card'),t)
 			t.widgets.v.map((v,i)=>bind(t.widgets.k[i],v))
 			sname='!card_scope'
