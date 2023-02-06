@@ -1622,19 +1622,19 @@ grid_write=x=>{
 	return r
 }
 canvas_clip=(canvas,z)=>{
-	const i=canvas_image(canvas,1),s=i.size,w=rect(0,0,s.x,s.y);canvas.clip=!z||z.length<1?w:rint(rclip(w,unpack_rect(z,w)))
+	const i=container_image(canvas,1),s=i.size,w=rect(0,0,s.x,s.y);canvas.clip=!z||z.length<1?w:rint(rclip(w,unpack_rect(z,w)))
 }
 canvas_pick=canvas=>{
-	canvas_image(canvas,1)
+	container_image(canvas,1)
 	if(!canvas.brush  )iwrite(canvas,lms('brush'  ),ifield(canvas,'brush'  ))
 	if(!canvas.pattern)iwrite(canvas,lms('pattern'),ifield(canvas,'pattern'))
 	if(!canvas.font   )iwrite(canvas,lms('font'   ),ifield(canvas,'font'   ))
 	if(!canvas.clip   )canvas_clip(canvas)
 	frame=canvas
 }
-canvas_image=(canvas,build)=>{
+container_image=(canvas,build)=>{
 	if(canvas.image||!build)return canvas.image
-	const i=canvas.image,scale=card_is(canvas)?1.0:ln(ifield(canvas,'scale')),size=getpair(ifield(canvas,'size'))
+	const i=canvas.image,scale=!canvas_is(canvas)?1.0:ln(ifield(canvas,'scale')),size=getpair(ifield(canvas,'size'))
 	canvas.image=i?image_copy(i):image_make(rect(ceil(size.x/scale),ceil(size.y/scale))),canvas_clip(canvas);return canvas.image
 }
 canvas_resize=(canvas,size)=>{
@@ -1643,8 +1643,8 @@ canvas_resize=(canvas,size)=>{
 }
 canvas_read=(x,card)=>{
 	const wid_pal=x=>x.card.deck.patterns.pal.pix
-	const wid_rect=(x,z)=>rint(unpack_rect(z,canvas_image(x).size))
-	const wid_crect=(x,z)=>rint(rclip(unpack_rect(z,canvas_image(x).size),frame.clip))
+	const wid_rect=(x,z)=>rint(unpack_rect(z,container_image(x).size))
+	const wid_crect=(x,z)=>rint(rclip(unpack_rect(z,container_image(x).size),frame.clip))
 	const text=(t,pos,a)=>{
 		const font=ifield(frame,'font')
 		if(pos&&lil(pos)&&count(pos)>=4){
@@ -1665,7 +1665,7 @@ canvas_read=(x,card)=>{
 			if(ikey(i,'brush'    ))return self.brush  =0|clamp(0,ln(x), 23),x
 			if(ikey(i,'pattern'  ))return self.pattern=0|clamp(0,ln(x),255),x
 			if(ikey(i,'font'     ))return self.font=normalize_font(self.card.deck.fonts,x),x
-			if(!lis(i)){const img=canvas_image(self,1);return img.f(img,i,x)}
+			if(!lis(i)){const img=container_image(self,1);return img.f(img,i,x)}
 			if(self.free)return x
 			if(ikey(i,'border'   ))return self.border=lb(x),x
 			if(ikey(i,'draggable'))return self.draggable=lb(x),x
@@ -1673,7 +1673,7 @@ canvas_read=(x,card)=>{
 			if(ikey(i,'size'     )){canvas_resize(self,getpair(x))}
 			if(ikey(i,'scale'    )){return self.scale=max(0.1,ln(x)),canvas_resize(self,getpair(ifield(self,'size'))),x}
 		}else{
-			if(!lis(i)){const img=canvas_image(self,0);return img?img.f(img,i,x):NONE}
+			if(!lis(i)){const img=container_image(self,0);return img?img.f(img,i,x):NONE}
 			if(ikey(i,'border'   ))return lmn(ivalue(self,ls(i),1))
 			if(ikey(i,'draggable'))return lmn(ivalue(self,ls(i),0))
 			if(ikey(i,'brush'    ))return lmn(ivalue(self,ls(i),0))
@@ -1689,9 +1689,9 @@ canvas_read=(x,card)=>{
 			if(ikey(i,'poly'     ))return lmnat(z=>(canvas_pick(self),draw_poly(unpack_poly(z),frame.pattern)              ,NONE))
 			if(ikey(i,'line'     ))return lmnat(z=>(canvas_pick(self),draw_lines(unpack_poly(z),frame.brush,frame.pattern) ,NONE))
 			if(ikey(i,'fill'     ))return lmnat(([pos])=>(canvas_pick(self),draw_fill(rint(getpair(pos)),self.pattern)     ,NONE))
-			if(ikey(i,'copy'     ))return lmnat(z=>{const img=canvas_image(self,1);return image_copy(img,unpack_rect(z,img.size))})
+			if(ikey(i,'copy'     ))return lmnat(z=>{const img=container_image(self,1);return image_copy(img,unpack_rect(z,img.size))})
 			if(ikey(i,'paste'    ))return lmnat(([img,pos,t])=>{
-				canvas_pick(self);const dst=canvas_image(self,1)
+				canvas_pick(self);const dst=container_image(self,1)
 				img=getimage(img),pos=(pos?ll(pos):[]).map(ln); let solid=t?!lb(t):1
 				image_paste_scaled(pos.length<=2?rect(pos[0],pos[1],img.size.x,img.size.y):getrect(pos),frame.clip,img,dst,solid)
 				return NONE
@@ -1738,13 +1738,13 @@ contraption_read=(x,card)=>{
 		if(x){
 			if(ikey(i,'def'  ))return x // not mutable!
 			if(ikey(i,'size' ))return x // not mutable!
-			if(ikey(i,'image'))return self.image=image_is(x)?x:image_make(rect()),x
+			if(ikey(i,'image'))return x // not mutable!
 			if(lis(i)&&ls(i) in masks)return interface_widget(self,i,x)
 			return fire_attr_sync(self,'set_'+ls(i),x),x
 		}else{
 			if(ikey(i,'def'  ))return self.def
 			if(ikey(i,'size' ))return ifield(self.def,'size')
-			if(ikey(i,'image'))return self.image
+			if(ikey(i,'image'))return ifield(self.def,'image')
 			if(lis(i)&&ls(i) in masks)return interface_widget(self,i,x)
 			return fire_attr_sync(self,'get_'+ls(i),null)
 		}
@@ -1753,14 +1753,12 @@ contraption_read=(x,card)=>{
 	ri.deck   =card.deck
 	ri.def    =def
 	ri.widgets=lmd()
-	{const v=dget(x,lms('image'));ri.image=v?image_read(ls(v)):image_make(rect())}
-	let w=dget(x,lms('widgets'));if(w){w=ld(w)}else{w=lmd();def.widgets.k.map(k=>dset(w,k,lmd()))}
-	w.k.map((k,i)=>{const a=w.v[i],o=dget(def.widgets,k);widget_add(ri,o?dyad[','](widget_write(o),a):a);})
+	let w=dget(x,lms('widgets')),d=def.widgets;if(w){w=ld(w)}else{w=lmd();def.widgets.k.map(k=>dset(w,k,lmd()))}
+	d.k.map((k,i)=>{const a=widget_write(d.v[i]),o=dget(w,k);widget_add(ri,o?dyad[','](a,o):a)})
 	return ri
 }
 contraption_write=x=>{
 	const wids=lmd(), r=lmd(['type','def','widgets'].map(lms),[lms('contraption'),ifield(x.def,'name'),wids])
-	if(x.image&&x.image.size.x>0&&x.image.size.y>0)dset(r,lms('image'),lms(image_write(x.image)))
 	const dict_delta=(a,b)=>{const r=lmd();b.k.map((k,i)=>{const av=dget(a,k),bv=b.v[i];if(!av||!match(av,bv))dset(r,k,bv)});return r}
 	x.widgets.v.map(w=>{
 		let wid=widget_write(w), n=ifield(w,'name'), src=dget(x.def.widgets,n)
@@ -1838,10 +1836,10 @@ card_remove=(card,x)=>{
 	if(!widget_is(x)||!dkey(card.widgets,x))return 0
 	const name=ifield(x,'name');dget(card.widgets,name).dead=true,card.widgets=dyad.drop(name,card.widgets);return 1
 }
-card_copy_raw=(card,z)=>z.filter(w=>widget_is(w)&&w.card==card).map(widget_write)
-card_paste_raw=(card,payload)=>payload.map(p=>widget_add(card,ld(p)))
-card_copy=(card,z)=>lms(`%%WGT0${fjson(lml(card_copy_raw(card,lil(z)?ll(z):[z])))}`)
-card_paste=(card,z)=>!lis(z)||!z.v.startsWith('%%WGT0')?NONE:lml(card_paste_raw(card,ll(pjson(ls(z),6,count(z)-6).value)))
+con_copy_raw=(card,z)=>z.filter(w=>widget_is(w)&&w.card==card).map(widget_write)
+con_paste_raw=(card,payload)=>payload.map(p=>widget_add(card,ld(p)))
+con_copy=(card,z)=>lms(`%%WGT0${fjson(lml(con_copy_raw(card,lil(z)?ll(z):[z])))}`)
+con_paste=(card,z)=>!lis(z)||!z.v.startsWith('%%WGT0')?NONE:lml(con_paste_raw(card,ll(pjson(ls(z),6,count(z)-6).value)))
 card_read=(x,deck,cdata)=>{
 	x=ld(x);const nav_dirs={right:1,left:1,up:1,down:1},ri=lmi((self,i,x)=>{
 		if(self.dead)return NONE
@@ -1863,8 +1861,8 @@ card_read=(x,deck,cdata)=>{
 			if(ikey(i,'add'    ))return lmnat(([t,n1,n2])=>card_add(self,t,n1,n2))
 			if(ikey(i,'remove' ))return lmnat(([x])=>lmn(card_remove(self,x)))
 			if(ikey(i,'event'  ))return lmnat(args=>n_event(self,args))
-			if(ikey(i,'copy'    )&&state.external)return lmnat(([z])=>card_copy(self,z))
-			if(ikey(i,'paste'   )&&state.external)return lmnat(([z])=>card_paste(self,z))
+			if(ikey(i,'copy'    )&&state.external)return lmnat(([z])=>con_copy(self,z))
+			if(ikey(i,'paste'   )&&state.external)return lmnat(([z])=>con_paste(self,z))
 		}return x?x:NONE
 	},'card')
 	const n=dget(x,lms('name'))
@@ -1887,8 +1885,7 @@ card_write=card=>{
 		if(count(wid))dset(wids,n,wid)
 	});return r
 }
-condef_read=(x,deck)=>{
-	x=ld(x)
+contraption_update=(deck,def)=>{
 	const contraption_strip=x=>{
 		const r=lmd();x.widgets.v.map(w=>{
 			let p=widget_write(w)
@@ -1900,17 +1897,18 @@ condef_read=(x,deck)=>{
 			dset(r,ifield(w,'name'),p)
 		});return r
 	}
-	const contraption_update=def=>{
-		deck.cards.v.map(card=>{
-			card.widgets.v.filter(x=>contraption_is(x)&&x.def==def).map(widget=>{
-				const d=widget_write(widget), n=widget.name
-				dset(d,lms('image'  ),image_copy(ifield(def,'image')))
-				dset(d,lms('size'   ),ifield(def,'size'))
-				dset(d,lms('widgets'),contraption_strip(widget))
-				for(var k in widget)delete widget[k];Object.assign(widget,widget_read(d,card));widget.name=n
-			})
+	deck.cards.v.map(card=>{
+		card.widgets.v.filter(x=>contraption_is(x)&&x.def==def).map(widget=>{
+			const d=widget_write(widget), n=widget.name
+			dset(d,lms('image'  ),image_copy(ifield(def,'image')))
+			dset(d,lms('size'   ),ifield(def,'size'))
+			dset(d,lms('widgets'),contraption_strip(widget))
+			for(var k in widget)delete widget[k];Object.assign(widget,widget_read(d,card));widget.name=n
 		})
-	}
+	})
+}
+condef_read=(x,deck)=>{
+	x=ld(x)
 	const attribute_types={'':1,bool:1,number:1,string:1,code:1,rich:1}
 	const normalize_attributes=x=>{
 		const r=lmt({name:[],label:[],type:[]});if(!lit(x))return r
@@ -1927,8 +1925,8 @@ condef_read=(x,deck)=>{
 				condefs.k[dvix(condefs,self)]=n,self.name=ls(n);return x
 			}
 			if(ikey(i,'description'))return self.description=ls(x),x
-			if(ikey(i,'size'       ))return self.size=rint(getpair(x)),contraption_update(self),x
-			if(ikey(i,'image'      ))return self.image=image_is(x)?x:image_make(rect(0,0)),contraption_update(self),x
+			if(ikey(i,'size'       ))return self.size=rint(getpair(x)),contraption_update(deck,self),x
+			if(ikey(i,'image'      ))return self.image=image_is(x)?x:image_make(rect(0,0)),x
 			if(ikey(i,'script'     ))return self.script=ls(x),x
 			if(ikey(i,'template'   ))return self.template=ls(x),x
 			if(ikey(i,'attributes' ))return self.attributes=normalize_attributes(x),x
@@ -1941,9 +1939,9 @@ condef_read=(x,deck)=>{
 			if(ikey(i,'image'      ))return self.image
 			if(ikey(i,'widgets'    ))return self.widgets
 			if(ikey(i,'attributes' ))return self.attributes||normalize_attributes(NONE)
-			if(ikey(i,'add'        ))return lmnat(([t,n1,n2])=>{const r=card_add(self,t,n1,n2);if(widget_is(r))contraption_update(self);return r})
-			if(ikey(i,'remove'     ))return lmnat(([x])=>{const r=card_remove(self,x);if(lb(r))contraption_update(self);return r})
-			if(ikey(i,'update'     ))return lmnat(_=>{contraption_update(self);return NONE})
+			if(ikey(i,'add'        ))return lmnat(([t,n1,n2])=>{const r=card_add(self,t,n1,n2);if(widget_is(r))contraption_update(deck,self);return r})
+			if(ikey(i,'remove'     ))return lmnat(([x])=>{const r=card_remove(self,x);if(lb(r))contraption_update(deck,self);return r})
+			if(ikey(i,'update'     ))return lmnat(_=>{contraption_update(deck,self);return NONE})
 		}return x?x:NONE
 	},'condef')
 	ri.deck   =deck

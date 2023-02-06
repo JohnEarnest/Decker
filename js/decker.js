@@ -203,7 +203,7 @@ draw_dithered=(r,image,opaque,mask,threshold)=>{
 	}
 }
 draw_widget=w=>{
-	if(canvas_is(w))return canvas_image(w,1)
+	if(canvas_is(w))return container_image(w,1)
 	const rsize=getpair(ifield(w,'size')),r=image_make(rsize),t=frame,te=copy_object(ev);frame=draw_frame(r),ev=event_state(),menus_clear() // !!!
 	if     (button_is     (w)){const p=unpack_button(w);p.size.x=0,p.size.y=0;widget_button(w,p,lb(ifield(w,'value')))}
 	else if(slider_is     (w)){const p=unpack_slider(w);p.size.x=0,p.size.y=0;widget_slider(w,p)}
@@ -212,15 +212,15 @@ draw_widget=w=>{
 	else if(contraption_is(w)){const o=w.pos;w.pos=rect(0,0);widget_contraption(w);w.pos=o}
 	return ev=te,frame=t,r
 }
-draw_card=(card,active)=>{
+draw_con=(card,active)=>{
 	const im=ms.in_modal;ms.in_modal=active
 	const rsize=getpair(ifield(card,'size')),r=image_make(rsize),t=frame,te=copy_object(ev);frame=draw_frame(r),ev=event_state()
-	const back=ifield(card,'image'), bsize=back.size, wids=ifield(card,'widgets')
+	const back=ifield(card,'image'), bsize=back.size, wids=card.widgets
 	if(bsize.x!=0&&bsize.y!=0)image_paste(rpair(rect(),bsize),frame.clip,back,frame.image,1)
 	if(uimode!='draw'||dr.show_widgets)wids.v.map(w=>{
 		if(button_is     (w))widget_button(w,unpack_button(w),lb(ifield(w,'value')))
 		if(slider_is     (w))widget_slider(w,unpack_slider(w))
-		if(canvas_is     (w))widget_canvas(w,unpack_canvas(w),canvas_image(w,0))
+		if(canvas_is     (w))widget_canvas(w,unpack_canvas(w),container_image(w,0))
 		if(grid_is       (w))widget_grid  (w,unpack_grid  (w),unpack_grid_value(w))
 		if(field_is      (w))widget_field (w,unpack_field (w),unpack_field_value(w))
 		if(contraption_is(w))widget_contraption(w)
@@ -381,7 +381,30 @@ PANGRAM='How razorback jumping-frogs can level six piqued gymnasts.'
 
 // State
 
-let uimode='interact', uicursor=0, enable_gestures=0, profiler=0
+let uimode='interact', ui_container=null, uicursor=0, enable_gestures=0, profiler=0
+con_set=x=>{if(x!=ui_container)setmode(uimode);if(x!=ui_container&&condef_is(ui_container))contraption_update(deck,ui_container);ui_container=x}
+con=_=>ui_container?ui_container:ifield(deck,'card')
+con_wids=_=>con().widgets
+con_image=_=>ifield(con(),'image')
+con_size=_=>getpair(ifield(con(),'size'))
+con_clip=_=>rclip(frame.clip,rcenter(frame.clip,con_size()))
+con_offset=_=>{const r=con_clip();return rect(r.x,r.y)}
+con_to_screen=x=>radd(x,con_offset())
+screen_to_con=x=>rsub(x,con_offset())
+ev_to_con=e=>{const o=con_offset();e.pos=rsub(e.pos,o);e.dpos=rsub(e.dpos,o);return e}
+con_to_ev=e=>{const o=con_offset();e.pos=radd(e.pos,o);e.dpos=radd(e.dpos,o);return e}
+tracking=_=>{
+	const c=con()
+	if(condef_is(c)){
+		const condefs=deck.contraptions, i=dkix(condefs,ifield(c,'name')), n=count(condefs)
+		if(ev.dir=='left' )con_set(condefs.v[(i+(n-1))%n])
+		if(ev.dir=='right')con_set(condefs.v[(i+1    )%n])
+	}
+	if(card_is(c)){
+		if(ev.dir=='left' )n_go([lms('Prev')],deck)
+		if(ev.dir=='right')n_go([lms('Next')],deck)
+	}
+}
 is_fullscreen=_=>(document.fullscreenElement||document.webkitFullscreenElement)!=null
 toggle_fullscreen=_=>{
 	if(is_fullscreen()){
@@ -779,7 +802,7 @@ grid_keys=(code,shift)=>{
 	if(code=='Home'     ){m=1,r=0}
 	if(code=='End'      ){m=1,r=nr-1}
 	if(code=='Backspace'||code=='Delete')grid_deleterow()
-	if(!m)return
+	if(!m)return;if(ms.type=='condef_attrs')ms.text.table=ms.name.table=null
 	wid.gv.row=r=max(0,min(r,nr-1));if(wid.gt){iwrite(wid.gt,lms('row'),lmn(r)),mark_dirty(),msg.target_click=wid.gt,msg.arg_click=rect(0,r)}
 	const os=wid.gv.scroll;if(r-os<0)wid.gv.scroll=r;if(r-os>=nrd)wid.gv.scroll=r-(nrd-1)
 	if(wid.gt&&os!=wid.gv.scroll)iwrite(wid.gt,lms('scroll'),lmn(wid.gv.scroll)),mark_dirty()
@@ -946,7 +969,7 @@ field_keys=(code,shift)=>{
 widget_contraption=x=>{
 	const show=ls(ifield(x,'show'));if(show=='none')return
 	const b=rpair(getpair(ifield(x,'pos')),getpair(ifield(x,'size'))), image=ifield(x,'image'), s=image.size
-	const bc=rclip(frame.clip,b), oc=frame.clip;frame.clip=bc
+	const bc=rclip(con_clip(),b), oc=frame.clip;frame.clip=bc
 	if(show=='solid'){if(s.x<b.w||s.y<b.h)draw_rect(b,32);image_paste(b,frame.clip,image,frame.image,1)}
 	if(show=='transparent'){image_paste(b,frame.clip,image,frame.image,0)}
 	if(show=='invert'){draw_invert_scaled(deck.patterns.pal.pix,rect(b.x,b.y,s.x,s.y),image)}
@@ -978,7 +1001,7 @@ handle_widgets=(x,offset)=>{
 			if(widget_button(w,p,v)&&p.style=='check')iwrite(w,lms('value'),lmn(!v)),mark_dirty()
 		}
 		if(slider_is(w)){const p=unpack_slider(w);p.size=radd(p.size,offset);widget_slider(w,p)}
-		if(canvas_is(w)){const p=unpack_canvas(w);p.size=radd(p.size,offset);widget_canvas(w,p,canvas_image(w,0))}
+		if(canvas_is(w)){const p=unpack_canvas(w);p.size=radd(p.size,offset);widget_canvas(w,p,container_image(w,0))}
 		if(grid_is  (w)){const p=unpack_grid(w),v=unpack_grid_value(w);p.size=radd(p.size,offset);widget_grid(w,p,v);if(wid.gt==w)wid.gv=v}
 		if(field_is(w)){
 			if(wid.ft==w){widget_field(w,wid.f,wid.fv)}
@@ -993,6 +1016,7 @@ ui_toggle  =(r,label,inv,enable,func )=>widget_button(null,{text:label,size:r,fo
 ui_radio   =(r,label,    enable,value)=>widget_button(null,{text:label,size:r,font:FONT_BODY,style:'radio',show:             'solid',locked:!enable},value)
 ui_checkbox=(r,label,    enable,value)=>widget_button(null,{text:label,size:r,font:FONT_BODY,style:'check',show:             'solid',locked:!enable},value)
 ui_field   =(r,       value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:0,border:1,style:'plain',align:ALIGN.left,locked:0},value)
+ui_dfield  =(r,enable,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:0,border:1,style:'plain',align:ALIGN.left,locked:!enable},value)
 ui_textedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:1,border  ,style:'plain',align:ALIGN.left,locked:0},value)
 ui_codeedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_MONO,show:'transparent',scrollbar:1,border  ,style:'code' ,align:ALIGN.left,locked:running()},value)
 ui_table   =(r,widths,format,value)=>widget_grid(null,{size:r,font:FONT_BODY,widths   ,format   ,headers:2,scrollbar:1,lines:0,show:'solid',locked:1},value)
@@ -1230,10 +1254,23 @@ modal_enter=type=>{
 		attrs=[],attrs_scroll=0;a.v.name.map((n,i)=>{
 			const v=iwrite(w,n), item={type:ls(a.v.type[i]), label:ls(a.v.label[i]), bval:0, value:fieldstr('')}
 			if     (item.type=='bool'){item.bval=lb(v)}
-			else if(item.type=='rich'){item.value.table=v}
+			else if(item.type=='rich'){item.value.table=rtext_cast(v)}
 			else {item.value.table=rtext_cast(v)}
 			attrs.push(item)
 		})
+	}
+	if(type=='condef_props'){
+		const c=con()
+		ms.name =fieldstr(ifield(c,'name'))
+		ms.text =fieldstr(dyad.fuse(lms(','),ifield(c,'size')))
+		ms.form0=fieldstr(ifield(c,'description'))
+		ms.form1=fieldstr(ifield(c,'template'))
+	}
+	if(type=='condef_attrs'){
+		const a=ifield(con(),'attributes')
+		ms.grid=gridtab(dyad.take(lmn(count(a)),a))
+		ms.name=fieldstr(lms(''))
+		ms.text=fieldstr(lms(''))
 	}
 	if(type=='action'){
 		sc.target=ob.sel[0],sc.others=[]
@@ -1276,6 +1313,10 @@ modal_exit=value=>{
 			if(t=='rich'  )v=attrs[i].value.table
 			iwrite(w,n,v)
 		})
+	}
+	if(ms.type=='condef_props'){
+		const s=rmax(rect(),getpair(dyad.parse(lms('%i%*-.10r0123456789%i'),rtext_string(ms.text.table))))
+		iwrite(con(),lms('size'),lmpair(s)),mark_dirty()
 	}
 	if(ms.type=='action'&&value){
 		let r='on click do\n'
@@ -1330,7 +1371,7 @@ modals=_=>{
 			const str=rtext_string(ms.text.table);if(count(str)<1)return
 			try{
 				const prog=parse(ls(str)), b=lmblk(); ms.text=fieldstr(lms('')),listen_show(ALIGN.left,1,str)
-				const target=uimode=='script'?sc.target: ob.sel.length==1?ob.sel[0]: ifield(deck,'card')
+				const target=uimode=='script'?sc.target: ob.sel.length==1?ob.sel[0]: con()
 				blk_opa(b,op.BUND,1),blk_lit(b,lmnat(n_pre_listen )),blk_lit(b,NONE   ),blk_op(b,op.CALL),blk_op(b,op.DROP),blk_cat(b,prog)
 				blk_opa(b,op.BUND,1),blk_lit(b,lmnat(n_post_listen)),blk_op (b,op.SWAP),blk_op(b,op.CALL),blk_op(b,op.DROP),fire_hunk_async(target,b)
 			}catch(e){listen_show(ALIGN.right,1,lms(`error: ${e.x}`));return}
@@ -1456,8 +1497,8 @@ modals=_=>{
 		const c=rect(b.x+b.w-60,b.y+b.h-20)
 		if(ms.type=='contraptions'){
 			if(ui_button(rect(c.x,c.y,60,20),'OK',1)||ev.exit){modal_exit(0)};c.x=b.x
-			if(ui_button(rect(c.x,c.y,60,20),'New....',1)){modal_exit(1)}c.x+=65
-			if(ui_button(rect(c.x,c.y,60,20),'Edit...',ms.grid.row>=0)||choose){modal_exit(2)}
+			if(ui_button(rect(c.x,c.y,60,20),'New...',1)){modal_exit(1),con_set(deck_add(deck,lms('contraption'))),mark_dirty()}c.x+=65
+			if(ui_button(rect(c.x,c.y,60,20),'Edit...',ms.grid.row>=0)||choose){modal_exit(2),con_set(deck.contraptions.v[ms.grid.row])}
 		}
 		if(ms.type=='pick_contraption'){
 			if(ui_button(rect(c.x,c.y,60,20),'Create',ms.grid.row>=0)||choose){
@@ -1471,12 +1512,68 @@ modals=_=>{
 		draw_textc(rect(b.x,b.y-5,b.w,20),`${contraption.def.name} Properties`,FONT_MENU,1)
 		draw_text(rect(b.x,b.y+22,47,20),'Name',FONT_MENU,1)
 		ui_field (rect(b.x+47  ,b.y+20  ,b.w-47,18),ms.name)
-		iwrite(contraption,lms('name'),rtext_string(ms.name.table))
+		iwrite(contraption,lms('name'),rtext_string(ms.name.table)),mark_dirty()
 		widget_attributes(rect(b.x,b.y+42,b.w,b.h-42-25))
 		const c=rect(b.x,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))modal_exit(0),setscript(contraption);c.x+=65
-		if(ui_button(rect(c.x,c.y,60,20),'Edit...',0))modal_exit(1)
+		if(ui_button(rect(c.x,c.y,60,20),'Edit...',1))modal_exit(1),con_set(contraption.def)
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
+	}
+	else if(ms.type=='condef_props'){
+		const b=draw_modalbox(rect(220,220)),condef=con(), lw=67
+		draw_textc(rect(b.x,b.y-5,b.w,20),'ConDef Properties',FONT_MENU,1)
+		draw_text(rect(b.x,b.y+ 22,lw,20),'Name',FONT_MENU,1)
+		draw_text(rect(b.x,b.y+ 42,lw,20),'Size',FONT_MENU,1)
+		draw_text(rect(b.x,b.y+ 62,lw,20),'Description',FONT_MENU,1)
+		draw_text(rect(b.x,b.y+122,lw,20),'Template',FONT_MENU,1)
+		ui_field   (rect(b.x+lw,b.y+20 ,b.w-lw,18),ms.name)
+		ui_field   (rect(b.x+lw,b.y+40 ,b.w-lw,18),ms.text)
+		ui_textedit(rect(b.x+lw,b.y+60 ,b.w-lw,58),1,ms.form0)
+		ui_codeedit(rect(b.x+lw,b.y+120,b.w-lw,58),1,ms.form1)
+		iwrite(condef,lms('name'       ),rtext_string(ms.name .table))
+		iwrite(condef,lms('description'),rtext_string(ms.form0.table))
+		iwrite(condef,lms('template'   ),rtext_string(ms.form1.table)),mark_dirty()
+		const c=rect(b.x,b.y+b.h-20)
+		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))modal_exit(1),setscript(condef);c.x+=65
+		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(0)
+	}
+	else if(ms.type=='condef_attrs'){
+		const b=draw_modalbox(rect(220,200)),condef=con(), lw=42
+		draw_textc(rect(b.x,b.y-5,b.w,20),`${condef.name} Attributes`,FONT_MENU,1)
+		const gsize=rect(b.x,b.y+20,80,b.h-(20+5+20))
+		const before=ms.grid.row;ui_table(gsize,[gsize.w-18],'s',ms.grid)
+		if(before!=ms.grid.row||ms.name.table==null||ms.text.table==null){
+			ms.name=fieldstr(ms.grid.row>=0?ms.grid.table.v.name [ms.grid.row]:lms(''))
+			ms.text=fieldstr(ms.grid.row>=0?ms.grid.table.v.label[ms.grid.row]:lms(''))
+		}
+		const sel=ms.grid.row>=0
+		draw_text(rect(gsize.x+gsize.w+10,b.y+20+2,lw,20),'Name' ,FONT_MENU,1)
+		draw_text(rect(gsize.x+gsize.w+10,b.y+40+2,lw,20),'Label',FONT_MENU,1)
+		draw_text(rect(gsize.x+gsize.w+10,b.y+60+2,lw,20),'Type' ,FONT_MENU,1)
+		ui_dfield(rect(gsize.x+gsize.w+5+lw,b.y+20,b.w-(lw+5+gsize.w),18),sel,ms.name)
+		ui_dfield(rect(gsize.x+gsize.w+5+lw,b.y+40,b.w-(lw+5+gsize.w),18),sel,ms.text)
+		if(sel){
+			ms.grid.table.v.name [ms.grid.row]=rtext_string(ms.name.table)
+			ms.grid.table.v.label[ms.grid.row]=rtext_string(ms.text.table)
+		}
+		const cr=rect(gsize.x+gsize.w+5+lw,b.y+62), c=rect(b.x,b.y+b.h-20)
+		const attr_types=['bool','number','string','code','rich']
+		const attr_labels=['Boolean','Number','String','Code','Rich Text']
+		const t=sel?ls(ms.grid.table.v.type[ms.grid.row]):''
+		for(let z=0;z<attr_types.length;z++,cr.y+=16)if(ui_radio(rect(cr.x,cr.y,b.w-(lw+5+gsize.w),16),attr_labels[z],sel,t==attr_types[z])){
+			ms.grid.table.v.type[ms.grid.row]=lms(attr_types[z])
+		}
+		if(ui_button(rect(c.x,c.y,60,20),'Add',1)){
+			ms.grid.table.v.name .push(lms(''))
+			ms.grid.table.v.label.push(lms(''))
+			ms.grid.table.v.type .push(lms('bool'))
+			ms.grid.row=count(ms.grid.table)-1,ms.name.table=null,ms.text.table=null
+		};c.x+=65
+		if(ui_button(rect(c.x,c.y,60,20),'Remove',sel)){
+			ms.grid.table=dyad.drop(lml([lmn(ms.grid.row)]),ms.grid.table)
+			ms.grid.row=-1,ms.name.table=null,ms.text.table=null
+		}
+		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit){iwrite(condef,lms('attributes'),ms.grid.table),mark_dirty(),modal_exit(1)}
 	}
 	else if(ms.type=='resources'){
 		const b=draw_modalbox(rect(280,190))
@@ -1589,7 +1686,7 @@ modals=_=>{
 			}
 			const save_image=_=>{
 				if(bg_has_sel()){const s=rcopy(dr.sel_here);bg_end_selection(),dr.sel_here=s}
-				let i=draw_card(ifield(deck,'card'),1),off=rect(),f=1,a=0, bg=dr.trans?0:32, frames=[]
+				let i=draw_con(ifield(deck,'card'),1),off=rect(),f=1,a=0, bg=dr.trans?0:32, frames=[]
 				const anim=deck.patterns.anim
 				const anim_pattern=(pix,x,y,f)=>pix<28||pix>31?pix: anim[pix-28][f%max(1,anim[pix-28].length)]
 				const draw_pattern=(pix,x,y  )=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal[(x%8)+(8*(y%8))+(8*8*pix)]&1
@@ -1812,7 +1909,7 @@ modals=_=>{
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='grid_props'){
-		const b=draw_modalbox(rect(220,140+70)),grid=ob.sel[0]
+		const b=draw_modalbox(rect(280,140+70)),grid=ob.sel[0]
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Grid Properties',FONT_MENU,1)
 		draw_text(rect(b.x,b.y+22,47,20),'Name'  ,FONT_MENU,1)
 		draw_text(rect(b.x,b.y+42,47,20),'Format',FONT_MENU,1)
@@ -1916,16 +2013,17 @@ free_canvas=deck=>{ // make a drawing surface that isn't attached to the parent 
 	const d=deck_read('{deck}\n{card:home}\n{widgets}\nc:{"type":"canvas"}')
 	const c=d.cards.v[0], r=c.widgets.v[0]
 	iwrite(r,lms('size'),lmpair(deck.size)),d.fonts=deck.fonts,d.patterns=deck.patterns,r.free=1
-	canvas_image(r,1);return r
+	container_image(r,1);return r
 }
 go_notify=(deck,x,t,url)=>{
 	if(url&&/(http|https|ftp|gopher|gemini):\/\//.test(url))modal_enter('url'),ms.text=fieldstr(lms(url))
+	const moved=x!=ln(ifield(ifield(deck,'card'),'index'))
+	if(moved)con_set(null)
 	if(ms.type!='trans'&&x>=0&&t&&dget(deck.transit,lms(t))){
 		modal_enter('trans'),ms.time_curr=0,ms.time_end=30,ms.time_start=-1;
 		ms.trans=dget(deck.transit,lms(t)), ms.canvas=free_canvas(deck)
-		ms.carda=draw_card(ifield(deck,'card')), ms.cardb=draw_card(ifield(deck,'cards').v[x])
+		ms.carda=draw_con(ifield(deck,'card')), ms.cardb=draw_con(ifield(deck,'cards').v[x])
 	}
-	const moved=x!=ln(ifield(ifield(deck,'card'),'index'))
 	if(moved&&uimode=='interact')msg.pending_loop=1
 	if(moved||t){
 		grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel=[],wid.active=ms.type=='listen'?0:-1,mark_dirty()
@@ -1941,17 +2039,29 @@ has_redo=_=>doc_hist_cursor<doc_hist.length
 undo=_=>{const x=doc_hist[--(doc_hist_cursor)];apply(0,x)}
 redo=_=>{const x=doc_hist[(doc_hist_cursor)++];apply(1,x)}
 edit=x=>{doc_hist=doc_hist.slice(0,doc_hist_cursor),doc_hist.push(x),redo()}
+edit_target=r=>{
+	const c=con()
+	if(card_is  (c))r.card=ln(ifield(c,'index'))
+	if(condef_is(c))r.def=ifield(c,'name')
+	return r
+}
 apply=(fwd,x)=>{
-	let card=ifield(deck,'card'), cn=ln(ifield(card,'index')), tn=x.card, t=x.type
-	if(cn!=tn)n_go([lmn(tn)],deck),card=ifield(deck,'card')
-	const wids=card.widgets
+	let container=null, t=x.type
+	if(x.def){con_set(container=dget(deck.contraptions,x.def))}
+	else if(x.card!=undefined){
+		let c=ifield(deck,'card')
+		if(ln(ifield(c,'index'))!=x.card)n_go([lmn(x.card)],deck),c=ifield(deck,'card')
+		con_set(null),container=c
+	}
+	if(!container)return
+	const wids=con_wids()
 	if(t=='ob_create'){fwd=!fwd,t='ob_destroy'}
 	if(t=='bg_block'){
 		if(uimode!='draw')setmode('draw')
 		const r=x.pos, p=x[fwd?'after':'before']
-		let bg=canvas_image(card,1), s=bg.size
-		const cs=getpair(ifield(card,'size'))
-		if(s.x!=cs.x||s.y!=cs.y){bg=image_resize(bg,cs),iwrite(card,lms('image'),bg),s=cs}
+		let bg=container_image(container,1), s=bg.size
+		const cs=getpair(ifield(container,'size'))
+		if(s.x!=cs.x||s.y!=cs.y){bg=image_resize(bg,cs),iwrite(container,lms('image'),bg),s=cs}
 		const cb=x.clr_before, ca=x.clr_after, clip=rect(0,0,s.x,s.y)
 		if(fwd&&ca)image_paste(x.clr_pos,clip,ca,bg,1)
 		image_paste(r,clip,p,bg,1)
@@ -1966,12 +2076,12 @@ apply=(fwd,x)=>{
 		if(uimode!='object')setmode('object')
 		if(fwd){
 			const w=x.props.map(z=>dget(wids,dget(z,lms('name')))).filter(x=>x!=null)
-			x.props=card_copy_raw(card,w),w.map(z=>card_remove(card,z))
+			x.props=con_copy_raw(container,w),w.map(z=>card_remove(container,z))
 		}
 		else{
-			ob.sel=[];const w=card_paste_raw(card,x.props);w.map((z,i)=>{
+			ob.sel=[];const w=con_paste_raw(container,x.props);w.map((z,i)=>{
 				dset(x.props[i],lms('name'),ifield(z,'name')),ob.sel.push(z)
-				if(!dget(x.props[i],lms('pos')))iwrite(z,lms('pos'),lmpair(rcenter(frame.clip,getpair(ifield(z,'size')))))
+				if(!dget(x.props[i],lms('pos')))iwrite(z,lms('pos'),lmpair(rcenter(rpair(rect(),con_size()),getpair(ifield(z,'size')))))
 			})
 		}
 	}mark_dirty()
@@ -1983,8 +2093,8 @@ image_overlay=(dst,src,mask)=>{for(let z=0;z<src.pix.length;z++)if(src.pix[z]!=m
 image_mask=(src,mask)=>{const r=image_copy(src);for(let z=0;z<mask.pix.length;z++)if(!mask.pix[z])r.pix[z]=0;return r}
 bg_scratch_clear=_=>dr.scratch.pix.fill(BG_MASK)
 bg_scratch=_=>{
-	if(!dr.scratch)dr.scratch=image_make(frame.size)
-	const s=dr.scratch.size;if(s.x!=frame.size.x||s.y!=frame.size.y)dr.scratch=image_make(frame.size)
+	const c=con_size();if(!dr.scratch)dr.scratch=image_make(c)
+	const s=dr.scratch.size;if(s.x!=c.x||s.y!=c.y)dr.scratch=image_make(c)
 	bg_scratch_clear()
 }
 bg_edit=_=>{
@@ -1993,9 +2103,8 @@ bg_edit=_=>{
 		if(dr.scratch.pix[z]==BG_MASK)continue;const x=z%s.x, y=0|(z/s.x)
 		d.x=min(d.x,x), d.y=min(d.y,y), d.w=max(d.w,x), d.h=max(d.h,y)
 	}d.w-=d.x,d.h-=d.y,d.w++,d.h++
-	const card=ifield(deck,'card'), back=ifield(card,'image')
-	const after=image_copy(back,d);image_overlay(after,image_copy(dr.scratch,d),BG_MASK)
-	edit({type:'bg_block',card:ln(ifield(card,'index')),pos:d,before:image_copy(back,d),after})
+	const back=con_image(),after=image_copy(back,d);image_overlay(after,image_copy(dr.scratch,d),BG_MASK)
+	edit(edit_target({type:'bg_block',pos:d,before:image_copy(back,d),after}))
 }
 draw_limbo=(clip,scale)=>{
 	if(!dr.limbo){/*nothing*/}
@@ -2005,22 +2114,22 @@ draw_limbo=(clip,scale)=>{
 	else                           {draw_scaled    (clip,dr.limbo,!dr.trans)}
 }
 bg_scaled_limbo=_=>{
-	const d=dr.sel_here, card=ifield(deck,'card'), back=ifield(card,'image')
+	const d=dr.sel_here, back=con_image()
 	const r=dr.trans||dr.omask?image_copy(back,d):image_make(rect(d.w,d.h)), s=r.size, t=frame;frame=draw_frame(r)
 	if(dr.trans){const c=dr.sel_start;draw_rect(rect(c.x-d.x,c.y-d.y,c.w,c.h),dr.fill)}
-	draw_limbo(frame.clip,0),frame=t;return r
+	draw_limbo(con_clip(),0),frame=t;return r
 }
 bg_edit_sel=_=>{
 	if(!dr.limbo)return
-	const d=rcopy(dr.sel_here), card=ifield(deck,'card'), back=ifield(card,'image')
-	const r={type:'bg_block',card:ln(ifield(card,'index')),pos:d,before:image_copy(back,d),after:bg_scaled_limbo()}
+	const d=rcopy(dr.sel_here), back=con_image()
+	const r={type:'bg_block',pos:d,before:image_copy(back,d),after:bg_scaled_limbo()}
 	dr.limbo=null,dr.limbo_dither=0
 	if(dr.sel_start.w>0||dr.sel_start.h>0){
 		const after=image_make(rect(dr.sel_start.w,dr.sel_start.h));for(let z=0;z<after.pix.length;z++)after.pix[z]=dr.fill
 		r.clr_pos=rcopy(dr.sel_start), r.clr_before=image_copy(back,dr.sel_start), r.clr_after=after, dr.sel_start=rect()
-	}edit(r)
+	}edit(edit_target(r))
 }
-bg_copy_selection=s=>image_copy(canvas_image(ifield(deck,'card'),1),s)
+bg_copy_selection=s=>image_copy(container_image(con(),1),s)
 bg_scoop_selection=_=>{if(dr.limbo)return;dr.sel_start=rcopy(dr.sel_here);dr.limbo=bg_copy_selection(dr.sel_start),dr.limbo_dither=0}
 bg_draw_lasso=(r,show_ants,fill)=>{
 	const o=dr.sel_start
@@ -2061,7 +2170,7 @@ bg_tools=_=>{
 	else if( dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=0;return}if(ev.alt)return
 	if(ev.md)pointer.prev=ev.pos
 	const pp=rcopy(pointer.prev), te=copy_object(ev)
-	if(!dover(frame.clip))ev.md=ev.mu=ev.drag=0
+	if(!dover(con_clip()))ev.md=ev.mu=ev.drag=0
 	if(dr.fatbits){ev.pos=fat_to_card(ev.pos),ev.dpos=fat_to_card(ev.dpos),pointer.prev=fat_to_card(pointer.prev)}
 	if(dr.tool=='pencil'||dr.tool=='line'||dr.tool=='rect'||dr.tool=='fillrect'||dr.tool=='ellipse'||dr.tool=='fillellipse'){
 		let clear=0;if(!dr.scratch)bg_scratch()
@@ -2139,7 +2248,7 @@ bg_tools=_=>{
 		draw_lines(dr.poly.map(p=>radd(o,card_to_fat(p))),dr.tool=='lasso'?0:dr.brush,dr.tool=='lasso'?ANTS:bg_pat())
 	}
 	if(dr.tool=='fill'&&ev.mu){
-		const bg=canvas_image(ifield(deck,'card'),1), t=frame;bg_scratch(),frame=draw_frame(dr.scratch)
+		const bg=container_image(con(),1), t=frame;bg_scratch(),frame=draw_frame(dr.scratch)
 		draw_fill(ev.pos,ev.rup?bg_fill():bg_pat(),bg),frame=t,bg_edit(),bg_scratch_clear()
 	}
 	if(!bg_has_sel()&&!bg_has_lasso()){
@@ -2148,13 +2257,10 @@ bg_tools=_=>{
 			if(ev.dir=='right')dr.offset.x+=ev.shift?dr.grid_size.x:1
 			if(ev.dir=='up'   )dr.offset.y-=ev.shift?dr.grid_size.y:1
 			if(ev.dir=='down' )dr.offset.y+=ev.shift?dr.grid_size.y:1
-			dr.offset=rint(rect(max(0,min(dr.offset.x,frame.size.x-(frame.size.x/8))),max(0,min(dr.offset.y,frame.size.y-(frame.size.y/8)))))
+			const c=con_size()
+			dr.offset=rint(rect(max(0,min(dr.offset.x,c.x-(c.x/8))),max(0,min(dr.offset.y,c.y-(c.y/8)))))
 			if(ev.exit)dr.fatbits=0
-		}
-		else{
-			if(ev.dir=='left' )n_go([lms('Prev')],deck)
-			if(ev.dir=='right')n_go([lms('Next')],deck)
-		}
+		}else{tracking()}
 	}
 	ev=te,pointer.prev=pp
 }
@@ -2275,15 +2381,15 @@ ob_order=_=>{ob.sel.sort((av,bv)=>ln(ifield(av,'index'))-ln(ifield(bv,'index')))
 ob_edit_prop=(key,value)=>{
 	const before={}, after={}
 	ob.sel.map(w=>{const n=ls(ifield(w,'name')),bp={},ap={}; bp[key]=ifield(w,key),ap[key]=value,before[n]=bp,after[n]=ap})
-	edit({type:'ob_props',card:ln(ifield(ifield(deck,'card'),'index')),before,after})
+	edit(edit_target({type:'ob_props',before,after}))
 }
 ob_create=props=>{
-	edit({type:'ob_create',card:ln(ifield(ifield(deck,'card'),'index')),props})
+	edit(edit_target({type:'ob_create',props}))
 }
 ob_destroy=_=>{
 	if(ob.sel.length<1)return
 	const props=ob.sel.map(w=>lmd([lms('name')],[ifield(w,'name')]))
-	edit({type:'ob_destroy',card:ln(ifield(ifield(deck,'card'),'index')),props}),ob.sel=[]
+	edit(edit_target({type:'ob_destroy',props})),ob.sel=[]
 }
 can_coalesce=move=>{
 	if(has_redo()||doc_hist.length==0)return false
@@ -2307,7 +2413,7 @@ ob_move=(delta,coalesce)=>{
 		const before={},after={};ob.sel.map(w=>{
 			const n=ls(ifield(w,'name')),f=ifield(w,'pos'),fv=getpair(f)
 			before[n]={pos:f},after[n]={pos:lmpair(radd(fv,delta))}
-		}),edit({type:'ob_props',card:ln(ifield(ifield(deck,'card'),'index')),before,after})
+		}),edit(edit_target({type:'ob_props',before,after}))
 	}
 }
 ob_resize=(size,coalesce)=>{
@@ -2320,7 +2426,7 @@ ob_resize=(size,coalesce)=>{
 		const bp={pos:ifield(w,'pos')            ,size:ifield(w,'size')           }
 		const ap={pos:lmpair(rect(size.x,size.y)),size:lmpair(rect(size.w,size.h))}
 		const before={},after={},n=ls(ifield(w,'name'));before[n]=bp,after[n]=ap
-		edit({type:'ob_props',card:ln(ifield(ifield(deck,'card'),'index')),before,after})
+		edit(edit_target({type:'ob_props',before,after}))
 	}
 }
 object_properties=x=>{
@@ -2333,13 +2439,9 @@ object_properties=x=>{
 	if(contraption_is(x))modal_enter('contraption_props')
 }
 object_editor=_=>{
-	const card=ifield(deck,'card'), wids=ifield(card,'widgets'), pal=deck.patterns.pal.pix
-	if(ob.sel.length==0&&in_layer()){
-		if(ev.dir=='left' )n_go([lms('Prev')],deck)
-		if(ev.dir=='right')n_go([lms('Next')],deck)
-	}
+	const wids=con_wids(), pal=deck.patterns.pal.pix
 	wids.v.map(wid=>{
-		const w=unpack_widget(wid), sel=ob.sel.some(x=>x==wid)
+		const w=unpack_widget(wid), sel=ob.sel.some(x=>x==wid);w.size=con_to_screen(w.size)
 		if(sel){draw_box(inset(w.size,-1),0,ANTS)}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1))}
 		if(sel&&ob.sel.length==1&&!contraption_is(ob.sel[0])){draw_handles(w.size)}
 		if(w.locked&&ob.show_bounds){draw_rect(rect(w.size.x+w.size.w-10,w.size.y,10,10),1),draw_icon(rect(w.size.x+w.size.w-8,w.size.y+1),LOCK,32)}
@@ -2393,7 +2495,7 @@ object_editor=_=>{
 		const delta=rsub(a,b)
 		if(dragged)ob_move(delta,!ob.move_first),ob.move_first=0,ob.prev=rcopy(ev.pos)
 	}else{
-		if(box&&ev.drag)draw_box(sr,0,ANTS); if(box&&(ev.drag||ev.mu))ob.sel=[]
+		if(box&&ev.drag)draw_box(con_to_screen(sr),0,ANTS); if(box&&(ev.drag||ev.mu))ob.sel=[]
 		let f=0;for(let z=count(wids)-1;z>=0;z--){ // backward pass for selection priority(!)
 			const wid=wids.v[z], w=unpack_widget(wid), sel=ob.sel.some(x=>x==wid), overlap=rclip(w.size,sr)
 			const insel=box?overlap.w>=1&&overlap.h>=1: over(w.size)&&dover(w.size), c=ev.mu&insel
@@ -2500,13 +2602,12 @@ script_editor=_=>{
 	}
 	const mh=3+font_h(FONT_MENU), bb=rect(0,mh,frame.size.x+1,frame.size.y-2*mh)
 	let overw=null;if(sc.xray){
-		const card=ifield(deck,'card'),wids=ifield(card,'widgets');
-		for(let z=0;z<wids.v.length;z++){
+		const wids=con_wids();for(let z=0;z<wids.v.length;z++){
 			const wid=wids.v[z],size=unpack_widget(wid).size, o=ev.alt&&over(size), col=o?(overw=wid,13):44
 			draw_textc(size,ls(ifield(wid,'name')),FONT_BODY,o?-1:col),draw_box(size,0,col)
 			if(count(ifield(wid,'script')))draw_icon(rect(size.x-1,size.y),ICONS[ICON.lil],o?1:col)
 			if(ev.alt&&ev.mu&&over(size)&&dover(size)){close_script(wid),ev.md=ev.mu=0;break}
-		}if(ev.alt&&ev.mu)close_script(card),ev.md=ev.mu=0
+		}if(ev.alt&&ev.mu)close_script(con()),ev.md=ev.mu=0
 	}
 	ui_codeedit(bb,0,sc.f),draw_hline(0,frame.size.x,frame.size.y-mh-1,1)
 	if(overw){uicursor=cursor.point;draw_textc(unpack_widget(overw).size,ls(ifield(overw,'name')),FONT_BODY,-1)}
@@ -2601,7 +2702,8 @@ all_menus=_=>{
 		if(menu_item('Export Script...',1))modal_enter('export_script')
 		menu_separator()
 		if(menu_item('Go to Deck',!deck_is(sc.target)           ))close_script(deck)
-		if(menu_item('Go to Card',sc.target!=ifield(deck,'card')))close_script(ifield(deck,'card'))
+		const container=con()
+		if(menu_item(`Go to ${condef_is(container)?'ConDef':'Card'}`,sc.target!=container))close_script(container)
 		if(menu_check('X-Ray Specs',1,sc.xray))sc.xray^=1
 	}
 	else if(ms.type=='recording'){
@@ -2669,12 +2771,12 @@ all_menus=_=>{
 			if(menu_item('Cut Image',sel,0,menucut)){}
 			if(menu_item('Copy Image',sel,0,menucopy)){}
 			if(menu_item('Paste',1,'v',menupaste)){}
-			if(menu_item('Clear',1)){const t=dr.tool;if(!sel){settool('select'),dr.sel_here=rcopy(frame.clip)}bg_delete_selection(),settool(t)}
+			if(menu_item('Clear',1)){const t=dr.tool;if(!sel){settool('select'),dr.sel_here=rcopy(con_clip())}bg_delete_selection(),settool(t)}
 			menu_separator()
-			if(menu_item('Select All',1,'a')){settool('select'),dr.sel_here=rcopy(frame.clip)}
+			if(menu_item('Select All',1,'a')){settool('select'),dr.sel_here=rcopy(con_clip())}
 			if(menu_item('Tight Selection',sel,'g'))bg_tighten()
-			if(menu_item("Resize to Original",sel&&dr.tool=='select',0)){bg_scoop_selection();const s=dr.limbo.size;dr.sel_here.w=s.x,dr.sel_here.h=s.y}
-			if(menu_item("Resize to Card"    ,sel&&dr.tool=='select',0)){bg_scoop_selection(),dr.sel_here=rect(0,0,frame.size.x,frame.size.y)}
+			if(menu_item('Resize to Original',sel&&dr.tool=='select',0)){bg_scoop_selection();const s=dr.limbo.size;dr.sel_here.w=s.x,dr.sel_here.h=s.y}
+			if(menu_item(`Resize to ${condef_is(con())?'ConDef':'Card'}`,sel&&dr.tool=='select',0)){bg_scoop_selection(),dr.sel_here=con_clip()}
 			menu_separator()
 			if(menu_item('Invert',sel&&!dr.limbo_dither,'i')){
 				if(bg_has_sel())bg_scoop_selection()
@@ -2711,7 +2813,6 @@ all_menus=_=>{
 				if(menu_item('Darken  Image',dr.dither_threshold< 2.0))dr.dither_threshold+=.1
 			}
 		}
-		const card=ifield(deck,'card')
 		if(ms.type==null&&uimode=='object'){
 			if(menu_item('Undo',has_undo(),'z'))undo()
 			if(menu_item('Redo',has_redo(),'Z'))redo()
@@ -2724,7 +2825,7 @@ all_menus=_=>{
 			if(menu_item('Paste as new Canvas',1,0,pasteascanvas)){}
 			if(menu_item('Paste into Canvas',ob.sel.length==1&&canvas_is(ob.sel[0]),0,pasteintocanvas)){}
 			menu_separator()
-			if(menu_item('Select All',1,'a'))ob.sel=card.widgets.v.slice(0)
+			if(menu_item('Select All',1,'a'))ob.sel=con_wids().v.slice(0)
 			if(menu_item('Move to Front',ob.sel.length))ob_order(),ob.sel                   .map(w=>iwrite(w,lms('index'),lmn(RTEXT_END))),mark_dirty()
 			if(menu_item('Move to Back' ,ob.sel.length))ob_order(),ob.sel.slice(0).reverse().map(w=>iwrite(w,lms('index'),NONE          )),mark_dirty()
 		}
@@ -2759,9 +2860,8 @@ all_menus=_=>{
 		menu_separator()
 		if(menu_item('Select All',1,'a'))au.head=0,au.sel=rect(0,au.target.data.length-1)
 	}
-	if(uimode=='interact'||uimode=='draw'||uimode=='object'){
+	if((uimode=='interact'||uimode=='draw'||uimode=='object')&&card_is(con())){
 		menu_bar('Card',ms.type==null)
-		const card=ifield(deck,'card')
 		if(menu_item('Go to First'   ,1))n_go([lms('First')],deck)
 		if(menu_item('Go to Previous',1))n_go([lms('Prev' )],deck)
 		if(menu_item('Go to Next'    ,1))n_go([lms('Next' )],deck)
@@ -2770,8 +2870,21 @@ all_menus=_=>{
 		if(menu_item('Cut Card',1,0,cutcard)){}
 		if(menu_item('Copy Card',1,0,copycard)){}
 		menu_separator()
-		if(menu_item('Script...'    ,1))setscript(card)
+		if(menu_item('Script...'    ,1))setscript(con())
 		if(menu_item('Properties...',1))modal_enter('card_props')
+	}
+	if((uimode=='interact'||uimode=='draw'||uimode=='object')&&condef_is(con())){
+		menu_bar('Contraption',ms.type==null)
+		const condefs=deck.contraptions
+		if(menu_item('Close',1))con_set(null)
+		if(menu_item('Go to Previous',count(condefs)>1)){ev.dir='left' ,tracking(),ev.dir=0}
+		if(menu_item('Go to Next'    ,count(condefs)>1)){ev.dir='right',tracking(),ev.dir=0}
+		menu_separator()
+		if(menu_item('Script...'    ,1))setscript(con())
+		if(menu_item('Properties...',1))modal_enter('condef_props')
+		if(menu_item('Attributes...',1))modal_enter('condef_attrs')
+	}
+	if(uimode=='interact'||uimode=='draw'||uimode=='object'){
 		menu_bar('Tool',ms.type==null)
 		if(menu_check('Interact',1,uimode=='interact',0))setmode('interact')
 		if(menu_check('Widgets' ,1,uimode=='object'  ,0))setmode('object')
@@ -2802,7 +2915,7 @@ all_menus=_=>{
 		if(menu_check('Transparency Mask',1,dr.trans_mask))dr.trans_mask^=1
 		if(menu_check('Fat Bits'         ,1,dr.fatbits   )){
 			if(uimode!='draw')setmode('draw')
-			dr.fatbits^=1;if(dr.fatbits)fat_offset(rcenter(bg_has_sel()||bg_has_lasso()?dr.sel_here:frame.clip,rect()))
+			dr.fatbits^=1;if(dr.fatbits)fat_offset(rcenter(bg_has_sel()||bg_has_lasso()?dr.sel_here:con_clip(),rect()))
 		}
 	}
 	if(uimode=='draw'){
@@ -2820,7 +2933,7 @@ all_menus=_=>{
 		if(menu_item('New Slider...'     ,1))ob_create([lmd([lms('type')],[lms('slider')])])
 		if(menu_item('New Canvas...'     ,1))ob_create([lmd([lms('type')],[lms('canvas')])])
 		if(menu_item('New Grid...'       ,1))ob_create([lmd([lms('type')],[lms('grid'  )])])
-		if(menu_item('New Contraption...',1))modal_enter('pick_contraption')
+		if(card_is(con())&&menu_item('New Contraption...',1))modal_enter('pick_contraption')
 		menu_separator()
 		let al=1,as=1,at=1,ai=1,an=1
 		ob.sel.map(unpack_widget).map(w=>{al&=w.locked, as&=w.show=='solid', at&=w.show=='transparent', ai&=w.show=='invert', an&=w.show=='none'})
@@ -2850,62 +2963,68 @@ all_menus=_=>{
 }
 
 main_view=_=>{
-	const card=ifield(deck,'card'), back=ifield(card,'image'), wids=ifield(card,'widgets'), pal=deck.patterns.pal.pix
-	if(back.size.x>0&&back.size.y>0&&ms.type!='trans'){
+	if(ob.sel.length==0&&in_layer()&&(!card_is(con())||uimode=='object'))tracking()
+	const back=con_image(), wids=con_wids(), pal=deck.patterns.pal.pix
+	if(ms.type!='trans'){
+		const cl=con_clip(),s=con_size()
+		if(back.size.x!=s.x||back.size.y!=s.y)image_resize(back,s),mark_dirty()
 		if(dr.fatbits){draw_fat(back,pal,frame_count,0,FAT,dr.offset)}
-		else{image_paste(rpair(rect(),back.size),frame.clip,back,frame.image,1)}
+		else if(s.x==frame.size.x&&s.y==frame.size.y){image_paste(rpair(rect(),back.size),frame.clip,back,frame.image,1)}
+		else{frame.image.pix.fill(46),draw_rect(cl,bg_fill()),image_paste(cl,frame.clip,back,frame.image,0)}
 	}
 	if(uimode=='draw'&&in_layer())bg_tools()
 	if(dr.tool=='select'&&(dr.sel_start.w>0||dr.sel_start.h>0))draw_rect(card_to_fat(dr.sel_start),dr.fill)
 	bg_lasso_preview()
 	const livesel=bg_select()
 	if(((uimode=='object'||uimode=='draw')&&dr.show_grid)||ms.type=='grid'){
-		for(let x=0;x<frame.size.x;x++){const r=card_to_fat(rect(x*dr.grid_size.x,0,1,frame.size.y));draw_vline(r.x,r.y,r.y+r.h,44)}
-		for(let y=0;y<frame.size.y;y++){const r=card_to_fat(rect(0,y*dr.grid_size.y,frame.size.x,1));draw_hline(r.x,r.x+r.w,r.y,44)}
+		const c=con_clip()
+		for(let x=dr.grid_size.x;x<c.w;x+=dr.grid_size.x){const r=card_to_fat(rect(c.x+x,c.y,1,c.h));draw_vline(r.x,r.y,r.y+r.h,44)}
+		for(let y=dr.grid_size.y;y<c.h;y+=dr.grid_size.y){const r=card_to_fat(rect(c.x,c.y+y,c.w,1));draw_hline(r.x,r.x+r.w,r.y,44)}
 	}
 	const eb=ev;if(uimode!='interact')ev=event_state()
-	if(uimode=='interact'||(dr.show_widgets&&!dr.fatbits)){handle_widgets(wids,rect(0,0))}
+	if(uimode=='interact'||(dr.show_widgets&&!dr.fatbits)){handle_widgets(wids,con_offset())}
 	else if(dr.show_widgets&&dr.fatbits)wids.v.map(w=>{draw_boxinv(pal,card_to_fat(unpack_widget(w).size))})
 	ev=eb
 	if(uimode=='draw'){if(bg_has_sel())draw_handles(livesel);draw_box(livesel,0,ANTS)}
 	if(wid.pending_grid_edit){wid.pending_grid_edit=0;modal_enter('gridcell')}
-	if(uimode=='object')object_editor()
+	if(uimode=='object')ev=ev_to_con(ev),object_editor(),ev=con_to_ev(ev)
 	if((uimode=='object'&&ob.show_names)||(uimode=='draw'&&dr.show_widgets&&dr.fatbits)||ms.type=='listen'){
 		wids.v.map(wid=>{
-			const size=card_to_fat(unpack_widget(wid).size)
+			const size=con_to_screen(card_to_fat(unpack_widget(wid).size))
 			const n=ls(ifield(wid,'name')),s=font_textsize(FONT_BODY,n)
 			draw_text_outlined(rect(size.x,size.y-s.y,s.x,s.y),n,FONT_BODY)
 		})
 	}
 	if(ob.show_cursor&&ms.type==null&&uimode in {draw:1,object:1}){
+		ev=ev_to_con(ev);
 		if(uimode=='draw'&&bg_has_sel()){
 			let r=livesel,l=r;if(dr.fatbits){const p=fat_to_card(r);l=rint(rect(p.x,p.y,r.w/FAT,r.h/FAT))}
 			const t=ls(dyad.format(lms('(%3i,%3i,%3i,%3i)'),lml([l.x,l.y,l.w,l.h].map(lmn)))),s=font_textsize(FONT_BODY,t)
-			draw_text_outlined(rect(r.x,r.y-s.y,s.x,s.y),t,FONT_BODY)
+			draw_text_outlined(con_to_screen(rect(r.x,r.y-s.y,s.x,s.y)),t,FONT_BODY)
 		}
 		else if(ev.drag){
 			const a=dr.fatbits?fat_to_card(ev.dpos):ev.dpos, b=dr.fatbits?fat_to_card(ev.pos):ev.pos, r=rect(b.x,b.y,b.x-a.x,b.y-a.y)
 			const t=ls(dyad.format(lms('(%3i,%3i,%3i,%3i)'),lml([r.x,r.y,r.w,r.h].map(lmn)))),s=font_textsize(FONT_BODY,t)
-			draw_text_outlined(rect(ev.pos.x,ev.pos.y-s.y,s.x,s.y),t,FONT_BODY)
+			draw_text_outlined(con_to_screen(rect(ev.pos.x,ev.pos.y-s.y,s.x,s.y)),t,FONT_BODY)
 		}
 		else{
 			const c=dr.fatbits?fat_to_card(ev.pos):ev.pos
 			const t=ls(dyad.format(lms('(%3i,%3i)'),lml([c.x,c.y].map(lmn)))),s=font_textsize(FONT_BODY,t)
-			draw_text_outlined(rect(ev.pos.x,ev.pos.y-s.y,s.x,s.y),t,FONT_BODY)
-		}
+			draw_text_outlined(con_to_screen(rect(ev.pos.x,ev.pos.y-s.y,s.x,s.y)),t,FONT_BODY)
+		}ev=con_to_ev(ev);
 	}
+	if(in_layer()&&ev.exit&&!card_is(con()))con_set(null),ev.exit=0
 }
 gestures=_=>{
-	if(!enable_gestures)return
-	const card=ifield(deck,'card')
+	if(!enable_gestures||!card_is(con()))return
 	if(!in_layer()||uimode!='interact'||(!ev.drag&&!ev.mu))return          // must be in the right state of mind
 	if(ev.drag&&ob.sel.length&&lb(ifield(ob.sel[0],'draggable')))return    // must not be dragging a canvas
-	if(card.widgets.v.some(x=>dover(unpack_widget(x).size)))return         // must touch grass
+	if(con_wids().v.some(x=>dover(unpack_widget(x).size)))return           // must touch grass
 	const d=rsub(ev.pos,ev.dpos);if(Math.sqrt(d.x*d.x+d.y*d.y)<50)return   // must be emphatic
 	if(Math.abs(d.x)<2*Math.abs(d.y)&&Math.abs(d.y)<2*Math.abs(d.x))return // must be highly directional
 	const dir=Math.abs(d.x)>2*Math.abs(d.y)?(d.x<0?'left':'right'):(d.y<0?'up':'down')
 	image_paste(rect(ev.pos.x-8,ev.pos.y-8,16,16),frame.clip,GESTURES[dir],frame.image,0)
-	if(ev.mu)msg.target_navigate=card,msg.arg_navigate=lms(dir)
+	if(ev.mu)msg.target_navigate=con(),msg.arg_navigate=lms(dir)
 }
 
 validate_modules=_=>{
@@ -3034,7 +3153,7 @@ q('body').onkeyup=e=>{
 	if(e.key=='m'&&uimode=='draw'&&in_layer())ev.hidemenu^=1
 	if(e.key=='t'&&uimode=='draw'&&in_layer())dr.trans^=1
 	if(e.key=='Escape')ev.exit=1
-	if(!wid.infield&&uimode=='interact'){
+	if(!wid.infield&&uimode=='interact'&&card_is(con())){
 		if(e.key=='ArrowUp'   )msg.target_navigate=ifield(deck,'card'),msg.arg_navigate=lms('up'   )
 		if(e.key=='ArrowDown' )msg.target_navigate=ifield(deck,'card'),msg.arg_navigate=lms('down' )
 		if(e.key=='ArrowLeft' )msg.target_navigate=ifield(deck,'card'),msg.arg_navigate=lms('left' )
@@ -3066,7 +3185,7 @@ docut=_=>{
 		const i=bg_has_lasso()?image_mask(dr.limbo,dr.mask): dr.limbo?bg_scaled_limbo():bg_copy_selection(dr.sel_here)
 		bg_scoop_selection(),bg_delete_selection();return image_write(i)
 	}
-	else if(ms.type==null&&uimode=='object'&&ob.sel.length){ob_order();const r=ls(card_copy(ifield(deck,'card'),lml(ob.sel)));ob_destroy();return r}
+	else if(ms.type==null&&uimode=='object'&&ob.sel.length){ob_order();const r=ls(con_copy(con(),lml(ob.sel)));ob_destroy();return r}
 	return null
 }
 docopy=_=>{
@@ -3079,7 +3198,7 @@ docopy=_=>{
 	else if(ms.type==null&&uimode=='draw'&&(bg_has_sel()||bg_has_lasso())){
 		const i=bg_has_lasso()?image_mask(dr.limbo,dr.mask): dr.limbo?bg_scaled_limbo():bg_copy_selection(dr.sel_here);return image_write(i)
 	}
-	else if(ms.type==null&&uimode=='object'&&ob.sel.length){ob_order();return ls(card_copy(ifield(deck,'card'),lml(ob.sel)))}
+	else if(ms.type==null&&uimode=='object'&&ob.sel.length){ob_order();return ls(con_copy(con(),lml(ob.sel)))}
 	return null
 }
 dopaste=x=>{
@@ -3091,9 +3210,9 @@ dopaste=x=>{
 		}else{setmode('draw'),bg_paste(i)}
 	}
 	else if(ms.type=='recording'&&au.mode=='stopped'&&/^%%SND0/.test(x)){sound_edit(sound_replace(sound_read(x)))}
-	else if(ms.type==null&&/^%%WGT0/.test(x)){setmode('object'),card_paste(ifield(deck,'card'),lms(x))}
+	else if(ms.type==null&&/^%%WGT0/.test(x)){ob_create(ll(pjson(x,6,x.length-6).value))}
 	else if(ms.type==null&&/^%%CRD0/.test(x)){
-		const c=deck_paste(deck,lms(x))
+		const c=deck_paste(deck,lms(x));con_set(null)
 		const card=ifield(deck,'card'), n=ln(ifield(card,'index'));iwrite(c,lms('index'),lmn(n+1)),n_go([c],deck)
 	}
 	else if(wid.gv&&!wid.g.locked&&ms.type==null){grid_edit(n_readcsv([lms(x),lms(wid.g.format)]))}

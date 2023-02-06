@@ -1043,7 +1043,7 @@ Contraptions are custom widgets, defined in a [ConDef](#condefinterface). See th
 | `typeof x`              | `"contraption"`                                                                                       |
 | `x.name`                | String. The name of this widget. r/w.                                                                 |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
-| `x.image`               | An _image_ interface representing the contraption's background. r/w.                                  |
+| `x.image`               | An _image_ interface representing the contraption's background, inherited from its ConDef.            |
 | `x.locked`              | Bool. Behavior of this property is entirely up to the ConDef. r/w.                                    |
 | `x.pos`                 | The `pos` of this widget on the card. r/w.                                                            |
 | `x.size`                | The `size` of the widget in pixels.                                                                   |
@@ -1194,7 +1194,7 @@ end
 
 on drag pos do
 	if !me.locked|me.draggable
-		me.line[(pointer.prev-me.pos)/me.scale pos]
+		me.line[(pointer.prev-me.pos+card.pos)/me.scale pos]
 	end
 end
 

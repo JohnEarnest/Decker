@@ -218,6 +218,7 @@ lv* lmfpair(fpair x){return lml2(lmn(x.x),lmn(x.y));}
 lv* lmrect(rect x){lv*r=lml(4);r->lv[0]=lmn(x.x),r->lv[1]=lmn(x.y),r->lv[2]=lmn(x.w),r->lv[3]=lmn(x.h);return r;}
 pair pair_max(pair a,pair b){return (pair){MAX(a.x,b.x),MAX(a.y,b.y)};}
 rect rect_add(rect a,pair b){return (rect){a.x+b.x,a.y+b.y,a.w,a.h};}
+rect rect_sub(rect a,pair b){return (rect){a.x-b.x,a.y-b.y,a.w,a.h};}
 rect rect_pair(pair a,pair b){return (rect){a.x,a.y,b.x,b.y};}
 int rect_same(rect a,rect b){return a.x==b.x&&a.y==b.y&&a.w==b.w&&a.h==b.h;}
 rect inset(rect r,int n){return (rect){r.x+n,r.y+n,r.w-2*n,r.h-2*n};}
@@ -1109,16 +1110,16 @@ void canvas_size(lv*self,pair size){
 	image_resize(i,(pair){ceil(size.x/scale),ceil(size.y/scale)});
 	n_canvas_clip(self,lml(0));
 }
-lv* canvas_image(lv*self,int build){
+lv* container_image(lv*self,int build){
 	pair size=getpair(ifield(self,"size"));lv*image=dget(self->b,lmistr("image"));
 	if(!image&&build){
-		lv*i=ivalue(self,"image");float scale=card_is(self)?1.0:ln(ifield(self,"scale"));
+		lv*i=ivalue(self,"image");float scale=!canvas_is(self)?1.0:ln(ifield(self,"scale"));
 		image=i?image_clone(i):image_make(lmbuff((pair){ceil(size.x/scale),ceil(size.y/scale)}));
 		dset(self->b,lmistr("image"),image);
 	}return image;
 }
 void pick_canvas(lv*self){
-	lv*image=canvas_image(self,1),*clip=ivalue(self,"clip");pair size=image_size(image);
+	lv*image=container_image(self,1),*clip=ivalue(self,"clip");pair size=image_size(image);
 	frame=(cstate){
 		ln(ifield(self,"brush")),
 		ln(ifield(self,"pattern")),
@@ -1141,7 +1142,7 @@ lv* n_canvas_rect (lv*self,lv*z){pick_canvas(self);draw_rect(box_intersect(unpac
 lv* n_canvas_clear(lv*self,lv*z){pick_canvas(self);draw_rect(box_intersect(unpack_rect(z),frame.clip),0);return NONE;}
 lv* n_canvas_box(lv*self,lv*z){pick_canvas(self);draw_box(unpack_rect(z),frame.brush,frame.pattern);return NONE;}
 lv* n_canvas_fill(lv*self,lv*z){pick_canvas(self);draw_fill(unpack_pair(z,0),frame.pattern,NULL);return NONE;}
-lv* n_canvas_copy(lv*self,lv*z){return n_image_copy(canvas_image(self,1),z);}
+lv* n_canvas_copy(lv*self,lv*z){return n_image_copy(container_image(self,1),z);}
 lv* n_canvas_paste(lv*self,lv*z){
 	pick_canvas(self);lv*c=unpack_image(z,0),*pos=z->c>=2?ll(z->lv[1]):lml(0);int solid=z->c>=3?!lb(z->lv[2]):1;
 	if(pos->c<=2){buffer_paste(rect_pair(getpair(pos),image_size(c)),frame.clip,c->b,frame.buffer,solid);}
@@ -1192,7 +1193,7 @@ lv* interface_canvas(lv*self,lv*i,lv*x){
 		ikey("brush"  ){int n=CLAMP(0,ln(x), 23);dset(data,i,lmn(n));return x;}
 		ikey("pattern"){int n=CLAMP(0,ln(x),255);dset(data,i,lmn(n));return x;}
 		ikey("font"   ){dset(data,i,normalize_font(fonts,x));return x;}
-		if(!lis(i)    ){return interface_image(canvas_image(self,1),i,x);}
+		if(!lis(i)    ){return interface_image(container_image(self,1),i,x);}
 		if(dget(data,lmistr("free")))return x;
 		ikey("border"   ){dset(data,i,lmn(lb(x)));return x;}
 		ikey("draggable"){dset(data,i,lmn(lb(x)));return x;}
@@ -1200,7 +1201,7 @@ lv* interface_canvas(lv*self,lv*i,lv*x){
 		ikey("size"     ){canvas_size(self,getpair(x));}// falls through to widget.size!
 		ikey("scale"    ){dset(data,i,lmn(MAX(0.1,ln(x))));canvas_size(self,getpair(ifield(self,"size")));return x;}
 	}else{
-		if(!lis(i)      ){lv*img=canvas_image(self,0);return img?interface_image(img,i,x):NONE;}
+		if(!lis(i)      ){lv*img=container_image(self,0);return img?interface_image(img,i,x):NONE;}
 		ikey("border"   ){lv*r=dget(data,i);return r?r:ONE;}
 		ikey("draggable"){lv*r=dget(data,i);return r?r:NONE;}
 		ikey("brush"    ){lv*r=dget(data,i);return r?r:NONE;}
@@ -1604,13 +1605,13 @@ lv* interface_contraption(lv*self,lv*i,lv*x){
 	if(x){
 		ikey("def"  )return x; // not mutable!
 		ikey("size" )return x; // not mutable!
-		ikey("image"){dset(data,i,image_is(x)?x:image_empty());return x;}
+		ikey("image")return x; // not mutable!
 		if(lis(i))for(int z=0;masks[z];z++)if(!strcmp(i->sv,masks[z]))return interface_widget(self,i,x);
 		fire_attr_sync(self,"set_",ls(i),x);return x;
 	}else{
 		ikey("def"  )return dget(data,i);
 		ikey("size" )return ifield(dget(data,lmistr("def")),"size");
-		ikey("image")return dget(data,i);
+		ikey("image")return ifield(dget(data,lmistr("def")),"image");
 		if(lis(i))for(int z=0;masks[z];z++)if(!strcmp(i->sv,masks[z]))return interface_widget(self,i,NULL);
 		return fire_attr_sync(self,"get_",ls(i),NULL);
 	}
@@ -1620,7 +1621,6 @@ lv*dict_delta(lv*a,lv*b){lv*r=lmd();EACH(z,b){lv*v=dget(a,b->kv[z]);if(!v||!matc
 lv* contraption_write(lv*x){
 	lv*data=x->b,*def=ifield(x,"def"),*r=lmd();
 	dset(r,lmistr("type"),lmistr("contraption")),dset(r,lmistr("def"),ifield(def,"name"));
-	{lv*k=lmistr("image" ),*v=dget(data,k);if(v&&!is_empty(v))dset(r,k,image_write(v));}
 	lv*o=ifield(def,"widgets"),*w=dget(data,lmistr("widgets")),*wids=lmd();EACH(z,w){
 		lv*wid=widget_write(w->lv[z]),*n=dget(wid,lmistr("name"));
 		lv*src=dget(o,n);if(src)wid=dict_delta(widget_write(src),wid);
@@ -1629,12 +1629,11 @@ lv* contraption_write(lv*x){
 }
 lv* contraption_read(lv*x,lv*r){
 	x=ld(x);lv*card=dget(r,lmistr("card")),*deck=dget(card->b,lmistr("deck")),*condefs=ifield(deck,"contraptions");
-	{lv*k=lmistr("image" ),*v=dget(x,k);dset(r,k,v?image_read(v):image_empty());}
 	lv*dname=dget(x,lmistr("def")),*def=dname?dget(condefs,dname):NULL;if(!def)return NULL;dset(r,lmistr("def"),def);
 	lv*widgets=lmd(),*ri=lmi(interface_contraption,lmistr("contraption"),r);dset(r,lmistr("widgets"),widgets),dset(r,lmistr("deck"),deck);
 	lv*d=ifield(def,"widgets"),*w=dget(x,lmistr("widgets"));if(w){w=ld(w);}else{w=lmd();EACH(z,d)dset(w,d->kv[z],lmd());}
-	EACH(z,w){
-		lv*a=w->lv[z],*o=dget(d,w->kv[z]);if(o)a=l_comma(widget_write(o),a);
+	EACH(z,d){
+		lv*a=widget_write(d->lv[z]),*o=dget(w,d->kv[z]);if(o)a=l_comma(a,o);
 		lv*i=widget_read(a,ri);if(lii(i))dset(widgets,ifield(i,"name"),i);
 	}return ri;
 }
@@ -1784,19 +1783,18 @@ lv* n_card_remove(lv*self,lv*z){
 	dset(self->b,lmistr("widgets"),l_drop(name,widgets));
 	dset(target->b,lmistr("dead"),ONE);return ONE;
 }
-lv* card_copy_raw(lv*card,lv*z){
-	lv*r=lml(0);EACH(i,z){lv*w=z->lv[i];if(widget_is(w)&&dget(w->b,lmistr("card"))==card)ll_add(r,widget_write(w));}return r;
-}
-lv* card_paste_raw(lv*card,lv*payload){
-	lv*r=lml(0);EACH(z,payload){lv*a=ld(payload->lv[z]);ll_add(r,widget_add(card,a));}return r;
-}
-lv* n_card_copy(lv*card,lv*z){
+void contraption_update(lv*def); // forward ref
+lv* n_con_add(lv*self,lv*z){lv*r=n_card_add(self,z);if(widget_is(r)&&condef_is(self))contraption_update(self);return r;}
+lv* n_con_remove(lv*self,lv*z){lv*r=n_card_remove(self,z);if(lb(r)&&condef_is(self))contraption_update(self);return r;}
+lv* con_copy_raw(lv*container,lv*z){lv*r=lml(0);EACH(i,z){lv*w=z->lv[i];if(widget_is(w)&&dget(w->b,lmistr("card"))==container)ll_add(r,widget_write(w));}return r;}
+lv* con_paste_raw(lv*container,lv*payload){lv*r=lml(0);EACH(z,payload){lv*a=ld(payload->lv[z]);ll_add(r,widget_add(container,a));}return r;}
+lv* n_con_copy(lv*card,lv*z){
 	z=l_first(z);if(!lil(z))z=l_list(z);
-	str r=str_new();str_addz(&r,"%%WGT0");fjson(&r,card_copy_raw(card,z));return lmstr(r);
+	str r=str_new();str_addz(&r,"%%WGT0");fjson(&r,con_copy_raw(card,z));return lmstr(r);
 }
-lv* n_card_paste(lv*card,lv*z){
+lv* n_con_paste(lv*card,lv*z){
 	z=l_first(z);if(!lis(z)||!has_prefix(z->sv,"%%wgt0"))return NONE;
-	int f=1,i=6,n=z->c-i;return card_paste_raw(card,ll(pjson(z->sv,&i,&f,&n)));
+	int f=1,i=6,n=z->c-i;return con_paste_raw(card,ll(pjson(z->sv,&i,&f,&n)));
 }
 lv* interface_card(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
@@ -1819,8 +1817,8 @@ lv* interface_card(lv*self,lv*i,lv*x){
 		ikey("add"     )return lmnat(n_card_add,self);
 		ikey("remove"  )return lmnat(n_card_remove,self);
 		ikey("event"   )return lmnat(n_event,self);
-		ikey("copy"    )if(state.external)return lmnat(n_card_copy,self);
-		ikey("paste"   )if(state.external)return lmnat(n_card_paste,self);
+		ikey("copy"    )if(state.external)return lmnat(n_con_copy,self);
+		ikey("paste"   )if(state.external)return lmnat(n_con_paste,self);
 	}return x?x:NONE;
 }
 lv* card_write(lv*card){
@@ -1869,8 +1867,6 @@ void contraption_update(lv*def){
 		}
 	}
 }
-lv* n_condef_add(lv*self,lv*z){lv*r=n_card_add(self,z);if(widget_is(r))contraption_update(self);return r;}
-lv* n_condef_remove(lv*self,lv*z){lv*r=n_card_remove(self,z);if(lb(r))contraption_update(self);return r;}
 lv* n_condef_update(lv*self,lv*z){(void)z;contraption_update(self);return NONE;}
 char*attribute_types[]={"","bool","number","string","code","rich",NULL};
 enum attribute_type{attr_nil,attr_bool,attr_number,attr_string,attr_code,attr_rich};
@@ -1893,8 +1889,8 @@ lv* interface_condef(lv*self,lv*i,lv*x){
 			condefs->kv[dgeti(condefs,o)]=n;dset(data,i,n);return x;
 		}
 		ikey("description"){dset(data,i,ls(x));return x;}
-		ikey("size"       ){dset(data,i,normalize_pair(x))          ,contraption_update(self);return x;}
-		ikey("image"      ){dset(data,i,image_is(x)?x:image_empty()),contraption_update(self);return x;}
+		ikey("size"       ){dset(data,i,normalize_pair(x)),contraption_update(self);return x;}
+		ikey("image"      ){dset(data,i,image_is(x)?x:image_empty());return x;}
 		ikey("script"     ){dset(data,i,ls(x));return x;}
 		ikey("template"   ){dset(data,i,ls(x));return x;}
 		ikey("attributes" ){dset(data,i,normalize_attributes(x));return x;}
@@ -1907,8 +1903,8 @@ lv* interface_condef(lv*self,lv*i,lv*x){
 		ikey("image"      ){lv*r=dget(data,i);return r?r:image_empty();}
 		ikey("widgets"    )return dget(data,i);
 		ikey("attributes" ){lv*r=dget(data,i);return r?r:normalize_attributes(NONE);}
-		ikey("add"        )return lmnat(n_condef_add,self);
-		ikey("remove"     )return lmnat(n_condef_remove,self);
+		ikey("add"        )return lmnat(n_con_add,self);
+		ikey("remove"     )return lmnat(n_con_remove,self);
 		ikey("update"     )return lmnat(n_condef_update,self);
 	}return x?x:NONE;
 }
