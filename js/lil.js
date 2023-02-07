@@ -786,7 +786,7 @@ grid_is       =x=>lii(x)&&x.n=='grid'
 slider_is     =x=>lii(x)&&x.n=='slider'
 canvas_is     =x=>lii(x)&&x.n=='canvas'
 contraption_is=x=>lii(x)&&x.n=='contraption'
-condef_is     =x=>lii(x)&&x.n=='condef'
+prototype_is  =x=>lii(x)&&x.n=='prototype'
 deck_is       =x=>lii(x)&&x.n=='deck'
 card_is       =x=>lii(x)&&x.n=='card'
 patterns_is   =x=>lii(x)&&x.n=='patterns'
@@ -1820,10 +1820,10 @@ widget_write=x=>{
 widget_strip=x=>dyad.take(lml([lms('name'),lms('type')]),x)
 widget_add=(card,x)=>{const r=widget_read(x,card);if(lii(r))dset(card.widgets,ifield(r,'name'),r);return r}
 card_add=(card,type,name,n2)=>{
-	if(condef_is(card)&&(contraption_is(type)||ls(type)=='contraption'))return NONE
+	if(prototype_is(card)&&(contraption_is(type)||ls(type)=='contraption'))return NONE
 	if(lis(type)){
 		if(ls(type)=='contraption'){
-			const condefs=card.deck.contraptions, ct=lms(name?ls(name):''), def=dget(condefs,ct);if(!def)return NONE
+			const defs=card.deck.contraptions, ct=lms(name?ls(name):''), def=dget(defs,ct);if(!def)return NONE
 			const a=lmd(['type','def'].map(lms),[lms('contraption'),ct]);if(n2)dset(a,lms('name'),lms(ls(n2)));return widget_add(card,a)
 		}
 		if(!ls(type)in{button:1,field:1,slider:1,canvas:1,grid:1})return NONE
@@ -1907,7 +1907,7 @@ contraption_update=(deck,def)=>{
 		})
 	})
 }
-condef_read=(x,deck)=>{
+prototype_read=(x,deck)=>{
 	x=ld(x)
 	const attribute_types={'':1,bool:1,number:1,string:1,code:1,rich:1}
 	const normalize_attributes=x=>{
@@ -1921,8 +1921,8 @@ condef_read=(x,deck)=>{
 		if(self.dead)return NONE
 		if(x){
 			if(ikey(i,'name')){
-				const condefs=self.deck.contraptions, o=self.name, n=ukey(condefs,lms(ls(x)),ls(x),lms(o))
-				condefs.k[dvix(condefs,self)]=n,self.name=ls(n);return x
+				const defs=self.deck.contraptions, o=self.name, n=ukey(defs,lms(ls(x)),ls(x),lms(o))
+				defs.k[dvix(defs,self)]=n,self.name=ls(n);return x
 			}
 			if(ikey(i,'description'))return self.description=ls(x),x
 			if(ikey(i,'size'       ))return self.size=rint(getpair(x)),contraption_update(deck,self),x
@@ -1943,10 +1943,10 @@ condef_read=(x,deck)=>{
 			if(ikey(i,'remove'     ))return lmnat(([x])=>{const r=card_remove(self,x);if(lb(r))contraption_update(deck,self);return r})
 			if(ikey(i,'update'     ))return lmnat(_=>{contraption_update(deck,self);return NONE})
 		}return x?x:NONE
-	},'condef')
+	},'prototype')
 	ri.deck   =deck
 	ri.widgets=lmd()
-	{const v=dget(x,lms('name'      ));ri.name=ls(ukey(deck.contraptions,v&&lis(v)&&count(v)==0?null:v,'condef'))}
+	{const v=dget(x,lms('name'      ));ri.name=ls(ukey(deck.contraptions,v&&lis(v)&&count(v)==0?null:v,'prototype'))}
 	{const v=dget(x,lms('image'     ));ri.image=v?image_read(ls(v)):image_make(range(0,0))}
 	{const v=dget(x,lms('attributes'));if(v)iwrite(ri,lms('attributes'),monad.table(v))}
 	{const v=dget(x,lms('size'      ));if(v)ri.size=rint(getpair(v))}
@@ -1956,7 +1956,7 @@ condef_read=(x,deck)=>{
 	init_field(ri,'template'   ,x)
 	return ri
 }
-condef_write=x=>{
+prototype_write=x=>{
 	const r=lmd(), wids=lmd(), nice=x=>x&&image_is(x)&&x.size.x>0&&x.size.y>0
 	dset(r,lms('name'),lms(x.name))
 	dset(r,lms('size'),ifield(x,'size'))
@@ -1984,8 +1984,8 @@ deck_add=(deck,type,y,z)=>{
 	if(ikey(type,'module')){const a=lmd();if(y)dset(a,lms('name'),lms(ls(y)));const r=module_read(a,deck);return dset(deck.modules,ifield(r,'name'),r),r}
 	if(card_is(type))return deck_paste(deck,deck_copy(deck,type),y?lms(ls(y)):null)
 	if(ikey(type,'card')){const a=lmd();if(y)dset(a,lms('name'),lms(ls(y)));const r=card_read(a,deck);return dset(deck.cards,ifield(r,'name'),r),r}
-	if(condef_is(type)){const a=condef_write(type);if(y)dset(a,lms('name'),lms(ls(y)));const r=condef_read(a,deck);return dset(deck.contraptions,ifield(r,'name'),r),r}
-	if(ikey(type),'contraption'){const a=lmd();if(y)dset(a,lms('name'),lms(ls(y)));const r=condef_read(a,deck);return dset(deck.contraptions,ifield(r,'name'),r),r}
+	if(prototype_is(type)){const a=prototype_write(type);if(y)dset(a,lms('name'),lms(ls(y)));const r=prototype_read(a,deck);return dset(deck.contraptions,ifield(r,'name'),r),r}
+	if(ikey(type),'contraption'){const a=lmd();if(y)dset(a,lms('name'),lms(ls(y)));const r=prototype_read(a,deck);return dset(deck.contraptions,ifield(r,'name'),r),r}
 	return NONE
 }
 deck_remove=(deck,t)=>{
@@ -1998,7 +1998,7 @@ deck_remove=(deck,t)=>{
 		deck.contraptions.v.map(c=>remove(c.widgets))
 		return deck.fonts=dyad.drop(k,deck.fonts),1
 	}
-	if(condef_is(t)){
+	if(prototype_is(t)){
 		const k=dkey(deck.contraptions,t);if(!k)return 0
 		deck.cards.v.map(card=>card.widgets.v.filter(w=>contraption_is(w)&&w.def==t).map(w=>card_remove(card,w)))
 		return deck.contraptions=dyad.drop(k,deck.contraptions),t.dead=true,1
@@ -2021,7 +2021,7 @@ deck_paste=(deck,z,name)=>{
 	return r
 }
 deck_read=x=>{
-	const deck={},scripts={},cards={},modules={},condefs={}, fonts=lmd(),sounds=lmd(); let i=0,m=0,md=0,lc=0
+	const deck={},scripts={},cards={},modules={},defs={}, fonts=lmd(),sounds=lmd(); let i=0,m=0,md=0,lc=0
 	Object.keys(FONTS).map(k=>dset(fonts,lms(k),font_read(FONTS[k])))
 	const match=k=>x.startsWith(k,i)?(i+=k.length,1):0
 	const end=_=>i>=x.length||x.startsWith('<\/script>',i)
@@ -2037,7 +2037,7 @@ deck_read=x=>{
 		else if(match('{card:')){const k=str('}');cards[k]=lmd(['name','widgets'].map(lms),[lms(k),lml([])]),m=5,lc=0}
 		else if(match('{script:')){const k=str('}\n');scripts[k]=str('\n{end}')}
 		else if(match('{module:')){const k=str('}');modules[k]=lmd(['name','script','data'].map(lms),[lms(k),lms(''),lmd()]),m=6,md=0}
-		else if(match('{contraption:')){const k=str('}');condefs[k]=lmd(['name','widgets'].map(lms),[lms(k),lml([])]),m=7,lc=1}
+		else if(match('{contraption:')){const k=str('}');defs[k]=lmd(['name','widgets'].map(lms),[lms(k),lml([])]),m=7,lc=1}
 		else if(m==6&&match('{data}\n')){md=1}
 		else if(m==6&&match('{script}\n')){dset(last(modules),lms('script'),lms(str('\n{end}'))),m=1}
 		else{
@@ -2045,16 +2045,16 @@ deck_read=x=>{
 			if(m==1)deck[k]=v
 			if(m==2)dset(fonts,lms(k),font_read(ls(v)))
 			if(m==3)dset(sounds,lms(k),sound_read(ls(v)))
-			if(m==4&&!lc){if(Object.keys(cards  ).length)dget(last(cards  ),lms('widgets')).v.push(dset(ld(v),lms('name'),lms(k)))}
-			if(m==4&& lc){if(Object.keys(condefs).length)dget(last(condefs),lms('widgets')).v.push(dset(ld(v),lms('name'),lms(k)))}
+			if(m==4&&!lc){if(Object.keys(cards).length)dget(last(cards),lms('widgets')).v.push(dset(ld(v),lms('name'),lms(k)))}
+			if(m==4&& lc){if(Object.keys(defs ).length)dget(last(defs ),lms('widgets')).v.push(dset(ld(v),lms('name'),lms(k)))}
 			if(m==5)dset(last(cards),lms(k),v)
 			if(m==6)dset(md?dget(last(modules),lms('data')):last(modules),lms(k),v)
-			if(m==7)dset(last(condefs),lms(k),v)
+			if(m==7)dset(last(defs),lms(k),v)
 		}
 	}
 	const dscript=x=>{const k=lms('script'),s=dget(x,k);if(s)dset(x,k,lms(scripts[ls(s)]))}
-	Object.values(cards  ).map(c=>{dscript(c),dget(c,lms('widgets')).v.map(dscript)})
-	Object.values(condefs).map(c=>{dscript(c),dget(c,lms('widgets')).v.map(dscript)})
+	Object.values(cards).map(c=>{dscript(c),dget(c,lms('widgets')).v.map(dscript)})
+	Object.values(defs ).map(c=>{dscript(c),dget(c,lms('widgets')).v.map(dscript)})
 	const ri=lmi((self,i,x)=>{
 		if(x){
 			if(ikey(i,'locked'))return self.locked=lb(x),x
@@ -2099,9 +2099,9 @@ deck_read=x=>{
 	if(Object.keys(cards).length==0)cards.home=lmd(['name'].map(lms),[lms('home')])
 	const root=lmenv();constants(root),primitives(root,ri)
 	pushstate(root),issue(root,parse(DEFAULT_TRANSITIONS));while(running())runop();popstate()
-	Object.values(condefs).map(x=>{const v=condef_read(x,ri)      ;dset(ri.contraptions,ifield(v,'name'),v)})
-	Object.values(cards  ).map(x=>{const v=card_read  (x,ri,cards);dset(ri.cards       ,ifield(v,'name'),v)})
-	Object.values(modules).map(x=>{const v=module_read(x,ri)      ;dset(ri.modules     ,ifield(v,'name'),v)})
+	Object.values(defs   ).map(x=>{const v=prototype_read(x,ri)      ;dset(ri.contraptions,ifield(v,'name'),v)})
+	Object.values(cards  ).map(x=>{const v=card_read     (x,ri,cards);dset(ri.cards       ,ifield(v,'name'),v)})
+	Object.values(modules).map(x=>{const v=module_read   (x,ri)      ;dset(ri.modules     ,ifield(v,'name'),v)})
 	ri.history=[ln(ifield(ifield(ri,'card'),'index'))]
 	return ri
 }
@@ -2149,8 +2149,8 @@ deck_write=(x,html)=>{
 		write_dict('{data}\n',dget(data,lms('data')),x=>x)
 		r+=`{script}\n${esc_write(0,ls(ifield(m,'script')))}\n{end}\n`
 	})
-	deck.contraptions.v.map(condef=>{
-		const data=condef_write(condef),wids=dget(data,lms('widgets')),base=ls(dget(data,lms('name')));sci=0
+	deck.contraptions.v.map(def=>{
+		const data=prototype_write(def),wids=dget(data,lms('widgets')),base=ls(dget(data,lms('name')));sci=0
 		r+=`\n{contraption:${esc_write(1,base)}}\n`
 		write_key(data,'size'       ,x=>1       ,x=>x)
 		write_key(data,'description',x=>x       ,x=>x)
@@ -2228,10 +2228,10 @@ fire_async=(target,name,arg,hunk,nest)=>{
 		if(deck_is(target)){deck=target;if(isolate)return}
 		if(contraption_is(target)){deck=target.card.deck}
 		if(widget_is(target)&&!contraption_is(target)){
-			if(condef_is(target.card)||contraption_is(target.card))isolate=1
+			if(prototype_is(target.card)||contraption_is(target.card))isolate=1
 			ancestors(target.card)
 		}
-		if(card_is(target)||condef_is(target))ancestors(target.deck)
+		if(card_is(target)||prototype_is(target))ancestors(target.deck)
 		try{dset(scopes,target,parse(ls(ifield(target,'script'))))}
 		catch(e){dset(scopes,target,lmblk());}
 	}
@@ -2253,7 +2253,7 @@ fire_async=(target,name,arg,hunk,nest)=>{
 			t.cards  .v.map((v,i)=>bind(t.cards  .k[i],v                ))
 			sname='!deck_scope'
 		}
-		if(card_is(t)||condef_is(t)||contraption_is(t)){
+		if(card_is(t)||prototype_is(t)||contraption_is(t)){
 			bind(lms('card'),t)
 			t.widgets.v.map((v,i)=>bind(t.widgets.k[i],v))
 			sname='!card_scope'

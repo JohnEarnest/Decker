@@ -27,7 +27,7 @@ Widgets, cards, or the deck itself may contain scripts written in the [Lil progr
 
 Lil code intended to be reusable across projects can be organized into _Modules_. From a programming perspective, modules execute once when a deck is loaded (or the module is modified) and each return a dictionary which will be mounted as a global for use by ordinary event-triggered scripts. Modules do not have direct access to the deck or its components, nor do they have direct access to one another. Each module has an independent key-value store which can furnish static data used by the module or allow the module to explicitly preserve its state.
 
-In addition to the built-in selection of widgets, it is possible to define custom widgets called _Contraptions_. Internally, a contraption behaves like a card, containing widgets (representing its state and interactive elements) and a background image. Externally, it behaves like a single widget. Many contraption instances can be created from a single definition, which is called a _ConDef_.
+In addition to the built-in selection of widgets, it is possible to define custom widgets called _Contraptions_. Internally, a contraption behaves like a card, containing widgets (representing its state and interactive elements) and a background image. Externally, it behaves like a single widget. Many contraption instances can be created from a single definition, which is called a _Prototype_.
 
 Rationale
 ---------
@@ -101,10 +101,10 @@ A _Chunk_ begins with a line that begins and ends with curly braces `{}`, indica
 - `{sounds}`: a dictionary of _Sound Records_. Every property line has an ID and an `SND0` data block.
 - `{fonts}`: a dictionary of _Font Records_. Every property line has an ID and an `FNT0` data block. The built-in fonts `menu`, `body`, and `mono` are provided by Decker itself, but _could_ be overridden by definitions in this chunk.
 - `{card:ID}`: contains properties pertaining to a card, and is followed by a `{widgets}` chunk (optional).
-- `{widgets}`: a collection of a card or condef's _Widget Records_.
+- `{widgets}`: a collection of a card or prototype's _Widget Records_.
 - `{script:ID}`: contains a Lil script.
 - `{module:ID}`: contains a Lil module and its metadata.
-- `{contraption:ID}`: contains a contraption definition (ConDef).
+- `{contraption:ID}`: contains a contraption definition (Prototype).
 - `{data}`: contains a Lil module's key-value store.
 - `{end}`: terminates a `{script}` chunk.
 
@@ -241,7 +241,7 @@ Each `type` of widget has its own additional optional fields:
 	- `row`: an integer; the selected row index, or -1.
 
 - `"contraption"`:
-	- `def`: a string; the ID of a contraption definition (ConDef).
+	- `def`: a string; the ID of a contraption definition (Prototype).
 	- `widgets`: a dictionary of JSON objects representing the widgets contained in this contraption instance. The properties given here override any properties from the corresponding `widgets` of the contraption's definition. Note that the `pos` of any "inner" widget is relative to the `pos` of the contraption which contains it.
 
 The `{module:ID}` Chunk
@@ -280,16 +280,16 @@ end
 
 The `{contraption:ID}` Chunk
 ----------------------------
-Contraption chunks always have an ID, which serves as the `name` of the ConDef. They may have additional optional properties:
+Contraption chunks always have an ID, which serves as the `name` of the Prototype. They may have additional optional properties:
 
-- `size`: an array of 2 integers providing the width and height of instances of the ConDef, respectively, in pixels.
-- `description`: a string giving a human-readable description of the purpose of the ConDef.
-- `image`: an _Image Record_ used as the background of instances of the ConDef.
+- `size`: an array of 2 integers providing the width and height of instances of the Prototype, respectively, in pixels.
+- `description`: a string giving a human-readable description of the purpose of the Prototype.
+- `image`: an _Image Record_ used as the background of instances of the Prototype.
 - `script`: a number or string corresponding to a `{script:ID}` chunk, analogous to the script of a card from the perspective of contained widgets.
-- `template`: a string containing a Lil script that will be used as the default script for newly-created instances of this ConDef.
+- `template`: a string containing a Lil script that will be used as the default script for newly-created instances of this Prototype.
 - `attributes`: a rectangular dictionary with the following columns:
-	- `name`: the attribute name of an editable property for instances of this ConDef.
-	- `label`: the display label of an editable property for instances of this ConDef. If missing, the `name` will be used.
+	- `name`: the attribute name of an editable property for instances of this Prototype.
+	- `label`: the display label of an editable property for instances of this Prototype. If missing, the `name` will be used.
 	- `type`: the type of this editable property, for the purpose of supplying a sensible user interface for editing. An invalid `type` will cause the current row to be ignored.
 
 Attribute `type`s may be one of the following:

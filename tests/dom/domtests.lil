@@ -1744,9 +1744,9 @@ deck:readdeck[]
 
 def:deck.add["contraption" "spinner"]
 defaults:def @ "type","description","script","size"
-assert["condef default attributes" ("condef","","",(list 100,100)) defaults]
-assert["deck contraptions"        "dict"               (typeof deck.contraptions)]
-assert["deck contraption content" ("condef","spinner") (typeof deck.contraptions.spinner),(range deck.contraptions)]
+assert["prototype default attributes" ("prototype","","",(list 100,100)) defaults]
+assert["deck contraptions"        "dict"                  (typeof deck.contraptions)]
+assert["deck contraption content" ("prototype","spinner") (typeof deck.contraptions.spinner),(range deck.contraptions)]
 
 def.description:"unbounded numeric picker"
 def.size:150,50
@@ -1787,14 +1787,14 @@ b.value:42
 assert["contraption custom attrs get/set" (42,1) (b.value,b.step)]
 
 writedeck["temp.deck" deck]
-assert_file["write a deck with contraptions/condefs." "tests/dom/contraptions.deck" "temp.deck"]
+assert_file["write a deck with contraptions/prototypes." "tests/dom/contraptions.deck" "temp.deck"]
 deck.remove[def]
 assert["contraption deletion" 0 (count deck.contraptions)]
 assert["contraption deletion scrubs instances" () (range deck.card.widgets)]
 
 deck:readdeck["tests/dom/contraptions.deck"]
 def:deck.contraptions.spinner
-assert["read contraption def" ("condef","spinner",150,50) (def.type,def.name,def.size)]
+assert["read contraption def" ("prototype","spinner",150,50) (def.type,def.name,def.size)]
 assert["read contraption instances" ("a","b","contraption","contraption") ((range deck.card.widgets),(deck.card.widgets..type))]
 assert["read contraption base attr"      1 deck.card.widgets.a.step ]
 assert["read contraption instance attr" 42 deck.card.widgets.b.value]
@@ -1802,15 +1802,15 @@ assert["read contraption instance attr" 42 deck.card.widgets.b.value]
 def.widgets.step.text:"15"
 def.widgets.up.event["click"]
 def.widgets.up.event["click"]
-assert["events to a condef" "30" def.widgets.value.text]
+assert["events to a prototype" "30" def.widgets.value.text]
 def.size:200,25
 def.update[]
-assert["condef update instance properties"             (200,25) deck.card.widgets.a.size ]
-assert["condef update instances preserve local state"        42 deck.card.widgets.b.value]
+assert["proto update instance properties"             (200,25) deck.card.widgets.a.size ]
+assert["proto update instances preserve local state"        42 deck.card.widgets.b.value]
 deck.card.widgets.a.pos:35,37
 def.update[]
-assert["condef update instances preserve instance state" (35,37) deck.card.widgets.a.pos ]
-assert["condef update instances preserve name"               "a" deck.card.widgets.a.name]
+assert["proto update instances preserve instance state" (35,37) deck.card.widgets.a.pos ]
+assert["proto update instances preserve name"               "a" deck.card.widgets.a.name]
 
 def.script:"won't parse"
 assert["read contraption instance attr with broken script" 0 deck.card.widgets.b.value]

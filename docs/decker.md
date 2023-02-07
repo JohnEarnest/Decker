@@ -525,7 +525,7 @@ Decker's interfaces break down into several general categories:
 | :--------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
 | Datatypes  | [Font](#fontinterface), [Image](#imageinterface), [Sound](#soundinterface), [Array](#arrayinterface)                                       |
 | Utilities  | [System](#systeminterface), [RText](#rtextinterface), [Pointer](#pointerinterface)                                                         |
-| Deck Parts | [Deck](#deckinterface), [Card](#cardinterface), [Patterns](#patternsinterface), [Module](#moduleinterface), [KeyStore](#keystoreinterface), [ConDef](#condefinterface) |
+| Deck Parts | [Deck](#deckinterface), [Card](#cardinterface), [Patterns](#patternsinterface), [Module](#moduleinterface), [KeyStore](#keystoreinterface), [Prototype](#prototypeinterface) |
 | Widgets    | [Button](#buttoninterface), [Field](#fieldinterface), [Slider](#sliderinterface), [Grid](#gridinterface), [Canvas](#canvasinterface), [Contraption](#contraptioninterface) |
 
 When describing methods and values, this document will use some conventions for brevity:
@@ -633,16 +633,16 @@ The deck interface represents the global attributes of a Decker document.
 | `x.remove[x]`     | Remove a resource from this deck. Returns 1 on success.                         |
 | `x.event[n x...]` | Issue an event named `n` at this deck with argument(s) `x`, and return the deck.|
 
-`deck.add[x y z]` can add new cards, sounds, modules, condefs and fonts to the deck:
+`deck.add[x y z]` can add new cards, sounds, modules, prototypes and fonts to the deck:
 
-- If `x` is a card, sound, module, condef or font interface, insert an exact copy of it using `y` as a name (or an appropriate default name).
+- If `x` is a card, sound, module, prototype or font interface, insert an exact copy of it using `y` as a name (or an appropriate default name).
 - If `x` is `"card"`, insert a new blank card at the end of the deck, using `y` as a name (or an appropriate default name).
 - If `x` is `"sound"`, insert a new sound, using an int `y` as a length (if present), and `z` as a name (or an appropriate default name).
 - If `x` is `"font"`, insert a new font, using an int pair `y` as a size (if present), and `z` as a name (or an appropriate default name).
 - If `x` is `"module"`, insert a new module, using `y` as a name (or an appropriate default name).
-- If `x` is `"contraption"`, insert a new condef, using `y` as a name (or an appropriate default name).
+- If `x` is `"contraption"`, insert a new prototype, using `y` as a name (or an appropriate default name).
 
-`deck.remove[x]` will conversely remove existing cards, sounds, modules, condefs or fonts from the deck. The argument `x` must be an interface value. The built-in fonts may not be removed from a deck. Removing a font will adjust any existing widgets which use it as their `font` attribute with the built-in "body" font. Decks will always have at least one card; attempting to remove the final card will have no effect. When a card is removed from its deck, the interface becomes inert: it will ignore all reads and writes of attributes.
+`deck.remove[x]` will conversely remove existing cards, sounds, modules, prototypes or fonts from the deck. The argument `x` must be an interface value. The built-in fonts may not be removed from a deck. Removing a font will adjust any existing widgets which use it as their `font` attribute with the built-in "body" font. Decks will always have at least one card; attempting to remove the final card will have no effect. When a card is removed from its deck, the interface becomes inert: it will ignore all reads and writes of attributes.
 
 Patterns Interface
 ------------------
@@ -868,7 +868,7 @@ The card interface gives access to the contents of a given card.
 | `x.remove[x]`     | Remove a widget `x` from this card. Returns 1 on success.                                         |
 | `x.event[n x...]` | Issue an event named `n` at this card with argument(s) `x`, and return the card.                  |
 
-`card.add[x y]` can add a new widget to the card. If `x` is a string {`"button"`, `"field"`, `"slider"`, `"canvas"`, or `"grid"`}, insert a new widget of the appropriate type using `y` as a name (or an appropriate default name). If `x` is the string `"contraption"`, insert a new instance of the ConDef with name `y` using `z` as a name (or an appropriate default name). If `x` is a widget interface, insert a copy of it, again using `y` as a name or an appropriate default.
+`card.add[x y]` can add a new widget to the card. If `x` is a string {`"button"`, `"field"`, `"slider"`, `"canvas"`, or `"grid"`}, insert a new widget of the appropriate type using `y` as a name (or an appropriate default name). If `x` is the string `"contraption"`, insert a new instance of the prototype with name `y` using `z` as a name (or an appropriate default name). If `x` is a widget interface, insert a copy of it, again using `y` as a name or an appropriate default.
 
 When a widget is removed from its card, the interface becomes inert: it will ignore all reads and writes of attributes.
 
@@ -1036,24 +1036,24 @@ The following brush shapes are supported:
 
 Contraption Interface
 ---------------------
-Contraptions are custom widgets, defined in a [ConDef](#condefinterface). See the [Custom Widgets](#customwidgets) section for more detail.
+Contraptions are custom widgets, defined in a [Prototype](#prototypeinterface). See the [Custom Widgets](#customwidgets) section for more detail.
 
 | Name                    | Description                                                                                           |
 | :---------------------- | :---------------------------------------------------------------------------------------------------- |
 | `typeof x`              | `"contraption"`                                                                                       |
 | `x.name`                | String. The name of this widget. r/w.                                                                 |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
-| `x.image`               | An _image_ interface representing the contraption's background, inherited from its ConDef.            |
-| `x.locked`              | Bool. Behavior of this property is entirely up to the ConDef. r/w.                                    |
+| `x.image`               | An _image_ interface representing the contraption's background, inherited from its Prototype.         |
+| `x.locked`              | Bool. Behavior of this property is entirely up to the Prototype. r/w.                                 |
 | `x.pos`                 | The `pos` of this widget on the card. r/w.                                                            |
 | `x.size`                | The `size` of the widget in pixels.                                                                   |
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
-| `x.def`                 | The ConDef of this contraption.                                                                       |
+| `x.def`                 | The Prototype of this contraption.                                                                    |
 | `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`, and return the widget.                  |
 
-Contraption interfaces may expose additional attributes. Reads or writes to properties aside from those listed above (such as `.zami`) will invoke the `script` of the `ConDef` corresponding to this Contraption, calling either a function `get_zami` on a read, or `set_zami` (with a value) on a write.
+Contraption interfaces may expose additional attributes. Reads or writes to properties aside from those listed above (such as `.zami`) will invoke the `script` of the Prototype corresponding to this Contraption, calling either a function `get_zami` on a read, or `set_zami` (with a value) on a write.
 
 
 Module Interface
@@ -1094,30 +1094,30 @@ A keystore is subject to several constraints:
 - Values must be recursively composed of JSON-compatible data: numbers, strings, lists, and dictionaries with string keys. Other values will be converted to `0`.
 - Setting a value to 0 will remove the key-value binding from storage.
 
-ConDef Interface
-----------------
-ConDefs are definitions from which [Contraptions](#contraptioninterface) are made. See the [Custom Widgets](#customwidgets) section for more detail. Note that the structure of a ConDef is very similar to a [Card](#cardinterface).
+Prototype Interface
+-------------------
+Prototypes are definitions from which [Contraptions](#contraptioninterface) are made. See the [Custom Widgets](#customwidgets) section for more detail. Note that the structure of a Prototype is very similar to a [Card](#cardinterface).
 
 | Name                    | Description                                                                                            |
 | :---------------------- | :----------------------------------------------------------------------------------------------------- |
-| `typeof x`              | `"condef"`                                                                                             |
-| `x.name`                | String. The name of the condef. r/w.                                                                   |
-| `x.description`         | String. A human-readable description of the purpose of this condef. r/w.                               |
-| `x.script`              | String. The Lil source code of the condef's script, or `""`. r/w.                                      |
-| `x.template`            | String. The Lil source code that can be used as a default for newly-created condef instances. r/w.     |
-| `x.size`                | The `size` of this condef in pixels. r/w.                                                              |
-| `x.image`               | An _image_ interface representing the condef's background. r/w.                                        |
-| `x.widgets`             | A dictionary of widget interfaces in this condef, keyed by name.                                       |
-| `x.attributes`          | A table of editable attributes exposed by this condef (see below). r/w.                                |
-| `x.add[x y]`            | Add a widget to this condef, and return it.                                                            |
-| `x.remove[x]`           | Remove a widget `x` from this condef. Returns 1 on success.                                            |
+| `typeof x`              | `"prototype"`                                                                                          |
+| `x.name`                | String. The name of the Prototype. r/w.                                                                |
+| `x.description`         | String. A human-readable description of the purpose of this Prototype. r/w.                            |
+| `x.script`              | String. The Lil source code of the Prototype's script, or `""`. r/w.                                   |
+| `x.template`            | String. The Lil source code that can be used as a default for newly-created Prototype instances. r/w.  |
+| `x.size`                | The `size` of this Prototype in pixels. r/w.                                                           |
+| `x.image`               | An _image_ interface representing the Prototype's background. r/w.                                     |
+| `x.widgets`             | A dictionary of widget interfaces in this Prototype, keyed by name.                                    |
+| `x.attributes`          | A table of editable attributes exposed by this Prototype (see below). r/w.                             |
+| `x.add[x y]`            | Add a widget to this Prototype, and return it.                                                         |
+| `x.remove[x]`           | Remove a widget `x` from this Prototype. Returns 1 on success.                                         |
 | `x.update[]`            | Refresh any applicable Contraption instances in the current deck.                                      |
 
-`condef.add[x y]` can add a new widget to the ConDef. If `x` is a string {`"button"`, `"field"`, `"slider"`, `"canvas"`, or `"grid"`}, insert a new widget of the appropriate type using `y` as a name (or an appropriate default name). If `x` is a widget interface, insert a copy of it, again using `y` as a name or an appropriate default.
+`prototype.add[x y]` can add a new widget to the Prototype. If `x` is a string {`"button"`, `"field"`, `"slider"`, `"canvas"`, or `"grid"`}, insert a new widget of the appropriate type using `y` as a name (or an appropriate default name). If `x` is a widget interface, insert a copy of it, again using `y` as a name or an appropriate default.
 
-When a widget is removed from its ConDef, the interface becomes inert: it will ignore all reads and writes of attributes.
+When a widget is removed from its Prototype, the interface becomes inert: it will ignore all reads and writes of attributes.
 
-The `attributes` table provides information about the attributes of contraption instances based on this ConDef which should be editable by users. It contains a `name` column with (string) attribute names, a `label` column with (string) display names for attributes, and a `type` column indicating the editor that should be provided for that attribute:
+The `attributes` table provides information about the attributes of contraption instances based on this Prototype which should be editable by users. It contains a `name` column with (string) attribute names, a `label` column with (string) display names for attributes, and a `type` column indicating the editor that should be provided for that attribute:
 
 | Attribute Type | Description           | Editor                              |
 | :------------- | :-------------------- | :---------------------------------- |
@@ -1127,7 +1127,7 @@ The `attributes` table provides information about the attributes of contraption 
 | `"code"`       | A Lil string          | Large field in "code" editing mode. |
 | `"rich"`       | An rtext table        | Large field in "rich" editing mode. |
 
-Modifying the attributes of a ConDef will automatically update Contraption instances in the current deck. Modifying the attributes of widgets contained in this ConDef will require explicitly calling `condef.update[]`. In either case, when a definition is updated, the `name`, `pos`, `show`, `locked`, `font`, and `script` attributes of Contraptions will be preserved, as well the `value`, `scroll`, `row` and `image` attributes of the widgets they contain (as applicable), but everything else will be regenerated from the definition. The _state_ of contraptions is kept, and the _behavior and appearance_ is changed.
+Modifying the attributes of a Prototype will automatically update Contraption instances in the current deck. Modifying the attributes of widgets contained in this Prototype will require explicitly calling `prototype.update[]`. In either case, when a definition is updated, the `name`, `pos`, `show`, `locked`, `font`, and `script` attributes of Contraptions will be preserved, as well the `value`, `scroll`, `row` and `image` attributes of the widgets they contain (as applicable), but everything else will be regenerated from the definition. The _state_ of contraptions is kept, and the _behavior and appearance_ is changed.
 
 
 Events
