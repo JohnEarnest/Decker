@@ -1178,7 +1178,8 @@ void import_image(char*path){
 }
 lv* table_decode(lv*text,lv*format){return ms.edit_json?l_table(l_parse(lmistr("%j"),text)): n_readcsv(NULL,format->c?lml2(text,format):l_list(text));}
 lv* modal_open_path(){
-	char t[PATH_MAX]={0};directory_cat(t,ms.path,ms.grid.table->lv[1]->lv[ms.grid.row]->sv);return lmcstr(t);
+	int n=ms.grid.table->n,r=ms.grid.row;
+	char t[PATH_MAX]={0};directory_cat(t,ms.path,r<n&&r>=0?ms.grid.table->lv[1]->lv[r]->sv:"");return lmcstr(t);
 }
 lv* modal_save_path(char*suffix){
 	char t[PATH_MAX]={0};directory_cat(t,ms.path,rtext_all(ms.text.table)->sv);
