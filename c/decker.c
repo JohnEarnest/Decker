@@ -2055,6 +2055,36 @@ void validate_modules(){
 		break;
 	}
 }
+void script_editor(){
+	int mh=3+font_h(FONT_MENU);rect b={0,mh,frame.size.x+1,frame.size.y-2*mh};
+	lv*overw=NULL;if(sc.xray){
+		lv*wids=con_wids();EACH(z,wids){
+			lv*wid=wids->lv[z];rect size=unpack_widget(wid).size;
+			int o=ev.alt&&over(size), col=o?(overw=wid,13):44;
+			draw_textc(size,ifield(wid,"name")->sv,FONT_BODY,o?-1:col),draw_box(size,0,col);
+			if(ifield(wid,"script")->c)draw_icon((pair){size.x-1,size.y},ICONS[icon_lil],o?1:col);
+			if(ev.alt&&ev.mu&&over(size)&&dover(size)){close_script(wid);ev.md=ev.mu=0;break;}
+		}if(ev.alt&&ev.mu)close_script(con()),ev.md=ev.mu=0;
+	}
+	ui_codeedit(b,0,&sc.f),draw_hline(0,frame.size.x,frame.size.y-mh-1,1);
+	if(overw){uicursor=cursor_point;draw_textc(unpack_widget(overw).size,ifield(overw,"name")->sv,FONT_BODY,-1);}
+	if(strlen(sc.status)){draw_text_fit((rect){3,frame.size.y-mh+3,frame.size.x,mh-6},sc.status,FONT_BODY,1);}
+	else{
+		char stat[4096]={0};
+		if(in_layer()&&wid.infield){
+			int a=MIN(wid.cursor.x,wid.cursor.y), b=MAX(wid.cursor.x,wid.cursor.y);if(a!=b&&a<layout_count){
+				a=MAX(0,MIN(a,layout_count)), b=MAX(0,MIN(b,layout_count));
+				pair ap=field_position(a),bp=field_position(b);int l=(bp.x-ap.x)+1, c=b-a;
+				snprintf(stat,sizeof(stat),"%d line%s, %d character%s selected",l,l==1?"":"s",c,c==1?"":"s");
+			}else{pair p=field_position(MIN(a,b));snprintf(stat,sizeof(stat),"Line %d, Column %d",p.x,p.y);}
+		}
+		pair l=font_textsize(FONT_BODY,stat);draw_text((rect){3,frame.size.y-mh+3,l.x,l.y},stat,FONT_BODY,1);
+		if(sc.others->c){snprintf(stat,sizeof(stat),"script of %s  '%s' and %d more",sc.target->a->sv,ifield(sc.target,"name")->sv,sc.others->c);}
+		else{snprintf(stat,sizeof(stat),"script of %s  '%s'",sc.target->a->sv,ifield(sc.target,"name")->sv);}
+		pair t=layout_plaintext(stat,FONT_BODY,align_right,(pair){frame.size.x-6-20-l.x,font_h(FONT_BODY)});
+		draw_text_wrap((rect){3+l.x+20,frame.size.y-mh+3,t.x,t.y},1);
+	}if(in_layer()&&ev.exit)close_script(NULL),ev.exit=0;
+}
 
 // General Purpose History
 
@@ -2563,6 +2593,84 @@ void ob_resize(rect size,int coalesce){
 		edit(r);
 	}
 }
+void object_properties(lv*x){
+	ob.sel->c=0;ll_add(ob.sel,x);
+	if(button_is     (x))modal_enter(modal_button_props     );
+	if(field_is      (x))modal_enter(modal_field_props      );
+	if(slider_is     (x))modal_enter(modal_slider_props     );
+	if(canvas_is     (x))modal_enter(modal_canvas_props     );
+	if(grid_is       (x))modal_enter(modal_grid_props       );
+	if(contraption_is(x))modal_enter(modal_contraption_props);
+}
+void object_editor(){
+	char*pal=patterns_pal(ifield(deck,"patterns"));
+	lv*wids=con_wids();EACH(z,wids){ // forward pass for rendering
+		lv*wid=wids->lv[z];widget w=unpack_widget(wid);w.size=con_to_screen(w.size);
+		int sel=0;EACH(z,ob.sel)if(ob.sel->lv[z]==wid){sel=1;break;}
+		if(sel){draw_box(inset(w.size,-1),0,ANTS);}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1));}
+		if(sel&&ob.sel->c==1&&!contraption_is(ob.sel->lv[0])){draw_handles(w.size);}
+		if(w.locked&&ob.show_bounds){draw_rect((rect){w.size.x+w.size.w-10,w.size.y,10,10},1),draw_icon((pair){w.size.x+w.size.w-8,w.size.y+1},LOCK,32);}
+	}
+	if(!in_layer())return;
+	if(ob.sel->c>0){
+		int nudge=0;
+		if(ev.dir==dir_left )ob_move((pair){-1*(ev.shift?dr.grid_size.x:1), 0},1),nudge=1;
+		if(ev.dir==dir_right)ob_move((pair){ 1*(ev.shift?dr.grid_size.x:1), 0},1),nudge=1;
+		if(ev.dir==dir_up   )ob_move((pair){ 0,-1*(ev.shift?dr.grid_size.y:1)},1),nudge=1;
+		if(ev.dir==dir_down )ob_move((pair){ 0, 1*(ev.shift?dr.grid_size.y:1)},1),nudge=1;
+		if(nudge&&ev.shift&&ob.sel->c==1)ob_move(snap_delta(getpair(ifield(ob.sel->lv[0],"pos"))),1);
+	}
+	int ish=ob.sel->c==1?in_handle(unpack_widget(ob.sel->lv[0]).size):-1;
+	int isw=0;EACH(w,wids){rect wid=unpack_widget(wids->lv[w]).size;EACH(z,ob.sel)if(ob.sel->lv[z]==wids->lv[w]&&over(wid))isw=1;}
+	pair a=ev.pos,b=ob.prev;int dragged=a.x!=b.x||a.y!=b.y;
+	rect sr=normalize_rect((rect){ev.dpos.x,ev.dpos.y,ev.pos.x-ev.dpos.x,ev.pos.y-ev.dpos.y});int box=sr.w>1||sr.h>1;
+	if(isw&&ev.dclick){
+		for(int z=wids->c-1;z>=0;z--){
+			lv*wid=wids->lv[z];widget w=unpack_widget(wid);
+			if(over(w.size)){object_properties(wid);break;}
+		}
+	}
+	else if(isw&&ev.mu&&!box){
+		for(int z=ob.sel->c-1;z>=0;z--){
+			lv*wid=ob.sel->lv[z];widget w=unpack_widget(wid);
+			if(over(w.size)){if(ev.shift){ob.sel=l_drop(wid,ob.sel);}else{ob.sel->c=0;ll_add(ob.sel,wid);}break;}
+		}
+	}
+	else if(ish!=-1&&ev.md){ob.resize=1,ob.resize_first=1,ob.handle=ish,ob.prev=ev.pos;ob.orig=unpack_widget(ob.sel->lv[0]).size;}
+	else if(isw    &&ev.md){ob.move  =1,ob.move_first  =1,ob.prev=ev.pos;}
+	else if(ob.resize&&(!ev.drag||!ob.sel->c)){ob.resize=0,ob.resize_first=0;}
+	else if(ob.move&&(!ev.drag||!ob.sel->c)){
+		if(ob.sel->c==1)ob_move(snap_delta(getpair(ifield(ob.sel->lv[0],"pos"))),!ob.move_first);
+		ob.move=0,ob.move_first=0;
+	}
+	else if(ob.resize){
+		pair delta={ev.pos.x-ev.dpos.x,ev.pos.y-ev.dpos.y};rect r=ob.orig;
+		if(ob.handle==0){r.w+=delta.x, r.h+=delta.y;}
+		if(ob.handle==2){r.w+=delta.x, r.h-=delta.y; r.y+=delta.y;}
+		if(ob.handle==6){r.w-=delta.x, r.h+=delta.y; r.x+=delta.x;}
+		if(ob.handle==4){r.w-=delta.x, r.h-=delta.y; r.x+=delta.x; r.y+=delta.y;}
+		if(ob.handle==1){r.w+=delta.x;}
+		if(ob.handle==3){r.h-=delta.y, r.y+=delta.y;}
+		if(ob.handle==5){r.w-=delta.x, r.x+=delta.x;}
+		if(ob.handle==7){r.h+=delta.y;}
+		r=snapr(r), r.w=MAX(8,r.w), r.h=MAX(8,r.h);
+		if(dragged){ob_resize(r,!ob.resize_first);ob.resize_first=0,ob.prev=ev.pos;}
+	}
+	else if(ob.move){
+		pair delta=(pair){a.x-b.x,a.y-b.y};
+		if(dragged){ob_move(delta,!ob.move_first);ob.move_first=0,ob.prev=ev.pos;}
+	}else{
+		if(box&&ev.drag)draw_box(con_to_screen(sr),0,ANTS); if(box&&(ev.drag||ev.mu))ob.sel->c=0;
+		int f=0;for(int z=wids->c-1;z>=0;z--){ // backward pass for selection priority(!)
+			lv*wid=wids->lv[z];widget w=unpack_widget(wid);
+			int sel=0;EACH(z,ob.sel)if(ob.sel->lv[z]==wid){sel=1;break;}
+			rect overlap=box_intersect(w.size,sr);
+			int insel=box?overlap.w>=1&&overlap.h>=1: over(w.size)&&dover(w.size), c=ev.mu&insel;
+			if(c)f=1; if(!c)continue; if(box){ll_add(ob.sel,wid);continue;}
+			if(!sel){if(!ev.shift)ob.sel->c=0;ll_add(ob.sel,wid);break;}
+		}if(ev.mu&&!f)ob.sel->c=0;
+	}
+}
 
 // Audio
 
@@ -2913,15 +3021,6 @@ void gestures(){
 	buffer_paste((rect){ev.pos.x-8,ev.pos.y-8,16,16},frame.clip,GESTURES[dir]->b,frame.buffer,0);
 	if(ev.mu)msg.target_navigate=con(),msg.arg_navigate=lmistr(dnames[dir]);
 }
-void object_properties(lv*x){
-	ob.sel->c=0;ll_add(ob.sel,x);
-	if(button_is     (x))modal_enter(modal_button_props     );
-	if(field_is      (x))modal_enter(modal_field_props      );
-	if(slider_is     (x))modal_enter(modal_slider_props     );
-	if(canvas_is     (x))modal_enter(modal_canvas_props     );
-	if(grid_is       (x))modal_enter(modal_grid_props       );
-	if(contraption_is(x))modal_enter(modal_contraption_props);
-}
 void text_edit_menu(){
 	int selection=wid.fv!=NULL&&wid.cursor.x!=wid.cursor.y;
 	int rich=wid.fv!=NULL&&wid.f.style==field_rich;
@@ -2943,18 +3042,7 @@ void text_edit_menu(){
 	menu_separator();
 	if(menu_item("Select All",wid.fv!=NULL,'a')){wid.cursor=(pair){0,RTEXT_END};}
 }
-
-void tick(lv*env){
-	SDL_LockMutex(gil);
-	msg.pending_drag=0;
-	msg.pending_halt=0;
-	if(dirty&&dirty_timer>0&&!running()&&autosave&&strlen(document_path)){
-		dirty_timer--;
-		if(dirty_timer==0)dirty=0,save_deck(lmcstr(document_path));
-	}
-	frame=context;
-	uicursor=0;
-	menu_setup();
+void all_menus(){
 	int blocked=running()||msg.overshoot;
 	int canlisten=!blocked&&(ms.type==modal_listen||ms.type==modal_none);
 	menu_bar("Decker",canlisten);
@@ -2973,491 +3061,398 @@ void tick(lv*env){
 		if(menu_item("Stop",1,'\0')){msg.pending_halt=1;if(ms.type!=modal_none&&ms.type!=modal_query&&ms.type!=modal_listen)modal_exit(0);}
 		menu_bar("Edit",(ms.type==modal_input||ms.type==modal_save)&&wid.fv);
 		text_edit_menu();
+		return;
 	}
-	else{
-		menu_bar("File",ms.type==modal_none||ms.type==modal_recording);
-		if(uimode==mode_script){
-			if(menu_item("Close Script",1,'\0'))close_script(NULL);
-			if(menu_item("Save Script",1,'s')){
-				lv*text=rtext_all(sc.f.table);parse(text->sv);
-				if(perr()){snprintf(sc.status,sizeof(sc.status),"Error: %s",par.error);wid.cursor=(pair){par.i,par.i};}
-				else{script_save(text);snprintf(sc.status,sizeof(sc.status),"Saved.");}
-			}
-			menu_separator();
-			if(menu_item("Import Script..."  ,1,'\0'))modal_enter(modal_import_script);
-			if(menu_item("Export Script..."  ,1,'\0'))modal_enter(modal_export_script);
-			menu_separator();
-			if(menu_item("Go to Deck",!deck_is(sc.target)           ,'\0'))close_script(deck);
-			lv*container=con();
-			if(condef_is(container)){if(menu_item("Go to ConDef",sc.target!=container,'\0'))close_script(container);}
-			else                    {if(menu_item("Go to Card"  ,sc.target!=container,'\0'))close_script(container);}
-			if(menu_check("X-Ray Specs",1,sc.xray,'r'))sc.xray^=1;
-		}
-		else if(ms.type==modal_recording){
-			if(menu_item("Import Sound...",1,'\0'))modal_enter(modal_import_sound);
-			menu_separator();
-			if(menu_item("Close Sound",1,'\0'))modal_exit(0);
-		}
-		else{
-			if(menu_item("New Deck...",1,'\0')){
-				if(dirty&&autosave&&strlen(document_path)){save_deck(lmcstr(document_path));dirty=0;}
-				if(dirty){
-					modal_enter(modal_confirm_new);
-					ms.message=lmcstr("The current deck has unsaved changes.\nAre you sure you want to discard it?");
-					ms.verb=lmcstr("Discard");
-				}else{load_deck(deck_get(lmistr("")));set_path("");}
-			}
-			if(menu_item("New Card",1,'\0')){
-				lv*c=n_deck_add(deck,l_list(lmistr("card")));int n=ln(ifield(ifield(deck,"card"),"index"));
-				iwrite(c,lmistr("index"),lmn(n+1)),n_go(deck,l_list(c));
-			}
-			menu_separator();
-			if(menu_item("Open...",1,'o'))modal_enter(modal_open_deck);
-			if(menu_item("Save",dirty&&strlen(document_path),'s'))save_deck(lmcstr(document_path));
-			if(menu_item("Save As...",1,'\0'))modal_enter(modal_save_deck);
-			if(wid.gv){
-				menu_separator();
-				if(menu_item("Import Table...",!wid.g.locked,'\0'))modal_enter(modal_import_table);
-				if(menu_item("Export Table...",1,'\0'))modal_enter(modal_export_table);
-			}
-			else{
-				menu_separator();
-				if(menu_item("Import Image..."   ,1,'\0'))modal_enter(modal_import_image);
-				if(menu_item("Export Image..."   ,1,'\0'))modal_enter(modal_export_image);
-			}
-			menu_separator();
-			if(menu_item("Cards..."       ,1,'C' ))modal_enter(modal_cards);
-			if(menu_item("Sounds..."      ,1,'S' ))modal_enter(modal_sounds);
-			if(menu_item("Contraptions...",1,'T' ))modal_enter(modal_contraptions);
-			if(menu_item("Resources..."   ,1,'\0'))modal_enter(modal_resources);
-			if(menu_item("Properties..."  ,1,'\0'))modal_enter(modal_deck_props);
-		}
-		if(ms.type==modal_none||wid.gv||wid.fv){
-			menu_bar("Edit",wid.gv||wid.fv||(ms.type==modal_none&&uimode==mode_interact)||uimode==mode_draw||uimode==mode_object);
-			if(wid.gv){
-				int mutable=!wid.g.locked&&ms.type==modal_none;
-				if(menu_item("Undo",wid.hist_cursor>0          ,'z'))grid_undo();
-				if(menu_item("Redo",wid.hist_cursor<wid.hist->c,'Z'))grid_redo();
-				menu_separator();
-				if(menu_item("Copy Table",1,'c')){
-					SDL_SetClipboardText(n_writecsv(NULL,lml2(wid.gv->table,grid_format()))->sv);
-				}
-				if(menu_item("Paste Table",mutable&&strlen(clip_stash),'v')){
-					char*t=SDL_GetClipboardText();
-					grid_edit(n_readcsv(NULL,lml2(lmcstr(t),lmcstr(wid.g.format))));
-					SDL_free(t);
-				}
-				menu_separator();
-				if(menu_item("Delete Row",mutable&&wid.gv->row!=-1,'\0'))grid_deleterow();
-				if(menu_item("Add Row",mutable,'\0'))grid_insertrow();
-				if(menu_item("Query...",ms.type==modal_none,'u'))modal_enter(modal_query);
-			}
-			if(wid.fv)text_edit_menu();
-			if(ms.type==modal_none&&uimode==mode_interact){
-				if(menu_item("Undo",has_undo(),'z'))undo();
-				if(menu_item("Redo",has_redo(),'Z'))redo();
-				menu_separator();
-				paste_any();
-			}
-			if(ms.type==modal_none&&uimode==mode_draw){
-				int sel=bg_has_sel()||bg_has_lasso();
-				if(menu_item("Undo",(!sel)&&has_undo(),'z'))undo();
-				if(menu_item("Redo",(!sel)&&has_redo(),'Z'))redo();
-				menu_separator();
-				if(menu_item("Cut Image",sel,'x')){
-					lv*i=bg_has_lasso()?buffer_mask(dr.limbo,dr.mask): dr.limbo?bg_scaled_limbo():bg_copy_selection(dr.sel_here);
-					bg_scoop_selection(),SDL_SetClipboardText(image_write(image_make(i))->sv);bg_delete_selection();
-				}
-				if(menu_item("Copy Image",sel,'c' )){
-					lv*i=bg_has_lasso()?buffer_mask(dr.limbo,dr.mask): dr.limbo?bg_scaled_limbo():bg_copy_selection(dr.sel_here);
-					SDL_SetClipboardText(image_write(image_make(i))->sv);
-				}
-				paste_any();
-				if(menu_item("Clear",1,'\0')){int t=dr.tool;if(!sel){settool(tool_select),dr.sel_here=con_clip();}bg_delete_selection();settool(t);}
-				menu_separator();
-				if(menu_item("Select All",1,'a')){settool(tool_select),dr.sel_here=con_clip();}
-				if(menu_item("Tight Selection",sel,'g'))bg_tighten();
-				if(menu_item("Resize to Original",sel&&dr.tool==tool_select,'\0')){
-					bg_scoop_selection();pair s=buff_size(dr.limbo);dr.sel_here.w=s.x,dr.sel_here.h=s.y;
-				}
-				lv*c=con();
-				if(card_is  (c))if(menu_item("Resize to Card"  ,sel&&dr.tool==tool_select,'\0')){bg_scoop_selection(),dr.sel_here=con_clip();}
-				if(condef_is(c))if(menu_item("Resize to ConDef",sel&&dr.tool==tool_select,'\0')){bg_scoop_selection(),dr.sel_here=con_clip();}
-				menu_separator();
-				if(menu_item("Invert",sel&&!dr.limbo_dither,'i')){
-					if(bg_has_sel())bg_scoop_selection();
-					pair s=buff_size(dr.limbo);char*pal=patterns_pal(ifield(deck,"patterns"));
-					EACH(z,dr.limbo)dr.limbo->sv[z]=1^draw_pattern(pal,dr.limbo->sv[z],(z%s.x),(z/s.x));
-				}
-				if(menu_item("Flip Horizontal",sel,'\0')){
-					if(bg_has_sel())bg_scoop_selection();
-					buffer_flip_h(dr.limbo);if(dr.mask)buffer_flip_h(dr.mask);if(dr.omask&&dr.limbo_dither)buffer_flip_h(dr.omask);
-				}
-				if(menu_item("Flip Vertical",sel,'\0')){
-					if(bg_has_sel())bg_scoop_selection();
-					buffer_flip_v(dr.limbo);if(dr.mask)buffer_flip_v(dr.mask);if(dr.omask&&dr.limbo_dither)buffer_flip_v(dr.omask);
-				}
-				if(menu_item("Rotate Left",sel,',')){
-					pair s={dr.sel_here.w,dr.sel_here.h};
-					if(bg_has_sel())bg_scoop_selection();
-					buffer_flip_h(dr.limbo),dr.limbo=buffer_transpose(dr.limbo);
-					if(dr.mask)buffer_flip_h(dr.mask),dr.mask=buffer_transpose(dr.mask);
-					if(dr.omask&&dr.limbo_dither)buffer_flip_h(dr.omask),dr.omask=buffer_transpose(dr.omask);
-					dr.sel_here.w=s.y,dr.sel_here.h=s.x;
-				}
-				if(menu_item("Rotate Right",sel,'.')){
-					pair s={dr.sel_here.w,dr.sel_here.h};
-					if(bg_has_sel())bg_scoop_selection();
-					dr.limbo=buffer_transpose(dr.limbo),buffer_flip_h(dr.limbo);
-					if(dr.mask)dr.mask=buffer_transpose(dr.mask),buffer_flip_h(dr.mask);
-					if(dr.omask&&dr.limbo_dither)dr.omask=buffer_transpose(dr.omask),buffer_flip_h(dr.omask);
-					dr.sel_here.w=s.y,dr.sel_here.h=s.x;
-				}
-				if(dr.limbo_dither&&sel){
-					menu_separator();
-					if(menu_item("Lighten Image",dither_threshold>-2.0,'j'))dither_threshold-=.1;
-					if(menu_item("Darken  Image",dither_threshold< 2.0,'k'))dither_threshold+=.1;
-				}
-			}
-			if(ms.type==modal_none&&uimode==mode_object){
-				if(menu_item("Undo",has_undo(),'z'))undo();
-				if(menu_item("Redo",has_redo(),'Z'))redo();
-				menu_separator();
-				if(menu_item("Cut Widgets" ,ob.sel->c,'x' )){ob_order();SDL_SetClipboardText(n_con_copy(con(),l_list(ob.sel))->sv);ob_destroy();}
-				if(menu_item("Copy Widgets",ob.sel->c,'c' )){ob_order();SDL_SetClipboardText(n_con_copy(con(),l_list(ob.sel))->sv);}
-				if(menu_item("Copy Image",ob.sel->c==1,'\0')){SDL_SetClipboardText(image_write(draw_widget(ob.sel->lv[0]))->sv);frame=context;}
-				paste_any();
-				menu_separator();
-				if(menu_item("Paste as new Canvas",has_clip("%%IMG"),'\0')){
-					lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas")),dset(p,lmistr("locked"),ONE);
-					char*t=SDL_GetClipboardText();dset(p,lmistr("image"),lmcstr(t));SDL_free(t);
-					ob_create(l_list(p));frame=context;
-				}
-				if(menu_item("Paste into Canvas",has_clip("%%IMG")&&ob.sel->c==1&&canvas_is(ob.sel->lv[0]),'\0')){
-					char*t=SDL_GetClipboardText();lv*i=image_read(lmcstr(t));SDL_free(t);
-					lv*c=ob.sel->lv[0];iwrite(c,lmistr("size"),ifield(i,"size")),dset(c->b,lmistr("image"),i);
-				}
-				menu_separator();
-				if(menu_item("Select All",1,'a')){lv*wids=con_wids();ob.sel->c=0;EACH(z,wids)ll_add(ob.sel,wids->lv[z]);}
-				if(menu_item("Move to Front",ob.sel->c,'\0')){ob_order();EACH(z,ob.sel){iwrite(ob.sel->lv[z],lmistr("index"),lmn(RTEXT_END));}mark_dirty();}
-				if(menu_item("Move to Back",ob.sel->c,'\0')){ob_order();EACHR(z,ob.sel){iwrite(ob.sel->lv[z],lmistr("index"),NONE);};mark_dirty();}
-			}
-			if(wid.fv){
-				int selection=wid.fv!=NULL&&wid.cursor.x!=wid.cursor.y;
-				menu_bar("Text",ms.type!=modal_field_props);
-				if(wid.f.style==field_rich){
-					if(menu_item("Heading"    ,selection,'\0'))field_stylespan(lmistr("menu"),lmistr(""));
-					if(menu_item("Body"       ,selection,'\0'))field_stylespan(lmistr(""    ),lmistr(""));
-					if(menu_item("Fixed Width",selection,'\0'))field_stylespan(lmistr("mono"),lmistr(""));
-					if(menu_item("Link..."    ,selection,'\0'))modal_enter(modal_link);
-				}
-				else if(wid.f.style==field_code){
-					if(menu_item("Indent"        ,1,'\0'))field_indent(1);
-					if(menu_item("Unindent"      ,1,'\0'))field_indent(0);
-					if(menu_item("Toggle Comment",1,'/' ))field_comment();
-				}
-				if(wid.f.style!=field_code){
-					if(menu_item("Font...",wid.f.style!=field_plain,'\0'))modal_enter(modal_fonts);
-				}
-			}
-		}
-		if(ms.type==modal_recording&&!wid.fv){
-			menu_bar("Edit",au.mode==record_stopped);
-			if(menu_item("Undo",au.hist_cursor>0         ,'z'))sound_undo();
-			if(menu_item("Redo",au.hist_cursor<au.hist->c,'Z'))sound_redo();
-			menu_separator();
-			if(menu_item("Cut Sound"  ,1,'x' )){SDL_SetClipboardText(sound_write(sound_selected())->sv);sound_delete();}
-			if(menu_item("Copy Sound" ,1,'c' )){SDL_SetClipboardText(sound_write(sound_selected())->sv);}
-			if(menu_item("Paste Sound",has_clip("%%SND"),'v')){
-				char*t=SDL_GetClipboardText();lv*s=sound_read(lmcstr(t));SDL_free(t);
-				lv*r=sound_slice((pair){0,au.sel.x});int i=au.sel.x; au.head=i;
-				for(int z=0       ;z<s->b->c        &&i<(10*SFX_RATE);z++)r->b->sv[i++]=s->b->sv[z];int a=i;
-				for(int z=au.sel.y;z<au.target->b->c&&i<(10*SFX_RATE);z++)r->b->sv[i++]=au.target->b->sv[z];
-				r->b->c=i;au.sel.y=a;sound_edit(r);
-			}
-			if(menu_item("Clear",1,'\0'))sound_delete();
-			menu_separator();
-			if(menu_item("Select All",1,'a')){au.head=0;au.sel=(pair){0,au.target->b->c-1};}
-		}
-		if((uimode==mode_interact||uimode==mode_draw||uimode==mode_object)&&card_is(con())){
-			menu_bar("Card",ms.type==modal_none);
-			lv*card=con();
-			if(menu_item("Go to First"   ,1,'\0'))n_go(deck,l_list(lmistr("First")));
-			if(menu_item("Go to Previous",1,'\0'))n_go(deck,l_list(lmistr("Prev")));
-			if(menu_item("Go to Next"    ,1,'\0'))n_go(deck,l_list(lmistr("Next")));
-			if(menu_item("Go to Last"    ,1,'\0'))n_go(deck,l_list(lmistr("Last")));
-			menu_separator();
-			if(menu_item("Cut Card" ,1,'\0')){SDL_SetClipboardText(n_deck_copy(deck,l_list(card))->sv);n_deck_remove(deck,l_list(card));mark_dirty();}
-			if(menu_item("Copy Card",1,'\0')){SDL_SetClipboardText(n_deck_copy(deck,l_list(card))->sv);}
-			menu_separator();
-			if(menu_item("Script..."    ,1,'e'))setscript(card);
-			if(menu_item("Properties...",1,'\0'))modal_enter(modal_card_props);
-		}
-		if((uimode==mode_interact||uimode==mode_draw||uimode==mode_object)&&condef_is(con())){
-			menu_bar("Contraption",ms.type==modal_none);
-			lv*condef=con(),*condefs=ifield(deck,"contraptions");
-			if(menu_item("Close",1,'\0'))con_set(NULL);
-			if(menu_item("Go to Previous",condefs->c>1,'\0')){ev.dir=dir_left ;tracking();ev.dir=dir_none;}
-			if(menu_item("Go to Next"    ,condefs->c>1,'\0')){ev.dir=dir_right;tracking();ev.dir=dir_none;}
-			menu_separator();
-			if(menu_item("Script..."    ,1,'e'))setscript(condef);
-			if(menu_item("Properties...",1,'\0'))modal_enter(modal_condef_props);
-			if(menu_item("Attributes...",1,'\0'))modal_enter(modal_condef_attrs);
-		}
-		if(uimode==mode_interact||uimode==mode_draw||uimode==mode_object){
-			menu_bar("Tool",ms.type==modal_none);
-			if(menu_check("Interact",1,uimode==mode_interact,0))setmode(mode_interact);
-			if(menu_check("Widgets" ,1,uimode==mode_object  ,0))setmode(mode_object);
-			menu_separator();
-			if(menu_check("Select"     ,1,uimode==mode_draw&&dr.tool==tool_select     ,0))settool(tool_select     );
-			if(menu_check("Lasso"      ,1,uimode==mode_draw&&dr.tool==tool_lasso      ,0))settool(tool_lasso      );
-			if(menu_check("Pencil"     ,1,uimode==mode_draw&&dr.tool==tool_pencil     ,0))settool(tool_pencil     );
-			if(menu_check("Line"       ,1,uimode==mode_draw&&dr.tool==tool_line       ,0))settool(tool_line       );
-			if(menu_check("Flood"      ,1,uimode==mode_draw&&dr.tool==tool_fill       ,0))settool(tool_fill       );
-			if(menu_check("Box"        ,1,uimode==mode_draw&&dr.tool==tool_rect       ,0))settool(tool_rect       );
-			if(menu_check("Filled Box" ,1,uimode==mode_draw&&dr.tool==tool_fillrect   ,0))settool(tool_fillrect   );
-			if(menu_check("Oval"       ,1,uimode==mode_draw&&dr.tool==tool_ellipse    ,0))settool(tool_ellipse    );
-			if(menu_check("Filled Oval",1,uimode==mode_draw&&dr.tool==tool_fillellipse,0))settool(tool_fillellipse);
-			if(menu_check("Polygon"    ,1,uimode==mode_draw&&dr.tool==tool_poly       ,0))settool(tool_poly       );
-		}
-		if(uimode==mode_draw||uimode==mode_object){
-			menu_bar("View",ms.type==modal_none);
-			if(menu_check("Show Widgets"      ,1,dr.show_widgets,'\0'))dr.show_widgets^=1;
-			if(menu_check("Show Widget Bounds",1,ob.show_bounds ,'\0'))ob.show_bounds ^=1;
-			if(menu_check("Show Widget Names" ,1,ob.show_names  ,'\0'))ob.show_names  ^=1;
-			if(menu_check("Show Cursor Info"  ,1,ob.show_cursor ,'\0'))ob.show_cursor ^=1;
-			menu_separator();
-			if(menu_check("Show Grid Overlay",1,dr.show_grid,0  ))dr.show_grid^=1;
-			if(menu_check("Snap to Grid"     ,1,dr.snap     ,'p'))dr.snap     ^=1;
-			if(menu_item("Grid Size...",1,'\0'))modal_enter(modal_grid);
-			menu_separator();
-			if(menu_check("Show Animation"   ,1,dr.show_anim   ,0))dr.show_anim   ^=1;
-			if(menu_check("Transparency Mask",1,dr.trans_mask  ,0))dr.trans_mask  ^=1;
-			if(menu_check("Fat Bits"         ,1,dr.fatbits     ,0)){
-				if(uimode!=mode_draw)setmode(mode_draw);
-				dr.fatbits^=1;if(dr.fatbits){fat_offset(box_midpoint(bg_has_sel()||bg_has_lasso()?dr.sel_here:con_clip()));}
-			}
-		}
-		if(uimode==mode_draw){
-			menu_bar("Style",ms.type==modal_none);
-			if(menu_item("Stroke...",1,'\0'))modal_enter(modal_pattern);
-			if(menu_item("Fill..."  ,1,'\0'))modal_enter(modal_fill);
-			if(menu_item("Brush..." ,1,'\0'))modal_enter(modal_brush);
-			menu_separator();
-			if(menu_check("Transparency",1,dr.trans,0))dr.trans^=1;
-		}
-		if(uimode==mode_object){
-			menu_bar("Widgets",ms.type==modal_none);
-			if(menu_item("New Button..."     ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("button"));ob_create(l_list(p));}
-			if(menu_item("New Field..."      ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("field" ));ob_create(l_list(p));}
-			if(menu_item("New Slider..."     ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("slider"));ob_create(l_list(p));}
-			if(menu_item("New Canvas..."     ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas"));ob_create(l_list(p));}
-			if(menu_item("New Grid..."       ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("grid"  ));ob_create(l_list(p));}
-			if(card_is(con())&&menu_item("New Contraption...",1,'\0'))modal_enter(modal_pick_contraption);
-			menu_separator();
-			int al=1,as=1,at=1,ai=1,an=1;EACH(z,ob.sel){
-				widget w=unpack_widget(ob.sel->lv[z]);al&=w.locked;
-				as&=w.show==show_solid, at&=w.show==show_transparent, ai&=w.show==show_invert, an&=w.show==show_none;
-			}
-			if(menu_check("Locked"          ,ob.sel->c,ob.sel->c&&al,'\0'))ob_edit_prop("locked",lmn(!al));
-			if(menu_check("Show Solid"      ,ob.sel->c,ob.sel->c&&as,'\0'))ob_edit_prop("show",lmistr("solid"));
-			if(menu_check("Show Transparent",ob.sel->c,ob.sel->c&&at,'\0'))ob_edit_prop("show",lmistr("transparent"));
-			if(menu_check("Show Inverted"   ,ob.sel->c,ob.sel->c&&ai,'\0'))ob_edit_prop("show",lmistr("invert"));
-			if(menu_check("Show None"       ,ob.sel->c,ob.sel->c&&an,'\0'))ob_edit_prop("show",lmistr("none"));
-			menu_separator();
-			if(menu_item("Font..."      ,ob.sel->c   ,'\0'))modal_enter(modal_fonts);
-			if(menu_item("Script..."    ,ob.sel->c   ,'r')){
-				int m=1;for(int z=1;z<ob.sel->c;z++)if(!matchr(ifield(ob.sel->lv[0],"script"),ifield(ob.sel->lv[z],"script"))){m=0;break;}
-				if(m){setscript(l_drop(NONE,ob.sel));}else{
-					modal_enter(modal_multiscript);
-					ms.message=lmcstr("Not all of the selected widgets\nhave the same script.\nEdit them all together anyway?");
-					ms.verb=lmcstr("Edit");
-				}
-			}
-			if(menu_item("Properties...",ob.sel->c==1,'\0')||(ob.sel->c==1&&ev.action&&ms.type==modal_none))object_properties(ob.sel->lv[0]);
-		}
-		if(ms.type==modal_listen){
-			menu_bar("Listener",1);
-			if(menu_item("Clear History",1,'\0')){li.hist->c=0,li.scroll=0;}
-			if(menu_item("Clear Locals" ,1,'\0')){li.vars->c=0;}
-			menu_separator();
-			if(menu_item("Show Locals"  ,1,'\0')){listen_show(align_right,0,li.vars);}
-		}
-	}
-	widget_setup();
-	memset(frame.buffer->sv,0,frame.buffer->c);
-	char*pal=patterns_pal(ifield(deck,"patterns"));
+	menu_bar("File",ms.type==modal_none||ms.type==modal_recording);
 	if(uimode==mode_script){
-		int mh=3+font_h(FONT_MENU);rect b={0,mh,frame.size.x+1,frame.size.y-2*mh};
-		lv*overw=NULL;if(sc.xray){
-			lv*wids=con_wids();EACH(z,wids){
-				lv*wid=wids->lv[z];rect size=unpack_widget(wid).size;
-				int o=ev.alt&&over(size), col=o?(overw=wid,13):44;
-				draw_textc(size,ifield(wid,"name")->sv,FONT_BODY,o?-1:col),draw_box(size,0,col);
-				if(ifield(wid,"script")->c)draw_icon((pair){size.x-1,size.y},ICONS[icon_lil],o?1:col);
-				if(ev.alt&&ev.mu&&over(size)&&dover(size)){close_script(wid);ev.md=ev.mu=0;break;}
-			}if(ev.alt&&ev.mu)close_script(con()),ev.md=ev.mu=0;
+		if(menu_item("Close Script",1,'\0'))close_script(NULL);
+		if(menu_item("Save Script",1,'s')){
+			lv*text=rtext_all(sc.f.table);parse(text->sv);
+			if(perr()){snprintf(sc.status,sizeof(sc.status),"Error: %s",par.error);wid.cursor=(pair){par.i,par.i};}
+			else{script_save(text);snprintf(sc.status,sizeof(sc.status),"Saved.");}
 		}
-		ui_codeedit(b,0,&sc.f),draw_hline(0,frame.size.x,frame.size.y-mh-1,1);
-		if(overw){uicursor=cursor_point;draw_textc(unpack_widget(overw).size,ifield(overw,"name")->sv,FONT_BODY,-1);}
-		if(strlen(sc.status)){draw_text_fit((rect){3,frame.size.y-mh+3,frame.size.x,mh-6},sc.status,FONT_BODY,1);}
-		else{
-			char stat[4096]={0};
-			if(in_layer()&&wid.infield){
-				int a=MIN(wid.cursor.x,wid.cursor.y), b=MAX(wid.cursor.x,wid.cursor.y);if(a!=b&&a<layout_count){
-					a=MAX(0,MIN(a,layout_count)), b=MAX(0,MIN(b,layout_count));
-					pair ap=field_position(a),bp=field_position(b);int l=(bp.x-ap.x)+1, c=b-a;
-					snprintf(stat,sizeof(stat),"%d line%s, %d character%s selected",l,l==1?"":"s",c,c==1?"":"s");
-				}else{pair p=field_position(MIN(a,b));snprintf(stat,sizeof(stat),"Line %d, Column %d",p.x,p.y);}
-			}
-			pair l=font_textsize(FONT_BODY,stat);draw_text((rect){3,frame.size.y-mh+3,l.x,l.y},stat,FONT_BODY,1);
-			if(sc.others->c){snprintf(stat,sizeof(stat),"script of %s  '%s' and %d more",sc.target->a->sv,ifield(sc.target,"name")->sv,sc.others->c);}
-			else{snprintf(stat,sizeof(stat),"script of %s  '%s'",sc.target->a->sv,ifield(sc.target,"name")->sv);}
-			pair t=layout_plaintext(stat,FONT_BODY,align_right,(pair){frame.size.x-6-20-l.x,font_h(FONT_BODY)});
-			draw_text_wrap((rect){3+l.x+20,frame.size.y-mh+3,t.x,t.y},1);
-		}if(in_layer()&&ev.exit)close_script(NULL),ev.exit=0;
+		menu_separator();
+		if(menu_item("Import Script..."  ,1,'\0'))modal_enter(modal_import_script);
+		if(menu_item("Export Script..."  ,1,'\0'))modal_enter(modal_export_script);
+		menu_separator();
+		if(menu_item("Go to Deck",!deck_is(sc.target)           ,'\0'))close_script(deck);
+		lv*container=con();
+		if(condef_is(container)){if(menu_item("Go to ConDef",sc.target!=container,'\0'))close_script(container);}
+		else                    {if(menu_item("Go to Card"  ,sc.target!=container,'\0'))close_script(container);}
+		if(menu_check("X-Ray Specs",1,sc.xray,'r'))sc.xray^=1;
+	}
+	else if(ms.type==modal_recording){
+		if(menu_item("Import Sound...",1,'\0'))modal_enter(modal_import_sound);
+		menu_separator();
+		if(menu_item("Close Sound",1,'\0'))modal_exit(0);
 	}
 	else{
-		if(ob.sel->c==0&&in_layer()&&(!card_is(con())||uimode==mode_object))tracking();
-		lv*back=con_image();pair bsize=image_size(back);
-		if(ms.type!=modal_trans){
-			rect cl=con_clip();pair s=con_size();
-			if(bsize.x!=s.x||bsize.y!=s.y)image_resize(back,s),mark_dirty();
-			if(dr.fatbits){draw_fat(back->b,pal,frame_count,0,FAT,dr.offset);}
-			else if(s.x==frame.size.x&&s.y==frame.size.y){memcpy(frame.buffer->sv,back->b->sv,frame.buffer->c);}
-			else{memset(frame.buffer->sv,46,frame.buffer->c),draw_rect(cl,bg_fill());buffer_paste(cl,frame.clip,back->b,frame.buffer,0);}
+		if(menu_item("New Deck...",1,'\0')){
+			if(dirty&&autosave&&strlen(document_path)){save_deck(lmcstr(document_path));dirty=0;}
+			if(dirty){
+				modal_enter(modal_confirm_new);
+				ms.message=lmcstr("The current deck has unsaved changes.\nAre you sure you want to discard it?");
+				ms.verb=lmcstr("Discard");
+			}else{load_deck(deck_get(lmistr("")));set_path("");}
 		}
-
-
-		// TODO:
-		//ev=ev_to_con(ev);
-		if(uimode==mode_draw&&in_layer())bg_tools();
-		if(dr.tool==tool_select&&(dr.sel_start.w>0||dr.sel_start.h>0))draw_rect(card_to_fat(dr.sel_start),dr.fill);
-		bg_lasso_preview();
-		rect livesel=bg_select();
-		//ev=con_to_ev(ev);
-
-
-		if(((uimode==mode_object||uimode==mode_draw)&&dr.show_grid)||ms.type==modal_grid){
-			rect c=con_clip();
-			for(int x=dr.grid_size.x;x<c.w;x+=dr.grid_size.x){rect r=card_to_fat((rect){c.x+x,c.y,1,c.h});r.w=1;draw_rect(r,44);}
-			for(int y=dr.grid_size.y;y<c.h;y+=dr.grid_size.y){rect r=card_to_fat((rect){c.x,c.y+y,c.w,1});r.h=1;draw_rect(r,44);}
+		if(menu_item("New Card",1,'\0')){
+			lv*c=n_deck_add(deck,l_list(lmistr("card")));int n=ln(ifield(ifield(deck,"card"),"index"));
+			iwrite(c,lmistr("index"),lmn(n+1)),n_go(deck,l_list(c));
 		}
-		lv*wids=con_wids();
-		event_state eb=ev;if(uimode!=mode_interact)ev=(event_state){0};
-		if(uimode==mode_interact||(dr.show_widgets&&!dr.fatbits)){handle_widgets(wids,con_offset());}
-		else if(dr.show_widgets&&dr.fatbits)EACH(z,wids){draw_boxinv(pal,card_to_fat(unpack_widget(wids->lv[z]).size));}
-		ev=eb;
-		if(uimode==mode_draw){if(bg_has_sel())draw_handles(livesel);draw_box(livesel,0,ANTS);}
-		if(wid.pending_grid_edit){wid.pending_grid_edit=0;modal_enter(modal_gridcell);}
-		if(uimode==mode_object){
-			ev=ev_to_con(ev);
-			EACH(z,wids){ // forward pass for rendering
-				lv*wid=wids->lv[z];widget w=unpack_widget(wid);w.size=con_to_screen(w.size);
-				int sel=0;EACH(z,ob.sel)if(ob.sel->lv[z]==wid){sel=1;break;}
-				if(sel){draw_box(inset(w.size,-1),0,ANTS);}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1));}
-				if(sel&&ob.sel->c==1&&!contraption_is(ob.sel->lv[0])){draw_handles(w.size);}
-				if(w.locked&&ob.show_bounds){draw_rect((rect){w.size.x+w.size.w-10,w.size.y,10,10},1),draw_icon((pair){w.size.x+w.size.w-8,w.size.y+1},LOCK,32);}
-			}
-			if(in_layer()){
-				if(ob.sel->c>0){
-					int nudge=0;
-					if(ev.dir==dir_left )ob_move((pair){-1*(ev.shift?dr.grid_size.x:1), 0},1),nudge=1;
-					if(ev.dir==dir_right)ob_move((pair){ 1*(ev.shift?dr.grid_size.x:1), 0},1),nudge=1;
-					if(ev.dir==dir_up   )ob_move((pair){ 0,-1*(ev.shift?dr.grid_size.y:1)},1),nudge=1;
-					if(ev.dir==dir_down )ob_move((pair){ 0, 1*(ev.shift?dr.grid_size.y:1)},1),nudge=1;
-					if(nudge&&ev.shift&&ob.sel->c==1)ob_move(snap_delta(getpair(ifield(ob.sel->lv[0],"pos"))),1);
-				}
-				int ish=ob.sel->c==1?in_handle(unpack_widget(ob.sel->lv[0]).size):-1;
-				int isw=0;EACH(w,wids){rect wid=unpack_widget(wids->lv[w]).size;EACH(z,ob.sel)if(ob.sel->lv[z]==wids->lv[w]&&over(wid))isw=1;}
-				pair a=ev.pos,b=ob.prev;int dragged=a.x!=b.x||a.y!=b.y;
-				rect sr=normalize_rect((rect){ev.dpos.x,ev.dpos.y,ev.pos.x-ev.dpos.x,ev.pos.y-ev.dpos.y});int box=sr.w>1||sr.h>1;
-				if(isw&&ev.dclick){
-					for(int z=wids->c-1;z>=0;z--){
-						lv*wid=wids->lv[z];widget w=unpack_widget(wid);
-						if(over(w.size)){object_properties(wid);break;}
-					}
-				}
-				else if(isw&&ev.mu&&!box){
-					for(int z=ob.sel->c-1;z>=0;z--){
-						lv*wid=ob.sel->lv[z];widget w=unpack_widget(wid);
-						if(over(w.size)){if(ev.shift){ob.sel=l_drop(wid,ob.sel);}else{ob.sel->c=0;ll_add(ob.sel,wid);}break;}
-					}
-				}
-				else if(ish!=-1&&ev.md){ob.resize=1,ob.resize_first=1,ob.handle=ish,ob.prev=ev.pos;ob.orig=unpack_widget(ob.sel->lv[0]).size;}
-				else if(isw    &&ev.md){ob.move  =1,ob.move_first  =1,ob.prev=ev.pos;}
-				else if(ob.resize&&(!ev.drag||!ob.sel->c)){ob.resize=0,ob.resize_first=0;}
-				else if(ob.move&&(!ev.drag||!ob.sel->c)){
-					if(ob.sel->c==1)ob_move(snap_delta(getpair(ifield(ob.sel->lv[0],"pos"))),!ob.move_first);
-					ob.move=0,ob.move_first=0;
-				}
-				else if(ob.resize){
-					pair delta={ev.pos.x-ev.dpos.x,ev.pos.y-ev.dpos.y};rect r=ob.orig;
-					if(ob.handle==0){r.w+=delta.x, r.h+=delta.y;}
-					if(ob.handle==2){r.w+=delta.x, r.h-=delta.y; r.y+=delta.y;}
-					if(ob.handle==6){r.w-=delta.x, r.h+=delta.y; r.x+=delta.x;}
-					if(ob.handle==4){r.w-=delta.x, r.h-=delta.y; r.x+=delta.x; r.y+=delta.y;}
-					if(ob.handle==1){r.w+=delta.x;}
-					if(ob.handle==3){r.h-=delta.y, r.y+=delta.y;}
-					if(ob.handle==5){r.w-=delta.x, r.x+=delta.x;}
-					if(ob.handle==7){r.h+=delta.y;}
-					r=snapr(r), r.w=MAX(8,r.w), r.h=MAX(8,r.h);
-					if(dragged){ob_resize(r,!ob.resize_first);ob.resize_first=0,ob.prev=ev.pos;}
-				}
-				else if(ob.move){
-					pair delta=(pair){a.x-b.x,a.y-b.y};
-					if(dragged){ob_move(delta,!ob.move_first);ob.move_first=0,ob.prev=ev.pos;}
-				}else{
-					if(box&&ev.drag)draw_box(con_to_screen(sr),0,ANTS); if(box&&(ev.drag||ev.mu))ob.sel->c=0;
-					int f=0;for(int z=wids->c-1;z>=0;z--){ // backward pass for selection priority(!)
-						lv*wid=wids->lv[z];widget w=unpack_widget(wid);
-						int sel=0;EACH(z,ob.sel)if(ob.sel->lv[z]==wid){sel=1;break;}
-						rect overlap=box_intersect(w.size,sr);
-						int insel=box?overlap.w>=1&&overlap.h>=1: over(w.size)&&dover(w.size), c=ev.mu&insel;
-						if(c)f=1; if(!c)continue; if(box){ll_add(ob.sel,wid);continue;}
-						if(!sel){if(!ev.shift)ob.sel->c=0;ll_add(ob.sel,wid);break;}
-					}if(ev.mu&&!f)ob.sel->c=0;
-				}
-			}
-			ev=con_to_ev(ev);
+		menu_separator();
+		if(menu_item("Open...",1,'o'))modal_enter(modal_open_deck);
+		if(menu_item("Save",dirty&&strlen(document_path),'s'))save_deck(lmcstr(document_path));
+		if(menu_item("Save As...",1,'\0'))modal_enter(modal_save_deck);
+		if(wid.gv){
+			menu_separator();
+			if(menu_item("Import Table...",!wid.g.locked,'\0'))modal_enter(modal_import_table);
+			if(menu_item("Export Table...",1,'\0'))modal_enter(modal_export_table);
 		}
-		if((uimode==mode_object&&ob.show_names)||(uimode==mode_draw&&dr.show_widgets&&dr.fatbits)||ms.type==modal_listen){
-			EACH(z,wids){
-				lv*wid=wids->lv[z];rect size=con_to_screen(card_to_fat(unpack_widget(wid).size));
-				lv*n=ifield(wid,"name");pair s=font_textsize(FONT_BODY,n->sv);
-				draw_text_outlined((rect){size.x,size.y-s.y,s.x,s.y},n->sv,FONT_BODY);
-			}
+		else{
+			menu_separator();
+			if(menu_item("Import Image..."   ,1,'\0'))modal_enter(modal_import_image);
+			if(menu_item("Export Image..."   ,1,'\0'))modal_enter(modal_export_image);
 		}
-		if(ob.show_cursor&&ms.type==modal_none&&(uimode==mode_draw||uimode==mode_object)){
-			char t[4096];ev=ev_to_con(ev);
-			if(uimode==mode_draw&&bg_has_sel()){
-				rect r=livesel,l=r;if(dr.fatbits){pair p=fat_to_card((pair){r.x,r.y});l=(rect){p.x,p.y,r.w/FAT,r.h/FAT};}
-				snprintf(t,sizeof(t),"(%3d,%3d,%3d,%3d)",l.x,l.y,l.w,l.h);pair s=font_textsize(FONT_BODY,t);
-				draw_text_outlined(con_to_screen((rect){r.x,r.y-s.y,s.x,s.y}),t,FONT_BODY);
-			}
-			else if(ev.drag){
-				pair a=dr.fatbits?fat_to_card(ev.dpos):ev.dpos, b=dr.fatbits?fat_to_card(ev.pos):ev.pos;rect r={b.x,b.y,b.x-a.x,b.y-a.y};
-				snprintf(t,sizeof(t),"(%3d,%3d,%3d,%3d)",r.x,r.y,r.w,r.h);pair s=font_textsize(FONT_BODY,t);
-				draw_text_outlined(con_to_screen((rect){ev.pos.x,ev.pos.y-s.y,s.x,s.y}),t,FONT_BODY);
-			}
-			else{
-				pair c=dr.fatbits?fat_to_card(ev.pos):ev.pos;
-				snprintf(t,sizeof(t),"(%3d,%3d)",c.x,c.y);pair s=font_textsize(FONT_BODY,t);
-				draw_text_outlined(con_to_screen((rect){ev.pos.x,ev.pos.y-s.y,s.x,s.y}),t,FONT_BODY);
-			}ev=con_to_ev(ev);
-		}
-		if(in_layer()&&ev.exit&&!card_is(con()))con_set(NULL),ev.exit=0;
+		menu_separator();
+		if(menu_item("Cards..."       ,1,'C' ))modal_enter(modal_cards);
+		if(menu_item("Sounds..."      ,1,'S' ))modal_enter(modal_sounds);
+		if(menu_item("Contraptions...",1,'T' ))modal_enter(modal_contraptions);
+		if(menu_item("Resources..."   ,1,'\0'))modal_enter(modal_resources);
+		if(menu_item("Properties..."  ,1,'\0'))modal_enter(modal_deck_props);
 	}
-	modals();
-	gestures();
-	menu_finish();
+	if(ms.type==modal_none||wid.gv||wid.fv){
+		menu_bar("Edit",wid.gv||wid.fv||(ms.type==modal_none&&uimode==mode_interact)||uimode==mode_draw||uimode==mode_object);
+		if(wid.gv){
+			int mutable=!wid.g.locked&&ms.type==modal_none;
+			if(menu_item("Undo",wid.hist_cursor>0          ,'z'))grid_undo();
+			if(menu_item("Redo",wid.hist_cursor<wid.hist->c,'Z'))grid_redo();
+			menu_separator();
+			if(menu_item("Copy Table",1,'c')){
+				SDL_SetClipboardText(n_writecsv(NULL,lml2(wid.gv->table,grid_format()))->sv);
+			}
+			if(menu_item("Paste Table",mutable&&strlen(clip_stash),'v')){
+				char*t=SDL_GetClipboardText();
+				grid_edit(n_readcsv(NULL,lml2(lmcstr(t),lmcstr(wid.g.format))));
+				SDL_free(t);
+			}
+			menu_separator();
+			if(menu_item("Delete Row",mutable&&wid.gv->row!=-1,'\0'))grid_deleterow();
+			if(menu_item("Add Row",mutable,'\0'))grid_insertrow();
+			if(menu_item("Query...",ms.type==modal_none,'u'))modal_enter(modal_query);
+		}
+		if(wid.fv)text_edit_menu();
+		if(ms.type==modal_none&&uimode==mode_interact){
+			if(menu_item("Undo",has_undo(),'z'))undo();
+			if(menu_item("Redo",has_redo(),'Z'))redo();
+			menu_separator();
+			paste_any();
+		}
+		if(ms.type==modal_none&&uimode==mode_draw){
+			int sel=bg_has_sel()||bg_has_lasso();
+			if(menu_item("Undo",(!sel)&&has_undo(),'z'))undo();
+			if(menu_item("Redo",(!sel)&&has_redo(),'Z'))redo();
+			menu_separator();
+			if(menu_item("Cut Image",sel,'x')){
+				lv*i=bg_has_lasso()?buffer_mask(dr.limbo,dr.mask): dr.limbo?bg_scaled_limbo():bg_copy_selection(dr.sel_here);
+				bg_scoop_selection(),SDL_SetClipboardText(image_write(image_make(i))->sv);bg_delete_selection();
+			}
+			if(menu_item("Copy Image",sel,'c' )){
+				lv*i=bg_has_lasso()?buffer_mask(dr.limbo,dr.mask): dr.limbo?bg_scaled_limbo():bg_copy_selection(dr.sel_here);
+				SDL_SetClipboardText(image_write(image_make(i))->sv);
+			}
+			paste_any();
+			if(menu_item("Clear",1,'\0')){int t=dr.tool;if(!sel){settool(tool_select),dr.sel_here=con_clip();}bg_delete_selection();settool(t);}
+			menu_separator();
+			if(menu_item("Select All",1,'a')){settool(tool_select),dr.sel_here=con_clip();}
+			if(menu_item("Tight Selection",sel,'g'))bg_tighten();
+			if(menu_item("Resize to Original",sel&&dr.tool==tool_select,'\0')){
+				bg_scoop_selection();pair s=buff_size(dr.limbo);dr.sel_here.w=s.x,dr.sel_here.h=s.y;
+			}
+			lv*c=con();
+			if(card_is  (c))if(menu_item("Resize to Card"  ,sel&&dr.tool==tool_select,'\0')){bg_scoop_selection(),dr.sel_here=con_clip();}
+			if(condef_is(c))if(menu_item("Resize to ConDef",sel&&dr.tool==tool_select,'\0')){bg_scoop_selection(),dr.sel_here=con_clip();}
+			menu_separator();
+			if(menu_item("Invert",sel&&!dr.limbo_dither,'i')){
+				if(bg_has_sel())bg_scoop_selection();
+				pair s=buff_size(dr.limbo);char*pal=patterns_pal(ifield(deck,"patterns"));
+				EACH(z,dr.limbo)dr.limbo->sv[z]=1^draw_pattern(pal,dr.limbo->sv[z],(z%s.x),(z/s.x));
+			}
+			if(menu_item("Flip Horizontal",sel,'\0')){
+				if(bg_has_sel())bg_scoop_selection();
+				buffer_flip_h(dr.limbo);if(dr.mask)buffer_flip_h(dr.mask);if(dr.omask&&dr.limbo_dither)buffer_flip_h(dr.omask);
+			}
+			if(menu_item("Flip Vertical",sel,'\0')){
+				if(bg_has_sel())bg_scoop_selection();
+				buffer_flip_v(dr.limbo);if(dr.mask)buffer_flip_v(dr.mask);if(dr.omask&&dr.limbo_dither)buffer_flip_v(dr.omask);
+			}
+			if(menu_item("Rotate Left",sel,',')){
+				pair s={dr.sel_here.w,dr.sel_here.h};
+				if(bg_has_sel())bg_scoop_selection();
+				buffer_flip_h(dr.limbo),dr.limbo=buffer_transpose(dr.limbo);
+				if(dr.mask)buffer_flip_h(dr.mask),dr.mask=buffer_transpose(dr.mask);
+				if(dr.omask&&dr.limbo_dither)buffer_flip_h(dr.omask),dr.omask=buffer_transpose(dr.omask);
+				dr.sel_here.w=s.y,dr.sel_here.h=s.x;
+			}
+			if(menu_item("Rotate Right",sel,'.')){
+				pair s={dr.sel_here.w,dr.sel_here.h};
+				if(bg_has_sel())bg_scoop_selection();
+				dr.limbo=buffer_transpose(dr.limbo),buffer_flip_h(dr.limbo);
+				if(dr.mask)dr.mask=buffer_transpose(dr.mask),buffer_flip_h(dr.mask);
+				if(dr.omask&&dr.limbo_dither)dr.omask=buffer_transpose(dr.omask),buffer_flip_h(dr.omask);
+				dr.sel_here.w=s.y,dr.sel_here.h=s.x;
+			}
+			if(dr.limbo_dither&&sel){
+				menu_separator();
+				if(menu_item("Lighten Image",dither_threshold>-2.0,'j'))dither_threshold-=.1;
+				if(menu_item("Darken  Image",dither_threshold< 2.0,'k'))dither_threshold+=.1;
+			}
+		}
+		if(ms.type==modal_none&&uimode==mode_object){
+			if(menu_item("Undo",has_undo(),'z'))undo();
+			if(menu_item("Redo",has_redo(),'Z'))redo();
+			menu_separator();
+			if(menu_item("Cut Widgets" ,ob.sel->c,'x' )){ob_order();SDL_SetClipboardText(n_con_copy(con(),l_list(ob.sel))->sv);ob_destroy();}
+			if(menu_item("Copy Widgets",ob.sel->c,'c' )){ob_order();SDL_SetClipboardText(n_con_copy(con(),l_list(ob.sel))->sv);}
+			if(menu_item("Copy Image",ob.sel->c==1,'\0')){SDL_SetClipboardText(image_write(draw_widget(ob.sel->lv[0]))->sv);frame=context;}
+			paste_any();
+			menu_separator();
+			if(menu_item("Paste as new Canvas",has_clip("%%IMG"),'\0')){
+				lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas")),dset(p,lmistr("locked"),ONE);
+				char*t=SDL_GetClipboardText();dset(p,lmistr("image"),lmcstr(t));SDL_free(t);
+				ob_create(l_list(p));frame=context;
+			}
+			if(menu_item("Paste into Canvas",has_clip("%%IMG")&&ob.sel->c==1&&canvas_is(ob.sel->lv[0]),'\0')){
+				char*t=SDL_GetClipboardText();lv*i=image_read(lmcstr(t));SDL_free(t);
+				lv*c=ob.sel->lv[0];iwrite(c,lmistr("size"),ifield(i,"size")),dset(c->b,lmistr("image"),i);
+			}
+			menu_separator();
+			if(menu_item("Select All",1,'a')){lv*wids=con_wids();ob.sel->c=0;EACH(z,wids)ll_add(ob.sel,wids->lv[z]);}
+			if(menu_item("Move to Front",ob.sel->c,'\0')){ob_order();EACH(z,ob.sel){iwrite(ob.sel->lv[z],lmistr("index"),lmn(RTEXT_END));}mark_dirty();}
+			if(menu_item("Move to Back",ob.sel->c,'\0')){ob_order();EACHR(z,ob.sel){iwrite(ob.sel->lv[z],lmistr("index"),NONE);};mark_dirty();}
+		}
+		if(wid.fv){
+			int selection=wid.fv!=NULL&&wid.cursor.x!=wid.cursor.y;
+			menu_bar("Text",ms.type!=modal_field_props);
+			if(wid.f.style==field_rich){
+				if(menu_item("Heading"    ,selection,'\0'))field_stylespan(lmistr("menu"),lmistr(""));
+				if(menu_item("Body"       ,selection,'\0'))field_stylespan(lmistr(""    ),lmistr(""));
+				if(menu_item("Fixed Width",selection,'\0'))field_stylespan(lmistr("mono"),lmistr(""));
+				if(menu_item("Link..."    ,selection,'\0'))modal_enter(modal_link);
+			}
+			else if(wid.f.style==field_code){
+				if(menu_item("Indent"        ,1,'\0'))field_indent(1);
+				if(menu_item("Unindent"      ,1,'\0'))field_indent(0);
+				if(menu_item("Toggle Comment",1,'/' ))field_comment();
+			}
+			if(wid.f.style!=field_code){
+				if(menu_item("Font...",wid.f.style!=field_plain,'\0'))modal_enter(modal_fonts);
+			}
+		}
+	}
+	if(ms.type==modal_recording&&!wid.fv){
+		menu_bar("Edit",au.mode==record_stopped);
+		if(menu_item("Undo",au.hist_cursor>0         ,'z'))sound_undo();
+		if(menu_item("Redo",au.hist_cursor<au.hist->c,'Z'))sound_redo();
+		menu_separator();
+		if(menu_item("Cut Sound"  ,1,'x' )){SDL_SetClipboardText(sound_write(sound_selected())->sv);sound_delete();}
+		if(menu_item("Copy Sound" ,1,'c' )){SDL_SetClipboardText(sound_write(sound_selected())->sv);}
+		if(menu_item("Paste Sound",has_clip("%%SND"),'v')){
+			char*t=SDL_GetClipboardText();lv*s=sound_read(lmcstr(t));SDL_free(t);
+			lv*r=sound_slice((pair){0,au.sel.x});int i=au.sel.x; au.head=i;
+			for(int z=0       ;z<s->b->c        &&i<(10*SFX_RATE);z++)r->b->sv[i++]=s->b->sv[z];int a=i;
+			for(int z=au.sel.y;z<au.target->b->c&&i<(10*SFX_RATE);z++)r->b->sv[i++]=au.target->b->sv[z];
+			r->b->c=i;au.sel.y=a;sound_edit(r);
+		}
+		if(menu_item("Clear",1,'\0'))sound_delete();
+		menu_separator();
+		if(menu_item("Select All",1,'a')){au.head=0;au.sel=(pair){0,au.target->b->c-1};}
+	}
+	if((uimode==mode_interact||uimode==mode_draw||uimode==mode_object)&&card_is(con())){
+		menu_bar("Card",ms.type==modal_none);
+		lv*card=con();
+		if(menu_item("Go to First"   ,1,'\0'))n_go(deck,l_list(lmistr("First")));
+		if(menu_item("Go to Previous",1,'\0'))n_go(deck,l_list(lmistr("Prev")));
+		if(menu_item("Go to Next"    ,1,'\0'))n_go(deck,l_list(lmistr("Next")));
+		if(menu_item("Go to Last"    ,1,'\0'))n_go(deck,l_list(lmistr("Last")));
+		menu_separator();
+		if(menu_item("Cut Card" ,1,'\0')){SDL_SetClipboardText(n_deck_copy(deck,l_list(card))->sv);n_deck_remove(deck,l_list(card));mark_dirty();}
+		if(menu_item("Copy Card",1,'\0')){SDL_SetClipboardText(n_deck_copy(deck,l_list(card))->sv);}
+		menu_separator();
+		if(menu_item("Script..."    ,1,'e'))setscript(card);
+		if(menu_item("Properties...",1,'\0'))modal_enter(modal_card_props);
+	}
+	if((uimode==mode_interact||uimode==mode_draw||uimode==mode_object)&&condef_is(con())){
+		menu_bar("Contraption",ms.type==modal_none);
+		lv*condef=con(),*condefs=ifield(deck,"contraptions");
+		if(menu_item("Close",1,'\0'))con_set(NULL);
+		if(menu_item("Go to Previous",condefs->c>1,'\0')){ev.dir=dir_left ;tracking();ev.dir=dir_none;}
+		if(menu_item("Go to Next"    ,condefs->c>1,'\0')){ev.dir=dir_right;tracking();ev.dir=dir_none;}
+		menu_separator();
+		if(menu_item("Script..."    ,1,'e'))setscript(condef);
+		if(menu_item("Properties...",1,'\0'))modal_enter(modal_condef_props);
+		if(menu_item("Attributes...",1,'\0'))modal_enter(modal_condef_attrs);
+	}
+	if(uimode==mode_interact||uimode==mode_draw||uimode==mode_object){
+		menu_bar("Tool",ms.type==modal_none);
+		if(menu_check("Interact",1,uimode==mode_interact,0))setmode(mode_interact);
+		if(menu_check("Widgets" ,1,uimode==mode_object  ,0))setmode(mode_object);
+		menu_separator();
+		if(menu_check("Select"     ,1,uimode==mode_draw&&dr.tool==tool_select     ,0))settool(tool_select     );
+		if(menu_check("Lasso"      ,1,uimode==mode_draw&&dr.tool==tool_lasso      ,0))settool(tool_lasso      );
+		if(menu_check("Pencil"     ,1,uimode==mode_draw&&dr.tool==tool_pencil     ,0))settool(tool_pencil     );
+		if(menu_check("Line"       ,1,uimode==mode_draw&&dr.tool==tool_line       ,0))settool(tool_line       );
+		if(menu_check("Flood"      ,1,uimode==mode_draw&&dr.tool==tool_fill       ,0))settool(tool_fill       );
+		if(menu_check("Box"        ,1,uimode==mode_draw&&dr.tool==tool_rect       ,0))settool(tool_rect       );
+		if(menu_check("Filled Box" ,1,uimode==mode_draw&&dr.tool==tool_fillrect   ,0))settool(tool_fillrect   );
+		if(menu_check("Oval"       ,1,uimode==mode_draw&&dr.tool==tool_ellipse    ,0))settool(tool_ellipse    );
+		if(menu_check("Filled Oval",1,uimode==mode_draw&&dr.tool==tool_fillellipse,0))settool(tool_fillellipse);
+		if(menu_check("Polygon"    ,1,uimode==mode_draw&&dr.tool==tool_poly       ,0))settool(tool_poly       );
+	}
+	if(uimode==mode_draw||uimode==mode_object){
+		menu_bar("View",ms.type==modal_none);
+		if(menu_check("Show Widgets"      ,1,dr.show_widgets,'\0'))dr.show_widgets^=1;
+		if(menu_check("Show Widget Bounds",1,ob.show_bounds ,'\0'))ob.show_bounds ^=1;
+		if(menu_check("Show Widget Names" ,1,ob.show_names  ,'\0'))ob.show_names  ^=1;
+		if(menu_check("Show Cursor Info"  ,1,ob.show_cursor ,'\0'))ob.show_cursor ^=1;
+		menu_separator();
+		if(menu_check("Show Grid Overlay",1,dr.show_grid,0  ))dr.show_grid^=1;
+		if(menu_check("Snap to Grid"     ,1,dr.snap     ,'p'))dr.snap     ^=1;
+		if(menu_item("Grid Size...",1,'\0'))modal_enter(modal_grid);
+		menu_separator();
+		if(menu_check("Show Animation"   ,1,dr.show_anim   ,0))dr.show_anim   ^=1;
+		if(menu_check("Transparency Mask",1,dr.trans_mask  ,0))dr.trans_mask  ^=1;
+		if(menu_check("Fat Bits"         ,1,dr.fatbits     ,0)){
+			if(uimode!=mode_draw)setmode(mode_draw);
+			dr.fatbits^=1;if(dr.fatbits){fat_offset(box_midpoint(bg_has_sel()||bg_has_lasso()?dr.sel_here:con_clip()));}
+		}
+	}
+	if(uimode==mode_draw){
+		menu_bar("Style",ms.type==modal_none);
+		if(menu_item("Stroke...",1,'\0'))modal_enter(modal_pattern);
+		if(menu_item("Fill..."  ,1,'\0'))modal_enter(modal_fill);
+		if(menu_item("Brush..." ,1,'\0'))modal_enter(modal_brush);
+		menu_separator();
+		if(menu_check("Transparency",1,dr.trans,0))dr.trans^=1;
+	}
+	if(uimode==mode_object){
+		menu_bar("Widgets",ms.type==modal_none);
+		if(menu_item("New Button..."     ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("button"));ob_create(l_list(p));}
+		if(menu_item("New Field..."      ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("field" ));ob_create(l_list(p));}
+		if(menu_item("New Slider..."     ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("slider"));ob_create(l_list(p));}
+		if(menu_item("New Canvas..."     ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas"));ob_create(l_list(p));}
+		if(menu_item("New Grid..."       ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("grid"  ));ob_create(l_list(p));}
+		if(card_is(con())&&menu_item("New Contraption...",1,'\0'))modal_enter(modal_pick_contraption);
+		menu_separator();
+		int al=1,as=1,at=1,ai=1,an=1;EACH(z,ob.sel){
+			widget w=unpack_widget(ob.sel->lv[z]);al&=w.locked;
+			as&=w.show==show_solid, at&=w.show==show_transparent, ai&=w.show==show_invert, an&=w.show==show_none;
+		}
+		if(menu_check("Locked"          ,ob.sel->c,ob.sel->c&&al,'\0'))ob_edit_prop("locked",lmn(!al));
+		if(menu_check("Show Solid"      ,ob.sel->c,ob.sel->c&&as,'\0'))ob_edit_prop("show",lmistr("solid"));
+		if(menu_check("Show Transparent",ob.sel->c,ob.sel->c&&at,'\0'))ob_edit_prop("show",lmistr("transparent"));
+		if(menu_check("Show Inverted"   ,ob.sel->c,ob.sel->c&&ai,'\0'))ob_edit_prop("show",lmistr("invert"));
+		if(menu_check("Show None"       ,ob.sel->c,ob.sel->c&&an,'\0'))ob_edit_prop("show",lmistr("none"));
+		menu_separator();
+		if(menu_item("Font..."      ,ob.sel->c   ,'\0'))modal_enter(modal_fonts);
+		if(menu_item("Script..."    ,ob.sel->c   ,'r')){
+			int m=1;for(int z=1;z<ob.sel->c;z++)if(!matchr(ifield(ob.sel->lv[0],"script"),ifield(ob.sel->lv[z],"script"))){m=0;break;}
+			if(m){setscript(l_drop(NONE,ob.sel));}else{
+				modal_enter(modal_multiscript);
+				ms.message=lmcstr("Not all of the selected widgets\nhave the same script.\nEdit them all together anyway?");
+				ms.verb=lmcstr("Edit");
+			}
+		}
+		if(menu_item("Properties...",ob.sel->c==1,'\0')||(ob.sel->c==1&&ev.action&&ms.type==modal_none))object_properties(ob.sel->lv[0]);
+	}
+	if(ms.type==modal_listen){
+		menu_bar("Listener",1);
+		if(menu_item("Clear History",1,'\0')){li.hist->c=0,li.scroll=0;}
+		if(menu_item("Clear Locals" ,1,'\0')){li.vars->c=0;}
+		menu_separator();
+		if(menu_item("Show Locals"  ,1,'\0')){listen_show(align_right,0,li.vars);}
+	}
+}
+
+void main_view(){
+	if(ob.sel->c==0&&in_layer()&&(!card_is(con())||uimode==mode_object))tracking();
+	lv*back=con_image();pair bsize=image_size(back);char*pal=patterns_pal(ifield(deck,"patterns"));
+	if(ms.type!=modal_trans){
+		rect cl=con_clip();pair s=con_size();
+		if(bsize.x!=s.x||bsize.y!=s.y)image_resize(back,s),mark_dirty();
+		if(dr.fatbits){draw_fat(back->b,pal,frame_count,0,FAT,dr.offset);}
+		else if(s.x==frame.size.x&&s.y==frame.size.y){memcpy(frame.buffer->sv,back->b->sv,frame.buffer->c);}
+		else{memset(frame.buffer->sv,46,frame.buffer->c),draw_rect(cl,bg_fill());buffer_paste(cl,frame.clip,back->b,frame.buffer,0);}
+	}
+
+	// TODO:
+	//ev=ev_to_con(ev);
+	if(uimode==mode_draw&&in_layer())bg_tools();
+	if(dr.tool==tool_select&&(dr.sel_start.w>0||dr.sel_start.h>0))draw_rect(card_to_fat(dr.sel_start),dr.fill);
+	bg_lasso_preview();
+	rect livesel=bg_select();
+	//ev=con_to_ev(ev);
+
+
+	if(((uimode==mode_object||uimode==mode_draw)&&dr.show_grid)||ms.type==modal_grid){
+		rect c=con_clip();
+		for(int x=dr.grid_size.x;x<c.w;x+=dr.grid_size.x){rect r=card_to_fat((rect){c.x+x,c.y,1,c.h});r.w=1;draw_rect(r,44);}
+		for(int y=dr.grid_size.y;y<c.h;y+=dr.grid_size.y){rect r=card_to_fat((rect){c.x,c.y+y,c.w,1});r.h=1;draw_rect(r,44);}
+	}
+	lv*wids=con_wids();
+	event_state eb=ev;if(uimode!=mode_interact)ev=(event_state){0};
+	if(uimode==mode_interact||(dr.show_widgets&&!dr.fatbits)){handle_widgets(wids,con_offset());}
+	else if(dr.show_widgets&&dr.fatbits)EACH(z,wids){draw_boxinv(pal,card_to_fat(unpack_widget(wids->lv[z]).size));}
+	ev=eb;
+	if(uimode==mode_draw){if(bg_has_sel())draw_handles(livesel);draw_box(livesel,0,ANTS);}
+	if(wid.pending_grid_edit){wid.pending_grid_edit=0;modal_enter(modal_gridcell);}
+	if(uimode==mode_object){ev=ev_to_con(ev),object_editor(),ev=con_to_ev(ev);}
+	if((uimode==mode_object&&ob.show_names)||(uimode==mode_draw&&dr.show_widgets&&dr.fatbits)||ms.type==modal_listen){
+		EACH(z,wids){
+			lv*wid=wids->lv[z];rect size=con_to_screen(card_to_fat(unpack_widget(wid).size));
+			lv*n=ifield(wid,"name");pair s=font_textsize(FONT_BODY,n->sv);
+			draw_text_outlined((rect){size.x,size.y-s.y,s.x,s.y},n->sv,FONT_BODY);
+		}
+	}
+	if(ob.show_cursor&&ms.type==modal_none&&(uimode==mode_draw||uimode==mode_object)){
+		char t[4096];ev=ev_to_con(ev);
+		if(uimode==mode_draw&&bg_has_sel()){
+			rect r=livesel,l=r;if(dr.fatbits){pair p=fat_to_card((pair){r.x,r.y});l=(rect){p.x,p.y,r.w/FAT,r.h/FAT};}
+			snprintf(t,sizeof(t),"(%3d,%3d,%3d,%3d)",l.x,l.y,l.w,l.h);pair s=font_textsize(FONT_BODY,t);
+			draw_text_outlined(con_to_screen((rect){r.x,r.y-s.y,s.x,s.y}),t,FONT_BODY);
+		}
+		else if(ev.drag){
+			pair a=dr.fatbits?fat_to_card(ev.dpos):ev.dpos, b=dr.fatbits?fat_to_card(ev.pos):ev.pos;rect r={b.x,b.y,b.x-a.x,b.y-a.y};
+			snprintf(t,sizeof(t),"(%3d,%3d,%3d,%3d)",r.x,r.y,r.w,r.h);pair s=font_textsize(FONT_BODY,t);
+			draw_text_outlined(con_to_screen((rect){ev.pos.x,ev.pos.y-s.y,s.x,s.y}),t,FONT_BODY);
+		}
+		else{
+			pair c=dr.fatbits?fat_to_card(ev.pos):ev.pos;
+			snprintf(t,sizeof(t),"(%3d,%3d)",c.x,c.y);pair s=font_textsize(FONT_BODY,t);
+			draw_text_outlined(con_to_screen((rect){ev.pos.x,ev.pos.y-s.y,s.x,s.y}),t,FONT_BODY);
+		}ev=con_to_ev(ev);
+	}
+	if(in_layer()&&ev.exit&&!card_is(con()))con_set(NULL),ev.exit=0;
+}
+
+void tick(lv*env){
+	SDL_LockMutex(gil);
+	msg.pending_drag=0,msg.pending_halt=0;
+	if(dirty&&dirty_timer>0&&!running()&&autosave&&strlen(document_path)){
+		dirty_timer--;
+		if(dirty_timer==0)dirty=0,save_deck(lmcstr(document_path));
+	}
+	frame=context,uicursor=0;
+	menu_setup(),all_menus(),widget_setup();
+	memset(frame.buffer->sv,0,frame.buffer->c);
+	if(uimode==mode_script){script_editor();}else{main_view();}
+	modals(),gestures(),menu_finish();
 	if(uimode==mode_draw&&dr.fatbits)draw_icon((pair){frame.size.x-14,2},ZOOM,1);
 	if(uimode==mode_interact&&ev.drag&&ob.sel->c&&lb(ifield(ob.sel->lv[0],"draggable"))){
 		iwrite(ob.sel->lv[0],lmistr("pos"),lmpair((pair){ev.pos.x-ob.prev.x,ev.pos.y-ob.prev.y})),mark_dirty();
 	}
 	double used=interpret();
 	if(uimode==mode_interact&&profiler){
-		rect r={frame.size.x-60,2,50,12};
+		rect r={frame.size.x-60,2,50,12};char*pal=patterns_pal(ifield(deck,"patterns"));
 		char t[64];snprintf(t,sizeof(t),"%.02f%%",100*used/FRAME_QUOTA),draw_text(inset(r,2),t,FONT_BODY,1);
 		draw_invert(pal,(rect){r.x+1,r.y,ceil((r.w-2)*(used/FRAME_QUOTA)),r.h}),draw_box(r,0,1);
 	}
