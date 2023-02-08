@@ -193,12 +193,15 @@ void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
 }
 void fire_event_async(lv*target,lv*name,lv*arg){fire_async(target,name,l_list(arg),NULL,1);}
 void fire_hunk_async(lv*target,lv*hunk){fire_async(target,NULL,lml(0),hunk,1);}
+int in_attr=0;
+
 lv* fire_attr_sync(lv*target,char*prefix,lv*name,lv*arg){
+	if(in_attr)return NONE;in_attr=1;
 	lv*root=lmenv(NULL);primitives(root,ivalue(target,"deck")),constants(root),dset(root,lmistr("me"),target);
 	lv*b=lmblk();lv*widgets=ivalue(target,"widgets");EACH(z,widgets)blk_lit(b,widgets->lv[z]),blk_loc(b,widgets->kv[z]),blk_op(b,DROP);
 	lv*s=ifield(ivalue(target,"def"),"script"),*sb=parse(s&&s->c?s->sv:"");if(perr()){sb=parse("");}blk_cat(b,sb),blk_op(b,DROP);
 	str n=str_new();str_addz(&n,prefix),str_addz(&n,name->sv);blk_get(b,lmstr(n)),blk_lit(b,arg?l_list(arg):lml(0)),blk_op(b,CALL);
-	pushstate(root);issue(root,b);int q=ATTR_QUOTA;while(running()&&q>0)runop(),q--;lv*r=running()?NONE:arg();popstate();return r;
+	pushstate(root);issue(root,b);int q=ATTR_QUOTA;while(running()&&q>0)runop(),q--;lv*r=running()?NONE:arg();popstate();return in_attr=0,r;
 }
 lv* n_event(lv*self,lv*x){fire_async(self,ls(l_first(x)),l_drop(ONE,x),NULL,0);return self;}
 

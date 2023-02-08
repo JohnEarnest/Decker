@@ -1817,6 +1817,12 @@ assert["read contraption instance attr with broken script" 0 deck.card.widgets.b
 def.script:"on get_value do 34567 end"
 assert["read contraption instance attr with fixed script" 34567 deck.card.widgets.b.value]
 
+deck:readdeck[]
+def:deck.add["contraption" "recurser"]
+def.script:"on set_rec x do x.rec:x end"
+con:deck.card.add["contraption" "recurser"]
+assert["recursive custom attrs are automatically halted" con con.rec:con]
+
 #######################################
 #
 #  Wrap Up
