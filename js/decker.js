@@ -1840,7 +1840,7 @@ modals=_=>{
 		if(ui_radio(rint(rect(sb.x,sb.y,b.w/2,16)),'Invisible',1,style=='invisible')){iwrite(button,lms('style'),lms('invisible')),mark_dirty()}sb.y+=16
 		const c=rect(b.x,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(button),modal_exit(0); c.x+=65
-		if(ui_button(rect(c.x,c.y,60,20),'Action...',1))modal_enter('action')
+		if(ui_button(rect(c.x,c.y,60,20),'Action...',card_is(con())))modal_enter('action')
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='field_props'){
