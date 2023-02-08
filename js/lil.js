@@ -660,7 +660,7 @@ FORMAT_VERSION=1, RTEXT_END=2147483647, SFX_RATE=8000, FRAME_QUOTA=MODULE_QUOTA=
 sleep_frames=0, sleep_play=0, pending_popstate=0
 DEFAULT_HANDLERS=`
 on link x do go[x] end
-on drag x do if !me.locked|me.draggable me.line[(pointer.prev-me.pos)/me.scale x] end end
+on drag x do if !me.locked|me.draggable me.line[(pointer.prev-me.offset)/me.scale x] end end
 on order x do if !me.locked me.value:select orderby me.value[x] asc from me.value end end
 on navigate x do if x~"right" go["Next"] end if x~"left" go["Prev"] end end
 on loop x do x end
@@ -1732,7 +1732,7 @@ canvas_write=x=>{
 }
 contraption_read=(x,card)=>{
 	x=ld(x);const dname=dget(x,lms('def')), def=dname?dget(card.deck.contraptions,dname):null;if(!def)return null
-	const masks={name:1,index:1,image:1,script:1,locked:1,pos:1,show:1,font:1,event:1}
+	const masks={name:1,index:1,image:1,script:1,locked:1,pos:1,show:1,font:1,event:1,offset:1}
 	const ri=lmi((self,i,x)=>{
 		if(!is_rooted(self))return NONE
 		if(x){
@@ -1786,6 +1786,11 @@ interface_widget=(self,i,x)=>{
 		if(ikey(i,'show'  ))return lms(ivalue(self,ls(i),'solid'))
 		if(ikey(i,'font'  ))return dget(self.card.deck.fonts,lms(ivalue(self,ls(i),button_is(self)?'menu':'body')))
 		if(ikey(i,'event' ))return lmnat(args=>n_event(self,args))
+		if(ikey(i,'offset')){
+			let c=getpair(ifield(self.card,'size')), p=self.pos, d=self.card.deck.size, con=self.card
+			while(contraption_is(con)){p=radd(p,con.pos),con=con.card,c=getpair(ifield(con,'size'))}
+			return lmpair(radd(p,rcenter(rect(0,0,d.x,d.y),c)))
+		}
 	}return x?x:NONE
 }
 widget_read=(x,card)=>{
@@ -2226,13 +2231,14 @@ fire_async=(target,name,arg,hunk,nest)=>{
 	const scopes=lmd([NONE],[parse(DEFAULT_HANDLERS)]), root=lmenv(); let deck=null,isolate=0
 	ancestors=target=>{
 		if(deck_is(target)){deck=target;if(isolate)return}
-		if(contraption_is(target)){deck=target.card.deck}
+		if(contraption_is(target)){ancestors(target.card)}
+		if(card_is(target)||prototype_is(target))ancestors(target.deck)
 		if(widget_is(target)&&!contraption_is(target)){
 			if(prototype_is(target.card)||contraption_is(target.card))isolate=1
 			ancestors(target.card)
 		}
-		if(card_is(target)||prototype_is(target))ancestors(target.deck)
-		try{dset(scopes,target,parse(ls(ifield(target,'script'))))}
+		const t=isolate&&contraption_is(target)?ifield(target,'def'):target
+		try{dset(scopes,target,parse(ls(ifield(t,'script'))))}
 		catch(e){dset(scopes,target,lmblk());}
 	}
 	ancestors(target)

@@ -1855,8 +1855,8 @@ void modals(){
 		iwrite(contraption,lmistr("name"),rtext_all(ms.name.table)),mark_dirty();
 		widget_attributes((rect){b.x,b.y+42,b.w,b.h-42-25});
 		pair c={b.x,b.y+b.h-20};
-		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))modal_exit(0),setscript(contraption);c.x+=65;
-		if(ui_button((rect){c.x,c.y,60,20},"Edit...",1)){modal_exit(1);con_set(ifield(contraption,"def"));}
+		if(ui_button((rect){c.x,c.y,60,20},"Script..."   ,1))modal_exit(0),setscript(contraption);c.x+=65;
+		if(ui_button((rect){c.x,c.y,80,20},"Prototype...",1))modal_exit(1),con_set(ifield(contraption,"def"));
 		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
 	else if(ms.type==modal_prototype_props){
@@ -3527,7 +3527,7 @@ void save_deck(lv*path){
 	set_path(path->sv);
 }
 void load_deck(lv*d){
-	dirty=0; wid.active=-1; dr=ddr;
+	dirty=0; wid.active=-1; dr=ddr; con_set(NULL);
 	dset(env,lmistr("deck"),deck=d);
 	dset(env,lmistr("hist" ),wid.hist=lml(0));
 	dset(env,lmistr("ahist"),au.hist=lml(0));

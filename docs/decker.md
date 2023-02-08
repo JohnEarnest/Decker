@@ -600,7 +600,7 @@ Dictionary arguments to `rtext.cat[]` are promoted to tables, and any other argu
 
 Pointer Interface
 -----------------
-The pointer interface represents the global state of the user's pointing device, such as a mouse, pen, or touchscreen. Its attributes will update live at 60hz, even if a script is running.
+The pointer interface represents the global state of the user's pointing device, such as a mouse, pen, or touchscreen. Its attributes will update live at 60hz, even if a script is running. The coordinates of the pointer are always in "screen space"; pixels relative to the top-left corner of the card. If you want to compare pointer coordinates to the position of a widget, you should use `widget.offset` rather than `widget.pos`, to properly reflect the screen coordinates of widgets nested within contraptions or prototypes.
 
 | Name       | Description                                                             |
 | :--------- | :---------------------------------------------------------------------- |
@@ -882,7 +882,8 @@ The button widget is a clickable button, possibly with a stateful checkbox.
 | `x.name`                | String. The name of this widget. r/w.                                                                 |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
 | `x.locked`              | Bool. If false, the user cannot modify the value of this checkbox. r/w.                               |
-| `x.pos`                 | The `pos` of this widget on the card. r/w.                                                            |
+| `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
+| `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
@@ -902,7 +903,8 @@ The field widget displays and possibly allows the editing of text.
 | `x.name`                | String. The name of this widget. r/w.                                                                 |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
 | `x.locked`              | Bool. If false, the user cannot edit the text of this field. r/w.                                     |
-| `x.pos`                 | The `pos` of this widget on the card. r/w.                                                            |
+| `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
+| `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
@@ -930,7 +932,8 @@ The slider widget represents a single number, constrained within a configurable 
 | `x.name`                | String. The name of this widget. r/w.                                                                 |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
 | `x.locked`              | Bool. If false, the user cannot change the value of this slider. r/w.                                 |
-| `x.pos`                 | The `pos` of this widget on the card. r/w.                                                            |
+| `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
+| `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
@@ -952,7 +955,8 @@ The grid widget represents an interactive spreadsheet-style view of a table.
 | `x.name`                | String. The name of this widget. r/w.                                                                 |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
 | `x.locked`              | Bool. If false, the user cannot select a row of the grid. r/w.                                        |
-| `x.pos`                 | The `pos` of this widget on the card. r/w.                                                            |
+| `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
+| `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
@@ -983,7 +987,8 @@ The canvas will scale _up_ logical pixels to display them on the card (resulting
 | `x.name`                | String. The name of this widget. r/w.                                                                             |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                                 |
 | `x.locked`              | Bool. If false, the user can draw on this canvas in the current brush and pattern. r/w.                           |
-| `x.pos`                 | The `pos` of this widget on the card. r/w.                                                                        |
+| `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                                          |
+| `x.offset`              | The `pos` of this widget in screen coordinates.                                                                   |
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.                          |
 | `x.border`              | Bool. Draw an outline around this widget? r/w.                                                                    |
 | `x.draggable`           | Bool. Allow the user to reposition this widget by dragging it in interact mode? r/w.                              |
@@ -1045,7 +1050,8 @@ Contraptions are custom widgets, defined in a [Prototype](#prototypeinterface). 
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
 | `x.image`               | An _image_ interface representing the contraption's background, inherited from its Prototype.         |
 | `x.locked`              | Bool. Behavior of this property is entirely up to the Prototype. r/w.                                 |
-| `x.pos`                 | The `pos` of this widget on the card. r/w.                                                            |
+| `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
+| `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
 | `x.size`                | The `size` of the widget in pixels.                                                                   |
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
@@ -1194,7 +1200,7 @@ end
 
 on drag pos do
 	if !me.locked|me.draggable
-		me.line[(pointer.prev-me.pos+card.pos)/me.scale pos]
+		me.line[(pointer.prev-me.pos+me.container.pos)/me.scale pos]
 	end
 end
 

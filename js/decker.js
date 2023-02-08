@@ -1516,7 +1516,7 @@ modals=_=>{
 		widget_attributes(rect(b.x,b.y+42,b.w,b.h-42-25))
 		const c=rect(b.x,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))modal_exit(0),setscript(contraption);c.x+=65
-		if(ui_button(rect(c.x,c.y,60,20),'Edit...',1))modal_exit(1),con_set(contraption.def)
+		if(ui_button(rect(c.x,c.y,80,20),'Prototype...',1))modal_exit(1),con_set(contraption.def)
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='prototype_props'){
@@ -3034,7 +3034,7 @@ validate_modules=_=>{
 	}
 }
 load_deck=d=>{
-	deck=d, dirty=0, wid.active=-1, wid.hist=[], au.hist=[], doc_hist=[], doc_hist_cursor=0, dr=draw_state()
+	deck=d, dirty=0, wid.active=-1, wid.hist=[], au.hist=[], doc_hist=[], doc_hist_cursor=0, dr=draw_state(), con_set(null)
 	FONT_BODY=dget(deck.fonts,lms('body')),FONT_MENU=dget(deck.fonts,lms('menu')),FONT_MONO=dget(deck.fonts,lms('mono'))
 	fb=image_make(getpair(ifield(ifield(deck,'card'),'size'))),context=frame=draw_frame(fb),validate_modules(),setmode('interact'),msg.next_view=1
 	seed=0|(new Date().getTime()/1000),n_play([NONE,lms('loop')])

@@ -111,7 +111,7 @@ char* default_handlers=""
 "	if x~\"left\"  go[\"Prev\"] end "
 "end\n"
 "on drag x do"
-"	if !me.locked|me.draggable me.line[(pointer.prev-me.pos)/me.scale x] end "
+"	if !me.locked|me.draggable me.line[(pointer.prev-me.offset)/me.scale x] end "
 "end\n"
 "on order x do"
 "	if !me.locked "
@@ -137,14 +137,15 @@ char* default_transitions=""
 
 void ancestors(lv*target,lv*found,lv**deck,int*isolate){
 	if(deck_is(target)){*deck=target;if(*isolate)return;}
-	if(contraption_is(target)){*deck=ivalue(ivalue(target,"card"),"deck");}
+	if(contraption_is(target)){ancestors(ivalue(target,"card"),found,deck,isolate);}
+	if(card_is(target)||prototype_is(target))ancestors(ivalue(target,"deck"),found,deck,isolate);
 	if(widget_is(target)&&!contraption_is(target)){
 		lv*c=ivalue(target,"card");
 		if(prototype_is(c)||contraption_is(c))*isolate=1;
 		ancestors(c,found,deck,isolate);
 	}
-	if(card_is(target)||prototype_is(target))ancestors(ivalue(target,"deck"),found,deck,isolate);
-	lv*s=ifield(target,"script"),*block=parse(s&&s->c?s->sv:"");
+	lv*t=(*isolate)&&contraption_is(target)?ifield(target,"def"):target;
+	lv*s=ifield(t,"script"),*block=parse(s&&s->c?s->sv:"");
 	if(perr()){block=parse("");}dset(found,target,block);
 }
 int pending_popstate=0;
@@ -1600,7 +1601,7 @@ lv* grid_write(lv*x){
 // Contraption interface
 
 lv* interface_contraption(lv*self,lv*i,lv*x){
-	lv*data=self->b;char*masks[]={"name","index","image","script","locked","pos","show","font","event",NULL};
+	lv*data=self->b;char*masks[]={"name","index","image","script","locked","pos","show","font","event","offset",NULL};
 	if(!is_rooted(self))return NONE;
 	if(x){
 		ikey("def"  )return x; // not mutable!
@@ -1665,6 +1666,11 @@ lv* interface_widget(lv*self,lv*i,lv*x){
 		ikey("show"  ){lv*r=dget(data,i);return r?r:lmistr(widget_shows[0]);}
 		ikey("font"  ){lv*r=dget(data,i);return r?dget(fonts,r): fonts->lv[button_is(self)?1:0];}
 		ikey("event" )return lmnat(n_event,self);
+		ikey("offset"){
+			pair c=getpair(ifield(card,"size")),p=getpair(ifield(self,"pos")),d=getpair(ivalue(deck,"size"));
+			lv*con=card;while(contraption_is(con)){pair o=getpair(ifield(con,"pos"));p.x+=o.x,p.y+=o.y;con=ivalue(con,"card"),c=getpair(ifield(con,"size"));}
+			rect b=box_center(rect_pair((pair){0,0},d),c);return lmpair((pair){p.x+b.x,p.y+b.y});
+		}
 	}return x?x:NONE;
 }
 lv* widget_read(lv*x,lv*card){
