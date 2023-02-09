@@ -1843,8 +1843,29 @@ card_remove=(card,x)=>{
 }
 con_copy_raw=(card,z)=>z.filter(w=>widget_is(w)&&w.card==card).map(widget_write)
 con_paste_raw=(card,payload)=>payload.map(p=>widget_add(card,ld(p)))
-con_copy=(card,z)=>lms(`%%WGT0${fjson(lml(con_copy_raw(card,lil(z)?ll(z):[z])))}`)
-con_paste=(card,z)=>!lis(z)||!z.v.startsWith('%%WGT0')?NONE:lml(con_paste_raw(card,ll(pjson(ls(z),6,count(z)-6).value)))
+con_copy=(card,z)=>{
+	z=lil(z)?ll(z):[z];const wids=lml(con_copy_raw(card,z)),defs=lmd(),v=lmd(['w','d'].map(lms),[wids,defs])
+	const condefs=card.deck.contraptions;wids.v.map(wid=>{
+		const type=dget(wid,lms('type')),def=dget(wid,lms('def'))
+		if(ls(type)=='contraption'&&dget(defs,def)==null)dset(defs,def,prototype_write(dget(condefs,def)))
+	});return lms(`%%WGT0${fjson(v)}`)
+}
+merge_prototypes=(deck,defs,uses)=>{
+	const condefs=deck.contraptions;defs.v.map(def=>{
+		const name=dget(def,lms('name')),desc=dget(def,lms('description'));if(!lis(name))return;if(!desc)desc=lms('')
+		if(condefs.v.some(con=>match(name,ifield(con,'name'))&&match(desc,ifield(con,'description'))))return
+		const p=prototype_read(def,deck),nn=ifield(p,'name');dset(condefs,nn,p)
+		uses.map(wid=>{
+			const type=dget(wid,lms('type')),def=dget(wid,lms('def'))
+			if(lis(type)&&ls(type)=='contraption'&&lis(def)&&ls(def)==ls(name))dset(wid,lms('def'),nn)
+		})
+	})
+}
+con_paste=(card,z)=>{
+	if(!lis(z)||!z.v.startsWith('%%WGT0'))return NONE
+	const v=ld(pjson(ls(z),6,count(z)-6).value),defs=dget(v,lms('d'));let wids=dget(v,lms('w'));wids=wids?ll(wids):[]
+	merge_prototypes(card.deck,defs?ld(defs):lmd(),wids);return lml(con_paste_raw(card,wids))
+}
 card_read=(x,deck,cdata)=>{
 	x=ld(x);const nav_dirs={right:1,left:1,up:1,down:1},ri=lmi((self,i,x)=>{
 		if(self.dead)return NONE
@@ -1954,8 +1975,9 @@ prototype_read=(x,deck)=>{
 	{const v=dget(x,lms('name'      ));ri.name=ls(ukey(deck.contraptions,v&&lis(v)&&count(v)==0?null:v,'prototype'))}
 	{const v=dget(x,lms('image'     ));ri.image=v?image_read(ls(v)):image_make(range(0,0))}
 	{const v=dget(x,lms('attributes'));if(v)iwrite(ri,lms('attributes'),monad.table(v))}
-	{const v=dget(x,lms('size'      ));if(v)ri.size=rint(getpair(v))}
-	ll(dget(x,lms('widgets'))||lml([])).map(w=>{const n=dget(w,lms('name'));if(n){const i=widget_read(w,ri);if(lii(i))dset(ri.widgets,ifield(i,'name'),i)}})
+	{const v=dget(x,lms('size'      ));ri.size=v?rint(getpair(v)):rect(100,100)}
+	let w=dget(x,lms('widgets'));if(lid(w)){w.v.map((v,i)=>dset(v,lms('name'),w.k[i]))}
+	(w?ll(w):[]).map(w=>{const n=dget(w,lms('name'));if(n){const i=widget_read(w,ri);if(lii(i))dset(ri.widgets,ifield(i,'name'),i)}})
 	init_field(ri,'description',x)
 	init_field(ri,'script'     ,x)
 	init_field(ri,'template'   ,x)
@@ -2016,14 +2038,16 @@ deck_remove=(deck,t)=>{
 		return 1
 	}return 0
 }
-deck_copy=(deck,z)=>!card_is(z)?NONE: lms(`%%CRD0${fjson(card_write(z))}`)
+deck_copy=(deck,z)=>{
+	if(!card_is(z))return NONE;const defs=lmd(),v=lmd(['c','d'].map(lms),[card_write(z),defs])
+	z.widgets.v.filter(contraption_is).map(wid=>{const d=wid.def,n=ifield(d,'name');if(dget(defs,n)==null)dset(defs,n,prototype_write(d))})
+	return lms(`%%CRD0${fjson(v)}`)
+}
 deck_paste=(deck,z,name)=>{
 	if(!lis(z)||!ls(z).startsWith('%%CRD0'))return NONE
-	const payload=ld(pjson(ls(z),6,count(z)-6).value)
-	const w=dget(payload,lms('widgets'));
-	if(w&&lid(w)){w.v.map((v,i)=>{dset(v,lms('name'),w.k[i])})}
-	const r=card_read(payload,deck);dset(deck.cards,name||ifield(r,'name'),r)
-	return r
+	const v=ld(pjson(ls(z),6,count(z)-6).value);let payload=dget(v,lms('c')),defs=dget(v,lms('d'));payload=payload?ld(payload):lmd()
+	const wids=dget(payload,lms('widgets'));if(wids&&lid(wids))wids.v.map((v,i)=>dset(v,lms('name'),wids.k[i]))
+	merge_prototypes(deck,defs?ld(defs):lmd(),wids?ll(wids):[]);const r=card_read(payload,deck);dset(deck.cards,name||ifield(r,'name'),r);return r
 }
 deck_read=x=>{
 	const deck={},scripts={},cards={},modules={},defs={}, fonts=lmd(),sounds=lmd(); let i=0,m=0,md=0,lc=0

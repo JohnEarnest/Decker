@@ -3210,7 +3210,10 @@ dopaste=x=>{
 		}else{setmode('draw'),bg_paste(i)}
 	}
 	else if(ms.type=='recording'&&au.mode=='stopped'&&/^%%SND0/.test(x)){sound_edit(sound_replace(sound_read(x)))}
-	else if(ms.type==null&&/^%%WGT0/.test(x)){ob_create(ll(pjson(x,6,x.length-6).value))}
+	else if(ms.type==null&&/^%%WGT0/.test(x)){
+		const v=pjson(x,6,x.length-6).value; let defs=dget(v,lms('d')),wids=dget(v,lms('w'));wids=wids?ll(wids):[]
+		merge_prototypes(deck,defs?ld(defs):lmd(),wids),ob_create(wids)
+	}
 	else if(ms.type==null&&/^%%CRD0/.test(x)){
 		const c=deck_paste(deck,lms(x));con_set(null)
 		const card=ifield(deck,'card'), n=ln(ifield(card,'index'));iwrite(c,lms('index'),lmn(n+1)),n_go([c],deck)

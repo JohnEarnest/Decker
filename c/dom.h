@@ -1792,18 +1792,33 @@ lv* n_card_remove(lv*self,lv*z){
 	dset(self->b,lmistr("widgets"),l_drop(name,widgets));
 	dset(target->b,lmistr("dead"),ONE);return ONE;
 }
-void contraption_update(lv*def); // forward ref
+void contraption_update(lv*def);lv* prototype_write(lv*prototype);lv* prototype_read(lv*x,lv*deck); // forward refs
 lv* n_con_add(lv*self,lv*z){lv*r=n_card_add(self,z);if(widget_is(r)&&prototype_is(self))contraption_update(self);return r;}
 lv* n_con_remove(lv*self,lv*z){lv*r=n_card_remove(self,z);if(lb(r)&&prototype_is(self))contraption_update(self);return r;}
 lv* con_copy_raw(lv*container,lv*z){lv*r=lml(0);EACH(i,z){lv*w=z->lv[i];if(widget_is(w)&&dget(w->b,lmistr("card"))==container)ll_add(r,widget_write(w));}return r;}
 lv* con_paste_raw(lv*container,lv*payload){lv*r=lml(0);EACH(z,payload){lv*a=ld(payload->lv[z]);ll_add(r,widget_add(container,a));}return r;}
 lv* n_con_copy(lv*card,lv*z){
-	z=l_first(z);if(!lil(z))z=l_list(z);
-	str r=str_new();str_addz(&r,"%%WGT0");fjson(&r,con_copy_raw(card,z));return lmstr(r);
+	z=l_first(z);if(!lil(z))z=l_list(z);lv*wids=con_copy_raw(card,z),*defs=lmd(),*v=lmd();dset(v,lmistr("w"),wids),dset(v,lmistr("d"),defs);
+	lv*condefs=ifield(ivalue(card,"deck"),"contraptions");EACH(w,wids){
+		lv*wid=wids->lv[w],*type=dget(wid,lmistr("type")),*def=dget(wid,lmistr("def"));
+		if(!strcmp(type->sv,"contraption")&&dget(defs,def)==NULL)dset(defs,def,prototype_write(dget(condefs,def)));
+	}str r=str_new();str_addz(&r,"%%WGT0");fjson(&r,v);return lmstr(r);
+}
+void merge_prototypes(lv*deck,lv*defs,lv*uses){
+	lv*condefs=ifield(deck,"contraptions");EACH(d,defs){
+		lv*def=ld(defs->lv[d]),*name=dget(def,lmistr("name")),*desc=dget(def,lmistr("description"));if(!lis(name))continue;if(!desc)desc=lmistr("");
+		int f=0;EACH(c,condefs){lv*con=condefs->lv[c];if(matchr(name,ifield(con,"name"))&&matchr(desc,ifield(con,"description"))){f=1;break;}}if(f)continue;
+		lv*p=prototype_read(def,deck),*nn=ifield(p,"name");dset(condefs,nn,p);
+		EACH(w,uses){
+			lv*wid=ld(uses->lv[w]),*type=dget(wid,lmistr("type")),*def=dget(wid,lmistr("def"));
+			if(lis(type)&&strcmp(type->sv,"contraption")&&lis(def)&&strcmp(def->sv,name->sv))dset(wid,lmistr("def"),nn);
+		}
+	}
 }
 lv* n_con_paste(lv*card,lv*z){
 	z=l_first(z);if(!lis(z)||!has_prefix(z->sv,"%%wgt0"))return NONE;
-	int f=1,i=6,n=z->c-i;return con_paste_raw(card,ll(pjson(z->sv,&i,&f,&n)));
+	int f=1,i=6,n=z->c-i;lv*v=ld(pjson(z->sv,&i,&f,&n)),*defs=dget(v,lmistr("d")),*wids=dget(v,lmistr("w"));wids=wids?ll(wids):lml(0);
+	merge_prototypes(ivalue(card,"deck"),defs?ld(defs):lmd(),wids);return con_paste_raw(card,wids);
 }
 lv* interface_card(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
@@ -1937,8 +1952,8 @@ lv* prototype_read(lv*x,lv*deck){
 	{lv*k=lmistr("name"       ),*v=dget(x,k);dset(r,k,ukey(defs,v&&lis(v)&&v->c==0?NULL:v,"prototype",NULL));}
 	{lv*k=lmistr("image"      ),*v=dget(x,k);dset(r,k,v?image_read(v):image_empty());}
 	{lv*k=lmistr("attributes" ),*v=dget(x,k);if(v)iwrite(ri,k,l_table(v));}
-	{lv*k=lmistr("size"       ),*v=dget(x,k);if(v)dset(r,k,normalize_pair(v));}
-	lv*w=dget(x,lmistr("widgets"));w=w?ll(w):lml(0);
+	{lv*k=lmistr("size"       ),*v=dget(x,k);dset(r,k,v?normalize_pair(v):lmpair((pair){100,100}));}
+	lv*w=dget(x,lmistr("widgets"));if(lid(w)){EACH(z,w)dset(w->lv[z],lmistr("name"),ls(w->kv[z]));}w=w?ll(w):lml(0);
 	EACH(z,w){lv*n=dget(w->lv[z],lmistr("name"));if(n){lv*i=widget_read(w->lv[z],ri);if(lii(i))dset(widgets,ifield(i,"name"),i);}}
 	init_field(ri,"description",x)
 	init_field(ri,"script"     ,x)
@@ -1954,14 +1969,18 @@ void rename_sound(lv*deck,lv*sound,lv*name){
 }
 lv* n_deck_copy(lv*deck,lv*z){
 	(void)deck;z=l_first(z);if(!card_is(z))return NONE;
-	str r=str_new();str_addz(&r,"%%CRD0");fjson(&r,card_write(z));return lmstr(r);
+	lv*defs=lmd(),*v=lmd();dset(v,lmistr("c"),card_write(z)),dset(v,lmistr("d"),defs);
+	lv*wids=ifield(z,"widgets");EACH(w,wids){
+		lv*wid=wids->lv[w];if(!contraption_is(wid))continue;
+		lv*d=ifield(wid,"def"),*n=ifield(d,"name");if(dget(defs,n)==NULL)dset(defs,n,prototype_write(d));
+	}str r=str_new();str_addz(&r,"%%CRD0");fjson(&r,v);return lmstr(r);
 }
 lv* deck_paste_named(lv*deck,lv*z,lv*name){
 	z=l_first(z);if(!lis(z)||!has_prefix(z->sv,"%%crd0"))return NONE;
-	int f=1,i=6,n=z->c-i;lv*payload=ld(pjson(z->sv,&i,&f,&n));
-	lv*w=dget(payload,lmistr("widgets"));if(w&&lid(w)){EACH(z,w)dset(w->lv[z],lmistr("name"),w->kv[z]);}
-	lv*r=card_read(payload,deck);dset(dget(deck->b,lmistr("cards")),name?name:ifield(r,"name"),r);
-	return r;
+	int f=1,i=6,n=z->c-i;lv*v=ld(pjson(z->sv,&i,&f,&n)),*payload=dget(v,lmistr("c")),*defs=dget(v,lmistr("d"));payload=payload?ld(payload):lmd();
+	lv*wids=dget(payload,lmistr("widgets"));if(wids&&lid(wids)){EACH(z,wids)dset(wids->lv[z],lmistr("name"),wids->kv[z]);}
+	merge_prototypes(deck,defs?ld(defs):lmd(),wids?ll(wids):lml(0));
+	lv*r=card_read(payload,deck);dset(dget(deck->b,lmistr("cards")),name?name:ifield(r,"name"),r);return r;
 }
 lv* n_deck_paste(lv*deck,lv*z){return deck_paste_named(deck,z,NULL);}
 lv* n_deck_add(lv*self,lv*z){

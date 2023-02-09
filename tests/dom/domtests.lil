@@ -1687,6 +1687,24 @@ assert["copy widgets: added widget" ("thing","field1")           (range v.widget
 assert["copy widgets: added value"  "Some Nice Text"             vv[0].text]
 assert["copy widgets: no sharing"   ("another","Some Nice Text") (v.widgets.thing.text, v.widgets.field1.text)]
 
+deck:readdeck[]
+def:deck.add["contraption" "moveable"]
+def.description:"A Moveable Feast"
+def.add["button" "clicky"]
+m:deck.card.add["contraption" "moveable" "instance"]
+target:readdeck[]
+copied:deck.card.copy[m]
+target.card.paste[copied]
+assert["copy contraption: instance" (list "instance") (range target.card.widgets)]
+assert["copy contraption: def"      (list "moveable") (range target.contraptions)]
+assert["copy contraption: def wids" (list "clicky"  ) (range target.contraptions.moveable.widgets)]
+target:readdeck[]
+copied:deck.copy[deck.cards.home]
+c:target.paste[copied]
+assert["copy contraption card: instance" (list "instance") (range c.widgets)]
+assert["copy contraption card: def"      (list "moveable") (range target.contraptions)]
+assert["copy contraption card: def wids" (list "clicky"  ) (range target.contraptions.moveable.widgets)]
+
 #######################################
 #
 #  Modules

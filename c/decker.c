@@ -3002,7 +3002,9 @@ void paste_any(){
 		char*t=SDL_GetClipboardText();lv*b=image_read(lmcstr(t))->b;SDL_free(t);setmode(mode_draw);bg_paste(b);
 	}}
 	else if(has_clip("%%WGT")){if(menu_item("Paste Widgets",1,'v')){
-		char*t=SDL_GetClipboardText();int f=1,i=6,n=strlen(t)-i;ob_create(ll(pjson(t,&i,&f,&n)));SDL_free(t);
+		char*t=SDL_GetClipboardText();int f=1,i=6,n=strlen(t)-i;lv*v=pjson(t,&i,&f,&n);SDL_free(t);
+		lv*defs=dget(v,lmistr("d")),*wids=dget(v,lmistr("w"));wids=wids?ll(wids):lml(0);
+		merge_prototypes(deck,defs?ld(defs):lmd(),wids),ob_create(wids);
 	}}
 	else if(has_clip("%%CRD")){if(menu_item("Paste Card",1,'v')){
 		char*t=SDL_GetClipboardText();lv*c=n_deck_paste(deck,l_list(lmcstr(t)));SDL_free(t);con_set(NULL);

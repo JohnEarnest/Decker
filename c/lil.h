@@ -100,7 +100,7 @@ lv* lmv(int type){
 	if(lv_stash(r))return r;lv_grow();lv_stash(r);return r;
 }
 lv* lmvv(int t,int n){lv*r=lmv(t);r->lv=calloc(r->s=MAX(n,8),sizeof(lv*));r->c=n;return r;}
-#define lm(n,c) int li##n(lv*x){return x->t==c;} lv*lm##n
+#define lm(n,c) int li##n(lv*x){return x&&x->t==c;} lv*lm##n
 lm(n  ,0)(double x){intern_num;lv*r=lmv(0);r->c=1,r->nv=isfinite(x)?x:0;                 return r;}
 lm(s  ,1)(int n)           {lv*r=lmv(1);r->c=n;r->sv=calloc(n+1,1);                      return r;}
 lm(l  ,2)(int n)           {lv*r=lmvv(2,n);                                              return r;}
