@@ -1198,6 +1198,7 @@ res_enumerate=(source)=>{
 	defs.v.map((def,i)=>{r.icon.push(lmn(ICON.app)),r.name.push(defs.k[i]),r.value.push(def)})
 	return lmt(r)
 }
+title_caps=x=>{let w=1;return x.split('').map(c=>{if(w)c=c.toUpperCase();w=c==' '||c=='\n';return c}).join('')}
 
 // Modal Dialogues
 
@@ -1509,7 +1510,7 @@ modals=_=>{
 	}
 	else if(ms.type=='contraption_props'){
 		const b=draw_modalbox(rect(240,240)),contraption=ob.sel[0]
-		draw_textc(rect(b.x,b.y-5,b.w,20),`${contraption.def.name} Properties`,FONT_MENU,1)
+		draw_textc(rect(b.x,b.y-5,b.w,20),`${title_caps(contraption.def.name)} Properties`,FONT_MENU,1)
 		draw_text(rect(b.x,b.y+22,47,20),'Name',FONT_MENU,1)
 		ui_field (rect(b.x+47  ,b.y+20  ,b.w-47,18),ms.name)
 		iwrite(contraption,lms('name'),rtext_string(ms.name.table)),mark_dirty()
@@ -1539,7 +1540,7 @@ modals=_=>{
 	}
 	else if(ms.type=='prototype_attrs'){
 		const b=draw_modalbox(rect(220,200)),def=con(), lw=42
-		draw_textc(rect(b.x,b.y-5,b.w,20),`${def.name} Attributes`,FONT_MENU,1)
+		draw_textc(rect(b.x,b.y-5,b.w,20),`${title_caps(def.name)} Attributes`,FONT_MENU,1)
 		const gsize=rect(b.x,b.y+20,80,b.h-(20+5+20))
 		const before=ms.grid.row;ui_table(gsize,[gsize.w-18],'s',ms.grid)
 		if(before!=ms.grid.row||ms.name.table==null||ms.text.table==null){

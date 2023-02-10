@@ -1794,10 +1794,10 @@ interface_widget=(self,i,x)=>{
 	}return x?x:NONE
 }
 widget_read=(x,card)=>{
-	const type=ls(dget(x,lms('type'))||lms('button'))
+	const type=ls(dget(x,lms('type'))||lms('button')), tname=type=='contraption'?ls(dget(x,lms('def'))||lms(type)):type
 	const ctors={button:button_read,field:field_read,slider:slider_read,grid:grid_read,canvas:canvas_read,contraption:contraption_read}
 	const ri=(ctors[type]||button_read)(ld(x),card);if(!lii(ri))return null
-	ri.name=ls(ukey(card.widgets,dget(x,lms('name')),type))
+	ri.name=ls(ukey(card.widgets,dget(x,lms('name')),tname))
 	init_field(ri,'size'  ,x)
 	init_field(ri,'script',x)
 	init_field(ri,'font'  ,x)

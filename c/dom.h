@@ -1679,7 +1679,8 @@ lv* interface_widget(lv*self,lv*i,lv*x){
 lv* widget_read(lv*x,lv*card){
 	x=ld(x);lv*r=lmd();dset(r,lmistr("card"),card);
 	lv*widgets=ivalue(card,"widgets"),*type=dget(x,lmistr("type"));if(!type)type=lmistr("button");
-	{lv*k=lmistr("name");dset(r,k,ukey(widgets,dget(x,k),type->sv,NULL));}
+	lv*tname=!strcmp(type->sv,"contraption")?dget(x,lmistr("def")):type;if(!tname)tname=type;
+	{lv*k=lmistr("name");dset(r,k,ukey(widgets,dget(x,k),ls(tname)->sv,NULL));}
 	lv*ri=(type&&!strcmp(type->sv,"field"      ))?field_read (x,r):
 	      (type&&!strcmp(type->sv,"grid"       ))?grid_read  (x,r):
 	      (type&&!strcmp(type->sv,"canvas"     ))?canvas_read(x,r):

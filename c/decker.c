@@ -1006,6 +1006,12 @@ rect modal_rtext(pair extra){
 		rect b=draw_modalbox((pair){t.x+extra.x,t.y+extra.y});draw_text_wrap((rect){b.x,b.y,b.w,t.y},1);return b;
 	}
 }
+char title_buffer[4096];
+char* title_caps(char*name,char*suffix){
+	unsigned int i=0,j=0,w=1;
+	while(i+1<sizeof(title_buffer)&&name  [i]){char c=name[i];if(w)c=toupper(c);w=isspace(c);title_buffer[i++]=c;}
+	while(i+1<sizeof(title_buffer)&&suffix[j])title_buffer[i++]=suffix[j++];return title_buffer[i]='\0',title_buffer;
+}
 
 // Modal Dialogues
 
@@ -1848,8 +1854,7 @@ void modals(){
 	}
 	else if(ms.type==modal_contraption_props){
 		rect b=draw_modalbox((pair){240,240});lv*contraption=ob.sel->lv[0];
-		char title[4096];snprintf(title,sizeof(title),"%s Properties",ifield(ifield(contraption,"def"),"name")->sv);
-		draw_textc((rect){b.x,b.y-5,b.w,20},title,FONT_MENU,1);
+		draw_textc((rect){b.x,b.y-5,b.w,20},title_caps(ifield(ifield(contraption,"def"),"name")->sv," Properties"),FONT_MENU,1);
 		draw_text((rect){b.x,b.y+22,47,20},"Name",FONT_MENU,1);
 		ui_field ((rect){b.x+47  ,b.y+20  ,b.w-47,18},&ms.name);
 		iwrite(contraption,lmistr("name"),rtext_all(ms.name.table)),mark_dirty();
@@ -1879,8 +1884,7 @@ void modals(){
 	}
 	else if(ms.type==modal_prototype_attrs){
 		rect b=draw_modalbox((pair){220,200});lv*def=con();int lw=42;
-		char title[4096];snprintf(title,sizeof(title),"%s Attributes",ifield(def,"name")->sv);
-		draw_textc((rect){b.x,b.y-5,b.w,20},title,FONT_MENU,1);
+		draw_textc((rect){b.x,b.y-5,b.w,20},title_caps(ifield(def,"name")->sv," Attributes"),FONT_MENU,1);
 		rect gsize={b.x,b.y+20,80,b.h-(20+5+20)};
 		int before=ms.grid.row;ui_table(gsize,1,gsize.w-18,0,"s",&ms.grid);
 		if(before!=ms.grid.row||ms.name.table==NULL||ms.text.table==NULL){
