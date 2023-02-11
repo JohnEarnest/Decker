@@ -387,12 +387,13 @@ con=_=>ui_container?ui_container:ifield(deck,'card')
 con_wids=_=>con().widgets
 con_image=_=>ifield(con(),'image')
 con_size=_=>getpair(ifield(con(),'size'))
+con_dim=_=>rpair(rect(),con_size())
 con_clip=_=>rclip(frame.clip,rcenter(frame.clip,con_size()))
 con_offset=_=>{const r=con_clip();return rect(r.x,r.y)}
 con_to_screen=x=>radd(x,con_offset())
 screen_to_con=x=>rsub(x,con_offset())
-ev_to_con=e=>{const o=con_offset();e.pos=rsub(e.pos,o);e.dpos=rsub(e.dpos,o);return e}
-con_to_ev=e=>{const o=con_offset();e.pos=radd(e.pos,o);e.dpos=radd(e.dpos,o);return e}
+ev_to_con=e=>{const o=con_offset();e.pos=rsub(e.pos,o);e.dpos=rsub(e.dpos,o);pointer.prev=rsub(pointer.prev,o);return e}
+con_to_ev=e=>{const o=con_offset();e.pos=radd(e.pos,o);e.dpos=radd(e.dpos,o);pointer.prev=radd(pointer.prev,o);return e}
 tracking=_=>{
 	const c=con()
 	if(prototype_is(c)){
@@ -2082,7 +2083,7 @@ apply=(fwd,x)=>{
 		else{
 			ob.sel=[];const w=con_paste_raw(container,x.props);w.map((z,i)=>{
 				dset(x.props[i],lms('name'),ifield(z,'name')),ob.sel.push(z)
-				if(!dget(x.props[i],lms('pos')))iwrite(z,lms('pos'),lmpair(rcenter(rpair(rect(),con_size()),getpair(ifield(z,'size')))))
+				if(!dget(x.props[i],lms('pos')))iwrite(z,lms('pos'),lmpair(rcenter(con_dim(),getpair(ifield(z,'size')))))
 			})
 		}
 	}mark_dirty()
@@ -2090,7 +2091,11 @@ apply=(fwd,x)=>{
 
 // Draw Mode
 
-image_overlay=(dst,src,mask)=>{for(let z=0;z<src.pix.length;z++)if(src.pix[z]!=mask)dst.pix[z]=src.pix[z]}
+image_overlay=(dst,src,mask,offset)=>{
+	const sd=dst.size, ss=src.size, d=rect(0,0,sd.x,sd.y);for(let b=0;b<ss.y;b++)for(let a=0;a<ss.x;a++){
+		const c=src.pix[a+b*ss.x], p=rect(a+offset.x,b+offset.y);if(c!=mask&&rin(d,p))dst.pix[p.x+p.y*sd.x]=c
+	}
+}
 image_mask=(src,mask)=>{const r=image_copy(src);for(let z=0;z<mask.pix.length;z++)if(!mask.pix[z])r.pix[z]=0;return r}
 bg_scratch_clear=_=>dr.scratch.pix.fill(BG_MASK)
 bg_scratch=_=>{
@@ -2104,7 +2109,7 @@ bg_edit=_=>{
 		if(dr.scratch.pix[z]==BG_MASK)continue;const x=z%s.x, y=0|(z/s.x)
 		d.x=min(d.x,x), d.y=min(d.y,y), d.w=max(d.w,x), d.h=max(d.h,y)
 	}d.w-=d.x,d.h-=d.y,d.w++,d.h++
-	const back=con_image(),after=image_copy(back,d);image_overlay(after,image_copy(dr.scratch,d),BG_MASK)
+	const back=con_image(),after=image_copy(back,d);image_overlay(after,image_copy(dr.scratch,d),BG_MASK,rect(0,0))
 	edit(edit_target({type:'bg_block',pos:d,before:image_copy(back,d),after}))
 }
 draw_limbo=(clip,scale)=>{
@@ -2132,8 +2137,7 @@ bg_edit_sel=_=>{
 }
 bg_copy_selection=s=>image_copy(container_image(con(),1),s)
 bg_scoop_selection=_=>{if(dr.limbo)return;dr.sel_start=rcopy(dr.sel_here);dr.limbo=bg_copy_selection(dr.sel_start),dr.limbo_dither=0}
-bg_draw_lasso=(r,show_ants,fill)=>{
-	const o=dr.sel_start
+bg_draw_lasso=(r,o,show_ants,fill)=>{
 	if(dr.omask)for(let a=0;a<o.h;a++)for(let b=0;b<o.w;b++){const h=rect(b+o.x,a+o.y);if(inclip(h)&&dr.omask.pix[b+a*o.w])pix(h,fill)}
 	if(dr.mask)for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){const h=rect(b+r.x,a+r.y);if(inclip(h)&&dr.mask.pix[b+a*r.w]){
 		const c=show_ants&&ANTS==(0xFF&dr.mask.pix[b+a*r.w]),p=c?ANTS:dr.limbo.pix[b+a*r.w];if(p||!dr.trans)pix(h,p)
@@ -2144,7 +2148,7 @@ bg_lasso_preview=_=>{
 	const pos=dr.fatbits?fat_to_card(ev.pos):ev.pos, dpos=dr.fatbits?fat_to_card(ev.dpos):ev.dpos
 	const d=rect(pos.x-dpos.x,pos.y-dpos.y), dh=rect(dr.sel_here.x+d.x,dr.sel_here.y+d.y,dr.sel_here.w,dr.sel_here.h)
 	const dd=rect(pos.x-dh.x,pos.y-dh.y), insel=dr.mask!=null&&rin(dh,pos)&&dr.mask.pix[dd.x+dd.y*dh.w], r=ev.drag&&insel?dh:dr.sel_here
-	if(!dr.fatbits){bg_draw_lasso(r,1,dr.fill);return}
+	if(!dr.fatbits){bg_draw_lasso(con_to_screen(r),con_to_screen(dr.sel_start),1,dr.fill);return}
 	const o=dr.sel_start, anim=deck.patterns.anim, pal=deck.patterns.pal.pix
 	const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][(0|(frame_count/4))%max(1,anim[pix-28].length)]
 	const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
@@ -2171,7 +2175,7 @@ bg_tools=_=>{
 	else if( dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=0;return}if(ev.alt)return
 	if(ev.md)pointer.prev=ev.pos
 	const pp=rcopy(pointer.prev), te=copy_object(ev)
-	if(!dover(con_clip()))ev.md=ev.mu=ev.drag=0
+	if(!dover(con_dim()))ev.md=ev.mu=ev.drag=0
 	if(dr.fatbits){ev.pos=fat_to_card(ev.pos),ev.dpos=fat_to_card(ev.dpos),pointer.prev=fat_to_card(pointer.prev)}
 	if(dr.tool=='pencil'||dr.tool=='line'||dr.tool=='rect'||dr.tool=='fillrect'||dr.tool=='ellipse'||dr.tool=='fillellipse'){
 		let clear=0;if(!dr.scratch)bg_scratch()
@@ -2208,7 +2212,7 @@ bg_tools=_=>{
 		}
 		if(dr.scratch){
 			if(dr.fatbits){draw_fat(dr.scratch,deck.patterns.pal.pix,frame_count,BG_MASK,FAT,dr.offset)}
-			else{image_overlay(frame.image,dr.scratch,BG_MASK);}
+			else{image_overlay(frame.image,dr.scratch,BG_MASK,con_offset());}
 		}
 		if(clear)bg_scratch_clear()
 	}
@@ -2245,7 +2249,7 @@ bg_tools=_=>{
 		}
 	}
 	if(dr.tool=='lasso'||dr.tool=='poly'){
-		const o=rsub(dr.sel_here,dr.sel_start)
+		const o=radd(rsub(dr.sel_here,dr.sel_start),con_offset())
 		draw_lines(dr.poly.map(p=>radd(o,card_to_fat(p))),dr.tool=='lasso'?0:dr.brush,dr.tool=='lasso'?ANTS:bg_pat())
 	}
 	if(dr.tool=='fill'&&ev.mu){
@@ -2270,7 +2274,7 @@ bg_end_lasso=_=>{
 	const data=dr.mask&&dr.limbo, diffrect=!requ(dr.sel_here,dr.sel_start);let diffmask=dr.omask==null;
 	if(dr.omask)for(let z=0;data&&z<dr.mask.pix.length;z++)if((dr.mask.pix[z]>0)!=(dr.omask.pix[z]>0)){diffmask=1;break}
 	if(data&&(diffrect||diffmask)){
-		bg_scratch();const t=frame;frame=draw_frame(dr.scratch),bg_draw_lasso(dr.sel_here,0,dr.fill),frame=t,bg_edit(),bg_scratch_clear()
+		bg_scratch();const t=frame;frame=draw_frame(dr.scratch),bg_draw_lasso(dr.sel_here,dr.sel_start,0,dr.fill),frame=t,bg_edit(),bg_scratch_clear()
 	}dr.poly=[],dr.mask=null,dr.omask=null,dr.limbo=null,dr.sel_here=rect(),dr.sel_start=rect()
 }
 bg_end_selection=_=>{
@@ -2280,7 +2284,7 @@ bg_end_selection=_=>{
 }
 bg_delete_selection=_=>{
 	if(bg_has_lasso()){
-		dr.mask=null,bg_scratch();const t=frame;frame=draw_frame(dr.scratch),bg_draw_lasso(dr.sel_here,0,dr.fill),frame=t
+		dr.mask=null,bg_scratch();const t=frame;frame=draw_frame(dr.scratch),bg_draw_lasso(dr.sel_here,dr.sel_start,0,dr.fill),frame=t
 		bg_edit(),bg_scratch_clear(),bg_end_lasso();return
 	}
 	if(!bg_has_sel())return
@@ -2289,7 +2293,7 @@ bg_delete_selection=_=>{
 	dr.sel_here=rect(),dr.limbo=image_make(rect(1,1)),dr.limbo_dither=0,bg_edit_sel(),dr.sel_start=rcopy(ev.dpos),dr.sel_here=rcopy(ev.dpos)
 }
 bg_paste=image=>{
-	const clip=fat_clip(), f=rect(clip.w*.75,clip.h*.75);let s=image.size
+	const clip=dr.fatbits?fat_clip():con_dim(), f=rect(clip.w*.75,clip.h*.75);let s=image.size
 	if(s.x>f.x||s.y>f.y){const scale=min(f.x/s.x,f.y/s.y);s=rect(s.x*scale,s.y*scale)}if(!s.x)return
 	if(bg_has_sel()){bg_scoop_selection(),dr.limbo=image,dr.limbo_dither=0}
 	else{settool('select'),dr.sel_start=rect(),dr.sel_here=rcenter(clip,s),dr.limbo=image,dr.limbo_dither=0}
@@ -2340,10 +2344,10 @@ bg_select=_=>{
 		else if(handle(x1,y2,  0, 0,  0, dy)){} // s
 		else if(ev.md&&in_sel){bg_scoop_selection()} // begin move
 		else if((ev.mu||ev.drag)&&in_sel){s.x+=dx, s.y+=dy;if(ev.mu)dr.sel_here=snap(s)} // move/finish
-		else if(ev.md&&!in_sel){if(has_sel){draw_limbo(card_to_fat(s),dr.fatbits),bg_end_selection(),has_sel=0}s=rcopy(dr.sel_here)} // begin create
+		else if(ev.md&&!in_sel){if(has_sel){draw_limbo(con_to_screen(card_to_fat(s)),dr.fatbits),bg_end_selection(),has_sel=0}s=rcopy(dr.sel_here)} // begin create
 		else if(ev.mu||ev.drag){s=snapr(rect(ax,ay,bx-ax,by-ay));if(ev.mu)dr.sel_here=s} // size/finish
 	}
-	if(has_sel)draw_limbo(s,dr.fatbits)
+	if(has_sel)draw_limbo(con_to_screen(s),dr.fatbits)
 	if(in_layer()){
 		let nudge=0
 		if(has_sel&&ev.dir=='left' ){ev.dir=0,bg_scoop_selection(),dr.sel_here.x-=ev.shift?dr.grid_size.x:1,nudge=1}
@@ -2772,12 +2776,12 @@ all_menus=_=>{
 			if(menu_item('Cut Image',sel,0,menucut)){}
 			if(menu_item('Copy Image',sel,0,menucopy)){}
 			if(menu_item('Paste',1,'v',menupaste)){}
-			if(menu_item('Clear',1)){const t=dr.tool;if(!sel){settool('select'),dr.sel_here=rcopy(con_clip())}bg_delete_selection(),settool(t)}
+			if(menu_item('Clear',1)){const t=dr.tool;if(!sel){settool('select'),dr.sel_here=rcopy(con_dim())}bg_delete_selection(),settool(t)}
 			menu_separator()
-			if(menu_item('Select All',1,'a')){settool('select'),dr.sel_here=rcopy(con_clip())}
+			if(menu_item('Select All',1,'a')){settool('select'),dr.sel_here=rcopy(con_dim())}
 			if(menu_item('Tight Selection',sel,'g'))bg_tighten()
 			if(menu_item('Resize to Original',sel&&dr.tool=='select',0)){bg_scoop_selection();const s=dr.limbo.size;dr.sel_here.w=s.x,dr.sel_here.h=s.y}
-			if(menu_item(`Resize to ${prototype_is(con())?'Prototype':'Card'}`,sel&&dr.tool=='select',0)){bg_scoop_selection(),dr.sel_here=con_clip()}
+			if(menu_item(`Resize to ${prototype_is(con())?'Prototype':'Card'}`,sel&&dr.tool=='select',0)){bg_scoop_selection(),dr.sel_here=con_dim()}
 			menu_separator()
 			if(menu_item('Invert',sel&&!dr.limbo_dither,'i')){
 				if(bg_has_sel())bg_scoop_selection()
@@ -2916,7 +2920,7 @@ all_menus=_=>{
 		if(menu_check('Transparency Mask',1,dr.trans_mask))dr.trans_mask^=1
 		if(menu_check('Fat Bits'         ,1,dr.fatbits   )){
 			if(uimode!='draw')setmode('draw')
-			dr.fatbits^=1;if(dr.fatbits)fat_offset(rcenter(bg_has_sel()||bg_has_lasso()?dr.sel_here:con_clip(),rect()))
+			dr.fatbits^=1;if(dr.fatbits)fat_offset(rcenter(bg_has_sel()||bg_has_lasso()?dr.sel_here:con_dim(),rect()))
 		}
 	}
 	if(uimode=='draw'){
@@ -2971,12 +2975,14 @@ main_view=_=>{
 		if(back.size.x!=s.x||back.size.y!=s.y)image_resize(back,s),mark_dirty()
 		if(dr.fatbits){draw_fat(back,pal,frame_count,0,FAT,dr.offset)}
 		else if(s.x==frame.size.x&&s.y==frame.size.y){image_paste(rpair(rect(),back.size),frame.clip,back,frame.image,1)}
-		else{frame.image.pix.fill(46),draw_rect(cl,bg_fill()),image_paste(cl,frame.clip,back,frame.image,0)}
+		else{frame.image.pix.fill(46),draw_rect(cl,dr.trans_mask?45:32),image_paste(cl,frame.clip,back,frame.image,0)}
 	}
+	ev=ev_to_con(ev)
 	if(uimode=='draw'&&in_layer())bg_tools()
-	if(dr.tool=='select'&&(dr.sel_start.w>0||dr.sel_start.h>0))draw_rect(card_to_fat(dr.sel_start),dr.fill)
+	if(dr.tool=='select'&&(dr.sel_start.w>0||dr.sel_start.h>0))draw_rect(con_to_screen(card_to_fat(dr.sel_start)),dr.fill)
 	bg_lasso_preview()
 	const livesel=bg_select()
+	ev=con_to_ev(ev)
 	if(((uimode=='object'||uimode=='draw')&&dr.show_grid)||ms.type=='grid'){
 		const c=con_clip()
 		for(let x=dr.grid_size.x;x<c.w;x+=dr.grid_size.x){const r=card_to_fat(rect(c.x+x,c.y,1,c.h));draw_vline(r.x,r.y,r.y+r.h,44)}
@@ -2986,7 +2992,7 @@ main_view=_=>{
 	if(uimode=='interact'||(dr.show_widgets&&!dr.fatbits)){handle_widgets(wids,con_offset())}
 	else if(dr.show_widgets&&dr.fatbits)wids.v.map(w=>{draw_boxinv(pal,card_to_fat(unpack_widget(w).size))})
 	ev=eb
-	if(uimode=='draw'){if(bg_has_sel())draw_handles(livesel);draw_box(livesel,0,ANTS)}
+	if(uimode=='draw'){if(bg_has_sel())draw_handles(con_to_screen(livesel));draw_box(con_to_screen(livesel),0,ANTS)}
 	if(wid.pending_grid_edit){wid.pending_grid_edit=0;modal_enter('gridcell')}
 	if(uimode=='object')ev=ev_to_con(ev),object_editor(),ev=con_to_ev(ev)
 	if((uimode=='object'&&ob.show_names)||(uimode=='draw'&&dr.show_widgets&&dr.fatbits)||ms.type=='listen'){

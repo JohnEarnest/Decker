@@ -100,6 +100,7 @@ lv* con(){return ui_container?ui_container:ifield(deck,"card");}
 lv* con_wids(){return ivalue(con(),"widgets");}
 lv* con_image(){return ifield(con(),"image");}
 pair con_size(){return getpair(ifield(con(),"size"));}
+rect con_dim(){return rect_pair((pair){0,0},con_size());}
 rect con_clip(){return box_intersect(frame.clip,box_center(frame.clip,con_size()));}
 pair con_offset(){rect r=con_clip();return (pair){r.x,r.y};}
 rect con_to_screen(rect x){return rect_add(x,con_offset());}
@@ -108,12 +109,14 @@ event_state ev_to_con(event_state e){
 	pair o=con_offset();
 	e.pos =(pair){e.pos .x-o.x,e. pos.y-o.y};
 	e.dpos=(pair){e.dpos.x-o.x,e.dpos.y-o.y};
+	pointer_prev=(pair){pointer_prev.x-o.x,pointer_prev.y-o.y};
 	return e;
 }
 event_state con_to_ev(event_state e){
 	pair o=con_offset();
 	e.pos =(pair){e.pos .x+o.x,e. pos.y+o.y};
 	e.dpos=(pair){e.dpos.x+o.x,e.dpos.y+o.y};
+	pointer_prev=(pair){pointer_prev.x+o.x,pointer_prev.y+o.y};
 	return e;
 }
 void tracking(){
@@ -2141,7 +2144,7 @@ void apply(int fwd,lv*x){
 			ob.sel->c=0;lv*w=con_paste_raw(container,props);EACH(z,w){
 				dset(props->lv[z],lmistr("name"),ifield(w->lv[z],"name"));ll_add(ob.sel,w->lv[z]);
 				if(dget(props->lv[z],lmistr("pos")))continue;
-				rect c=box_center(rect_pair((pair){0,0},con_size()),getpair(ifield(w->lv[z],"size")));
+				rect c=box_center(con_dim(),getpair(ifield(w->lv[z],"size")));
 				iwrite(w->lv[z],lmistr("pos"),lmpair((pair){c.x,c.y}));
 			}
 		}
@@ -2173,7 +2176,7 @@ void bg_edit(){
 		d.w=MAX(d.w,x), d.h=MAX(d.h,y);
 	}d.w-=d.x,d.h-=d.y,d.w++,d.h++;
 	lv*back=con_image()->b,*r=lmd();
-	lv*after=buffer_copy(back,d);buffer_overlay(after,buffer_copy(dr.scratch,d),BG_MASK);
+	lv*after=buffer_copy(back,d);buffer_overlay(after,buffer_copy(dr.scratch,d),BG_MASK,(pair){0,0});
 	dset(r,lmistr("type"  ),lmn(edit_bg_block));
 	dset(r,lmistr("pos"   ),lmrect(d));
 	dset(r,lmistr("before"),buffer_copy(back,d));
@@ -2219,8 +2222,7 @@ void bg_edit_sel(){
 }
 lv* bg_copy_selection(rect s){lv*bg=container_image(con(),1)->b;return buffer_copy(bg,s);}
 void bg_scoop_selection(){if(dr.limbo)return;dr.sel_start=dr.sel_here;dr.limbo=bg_copy_selection(dr.sel_start),dr.limbo_dither=0;}
-void bg_draw_lasso(rect r,int show_ants,int fill){
-	rect o=dr.sel_start;
+void bg_draw_lasso(rect r,rect o,int show_ants,int fill){
 	if(dr.omask)for(int a=0;a<o.h;a++)for(int b=0;b<o.w;b++)if(inclip(b+o.x,a+o.y)&&dr.omask->sv[b+a*o.w])PIX(b+o.x,a+o.y)=fill;
 	if(dr.mask)for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++)if(inclip(b+r.x,a+r.y)&&dr.mask->sv[b+a*r.w]){
 		int c=show_ants&&ANTS==(0xFF&dr.mask->sv[b+a*r.w]),p=c?ANTS:dr.limbo->sv[b+a*r.w];if(p||!dr.trans)PIX(b+r.x,a+r.y)=p;
@@ -2252,14 +2254,14 @@ void bg_lasso_preview(){
 			if(a<=    0||!dr.mask->sv[b+(a-1)*r.w])draw_hline(p.x,p.x+FAT-1,p.y      ,ANTS);
 			if(a>=r.h-1||!dr.mask->sv[b+(a+1)*r.w])draw_hline(p.x,p.x+FAT-1,p.y+FAT-1,ANTS);
 		}
-	}else{bg_draw_lasso(r,1,dr.fill);}
+	}else{bg_draw_lasso(con_to_screen(r),con_to_screen(dr.sel_start),1,dr.fill);}
 }
 void bg_tools(){
 	if     (!dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=1;fat_offset(ev.pos);return;}
 	else if( dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=0;return;}if(ev.alt)return;
 	if(ev.md)pointer_prev=ev.pos;
 	event_state te=ev;pair pp=pointer_prev;
-	if(!dover(con_clip()))ev.md=ev.mu=ev.drag=0;
+	if(!dover(con_dim()))ev.md=ev.mu=ev.drag=0;
 	if(dr.fatbits){ev.pos=fat_to_card(ev.pos),ev.dpos=fat_to_card(ev.dpos),pointer_prev=fat_to_card(pointer_prev);}
 	if(dr.tool==tool_pencil||dr.tool==tool_line||dr.tool==tool_rect||dr.tool==tool_fillrect||dr.tool==tool_ellipse||dr.tool==tool_fillellipse){
 		int clear=0;if(!dr.scratch)bg_scratch();
@@ -2301,8 +2303,8 @@ void bg_tools(){
 			frame=t;if(ev.mu)bg_edit(),clear=1;
 		}
 		if(dr.scratch){
-			if(dr.fatbits){draw_fat(dr.scratch,patterns_pal(ifield(deck,"patterns")),frame_count,BG_MASK,FAT,dr.offset);}
-			else{buffer_overlay(frame.buffer,dr.scratch,BG_MASK);}
+			if(dr.fatbits){draw_fat(dr.scratch,patterns_pal(ifield(deck,"patterns")),frame_count,BG_MASK,FAT,dr.offset);} // TODO!
+			else{buffer_overlay(frame.buffer,dr.scratch,BG_MASK,con_offset());}
 		}
 		if(clear)bg_scratch_clear();
 	}
@@ -2341,7 +2343,7 @@ void bg_tools(){
 		}
 	}
 	if(dr.tool==tool_lasso||dr.tool==tool_poly){
-		pair o=(pair){dr.sel_here.x-dr.sel_start.x,dr.sel_here.y-dr.sel_start.y};
+		pair co=con_offset(), o=(pair){dr.sel_here.x-dr.sel_start.x+co.x,dr.sel_here.y-dr.sel_start.y+co.y};
 		int br=dr.tool==tool_lasso?0:dr.brush, pat=dr.tool==tool_lasso?ANTS:bg_pat();
 		for(int z=0;z<poly_count-1;z++){
 			fpair a=card_to_fatf(poly[z]),b=card_to_fatf(poly[z+1]);
@@ -2374,7 +2376,7 @@ void bg_end_lasso(){
 	if(dr.omask)for(int z=0;data&&z<dr.mask->c;z++)if((dr.mask->sv[z]>0)!=(dr.omask->sv[z]>0)){diffmask=1;break;}
 	if(data&&(diffrect||diffmask)){
 		bg_scratch();cstate t=frame;frame=draw_buffer(dr.scratch);
-		bg_draw_lasso(dr.sel_here,0,dr.fill);frame=t;bg_edit();bg_scratch_clear();
+		bg_draw_lasso(dr.sel_here,dr.sel_start,0,dr.fill);frame=t;bg_edit();bg_scratch_clear();
 	}poly_count=0,dr.mask=NULL,dr.omask=NULL,dr.limbo=NULL,dr.sel_here=dr.sel_start=(rect){0};
 }
 void bg_end_selection(){
@@ -2387,7 +2389,7 @@ void bg_delete_selection(){
 	if(bg_has_lasso()){
 		dr.mask=NULL;
 		bg_scratch();cstate t=frame;frame=draw_buffer(dr.scratch);
-		bg_draw_lasso(dr.sel_here,0,dr.fill);frame=t;bg_edit();bg_scratch_clear();
+		bg_draw_lasso(dr.sel_here,dr.sel_start,0,dr.fill);frame=t;bg_edit();bg_scratch_clear();
 		bg_end_lasso();return;
 	}
 	if(!bg_has_sel())return;
@@ -2397,7 +2399,7 @@ void bg_delete_selection(){
 	dr.sel_start=dr.sel_here=(rect){ev.dpos.x,ev.dpos.y,0,0};
 }
 void bg_paste(lv*b){
-	rect clip=fat_clip();pair s=buff_size(b);fpair f={clip.w*.75,clip.h*.75};
+	rect clip=dr.fatbits?fat_clip():con_dim();pair s=buff_size(b);fpair f={clip.w*.75,clip.h*.75};
 	if(s.x>f.x||s.y>f.y){float scale=MIN(f.x/s.x,f.y/s.y);s=(pair){s.x*scale,s.y*scale};}if(!s.x)return;
 	if(bg_has_sel()){bg_scoop_selection();dr.limbo=b,dr.limbo_dither=0;}
 	else{settool(tool_select);dr.sel_start=(rect){0,0,0,0};dr.sel_here=box_center(clip,s);dr.limbo=b,dr.limbo_dither=0;}
@@ -2469,7 +2471,7 @@ rect bg_select(){
 		}
 		else if(ev.md&&!in_sel){
 			// begin create selection
-			if(has_sel){draw_limbo(card_to_fat(s),dr.fatbits),bg_end_selection(),has_sel=0;}s=dr.sel_here;
+			if(has_sel){draw_limbo(con_to_screen(card_to_fat(s)),dr.fatbits),bg_end_selection(),has_sel=0;}s=dr.sel_here;
 		}
 		else if(ev.mu||ev.drag){
 			// size selection
@@ -2477,7 +2479,7 @@ rect bg_select(){
 			if(ev.mu)dr.sel_here=s; // finish
 		}
 	}
-	if(has_sel){draw_limbo(s,dr.fatbits);}
+	if(has_sel){draw_limbo(con_to_screen(s),dr.fatbits);}
 	if(in_layer()){
 		int nudge=0;
 		if(has_sel&&ev.dir==dir_left ){ev.dir=dir_none;bg_scoop_selection();dr.sel_here.x-=ev.shift?dr.grid_size.x:1;nudge=1;}
@@ -3167,16 +3169,16 @@ void all_menus(){
 				SDL_SetClipboardText(image_write(image_make(i))->sv);
 			}
 			paste_any();
-			if(menu_item("Clear",1,'\0')){int t=dr.tool;if(!sel){settool(tool_select),dr.sel_here=con_clip();}bg_delete_selection();settool(t);}
+			if(menu_item("Clear",1,'\0')){int t=dr.tool;if(!sel){settool(tool_select),dr.sel_here=con_dim();}bg_delete_selection();settool(t);}
 			menu_separator();
-			if(menu_item("Select All",1,'a')){settool(tool_select),dr.sel_here=con_clip();}
+			if(menu_item("Select All",1,'a')){settool(tool_select),dr.sel_here=con_dim();}
 			if(menu_item("Tight Selection",sel,'g'))bg_tighten();
 			if(menu_item("Resize to Original",sel&&dr.tool==tool_select,'\0')){
 				bg_scoop_selection();pair s=buff_size(dr.limbo);dr.sel_here.w=s.x,dr.sel_here.h=s.y;
 			}
 			lv*c=con();
-			if(card_is     (c))if(menu_item("Resize to Card"     ,sel&&dr.tool==tool_select,'\0')){bg_scoop_selection(),dr.sel_here=con_clip();}
-			if(prototype_is(c))if(menu_item("Resize to Prototype",sel&&dr.tool==tool_select,'\0')){bg_scoop_selection(),dr.sel_here=con_clip();}
+			if(card_is     (c))if(menu_item("Resize to Card"     ,sel&&dr.tool==tool_select,'\0')){bg_scoop_selection(),dr.sel_here=con_dim();}
+			if(prototype_is(c))if(menu_item("Resize to Prototype",sel&&dr.tool==tool_select,'\0')){bg_scoop_selection(),dr.sel_here=con_dim();}
 			menu_separator();
 			if(menu_item("Invert",sel&&!dr.limbo_dither,'i')){
 				if(bg_has_sel())bg_scoop_selection();
@@ -3329,7 +3331,7 @@ void all_menus(){
 		if(menu_check("Transparency Mask",1,dr.trans_mask  ,0))dr.trans_mask  ^=1;
 		if(menu_check("Fat Bits"         ,1,dr.fatbits     ,0)){
 			if(uimode!=mode_draw)setmode(mode_draw);
-			dr.fatbits^=1;if(dr.fatbits){fat_offset(box_midpoint(bg_has_sel()||bg_has_lasso()?dr.sel_here:con_clip()));}
+			dr.fatbits^=1;if(dr.fatbits){fat_offset(box_midpoint(bg_has_sel()||bg_has_lasso()?dr.sel_here:con_dim()));}
 		}
 	}
 	if(uimode==mode_draw){
@@ -3387,18 +3389,13 @@ void main_view(){
 		if(bsize.x!=s.x||bsize.y!=s.y)image_resize(back,s),mark_dirty();
 		if(dr.fatbits){draw_fat(back->b,pal,frame_count,0,FAT,dr.offset);}
 		else if(s.x==frame.size.x&&s.y==frame.size.y){memcpy(frame.buffer->sv,back->b->sv,frame.buffer->c);}
-		else{memset(frame.buffer->sv,46,frame.buffer->c),draw_rect(cl,bg_fill());buffer_paste(cl,frame.clip,back->b,frame.buffer,0);}
+		else{memset(frame.buffer->sv,46,frame.buffer->c),draw_rect(cl,dr.trans_mask?45:32);buffer_paste(cl,frame.clip,back->b,frame.buffer,0);}
 	}
-
-	// TODO:
-	//ev=ev_to_con(ev);
+	ev=ev_to_con(ev);
 	if(uimode==mode_draw&&in_layer())bg_tools();
-	if(dr.tool==tool_select&&(dr.sel_start.w>0||dr.sel_start.h>0))draw_rect(card_to_fat(dr.sel_start),dr.fill);
-	bg_lasso_preview();
-	rect livesel=bg_select();
-	//ev=con_to_ev(ev);
-
-
+	if(dr.tool==tool_select&&(dr.sel_start.w>0||dr.sel_start.h>0))draw_rect(con_to_screen(card_to_fat(dr.sel_start)),dr.fill);
+	bg_lasso_preview();rect livesel=bg_select();
+	ev=con_to_ev(ev);
 	if(((uimode==mode_object||uimode==mode_draw)&&dr.show_grid)||ms.type==modal_grid){
 		rect c=con_clip();
 		for(int x=dr.grid_size.x;x<c.w;x+=dr.grid_size.x){rect r=card_to_fat((rect){c.x+x,c.y,1,c.h});r.w=1;draw_rect(r,44);}
@@ -3409,7 +3406,7 @@ void main_view(){
 	if(uimode==mode_interact||(dr.show_widgets&&!dr.fatbits)){handle_widgets(wids,con_offset());}
 	else if(dr.show_widgets&&dr.fatbits)EACH(z,wids){draw_boxinv(pal,card_to_fat(unpack_widget(wids->lv[z]).size));}
 	ev=eb;
-	if(uimode==mode_draw){if(bg_has_sel())draw_handles(livesel);draw_box(livesel,0,ANTS);}
+	if(uimode==mode_draw){if(bg_has_sel())draw_handles(con_to_screen(livesel));draw_box(con_to_screen(livesel),0,ANTS);}
 	if(wid.pending_grid_edit){wid.pending_grid_edit=0;modal_enter(modal_gridcell);}
 	if(uimode==mode_object){ev=ev_to_con(ev),object_editor(),ev=con_to_ev(ev);}
 	if((uimode==mode_object&&ob.show_names)||(uimode==mode_draw&&dr.show_widgets&&dr.fatbits)||ms.type==modal_listen){

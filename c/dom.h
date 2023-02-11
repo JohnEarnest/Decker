@@ -411,7 +411,11 @@ lv* image_read(lv*x){
 	if(f=='2'){int i=4,o=0;while(i+2<=data->c){int p=data->sv[i++],c=0xFF&data->sv[i++];while(c&&o+1<=r->c)c--,r->sv[o++]=p;}}
 	return image_make(r);
 }
-void buffer_overlay(lv*dst,lv*src,int mask){for(int z=0;z<src->c;z++)if(src->sv[z]!=mask)dst->sv[z]=src->sv[z];}
+void buffer_overlay(lv*dst,lv*src,int mask,pair offset){
+	pair ss=buff_size(src),sd=buff_size(dst);rect d=rect_pair((pair){0,0},sd);for(int b=0;b<ss.y;b++)for(int a=0;a<ss.x;a++){
+		int c=src->sv[a+b*ss.x];pair p=(pair){a+offset.x,b+offset.y};if(c!=mask&&box_in(d,p))dst->sv[p.x+p.y*sd.x]=c;
+	}
+}
 lv* buffer_mask(lv*src,lv*mask){lv*r=buffer_clone(src);EACH(z,mask)if(!mask->sv[z])r->sv[z]=0;return r;}
 
 // Font interface
