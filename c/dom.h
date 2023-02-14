@@ -220,7 +220,10 @@ lv* lml3(lv*x,lv*y,lv*z){lv*r=lml(3);r->lv[0]=x,r->lv[1]=y,r->lv[2]=z;return r;}
 lv* lmpair(pair x){return lml2(lmn(x.x),lmn(x.y));}
 lv* lmfpair(fpair x){return lml2(lmn(x.x),lmn(x.y));}
 lv* lmrect(rect x){lv*r=lml(4);r->lv[0]=lmn(x.x),r->lv[1]=lmn(x.y),r->lv[2]=lmn(x.w),r->lv[3]=lmn(x.h);return r;}
+pair pair_add(pair a,pair b){return (pair){a.x+b.x,a.y+b.y};}
+pair pair_sub(pair a,pair b){return (pair){a.x-b.x,a.y-b.y};}
 pair pair_max(pair a,pair b){return (pair){MAX(a.x,b.x),MAX(a.y,b.y)};}
+pair pair_min(pair a,pair b){return (pair){MIN(a.x,b.x),MIN(a.y,b.y)};}
 rect rect_add(rect a,pair b){return (rect){a.x+b.x,a.y+b.y,a.w,a.h};}
 rect rect_sub(rect a,pair b){return (rect){a.x-b.x,a.y-b.y,a.w,a.h};}
 rect rect_pair(pair a,pair b){return (rect){a.x,a.y,b.x,b.y};}
@@ -717,20 +720,19 @@ void draw_invert_scaled(char*pal,rect r,lv*buff){
 		if(inclip(dx,dy))PIX(dx,dy)=c^draw_pattern(pal,PIX(dx,dy),dx,dy);
 	}
 }
-void draw_fat(lv*src,char*pal,int frame_count,int mask,float scale,pair offset){
-	pair s=buff_size(src);for(int y=0;y<ceil(frame.size.y/scale);y++)for(int x=0;x<ceil(frame.size.x/scale);x++){
+void draw_fat(rect r,lv*buff,char*pal,int frame_count,int mask,float scale,pair offset){
+	pair s=buff_size(buff);for(int y=0;y<ceil(r.h/scale);y++)for(int x=0;x<ceil(r.w/scale);x++){
 		if(offset.x+x>=s.x||offset.y+y>=s.y||offset.x+x<0||offset.y+y<0)continue;
-		int v=src->sv[(offset.x+x)+(offset.y+y)*frame.size.x];if(v==mask)continue;
+		int v=buff->sv[(offset.x+x)+(offset.y+y)*s.x];if(v==mask)continue;
 		int c=anim_pattern(pal,v,frame_count),p=draw_pattern(pal,c,offset.x+x,offset.y+y);
-		draw_rect((rect){x*scale,y*scale,scale,scale},c>=32?c: c==0?0: p?1:32);
+		draw_rect((rect){r.x+x*scale,r.y+y*scale,scale,scale},c>=32?c: c==0?0: p?1:32);
 	}
 }
 void draw_fat_scaled(rect r,lv*buff,int opaque,char*pal,int frame_count,int scale,pair offset){
-	if(r.w==0||r.h==0)return;pair s=buff_size(buff);
-	for(int y=0;y<r.h;y++)for(int x=0;x<r.w;x++){
+	if(r.w==0||r.h==0)return;pair s=buff_size(buff);for(int y=0;y<r.h;y++)for(int x=0;x<r.w;x++){
 		int sx=s.x==r.w?x:((x*1.0)/r.w)*s.x, sy=s.y==r.h?y:((y*1.0)/r.h)*s.y, v=buff->sv[sx+sy*s.x];
 		int c=anim_pattern(pal,v,frame_count),p=draw_pattern(pal,c,r.x+x,r.y+y);
-		if(opaque||v!=0)draw_rect((rect){(r.x-offset.x+x)*scale,(r.y-offset.y+y)*scale,scale,scale},c>=32?c: p?1:0);
+		if(opaque||v!=0)draw_rect(rect_add((rect){(r.x+x)*scale,(r.y+y)*scale,scale,scale},offset),c>=32?c: p?1:0);
 	}
 }
 float*dither_err=NULL;int dither_err_size=0;float dither_threshold=0.5;

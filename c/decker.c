@@ -92,53 +92,6 @@ typedef struct {
 int over(rect r){return box_in(r,ev.pos);}
 int dover(rect r){return box_in(r,ev.dpos);}
 
-enum uimodes{mode_interact,mode_draw,mode_object,mode_script};
-int uimode=mode_interact;lv*ui_container=NULL;
-void setmode(int mode);// forward ref
-void con_set(lv*x){if(x!=ui_container)setmode(uimode);if(x!=ui_container&&prototype_is(ui_container))n_prototype_update(ui_container,NONE);ui_container=x;}
-lv* con(){return ui_container?ui_container:ifield(deck,"card");}
-lv* con_wids(){return ivalue(con(),"widgets");}
-lv* con_image(){return ifield(con(),"image");}
-pair con_size(){return getpair(ifield(con(),"size"));}
-rect con_dim(){return rect_pair((pair){0,0},con_size());}
-rect con_clip(){return box_intersect(frame.clip,box_center(frame.clip,con_size()));}
-pair con_offset(){rect r=con_clip();return (pair){r.x,r.y};}
-rect con_to_screen(rect x){return rect_add(x,con_offset());}
-rect screen_to_con(rect x){return rect_sub(x,con_offset());}
-event_state ev_to_con(event_state e){
-	pair o=con_offset();
-	e.pos =(pair){e.pos .x-o.x,e. pos.y-o.y};
-	e.dpos=(pair){e.dpos.x-o.x,e.dpos.y-o.y};
-	pointer_prev=(pair){pointer_prev.x-o.x,pointer_prev.y-o.y};
-	return e;
-}
-event_state con_to_ev(event_state e){
-	pair o=con_offset();
-	e.pos =(pair){e.pos .x+o.x,e. pos.y+o.y};
-	e.dpos=(pair){e.dpos.x+o.x,e.dpos.y+o.y};
-	pointer_prev=(pair){pointer_prev.x+o.x,pointer_prev.y+o.y};
-	return e;
-}
-void tracking(){
-	lv*c=con();
-	if(prototype_is(c)){
-		lv*defs=ifield(deck,"contraptions");int i=dgeti(defs,ifield(c,"name"));
-		if(ev.dir==dir_left )con_set(defs->lv[(i+(defs->c-1))%defs->c]);
-		if(ev.dir==dir_right)con_set(defs->lv[(i+1          )%defs->c]);
-	}
-	if(card_is(c)){
-		if(ev.dir==dir_left )n_go(deck,l_list(lmistr("Prev")));
-		if(ev.dir==dir_right)n_go(deck,l_list(lmistr("Next")));
-	}
-}
-
-#define LISTEN_LINES 30
-typedef struct {
-	lv*hist, *vars;
-	int scroll;
-} listen_state; listen_state li={0};
-
-#define FAT 8
 enum tools{tool_select,tool_pencil,tool_lasso,tool_line,tool_fill,tool_poly,tool_rect,tool_fillrect,tool_ellipse,tool_fillellipse};
 typedef struct {
 	int tool, brush, pattern, fill, erasing;
@@ -158,15 +111,72 @@ pair snap(pair p){return !dr.snap?p:(pair){dr.grid_size.x*((p.x+dr.grid_size.x/2
 pair snap_delta(pair p){pair a=snap(p);return (pair){a.x-p.x,a.y-p.y};}
 rect snapp(rect r){pair a=snap((pair){r.x,r.y});                        return (rect){a.x,a.y,r.w,r.h};} // position only
 rect snapr(rect r){pair a=snap((pair){r.x,r.y}),b=snap((pair){r.w,r.h});return (rect){a.x,a.y,b.x,b.y};} // position + dimensions
-void fat_offset(pair p){pair d={frame.size.x/FAT,frame.size.y/FAT};dr.offset=(pair){p.x-d.x/2,p.y-d.y/2};}
-rect fat_clip(){return dr.fatbits?(rect){dr.offset.x,dr.offset.y,frame.size.x/FAT,frame.size.y/FAT}: frame.clip;}
-pair fat_to_card(pair a){return (pair){(a.x/FAT)+dr.offset.x,(a.y/FAT)+dr.offset.y};}
-rect card_to_fat(rect a){return dr.fatbits?(rect){(a.x-dr.offset.x)*FAT,(a.y-dr.offset.y)*FAT,a.w*FAT,a.h*FAT}:a;}
-fpair card_to_fatf(fpair a){rect r=card_to_fat((rect){a.x,a.y,0,0});return (fpair){r.x,r.y};}
 cstate draw_buffer(lv*buff){pair size=buff_size(buff);return (cstate){0,0,size,(rect){0,0,size.x,size.y},buff,FONT_BODY};}
 void draw_invert(char*pal,rect r){
 	for(int a=r.y;a<r.y+r.h;a++)for(int b=r.x;b<r.x+r.w;b++)if(inclip(b,a)){int p=draw_pattern(pal,PIX(b,a),b,a);PIX(b,a)=p==0||p==32?1:32;}
 }
+
+enum uimodes{mode_interact,mode_draw,mode_object,mode_script};
+int uimode=mode_interact;lv*ui_container=NULL;
+void setmode(int mode);// forward ref
+void con_set(lv*x){if(x!=ui_container)setmode(uimode);if(x!=ui_container&&prototype_is(ui_container))n_prototype_update(ui_container,NONE);ui_container=x;}
+lv* con(){return ui_container?ui_container:ifield(deck,"card");}
+lv* con_wids(){return ivalue(con(),"widgets");}
+lv* con_image(){return ifield(con(),"image");}
+pair con_size(){return getpair(ifield(con(),"size"));}
+rect con_dim(){return rect_pair((pair){0,0},con_size());}
+#define FAT 8
+rect con_clip(){
+	pair size=con_size();
+	if(dr.fatbits)return box_center(frame.clip,pair_min(frame.size,(pair){size.x*FAT,size.y*FAT}));
+	return box_intersect(frame.clip,box_center(frame.clip,size));
+}
+pair con_offset(){rect r=con_clip();return (pair){r.x,r.y};}
+pair con_to_screen  (pair a){if(dr.fatbits){a=pair_sub(a,dr.offset);a.x*=FAT,a.y*=FAT                  ;}return pair_add(a,con_offset());}
+rect con_to_screenr (rect a){if(dr.fatbits){a=rect_sub(a,dr.offset);a.x*=FAT,a.y*=FAT,a.w*=FAT,a.h*=FAT;}return rect_add(a,con_offset());}
+fpair con_to_screenf(fpair a){pair r=con_to_screen((pair){a.x,a.y});return (fpair){r.x,r.y};}
+pair screen_to_con (pair a){a=pair_sub(a,con_offset());return dr.fatbits?pair_add((pair){a.x/FAT,a.y/FAT},dr.offset):a;}
+rect screen_to_conr(rect a){return rect_pair(screen_to_con((pair){a.x,a.y}),dr.fatbits?(pair){a.w/FAT,a.h/FAT}:(pair){a.w,a.h});}
+rect con_view_dim(){pair a=screen_to_con((pair){0,0}), b=screen_to_con(frame.size);return rect_pair(a,pair_sub(b,a));}
+void clamp_fatbits(){
+	pair v=(pair){frame.size.x/FAT,frame.size.y/FAT}, c=con_size(), o=pair_max(pair_sub(c,v),(pair){0,0});
+	dr.offset=(pair){CLAMP(0,dr.offset.x,o.x),CLAMP(0,dr.offset.y,o.y)};
+}
+void center_fatbits(pair p){
+	pair v=(pair){frame.size.x/FAT,frame.size.y/FAT};
+	dr.offset=(pair){p.x-v.x/2,p.y-v.y/2};clamp_fatbits();
+}
+event_state ev_to_con(event_state e){
+	e.pos =screen_to_con(e.pos);
+	e.dpos=screen_to_con(e.dpos);
+	pointer_prev=screen_to_con(pointer_prev);
+	return e;
+}
+event_state con_to_ev(event_state e){
+	e.pos =con_to_screen(e.pos);
+	e.dpos=con_to_screen(e.dpos);
+	pointer_prev=con_to_screen(pointer_prev);
+	return e;
+}
+
+void tracking(){
+	lv*c=con();
+	if(prototype_is(c)){
+		lv*defs=ifield(deck,"contraptions");int i=dgeti(defs,ifield(c,"name"));
+		if(ev.dir==dir_left )con_set(defs->lv[(i+(defs->c-1))%defs->c]);
+		if(ev.dir==dir_right)con_set(defs->lv[(i+1          )%defs->c]);
+	}
+	if(card_is(c)){
+		if(ev.dir==dir_left )n_go(deck,l_list(lmistr("Prev")));
+		if(ev.dir==dir_right)n_go(deck,l_list(lmistr("Next")));
+	}
+}
+
+#define LISTEN_LINES 30
+typedef struct {
+	lv*hist, *vars;
+	int scroll;
+} listen_state; listen_state li={0};
 
 typedef struct {
 	lv* sel; int show_bounds, show_names, show_cursor;
@@ -787,7 +797,7 @@ void handle_widgets(lv*x,pair offset){
 void widget_contraption(lv*x){
 	int show=ordinal_enum(ifield(x,"show"),widget_shows);if(show==show_none)return;
 	rect b=rect_pair(getpair(ifield(x,"pos")),getpair(ifield(x,"size")));lv* image=ifield(x,"image");pair s=image_size(image);
-	rect bc=box_intersect(con_clip(),b); rect oc=frame.clip;frame.clip=bc;
+	rect oc=frame.clip;frame.clip=b;
 	if(show==show_solid){if(s.x<b.w||s.y<b.h)draw_rect(b,32);buffer_paste(b,frame.clip,image->b,frame.buffer,1);}
 	if(show==show_transparent){buffer_paste(b,frame.clip,image->b,frame.buffer,0);}
 	if(show==show_invert){char*pal=patterns_pal(ifield(deck,"patterns"));draw_invert_scaled(pal,(rect){b.x,b.y,s.x,s.y},image->b);}
@@ -2185,9 +2195,9 @@ void bg_edit(){
 	edit(r);
 }
 void draw_limbo(rect clip,int scale){
-	if(!dr.limbo){/*nothing*/}
-	else if(scale&&dr.limbo_dither){draw_rect      (card_to_fat(clip),21);}
-	else if(scale                 ){draw_fat_scaled(clip,dr.limbo,!dr.trans,patterns_pal(ifield(deck,"patterns")),frame_count,FAT,dr.offset);}
+	clip=normalize_rect(clip);if(!dr.limbo){/*nothing*/}
+	else if(scale&&dr.limbo_dither){draw_rect      (clip,21);}
+	else if(scale                 ){draw_fat_scaled(screen_to_conr(clip),dr.limbo,!dr.trans,patterns_pal(ifield(deck,"patterns")),frame_count,FAT,con_to_screen((pair){0,0}));}
 	else if(       dr.limbo_dither){draw_dithered  (clip,dr.limbo,!dr.trans,dr.omask);}
 	else                           {draw_scaled    (clip,dr.limbo,!dr.trans);}
 }
@@ -2197,7 +2207,7 @@ lv* bg_scaled_limbo(){
 	lv*r=dr.trans||dr.omask?buffer_copy(back,d):lmbuff((pair){d.w,d.h});
 	cstate t=frame;frame=draw_buffer(r);
 	if(dr.trans){rect c=dr.sel_start;draw_rect((rect){c.x-d.x,c.y-d.y,c.w,c.h},dr.fill);}
-	draw_limbo(con_clip(),0);
+	draw_limbo(frame.clip,0);
 	frame=t;return r;
 }
 void bg_edit_sel(){
@@ -2230,39 +2240,36 @@ void bg_draw_lasso(rect r,rect o,int show_ants,int fill){
 }
 void bg_lasso_preview(){
 	if(!bg_has_lasso())return;
-	pair pos=dr.fatbits?fat_to_card(ev.pos):ev.pos, dpos=dr.fatbits?fat_to_card(ev.dpos):ev.dpos;
-	pair d={pos.x-dpos.x,pos.y-dpos.y};
+	pair d={ev.pos.x-ev.dpos.x,ev.pos.y-ev.dpos.y};
 	rect dh={dr.sel_here.x+d.x,dr.sel_here.y+d.y,dr.sel_here.w,dr.sel_here.h};
-	pair dd={pos.x-dh.x,pos.y-dh.y}; int insel=dr.mask!=NULL&&box_in(dh,pos)&&dr.mask->sv[dd.x+dd.y*dh.w];
-	rect r=ev.drag&&insel?dh:dr.sel_here;
+	pair dd={ev.pos.x-dh.x,ev.pos.y-dh.y}; int insel=dr.mask!=NULL&&box_in(dh,ev.pos)&&dr.mask->sv[dd.x+dd.y*dh.w];
+	rect r=ev.drag&&insel?dh:dr.sel_here;pair origin=con_to_screen((pair){0,0});
 	if(dr.fatbits){
 		rect o=dr.sel_start;char*pal=patterns_pal(ifield(deck,"patterns"));
 		for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++){
 			if(!dr.omask->sv[b+a*o.w])continue;
-			draw_rect((rect){(b+o.x-dr.offset.x)*FAT,(a+o.y-dr.offset.y)*FAT,FAT,FAT},dr.fill);
+			draw_rect(rect_add((rect){(b+o.x)*FAT,(a+o.y)*FAT,FAT,FAT},origin),dr.fill);
 		}
 		for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++){
 			if(!dr.mask->sv[b+a*r.w])continue;
 			int v=dr.limbo->sv[b+a*r.w],c=anim_pattern(pal,v,frame_count),pat=draw_pattern(pal,c,r.x+b,r.y+a);
-			if(c||!dr.trans)draw_rect((rect){(b+r.x-dr.offset.x)*FAT,(a+r.y-dr.offset.y)*FAT,FAT,FAT},c>=32?c: c==0?c: pat?1:32);
+			if(c||!dr.trans)draw_rect(rect_add((rect){(b+r.x)*FAT,(a+r.y)*FAT,FAT,FAT},origin),c>=32?c: c==0?c: pat?1:32);
 		}
 		for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++){
 			if((0xFF&dr.mask->sv[b+a*r.w])!=ANTS)continue;
-			pair p={(b+r.x-dr.offset.x)*FAT,(a+r.y-dr.offset.y)*FAT};
+			pair p=pair_add((pair){(b+r.x)*FAT,(a+r.y)*FAT},origin);
 			if(b<=    0||!dr.mask->sv[(b-1)+a*r.w])draw_vline(p.x      ,p.y,p.y+FAT-1,ANTS);
 			if(b>=r.w-1||!dr.mask->sv[(b+1)+a*r.w])draw_vline(p.x+FAT-1,p.y,p.y+FAT-1,ANTS);
 			if(a<=    0||!dr.mask->sv[b+(a-1)*r.w])draw_hline(p.x,p.x+FAT-1,p.y      ,ANTS);
 			if(a>=r.h-1||!dr.mask->sv[b+(a+1)*r.w])draw_hline(p.x,p.x+FAT-1,p.y+FAT-1,ANTS);
 		}
-	}else{bg_draw_lasso(con_to_screen(r),con_to_screen(dr.sel_start),1,dr.fill);}
+	}else{bg_draw_lasso(con_to_screenr(r),con_to_screenr(dr.sel_start),1,dr.fill);}
 }
 void bg_tools(){
-	if     (!dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=1;fat_offset(ev.pos);return;}
+	if     (!dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=1;center_fatbits(ev.pos);return;}
 	else if( dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=0;return;}if(ev.alt)return;
 	if(ev.md)pointer_prev=ev.pos;
-	event_state te=ev;pair pp=pointer_prev;
-	if(!dover(con_dim()))ev.md=ev.mu=ev.drag=0;
-	if(dr.fatbits){ev.pos=fat_to_card(ev.pos),ev.dpos=fat_to_card(ev.dpos),pointer_prev=fat_to_card(pointer_prev);}
+	if(!dover(con_view_dim()))ev.md=ev.mu=ev.drag=0;
 	if(dr.tool==tool_pencil||dr.tool==tool_line||dr.tool==tool_rect||dr.tool==tool_fillrect||dr.tool==tool_ellipse||dr.tool==tool_fillellipse){
 		int clear=0;if(!dr.scratch)bg_scratch();
 		if(ev.md){bg_scratch();dr.erasing=ev.rdown||ev.shift;}
@@ -2303,7 +2310,7 @@ void bg_tools(){
 			frame=t;if(ev.mu)bg_edit(),clear=1;
 		}
 		if(dr.scratch){
-			if(dr.fatbits){draw_fat(dr.scratch,patterns_pal(ifield(deck,"patterns")),frame_count,BG_MASK,FAT,dr.offset);} // TODO!
+			if(dr.fatbits){draw_fat(con_clip(),dr.scratch,patterns_pal(ifield(deck,"patterns")),frame_count,BG_MASK,FAT,dr.offset);}
 			else{buffer_overlay(frame.buffer,dr.scratch,BG_MASK,con_offset());}
 		}
 		if(clear)bg_scratch_clear();
@@ -2343,10 +2350,10 @@ void bg_tools(){
 		}
 	}
 	if(dr.tool==tool_lasso||dr.tool==tool_poly){
-		pair co=con_offset(), o=(pair){dr.sel_here.x-dr.sel_start.x+co.x,dr.sel_here.y-dr.sel_start.y+co.y};
+		pair o=(pair){dr.sel_here.x-dr.sel_start.x,dr.sel_here.y-dr.sel_start.y};
 		int br=dr.tool==tool_lasso?0:dr.brush, pat=dr.tool==tool_lasso?ANTS:bg_pat();
 		for(int z=0;z<poly_count-1;z++){
-			fpair a=card_to_fatf(poly[z]),b=card_to_fatf(poly[z+1]);
+			fpair a=con_to_screenf(poly[z]),b=con_to_screenf(poly[z+1]);
 			draw_line((rect){a.x+o.x,a.y+o.y,b.x+o.x,b.y+o.y},br,pat);
 		}
 	}
@@ -2363,12 +2370,9 @@ void bg_tools(){
 			if(ev.dir==dir_right)dr.offset.x+=ev.shift?dr.grid_size.x:1;
 			if(ev.dir==dir_up   )dr.offset.y-=ev.shift?dr.grid_size.y:1;
 			if(ev.dir==dir_down )dr.offset.y+=ev.shift?dr.grid_size.y:1;
-			pair c=con_size();
-			dr.offset=(pair){MAX(0,MIN(dr.offset.x,c.x-(c.x/8))),MAX(0,MIN(dr.offset.y,c.y-(c.y/8)))};
-			if(ev.exit)dr.fatbits=0;
+			clamp_fatbits();if(ev.exit)dr.fatbits=0,ev.exit=0;
 		}else{tracking();}
 	}
-	ev=te;pointer_prev=pp;
 }
 void bg_end_lasso(){
 	if(uimode!=mode_draw||dr.tool!=tool_lasso)return;
@@ -2399,10 +2403,10 @@ void bg_delete_selection(){
 	dr.sel_start=dr.sel_here=(rect){ev.dpos.x,ev.dpos.y,0,0};
 }
 void bg_paste(lv*b){
-	rect clip=dr.fatbits?fat_clip():con_dim();pair s=buff_size(b);fpair f={clip.w*.75,clip.h*.75};
+	rect clip=con_dim();pair s=buff_size(b);fpair f={clip.w*.75,clip.h*.75};
 	if(s.x>f.x||s.y>f.y){float scale=MIN(f.x/s.x,f.y/s.y);s=(pair){s.x*scale,s.y*scale};}if(!s.x)return;
 	if(bg_has_sel()){bg_scoop_selection();dr.limbo=b,dr.limbo_dither=0;}
-	else{settool(tool_select);dr.sel_start=(rect){0,0,0,0};dr.sel_here=box_center(clip,s);dr.limbo=b,dr.limbo_dither=0;}
+	else{settool(tool_select);dr.sel_start=(rect){0,0,0,0};dr.sel_here=box_center(con_view_dim(),s);dr.limbo=b,dr.limbo_dither=0;}
 }
 rect keep_ratio(rect r,pair s){
 	if(!ev.shift||s.x==0||s.y==0)return r;
@@ -2438,8 +2442,6 @@ int in_handle(rect r){
 }
 rect bg_select(){
 	if(uimode!=mode_draw||dr.tool!=tool_select)return (rect){0,0,0,0};
-	event_state te=ev;
-	if(dr.fatbits){ev.pos=fat_to_card(ev.pos),ev.dpos=fat_to_card(ev.dpos),pointer_prev=fat_to_card(pointer_prev);}
 	rect s=dr.sel_here; int has_sel=s.w>0||s.h>0, in_sel=has_sel&&dover(s);
 	int ax=MIN(ev.dpos.x,ev.pos.x), bx=MAX(ev.dpos.x,ev.pos.x);
 	int ay=MIN(ev.dpos.y,ev.pos.y), by=MAX(ev.dpos.y,ev.pos.y);
@@ -2471,7 +2473,7 @@ rect bg_select(){
 		}
 		else if(ev.md&&!in_sel){
 			// begin create selection
-			if(has_sel){draw_limbo(con_to_screen(card_to_fat(s)),dr.fatbits),bg_end_selection(),has_sel=0;}s=dr.sel_here;
+			if(has_sel){draw_limbo(con_to_screenr(s),dr.fatbits),bg_end_selection(),has_sel=0;}s=dr.sel_here;
 		}
 		else if(ev.mu||ev.drag){
 			// size selection
@@ -2479,7 +2481,7 @@ rect bg_select(){
 			if(ev.mu)dr.sel_here=s; // finish
 		}
 	}
-	if(has_sel){draw_limbo(con_to_screen(s),dr.fatbits);}
+	if(has_sel){draw_limbo(con_to_screenr(s),dr.fatbits);}
 	if(in_layer()){
 		int nudge=0;
 		if(has_sel&&ev.dir==dir_left ){ev.dir=dir_none;bg_scoop_selection();dr.sel_here.x-=ev.shift?dr.grid_size.x:1;nudge=1;}
@@ -2488,7 +2490,7 @@ rect bg_select(){
 		if(has_sel&&ev.dir==dir_down ){ev.dir=dir_none;bg_scoop_selection();dr.sel_here.y+=ev.shift?dr.grid_size.y:1;nudge=1;}
 		if(nudge&&ev.shift)dr.sel_here=snapp(dr.sel_here);
 		if(ev.exit){dr.limbo=NULL,dr.limbo_dither=0;bg_end_selection();}
-	}ev=te;return card_to_fat(s);
+	}return s;
 }
 void bg_mask_set(pair p,int v){dr.mask->sv[p.x+p.y*dr.sel_here.w]=v;}
 int bg_mask_get(pair p){return (p.x<0||p.y<0||p.x>=dr.sel_here.w||p.y>=dr.sel_here.h)?0:dr.mask->sv[p.x+p.y*dr.sel_here.w];}
@@ -2611,7 +2613,7 @@ void object_properties(lv*x){
 void object_editor(){
 	char*pal=patterns_pal(ifield(deck,"patterns"));
 	lv*wids=con_wids();EACH(z,wids){ // forward pass for rendering
-		lv*wid=wids->lv[z];widget w=unpack_widget(wid);w.size=con_to_screen(w.size);
+		lv*wid=wids->lv[z];widget w=unpack_widget(wid);w.size=con_to_screenr(w.size);
 		int sel=0;EACH(z,ob.sel)if(ob.sel->lv[z]==wid){sel=1;break;}
 		if(sel){draw_box(inset(w.size,-1),0,ANTS);}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1));}
 		if(sel&&ob.sel->c==1&&!contraption_is(ob.sel->lv[0])){draw_handles(w.size);}
@@ -2666,7 +2668,7 @@ void object_editor(){
 		pair delta=(pair){a.x-b.x,a.y-b.y};
 		if(dragged){ob_move(delta,!ob.move_first);ob.move_first=0,ob.prev=ev.pos;}
 	}else{
-		if(box&&ev.drag)draw_box(con_to_screen(sr),0,ANTS); if(box&&(ev.drag||ev.mu))ob.sel->c=0;
+		if(box&&ev.drag)draw_box(con_to_screenr(sr),0,ANTS); if(box&&(ev.drag||ev.mu))ob.sel->c=0;
 		int f=0;for(int z=wids->c-1;z>=0;z--){ // backward pass for selection priority(!)
 			lv*wid=wids->lv[z];widget w=unpack_widget(wid);
 			int sel=0;EACH(z,ob.sel)if(ob.sel->lv[z]==wid){sel=1;break;}
@@ -3331,7 +3333,7 @@ void all_menus(){
 		if(menu_check("Transparency Mask",1,dr.trans_mask  ,0))dr.trans_mask  ^=1;
 		if(menu_check("Fat Bits"         ,1,dr.fatbits     ,0)){
 			if(uimode!=mode_draw)setmode(mode_draw);
-			dr.fatbits^=1;if(dr.fatbits){fat_offset(box_midpoint(bg_has_sel()||bg_has_lasso()?dr.sel_here:con_dim()));}
+			dr.fatbits^=1;if(dr.fatbits){center_fatbits(box_midpoint(bg_has_sel()||bg_has_lasso()?dr.sel_here:con_dim()));}
 		}
 	}
 	if(uimode==mode_draw){
@@ -3382,36 +3384,36 @@ void all_menus(){
 }
 
 void main_view(){
-	if(ob.sel->c==0&&in_layer()&&(!card_is(con())||uimode==mode_object))tracking();
+	if(in_layer()&&uimode==mode_object&&ob.sel->c==0)tracking();
 	lv*back=con_image();pair bsize=image_size(back);char*pal=patterns_pal(ifield(deck,"patterns"));
 	if(ms.type!=modal_trans){
 		rect cl=con_clip();pair s=con_size();
 		if(bsize.x!=s.x||bsize.y!=s.y)image_resize(back,s),mark_dirty();
-		if(dr.fatbits){draw_fat(back->b,pal,frame_count,0,FAT,dr.offset);}
+		if(dr.fatbits){memset(frame.buffer->sv,46,frame.buffer->c),draw_rect(cl,dr.trans_mask?45:32);draw_fat(cl,back->b,pal,frame_count,0,FAT,dr.offset);}
 		else if(s.x==frame.size.x&&s.y==frame.size.y){memcpy(frame.buffer->sv,back->b->sv,frame.buffer->c);}
 		else{memset(frame.buffer->sv,46,frame.buffer->c),draw_rect(cl,dr.trans_mask?45:32);buffer_paste(cl,frame.clip,back->b,frame.buffer,0);}
 	}
 	ev=ev_to_con(ev);
 	if(uimode==mode_draw&&in_layer())bg_tools();
-	if(dr.tool==tool_select&&(dr.sel_start.w>0||dr.sel_start.h>0))draw_rect(con_to_screen(card_to_fat(dr.sel_start)),dr.fill);
+	if(dr.tool==tool_select&&(dr.sel_start.w>0||dr.sel_start.h>0))draw_rect(con_to_screenr(dr.sel_start),dr.fill);
 	bg_lasso_preview();rect livesel=bg_select();
 	ev=con_to_ev(ev);
 	if(((uimode==mode_object||uimode==mode_draw)&&dr.show_grid)||ms.type==modal_grid){
-		rect c=con_clip();
-		for(int x=dr.grid_size.x;x<c.w;x+=dr.grid_size.x){rect r=card_to_fat((rect){c.x+x,c.y,1,c.h});r.w=1;draw_rect(r,44);}
-		for(int y=dr.grid_size.y;y<c.h;y+=dr.grid_size.y){rect r=card_to_fat((rect){c.x,c.y+y,c.w,1});r.h=1;draw_rect(r,44);}
+		rect c=con_dim();
+		for(int x=dr.grid_size.x;x<c.w;x+=dr.grid_size.x){rect r=con_to_screenr((rect){x,0,1,c.h});r.w=1;draw_rect(r,44);}
+		for(int y=dr.grid_size.y;y<c.h;y+=dr.grid_size.y){rect r=con_to_screenr((rect){0,y,c.w,1});r.h=1;draw_rect(r,44);}
 	}
 	lv*wids=con_wids();
 	event_state eb=ev;if(uimode!=mode_interact)ev=(event_state){0};
 	if(uimode==mode_interact||(dr.show_widgets&&!dr.fatbits)){handle_widgets(wids,con_offset());}
-	else if(dr.show_widgets&&dr.fatbits)EACH(z,wids){draw_boxinv(pal,card_to_fat(unpack_widget(wids->lv[z]).size));}
+	else if(dr.show_widgets&&dr.fatbits)EACH(z,wids){draw_boxinv(pal,con_to_screenr(unpack_widget(wids->lv[z]).size));}
 	ev=eb;
-	if(uimode==mode_draw){if(bg_has_sel())draw_handles(con_to_screen(livesel));draw_box(con_to_screen(livesel),0,ANTS);}
+	if(uimode==mode_draw){if(bg_has_sel())draw_handles(con_to_screenr(livesel));draw_box(con_to_screenr(livesel),0,ANTS);}
 	if(wid.pending_grid_edit){wid.pending_grid_edit=0;modal_enter(modal_gridcell);}
 	if(uimode==mode_object){ev=ev_to_con(ev),object_editor(),ev=con_to_ev(ev);}
 	if((uimode==mode_object&&ob.show_names)||(uimode==mode_draw&&dr.show_widgets&&dr.fatbits)||ms.type==modal_listen){
 		EACH(z,wids){
-			lv*wid=wids->lv[z];rect size=con_to_screen(card_to_fat(unpack_widget(wid).size));
+			lv*wid=wids->lv[z];rect size=con_to_screenr(unpack_widget(wid).size);
 			lv*n=ifield(wid,"name");pair s=font_textsize(FONT_BODY,n->sv);
 			draw_text_outlined((rect){size.x,size.y-s.y,s.x,s.y},n->sv,FONT_BODY);
 		}
@@ -3419,22 +3421,22 @@ void main_view(){
 	if(ob.show_cursor&&ms.type==modal_none&&(uimode==mode_draw||uimode==mode_object)){
 		char t[4096];ev=ev_to_con(ev);
 		if(uimode==mode_draw&&bg_has_sel()){
-			rect r=livesel,l=r;if(dr.fatbits){pair p=fat_to_card((pair){r.x,r.y});l=(rect){p.x,p.y,r.w/FAT,r.h/FAT};}
+			rect r=livesel,l=r;
 			snprintf(t,sizeof(t),"(%3d,%3d,%3d,%3d)",l.x,l.y,l.w,l.h);pair s=font_textsize(FONT_BODY,t);
-			draw_text_outlined(con_to_screen((rect){r.x,r.y-s.y,s.x,s.y}),t,FONT_BODY);
+			draw_text_outlined(rect_sub(con_to_screenr((rect){r.x,r.y,s.x,s.y}),(pair){0,s.y}),t,FONT_BODY);
 		}
 		else if(ev.drag){
-			pair a=dr.fatbits?fat_to_card(ev.dpos):ev.dpos, b=dr.fatbits?fat_to_card(ev.pos):ev.pos;rect r={b.x,b.y,b.x-a.x,b.y-a.y};
+			pair a=ev.dpos,b=ev.pos;rect r={b.x,b.y,b.x-a.x,b.y-a.y};
 			snprintf(t,sizeof(t),"(%3d,%3d,%3d,%3d)",r.x,r.y,r.w,r.h);pair s=font_textsize(FONT_BODY,t);
-			draw_text_outlined(con_to_screen((rect){ev.pos.x,ev.pos.y-s.y,s.x,s.y}),t,FONT_BODY);
+			draw_text_outlined(rect_sub(con_to_screenr(rect_pair(ev.pos,s)),(pair){0,s.y}),t,FONT_BODY);
 		}
 		else{
-			pair c=dr.fatbits?fat_to_card(ev.pos):ev.pos;
+			pair c=ev.pos;
 			snprintf(t,sizeof(t),"(%3d,%3d)",c.x,c.y);pair s=font_textsize(FONT_BODY,t);
-			draw_text_outlined(con_to_screen((rect){ev.pos.x,ev.pos.y-s.y,s.x,s.y}),t,FONT_BODY);
+			draw_text_outlined(rect_sub(con_to_screenr(rect_pair(ev.pos,s)),(pair){0,s.y}),t,FONT_BODY);
 		}ev=con_to_ev(ev);
 	}
-	if(in_layer()&&ev.exit&&!card_is(con()))con_set(NULL),ev.exit=0;
+	if(in_layer()&&ev.exit&&!dr.fatbits&&!card_is(con()))con_set(NULL),ev.exit=0;
 }
 
 void tick(lv*env){

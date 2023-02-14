@@ -814,6 +814,7 @@ rint=r=>rect(0|r.x,0|r.y,0|r.w,0|r.h)
 radd=(a,b)=>rect(a.x+b.x,a.y+b.y,a.w+b.w,a.h+b.h)
 rsub=(a,b)=>rect(a.x-b.x,a.y-b.y,a.w-b.w,a.h-b.h)
 rmul=(a,n)=>rect(a.x*n,a.y*n,a.w*n,a.h*n)
+rdiv=(a,n)=>rint(rmul(a,1/n))
 inset=(r,n)=>rect(r.x+n,r.y+n,r.w-2*n,r.h-2*n)
 rin=(r,p)=>p.x>=r.x&&p.y>=r.y&&p.x<r.x+r.w&&p.y<r.y+r.h           // point-in-rect
 ron=(a,b)=>b.x+b.w>=a.x&&b.x<=a.x+a.w&&b.y+b.h>=a.y&&b.y<=a.y+a.h // rect-overlaps-rect

@@ -10,7 +10,6 @@ const FIELD_CHANGE_DELAY=60
 const LISTEN_LINES      =30
 const LISTEN_SIZE       =_=>rect(frame.size.x-20,100)
 const MASTER_VOLUME     =0.3
-const FAT               =8
 const BG_MASK           =100
 
 q=x=>document.querySelector(x)
@@ -171,26 +170,25 @@ draw_invert_scaled=(pal,r,image)=>{
 		if(inclip(h))pix(h,c^draw_pattern(gpix(h),dx,dy))
 	}
 }
-draw_fat=(src,pal,frame_count,mask,scale,offset)=>{
+draw_fat=(r,image,pal,frame_count,mask,scale,offset)=>{
 	const anim=deck.patterns.anim
 	const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][(0|(frame_count/4))%max(1,anim[pix-28].length)]
 	const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal[(x%8)+(8*(y%8))+(8*8*pix)]&1
-	const s=src.size;for(let y=0;y<ceil(frame.size.y/scale);y++)for(let x=0;x<ceil(frame.size.x/scale);x++){
+	const s=image.size;for(let y=0;y<ceil(r.h/scale);y++)for(let x=0;x<ceil(r.w/scale);x++){
 		if(offset.x+x>=s.x||offset.y+y>=s.y||offset.x+x<0||offset.y+y<0)continue
-		const v=src.pix[(offset.x+x)+(offset.y+y)*frame.size.x];if(v==mask)continue
+		const v=image.pix[(offset.x+x)+(offset.y+y)*s.x];if(v==mask)continue
 		const c=anim_pattern(v,offset.x+x,offset.y+y),p=draw_pattern(c,offset.x+x,offset.y+y)
-		draw_rect(rect(x*scale,y*scale,scale,scale),c>=32?c: c==0?0: p?1:32)
+		draw_rect(radd(rect(x*scale,y*scale,scale,scale),rect(r.x,r.y)),c>=32?c: c==0?0: p?1:32)
 	}
 }
 draw_fat_scaled=(r,image,opaque,pal,frame_count,scale,offset)=>{
 	const anim=deck.patterns.anim
 	const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][(0|(frame_count/4))%max(1,anim[pix-28].length)]
 	const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal[(x%8)+(8*(y%8))+(8*8*pix)]&1
-	if(r.w==0||r.h==0)return;const s=image.size
-	for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++){
+	if(r.w==0||r.h==0)return;const s=image.size;for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++){
 		const sx=0|(s.x==r.w?x:((x*1.0)/r.w)*s.x), sy=0|(s.y==r.h?y:((y*1.0)/r.h)*s.y), v=image.pix[sx+sy*s.x]
 		const c=anim_pattern(v,r.x+x,r.y+y),p=draw_pattern(c,r.x+x,r.y+y)
-		if(opaque||v!=0)draw_rect(rect((r.x-offset.x+x)*scale,(r.y-offset.y+y)*scale,scale,scale),c>=32?c: p?1:0)
+		if(opaque||v!=0)draw_rect(radd(rect((r.x+x)*scale,(r.y+y)*scale,scale,scale),offset),c>=32?c: p?1:0)
 	}
 }
 draw_dithered=(r,image,opaque,mask,threshold)=>{
@@ -382,18 +380,23 @@ PANGRAM='How razorback jumping-frogs can level six piqued gymnasts.'
 // State
 
 let uimode='interact', ui_container=null, uicursor=0, enable_gestures=0, profiler=0
+mark_dirty=_=>{dirty=1}
 con_set=x=>{if(x!=ui_container)setmode(uimode);if(x!=ui_container&&prototype_is(ui_container))contraption_update(deck,ui_container);ui_container=x}
 con=_=>ui_container?ui_container:ifield(deck,'card')
 con_wids=_=>con().widgets
 con_image=_=>ifield(con(),'image')
 con_size=_=>getpair(ifield(con(),'size'))
 con_dim=_=>rpair(rect(),con_size())
-con_clip=_=>rclip(frame.clip,rcenter(frame.clip,con_size()))
+const FAT=8
+con_clip=_=>{const size=con_size();return dr.fatbits?rcenter(frame.clip,rmin(frame.size,rmul(size,FAT))): rclip(frame.clip,rcenter(frame.clip,size))}
 con_offset=_=>{const r=con_clip();return rect(r.x,r.y)}
-con_to_screen=x=>radd(x,con_offset())
-screen_to_con=x=>rsub(x,con_offset())
-ev_to_con=e=>{const o=con_offset();e.pos=rsub(e.pos,o);e.dpos=rsub(e.dpos,o);pointer.prev=rsub(pointer.prev,o);return e}
-con_to_ev=e=>{const o=con_offset();e.pos=radd(e.pos,o);e.dpos=radd(e.dpos,o);pointer.prev=radd(pointer.prev,o);return e}
+con_to_screen=a=>radd(dr.fatbits?rmul(rsub(a,dr.offset),FAT):a,con_offset())
+screen_to_con=a=>{a=rsub(a,con_offset());return dr.fatbits?radd(rdiv(a,FAT),dr.offset):a}
+con_view_dim=_=>{const a=screen_to_con(rect(0,0)),b=screen_to_con(frame.size);return rpair(a,rsub(b,a))}
+clamp_fatbits=_=>{dr.offset=rclamp(rect(0,0),dr.offset,rmax(rsub(con_size(),rdiv(frame.size,FAT)),rect(0,0)))}
+center_fatbits=p=>{dr.offset=rsub(p,rdiv(rdiv(frame.size,FAT),2)),clamp_fatbits()}
+ev_to_con=e=>{e.pos=screen_to_con(e.pos),e.dpos=screen_to_con(e.dpos),pointer.prev=screen_to_con(pointer.prev);return e}
+con_to_ev=e=>{e.pos=con_to_screen(e.pos),e.dpos=con_to_screen(e.dpos),pointer.prev=con_to_screen(pointer.prev);return e}
 tracking=_=>{
 	const c=con()
 	if(prototype_is(c)){
@@ -481,11 +484,6 @@ sint=(x,a)=>a*(0|((0|(x+a/2))/a))
 snap=p=>!dr.snap?p:rect(sint(p.x,dr.grid_size.x),sint(p.y,dr.grid_size.y),p.w,p.h) // position only
 snapr=r=>rpair(snap(r),snap(rect(r.w,r.h))) // position + dimensions
 snap_delta=p=>{const a=snap(p);return rect(a.x-p.x,a.y-p.y)}
-fat_offset=p=>{const d=rect(frame.size.x/FAT,frame.size.y/FAT);dr.offset=rint(rect(p.x-d.x/2,p.y-d.y/2))}
-fat_clip=_=>dr.fatbits?rint(rect(dr.offset.x,dr.offset.y,frame.size.x/FAT,frame.size.y/FAT)): frame.clip
-fat_to_card=a=>rint(rect((a.x/FAT)+dr.offset.x,(a.y/FAT)+dr.offset.y))
-card_to_fat=a=>dr.fatbits?rect((a.x-dr.offset.x)*FAT,(a.y-dr.offset.y)*FAT,a.w*FAT,a.h*FAT):a
-mark_dirty=_=>{dirty=1}
 
 let au={target:null,mode:'stopped', head:0,sel:rect(), hist:[],hist_cursor:0, clip:null,tick:null, record_stream:null,norecord:0} // audio editor state
 byte_to_sample=b=>(b<<24>>24)/128
@@ -970,7 +968,7 @@ field_keys=(code,shift)=>{
 widget_contraption=x=>{
 	const show=ls(ifield(x,'show'));if(show=='none')return
 	const b=rpair(getpair(ifield(x,'pos')),getpair(ifield(x,'size'))), image=ifield(x,'image'), s=image.size
-	const bc=rclip(con_clip(),b), oc=frame.clip;frame.clip=bc
+	const oc=frame.clip;frame.clip=b
 	if(show=='solid'){if(s.x<b.w||s.y<b.h)draw_rect(b,32);image_paste(b,frame.clip,image,frame.image,1)}
 	if(show=='transparent'){image_paste(b,frame.clip,image,frame.image,0)}
 	if(show=='invert'){draw_invert_scaled(deck.patterns.pal.pix,rect(b.x,b.y,s.x,s.y),image)}
@@ -2113,9 +2111,9 @@ bg_edit=_=>{
 	edit(edit_target({type:'bg_block',pos:d,before:image_copy(back,d),after}))
 }
 draw_limbo=(clip,scale)=>{
-	if(!dr.limbo){/*nothing*/}
-	else if(scale&&dr.limbo_dither){draw_rect      (card_to_fat(clip),21)}
-	else if(scale                 ){draw_fat_scaled(clip,dr.limbo,!dr.trans,deck.patterns.pal.pix,frame_count,FAT,dr.offset)}
+	clip=rnorm(clip);if(!dr.limbo){/*nothing*/}
+	else if(scale&&dr.limbo_dither){draw_rect      (clip,21)}
+	else if(scale                 ){draw_fat_scaled(screen_to_con(clip),dr.limbo,!dr.trans,deck.patterns.pal.pix,frame_count,FAT,con_to_screen(rect(0,0)))}
 	else if(       dr.limbo_dither){draw_dithered  (clip,dr.limbo,!dr.trans,dr.omask,dr.dither_threshold)}
 	else                           {draw_scaled    (clip,dr.limbo,!dr.trans)}
 }
@@ -2123,7 +2121,7 @@ bg_scaled_limbo=_=>{
 	const d=dr.sel_here, back=con_image()
 	const r=dr.trans||dr.omask?image_copy(back,d):image_make(rect(d.w,d.h)), s=r.size, t=frame;frame=draw_frame(r)
 	if(dr.trans){const c=dr.sel_start;draw_rect(rect(c.x-d.x,c.y-d.y,c.w,c.h),dr.fill)}
-	draw_limbo(con_clip(),0),frame=t;return r
+	draw_limbo(frame.clip,0),frame=t;return r
 }
 bg_edit_sel=_=>{
 	if(!dr.limbo)return
@@ -2145,25 +2143,26 @@ bg_draw_lasso=(r,o,show_ants,fill)=>{
 }
 bg_lasso_preview=_=>{
 	if(!bg_has_lasso())return
-	const pos=dr.fatbits?fat_to_card(ev.pos):ev.pos, dpos=dr.fatbits?fat_to_card(ev.dpos):ev.dpos
-	const d=rect(pos.x-dpos.x,pos.y-dpos.y), dh=rect(dr.sel_here.x+d.x,dr.sel_here.y+d.y,dr.sel_here.w,dr.sel_here.h)
-	const dd=rect(pos.x-dh.x,pos.y-dh.y), insel=dr.mask!=null&&rin(dh,pos)&&dr.mask.pix[dd.x+dd.y*dh.w], r=ev.drag&&insel?dh:dr.sel_here
+	const d=rsub(ev.pos,ev.dpos), dh=rect(dr.sel_here.x+d.x,dr.sel_here.y+d.y,dr.sel_here.w,dr.sel_here.h)
+	const dd=rsub(ev.pos,dh), insel=dr.mask!=null&&rin(dh,ev.pos)&&dr.mask.pix[dd.x+dd.y*dh.w], r=ev.drag&&insel?dh:dr.sel_here, origin=con_to_screen(rect(0,0))
 	if(!dr.fatbits){bg_draw_lasso(con_to_screen(r),con_to_screen(dr.sel_start),1,dr.fill);return}
+
+
 	const o=dr.sel_start, anim=deck.patterns.anim, pal=deck.patterns.pal.pix
 	const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][(0|(frame_count/4))%max(1,anim[pix-28].length)]
 	const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
 	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
 		if(!dr.omask.pix[b+a*o.w])continue
-		draw_rect(rmul(rect(b+o.x-dr.offset.x,a+o.y-dr.offset.y,1,1),FAT),dr.fill)
+		draw_rect(radd(rmul(rect(b+o.x,a+o.y,1,1),FAT),origin),dr.fill)
 	}
 	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
 		if(!dr.mask.pix[b+a*r.w])continue
 		const v=dr.limbo.pix[b+a*r.w],c=anim_pattern(v,r.x+b,r.y+a),pat=draw_pattern(c,r.x+b,r.y+a)
-		if(c||!dr.trans)draw_rect(rmul(rect(b+r.x-dr.offset.x,a+r.y-dr.offset.y,1,1),FAT),c>=32?c: c==0?c: pat?1:32)
+		if(c||!dr.trans)draw_rect(radd(rmul(rect(b+r.x,a+r.y,1,1),FAT),origin),c>=32?c: c==0?c: pat?1:32)
 	}
 	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
 		if((0xFF&dr.mask.pix[b+a*r.w])!=ANTS)continue
-		const p=rmul(rect(b+r.x-dr.offset.x,a+r.y-dr.offset.y),FAT)
+		const p=radd(rmul(rect(b+r.x,a+r.y),FAT),origin)
 		if(b<=    0||!dr.mask.pix[(b-1)+a*r.w])draw_vline(p.x      ,p.y,p.y+FAT-1,ANTS)
 		if(b>=r.w-1||!dr.mask.pix[(b+1)+a*r.w])draw_vline(p.x+FAT-1,p.y,p.y+FAT-1,ANTS)
 		if(a<=    0||!dr.mask.pix[b+(a-1)*r.w])draw_hline(p.x,p.x+FAT-1,p.y      ,ANTS)
@@ -2171,12 +2170,10 @@ bg_lasso_preview=_=>{
 	}
 }
 bg_tools=_=>{
-	if     (!dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=1,fat_offset(ev.pos);return}
+	if     (!dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=1,center_fatbits(ev.pos);return}
 	else if( dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=0;return}if(ev.alt)return
 	if(ev.md)pointer.prev=ev.pos
-	const pp=rcopy(pointer.prev), te=copy_object(ev)
-	if(!dover(con_dim()))ev.md=ev.mu=ev.drag=0
-	if(dr.fatbits){ev.pos=fat_to_card(ev.pos),ev.dpos=fat_to_card(ev.dpos),pointer.prev=fat_to_card(pointer.prev)}
+	if(!dover(con_view_dim()))ev.md=ev.mu=ev.drag=0
 	if(dr.tool=='pencil'||dr.tool=='line'||dr.tool=='rect'||dr.tool=='fillrect'||dr.tool=='ellipse'||dr.tool=='fillellipse'){
 		let clear=0;if(!dr.scratch)bg_scratch()
 		if(ev.md){bg_scratch(),dr.erasing=ev.rdown||ev.shift}
@@ -2211,7 +2208,7 @@ bg_tools=_=>{
 			frame=t;if(ev.mu)bg_edit(),clear=1
 		}
 		if(dr.scratch){
-			if(dr.fatbits){draw_fat(dr.scratch,deck.patterns.pal.pix,frame_count,BG_MASK,FAT,dr.offset)}
+			if(dr.fatbits){draw_fat(con_clip(),dr.scratch,deck.patterns.pal.pix,frame_count,BG_MASK,FAT,dr.offset)}
 			else{image_overlay(frame.image,dr.scratch,BG_MASK,con_offset());}
 		}
 		if(clear)bg_scratch_clear()
@@ -2249,8 +2246,8 @@ bg_tools=_=>{
 		}
 	}
 	if(dr.tool=='lasso'||dr.tool=='poly'){
-		const o=radd(rsub(dr.sel_here,dr.sel_start),con_offset())
-		draw_lines(dr.poly.map(p=>radd(o,card_to_fat(p))),dr.tool=='lasso'?0:dr.brush,dr.tool=='lasso'?ANTS:bg_pat())
+		const o=rsub(dr.sel_here,dr.sel_start);o.w=o.h=0
+		draw_lines(dr.poly.map(p=>radd(o,con_to_screen(p))),dr.tool=='lasso'?0:dr.brush,dr.tool=='lasso'?ANTS:bg_pat())
 	}
 	if(dr.tool=='fill'&&ev.mu){
 		const bg=container_image(con(),1), t=frame;bg_scratch(),frame=draw_frame(dr.scratch)
@@ -2262,12 +2259,9 @@ bg_tools=_=>{
 			if(ev.dir=='right')dr.offset.x+=ev.shift?dr.grid_size.x:1
 			if(ev.dir=='up'   )dr.offset.y-=ev.shift?dr.grid_size.y:1
 			if(ev.dir=='down' )dr.offset.y+=ev.shift?dr.grid_size.y:1
-			const c=con_size()
-			dr.offset=rint(rect(max(0,min(dr.offset.x,c.x-(c.x/8))),max(0,min(dr.offset.y,c.y-(c.y/8)))))
-			if(ev.exit)dr.fatbits=0
+			clamp_fatbits();if(ev.exit)dr.fatbits=0,ev.exit=0
 		}else{tracking()}
 	}
-	ev=te,pointer.prev=pp
 }
 bg_end_lasso=_=>{
 	if(uimode!='draw'||dr.tool!='lasso')return
@@ -2293,10 +2287,10 @@ bg_delete_selection=_=>{
 	dr.sel_here=rect(),dr.limbo=image_make(rect(1,1)),dr.limbo_dither=0,bg_edit_sel(),dr.sel_start=rcopy(ev.dpos),dr.sel_here=rcopy(ev.dpos)
 }
 bg_paste=image=>{
-	const clip=dr.fatbits?fat_clip():con_dim(), f=rect(clip.w*.75,clip.h*.75);let s=image.size
+	const clip=con_dim(), f=rect(clip.w*.75,clip.h*.75);let s=image.size
 	if(s.x>f.x||s.y>f.y){const scale=min(f.x/s.x,f.y/s.y);s=rect(s.x*scale,s.y*scale)}if(!s.x)return
 	if(bg_has_sel()){bg_scoop_selection(),dr.limbo=image,dr.limbo_dither=0}
-	else{settool('select'),dr.sel_start=rect(),dr.sel_here=rcenter(clip,s),dr.limbo=image,dr.limbo_dither=0}
+	else{settool('select'),dr.sel_start=rect(),dr.sel_here=rcenter(con_view_dim(),s),dr.limbo=image,dr.limbo_dither=0}
 }
 draw_handles=r=>{
 	const h=5, pal=deck.patterns.pal.pix
@@ -2323,8 +2317,6 @@ in_handle=r=>{
 }
 bg_select=_=>{
 	if(uimode!='draw'||dr.tool!='select')return rect(0,0,0,0)
-	const te=copy_object(ev)
-	if(dr.fatbits){ev.pos=fat_to_card(ev.pos),ev.dpos=fat_to_card(ev.dpos),pointer.prev=fat_to_card(pointer.prev)}
 	let s=rcopy(dr.sel_here), has_sel=s.w>0||s.h>0, in_sel=has_sel&&dover(s)
 	const ax=min(ev.dpos.x,ev.pos.x), bx=max(ev.dpos.x,ev.pos.x), ay=min(ev.dpos.y,ev.pos.y), by=max(ev.dpos.y,ev.pos.y), h=5
 	const x0=s.x+1-h, x2=s.x+s.w-1, y0=s.y+1-h, y2=s.y+s.h-1, x1=0|((x2-x0)/2+x0), y1=0|((y2-y0)/2+y0), dx=ev.pos.x-ev.dpos.x, dy=ev.pos.y-ev.dpos.y
@@ -2344,7 +2336,7 @@ bg_select=_=>{
 		else if(handle(x1,y2,  0, 0,  0, dy)){} // s
 		else if(ev.md&&in_sel){bg_scoop_selection()} // begin move
 		else if((ev.mu||ev.drag)&&in_sel){s.x+=dx, s.y+=dy;if(ev.mu)dr.sel_here=snap(s)} // move/finish
-		else if(ev.md&&!in_sel){if(has_sel){draw_limbo(con_to_screen(card_to_fat(s)),dr.fatbits),bg_end_selection(),has_sel=0}s=rcopy(dr.sel_here)} // begin create
+		else if(ev.md&&!in_sel){if(has_sel){draw_limbo(con_to_screen(s),dr.fatbits),bg_end_selection(),has_sel=0}s=rcopy(dr.sel_here)} // begin create
 		else if(ev.mu||ev.drag){s=snapr(rect(ax,ay,bx-ax,by-ay));if(ev.mu)dr.sel_here=s} // size/finish
 	}
 	if(has_sel)draw_limbo(con_to_screen(s),dr.fatbits)
@@ -2357,7 +2349,7 @@ bg_select=_=>{
 		if(nudge&&ev.shift)dr.sel_here=snap(dr.sel_here)
 		if(ev.exit){dr.limbo=null,dr.limbo_dither=0,bg_end_selection()}
 	}
-	ev=te;return card_to_fat(s)
+	return s
 }
 bg_tighten=_=>{
 	const r=dr.sel_here
@@ -2920,7 +2912,7 @@ all_menus=_=>{
 		if(menu_check('Transparency Mask',1,dr.trans_mask))dr.trans_mask^=1
 		if(menu_check('Fat Bits'         ,1,dr.fatbits   )){
 			if(uimode!='draw')setmode('draw')
-			dr.fatbits^=1;if(dr.fatbits)fat_offset(rcenter(bg_has_sel()||bg_has_lasso()?dr.sel_here:con_dim(),rect()))
+			dr.fatbits^=1;if(dr.fatbits)center_fatbits(rcenter(bg_has_sel()||bg_has_lasso()?dr.sel_here:con_dim(),rect()))
 		}
 	}
 	if(uimode=='draw'){
@@ -2968,36 +2960,36 @@ all_menus=_=>{
 }
 
 main_view=_=>{
-	if(ob.sel.length==0&&in_layer()&&(!card_is(con())||uimode=='object'))tracking()
+	if(in_layer()&&uimode=='object'&&ob.sel.length==0)tracking()
 	const back=con_image(), wids=con_wids(), pal=deck.patterns.pal.pix
 	if(ms.type!='trans'){
 		const cl=con_clip(),s=con_size()
 		if(back.size.x!=s.x||back.size.y!=s.y)image_resize(back,s),mark_dirty()
-		if(dr.fatbits){draw_fat(back,pal,frame_count,0,FAT,dr.offset)}
+		if(dr.fatbits){frame.image.pix.fill(46),draw_rect(cl,dr.trans_mask?45:32),draw_fat(cl,back,pal,frame_count,0,FAT,dr.offset)}
 		else if(s.x==frame.size.x&&s.y==frame.size.y){image_paste(rpair(rect(),back.size),frame.clip,back,frame.image,1)}
 		else{frame.image.pix.fill(46),draw_rect(cl,dr.trans_mask?45:32),image_paste(cl,frame.clip,back,frame.image,0)}
 	}
 	ev=ev_to_con(ev)
 	if(uimode=='draw'&&in_layer())bg_tools()
-	if(dr.tool=='select'&&(dr.sel_start.w>0||dr.sel_start.h>0))draw_rect(con_to_screen(card_to_fat(dr.sel_start)),dr.fill)
+	if(dr.tool=='select'&&(dr.sel_start.w>0||dr.sel_start.h>0))draw_rect(con_to_screen(dr.sel_start),dr.fill)
 	bg_lasso_preview()
 	const livesel=bg_select()
 	ev=con_to_ev(ev)
 	if(((uimode=='object'||uimode=='draw')&&dr.show_grid)||ms.type=='grid'){
-		const c=con_clip()
-		for(let x=dr.grid_size.x;x<c.w;x+=dr.grid_size.x){const r=card_to_fat(rect(c.x+x,c.y,1,c.h));draw_vline(r.x,r.y,r.y+r.h,44)}
-		for(let y=dr.grid_size.y;y<c.h;y+=dr.grid_size.y){const r=card_to_fat(rect(c.x,c.y+y,c.w,1));draw_hline(r.x,r.x+r.w,r.y,44)}
+		const c=con_dim()
+		for(let x=dr.grid_size.x;x<c.w;x+=dr.grid_size.x){const r=con_to_screen(rect(c.x+x,c.y,1,c.h));draw_vline(r.x,r.y,r.y+r.h,44)}
+		for(let y=dr.grid_size.y;y<c.h;y+=dr.grid_size.y){const r=con_to_screen(rect(c.x,c.y+y,c.w,1));draw_hline(r.x,r.x+r.w,r.y,44)}
 	}
 	const eb=ev;if(uimode!='interact')ev=event_state()
 	if(uimode=='interact'||(dr.show_widgets&&!dr.fatbits)){handle_widgets(wids,con_offset())}
-	else if(dr.show_widgets&&dr.fatbits)wids.v.map(w=>{draw_boxinv(pal,card_to_fat(unpack_widget(w).size))})
+	else if(dr.show_widgets&&dr.fatbits)wids.v.map(w=>{draw_boxinv(pal,con_to_screen(unpack_widget(w).size))})
 	ev=eb
 	if(uimode=='draw'){if(bg_has_sel())draw_handles(con_to_screen(livesel));draw_box(con_to_screen(livesel),0,ANTS)}
 	if(wid.pending_grid_edit){wid.pending_grid_edit=0;modal_enter('gridcell')}
 	if(uimode=='object')ev=ev_to_con(ev),object_editor(),ev=con_to_ev(ev)
 	if((uimode=='object'&&ob.show_names)||(uimode=='draw'&&dr.show_widgets&&dr.fatbits)||ms.type=='listen'){
 		wids.v.map(wid=>{
-			const size=con_to_screen(card_to_fat(unpack_widget(wid).size))
+			const size=con_to_screen(unpack_widget(wid).size)
 			const n=ls(ifield(wid,'name')),s=font_textsize(FONT_BODY,n)
 			draw_text_outlined(rect(size.x,size.y-s.y,s.x,s.y),n,FONT_BODY)
 		})
@@ -3005,22 +2997,22 @@ main_view=_=>{
 	if(ob.show_cursor&&ms.type==null&&uimode in {draw:1,object:1}){
 		ev=ev_to_con(ev);
 		if(uimode=='draw'&&bg_has_sel()){
-			let r=livesel,l=r;if(dr.fatbits){const p=fat_to_card(r);l=rint(rect(p.x,p.y,r.w/FAT,r.h/FAT))}
+			let r=livesel,l=r
 			const t=ls(dyad.format(lms('(%3i,%3i,%3i,%3i)'),lml([l.x,l.y,l.w,l.h].map(lmn)))),s=font_textsize(FONT_BODY,t)
-			draw_text_outlined(con_to_screen(rect(r.x,r.y-s.y,s.x,s.y)),t,FONT_BODY)
+			draw_text_outlined(rsub(con_to_screen(rect(r.x,r.y,s.x,s.y)),rect(0,s.y)),t,FONT_BODY)
 		}
 		else if(ev.drag){
-			const a=dr.fatbits?fat_to_card(ev.dpos):ev.dpos, b=dr.fatbits?fat_to_card(ev.pos):ev.pos, r=rect(b.x,b.y,b.x-a.x,b.y-a.y)
+			const a=ev.dpos,b=ev.pos,r=rpair(b,rsub(b,a))
 			const t=ls(dyad.format(lms('(%3i,%3i,%3i,%3i)'),lml([r.x,r.y,r.w,r.h].map(lmn)))),s=font_textsize(FONT_BODY,t)
-			draw_text_outlined(con_to_screen(rect(ev.pos.x,ev.pos.y-s.y,s.x,s.y)),t,FONT_BODY)
+			draw_text_outlined(rsub(con_to_screen(rpair(ev.pos,s)),rect(0,s.y)),t,FONT_BODY)
 		}
 		else{
-			const c=dr.fatbits?fat_to_card(ev.pos):ev.pos
+			const c=ev.pos
 			const t=ls(dyad.format(lms('(%3i,%3i)'),lml([c.x,c.y].map(lmn)))),s=font_textsize(FONT_BODY,t)
-			draw_text_outlined(con_to_screen(rect(ev.pos.x,ev.pos.y-s.y,s.x,s.y)),t,FONT_BODY)
+			draw_text_outlined(rsub(con_to_screen(rpair(ev.pos,s)),rect(0,s.y)),t,FONT_BODY)
 		}ev=con_to_ev(ev);
 	}
-	if(in_layer()&&ev.exit&&!card_is(con()))con_set(null),ev.exit=0
+	if(in_layer()&&ev.exit&&!dr.fatbits&&!card_is(con()))con_set(null),ev.exit=0
 }
 gestures=_=>{
 	if(!enable_gestures||!card_is(con()))return
