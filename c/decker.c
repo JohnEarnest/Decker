@@ -10,7 +10,7 @@ void quit();
 
 // Assets
 
-lv*CHECK,*LOCK,*ZOOM,*CHECKS[4],*CORNERS[4],*RADIOS[4],*ICONS[8],*GESTURES[4];
+lv*CHECK,*LOCK,*ZOOM,*CHECKS[4],*CORNERS[4],*RADIOS[4],*ICONS[8],*GESTURES[4],*HANDLES[2];
 lv*FONT_BODY,*FONT_MENU,*FONT_MONO,*TOOLS,*ARROWS,*TOOLB,*PLAYING,*ATTRS;
 enum mini_icons {icon_dir,icon_doc,icon_sound,icon_font,icon_app,icon_lil,icon_pat,icon_chek,icon_none};
 enum cursor_styles {cursor_default,cursor_point,cursor_ibeam,cursor_drag};
@@ -82,9 +82,9 @@ typedef struct {
 enum dirs{dir_none,dir_left,dir_right,dir_up,dir_down};
 typedef struct {
 	int mu,md, clicktime;
-	int click, rdown, rup; pair pos, rawpos;
+	int click, rdown, rup; pair pos, rawpos, opos;
 	int dclick, clicklast;
-	int drag;  pair dpos, rawdpos;
+	int drag;  pair dpos, rawdpos, odpos;
 	int tab, shift, alt, action, dir, exit, eval;
 	int shortcuts[256];
 	int scroll; int hidemenu;
@@ -147,14 +147,14 @@ void center_fatbits(pair p){
 	dr.offset=(pair){p.x-v.x/2,p.y-v.y/2};clamp_fatbits();
 }
 event_state ev_to_con(event_state e){
-	e.pos =screen_to_con(e.pos);
-	e.dpos=screen_to_con(e.dpos);
+	e.pos =screen_to_con(e.opos =e.pos);
+	e.dpos=screen_to_con(e.odpos=e.dpos);
 	pointer_prev=screen_to_con(pointer_prev);
 	return e;
 }
 event_state con_to_ev(event_state e){
-	e.pos =con_to_screen(e.pos);
-	e.dpos=con_to_screen(e.dpos);
+	e.pos =e.opos;
+	e.dpos=e.odpos;
 	pointer_prev=con_to_screen(pointer_prev);
 	return e;
 }
@@ -224,7 +224,7 @@ enum modal_type{
 	modal_brush,modal_pattern,modal_fill,
 	modal_deck_props,modal_card_props,modal_button_props,modal_field_props,modal_slider_props,modal_canvas_props,modal_grid_props,modal_contraption_props,
 	modal_cards,modal_sounds,modal_recording,modal_fonts,modal_contraptions,modal_resources,
-	modal_action,modal_pick_card,modal_pick_contraption,modal_trans,modal_grid,modal_prototype_props,modal_prototype_attrs,
+	modal_action,modal_pick_card,modal_pick_contraption,modal_trans,modal_grid,modal_prototype_props,modal_prototype_attrs,modal_prototype_size,
 };
 typedef struct {
 	int type, subtype, filter, in_modal, edit_json;
@@ -794,15 +794,32 @@ void handle_widgets(lv*x,pair offset){
 		if(contraption_is(w))widget_contraption(w);
 	}
 }
+void draw_wrapped(rect r,rect sr,lv*dst,lv*src,rect clip,int opaque,char*pal){
+	pair ss=buff_size(src),ds=buff_size(dst);r=box_intersect(r,clip);if(r.w==0||r.h==0||sr.w==0||sr.h==0)return;
+	if(!pal){for(int y=0;y<r.h;y++)for(int x=0;x<r.w;x++){int c=src->sv[(sr.x+(x%sr.w))+(sr.y+(y%sr.h))*ss.x];if(opaque||c)dst->sv[(r.x+x)+(r.y+y)*ds.x]=c;}return;}
+	for(int y=0;y<r.h;y++)for(int x=0;x<r.w;x++){
+		int dx=r.x+x,dy=r.y+y, c=draw_pattern(pal,src->sv[(sr.x+(x%sr.w))+(sr.y+(y%sr.h))*ss.x],dx,dy), di=(r.x+x)+(r.y+y)*ds.x;
+		dst->sv[di]=c^draw_pattern(pal,dst->sv[di],dx,dy);
+	}
+}
+void draw_9seg(rect r,lv*dst,lv*src,rect m,rect clip,int opaque,char*inv){
+	pair o={r.x,r.y}, s=buff_size(src);
+	draw_wrapped(rect_add((rect){0      ,0      ,m.x          ,m.y          },o),(rect){0      ,0      ,m.x          ,m.y          },dst,src,clip,opaque,inv); // NW
+	draw_wrapped(rect_add((rect){0      ,r.h-m.h,m.x          ,m.h          },o),(rect){0      ,s.y-m.h,m.x          ,m.h          },dst,src,clip,opaque,inv); // SW
+	draw_wrapped(rect_add((rect){r.w-m.w,0      ,m.w          ,m.y          },o),(rect){s.x-m.w,0      ,m.w          ,m.y          },dst,src,clip,opaque,inv); // NE
+	draw_wrapped(rect_add((rect){r.w-m.w,r.h-m.h,m.w          ,m.h          },o),(rect){s.x-m.w,s.y-m.h,m.w          ,m.h          },dst,src,clip,opaque,inv); // SE
+	draw_wrapped(rect_add((rect){0      ,m.y    ,m.x          ,r.h-(m.y+m.h)},o),(rect){0      ,m.y    ,m.x          ,s.y-(m.y+m.h)},dst,src,clip,opaque,inv); // W
+	draw_wrapped(rect_add((rect){m.x    ,0      ,r.w-(m.x+m.w),m.y          },o),(rect){m.x    ,0      ,s.x-(m.x+m.w),m.y          },dst,src,clip,opaque,inv); // N
+	draw_wrapped(rect_add((rect){r.w-m.w,m.y    ,m.w          ,r.h-(m.y+m.h)},o),(rect){s.x-m.w,m.y    ,m.w          ,s.y-(m.y+m.h)},dst,src,clip,opaque,inv); // E
+	draw_wrapped(rect_add((rect){m.x    ,r.h-m.h,r.w-(m.x+m.w),m.h          },o),(rect){m.x    ,s.y-m.h,s.x-(m.x+m.w),m.h          },dst,src,clip,opaque,inv); // S
+	draw_wrapped(rect_add((rect){m.x    ,m.y    ,r.w-(m.x+m.w),r.h-(m.y+m.h)},o),(rect){m.x    ,m.y    ,s.x-(m.x+m.w),s.y-(m.y+m.h)},dst,src,clip,opaque,inv); // C
+}
 void widget_contraption(lv*x){
 	int show=ordinal_enum(ifield(x,"show"),widget_shows);if(show==show_none)return;
-	rect b=rect_pair(getpair(ifield(x,"pos")),getpair(ifield(x,"size")));lv* image=ifield(x,"image");pair s=image_size(image);
-	rect oc=frame.clip;frame.clip=b;
-	if(show==show_solid){if(s.x<b.w||s.y<b.h)draw_rect(b,32);buffer_paste(b,frame.clip,image->b,frame.buffer,1);}
-	if(show==show_transparent){buffer_paste(b,frame.clip,image->b,frame.buffer,0);}
-	if(show==show_invert){char*pal=patterns_pal(ifield(deck,"patterns"));draw_invert_scaled(pal,(rect){b.x,b.y,s.x,s.y},image->b);}
-	handle_widgets(ivalue(x,"widgets"),(pair){b.x,b.y});
-	frame.clip=oc;
+	rect b=rect_pair(getpair(ifield(x,"pos")),getpair(ifield(x,"size")));lv*image=ifield(x,"image");
+	rect oc=frame.clip;frame.clip=box_intersect(frame.clip,b);char*pal=patterns_pal(ifield(deck,"patterns"));
+	draw_9seg(b,frame.buffer,image->b,getrect(ifield(ifield(x,"def"),"margin")),frame.clip,show==show_solid,show==show_invert?pal:NULL);
+	handle_widgets(ivalue(x,"widgets"),(pair){b.x,b.y});frame.clip=oc;
 }
 
 int  ui_button  (rect r,char*label,int enable          ){return widget_button(NULL,(button){label,r,FONT_MENU,button_round,show_solid,!enable},0);}
@@ -1136,7 +1153,6 @@ void modal_enter(int type){
 	if(type==modal_prototype_props){
 		lv*c=con();
 		ms.name =(field_val){rtext_cast(ifield(c,"name")),0};
-		ms.text =(field_val){rtext_cast(l_fuse(lmistr(","),ifield(c,"size"))),0};
 		ms.form0=(field_val){rtext_cast(ifield(c,"description")),0};
 		ms.form1=(field_val){rtext_cast(ifield(c,"template")),0};
 	}
@@ -1178,7 +1194,7 @@ void modal_enter(int type){
 	if(type==modal_open||type==modal_save){ms.grid=(grid_val){directory_enumerate(ms.path,ms.filter,0),0,0};}
 	if(type==modal_save||type==modal_input){ms.text=(field_val){rtext_cast(lmistr("")),0};}
 }
-void bg_paste(lv*b); // forward ref
+void bg_paste(lv*b);void proto_prop(lv*target,char*key,lv*value);void proto_size(lv*target,pair size,rect margin); // forward refs
 lv* readimage(char*path,int grayscale){
 	SDL_Surface*b=IMG_Load(path);if(b==NULL)return image_empty();lv*i=lmbuff((pair){b->w,b->h});
 	SDL_Surface*c=SDL_ConvertSurface(b,SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888),0);
@@ -1265,10 +1281,6 @@ void modal_exit(int value){
 			if(t==attr_rich  )v=attrs[z].value.table;
 			iwrite(w,a->lv[0]->lv[z],v);
 		}attrs_count=0;
-	}
-	if(ms.type==modal_prototype_props){
-		pair s=pair_max((pair){0,0},getpair(l_parse(lmistr("%i%*-.10r0123456789%i"),rtext_all(ms.text.table))));
-		iwrite(con(),lmistr("size"),lmpair(s)),mark_dirty();
 	}
 	if(ms.type==modal_action&&value){
 		str r=str_new();str_addz(&r,"on click do\n");
@@ -1881,13 +1893,11 @@ void modals(){
 		rect b=draw_modalbox((pair){220,220});lv*def=con();int lw=67;
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Prototype Properties",FONT_MENU,1);
 		draw_text((rect){b.x,b.y+ 22,lw,20},"Name",FONT_MENU,1);
-		draw_text((rect){b.x,b.y+ 42,lw,20},"Size",FONT_MENU,1);
-		draw_text((rect){b.x,b.y+ 62,lw,20},"Description",FONT_MENU,1);
-		draw_text((rect){b.x,b.y+122,lw,20},"Template",FONT_MENU,1);
+		draw_text((rect){b.x,b.y+ 42,lw,20},"Description",FONT_MENU,1);
+		draw_text((rect){b.x,b.y+102,lw,20},"Template\nScript",FONT_MENU,1);
 		ui_field   ((rect){b.x+lw,b.y+20 ,b.w-lw,18},&ms.name);
-		ui_field   ((rect){b.x+lw,b.y+40 ,b.w-lw,18},&ms.text);
-		ui_textedit((rect){b.x+lw,b.y+60 ,b.w-lw,58},1,&ms.form0);
-		ui_codeedit((rect){b.x+lw,b.y+120,b.w-lw,58},1,&ms.form1);
+		ui_textedit((rect){b.x+lw,b.y+40 ,b.w-lw,58},1,&ms.form0);
+		ui_codeedit((rect){b.x+lw,b.y+100,b.w-lw,78},1,&ms.form1);
 		iwrite(def,lmistr("name"       ),rtext_all(ms.name .table));
 		iwrite(def,lmistr("description"),rtext_all(ms.form0.table));
 		iwrite(def,lmistr("template"   ),rtext_all(ms.form1.table));mark_dirty();
@@ -1931,6 +1941,45 @@ void modals(){
 			ms.grid.row=-1,ms.name.table=NULL,ms.text.table=NULL;
 		}
 		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit){iwrite(def,lmistr("attributes"),ms.grid.table),mark_dirty(),modal_exit(1);}
+	}
+	else if(ms.type==modal_prototype_size){
+		lv*def=con();if(!prototype_is(def)){modal_exit(0);ms.in_modal=0;return;}
+		rect m=getrect(ifield(def,"margin")),om=m,drag={0,0,0,0};pair s=getpair(ifield(def,"size"));
+		pair delta=pair_sub(screen_to_con(ev.pos),screen_to_con(ev.dpos));int resize=0;
+		rect view=con_clip();if(view.x!=0&&view.y!=0&&view.w!=frame.size.x&&view.h!=frame.size.y){
+			// resize handle
+			char l[4096]={0};rect sh=rect_pair(pair_add(con_to_screen(s),(pair){1,1}),(pair){8,8});
+			if((ev.drag||ev.mu)&&dover(sh)&&(delta.x!=0||delta.y!=0)){
+				s=pair_max((pair){1,1},pair_add(s,delta)),sh=rect_pair(pair_add(con_to_screen(s),(pair){1,1}),(pair){8,8});
+				draw_box(con_to_screenr(rect_pair((pair){0,0},s)),0,ANTS);if(ev.mu)resize=1;
+			}
+			draw_rect(sh,32),draw_box(sh,0,1);if(over(sh))uicursor=cursor_drag;
+			snprintf(l,sizeof(l),"%d x %d",s.x,s.y),draw_text((rect){sh.x+10,sh.y+10,100,20},l,FONT_MONO,1);
+			// margin handles
+			#define h_margin(i,v,o)     rect h=rect_pair(pair_sub(con_to_screen(v),o),image_size(i))
+			#define m_margin(i,v,o,a,d) {h_margin(i,v,o);if((ev.drag||ev.mu)&&dover(h))m.d+=a,drag.d=1;}
+			#define i_margin(h,i)       {buffer_paste(h,frame.clip,i->b,frame.buffer,0);if(over(h))uicursor=cursor_drag;}
+			#define l_label(h,v)        {snprintf(l,sizeof(l),"%d",v);pair t=font_textsize(FONT_MONO,l);draw_text((rect){h.x-2-t.x    ,h.y-3  ,60,20},l,FONT_MONO,1);}
+			#define t_label(h,v)        {snprintf(l,sizeof(l),"%d",v);pair t=font_textsize(FONT_MONO,l);draw_text((rect){h.x+3-(t.x/2),h.y-t.y,60,20},l,FONT_MONO,1);}
+			#define l_margin(i,v,o,d)   {h_margin(i,v,o);if(drag.d)l_label(h,m.d);i_margin(h,i)}
+			#define t_margin(i,v,o,d)   {h_margin(i,v,o);if(drag.d)t_label(h,m.d);i_margin(h,i)}
+			m_margin(HANDLES[0],((pair){m.x    ,0      }),((pair){3,11}), delta.x,x);
+			m_margin(HANDLES[1],((pair){0      ,m.y    }),((pair){11,3}), delta.y,y);
+			m_margin(HANDLES[0],((pair){s.x-m.w,0      }),((pair){3,11}),-delta.x,w);if(drag.x&&drag.w)m.w+=delta.x,drag.w=0;
+			m_margin(HANDLES[1],((pair){0      ,s.y-m.h}),((pair){11,3}),-delta.y,h);if(drag.y&&drag.h)m.h+=delta.y,drag.h=0;
+			m=getrect(normalize_margin(lmrect(m),def));
+			t_margin(HANDLES[0],((pair){m.x    ,0      }),((pair){3,11}),x);
+			l_margin(HANDLES[1],((pair){0      ,m.y    }),((pair){11,3}),y);
+			t_margin(HANDLES[0],((pair){s.x-m.w,0      }),((pair){3,11}),w);
+			l_margin(HANDLES[1],((pair){0      ,s.y-m.h}),((pair){11,3}),h);
+		}
+		rect m0=con_to_screenr((rect){m.x,0,1,s.y    });draw_vline(m0.x,m0.y,m0.y+m0.h,ANTS);
+		rect m1=con_to_screenr((rect){0,m.y,s.x,1    });draw_hline(m1.x,m1.x+m1.w,m1.y,ANTS);
+		rect m2=con_to_screenr((rect){s.x-m.w,0,1,s.y});draw_vline(m2.x,m2.y,m2.y+m2.h,ANTS);
+		rect m3=con_to_screenr((rect){0,s.y-m.h,s.x,1});draw_hline(m3.x,m3.x+m3.w,m3.y,ANTS);
+		if(resize)proto_size(def,s,m);
+		else if(ev.mu&&(m.x!=om.x||m.y!=om.y||m.w!=om.w||m.h!=om.h))proto_prop(def,"margin",lmrect(m));
+		if(ev.exit||ev.action)modal_exit(0);
 	}
 	else if(ms.type==modal_action){
 		rect b=draw_modalbox((pair){220,180});
@@ -2105,7 +2154,7 @@ void script_editor(){
 
 // General Purpose History
 
-enum edit_types{edit_bg_block,edit_ob_props,edit_ob_create,edit_ob_destroy};
+enum edit_types{edit_bg_block,edit_ob_props,edit_ob_create,edit_ob_destroy,edit_proto_props};
 void edit_target(lv*r){
 	lv*c=con();
 	if(card_is     (c))dset(r,lmistr("card"),ifield(c,"index"));
@@ -2158,6 +2207,11 @@ void apply(int fwd,lv*x){
 				iwrite(w->lv[z],lmistr("pos"),lmpair((pair){c.x,c.y}));
 			}
 		}
+	}
+	else if(t==edit_proto_props){
+		if(ms.type!=modal_prototype_size)modal_enter(modal_prototype_size);
+		lv*k=dget(x,lmistr("keys")),*v=dget(x,lmistr(fwd?"after":"before"));
+		EACH(z,k)iwrite(container,k->lv[z],v->lv[z]);
 	}
 	mark_dirty();
 }
@@ -2601,6 +2655,25 @@ void ob_resize(rect size,int coalesce){
 		edit(r);
 	}
 }
+void proto_prop(lv*target,char*key,lv*value){
+	lv*r=lmd();
+	dset(r,lmistr("type"  ),lmn(edit_proto_props));
+	dset(r,lmistr("keys"  ),l_list(lmcstr(key)));
+	dset(r,lmistr("before"),l_list(ifield(target,key)));
+	dset(r,lmistr("after" ),l_list(value));
+	edit_target(r);
+	edit(r);
+}
+void proto_size(lv*target,pair size,rect margin){
+	lv*r=lmd(),*o=image_resize(ifield(target,"image"),getpair(ifield(target,"size"))),*n=image_make(lmbuff(size));
+	rect c=rect_pair((pair){0,0},size);draw_9seg(c,n->b,o->b,getrect(ifield(target,"margin")),c,1,NULL);
+	dset(r,lmistr("type"  ),lmn(edit_proto_props));
+	dset(r,lmistr("keys"  ),lml3(lmistr("size"),lmistr("image"),lmistr("margin")));
+	dset(r,lmistr("before"),lml3(ifield(target,"size"),image_clone(o),ifield(target,"margin")));
+	dset(r,lmistr("after" ),lml3(lmpair(size),n,lmrect(margin)));
+	edit_target(r);
+	edit(r);
+}
 void object_properties(lv*x){
 	ob.sel->c=0;ll_add(ob.sel,x);
 	if(button_is     (x))modal_enter(modal_button_props     );
@@ -2616,7 +2689,7 @@ void object_editor(){
 		lv*wid=wids->lv[z];widget w=unpack_widget(wid);w.size=con_to_screenr(w.size);
 		int sel=0;EACH(z,ob.sel)if(ob.sel->lv[z]==wid){sel=1;break;}
 		if(sel){draw_box(inset(w.size,-1),0,ANTS);}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1));}
-		if(sel&&ob.sel->c==1&&!contraption_is(ob.sel->lv[0])){draw_handles(w.size);}
+		if(sel&&ob.sel->c==1&&(contraption_is(ob.sel->lv[0])?lb(ifield(ifield(ob.sel->lv[0],"def"),"resizable")):1)){draw_handles(w.size);}
 		if(w.locked&&ob.show_bounds){draw_rect((rect){w.size.x+w.size.w-10,w.size.y,10,10},1),draw_icon((pair){w.size.x+w.size.w-8,w.size.y+1},LOCK,32);}
 	}
 	if(!in_layer())return;
@@ -3259,6 +3332,11 @@ void all_menus(){
 			}
 		}
 	}
+	if(ms.type==modal_prototype_size){
+		menu_bar("Edit",1);
+		if(menu_item("Undo",has_undo(),'z'))undo();
+		if(menu_item("Redo",has_redo(),'Z'))redo();
+	}
 	if(ms.type==modal_recording&&!wid.fv){
 		menu_bar("Edit",au.mode==record_stopped);
 		if(menu_item("Undo",au.hist_cursor>0         ,'z'))sound_undo();
@@ -3292,15 +3370,23 @@ void all_menus(){
 		if(menu_item("Properties...",1,'\0'))modal_enter(modal_card_props);
 	}
 	if((uimode==mode_interact||uimode==mode_draw||uimode==mode_object)&&prototype_is(con())){
-		menu_bar("Prototype",ms.type==modal_none);
+		menu_bar("Prototype",ms.type==modal_none||ms.type==modal_prototype_size);
 		lv*def=con(),*defs=ifield(deck,"contraptions");
-		if(menu_item("Close",1,'\0'))con_set(NULL);
-		if(menu_item("Go to Previous",defs->c>1,'\0')){ev.dir=dir_left ;tracking();ev.dir=dir_none;}
-		if(menu_item("Go to Next"    ,defs->c>1,'\0')){ev.dir=dir_right;tracking();ev.dir=dir_none;}
+		if(ms.type==modal_none){
+			if(menu_item("Close",1,'\0'))con_set(NULL);
+			if(menu_item("Go to Previous",defs->c>1,'\0')){ev.dir=dir_left ;tracking();ev.dir=dir_none;}
+			if(menu_item("Go to Next"    ,defs->c>1,'\0')){ev.dir=dir_right;tracking();ev.dir=dir_none;}
+			menu_separator();
+			if(menu_item("Script..."    ,1,'e'))setscript(def);
+			if(menu_item("Properties...",1,'\0'))modal_enter(modal_prototype_props);
+			if(menu_item("Attributes...",1,'\0'))modal_enter(modal_prototype_attrs);
+			if(menu_item("Size..."      ,1,'\0'))modal_enter(modal_prototype_size);
+		}else{
+			if(menu_item("Confirm Size",1,'\0'))modal_exit(0);
+		}
 		menu_separator();
-		if(menu_item("Script..."    ,1,'e'))setscript(def);
-		if(menu_item("Properties...",1,'\0'))modal_enter(modal_prototype_props);
-		if(menu_item("Attributes...",1,'\0'))modal_enter(modal_prototype_attrs);
+		int r=lb(ifield(def,"resizable"));
+		if(menu_check("Resizable",1,r,'\0')){r^=1,iwrite(def,lmistr("resizable"),lmn(r)),mark_dirty();}
 	}
 	if(uimode==mode_interact||uimode==mode_draw||uimode==mode_object){
 		menu_bar("Tool",ms.type==modal_none);
@@ -3319,20 +3405,21 @@ void all_menus(){
 		if(menu_check("Polygon"    ,1,uimode==mode_draw&&dr.tool==tool_poly       ,0))settool(tool_poly       );
 	}
 	if(uimode==mode_draw||uimode==mode_object){
-		menu_bar("View",ms.type==modal_none);
+		menu_bar("View",ms.type==modal_none||ms.type==modal_prototype_size);
+		int n=ms.type==modal_none;
 		if(menu_check("Show Widgets"      ,1,dr.show_widgets,'\0'))dr.show_widgets^=1;
 		if(menu_check("Show Widget Bounds",1,ob.show_bounds ,'\0'))ob.show_bounds ^=1;
 		if(menu_check("Show Widget Names" ,1,ob.show_names  ,'\0'))ob.show_names  ^=1;
-		if(menu_check("Show Cursor Info"  ,1,ob.show_cursor ,'\0'))ob.show_cursor ^=1;
+		if(menu_check("Show Cursor Info"  ,n,ob.show_cursor ,'\0'))ob.show_cursor ^=1;
 		menu_separator();
-		if(menu_check("Show Grid Overlay",1,dr.show_grid,0  ))dr.show_grid^=1;
-		if(menu_check("Snap to Grid"     ,1,dr.snap     ,'p'))dr.snap     ^=1;
-		if(menu_item("Grid Size...",1,'\0'))modal_enter(modal_grid);
+		if(menu_check("Show Grid Overlay",n,dr.show_grid,0  ))dr.show_grid^=1;
+		if(menu_check("Snap to Grid"     ,n,dr.snap     ,'p'))dr.snap     ^=1;
+		if(menu_item("Grid Size...",n,'\0'))modal_enter(modal_grid);
 		menu_separator();
 		if(menu_check("Show Animation"   ,1,dr.show_anim   ,0))dr.show_anim   ^=1;
 		if(menu_check("Transparency Mask",1,dr.trans_mask  ,0))dr.trans_mask  ^=1;
 		if(menu_check("Fat Bits"         ,1,dr.fatbits     ,0)){
-			if(uimode!=mode_draw)setmode(mode_draw);
+			if(ms.type==modal_none&&uimode!=mode_draw)setmode(mode_draw);
 			dr.fatbits^=1;if(dr.fatbits){center_fatbits(box_midpoint(bg_has_sel()||bg_has_lasso()?dr.sel_here:con_dim()));}
 		}
 	}
@@ -3599,6 +3686,8 @@ int main(int argc,char**argv){
 	dset(env,lmistr("gest rt"  ),GESTURES[1]=image_read(lmistr("%%IMG2ABAAEAASIAQADCABAQIgAwAKIAEBBCADAAggAQEGIAMABCADAQggAwACIAEBDCAEAQ4gAgEMIAYBCCADAAQgAQEGIAMABiABAQQgAwAIIAEBAiADAAogBAAq")));
 	dset(env,lmistr("gest up"  ),GESTURES[2]=image_read(lmistr("%%IMG2ABAAEAAHIAMADSABAQEgAQAMIAIBASACAAsgAQEDIAEACiACAQMgAgAJIAEBBSABAAggAgEFIAIAByABAQcgAQAGIAIBByACAAUgAQEJIAEABCACAQkgAgADIAEBCyABAAMgAQELIAEAAyAFAQMgBQAHIAEBAyABAAsgBQAF")));
 	dset(env,lmistr("gest dn"  ),GESTURES[3]=image_read(lmistr("%%IMG2ABAAEAAFIAUACyABAQMgAQAHIAUBAyAFAAMgAQELIAEAAyABAQsgAQADIAIBCSACAAQgAQEJIAEABSACAQcgAgAGIAEBByABAAcgAgEFIAIACCABAQUgAQAJIAIBAyACAAogAQEDIAEACyACAQEgAgAMIAEBASABAA0gAwAH")));
+	dset(env,lmistr("handlet"  ),HANDLES[0]=image_read(lmistr("%%IMG2AAcACgABAQUAAQEBIAUBAiAFAQIgBQECIAUBAiAFAQIgBQEBAAEBASADAQEAAwEBIAEBAQAFAQEAAw==")));
+	dset(env,lmistr("handlel"  ),HANDLES[1]=image_read(lmistr("%%IMG2AAoABwABAQYAAwEBIAYBAQACAQEgBwEBAAEBASAIAQIgBwEBAAEBASAGAQEAAwEGAAM=")));
 	dset(env,lmistr("tools"    ),TOOLS);
 	dset(env,lmistr("arrows"   ),ARROWS);
 	dset(env,lmistr("ltools"   ),TOOLB     =lmbuff((pair){tcellw*2+1,tcellh*18+tgap+1}));

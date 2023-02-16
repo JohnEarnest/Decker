@@ -227,6 +227,7 @@ pair pair_min(pair a,pair b){return (pair){MIN(a.x,b.x),MIN(a.y,b.y)};}
 rect rect_add(rect a,pair b){return (rect){a.x+b.x,a.y+b.y,a.w,a.h};}
 rect rect_sub(rect a,pair b){return (rect){a.x-b.x,a.y-b.y,a.w,a.h};}
 rect rect_pair(pair a,pair b){return (rect){a.x,a.y,b.x,b.y};}
+rect rect_max(rect a,rect b){return (rect){MAX(a.x,b.x),MAX(a.y,b.y),MAX(a.w,b.w),MAX(a.h,b.h)};}
 int rect_same(rect a,rect b){return a.x==b.x&&a.y==b.y&&a.w==b.w&&a.h==b.h;}
 rect inset(rect r,int n){return (rect){r.x+n,r.y+n,r.w-2*n,r.h-2*n};}
 rect box_union    (rect a,rect b){int x=MIN(a.x,b.x),y=MIN(a.y,b.y);return(rect){x,y,MAX(a.x+a.w,b.x+b.w)-x,MAX(a.y+a.h,b.y+b.h)-y};}
@@ -1609,18 +1610,37 @@ lv* grid_write(lv*x){
 
 // Contraption interface
 
+pair corner_reflow(pair p,pair s,rect m,pair d){ // point, proto size, margins, dest size
+	p.x=(p.x<m.x)?p.x: (p.x>s.x-m.w)?d.x-(s.x-p.x): s.x==0?0:((1.0f*p.x)/s.x)*d.x; // left | right  | stretch horiz
+	p.y=(p.y<m.y)?p.y: (p.y>s.y-m.h)?d.y-(s.y-p.y): s.y==0?0:((1.0f*p.y)/s.y)*d.y; // top  | bottom | stretch vert
+	return p;
+}
+void contraption_reflow(lv*c){
+	lv*def=ifield(c,"def"),*swids=ifield(def,"widgets"),*dwids=ivalue(c,"widgets");
+	rect m=getrect(ifield(def,"margin"));pair s=getpair(ifield(def,"size")), d=getpair(ifield(c,"size"));
+	EACH(z,swids){
+		lv*swid=swids->lv[z],*dwid=dget(dwids,dwids->kv[z]);if(!dwid)continue;
+		pair a=getpair(ifield(swid,"pos")), b=pair_add(getpair(ifield(swid,"size")),a);
+		a=corner_reflow(a,s,m,d),b=corner_reflow(b,s,m,d);
+		iwrite(dwid,lmistr("pos"),lmpair(a)),iwrite(dwid,lmistr("size"),lmpair(pair_sub(b,a)));
+	}
+}
 lv* interface_contraption(lv*self,lv*i,lv*x){
 	lv*data=self->b;char*masks[]={"name","index","image","script","locked","pos","show","font","event","offset",NULL};
 	if(!is_rooted(self))return NONE;
 	if(x){
 		ikey("def"  )return x; // not mutable!
-		ikey("size" )return x; // not mutable!
 		ikey("image")return x; // not mutable!
+		ikey("size" ){
+			rect m=getrect(ifield(dget(data,lmistr("def")),"margin"));
+			dset(data,i,lmpair(pair_max((pair){m.x+m.w,m.y+m.h},getpair(normalize_pair(x)))));
+			contraption_reflow(self);return x;
+		}
 		if(lis(i))for(int z=0;masks[z];z++)if(!strcmp(i->sv,masks[z]))return interface_widget(self,i,x);
 		fire_attr_sync(self,"set_",ls(i),x);return x;
 	}else{
 		ikey("def"  )return dget(data,i);
-		ikey("size" )return ifield(dget(data,lmistr("def")),"size");
+		ikey("size" )return dget(data,i);
 		ikey("image")return ifield(dget(data,lmistr("def")),"image");
 		if(lis(i))for(int z=0;masks[z];z++)if(!strcmp(i->sv,masks[z]))return interface_widget(self,i,NULL);
 		return fire_attr_sync(self,"get_",ls(i),NULL);
@@ -1645,7 +1665,9 @@ lv* contraption_read(lv*x,lv*r){
 	EACH(z,d){
 		lv*a=widget_write(d->lv[z]),*o=dget(w,d->kv[z]);if(o)a=l_comma(a,o);
 		lv*i=widget_read(a,ri);if(lii(i))dset(widgets,ifield(i,"name"),i);
-	}return ri;
+	}
+	{lv*k=lmistr("size"),*v=dget(x,k);iwrite(ri,k,v?v:ifield(def,"size"));}
+	return ri;
 }
 
 // Widget interface
@@ -1892,7 +1914,6 @@ void contraption_update(lv*def){
 			lv*widget=widgets->lv[w];if(!contraption_is(widget)||ifield(widget,"def")!=def)continue;
 			lv*d=widget_write(widget),*n=ifield(widget,"name");
 			dset(d,lmistr("image"  ),image_clone(ifield(def,"image")));
-			dset(d,lmistr("size"   ),ifield(def,"size"));
 			dset(d,lmistr("widgets"),contraption_strip(widget));
 			widget->b=widget_read(d,card)->b;dset(widget->b,lmistr("name"),n);
 		}
@@ -1911,6 +1932,10 @@ lv* normalize_attributes(lv*x){
 		}
 	}return torect(r),r;
 }
+lv* normalize_margin(lv*x,lv*p){
+	rect m=getrect(x);pair s=getpair(ifield(p,"size"));
+	return lmrect(rect_max((rect){MIN(m.x,s.x),MIN(m.y,s.y),MIN(m.w,s.x-m.x),MIN(m.h,s.y-m.y)},(rect){0,0,0,0}));
+}
 lv* interface_prototype(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	lv*data=self->b,*deck=dget(data,lmistr("deck")),*defs=ivalue(deck,"contraptions");
@@ -1920,7 +1945,9 @@ lv* interface_prototype(lv*self,lv*i,lv*x){
 			defs->kv[dgeti(defs,o)]=n;dset(data,i,n);return x;
 		}
 		ikey("description"){dset(data,i,ls(x));return x;}
-		ikey("size"       ){dset(data,i,normalize_pair(x)),contraption_update(self);return x;}
+		ikey("size"       ){dset(data,i,normalize_pair  (x     )),contraption_update(self);return x;}
+		ikey("margin"     ){dset(data,i,normalize_margin(x,self)),contraption_update(self);return x;}
+		ikey("resizable"  ){dset(data,i,lmn(lb(x)))              ,contraption_update(self);return x;}
 		ikey("image"      ){dset(data,i,image_is(x)?x:image_empty());return x;}
 		ikey("script"     ){dset(data,i,ls(x));return x;}
 		ikey("template"   ){dset(data,i,ls(x));return x;}
@@ -1930,7 +1957,9 @@ lv* interface_prototype(lv*self,lv*i,lv*x){
 		ikey("description"){lv*r=dget(data,i);return r?r:lmistr("");}
 		ikey("script"     ){lv*r=dget(data,i);return r?r:lmistr("");}
 		ikey("template"   ){lv*r=dget(data,i);return r?r:lmistr("");}
-		ikey("size"       ){lv*r=dget(data,i);return r?r:lmpair((pair){100,100});}
+		ikey("size"       )return dget(data,i);
+		ikey("margin"     )return dget(data,i);
+		ikey("resizable"  )return dget(data,i);
 		ikey("image"      ){lv*r=dget(data,i);return r?r:image_empty();}
 		ikey("widgets"    )return dget(data,i);
 		ikey("attributes" ){lv*r=dget(data,i);return r?r:normalize_attributes(NONE);}
@@ -1943,6 +1972,8 @@ lv* prototype_write(lv*prototype){
 	lv*data=prototype->b, *r=lmd();
 	{lv*k=lmistr("name"       ),*v=dget(data,k);dset(r,k,v);}
 	{lv*k=lmistr("size"       ),*v=dget(data,k);dset(r,k,v);}
+	{lv*k=lmistr("resizable"  ),*v=dget(data,k);if(lb(v))dset(r,k,v);}
+	{lv*k=lmistr("margin"     ),*v=dget(data,k);dset(r,k,v);}
 	{lv*k=lmistr("description"),*v=dget(data,k);if(v&&lis(v)&&v->c)dset(r,k,v);}
 	{lv*k=lmistr("script"     ),*v=dget(data,k);if(v&&lis(v)&&v->c)dset(r,k,v);}
 	{lv*k=lmistr("template"   ),*v=dget(data,k);if(v&&lis(v)&&v->c)dset(r,k,v);}
@@ -1960,11 +1991,13 @@ lv* prototype_read(lv*x,lv*deck){
 	{lv*k=lmistr("image"      ),*v=dget(x,k);dset(r,k,v?image_read(v):image_empty());}
 	{lv*k=lmistr("attributes" ),*v=dget(x,k);if(v)iwrite(ri,k,l_table(v));}
 	{lv*k=lmistr("size"       ),*v=dget(x,k);dset(r,k,v?normalize_pair(v):lmpair((pair){100,100}));}
+	{lv*k=lmistr("resizable"  ),*v=dget(x,k);dset(r,k,v?lmn(lb(v)):NONE);}
 	lv*w=dget(x,lmistr("widgets"));if(lid(w)){EACH(z,w)dset(w->lv[z],lmistr("name"),ls(w->kv[z]));}w=w?ll(w):lml(0);
 	EACH(z,w){lv*n=dget(w->lv[z],lmistr("name"));if(n){lv*i=widget_read(w->lv[z],ri);if(lii(i))dset(widgets,ifield(i,"name"),i);}}
 	init_field(ri,"description",x)
 	init_field(ri,"script"     ,x)
 	init_field(ri,"template"   ,x)
+	{lv*k=lmistr("margin"),*v=dget(x,k);dset(r,k,normalize_margin(v?v:NONE,ri));}
 	return ri;
 }
 
@@ -2219,12 +2252,14 @@ lv* deck_write(lv*x,int html){
 	lv*d=dget(data,lmistr("contraptions"));EACH(z,d){
 		lv*def=d->lv[z],*data=prototype_write(def),*wids=dget(data,lmistr("widgets"));lv*base=dget(data,lmistr("name"));sci=0;
 		str_addz(&r,"\n{contraption:"),esc_write(&r,1,base),str_addz(&r,"}\n");
-		write_line("size"       ,1      ,v                              )
-		write_line("description",v      ,v                              )
-		write_line("image"      ,v      ,v                              )
-		write_line("script"     ,v&&v->c,script_ref(scripts,base,&sci,v))
-		write_line("template"   ,v&&v->c,v                              )
-		write_line("attributes" ,v&&v->c,v                              )
+		write_line("size"       ,1       ,v                              )
+		write_line("resizable"  ,v&&lb(v),v                              )
+		write_line("margin"     ,1       ,v                              )
+		write_line("description",v       ,v                              )
+		write_line("image"      ,v       ,v                              )
+		write_line("script"     ,v&&v->c ,script_ref(scripts,base,&sci,v))
+		write_line("template"   ,v&&v->c ,v                              )
+		write_line("attributes" ,v&&v->c ,v                              )
 		EACH(w,wids){lv*k=lmistr("script"),*v=dget(wids->lv[w],k);if(v)dset(wids->lv[w],k,script_ref(scripts,base,&sci,v));}
 		write_dict("{widgets}\n",wids,)
 		scripts_write(scripts,&r,&si);

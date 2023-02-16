@@ -1799,8 +1799,6 @@ assert["contraption add bogus type" 0 c]
 defaults:b @ "type","name","index","locked"
 assert["contraption default attributes" ("contraption","b",1,0) defaults]
 assert["contraption def" def b.def]
-b.size:300,12
-assert["contraption size is immutable" 150,50 b.size]
 b.value:42
 assert["contraption custom attrs get/set" (42,1) (b.value,b.step)]
 
@@ -1821,9 +1819,6 @@ def.widgets.step.text:"15"
 def.widgets.up.event["click"]
 def.widgets.up.event["click"]
 assert["events to a prototype" "30" def.widgets.value.text]
-def.size:200,25
-def.update[]
-assert["proto update instance properties"             (200,25) deck.card.widgets.a.size ]
 assert["proto update instances preserve local state"        42 deck.card.widgets.b.value]
 deck.card.widgets.a.pos:35,37
 def.update[]

@@ -287,6 +287,8 @@ Contraption chunks always have an ID, which serves as the `name` of the Prototyp
 - `image`: an _Image Record_ used as the background of instances of the Prototype.
 - `script`: a number or string corresponding to a `{script:ID}` chunk, analogous to the script of a card from the perspective of contained widgets.
 - `template`: a string containing a Lil script that will be used as the default script for newly-created instances of this Prototype.
+- `resizable`: an integer; allow instances of this prototype to be resized? Default in `0`.
+- `margin`: an array of four integers giving the margin inset from the left, top, right, and bottom edges, respectively, for controlling widget reflow and dividing the background image into four static corners and five tileable regions. Default is `[0,0,0,0]`.
 - `attributes`: a rectangular dictionary with the following columns:
 	- `name`: the attribute name of an editable property for instances of this Prototype.
 	- `label`: the display label of an editable property for instances of this Prototype. If missing, the `name` will be used.
@@ -380,3 +382,6 @@ Changelog
 
 1.10:
 - Deprecated the `card.parent` field, a mechanism for inheriting the widgets and properties of a "template" card.
+
+1.12:
+- Introduced the `{contraption:ID}` section and the `contraption` widget type.

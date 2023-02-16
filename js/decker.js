@@ -374,6 +374,10 @@ ICONS=[
 	'%%IMG0AAwADAABFUIqoRVCKqEVQiqhFUIqoRVCKqAAAA==',
 	'%%IMG0AAwADAAAAAAAIABgAMRBhmMDNgEcAAgAAAAAAA==',
 ].map(image_read)
+HANDLES=[
+	'%%IMG2AAcACgABAQUAAQEBIAUBAiAFAQIgBQECIAUBAiAFAQIgBQEBAAEBASADAQEAAwEBIAEBAQAFAQEAAw==',
+	'%%IMG2AAoABwABAQYAAwEBIAYBAQACAQEgBwEBAAEBASAIAQIgBwEBAAEBASAGAQEAAwEGAAM=',
+].map(image_read)
 ICON={dir:0,doc:1,sound:2,font:3,app:4,lil:5,pat:6,chek:7,none:8}
 PANGRAM='How razorback jumping-frogs can level six piqued gymnasts.'
 
@@ -395,8 +399,8 @@ screen_to_con=a=>{a=rsub(a,con_offset());return dr.fatbits?radd(rdiv(a,FAT),dr.o
 con_view_dim=_=>{const a=screen_to_con(rect(0,0)),b=screen_to_con(frame.size);return rpair(a,rsub(b,a))}
 clamp_fatbits=_=>{dr.offset=rclamp(rect(0,0),dr.offset,rmax(rsub(con_size(),rdiv(frame.size,FAT)),rect(0,0)))}
 center_fatbits=p=>{dr.offset=rsub(p,rdiv(rdiv(frame.size,FAT),2)),clamp_fatbits()}
-ev_to_con=e=>{e.pos=screen_to_con(e.pos),e.dpos=screen_to_con(e.dpos),pointer.prev=screen_to_con(pointer.prev);return e}
-con_to_ev=e=>{e.pos=con_to_screen(e.pos),e.dpos=con_to_screen(e.dpos),pointer.prev=con_to_screen(pointer.prev);return e}
+ev_to_con=e=>{e.pos=screen_to_con(e.opos=rcopy(e.pos)),e.dpos=screen_to_con(e.odpos=rcopy(e.dpos)),pointer.prev=screen_to_con(pointer.prev);return e}
+con_to_ev=e=>{e.pos=e.opos,e.dpos=e.odpos,pointer.prev=con_to_screen(pointer.prev);return e}
 tracking=_=>{
 	const c=con()
 	if(prototype_is(c)){
@@ -436,7 +440,7 @@ setmode=mode=>{
 event_state=_=>({ // event state
 	mu:0,md:0, clicktime:0,click:0,rdown:0,rup:0, dclick:0, clicklast:0,
 	drag:0, tab:0, shift:0, alt:0, action:0, dir:0, exit:0, eval:0, scroll:0, hidemenu:0,
-	pos:rect(), dpos:rect(), rawpos:rect(), rawdpos:rect(), shortcuts:{},
+	pos:rect(), dpos:rect(), rawpos:rect(), rawdpos:rect(), shortcuts:{}, opos:rect(),odpos:rect(),
 	callback:null, callback_rect:null, callback_drag:0
 })
 let ev=event_state()
@@ -965,15 +969,37 @@ field_keys=(code,shift)=>{
 	wid.cursor_timer=0; if(!shift)wid.cursor.x=wid.cursor.y; field_showcursor()
 }
 
+draw_9seg=(r,dst,src,m,clip,opaque,pal)=>{
+	const o=rect(r.x,r.y), s=src.size, ss=s, ds=dst.size
+	const draw_wrapped=(r,sr)=>{
+		r=rclip(r,clip);if(r.w==0||r.h==0||sr.w==0||sr.h==0)return
+		if(!pal){ // solid/opaque
+			for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++){const c=src.pix[(sr.x+(x%sr.w))+(sr.y+(y%sr.h))*ss.x];if(opaque||c)dst.pix[(r.x+x)+(r.y+y)*ds.x]=c}
+		}
+		else{ // invert
+			const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
+			for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++){
+				let dx=r.x+x,dy=r.y+y, c=draw_pattern(src.pix[(sr.x+(x%sr.w))+(sr.y+(y%sr.h))*ss.x],dx,dy), di=(r.x+x)+(r.y+y)*ds.x
+				dst.pix[di]=c^draw_pattern(dst.pix[di],dx,dy)
+			}
+		}
+	}
+	draw_wrapped(radd(rect(0      ,0      ,m.x          ,m.y          ),o),rect(0      ,0      ,m.x          ,m.y          )) // NW
+	draw_wrapped(radd(rect(0      ,r.h-m.h,m.x          ,m.h          ),o),rect(0      ,s.y-m.h,m.x          ,m.h          )) // SW
+	draw_wrapped(radd(rect(r.w-m.w,0      ,m.w          ,m.y          ),o),rect(s.x-m.w,0      ,m.w          ,m.y          )) // NE
+	draw_wrapped(radd(rect(r.w-m.w,r.h-m.h,m.w          ,m.h          ),o),rect(s.x-m.w,s.y-m.h,m.w          ,m.h          )) // SE
+	draw_wrapped(radd(rect(0      ,m.y    ,m.x          ,r.h-(m.y+m.h)),o),rect(0      ,m.y    ,m.x          ,s.y-(m.y+m.h))) // W
+	draw_wrapped(radd(rect(m.x    ,0      ,r.w-(m.x+m.w),m.y          ),o),rect(m.x    ,0      ,s.x-(m.x+m.w),m.y          )) // N
+	draw_wrapped(radd(rect(r.w-m.w,m.y    ,m.w          ,r.h-(m.y+m.h)),o),rect(s.x-m.w,m.y    ,m.w          ,s.y-(m.y+m.h))) // E
+	draw_wrapped(radd(rect(m.x    ,r.h-m.h,r.w-(m.x+m.w),m.h          ),o),rect(m.x    ,s.y-m.h,s.x-(m.x+m.w),m.h          )) // S
+	draw_wrapped(radd(rect(m.x    ,m.y    ,r.w-(m.x+m.w),r.h-(m.y+m.h)),o),rect(m.x    ,m.y    ,s.x-(m.x+m.w),s.y-(m.y+m.h))) // C
+}
 widget_contraption=x=>{
 	const show=ls(ifield(x,'show'));if(show=='none')return
-	const b=rpair(getpair(ifield(x,'pos')),getpair(ifield(x,'size'))), image=ifield(x,'image'), s=image.size
-	const oc=frame.clip;frame.clip=b
-	if(show=='solid'){if(s.x<b.w||s.y<b.h)draw_rect(b,32);image_paste(b,frame.clip,image,frame.image,1)}
-	if(show=='transparent'){image_paste(b,frame.clip,image,frame.image,0)}
-	if(show=='invert'){draw_invert_scaled(deck.patterns.pal.pix,rect(b.x,b.y,s.x,s.y),image)}
-	handle_widgets(x.widgets,rect(b.x,b.y))
-	frame.clip=oc
+	const b=rpair(getpair(ifield(x,'pos')),getpair(ifield(x,'size'))), image=ifield(x,'image')
+	const oc=frame.clip,pal=deck.patterns.pal.pix;frame.clip=rclip(frame.clip,b)
+	draw_9seg(b,frame.image,image,getrect(ifield(x.def,'margin')),frame.clip,show=='solid',show=='invert'?pal:null)
+	handle_widgets(x.widgets,rect(b.x,b.y)),frame.clip=oc
 }
 
 let attrs=[], attrs_scroll=0
@@ -1262,7 +1288,6 @@ modal_enter=type=>{
 	if(type=='prototype_props'){
 		const c=con()
 		ms.name =fieldstr(ifield(c,'name'))
-		ms.text =fieldstr(dyad.fuse(lms(','),ifield(c,'size')))
 		ms.form0=fieldstr(ifield(c,'description'))
 		ms.form1=fieldstr(ifield(c,'template'))
 	}
@@ -1313,10 +1338,6 @@ modal_exit=value=>{
 			if(t=='rich'  )v=attrs[i].value.table
 			iwrite(w,n,v)
 		})
-	}
-	if(ms.type=='prototype_props'){
-		const s=rmax(rect(),getpair(dyad.parse(lms('%i%*-.10r0123456789%i'),rtext_string(ms.text.table))))
-		iwrite(con(),lms('size'),lmpair(s)),mark_dirty()
 	}
 	if(ms.type=='action'&&value){
 		let r='on click do\n'
@@ -1523,13 +1544,11 @@ modals=_=>{
 		const b=draw_modalbox(rect(220,220)),def=con(), lw=67
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Prototype Properties',FONT_MENU,1)
 		draw_text(rect(b.x,b.y+ 22,lw,20),'Name',FONT_MENU,1)
-		draw_text(rect(b.x,b.y+ 42,lw,20),'Size',FONT_MENU,1)
-		draw_text(rect(b.x,b.y+ 62,lw,20),'Description',FONT_MENU,1)
-		draw_text(rect(b.x,b.y+122,lw,20),'Template',FONT_MENU,1)
+		draw_text(rect(b.x,b.y+ 42,lw,20),'Description',FONT_MENU,1)
+		draw_text(rect(b.x,b.y+102,lw,20),'Template\nScript',FONT_MENU,1)
 		ui_field   (rect(b.x+lw,b.y+20 ,b.w-lw,18),ms.name)
-		ui_field   (rect(b.x+lw,b.y+40 ,b.w-lw,18),ms.text)
-		ui_textedit(rect(b.x+lw,b.y+60 ,b.w-lw,58),1,ms.form0)
-		ui_codeedit(rect(b.x+lw,b.y+120,b.w-lw,58),1,ms.form1)
+		ui_textedit(rect(b.x+lw,b.y+40 ,b.w-lw,58),1,ms.form0)
+		ui_codeedit(rect(b.x+lw,b.y+100,b.w-lw,78),1,ms.form1)
 		iwrite(def,lms('name'       ),rtext_string(ms.name .table))
 		iwrite(def,lms('description'),rtext_string(ms.form0.table))
 		iwrite(def,lms('template'   ),rtext_string(ms.form1.table)),mark_dirty()
@@ -1574,6 +1593,45 @@ modals=_=>{
 			ms.grid.row=-1,ms.name.table=null,ms.text.table=null
 		}
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit){iwrite(def,lms('attributes'),ms.grid.table),mark_dirty(),modal_exit(1)}
+	}
+	else if(ms.type=='prototype_size'){
+		const def=con(),drag=rect(0,0,0,0);if(!prototype_is(def)){modal_exit(0),ms.in_modal=0;return}
+		const delta=rsub(screen_to_con(ev.pos),screen_to_con(ev.dpos)),view=con_clip()
+		let resize=0, s=getpair(ifield(def,'size')), m=getrect(ifield(def,'margin')),om=rcopy(m)
+		if(view.x!=0&&view.y!=0&&view.w!=frame.size.x&&view.h!=frame.size.y){
+			// resize handle
+			let sh=rpair(radd(con_to_screen(s),rect(1,1)),rect(8,8))
+			if((ev.drag||ev.mu)&&dover(sh)&&(delta.x!=0||delta.y!=0)){
+				s=rmax(rect(1,1),radd(s,delta)),sh=rpair(radd(con_to_screen(s),rect(1,1)),rect(8,8))
+				draw_box(con_to_screen(rpair(rect(0,0),s)),0,ANTS);if(ev.mu)resize=1
+			}
+			draw_rect(sh,32),draw_box(sh,0,1);if(over(sh))uicursor=cursor.drag
+			draw_text(rect(sh.x+10,sh.y+10,100,20),`${s.x} x ${s.y}`,FONT_MONO,1)
+			// margin handles
+			const h_margin=(i,v,o)    =>rpair(rsub(con_to_screen(v),o),i.size)
+			const m_margin=(i,v,o,a,d)=>{const h=h_margin(i,v,o);if((ev.drag||ev.mu)&&dover(h))m[d]+=a,drag[d]=1;}
+			const i_margin=(h,i)      =>{image_paste(h,frame.clip,i,frame.image,0);if(over(h))uicursor=cursor.drag;}
+			const l_label =(h,v)      =>{const l=`${v}`,t=font_textsize(FONT_MONO,l);draw_text(rect(h.x-2-t.x        ,h.y-3  ,60,20),l,FONT_MONO,1)}
+			const t_label =(h,v)      =>{const l=`${v}`,t=font_textsize(FONT_MONO,l);draw_text(rect(h.x+3-(0|(t.x/2)),h.y-t.y,60,20),l,FONT_MONO,1)}
+			const l_margin=(i,v,o,d)  =>{const h=h_margin(i,v,o);if(drag[d])l_label(h,m[d]);i_margin(h,i)}
+			const t_margin=(i,v,o,d)  =>{const h=h_margin(i,v,o);if(drag[d])t_label(h,m[d]);i_margin(h,i)}
+			m_margin(HANDLES[0],rect(m.x    ,0      ),rect(3,11), delta.x,'x')
+			m_margin(HANDLES[1],rect(0      ,m.y    ),rect(11,3), delta.y,'y')
+			m_margin(HANDLES[0],rect(s.x-m.w,0      ),rect(3,11),-delta.x,'w');if(drag.x&&drag.w)m.w+=delta.x,drag.w=0
+			m_margin(HANDLES[1],rect(0      ,s.y-m.h),rect(11,3),-delta.y,'h');if(drag.y&&drag.h)m.h+=delta.y,drag.h=0
+			m=normalize_margin(lmrect(m),def)
+			t_margin(HANDLES[0],rect(m.x    ,0      ),rect(3,11),'x')
+			l_margin(HANDLES[1],rect(0      ,m.y    ),rect(11,3),'y')
+			t_margin(HANDLES[0],rect(s.x-m.w,0      ),rect(3,11),'w')
+			l_margin(HANDLES[1],rect(0      ,s.y-m.h),rect(11,3),'h')
+		}
+		const m0=con_to_screen(rect(m.x,0,1,s.y    ));draw_vline(m0.x,m0.y,m0.y+m0.h,ANTS)
+		const m1=con_to_screen(rect(0,m.y,s.x,1    ));draw_hline(m1.x,m1.x+m1.w,m1.y,ANTS)
+		const m2=con_to_screen(rect(s.x-m.w,0,1,s.y));draw_vline(m2.x,m2.y,m2.y+m2.h,ANTS)
+		const m3=con_to_screen(rect(0,s.y-m.h,s.x,1));draw_hline(m3.x,m3.x+m3.w,m3.y,ANTS)
+		if(resize){proto_size(def,s,m)}
+		else if(ev.mu&&(m.x!=om.x||m.y!=om.y||m.w!=om.w||m.h!=om.h)){proto_prop(def,'margin',lmrect(m))}
+		if(ev.exit||ev.action)modal_exit(0)
 	}
 	else if(ms.type=='resources'){
 		const b=draw_modalbox(rect(280,190))
@@ -2084,6 +2142,10 @@ apply=(fwd,x)=>{
 				if(!dget(x.props[i],lms('pos')))iwrite(z,lms('pos'),lmpair(rcenter(con_dim(),getpair(ifield(z,'size')))))
 			})
 		}
+	}
+	else if(t=='proto_props'){
+		if(ms.type!='prototype_size')modal_enter('prototype_size')
+		const v=x[fwd?'after':'before'];x.keys.map((k,i)=>iwrite(container,k,v[i]))
 	}mark_dirty()
 }
 
@@ -2146,8 +2208,6 @@ bg_lasso_preview=_=>{
 	const d=rsub(ev.pos,ev.dpos), dh=rect(dr.sel_here.x+d.x,dr.sel_here.y+d.y,dr.sel_here.w,dr.sel_here.h)
 	const dd=rsub(ev.pos,dh), insel=dr.mask!=null&&rin(dh,ev.pos)&&dr.mask.pix[dd.x+dd.y*dh.w], r=ev.drag&&insel?dh:dr.sel_here, origin=con_to_screen(rect(0,0))
 	if(!dr.fatbits){bg_draw_lasso(con_to_screen(r),con_to_screen(dr.sel_start),1,dr.fill);return}
-
-
 	const o=dr.sel_start, anim=deck.patterns.anim, pal=deck.patterns.pal.pix
 	const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][(0|(frame_count/4))%max(1,anim[pix-28].length)]
 	const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
@@ -2426,6 +2486,17 @@ ob_resize=(size,coalesce)=>{
 		edit(edit_target({type:'ob_props',before,after}))
 	}
 }
+proto_prop=(target,key,value)=>{
+	edit(edit_target({type:'proto_props',keys:[lms(key)],before:[ifield(target,key)],after:[value]}))
+}
+proto_size=(target,size,margin)=>{
+	const o=image_resize(image_copy(ifield(target,'image')),getpair(ifield(target,'size'))), n=image_make(size), c=rpair(rect(0,0),size)
+	draw_9seg(c,n,o,getrect(ifield(target,'margin')),c,1,null)
+	edit(edit_target({
+		type:'proto_props',keys:['size','image','margin'].map(lms),
+		before:[ifield(target,'size'),o,ifield(target,'margin')],after:[lmpair(size),n,lmrect(margin)]
+	}))
+}
 object_properties=x=>{
 	ob.sel=[x]
 	if(button_is     (x))modal_enter('button_props')
@@ -2440,7 +2511,7 @@ object_editor=_=>{
 	wids.v.map(wid=>{
 		const w=unpack_widget(wid), sel=ob.sel.some(x=>x==wid);w.size=con_to_screen(w.size)
 		if(sel){draw_box(inset(w.size,-1),0,ANTS)}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1))}
-		if(sel&&ob.sel.length==1&&!contraption_is(ob.sel[0])){draw_handles(w.size)}
+		if(sel&&ob.sel.length==1&&(contraption_is(ob.sel[0])?lb(ifield(ob.sel[0].def,'resizable')):1))draw_handles(w.size)
 		if(w.locked&&ob.show_bounds){draw_rect(rect(w.size.x+w.size.w-10,w.size.y,10,10),1),draw_icon(rect(w.size.x+w.size.w-8,w.size.y+1),LOCK,32)}
 	})
 	if(!in_layer())return
@@ -2845,6 +2916,11 @@ all_menus=_=>{
 			}
 		}
 	}
+	if(ms.type=='prototype_size'){
+		menu_bar('Edit',1);
+		if(menu_item('Undo',has_undo(),'z'))undo()
+		if(menu_item('Redo',has_redo(),'Z'))redo()
+	}
 	if(ms.type=='recording'&&!wid.fv){
 		menu_bar('Edit',au.mode=='stopped')
 		if(menu_item('Undo',au.hist_cursor>0             ,'z'))sound_undo()
@@ -2871,15 +2947,23 @@ all_menus=_=>{
 		if(menu_item('Properties...',1))modal_enter('card_props')
 	}
 	if((uimode=='interact'||uimode=='draw'||uimode=='object')&&prototype_is(con())){
-		menu_bar('Prototype',ms.type==null)
-		const defs=deck.contraptions
-		if(menu_item('Close',1))con_set(null)
-		if(menu_item('Go to Previous',count(defs)>1)){ev.dir='left' ,tracking(),ev.dir=0}
-		if(menu_item('Go to Next'    ,count(defs)>1)){ev.dir='right',tracking(),ev.dir=0}
+		menu_bar('Prototype',ms.type==null||ms.type=='prototype_size')
+		const def=con(), defs=deck.contraptions
+		if(ms.type==null){
+			if(menu_item('Close',1))con_set(null)
+			if(menu_item('Go to Previous',count(defs)>1)){ev.dir='left' ,tracking(),ev.dir=0}
+			if(menu_item('Go to Next'    ,count(defs)>1)){ev.dir='right',tracking(),ev.dir=0}
+			menu_separator()
+			if(menu_item('Script...'    ,1))setscript(con())
+			if(menu_item('Properties...',1))modal_enter('prototype_props')
+			if(menu_item('Attributes...',1))modal_enter('prototype_attrs')
+			if(menu_item("Size..."      ,1))modal_enter('prototype_size')
+		}else{
+			if(menu_item("Confirm Size",1,0))modal_exit(0)
+		}
 		menu_separator()
-		if(menu_item('Script...'    ,1))setscript(con())
-		if(menu_item('Properties...',1))modal_enter('prototype_props')
-		if(menu_item('Attributes...',1))modal_enter('prototype_attrs')
+		let r=lb(ifield(def,'resizable'))
+		if(menu_check('Resizable',1,r,0)){r^=1,iwrite(def,lms('resizable'),lmn(r)),mark_dirty()}
 	}
 	if(uimode=='interact'||uimode=='draw'||uimode=='object'){
 		menu_bar('Tool',ms.type==null)
@@ -2898,20 +2982,21 @@ all_menus=_=>{
 		if(menu_check('Polygon'    ,1,uimode=='draw'&&dr.tool=='poly'       ))settool('poly'       )
 	}
 	if(uimode=='draw'||uimode=='object'){
-		menu_bar('View',ms.type==null)
+		menu_bar('View',ms.type==null||ms.type=='modal_prototype_size')
+		const n=ms.type==null
 		if(menu_check('Show Widgets'      ,1,dr.show_widgets))dr.show_widgets^=1
 		if(menu_check('Show Widget Bounds',1,ob.show_bounds ))ob.show_bounds ^=1
 		if(menu_check('Show Widget Names' ,1,ob.show_names  ))ob.show_names  ^=1
-		if(menu_check('Show Cursor Info'  ,1,ob.show_cursor ))ob.show_cursor ^=1
+		if(menu_check('Show Cursor Info'  ,n,ob.show_cursor ))ob.show_cursor ^=1
 		menu_separator()
-		if(menu_check('Show Grid Overlay',1,dr.show_grid))dr.show_grid^=1
-		if(menu_check('Snap to Grid'     ,1,dr.snap     ))dr.snap     ^=1
-		if(menu_item('Grid Size...',1))modal_enter('grid')
+		if(menu_check('Show Grid Overlay',n,dr.show_grid))dr.show_grid^=1
+		if(menu_check('Snap to Grid'     ,n,dr.snap     ))dr.snap     ^=1
+		if(menu_item('Grid Size...',n))modal_enter('grid')
 		menu_separator()
 		if(menu_check('Show Animation'   ,1,dr.show_anim ))dr.show_anim ^=1
 		if(menu_check('Transparency Mask',1,dr.trans_mask))dr.trans_mask^=1
 		if(menu_check('Fat Bits'         ,1,dr.fatbits   )){
-			if(uimode!='draw')setmode('draw')
+			if(ms.type==null&&uimode!='draw')setmode('draw')
 			dr.fatbits^=1;if(dr.fatbits)center_fatbits(rcenter(bg_has_sel()||bg_has_lasso()?dr.sel_here:con_dim(),rect()))
 		}
 	}

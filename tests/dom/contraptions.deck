@@ -10,6 +10,7 @@ b:{"type":"contraption","size":[150,50],"pos":[0,0],"def":"spinner","widgets":{"
 
 {contraption:spinner}
 size:[150,50]
+margin:[0,0,0,0]
 description:"unbounded numeric picker"
 script:"spinner.0"
 template:"on change do\n \nend"

@@ -1052,7 +1052,7 @@ Contraptions are custom widgets, defined in a [Prototype](#prototypeinterface). 
 | `x.locked`              | Bool. Behavior of this property is entirely up to the Prototype. r/w.                                 |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
-| `x.size`                | The `size` of the widget in pixels.                                                                   |
+| `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
@@ -1113,6 +1113,8 @@ Prototypes are definitions from which [Contraptions](#contraptioninterface) are 
 | `x.template`            | String. The Lil source code that can be used as a default for newly-created Prototype instances. r/w.  |
 | `x.size`                | The `size` of this Prototype in pixels. r/w.                                                           |
 | `x.image`               | An _image_ interface representing the Prototype's background. r/w.                                     |
+| `x.resizable`           | Bool. Can instances of this Prototype be resized? r/w.                                                 |
+| `x.margin`              | A list of 4 integers. See below for details. r/w.                                                      |
 | `x.widgets`             | A dictionary of widget interfaces in this Prototype, keyed by name.                                    |
 | `x.attributes`          | A table of editable attributes exposed by this Prototype (see below). r/w.                             |
 | `x.add[x y]`            | Add a widget to this Prototype, and return it.                                                         |
@@ -1122,6 +1124,10 @@ Prototypes are definitions from which [Contraptions](#contraptioninterface) are 
 `prototype.add[x y]` can add a new widget to the Prototype. If `x` is a string {`"button"`, `"field"`, `"slider"`, `"canvas"`, or `"grid"`}, insert a new widget of the appropriate type using `y` as a name (or an appropriate default name). If `x` is a widget interface, insert a copy of it, again using `y` as a name or an appropriate default.
 
 When a widget is removed from its Prototype, the interface becomes inert: it will ignore all reads and writes of attributes.
+
+If a prototype is not `resizable`, contraptions will strictly inherit their `size` from the prototype. Otherwise, when the `size` of a contraption is modified, all the internal widgets will reflow based on the configuration of `margin`. The `margin` specifies four offsets inward from the left, top, right, and bottom edge of the prototype's bounding box, respectively. As a contraption is resized, corners of any widget which fall within a margin will retain their distance from the corresponding edge of the bounding box, and any other corners will be repositioned proportionally based on their original positions in the prototype. With appropriate margins, it is possible to achieve a wide variety of useful automatic layouts. Fully-collapsed (0) margins leave reflowing strictly on a proportional basis. The sum of the margins defines the minimum size of a contraption.
+
+In addition to controlling the position and size of widgets, `margin` controls how the background image of contraptions is rendered, by logically dividing it into 9 regions. As a contraption is resized, the four corners retain their original size. The left and right center regions are repeated vertically, the top and bottom center regions are repeated horizontally, and the centermost region is repeated horizontally _and_ vertically.
 
 The `attributes` table provides information about the attributes of contraption instances based on this Prototype which should be editable by users. It contains a `name` column with (string) attribute names, a `label` column with (string) display names for attributes, and a `type` column indicating the editor that should be provided for that attribute:
 

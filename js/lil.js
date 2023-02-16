@@ -827,8 +827,9 @@ rcenter=(a,b)=>rint(rect(a.x+(a.w-b.x)/2,ceil(a.y+(a.h-b.y)/2.0),b.x,b.y))
 rnorm=r=>{r=rcopy(r);if(r.w<0)r.w*=-1,r.x-=r.w;if(r.h<0)r.h*=-1,r.y-=r.h;return rint(r)}
 rclamp=(a,b,c)=>rmin(rmax(a,b),c)
 lmpair=r=>lml([lmn(r.x),lmn(r.y)])
+lmrect=r=>lml([lmn(r.x),lmn(r.y),lmn(r.w),lmn(r.h)])
 getpair=x=>(!x||!lil(x))?rect(): rect(x.v.length>0?ln(x.v[0]):0, x.v.length>1?ln(x.v[1]):0)
-getrect=x=>!x?rect(): rect(x[0],x[1],x[2],x[3])
+getrect=x=>(!x||!lil(x))?rect(): rect(x.v.length>0?ln(x.v[0]):0, x.v.length>1?ln(x.v[1]):0, x.v.length>2?ln(x.v[2]):0, x.v.length>3?ln(x.v[3]):0)
 getimage=x=>(!x||!image_is(x))? image_make(rect()): x
 ukey=(dict,name,root,original)=>{
 	if(original&&match(name,original))return name
@@ -1274,7 +1275,7 @@ image_make=size=>{
 		if(ikey(i,'copy'))return lmnat(z=>image_copy(self,unpack_rect(z,self.size)))
 		if(ikey(i,'paste'))return lmnat(([img,pos,t])=>{
 			img=getimage(img), pos=(pos?ll(pos):[]).map(ln); let solid=t?!lb(t):1, cl=rect(0,0,self.size.x,self.size.y); if(img==self)img=image_copy(img)
-			image_paste_scaled(pos.length<=2?rect(pos[0],pos[1],img.size.x,img.size.y):getrect(pos),cl,img,self,solid)
+			image_paste_scaled(pos.length<=2?rect(pos[0],pos[1],img.size.x,img.size.y):rect(pos[0],pos[1],pos[2],pos[3]),cl,img,self,solid)
 		})
 		return x?x:NONE
 	};return {t:'int',f:f,n:'image',size:size,pix:new Uint8Array(size.x*size.y)}
@@ -1649,7 +1650,7 @@ canvas_read=(x,card)=>{
 	const text=(t,pos,a)=>{
 		const font=ifield(frame,'font')
 		if(pos&&lil(pos)&&count(pos)>=4){
-			a=anchors[ls(a)]||0;const r=rint(getrect(ll(pos).map(ln))), align=(a==0||a==3||a==6)?ALIGN.left:(a==2||a==5||a==8)?ALIGN.right:ALIGN.center
+			a=anchors[ls(a)]||0;const r=rint(getrect(pos)), align=(a==0||a==3||a==6)?ALIGN.left:(a==2||a==5||a==8)?ALIGN.right:ALIGN.center
 			const valign=s=>rect(align==ALIGN.left?0:align==ALIGN.right?r.w-s.x:0|((r.w-s.x)/2), y=(a==0||a==1||a==2)?0:(a==6||a==7||a==8)?r.h-s.y:0|((r.h-s.y)/2))
 			const rbox=s=>{const a=valign(s);return rclip(rint(rect(r.x+a.x,r.y+a.y,s.x,s.y)),frame.clip)}
 			if(lit(t)){const l=layout_richtext(frame.card.deck,t,font,align,r.w);draw_text_rich(rbox(l.size),l,frame.pattern,0)}
@@ -1694,7 +1695,7 @@ canvas_read=(x,card)=>{
 			if(ikey(i,'paste'    ))return lmnat(([img,pos,t])=>{
 				canvas_pick(self);const dst=container_image(self,1)
 				img=getimage(img),pos=(pos?ll(pos):[]).map(ln); let solid=t?!lb(t):1
-				image_paste_scaled(pos.length<=2?rect(pos[0],pos[1],img.size.x,img.size.y):getrect(pos),frame.clip,img,dst,solid)
+				image_paste_scaled(pos.length<=2?rect(pos[0],pos[1],img.size.x,img.size.y):rect(pos[0],pos[1],pos[2],pos[3]),frame.clip,img,dst,solid)
 				return NONE
 			})
 			if(ikey(i,'merge'))return lmnat(z=>{
@@ -1733,18 +1734,34 @@ canvas_write=x=>{
 }
 contraption_read=(x,card)=>{
 	x=ld(x);const dname=dget(x,lms('def')), def=dname?dget(card.deck.contraptions,dname):null;if(!def)return null
+	const corner_reflow=(p,s,m,d)=>rect(
+		(p.x<m.x)?p.x: (p.x>s.x-m.w)?d.x-(s.x-p.x): s.x==0?0:Math.round((p.x/s.x)*d.x), // left | right  | stretch horiz
+		(p.y<m.y)?p.y: (p.y>s.y-m.h)?d.y-(s.y-p.y): s.y==0?0:Math.round((p.y/s.y)*d.y)  // top  | bottom | stretch vert
+	)
+	const reflow=c=>{
+		const def=c.def, swids=def.widgets, dwids=c.widgets, m=def.margin, s=def.size, d=getpair(ifield(c,'size'))
+		swids.k.map((k,i)=>{
+			const swid=swids.v[i],dwid=dget(dwids,k);if(!dwid)return
+			let a=getpair(ifield(swid,'pos')), b=radd(getpair(ifield(swid,'size')),a)
+			a=corner_reflow(a,s,m,d), b=corner_reflow(b,s,m,d)
+			iwrite(dwid,lms('pos'),lmpair(a)),iwrite(dwid,lms('size'),lmpair(rsub(b,a)))
+		})
+	}
 	const masks={name:1,index:1,image:1,script:1,locked:1,pos:1,show:1,font:1,event:1,offset:1}
 	const ri=lmi((self,i,x)=>{
 		if(!is_rooted(self))return NONE
 		if(x){
 			if(ikey(i,'def'  ))return x // not mutable!
-			if(ikey(i,'size' ))return x // not mutable!
 			if(ikey(i,'image'))return x // not mutable!
+			if(ikey(i,'size' )){
+				const m=self.def.margin
+				return self.size=rmax(rect(m.x+m.w,m.y+m.h),getpair(x)),reflow(self),x
+			}
 			if(lis(i)&&ls(i) in masks)return interface_widget(self,i,x)
 			return fire_attr_sync(self,'set_'+ls(i),x),x
 		}else{
 			if(ikey(i,'def'  ))return self.def
-			if(ikey(i,'size' ))return ifield(self.def,'size')
+			if(ikey(i,'size' ))return lmpair(self.size)
 			if(ikey(i,'image'))return ifield(self.def,'image')
 			if(lis(i)&&ls(i) in masks)return interface_widget(self,i,x)
 			return fire_attr_sync(self,'get_'+ls(i),null)
@@ -1753,6 +1770,7 @@ contraption_read=(x,card)=>{
 	ri.card   =card
 	ri.deck   =card.deck
 	ri.def    =def
+	ri.size   =getpair(dget(x,lms('size'))||ifield(def,'size'))
 	ri.widgets=lmd()
 	let w=dget(x,lms('widgets')),d=def.widgets;if(w){w=ld(w)}else{w=lmd();def.widgets.k.map(k=>dset(w,k,lmd()))}
 	d.k.map((k,i)=>{const a=widget_write(d.v[i]),o=dget(w,k);widget_add(ri,o?dyad[','](a,o):a)})
@@ -1928,11 +1946,14 @@ contraption_update=(deck,def)=>{
 		card.widgets.v.filter(x=>contraption_is(x)&&x.def==def).map(widget=>{
 			const d=widget_write(widget), n=widget.name
 			dset(d,lms('image'  ),image_copy(ifield(def,'image')))
-			dset(d,lms('size'   ),ifield(def,'size'))
 			dset(d,lms('widgets'),contraption_strip(widget))
 			for(var k in widget)delete widget[k];Object.assign(widget,widget_read(d,card));widget.name=n
 		})
 	})
+}
+normalize_margin=(x,p)=>{
+	const m=rint(getrect(x)), s=getpair(ifield(p,'size'))
+	return rmax(rect(min(m.x,s.x),min(m.y,s.y),min(m.w,s.x-m.x),min(m.h,s.y-m.y)),rect(0,0,0,0))
 }
 prototype_read=(x,deck)=>{
 	x=ld(x)
@@ -1953,6 +1974,8 @@ prototype_read=(x,deck)=>{
 			}
 			if(ikey(i,'description'))return self.description=ls(x),x
 			if(ikey(i,'size'       ))return self.size=rint(getpair(x)),contraption_update(deck,self),x
+			if(ikey(i,'margin'     ))return self.margin=normalize_margin(x,self),contraption_update(deck,self),x
+			if(ikey(i,'resizable'  ))return self.resizable=lb(x),contraption_update(deck,self),x
 			if(ikey(i,'image'      ))return self.image=image_is(x)?x:image_make(rect(0,0)),x
 			if(ikey(i,'script'     ))return self.script=ls(x),x
 			if(ikey(i,'template'   ))return self.template=ls(x),x
@@ -1962,7 +1985,9 @@ prototype_read=(x,deck)=>{
 			if(ikey(i,'description'))return lms(self.description||'')
 			if(ikey(i,'script'     ))return lms(self.script||'')
 			if(ikey(i,'template'   ))return lms(self.template||'')
-			if(ikey(i,'size'       ))return lmpair(self.size||rect(100,100))
+			if(ikey(i,'size'       ))return lmpair(self.size)
+			if(ikey(i,'margin'     ))return lmrect(self.margin)
+			if(ikey(i,'resizable'  ))return lmn(self.resizable)
 			if(ikey(i,'image'      ))return self.image
 			if(ikey(i,'widgets'    ))return self.widgets
 			if(ikey(i,'attributes' ))return self.attributes||normalize_attributes(NONE)
@@ -1977,17 +2002,21 @@ prototype_read=(x,deck)=>{
 	{const v=dget(x,lms('image'     ));ri.image=v?image_read(ls(v)):image_make(range(0,0))}
 	{const v=dget(x,lms('attributes'));if(v)iwrite(ri,lms('attributes'),monad.table(v))}
 	{const v=dget(x,lms('size'      ));ri.size=v?rint(getpair(v)):rect(100,100)}
+	{const v=dget(x,lms('resizable' ));ri.resizable=v?lb(v):0}
 	let w=dget(x,lms('widgets'));if(lid(w)){w.v.map((v,i)=>dset(v,lms('name'),w.k[i]))}
 	(w?ll(w):[]).map(w=>{const n=dget(w,lms('name'));if(n){const i=widget_read(w,ri);if(lii(i))dset(ri.widgets,ifield(i,'name'),i)}})
 	init_field(ri,'description',x)
 	init_field(ri,'script'     ,x)
 	init_field(ri,'template'   ,x)
+	ri.margin=normalize_margin(dget(x,lms('margin'))||NONE,ri)
 	return ri
 }
 prototype_write=x=>{
 	const r=lmd(), wids=lmd(), nice=x=>x&&image_is(x)&&x.size.x>0&&x.size.y>0
 	dset(r,lms('name'),lms(x.name))
 	dset(r,lms('size'),ifield(x,'size'))
+	if(x.resizable)dset(r,lms('resizable'),ONE)
+	dset(r,lms('margin'),ifield(x,'margin'))
 	if(x.description&&x.description.length)dset(r,lms('description'),lms(x.description))
 	if(x.script     &&x.script.length     )dset(r,lms('script'     ),lms(x.script     ))
 	if(x.template   &&x.template.length   )dset(r,lms('template'   ),lms(x.template   ))
@@ -2183,6 +2212,8 @@ deck_write=(x,html)=>{
 		const data=prototype_write(def),wids=dget(data,lms('widgets')),base=ls(dget(data,lms('name')));sci=0
 		r+=`\n{contraption:${esc_write(1,base)}}\n`
 		write_key(data,'size'       ,x=>1       ,x=>x)
+		write_key(data,'resizable'  ,x=>x&&lb(x),x=>x)
+		write_key(data,'margin'     ,x=>1       ,x=>x)
 		write_key(data,'description',x=>x       ,x=>x)
 		write_key(data,'image'      ,x=>x       ,x=>x)
 		write_key(data,'script'     ,x=>count(x),x=>script_ref(base,x))
