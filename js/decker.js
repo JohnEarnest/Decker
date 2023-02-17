@@ -3127,6 +3127,7 @@ load_deck=d=>{
 	seed=0|(new Date().getTime()/1000),n_play([NONE,lms('loop')])
 }
 tick=_=>{
+	toolbars()
 	msg.pending_drag=0,msg.pending_halt=0,frame=context,uicursor=0,fb.pix.fill(0)
 	menu_setup(),all_menus(),widget_setup()
 	if(uimode=='script'){script_editor()}else{main_view()}
@@ -3146,7 +3147,6 @@ tick=_=>{
 
 let id=null
 sync=_=>{
-	toolbars()
 	ev.shortcuts={}
 	ev.mu=ev.md=ev.click=ev.dclick=ev.tab=ev.action=ev.dir=ev.exit=ev.eval=ev.scroll=ev.rdown=ev.rup=0
 	if(ev.clicktime)ev.clicktime--;if(ev.clicklast)ev.clicklast--
