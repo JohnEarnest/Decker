@@ -1162,24 +1162,27 @@ When a card or widget script executes, the following constants will be defined i
 
 Finally, Decker will find the most recent function definition which matches the event name and execute it with an appropriate argument. Thus, if a button's script does not define a `click[]` function, Decker will effectively look for a definition in the containing card, and then finally the deck. If no definition is found, the event will be discarded harmlessly.
 
+For widgets within a contraption, `deck` and `patterns` will not be available, and `card` will be the contraption. While editing/previewing a Prototype, `card` will be the prototype.
+
 Events are as follows:
 
-| Target  | Name       | Argument                                     | When                                                           |
-| :------ | :--------- | :------------------------------------------- | :------------------------------------------------------------- |
-| button  | `click`    | None.                                        | The user clicks the button.                                    |
-| grid    | `click`    | Row number.                                  | The user selects a row in the grid.                            |
-| grid    | `order`    | Column name as a string.                     | The user clicks a header cell on the grid.                     |
-| grid    | `change`   | `grid.value` (table).                        | The user alters the data in the the grid.                      |
-| canvas  | `click`    | `pos` on the canvas.                         | The user depresses their pointing device on a canvas.          |
-| canvas  | `drag`     | `pos` on the canvas.                         | The user moves their pointing device while held on a canvas.   |
-| canvas  | `release`  | `pos` on the canvas.                         | The user releases their pointing device on a canvas.           |
-| field   | `link`     | Link contents (string).                      | The user clicks a link in rich text.                           |
-| field   | `run`      | Selection or `field.text` (string).          | The user presses shift+return with the field active.           |
-| field   | `change`   | `field.text` (string).                       | The user alters the field, debounced to 1 second.              |
-| slider  | `change`   | `slider.value` (number).                     | The user alters the slider, debounced to 1 frame.              |
-| card    | `navigate` | One of {`"up"`,`"down"`,`"left"`,`"right"`}. | The user performs a navigation input.                          |
-| card    | `view`     | None.                                        | The card is navigated to, or the user enters interaction mode. |
-| card    | `loop`     | Previous _sound interface_ or `0`.           | The card is navigated to, or the background loop completes.    |
+| Target      | Name       | Argument                                     | When                                                           |
+| :---------- | :--------- | :------------------------------------------- | :------------------------------------------------------------- |
+| button      | `click`    | None.                                        | The user clicks the button.                                    |
+| grid        | `click`    | Row number.                                  | The user selects a row in the grid.                            |
+| grid        | `order`    | Column name as a string.                     | The user clicks a header cell on the grid.                     |
+| grid        | `change`   | `grid.value` (table).                        | The user alters the data in the the grid.                      |
+| canvas      | `click`    | `pos` on the canvas.                         | The user depresses their pointing device on a canvas.          |
+| canvas      | `drag`     | `pos` on the canvas.                         | The user moves their pointing device while held on a canvas.   |
+| canvas      | `release`  | `pos` on the canvas.                         | The user releases their pointing device on a canvas.           |
+| field       | `link`     | Link contents (string).                      | The user clicks a link in rich text.                           |
+| field       | `run`      | Selection or `field.text` (string).          | The user presses shift+return with the field active.           |
+| field       | `change`   | `field.text` (string).                       | The user alters the field, debounced to 1 second.              |
+| slider      | `change`   | `slider.value` (number).                     | The user alters the slider, debounced to 1 frame.              |
+| card        | `navigate` | One of {`"up"`,`"down"`,`"left"`,`"right"`}. | The user performs a navigation input.                          |
+| card        | `view`     | None.                                        | The card is navigated to, or the user enters interaction mode. |
+| contraption | `view`     | None.                                        | The surrounding card is sent a `view` event (see above).       |
+| card        | `loop`     | Previous _sound interface_ or `0`.           | The card is navigated to, or the background loop completes.    |
 
 If a canvas is not "draggable", events are relative to pointer movement on the canvas: The canvas will fire `click` only if the pointer is depressed within the bounds of the canvas. If a canvas is sent a `click`, it will receive a `release` when the pointer is released, even if the pointer is no longer over that canvas- the `pos` provided may be out of bounds. If a canvas is sent a `click`, it will be sent `drag` events every time the pointer is moved within the bounds of the canvas up until the `release`.
 

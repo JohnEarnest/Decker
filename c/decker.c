@@ -119,7 +119,10 @@ void draw_invert(char*pal,rect r){
 enum uimodes{mode_interact,mode_draw,mode_object,mode_script};
 int uimode=mode_interact;lv*ui_container=NULL;
 void setmode(int mode);// forward ref
-void con_set(lv*x){if(x!=ui_container)setmode(uimode);if(x!=ui_container&&prototype_is(ui_container))n_prototype_update(ui_container,NONE);ui_container=x;}
+void con_set(lv*x){
+	if(x!=ui_container)setmode(uimode),msg.next_view=1;
+	if(x!=ui_container&&prototype_is(ui_container))n_prototype_update(ui_container,NONE);ui_container=x;
+}
 lv* con(){return ui_container?ui_container:ifield(deck,"card");}
 lv* con_wids(){return ivalue(con(),"widgets");}
 lv* con_image(){return ifield(con(),"image");}
@@ -2125,7 +2128,7 @@ void script_editor(){
 	int mh=3+font_h(FONT_MENU);rect b={0,mh,frame.size.x+1,frame.size.y-2*mh};
 	lv*overw=NULL;if(sc.xray){
 		lv*wids=con_wids();EACH(z,wids){
-			lv*wid=wids->lv[z];rect size=unpack_widget(wid).size;
+			lv*wid=wids->lv[z];rect size=con_to_screenr(unpack_widget(wid).size);
 			int o=ev.alt&&over(size), col=o?(overw=wid,13):44;
 			draw_textc(size,ifield(wid,"name")->sv,FONT_BODY,o?-1:col),draw_box(size,0,col);
 			if(ifield(wid,"script")->c)draw_icon((pair){size.x-1,size.y},ICONS[icon_lil],o?1:col);
@@ -2133,7 +2136,7 @@ void script_editor(){
 		}if(ev.alt&&ev.mu)close_script(con()),ev.md=ev.mu=0;
 	}
 	ui_codeedit(b,0,&sc.f),draw_hline(0,frame.size.x,frame.size.y-mh-1,1);
-	if(overw){uicursor=cursor_point;draw_textc(unpack_widget(overw).size,ifield(overw,"name")->sv,FONT_BODY,-1);}
+	if(overw){uicursor=cursor_point;draw_textc(con_to_screenr(unpack_widget(overw).size),ifield(overw,"name")->sv,FONT_BODY,-1);}
 	if(strlen(sc.status)){draw_text_fit((rect){3,frame.size.y-mh+3,frame.size.x,mh-6},sc.status,FONT_BODY,1);}
 	else{
 		char stat[4096]={0};
@@ -3061,7 +3064,7 @@ int interpret(){
 		if(!nomodal||quota<=0||sleep_frames||sleep_play){if(sleep_frames)sleep_frames--;break;}
 		if(!running()&&pending_popstate){popstate();pending_popstate=0;}
 		if(msg.pending_halt||pending_popstate){/*suppress other new events until this one finishes*/}
-		else if(msg.pending_view){fire_event_async(ifield(deck,"card"),lmistr("view"),NONE);msg.pending_view=0;}
+		else if(msg.pending_view){fire_event_async(con(),lmistr("view"),NONE);msg.pending_view=0;}
 		else if(msg.target_click){
 			lv*arg=grid_is(msg.target_click)?lmn(msg.arg_click.y): canvas_is(msg.target_click)?lmfpair(msg.arg_click): NONE;
 			fire_event_async(msg.target_click,lmistr("click"),arg);msg.target_click=NULL;

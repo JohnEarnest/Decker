@@ -2285,9 +2285,10 @@ fire_attr_sync=(target,name,a)=>{
 	blk_get(b,lms(name)),blk_lit(b,lml(a?[a]:[])),blk_op(b,op.CALL)
 	pushstate(root),issue(root,b);let q=ATTR_QUOTA;while(running()&&q>0)runop(),q--;const r=running()?NONE:arg();popstate();return in_attr=0,r
 }
-fire_async=(target,name,arg,hunk,nest)=>{
-	const scopes=lmd([NONE],[parse(DEFAULT_HANDLERS)]), root=lmenv(); let deck=null,isolate=0
-	ancestors=target=>{
+parent_deck=x=>deck_is(x)?x: card_is(x)||prototype_is(x)?x.deck: parent_deck(x.card)
+event_invoke=(target,name,arg,hunk,isolate)=>{
+	const scopes=lmd([NONE],[parse(DEFAULT_HANDLERS)]); let deck=null
+	const ancestors=target=>{
 		if(deck_is(target)){deck=target;if(isolate)return}
 		if(contraption_is(target)){ancestors(target.card)}
 		if(card_is(target)||prototype_is(target))ancestors(target.deck)
@@ -2298,36 +2299,37 @@ fire_async=(target,name,arg,hunk,nest)=>{
 		const t=isolate&&contraption_is(target)?ifield(target,'def'):target
 		try{dset(scopes,target,parse(ls(ifield(t,'script'))))}
 		catch(e){dset(scopes,target,lmblk());}
-	}
-	ancestors(target)
-	primitives(root,deck)
-	root.local('me',target)
-	if(!isolate){
-		root.local('deck',deck)
-		root.local('patterns',ifield(deck,'patterns'))
-	}
-	constants(root);let core=null
+	};ancestors(target)
+	const bind=(b,n,v)=>{blk_lit(b,v),blk_loc(b,n),blk_op(b,op.DROP)}
+	const func=(b,n,v)=>{blk_lit(b,lmon(n,[],blk_end(v))),blk_op(b,op.BIND),name=n,arg=lml([])}
+	let core=null
 	for(let z=scopes.v.length-1;z>=0;z--){
 		let t=scopes.k[z], b=lmblk(), sname='!widget_scope'
-		const bind=(n,v)=>{blk_lit(b,v),blk_loc(b,n),blk_op(b,op.DROP)}
-		const func=(n,v)=>{blk_lit(b,lmon(n,[],blk_end(v))),blk_op(b,op.BIND),name=n,arg=lml([])}
 		if(lin(t))sname='!default_handlers'
 		if(deck_is(t)){
-			t.modules.v.map((v,i)=>bind(t.modules.k[i],ifield(v,'value')))
-			t.cards  .v.map((v,i)=>bind(t.cards  .k[i],v                ))
+			t.modules.v.map((v,i)=>bind(b,t.modules.k[i],ifield(v,'value')))
+			t.cards  .v.map((v,i)=>bind(b,t.cards  .k[i],v                ))
 			sname='!deck_scope'
 		}
 		if(card_is(t)||prototype_is(t)||contraption_is(t)){
-			bind(lms('card'),t)
-			t.widgets.v.map((v,i)=>bind(t.widgets.k[i],v))
+			bind(b,lms('card'),t)
+			t.widgets.v.map((v,i)=>bind(b,t.widgets.k[i],v))
 			sname='!card_scope'
 		}
 		blk_cat(b,scopes.v[z]),blk_op(b,op.DROP)
-		if(!core&&hunk){func('!hunk',hunk)}
-		else if(core){func(sname,core)}
+		if(!core&&hunk){func(b,'!hunk',hunk)}
+		else if(core){func(b,sname,core)}
 		blk_get(b,lms(name)),blk_lit(b,arg),blk_op(b,op.CALL);if(!hunk)blk_op(b,op.DROP);core=b
 	}
-	if(nest)pushstate(root),pending_popstate=1;issue(root,core)
+	const r=lmblk();bind(r,lms('me'),target)
+	if(!isolate)bind(r,lms('deck'),deck),bind(r,lms('patterns'),deck.patterns)
+	return blk_cat(r,core),r
+}
+fire_async=(target,name,arg,hunk,nest)=>{
+	const root=lmenv();primitives(root,parent_deck(target)),constants(root)
+	const block=event_invoke(target,name,arg,hunk,0)
+	if(card_is(target)&&name=='view'){target.widgets.v.filter(contraption_is).map(w=>blk_cat(block,event_invoke(w,name,arg,hunk,1)))}
+	if(nest)pushstate(root),pending_popstate=1;issue(root,block)
 }
 fire_event_async=(target,name,x)=>fire_async(target,name,lml([x]),null,1)
 fire_hunk_async=(target,hunk)=>fire_async(target,null,lml([]),hunk,1)

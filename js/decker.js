@@ -385,7 +385,10 @@ PANGRAM='How razorback jumping-frogs can level six piqued gymnasts.'
 
 let uimode='interact', ui_container=null, uicursor=0, enable_gestures=0, profiler=0
 mark_dirty=_=>{dirty=1}
-con_set=x=>{if(x!=ui_container)setmode(uimode);if(x!=ui_container&&prototype_is(ui_container))contraption_update(deck,ui_container);ui_container=x}
+con_set=x=>{
+	if(x!=ui_container)setmode(uimode),msg.next_view=1
+	if(x!=ui_container&&prototype_is(ui_container))contraption_update(deck,ui_container);ui_container=x
+}
 con=_=>ui_container?ui_container:ifield(deck,'card')
 con_wids=_=>con().widgets
 con_image=_=>ifield(con(),'image')
@@ -2671,14 +2674,14 @@ script_editor=_=>{
 	const mh=3+font_h(FONT_MENU), bb=rect(0,mh,frame.size.x+1,frame.size.y-2*mh)
 	let overw=null;if(sc.xray){
 		const wids=con_wids();for(let z=0;z<wids.v.length;z++){
-			const wid=wids.v[z],size=unpack_widget(wid).size, o=ev.alt&&over(size), col=o?(overw=wid,13):44
+			const wid=wids.v[z],size=con_to_screen(unpack_widget(wid).size), o=ev.alt&&over(size), col=o?(overw=wid,13):44
 			draw_textc(size,ls(ifield(wid,'name')),FONT_BODY,o?-1:col),draw_box(size,0,col)
 			if(count(ifield(wid,'script')))draw_icon(rect(size.x-1,size.y),ICONS[ICON.lil],o?1:col)
 			if(ev.alt&&ev.mu&&over(size)&&dover(size)){close_script(wid),ev.md=ev.mu=0;break}
 		}if(ev.alt&&ev.mu)close_script(con()),ev.md=ev.mu=0
 	}
 	ui_codeedit(bb,0,sc.f),draw_hline(0,frame.size.x,frame.size.y-mh-1,1)
-	if(overw){uicursor=cursor.point;draw_textc(unpack_widget(overw).size,ls(ifield(overw,'name')),FONT_BODY,-1)}
+	if(overw){uicursor=cursor.point;draw_textc(con_to_screen(unpack_widget(overw).size),ls(ifield(overw,'name')),FONT_BODY,-1)}
 	if(sc.status.length){draw_text_fit(rect(3,frame.size.y-mh+3,frame.size.x,mh-6),sc.status,FONT_BODY,1)}
 	else{
 		let stat='';if(in_layer()&&wid.infield){
@@ -2711,7 +2714,7 @@ interpret=_=>{
 		if(!nomodal()||quota<=0||sleep_frames||sleep_play){if(sleep_frames)sleep_frames--;break}
 		if(!running()&&pending_popstate)popstate(),pending_popstate=0
 		if(msg.pending_halt||pending_popstate){/*suppress other new events until this one finishes*/}
-		else if(msg.pending_view){fire_event_async(ifield(deck,'card'),'view',NONE),msg.pending_view=0}
+		else if(msg.pending_view){fire_event_async(con(),'view',NONE),msg.pending_view=0}
 		else if(msg.target_click){
 			const arg=grid_is(msg.target_click)?lmn(msg.arg_click.y): canvas_is(msg.target_click)?lmpair(msg.arg_click): NONE
 			fire_event_async(msg.target_click,'click',arg),msg.target_click=null

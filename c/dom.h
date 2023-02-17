@@ -148,19 +148,14 @@ void ancestors(lv*target,lv*found,lv**deck,int*isolate){
 	lv*s=ifield(t,"script"),*block=parse(s&&s->c?s->sv:"");
 	if(perr()){block=parse("");}dset(found,target,block);
 }
-int pending_popstate=0;
-void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
+lv* parent_deck(lv*x){
+	if(deck_is(x))return x;
+	if(card_is(x)||prototype_is(x))return ivalue(x,"deck");
+	return parent_deck(ivalue(x,"card"));
+}
+lv* event_invoke(lv*target,lv*name,lv*arg,lv*hunk,int iso){
 	lv*scopes=lmd();dset(scopes,NONE,parse(default_handlers));
-	lv*deck=NULL;int isolate=0;ancestors(target,scopes,&deck,&isolate);
-	lv*root=lmenv(NULL);
-	primitives(root,deck);
-	dset(root,lmistr("me"),target);
-	if(!isolate){
-		dset(root,lmistr("deck"),deck);
-		dset(root,lmistr("patterns"),ifield(deck,"patterns"));
-	}
-	constants(root);
-	lv*core=NULL;
+	lv*deck=NULL,*core=NULL;int isolate=iso;ancestors(target,scopes,&deck,&isolate);
 	for(int z=scopes->c-1;z>=0;z--){
 		lv*t=scopes->kv[z],*b=lmblk();char*sname="!widget_scope";
 		if(lin(t))sname="!default_handlers";
@@ -188,8 +183,23 @@ void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
 		}
 		blk_get(b,name),blk_lit(b,arg),blk_op(b,CALL);if(!hunk)blk_op(b,DROP);core=b;
 	}
-	if(nest)pushstate(root),pending_popstate=1;
-	issue(root,core);
+	lv*b=lmblk();blk_lit(b,target),blk_loc(b,lmistr("me")),blk_op(b,DROP);
+	if(!isolate){
+		blk_lit(b,deck                   ),blk_loc(b,lmistr("deck"    )),blk_op(b,DROP);
+		blk_lit(b,ifield(deck,"patterns")),blk_loc(b,lmistr("patterns")),blk_op(b,DROP);
+	}blk_cat(b,core);return b;
+}
+int pending_popstate=0;
+void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
+	lv*root=lmenv(NULL);primitives(root,parent_deck(target)),constants(root);
+	lv*block=event_invoke(target,name,arg,hunk,0);
+	if(card_is(target)&&!strcmp(ls(name)->sv,"view")){
+		lv*wids=ifield(target,"widgets");EACH(z,wids){
+			lv*w=wids->lv[z];if(!contraption_is(w))continue;
+			blk_cat(block,event_invoke(w,name,arg,hunk,1));
+		}
+	}
+	if(nest)pushstate(root),pending_popstate=1;issue(root,block);
 }
 void fire_event_async(lv*target,lv*name,lv*arg){fire_async(target,name,l_list(arg),NULL,1);}
 void fire_hunk_async(lv*target,lv*hunk){fire_async(target,NULL,lml(0),hunk,1);}
