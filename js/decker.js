@@ -350,6 +350,7 @@ CHECKS=[
 	'%%IMG0AA8ADQAAVVAgIFBQCIBFEAIARRAIgFBQICBVUAAA',
 ].map(image_read)
 LOCK     =image_read('%%IMG0AAgACDhERP7+/v4A')
+ANIM     =image_read('%%IMG0AAgACBAoKER8goIA')
 ZOOM     =image_read('%%IMG0AAwADB4AIQBMgIxAv0C/QIxATIAhwB7gAHAAMA==')
 CORNERS=['%%IMG0AAUABf/mxISA','%%IMG0AAUABfk4GAgI','%%IMG0AAUABYSGx+f4','%%IMG0AAUABQgIGT/4'].map(image_read)
 GESTURES={
@@ -2515,7 +2516,11 @@ object_editor=_=>{
 		const w=unpack_widget(wid), sel=ob.sel.some(x=>x==wid);w.size=con_to_screen(w.size)
 		if(sel){draw_box(inset(w.size,-1),0,ANTS)}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1))}
 		if(sel&&ob.sel.length==1&&(contraption_is(ob.sel[0])?lb(ifield(ob.sel[0].def,'resizable')):1))draw_handles(w.size)
-		if(w.locked&&ob.show_bounds){draw_rect(rect(w.size.x+w.size.w-10,w.size.y,10,10),1),draw_icon(rect(w.size.x+w.size.w-8,w.size.y+1),LOCK,32)}
+		if(ob.show_bounds){
+			const badge=rect(w.size.x+w.size.w-10,w.size.y,10,10)
+			if(w.locked                  )draw_rect(badge,1),draw_icon(rect(badge.x+1,badge.y+1),LOCK,32),badge.y+=10
+			if(lb(ifield(wid,"animated")))draw_rect(badge,1),draw_icon(rect(badge.x+1,badge.y+1),ANIM,32)
+		}
 	})
 	if(!in_layer())return
 	if(ob.sel.length>0){
@@ -2653,6 +2658,7 @@ setscript=x=>{
 	               field_is (sc.target)?(p=1,lms('on change val do\n \nend')):
 	               slider_is(sc.target)?(p=1,lms('on change val do\n \nend')):
 	               canvas_is(sc.target)?(p=1,lms('on click pos do\n \nend\n\non drag pos do\n \nend\n\non release pos do\n \nend')):v
+	if(p&&widget_is(sc.target)&&!contraption_is(sc.target)&&lb(ifield(sc.target,'animated'))){v=lms(ls(v)+'\n\non view do\n \nend')}
 	if(!count(v)&&contraption_is(sc.target)){const t=sc.target.def.template;if(t&&t.length)p=1,v=lms(t)}
 	sc.status=p?'No existing script; populated a template.':'',sc.f=fieldstr(v)
 }
@@ -2702,7 +2708,27 @@ script_editor=_=>{
 
 // Runtime
 
+let viewed=lmd()
+find_animated=_=>{
+	const r=lmd();if(uimode!='interact')return r
+	con_wids().v.map(wid=>{
+		if(lb(ifield(wid,'animated'))&&!dget(viewed,wid))dset(r,wid,NONE)
+		if(contraption_is(wid))ivalue(wid,'widgets').v.map(cwid=>{if(lb(ifield(cwid,'animated'))&&!dget(viewed,cwid))dset(r,cwid,ONE)})
+	});return r
+}
+fire_animate=targets=>{
+	const root=lmenv(),block=lmblk();primitives(root,deck),constants(root)
+	targets.k.map((w,i)=>{blk_cat(block,event_invoke(w,'view',lml([NONE]),null,ln(targets.v[i]))),dset(viewed,w,ONE)})
+	pushstate(root),pending_popstate=1,issue(root,block)
+}
+fire_view=target=>{
+	const root=lmenv();primitives(root,deck),constants(root)
+	const block=event_invoke(target,'view',lml([NONE]),null,0)
+	ifield(target,'widgets').v.filter(w=>contraption_is(w)&&!dget(viewed,w)).map(w=>{blk_cat(block,event_invoke(w,'view',lml([NONE]),null,1)),dset(viewed,w,ONE)})
+	pushstate(root),pending_popstate=1,issue(root,block)
+}
 interpret=_=>{
+	viewed=lmd()
 	if(msg.overshoot&&!running()&&!msg.pending_view&&!msg.next_view)msg.overshoot=0
 	if(msg.pending_halt){if(running())halt();sleep_frames=0,sleep_play=0,msg.pending_view=0,msg.next_view=0}
 	if(sleep_play&&sfx_any())return 0;sleep_play=0
@@ -2713,8 +2739,9 @@ interpret=_=>{
 		if(quota<=0&&running())msg.overshoot=1
 		if(!nomodal()||quota<=0||sleep_frames||sleep_play){if(sleep_frames)sleep_frames--;break}
 		if(!running()&&pending_popstate)popstate(),pending_popstate=0
+		const a=find_animated()
 		if(msg.pending_halt||pending_popstate){/*suppress other new events until this one finishes*/}
-		else if(msg.pending_view){fire_event_async(con(),'view',NONE),msg.pending_view=0}
+		else if(msg.pending_view){fire_view(con()),msg.pending_view=0}
 		else if(msg.target_click){
 			const arg=grid_is(msg.target_click)?lmn(msg.arg_click.y): canvas_is(msg.target_click)?lmpair(msg.arg_click): NONE
 			fire_event_async(msg.target_click,'click',arg),msg.target_click=null
@@ -2726,6 +2753,7 @@ interpret=_=>{
 		else if(msg.target_order   ){fire_event_async(msg.target_order   ,'order'   ,msg.arg_order          ),msg.target_order   =null}
 		else if(msg.target_change  ){fire_event_async(msg.target_change  ,'change'  ,msg.arg_change         ),msg.target_change  =null}
 		else if(msg.target_navigate){fire_event_async(msg.target_navigate,'navigate',msg.arg_navigate       ),msg.target_navigate=null}
+		else if(count(a)           ){fire_animate(a)}
 		if(!running())break // not running, and no remaining events to process, so we're done for this frame
 	}if(msg.next_view&&ms.type!='listen')msg.pending_view=1,msg.next_view=0 // no more than one view[] event per frame!
 	return FRAME_QUOTA-quota
@@ -3020,9 +3048,12 @@ all_menus=_=>{
 		if(menu_item('New Grid...'       ,1))ob_create([lmd([lms('type')],[lms('grid'  )])])
 		if(card_is(con())&&menu_item('New Contraption...',1))modal_enter('pick_contraption')
 		menu_separator()
-		let al=1,as=1,at=1,ai=1,an=1
+		let al=1,aa=1,as=1,at=1,ai=1,an=1
 		ob.sel.map(unpack_widget).map(w=>{al&=w.locked, as&=w.show=='solid', at&=w.show=='transparent', ai&=w.show=='invert', an&=w.show=='none'})
-		if(menu_check('Locked'          ,ob.sel.length,ob.sel.length&&al))ob_edit_prop('locked',lmn(!al))
+		ob.sel.map(w=>aa&=lb(ifield(w,'animated')))
+		if(menu_check('Locked'          ,ob.sel.length,ob.sel.length&&al))ob_edit_prop('locked'  ,lmn(!al))
+		if(menu_check('Animated'        ,ob.sel.length,ob.sel.length&&aa))ob_edit_prop('animated',lmn(!aa))
+		menu_separator()
 		if(menu_check('Show Solid'      ,ob.sel.length,ob.sel.length&&as))ob_edit_prop('show',lms('solid'      ))
 		if(menu_check('Show Transparent',ob.sel.length,ob.sel.length&&at))ob_edit_prop('show',lms('transparent'))
 		if(menu_check('Show Inverted'   ,ob.sel.length,ob.sel.length&&ai))ob_edit_prop('show',lms('invert'     ))

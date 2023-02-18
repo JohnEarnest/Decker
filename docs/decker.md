@@ -882,6 +882,7 @@ The button widget is a clickable button, possibly with a stateful checkbox.
 | `x.name`                | String. The name of this widget. r/w.                                                                 |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
 | `x.locked`              | Bool. If false, the user cannot modify the value of this checkbox. r/w.                               |
+| `x.animated`            | Bool. If true, this widget will be sent `view[]` events at 60hz while on the current card. r/w.       |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
@@ -903,6 +904,7 @@ The field widget displays and possibly allows the editing of text.
 | `x.name`                | String. The name of this widget. r/w.                                                                 |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
 | `x.locked`              | Bool. If false, the user cannot edit the text of this field. r/w.                                     |
+| `x.animated`            | Bool. If true, this widget will be sent `view[]` events at 60hz while on the current card. r/w.       |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
@@ -932,6 +934,7 @@ The slider widget represents a single number, constrained within a configurable 
 | `x.name`                | String. The name of this widget. r/w.                                                                 |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
 | `x.locked`              | Bool. If false, the user cannot change the value of this slider. r/w.                                 |
+| `x.animated`            | Bool. If true, this widget will be sent `view[]` events at 60hz while on the current card. r/w.       |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
@@ -955,6 +958,7 @@ The grid widget represents an interactive spreadsheet-style view of a table.
 | `x.name`                | String. The name of this widget. r/w.                                                                 |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
 | `x.locked`              | Bool. If false, the user cannot select a row of the grid. r/w.                                        |
+| `x.animated`            | Bool. If true, this widget will be sent `view[]` events at 60hz while on the current card. r/w.       |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
@@ -987,6 +991,7 @@ The canvas will scale _up_ logical pixels to display them on the card (resulting
 | `x.name`                | String. The name of this widget. r/w.                                                                             |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                                 |
 | `x.locked`              | Bool. If false, the user can draw on this canvas in the current brush and pattern. r/w.                           |
+| `x.animated`            | Bool. If true, this widget will be sent `view[]` events at 60hz while on the current card. r/w.                   |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                                          |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                                   |
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.                          |
@@ -1050,6 +1055,7 @@ Contraptions are custom widgets, defined in a [Prototype](#prototypeinterface). 
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
 | `x.image`               | An _image_ interface representing the contraption's background, inherited from its Prototype.         |
 | `x.locked`              | Bool. Behavior of this property is entirely up to the Prototype. r/w.                                 |
+| `x.animated`            | Bool. If true, this widget will be sent `view[]` events at 60hz while on the current card. r/w.       |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
@@ -1139,7 +1145,7 @@ The `attributes` table provides information about the attributes of contraption 
 | `"code"`       | A Lil string          | Large field in "code" editing mode. |
 | `"rich"`       | An rtext table        | Large field in "rich" editing mode. |
 
-Modifying the attributes of a Prototype will automatically update Contraption instances in the current deck. Modifying the attributes of widgets contained in this Prototype will require explicitly calling `prototype.update[]`. In either case, when a definition is updated, the `name`, `pos`, `show`, `locked`, `font`, and `script` attributes of Contraptions will be preserved, as well the `value`, `scroll`, `row` and `image` attributes of the widgets they contain (as applicable), but everything else will be regenerated from the definition. The _state_ of contraptions is kept, and the _behavior and appearance_ is changed.
+Modifying the attributes of a Prototype will automatically update Contraption instances in the current deck. Modifying the attributes of widgets contained in this Prototype will require explicitly calling `prototype.update[]`. In either case, when a definition is updated, the `name`, `pos`, `show`, `locked`, `animated`, `font`, and `script` attributes of Contraptions will be preserved, as well the `value`, `scroll`, `row` and `image` attributes of the widgets they contain (as applicable), but everything else will be regenerated from the definition. The _state_ of contraptions is kept, and the _behavior and appearance_ is changed.
 
 
 Events
@@ -1182,6 +1188,7 @@ Events are as follows:
 | card        | `navigate` | One of {`"up"`,`"down"`,`"left"`,`"right"`}. | The user performs a navigation input.                          |
 | card        | `view`     | None.                                        | The card is navigated to, or the user enters interaction mode. |
 | contraption | `view`     | None.                                        | The surrounding card is sent a `view` event (see above).       |
+| widget      | `view`     | None.                                        | The surrounding card is active, repeatedly at 60hz.            |
 | card        | `loop`     | Previous _sound interface_ or `0`.           | The card is navigated to, or the background loop completes.    |
 
 If a canvas is not "draggable", events are relative to pointer movement on the canvas: The canvas will fire `click` only if the pointer is depressed within the bounds of the canvas. If a canvas is sent a `click`, it will receive a `release` when the pointer is released, even if the pointer is no longer over that canvas- the `pos` provided may be out of bounds. If a canvas is sent a `click`, it will be sent `drag` events every time the pointer is moved within the bounds of the canvas up until the `release`.
@@ -1377,6 +1384,23 @@ on view do
 end
 ```
 it would be equivalent to the first example!
+
+The `go[card]` method of animation is convenient, but it still requires us to write a card-level script. Furthermore, this method cannot be used from within a contraption, as contraption prototype scripts do not have access to the deck or the current card. There's one more option: the `animated` property. Any widget can be flagged as `animated` from the _Widgets_ menu. Animated widgets are automatically sent a `view` event on every frame so long as the card they appear on is visible. If we make our canvas "animated", it will only need the following script:
+```
+on view do
+ pinwheel[sys.frame]
+end
+```
+The `animated` property allows you to make widgets self-updating in an entirely self-contained way: their behavior can be fully contained in their own scripts, allowing them to be copied and pasted between cards or decks without requiring any additional "plumbing".
+
+You can use `animated` anywhere you want a "live updating" widget. Consider, for example, a field that continuously recomputes its value from other widgets:
+```
+on view do
+ me.text: price.text*(1+taxes.text)
+end
+```
+This approach "pulls" values from other fields, whereas you might otherwise "push" values from fields when they're edited, using their `change` event. As always, build your applications in the way that makes the most sense to you!
+
 
 Transitions
 ===========

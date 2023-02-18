@@ -193,12 +193,6 @@ int pending_popstate=0;
 void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
 	lv*root=lmenv(NULL);primitives(root,parent_deck(target)),constants(root);
 	lv*block=event_invoke(target,name,arg,hunk,0);
-	if(card_is(target)&&!strcmp(ls(name)->sv,"view")){
-		lv*wids=ifield(target,"widgets");EACH(z,wids){
-			lv*w=wids->lv[z];if(!contraption_is(w))continue;
-			blk_cat(block,event_invoke(w,name,arg,hunk,1));
-		}
-	}
 	if(nest)pushstate(root),pending_popstate=1;issue(root,block);
 }
 void fire_event_async(lv*target,lv*name,lv*arg){fire_async(target,name,l_list(arg),NULL,1);}
@@ -1636,7 +1630,7 @@ void contraption_reflow(lv*c){
 	}
 }
 lv* interface_contraption(lv*self,lv*i,lv*x){
-	lv*data=self->b;char*masks[]={"name","index","image","script","locked","pos","show","font","event","offset",NULL};
+	lv*data=self->b;char*masks[]={"name","index","image","script","locked","animated","pos","show","font","event","offset",NULL};
 	if(!is_rooted(self))return NONE;
 	if(x){
 		ikey("def"  )return x; // not mutable!
@@ -1691,23 +1685,25 @@ lv* interface_widget(lv*self,lv*i,lv*x){
 			int ix=dgeti(widgets,name);lv*n=ukey(widgets,ls(x),ls(x)->sv,dget(data,i));
 			widgets->kv[ix]=n;dset(widgets->lv[ix]->b,lmistr("name"),n);return x;
 		}
-		ikey("index" ){reorder(widgets,dgeti(widgets,name),ln(x));return x;}
-		ikey("font"  ){dset(data,i,normalize_font(fonts,x));return x;}
-		ikey("script"){dset(data,i,ls(x));return x;}
-		ikey("locked"){dset(data,i,lmn(lb(x)));return x;}
-		ikey("size"  ){dset(data,i,normalize_pair(x));return x;}
-		ikey("pos"   ){dset(data,i,lmpair(getpair(x)));return x;}
-		ikey("show"  ){dset(data,i,normalize_enum(x,widget_shows));return x;}
+		ikey("index"   ){reorder(widgets,dgeti(widgets,name),ln(x));return x;}
+		ikey("font"    ){dset(data,i,normalize_font(fonts,x));return x;}
+		ikey("script"  ){dset(data,i,ls(x));return x;}
+		ikey("locked"  ){dset(data,i,lmn(lb(x)));return x;}
+		ikey("animated"){dset(data,i,lmn(lb(x)));return x;}
+		ikey("size"    ){dset(data,i,normalize_pair(x));return x;}
+		ikey("pos"     ){dset(data,i,lmpair(getpair(x)));return x;}
+		ikey("show"    ){dset(data,i,normalize_enum(x,widget_shows));return x;}
 	}else{
-		ikey("name"  )return dget(data,i);
-		ikey("index" )return lmn(dgeti(widgets,name));
-		ikey("script"){lv*r=dget(data,i);return r?r:lmistr("");}
-		ikey("locked"){lv*r=dget(data,i);return r?r:NONE;}
-		ikey("pos"   ){lv*r=dget(data,i);return r?r:lmpair((pair){0,0});}
-		ikey("show"  ){lv*r=dget(data,i);return r?r:lmistr(widget_shows[0]);}
-		ikey("font"  ){lv*r=dget(data,i);return r?dget(fonts,r): fonts->lv[button_is(self)?1:0];}
-		ikey("event" )return lmnat(n_event,self);
-		ikey("offset"){
+		ikey("name"    )return dget(data,i);
+		ikey("index"   )return lmn(dgeti(widgets,name));
+		ikey("script"  ){lv*r=dget(data,i);return r?r:lmistr("");}
+		ikey("locked"  ){lv*r=dget(data,i);return r?r:NONE;}
+		ikey("animated"){lv*r=dget(data,i);return r?r:NONE;}
+		ikey("pos"     ){lv*r=dget(data,i);return r?r:lmpair((pair){0,0});}
+		ikey("show"    ){lv*r=dget(data,i);return r?r:lmistr(widget_shows[0]);}
+		ikey("font"    ){lv*r=dget(data,i);return r?dget(fonts,r): fonts->lv[button_is(self)?1:0];}
+		ikey("event"   )return lmnat(n_event,self);
+		ikey("offset"  ){
 			pair c=getpair(ifield(card,"size")),p=getpair(ifield(self,"pos")),d=getpair(ivalue(deck,"size"));
 			lv*con=card;while(contraption_is(con)){pair o=getpair(ifield(con,"pos"));p.x+=o.x,p.y+=o.y;con=ivalue(con,"card"),c=getpair(ifield(con,"size"));}
 			rect b=box_center(rect_pair((pair){0,0},d),c);return lmpair((pair){p.x+b.x,p.y+b.y});
@@ -1725,24 +1721,26 @@ lv* widget_read(lv*x,lv*card){
 	      (type&&!strcmp(type->sv,"slider"     ))?slider_read(x,r):
 	      (type&&!strcmp(type->sv,"contraption"))?contraption_read(x,r): button_read(x,r);
 	if(!lii(ri))return NULL;
-	init_field(ri,"size"  ,x);
-	init_field(ri,"script",x);
-	init_field(ri,"font"  ,x);
-	init_field(ri,"locked",x);
-	init_field(ri,"pos"   ,x);
-	init_field(ri,"show"  ,x);
+	init_field(ri,"size"    ,x);
+	init_field(ri,"script"  ,x);
+	init_field(ri,"font"    ,x);
+	init_field(ri,"locked"  ,x);
+	init_field(ri,"animated",x);
+	init_field(ri,"pos"     ,x);
+	init_field(ri,"show"    ,x);
 	return ri;
 }
 lv* widget_write(lv*x){
 	lv*data=x->b,*r=lmd();
-	{lv*k=lmistr("name"  ),*v=dget(data,k);dset(r,k,v);}
-	{lv*k=lmistr("type"  ),*v=dget(data,k);dset(r,k,v);}
-	{lv*k=lmistr("size"  );dset(r,k,ifield(x,"size"));}
-	{lv*k=lmistr("pos"   );dset(r,k,ifield(x,"pos" ));}
-	{lv*k=lmistr("locked"),*v=dget(data,k);if(v&&lb(v))dset(r,k,v);}
-	{lv*k=lmistr("script"),*v=dget(data,k);if(v&&v->c)dset(r,k,v);}
-	{lv*k=lmistr("font"  ),*v=dget(data,k);if(v&&strcmp(button_is(x)?"menu":"body",v->sv))dset(r,k,v);}
-	{lv*k=lmistr("show"  ),*v=dget(data,k);if(v&&strcmp(widget_shows[0],v->sv))dset(r,k,v);}
+	{lv*k=lmistr("name"    ),*v=dget(data,k);dset(r,k,v);}
+	{lv*k=lmistr("type"    ),*v=dget(data,k);dset(r,k,v);}
+	{lv*k=lmistr("size"    );dset(r,k,ifield(x,"size"));}
+	{lv*k=lmistr("pos"     );dset(r,k,ifield(x,"pos" ));}
+	{lv*k=lmistr("locked"  ),*v=dget(data,k);if(v&&lb(v))dset(r,k,v);}
+	{lv*k=lmistr("animated"),*v=dget(data,k);if(v&&lb(v))dset(r,k,v);}
+	{lv*k=lmistr("script"  ),*v=dget(data,k);if(v&&v->c)dset(r,k,v);}
+	{lv*k=lmistr("font"    ),*v=dget(data,k);if(v&&strcmp(button_is(x)?"menu":"body",v->sv))dset(r,k,v);}
+	{lv*k=lmistr("show"    ),*v=dget(data,k);if(v&&strcmp(widget_shows[0],v->sv))dset(r,k,v);}
 	return l_comma(r,button_is(x)?button_write(x): field_is (x)?field_write (x):slider_is(x)?slider_write(x):
 	                 grid_is  (x)?grid_write  (x): canvas_is(x)?canvas_write(x):contraption_is(x)?contraption_write(x): lmd());
 }

@@ -187,6 +187,7 @@ Some properties are common to all widgets:
 	- `"invert"`: Draw the widget with a white-on-black colorscheme, or, in the case of `canvas`, every pixel in the image will toggle (XOR) pixels in the graphics beneath it.
 	- `"none"`: Do not draw this widget at all. Such a widget will not produce any events.
 - `locked` an integer; if nonzero, this widget is non-editable. For `button`, this means it cannot be clicked. A locked `field` may not be edited, and a locked `canvas` may not be drawn upon by user mouse events. The default is `0`.
+- `animated` an integer; if nonzero, this widget will be sent a `view[]` event on each frame (60hz). The default is `0`.
 - `font` a string corresponding to the ID of a _Font Record_, used for drawing any text on this widget.
 - `script` a number or string corresponding to a `{script:ID}` chunk, representing event handlers applying to this widget.
 
@@ -385,3 +386,4 @@ Changelog
 
 1.12:
 - Introduced the `{contraption:ID}` section and the `contraption` widget type.
+- Introduced the `animated` property for all widgets.

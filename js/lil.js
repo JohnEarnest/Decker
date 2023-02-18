@@ -1747,7 +1747,7 @@ contraption_read=(x,card)=>{
 			iwrite(dwid,lms('pos'),lmpair(a)),iwrite(dwid,lms('size'),lmpair(rsub(b,a)))
 		})
 	}
-	const masks={name:1,index:1,image:1,script:1,locked:1,pos:1,show:1,font:1,event:1,offset:1}
+	const masks={name:1,index:1,image:1,script:1,locked:1,animated:1,pos:1,show:1,font:1,event:1,offset:1}
 	const ri=lmi((self,i,x)=>{
 		if(!is_rooted(self))return NONE
 		if(x){
@@ -1788,23 +1788,25 @@ widget_shows={solid:1,invert:1,transparent:1,none:1}
 interface_widget=(self,i,x)=>{
 	widget_rename=(card,a,b)=>{const w=card.widgets,i=dkix(w,a);w.k[i]=b,w.v[i].name=ls(b)}
 	if(x){
-		if(ikey(i,'name'  ))return widget_rename(self.card,lms(self.name),ukey(self.card.widgets,lms(ls(x)),ls(x),lms(self.name))),x
-		if(ikey(i,'index' ))return reorder(self.card.widgets,dvix(self.card.widgets,self),ln(x)),x
-		if(ikey(i,'font'  ))return self.font=normalize_font(self.card.deck.fonts,x),x
-		if(ikey(i,'script'))return self.script=ls(x),x
-		if(ikey(i,'locked'))return self.locked=lb(x),x
-		if(ikey(i,'size'  ))return self.size=rint(rclamp(rect(),getpair(x),rect(4096,4096))),x
-		if(ikey(i,'pos'   ))return self.pos=rint(getpair(x)),x
-		if(ikey(i,'show'  ))return self.show=normalize_enum(widget_shows,ls(x)),x
+		if(ikey(i,'name'    ))return widget_rename(self.card,lms(self.name),ukey(self.card.widgets,lms(ls(x)),ls(x),lms(self.name))),x
+		if(ikey(i,'index'   ))return reorder(self.card.widgets,dvix(self.card.widgets,self),ln(x)),x
+		if(ikey(i,'font'    ))return self.font=normalize_font(self.card.deck.fonts,x),x
+		if(ikey(i,'script'  ))return self.script=ls(x),x
+		if(ikey(i,'locked'  ))return self.locked=lb(x),x
+		if(ikey(i,'animated'))return self.animated=lb(x),x
+		if(ikey(i,'size'    ))return self.size=rint(rclamp(rect(),getpair(x),rect(4096,4096))),x
+		if(ikey(i,'pos'     ))return self.pos=rint(getpair(x)),x
+		if(ikey(i,'show'    ))return self.show=normalize_enum(widget_shows,ls(x)),x
 	}else{
-		if(ikey(i,'name'  ))return lms(self.name)
-		if(ikey(i,'index' ))return lmn(dvix(self.card.widgets,self))
-		if(ikey(i,'script'))return lms(ivalue(self,ls(i),''))
-		if(ikey(i,'locked'))return lmn(ivalue(self,ls(i),0))
-		if(ikey(i,'pos'   ))return lmpair(ivalue(self,ls(i),rect()))
-		if(ikey(i,'show'  ))return lms(ivalue(self,ls(i),'solid'))
-		if(ikey(i,'font'  ))return dget(self.card.deck.fonts,lms(ivalue(self,ls(i),button_is(self)?'menu':'body')))
-		if(ikey(i,'event' ))return lmnat(args=>n_event(self,args))
+		if(ikey(i,'name'    ))return lms(self.name)
+		if(ikey(i,'index'   ))return lmn(dvix(self.card.widgets,self))
+		if(ikey(i,'script'  ))return lms(ivalue(self,ls(i),''))
+		if(ikey(i,'locked'  ))return lmn(ivalue(self,ls(i),0))
+		if(ikey(i,'animated'))return lmn(ivalue(self,ls(i),0))
+		if(ikey(i,'pos'     ))return lmpair(ivalue(self,ls(i),rect()))
+		if(ikey(i,'show'    ))return lms(ivalue(self,ls(i),'solid'))
+		if(ikey(i,'font'    ))return dget(self.card.deck.fonts,lms(ivalue(self,ls(i),button_is(self)?'menu':'body')))
+		if(ikey(i,'event'   ))return lmnat(args=>n_event(self,args))
 		if(ikey(i,'offset')){
 			let c=getpair(ifield(self.card,'size')), p=self.pos, d=self.card.deck.size, con=self.card
 			while(contraption_is(con)){p=radd(p,con.pos),con=con.card,c=getpair(ifield(con,'size'))}
@@ -1817,12 +1819,13 @@ widget_read=(x,card)=>{
 	const ctors={button:button_read,field:field_read,slider:slider_read,grid:grid_read,canvas:canvas_read,contraption:contraption_read}
 	const ri=(ctors[type]||button_read)(ld(x),card);if(!lii(ri))return null
 	ri.name=ls(ukey(card.widgets,dget(x,lms('name')),tname))
-	init_field(ri,'size'  ,x)
-	init_field(ri,'script',x)
-	init_field(ri,'font'  ,x)
-	init_field(ri,'locked',x)
-	init_field(ri,'pos'   ,x)
-	init_field(ri,'show'  ,x)
+	init_field(ri,'size'    ,x)
+	init_field(ri,'script'  ,x)
+	init_field(ri,'font'    ,x)
+	init_field(ri,'locked'  ,x)
+	init_field(ri,'animated',x)
+	init_field(ri,'pos'     ,x)
+	init_field(ri,'show'    ,x)
 	return ri
 }
 widget_write=x=>{
@@ -1831,10 +1834,11 @@ widget_write=x=>{
 	dset(r,lms('type'),lms(x.n))
 	dset(r,lms('size'),ifield(x,'size'))
 	dset(r,lms('pos' ),ifield(x,'pos' ))
-	if(x.size  )dset(r,lms('size'  ),lmpair(x.size))
-	if(x.pos   )dset(r,lms('pos'   ),lmpair(x.pos))
-	if(x.locked)dset(r,lms('locked'),lmn(x.locked))
-	if(x.script)dset(r,lms('script'),lms(x.script))
+	if(x.size    )dset(r,lms('size'    ),lmpair(x.size))
+	if(x.pos     )dset(r,lms('pos'     ),lmpair(x.pos))
+	if(x.locked  )dset(r,lms('locked'  ),lmn(x.locked))
+	if(x.animated)dset(r,lms('animated'),lmn(x.animated))
+	if(x.script  )dset(r,lms('script'  ),lms(x.script))
 	if(x.font&&x.font!=(button_is(x)?"menu":"body"))dset(r,lms('font'),lms(x.font))
 	if(x.show&&x.show!='solid')dset(r,lms('show'),lms(x.show))
 	return dyad[','](r,button_is(x)?button_write(x): field_is (x)?field_write (x):slider_is(x)?slider_write(x):
@@ -2327,9 +2331,7 @@ event_invoke=(target,name,arg,hunk,isolate)=>{
 }
 fire_async=(target,name,arg,hunk,nest)=>{
 	const root=lmenv();primitives(root,parent_deck(target)),constants(root)
-	const block=event_invoke(target,name,arg,hunk,0)
-	if(card_is(target)&&name=='view'){target.widgets.v.filter(contraption_is).map(w=>blk_cat(block,event_invoke(w,name,arg,hunk,1)))}
-	if(nest)pushstate(root),pending_popstate=1;issue(root,block)
+	if(nest)pushstate(root),pending_popstate=1;issue(root,event_invoke(target,name,arg,hunk,0))
 }
 fire_event_async=(target,name,x)=>fire_async(target,name,lml([x]),null,1)
 fire_hunk_async=(target,hunk)=>fire_async(target,null,lml([]),hunk,1)

@@ -10,7 +10,7 @@ void quit();
 
 // Assets
 
-lv*CHECK,*LOCK,*ZOOM,*CHECKS[4],*CORNERS[4],*RADIOS[4],*ICONS[8],*GESTURES[4],*HANDLES[2];
+lv*CHECK,*LOCK,*ANIM,*ZOOM,*CHECKS[4],*CORNERS[4],*RADIOS[4],*ICONS[8],*GESTURES[4],*HANDLES[2];
 lv*FONT_BODY,*FONT_MENU,*FONT_MONO,*TOOLS,*ARROWS,*TOOLB,*PLAYING,*ATTRS;
 enum mini_icons {icon_dir,icon_doc,icon_sound,icon_font,icon_app,icon_lil,icon_pat,icon_chek,icon_none};
 enum cursor_styles {cursor_default,cursor_point,cursor_ibeam,cursor_drag};
@@ -338,6 +338,7 @@ void setscript(lv*x){
 		       field_is (sc.target)?(p=1,lmistr("on change val do\n \nend")):
 		       slider_is(sc.target)?(p=1,lmistr("on change val do\n \nend")):
 		       canvas_is(sc.target)?(p=1,lmistr("on click pos do\n \nend\n\non drag pos do\n \nend\n\non release pos do\n \nend")):v;
+	if(p&&widget_is(sc.target)&&!contraption_is(sc.target)&&lb(ifield(sc.target,"animated"))){v=l_fuse(lmistr(""),lml2(v,lmistr("\n\non view do\n \nend")));}
 	if(!v->c&&contraption_is(sc.target)){lv*t=ifield(ifield(sc.target,"def"),"template");if(t->c)p=1,v=t;}
 	if(p)snprintf(sc.status,sizeof(sc.status),"No existing script; populated a template.");
 	sc.f=(field_val){rtext_cast(v),0};
@@ -2693,7 +2694,11 @@ void object_editor(){
 		int sel=0;EACH(z,ob.sel)if(ob.sel->lv[z]==wid){sel=1;break;}
 		if(sel){draw_box(inset(w.size,-1),0,ANTS);}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1));}
 		if(sel&&ob.sel->c==1&&(contraption_is(ob.sel->lv[0])?lb(ifield(ifield(ob.sel->lv[0],"def"),"resizable")):1)){draw_handles(w.size);}
-		if(w.locked&&ob.show_bounds){draw_rect((rect){w.size.x+w.size.w-10,w.size.y,10,10},1),draw_icon((pair){w.size.x+w.size.w-8,w.size.y+1},LOCK,32);}
+		if(ob.show_bounds){
+			rect badge={w.size.x+w.size.w-10,w.size.y,10,10};
+			if(w.locked                  )draw_rect(badge,1),draw_icon((pair){badge.x+1,badge.y+1},LOCK,32),badge.y+=10;
+			if(lb(ifield(wid,"animated")))draw_rect(badge,1),draw_icon((pair){badge.x+1,badge.y+1},ANIM,32);
+		}
 	}
 	if(!in_layer())return;
 	if(ob.sel->c>0){
@@ -3051,7 +3056,36 @@ void sync(){
 
 // Runtime
 
+lv*viewed=NULL;
+lv* find_animated(){
+	lv*r=lmd();if(uimode!=mode_interact)return r;
+	lv*wids=con_wids();EACH(z,wids){
+		lv*wid=wids->lv[z];
+		if(lb(ifield(wid,"animated"))&&dget(viewed,wid)==NULL)dset(r,wid,NONE);
+		if(!contraption_is(wid))continue;
+		lv*cwids=ivalue(wid,"widgets");EACH(c,cwids){
+			lv*cwid=cwids->lv[c];
+			if(lb(ifield(cwid,"animated"))&&dget(viewed,cwid)==NULL)dset(r,cwid,ONE);
+		}
+	}return r;
+}
+void fire_animate(lv*targets){
+	lv*name=lmistr("view"),*root=lmenv(NULL);primitives(root,deck),constants(root);
+	lv*block=lmblk();EACH(z,targets){
+		lv*w=targets->kv[z];
+		blk_cat(block,event_invoke(w,name,NONE,NULL,ln(targets->lv[z]))),dset(viewed,w,ONE);
+	}pushstate(root),pending_popstate=1,issue(root,block);
+}
+void fire_view(lv*target){
+	lv*name=lmistr("view"),*root=lmenv(NULL);primitives(root,deck),constants(root);
+	lv*block=event_invoke(target,name,NONE,NULL,0);
+	lv*wids=ifield(target,"widgets");EACH(z,wids){
+		lv*w=wids->lv[z];if(!contraption_is(w)||dget(viewed,w)!=NULL)continue;
+		blk_cat(block,event_invoke(w,name,NONE,NULL,1)),dset(viewed,w,ONE);
+	}pushstate(root),pending_popstate=1,issue(root,block);
+}
 int interpret(){
+	viewed->c=0;
 	if(msg.overshoot&&!running()&&!msg.pending_view&&!msg.next_view)msg.overshoot=0;
 	if(msg.pending_halt){if(running())halt();sleep_frames=0,sleep_play=0,msg.pending_view=0,msg.next_view=0;}
 	if(sleep_play&&sfx_any())return 0;sleep_play=0;
@@ -3063,8 +3097,9 @@ int interpret(){
 		if(quota<=0&&running())msg.overshoot=1;
 		if(!nomodal||quota<=0||sleep_frames||sleep_play){if(sleep_frames)sleep_frames--;break;}
 		if(!running()&&pending_popstate){popstate();pending_popstate=0;}
+		lv*a=find_animated();
 		if(msg.pending_halt||pending_popstate){/*suppress other new events until this one finishes*/}
-		else if(msg.pending_view){fire_event_async(con(),lmistr("view"),NONE);msg.pending_view=0;}
+		else if(msg.pending_view){fire_view(con()),msg.pending_view=0;}
 		else if(msg.target_click){
 			lv*arg=grid_is(msg.target_click)?lmn(msg.arg_click.y): canvas_is(msg.target_click)?lmfpair(msg.arg_click): NONE;
 			fire_event_async(msg.target_click,lmistr("click"),arg);msg.target_click=NULL;
@@ -3076,6 +3111,7 @@ int interpret(){
 		else if(msg.target_order   ){fire_event_async(msg.target_order   ,lmistr("order"   ),msg.arg_order           );msg.target_order   =NULL;}
 		else if(msg.target_change  ){fire_event_async(msg.target_change  ,lmistr("change"  ),msg.arg_change          );msg.target_change  =NULL;}
 		else if(msg.target_navigate){fire_event_async(msg.target_navigate,lmistr("navigate"),msg.arg_navigate        );msg.target_navigate=NULL;}
+		else if(a->c               ){fire_animate(a);}
 		if(!running())break; // not running, and no remaining events to process, so we're done for this frame
 	}
 	if(msg.next_view&&ms.type!=modal_listen)msg.pending_view=1,msg.next_view=0; // no more than one view[] event per frame!
@@ -3443,11 +3479,14 @@ void all_menus(){
 		if(menu_item("New Grid..."       ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("grid"  ));ob_create(l_list(p));}
 		if(card_is(con())&&menu_item("New Contraption...",1,'\0'))modal_enter(modal_pick_contraption);
 		menu_separator();
-		int al=1,as=1,at=1,ai=1,an=1;EACH(z,ob.sel){
+		int al=1,aa=1,as=1,at=1,ai=1,an=1;EACH(z,ob.sel){
 			widget w=unpack_widget(ob.sel->lv[z]);al&=w.locked;
 			as&=w.show==show_solid, at&=w.show==show_transparent, ai&=w.show==show_invert, an&=w.show==show_none;
+			aa&=lb(ifield(ob.sel->lv[z],"animated"));
 		}
-		if(menu_check("Locked"          ,ob.sel->c,ob.sel->c&&al,'\0'))ob_edit_prop("locked",lmn(!al));
+		if(menu_check("Locked"          ,ob.sel->c,ob.sel->c&&al,'\0'))ob_edit_prop("locked"  ,lmn(!al));
+		if(menu_check("Animated"        ,ob.sel->c,ob.sel->c&&aa,'\0'))ob_edit_prop("animated",lmn(!aa));
+		menu_separator();
 		if(menu_check("Show Solid"      ,ob.sel->c,ob.sel->c&&as,'\0'))ob_edit_prop("show",lmistr("solid"));
 		if(menu_check("Show Transparent",ob.sel->c,ob.sel->c&&at,'\0'))ob_edit_prop("show",lmistr("transparent"));
 		if(menu_check("Show Inverted"   ,ob.sel->c,ob.sel->c&&ai,'\0'))ob_edit_prop("show",lmistr("invert"));
@@ -3668,6 +3707,7 @@ int main(int argc,char**argv){
 	dset(env,lmistr("checkdon" ),CHECKS[3] =image_read(lmistr("%%IMG0AA8ADQAAVVAgIFBQCIBFEAIARRAIgFBQICBVUAAA")));
 	dset(env,lmistr("checkdoff"),CHECKS[2] =image_read(lmistr("%%IMG0AA8ADQAAVVAAAEAQAABAEAAAQBAAAEAQAABVUAAA")));
 	dset(env,lmistr("locked"   ),LOCK      =image_read(lmistr("%%IMG0AAgACDhERP7+/v4A")));
+	dset(env,lmistr("anim"     ),ANIM      =image_read(lmistr("%%IMG0AAgACBAoKER8goIA")));
 	dset(env,lmistr("zoom"     ),ZOOM      =image_read(lmistr("%%IMG0AAwADB4AIQBMgIxAv0C/QIxATIAhwB7gAHAAMA==")));
 	dset(env,lmistr("corner nw"),CORNERS[0]=image_read(lmistr("%%IMG0AAUABf/mxISA")));
 	dset(env,lmistr("corner ne"),CORNERS[1]=image_read(lmistr("%%IMG0AAUABfk4GAgI")));
@@ -3698,6 +3738,7 @@ int main(int argc,char**argv){
 	dset(env,lmistr("attribs"  ),ATTRS     =lml(0));
 	dset(env,lmistr("li hist"  ),li.hist   =lml(0));
 	dset(env,lmistr("li vars"  ),li.vars   =lmd());
+	dset(env,lmistr("viewed"   ),viewed    =lmd());
 	ob.sel=lml(0);
 
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK | (nosound?0:SDL_INIT_AUDIO));

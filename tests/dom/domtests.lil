@@ -524,47 +524,51 @@ b:card.add["button"]
 # this one's a bit longer than most, since
 # it probes even the common widget properties:
 dattr:()
-dattr.name:   "button1"
-dattr.font:   deck.fonts.menu
-dattr.script: ""
-dattr.locked: 0
-dattr.size:   60,20
-dattr.pos:    0,0
-dattr.show:   "solid"
-dattr.text:   ""
-dattr.value:  0
-dattr.style:  "round"
+dattr.name:    "button1"
+dattr.font:    deck.fonts.menu
+dattr.script:  ""
+dattr.locked:  0
+dattr.animated:0
+dattr.size:    60,20
+dattr.pos:     0,0
+dattr.show:    "solid"
+dattr.text:    ""
+dattr.value:   0
+dattr.style:   "round"
 on buttonattrs x do
 	r:()
-	r.name:   x.name
-	r.font:   x.font
-	r.script: x.script
-	r.locked: x.locked
-	r.size:   x.size
-	r.pos:    x.pos
-	r.show:   x.show
-	r.text:   x.text
-	r.value:  x.value
-	r.style:  x.style
+	r.name:    x.name
+	r.font:    x.font
+	r.script:  x.script
+	r.locked:  x.locked
+	r.animated:x.animated
+	r.size:    x.size
+	r.pos:     x.pos
+	r.show:    x.show
+	r.text:    x.text
+	r.value:   x.value
+	r.style:   x.style
 end
 assert["button default attributes and types" dattr buttonattrs[b]]
 
-dattr.name:   b.name:   "bertram butan"
-dattr.font:   b.font:   deck.fonts.menu
-dattr.script: b.script: "2+3"
-dattr.locked: b.locked: 1
-dattr.size:   b.size:   32,48
-dattr.pos:    b.pos:    12,34
-dattr.show:   b.show:   "invert"
-dattr.text:   b.text:   "Click Me!"
-dattr.value:  b.value:  1
-dattr.style:  b.style:  "check"
+dattr.name:     b.name:     "bertram butan"
+dattr.font:     b.font:     deck.fonts.menu
+dattr.script:   b.script:   "2+3"
+dattr.locked:   b.locked:   1
+dattr.animated: b.animated: 1
+dattr.size:     b.size:     32,48
+dattr.pos:      b.pos:      12,34
+dattr.show:     b.show:     "invert"
+dattr.text:     b.text:     "Click Me!"
+dattr.value:    b.value:    1
+dattr.style:    b.style:    "check"
 assert["button mutable attributes" dattr buttonattrs[b]]
 
 dattr.name:"23"             b.name: 23
 dattr.font:deck.fonts.body  b.font: "zoop"
 dattr.script:"0"            b.script: 0
 dattr.locked:1              b.locked: 99
+dattr.animated:1            b.animated: 37
 dattr.size:0,19             b.size: -12,19
 dattr.pos:-99,0             b.pos:-99,"A"
 dattr.show:"solid"          b.show:"frizzle"
