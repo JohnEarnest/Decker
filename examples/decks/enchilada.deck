@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:11
+card:12
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -369,13 +369,24 @@ b:{"type":"contraption","size":[150,50],"pos":[40,150],"def":"spinner","widgets"
 contraption1:{"type":"contraption","size":[200,140],"pos":[276,89],"def":"enchilada","widgets":{"bool":{},"number":{},"string":{},"code":{},"rich":{}}}
 contraption2:{"type":"contraption","size":[150,90],"pos":[54,222],"def":"paintbox","widgets":{}}
 smol1:{"type":"contraption","size":[20,20],"pos":[222,268],"def":"smol","widgets":{}}
-viewCounter1:{"type":"contraption","size":[102,26],"pos":[326,29],"def":"viewCounter","widgets":{"c":{"value":"6"}}}
+viewCounter1:{"type":"contraption","size":[102,26],"pos":[326,29],"def":"viewCounter","widgets":{"c":{"value":"7"}}}
 
 {script:contraptions.0}
 on change do
  alert["changed spinner!"]
 end
 {end}
+
+{card:More Contraptions}
+{widgets}
+dieRoller1:{"type":"contraption","size":[137,23],"pos":[45,66],"def":"dieRoller","widgets":{"result":{"value":"1+1 = 2"},"button1":{}}}
+dieRoller2:{"type":"contraption","size":[229,23],"pos":[45,94],"def":"dieRoller","widgets":{"result":{"size":[143,19],"value":"2+10+7+6+10+5+2+4 = 46"},"button1":{"text":"5d10+3d6"}}}
+dieRoller3:{"type":"contraption","size":[137,23],"pos":[45,38],"def":"dieRoller","widgets":{"result":{"value":"1"},"button1":{"text":"1d6"}}}
+clock1:{"type":"contraption","size":[100,25],"pos":[375,39],"font":"menu","def":"clock","widgets":{"canvas1":{"size":[100,25],"font":"menu","image":"%%IMG0AGQAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAePAGHA8MAAAAAAAAAM2YDjARnAAAAAAAAADNmxZgwYwAAAAAAAAAzZsmfMGMAAAAAAAAAM2YRmYDDAAAAAAAAADM+H9mBgwAAAAAAAAAzBgGZgwMAAAAAAAAAMwzBmbYDAAAAAAAAAB44wY834wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="},"tz":{"size":[35,0],"pos":[6,18]},"mil":{"size":[31,0],"pos":[54,18]}}}
+datePicker1:{"type":"contraption","size":[109,123],"pos":[371,92],"def":"datePicker","widgets":{"canv":{"image":"%%IMG0AGcAZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIIAAAAAAAAAAAAAAADGAAAAAAAAAAAAAAAAqmSAAAAAAAAAAAAAAJIUgAAAAAAAAAAAAACCdIAAAAAAAAAAAAAAgpSAAAAAAAAAAAAAAIJzgAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAggHwBBAH0B4AHAAiAMYAQAQQARAQACIAIJCqYESCowEcELAgYByQkpBEgqSBEhzAHBACkIKQRIFHgRIQgAJwIpCCkESBRAESEIAikBxwgmBDgUMBEhCAHHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////////////+AAAgAIACAAgAIACAAgAAIACAAgAIACAAgAIAACAggcIPiAQg+IDCAAAgYIIiAQgMIICBAgAAICCAIgIIFCDwggIAACAggEIHCCQgCIPCAAAgIICCAIg+IAiCIgAAICCBAgiIBCCIgiIAACAgg+IHCAQgcIHCAAAgAIACAAgAIACAAgAAIACAAgAIACAAgAIAACAAgAIACAAgAIACD////////////////ggAIAD//gAIACAAgAIIACAA//4ACAAgAIACCD4gcP4+IciCIhyI+ggCIIj93mIphiYimBIIBCCI/d4iKIIiAogiCAQgcP4eIiiCIgSIcggIIIj/3iIogiIIiAoICCCI/74iKIIiEIiKCAggcP5+IciCIj6IcggAIAD//gAIACAAgAIIACAA//4ACAAgAIACCAAgAP/+AAgAIACAAg////////////////4IACAAgAIACAAgAIACCAAgAIACAAgAIACAAgiBIj6IMiPohyIcnHIJgyYgmEJgKYimIqKKCIUiPIiCIEiIoiKCigiJIgKI8iBIhyIehIoIj6ICiIogiIiiAoiKCIEiIoiKIIiIogSQigiBIhyIciCIhyIYvnIIACAAgAIACAAgAIACCAAgAIACAAgAIACAAggAIACAAgAIACAAgAIP///////////////+CAAgAIACAAgAIACAAggAIACAAgAIACAAgAIJwiccnPpwSc+nDJz6CiYooqISiMooKJCiCggiIIKCIglILyCgghIIQiEEhHISSEChPIQSCIIiCIgKI+iAoiKIIgkCJBCQikBJCKQikCIL4i++vnL4S+cvnL4iCAAgAIACAAgAIACAAggAIACAAgAIACAAgAIIACAAgAIACAAgAIACD////////////////ggAIACAAgAIAAAAAAAIACAAgAIACAAAAAAACccnHL5y+IgAAAAAAAooqKKEihGIAAAAAAAIKKCiiIogiAAAAAAACEchHpyKcIgAAAAAAAiIogKCigiIAAAAAAAJCKQEooqIiAAAAAAAC+cvmJxycIgAAAAAAAgAIACAAgAIAAAAAAAIACAAgAIACAAAAAAACAAgAIACAAgAAAAAAA/////////4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="},"val":{"value":"2023-05-09"},"next":{},"prev":{}}}
+fancyBorder1:{"type":"contraption","size":[31,45],"pos":[76,142],"def":"fancyBorder","widgets":{}}
+fancyBorder2:{"type":"contraption","size":[87,47],"pos":[114,142],"def":"fancyBorder","widgets":{}}
+fancyBorder3:{"type":"contraption","size":[124,29],"pos":[76,195],"def":"fancyBorder","widgets":{}}
 
 {card:anime 1}
 script:"anime 1.0"
@@ -602,4 +613,210 @@ on view do
  c.text:c.text+1
 end
 {end}
+
+{contraption:dieRoller}
+size:[137,23]
+resizable:1
+margin:[90,8,8,9]
+description:"roll dice using \"1d6+5\" notation."
+image:"%%IMG2AIkAFwD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wBb"
+script:"dieRoller.0"
+attributes:{"name":["formula"],"label":["Formula"],"type":["string"]}
+{widgets}
+result:{"type":"field","size":[51,19],"pos":[84,2],"style":"plain"}
+button1:{"type":"button","size":[79,19],"pos":[2,2],"script":"dieRoller.1","text":"2d6","style":"rect"}
+
+{script:dieRoller.0}
+on roll x do
+ r:() i:0
+ x:"" fuse " " split x
+ while i<count x
+  if x[i]="+"
+   i:i+1
+  else
+   p:("n","die","match","i") dict "%id%i%m%n" parse i drop x
+   r:r,if p.match 1+random[p.die p.n] else p.n end
+   i:i+p.i
+  end
+ end
+ r
+end
+
+on set_formula x do button1.text:x end
+on get_formula   do button1.text   end
+{end}
+
+{script:dieRoller.1}
+on click do
+ v:roll[me.text]
+ result.text:if 1=count v
+  v
+ else
+  v:"%s = %s" format ("+" fuse v),(sum v)
+ end
+end
+{end}
+
+{contraption:clock}
+size:[100,100]
+resizable:1
+margin:[8,8,10,10]
+description:"a realtime clock, with a configurable UTC offset."
+image:"%%IMG2AGQAZAD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wA3"
+script:"clock.0"
+attributes:{"name":["utcoffset","24hour"],"label":["UTC Offset","24 hour format"],"type":["number","bool"]}
+{widgets}
+canvas1:{"type":"canvas","size":[100,100],"pos":[0,0],"locked":1,"animated":1,"script":"clock.1","image":"%%IMG2AGQAZAD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wAnAQMAAgEFAAcBAQAEAQMABgEFAAIBAwA6AQEAAwEBAAUBAQAGAQIAAwEBAAMBAQAIAQEAAgEBAAMBAQA5AQEAAwEBAAQBAQADAQEABAEBAAMBAQADAQEAAgEBAAQBAQADAQEAAwEBADkBAQADAQEABAEBAAgBAQADAQEAAwEBAAYBAwACAQEAAwEBADkBAQADAQEAAwEBAAkBAQADAQEAAwEBAAkBAQABAQEAAwEBADkBAQADAQEAAwEBAAkBAQADAQEAAwEBAAUBAQADAQEAAQEBAAMBAQA6AQMABAEBAAQBAQAEAQEABAEDAAMBAQADAQMAAwEDAP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AIw=","scale":1}
+tz:{"type":"field","size":[35,18],"pos":[6,75],"locked":1,"show":"none","style":"plain","align":"center","value":"-8"}
+mil:{"type":"button","size":[31,19],"pos":[54,73],"show":"none","style":"check","value":0}
+
+{script:clock.0}
+on set_utcoffset x do tz.text:x   end
+on get_utcoffset   do 0+tz.text   end
+on set_24hour    x do mil.value:x end
+on get_24hour      do mil.value   end
+{end}
+
+{script:clock.1}
+on view do
+ h:if mil.value 24 else 12 end
+ t:"%i:%i:%i" parse last "T" split "%e" format sys.now
+ t:"%02i:%02i:%02i" format (h%t[0]+tz.text),t[1],t[2]
+ me.font:card.font
+ me.clear[]
+ me.text[t me.size/2 "center"]
+end
+{end}
+
+{contraption:datePicker}
+size:[109,123]
+margin:[0,0,0,0]
+description:"a date picker showing a monthly calendar."
+image:"%%IMG2AG0Aew3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/DZM="
+script:"datePicker.0"
+template:"on change x do\n \nend"
+attributes:{"name":["text"],"label":["Text"],"type":["string"]}
+{widgets}
+canv:{"type":"canvas","size":[103,100],"pos":[3,3],"script":"datePicker.1","image":"%%IMG0AGcAZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEEAAIAAAAAAAAAAAABjAACAAAAAAAAAAAAAVTLM4AAAAAAAAAAAAEkLEpAAAAAAAAAAAABBOhCQAAAAAAAAAAAAQUoSkAAAAAAAAAAAAEE6DJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAggHwBBAH0B4AHAAiAMYAQAQQARAQACIAIJCqYESCowEcELAgYByQkpBEgqSBEhzAHBACkIKQRIFHgRIQgAJwIpCCkESBRAESEIAikBxwgmBDgUMBEhCAHHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////////+AAAAAAAD//gAIACAAgAAAAAAA//4ACAAgAIAAAAAAAP9+Bwg+IBCAAAAAAAD+fgiIBCAwgAAAAAAA/34AiAggUIAAAAAAAP9+AQgcIJCAAAAAAAD/fgIIAiD4gAAAAAAA/34ECCIgEIAAAAAAAP9+D4gcIBCAAAAAAAD//gAIACAAgAAAAAAA//4ACAAgAIAAAAAAAP/+AAgAIACD////////////////ggAIACAAgAIACAAgAIIACAAgAIACAAgAIACCD4gMIPiBwgcIhyIIgggIECAIgiIIiYimGIIPCCAgEIIiCIiIogiCAIg8IBCBwgeIiKIIggCIIiAggiIAiIiiCIIIiCIgIIIiAQiIogiCBwgcICCBwgYIhyIIggAIACAAgAIACAAgAIIACAAgAIACAAgAIACCAAgAIACAAgAIACAAg////////////////4IACAAgAIACAAgAIACCAAgAIACAAgAIACAAgiHIj6IEiPogyI+iHIJiKYEmDJiCYQmApiKCICiCIhSI8iIIgSIigiBIhyIkiAojyIEiHIIgiICiPogKIiiCIiKCIQiIogSIiiIogiIigiPohyIEiHIhyIIiHIIACAAgAIACAAgAIACCAAgAIACAAgAIACAAggAIACAAgAIACAAgAIP///////////////+CAAgAIACAAgAIACAAggAIACAAgAIACAAgAIIhyccnCJxyc+nBJz6CYiooqJiiiohKIyiggiIoKKCIggoIiCUgvIIh6EihCIQSEchJIQKCICiIogiIIiAoj6ICgiBJCKQIkEJCKQEkIoIhi+cviL76+cvhL5yCAAgAIACAAgAIACAAggAIACAAgAIACAAgAIIACAAgAIACAAgAIACD////////////////ggAIACAAgAIACAAgAAIACAAgAIACAAgAIAACcMnPpxyccvnL4iAAAokKIKiioooSKEYgAAIKCCEgooKKIiiCIAACE8hBIRyEenIpwiAAAiIogiIiiAoKKCIgAAJCKQIkIpASiioiIAAC+cviL5y+YnHJwiAAAgAIACAAgAIACAAgAAIACAAgAIACAAgAIAACAAgAIACAAgAIACAAA//////////////gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=","scale":1}
+val:{"type":"field","size":[103,13],"pos":[3,107],"script":"datePicker.2","style":"plain","value":"2023-03-01"}
+next:{"type":"button","size":[19,13],"pos":[84,6],"script":"datePicker.3","text":">","style":"rect"}
+prev:{"type":"button","size":[19,13],"pos":[6,6],"script":"datePicker.4","text":"<","style":"rect"}
+
+{script:datePicker.0}
+dateparts: "year","month","day"
+dateform: "%04i-%02i-%02i"
+
+on do_change do
+ card.event["change" get_value[]]
+end
+
+on get_text    do val.text end
+on set_text  x do val.text:x view[] end
+on get_value   do dateparts dict dateform parse val.text end
+on set_value x do val.text:dateform format x @ dateparts view[] end
+
+cellsize:15,14
+day_names:"Su","Mo","Tu","We","Th","Fr","Sa"
+month_names:"January","February","March","April","May","June","July","August","September","October","November","December"
+
+# in each of these routines,
+# - m is a month index [0-11]
+# - y is a year (e.g. 2023)
+
+on is_leap_year y do (!4%y)&(!400%y)|(100%y) end
+on days_in_month y m do
+ r:(31,28,31,30,31,30,31,31,30,31,30,31)[m]
+ r+is_leap_year[y]&m=1
+end
+on first_day_of_month y m do
+ mont:0,3,3,6,1,4,6,2,5,0,3,5
+ if is_leap_year[y] mont[0]:6 mont[1]:6 end
+ r1:(4,2,0,6,4)[floor(y-1700)/100]
+ r2:floor 100%y
+ r3:floor r2/4
+ r4:mont[m]
+ 7%r1+r2+r3+r4+1
+end
+
+on days p do
+ f:first_day_of_month[p.year p.month-1]
+ c:days_in_month[p.year p.month-1]
+ c take f drop flip (2,32)+(cellsize-1)*flip 7 cross 6
+end
+
+on view do
+ p:get_value[]
+ canv.font:"Mono"
+ canv.clear[]
+ canv.text[month_names[p.month-1] (0,5)+canv.size*.5,0 "top_center"]
+ each day in range 7
+  canv.text[day_names[day] ((canv.size[0]/7)*day+.5),20 "top_center"]
+ end
+ each cell index in days[p]
+  canv.box[cell cellsize]
+  canv.text[("%2i" format 1+index) (1,0)+cell+cellsize/2 "center"]
+  if index=p.day-1 canv.invert[cell+1 cellsize-2] end
+ end
+end
+{end}
+
+{script:datePicker.1}
+on inside p r do
+ min(p>r)&(p<r+cellsize)
+end
+
+on click pos do
+ v:get_value[]
+ each day index in days[v]
+  if inside[pos day]
+   v.day:index+1
+   set_value[v]
+   do_change[]
+  end
+ end
+end
+
+{end}
+
+{script:datePicker.2}
+on change val do
+ set_text[val]
+ do_change[]
+end
+{end}
+
+{script:datePicker.3}
+on click do
+ v:get_value[]
+ if v.month=12
+  v.year:v.year+1
+  v.month:1
+ else
+  v.month:v.month+1
+ end
+ set_value[v]
+ do_change[]
+end
+{end}
+
+{script:datePicker.4}
+on click do
+ v:get_value[]
+ if v.month=1
+  v.year:v.year-1
+  v.month:12
+ else
+  v.month:v.month-1
+ end
+ set_value[v]
+ do_change[]
+end
+{end}
+
+{contraption:fancyBorder}
+size:[22,24]
+resizable:1
+margin:[10,11,10,11]
+description:"a decorative border"
+image:"%%IMG2ABYAGAABAQUACQEGAAEBASAFAQMABgEBIAUBAiABAQMgAQEBIAEBAQAGAQEgAQEDIAEBAiABAQEgAQEBIAEBASABAQEABgEBIAEBASABAQEgAQECIAEBAyABAQ4gAQECIAMBASABAQEgDgEGIAEBEAABAQQgAQEBIAEBASAGAQEgAQEBIAIBAgAEAQEgAQEBIAEBCCABAQQABQEBIAEBASABAQYgAQEBIAEBBAAFAQEgAQEBIAEBAQAEAQEgAQEBIAEBAQAIAQEgAQEBIAEBAQAEAQEgAQEBIAEBAQAIAQEgAQEBIAEBAQAEAQEgAQEBIAEBAQAIAQEgAQEBIAEBAQAEAQEgAQEBIAEBAQAFAQQgAQEBIAEBBiABAQEgAQEBAAUBASACAQEgAQEBIAEBASAEAQEgAQEBIAEBAQAFAQ8gAQEEAAEBASAOAQEgAQEBIAMBAiABAQ4gAQEDIAEBAiABAQEgAQEBIAEBCCABAQEgAQEBIAEBASABAQIgAQEDIAEBAQAGAQEgAQEBIAEBAyABAQIgBQEBAAYBAyAFAQEAAQEGAAYBCAACAQUACQEFAAI="
 

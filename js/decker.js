@@ -1587,7 +1587,7 @@ modals=_=>{
 			ms.grid.table.v.type[ms.grid.row]=lms(attr_types[z])
 		}
 		if(ui_button(rect(c.x,c.y,60,20),'Add',1)){
-			ms.grid.table.v.name .push(lms(''))
+			ms.grid.table.v.name .push(lms('untitled'))
 			ms.grid.table.v.label.push(lms(''))
 			ms.grid.table.v.type .push(lms('bool'))
 			ms.grid.row=count(ms.grid.table)-1,ms.name.table=null,ms.text.table=null

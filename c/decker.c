@@ -1935,7 +1935,7 @@ void modals(){
 			ms.grid.table->lv[2]->lv[ms.grid.row]=lmistr(attribute_types[z]);
 		}
 		if(ui_button((rect){c.x,c.y,60,20},"Add",1)){
-			ll_add(ms.grid.table->lv[0],lmistr(""));
+			ll_add(ms.grid.table->lv[0],lmistr("untitled"));
 			ll_add(ms.grid.table->lv[1],lmistr(""));
 			ll_add(ms.grid.table->lv[2],lmistr("bool"));
 			torect(ms.grid.table);ms.grid.row=ms.grid.table->n-1;ms.name.table=NULL,ms.text.table=NULL;

@@ -305,8 +305,11 @@ By default, if a canvas is unlocked, clicking and dragging on a canvas will allo
 
 Contraptions
 ------------
-TODO!
+A contraption is a "custom widget", built from simpler widgets, and defined in a _Prototype_. Contraptions can have almost any appearance, and may exhibit complex behaviors. Anywhere you have repetitive structure in a deck- like standardized forms, title cards in a presentation, or a heads-up-display for a game- you could use a contraption. Explore other people's decks; they might contain interesting contraptions you can use in your own creations!
 
+![](images/contraptions.gif)
+
+See the [Custom Widgets](#customwidgets) section for details on how to build and modify your own contraptions.
 
 Cards
 =====
@@ -1304,7 +1307,134 @@ It's a great idea to provide documentation and examples for your new module in t
 
 Custom Widgets
 ==============
-TODO!
+Let's walk through the process of defining a new contraption. If you aren't comfortable with programming, don't be intimidated! While Lil scripting is important for taking full advantage of contraptions, it is important to note that you can still make useful contraptions without writing any code.
+
+Our First Prototype
+-------------------
+The _File &#8594; Prototypes..._ menu will open a dialog listing the contraption prototypes available in your deck. Click "New..." to create a new prototype. You will see the blank prototype centered in your screen, and a new "Prototype" menu.
+
+First, let's give our prototype a name and description, so that it's easy to find in the future. Click the _Prototype &#8594; Properties..._ menu item. Our goal is to make a _counter_ with a field containing a number and a button which increments it. Update the "Name" and "Description" fields. We'll talk about "Template Script" later.
+
+![](images/protoprops.gif)
+
+Next, let's set a size for our prototype. Click the _Prototype &#8594; Size..._ menu item. This will switch the editor into a special mode with several draggable handles. For now, we're just interested in the bottom-right handle. Drag it until you're satisfied with the size, and then exit "sizing mode" with _Prototype &#8594; Confirm Size_ or by pressing "space" on the keyboard. (Note: if you have a specific pixel size in mind, you can also directly set the prototype size via the Listener without entering "sizing mode"- for example, `me.size:100,50`.)
+
+![](images/protosize.gif)
+
+Now we can add widgets to our prototype, in exactly the same way we'd add them to a card. Create a Field named `val` and a button named `inc`:
+
+![](images/protowids.gif)
+
+The `inc` button will need a short script:
+```
+on click do
+ val.text:val.text+1
+end
+```
+
+If you switch to "Interact" mode, you can try out the prototype immediately: clicking the button should increment the value in the field. When you're satisfied, be sure to set the field back to be blank or "0": the values in the widgets of a prototype will be the defaults for every contraption instance we make later!
+
+Backgrounds and Resizability
+----------------------------
+Let's give our prototype a bit of decoration by drawing a border using the "Box" tool. You can draw on the background of a prototype just like a card.
+
+By default, contraption instances have a fixed size, matching the prototype. If you make your contraption "Resizable" (_Prototype &#8594; Resizable_), every contraption instance can be resized with the "Widgets" tool. Enable this property, and return to "sizing mode".
+
+The handles on the top and left edge of your prototype in "sizing mode" adjust the "margins". When a contraption is resized, the background is logically divided into 9 pieces. The corners are kept their original size, the top and bottom edge are repeated horizontally, the left and right edge are repeated vertically, and the center is repeated horizontally and vertically. Another way to think of it is that the part of the prototype _between_ the margins for each axis will be stretched out, while the rest is kept the same size. Widgets behave similarly: any widget corners that fall outside of the margins will keep a fixed position relative to the edges of the prototype, while the rest will be scaled proportionally.
+
+A real example may be clearer. Set the margins of your prototype like so:
+
+![](images/protomargins.gif)
+
+Now let's make a few contraptions from our prototype! You can use the _Prototype &#8594; Close_ menu item or press "escape" on the keyboard to leave the prototype editor. Back on a normal card, switch to the "Widgets" tool and click the _Widgets &#8594; New Contraption..._ menu item. Choose your "counter" contraption and click "Create". Make a few counters, and play with resizing them. Observe how our border adapts to each size. You might find it useful to design contraptions that are _purely_ reusable, resizable decorative borders!
+
+![](images/protoinstances.gif)
+
+You can copy and paste contraptions like any other widget. In fact, if you copy a contraption to the clipboard, you can paste it into another deck and it will bring along the prototype definition!
+
+Custom Attributes
+-----------------
+So far, we've defined a useful, if simple, contraption with minimal code. We could stop here, but there are a few more details we could add that would make our contraptions behave more like the built-in widget flavors. Hop back into the prototype editor via _File &#8594; Prototypes..._ or by double-clicking on a contraption instance and clicking "Prototype..." in its Properties dialog.
+
+Field widgets have a `.text` and `.value` attribute; we used the former in the script we wrote previously. To expose an attribute like this on our `counter`, we'll add code to our prototype's script. Choose _Prototype &#8594; Script_ from the menu and enter the following:
+```
+on get_value do
+ val.text+0
+end
+
+on set_value x do
+ val.text:x
+end
+```
+
+Say we have a counter contraption named `count1`. When code outside our contraption refers to `count1.value`, the function `get_value` is called in the prototype script. Conversely, when code outside our contraption does `count1.value:5`, the function `set_value` is called in the prototype script with the argument `5`.
+
+Our `get_value` uses `+0` to force the string value of the interior field `val` to a number, and our `set_value` writes a number `x` to the same field. Just like within a card, the widgets of a contraption store the _state_ of the contraption, and any `get_` and `set_` functions we write translate external arguments and requests into manipulations of internal widgets. From the inside, a contraption acts like a little card, and from the outside it appears like a widget.
+
+If you want to expose an immutable attribute, don't define a `set_` corresponding to your `get_`. For example, you might want to expose a utility function that external scripts can call:
+```
+on reset do       # a normal function, callable from inside the prototype
+ val.text:0
+end
+
+on get_reset do   # an accessor that returns the internal function to outside users
+ reset            # note that we're returning the function, not calling it (reset[])!
+end
+```
+
+Some of our custom attributes might be things that users of the contraption would like to be able to adjust without writing scripts. When you're done configuring the prototype script, close the script editor and choose _Prototype &#8594; Attributes..._ from the menu.
+
+![](images/protoattrs.gif)
+
+From this dialog you can add metadata for any of the attributes you wrote `get_` and `set_` functions for. The "name" of an attribute should be the part that comes immediately after `get_`; in our case, "value". The "label" can be a longer/more detailed human-readable name. The "type" indicates which sort of picker should be provided for manipulating this attribute: a boolean becomes a checkbox, a number or string become small field, and code or rich text becomes a larger field of the appropriate style.
+
+With the "value" attribute set up as above, exit the prototype editor and double-click one of your contraption instances to see the new field in its Properties panel:
+
+![](images/conprops.gif)
+
+Try making a change here, and watch it be reflected on the contraption when you close the dialog!
+
+Custom Events
+-------------
+It is also possible to make your contraptions produce events, just as a button widget produces a `click` event when it is clicked, or a field widget produces a `change` event when its contents is edited.
+
+From the perspective of prototype scripts or the scripts on widgets within a prototype, the global variable `card` is a reference to _the contraption instance_ rather than the card containing the contraption. To send an event to a user script on the contraption instance, we will use `card.event[]`. Modify the script on the `inc` button as follows:
+```
+on click do
+ val.text:val.text+1
+ card.event["change" get_value[]]
+end
+```
+
+Now every time `inc` is clicked, it will send a `change[]` event to the contraption instance. If a user has not defined a handler for this event, it will do nothing harmlessly, just like a button that doesn't define `on click...` in its script.
+
+To help users know that a "change" event is available, we can provide a default "template" script for newly-created contraptions. Edit the template for your prototype via the _Prototype &#8594; Properties..._ menu item:
+```
+on change x do
+ 
+end
+```
+
+Exit the prototype editor, and modify the script of one of your contraption instances. The script editor should provide your template as a starting point. Try filling it in and then interacting with the contraption to confirm the event fires:
+```
+on change x do
+ alert["counter is now %i" format x]
+end
+```
+
+When designing custom event and custom attribute logic, try to follow the examples and conventions of Decker's built-in widgets when it makes sense. Having consistency makes your widget's behavior easier to understand and remember!
+
+
+Limitations
+-----------
+Contraptions and prototypes have a few important limitations to keep in mind:
+
+- Prototypes cannot contain contraptions. In other words, contraptions are non-recursive.
+- Unlike card scripts or scripts on card widgets, prototype scripts do not have access to `deck`, `card`, or `patterns` globals. From inside a contraption you don't know anything about the deck within which you reside. This constraint is essential to make contraptions "portable" and re-usable.
+- Unlike a card, contraption instances cannot add or remove "child" widgets dynamically.
+- Custom attribute reads and writes (from the outside) run in a brief quota, just like transition functions and module startup. If they take too long to execute, they halt and return `0`.
+- Custom attributes cannot be invoked recursively or directly call other custom attributes. If this is attempted, they halt and return `0`. For example, a script inside a prototype should use `get_value[]` instead of `card.value` to access the `value` attribute.
+
 
 Animation
 =========
