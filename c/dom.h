@@ -9,7 +9,7 @@
 #define MODULE_QUOTA   (10*4096)
 #define TRANS_QUOTA    ( 2*4096)
 #define LOOP_QUOTA     ( 1*4096)
-#define ATTR_QUOTA     (   1024)
+#define ATTR_QUOTA     ( 2*1024)
 #define FRAME_QUOTA    (10*4096)
 #define CLAMP(a,x,b)   ((x)<(a)?(a): (x)>(b)?(b): (x))
 #define ivalue(x,k)    dget(x->b,lmistr(k))
@@ -18,6 +18,15 @@
 #define iwrite(x,k,v)  ((lv*(*)(lv*,lv*,lv*))x->f)(x,k,v)
 #define itype(name)    int name##_is(lv*x){return x&&lii(x)&&!strcmp(x->a->sv,#name);}
 #define init_field(dst,key,src) {lv*k=lmistr(key),*v=dget(src,k);if(v)iwrite(dst,k,v);}
+
+typedef struct {int x,y;} pair;
+typedef struct {double x,y;} fpair;
+typedef struct {int x,y,w,h;} rect;
+typedef struct {
+	int brush, pattern;
+	pair size; rect clip;
+	lv *buffer, *font;
+} cstate; cstate frame;
 
 itype(image)itype(sound)itype(font)itype(button)itype(field)itype(slider)itype(grid)itype(canvas)itype(deck)itype(card)itype(patterns)itype(module)itype(array)
 itype(prototype)itype(contraption)
@@ -198,22 +207,17 @@ void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
 void fire_event_async(lv*target,lv*name,lv*arg){fire_async(target,name,l_list(arg),NULL,1);}
 void fire_hunk_async(lv*target,lv*hunk){fire_async(target,NULL,lml(0),hunk,1);}
 int in_attr=0;
-
 lv* fire_attr_sync(lv*target,char*prefix,lv*name,lv*arg){
-	if(in_attr)return NONE;in_attr=1;
+	if(in_attr)return NONE;in_attr=1;cstate bf=frame;
 	lv*root=lmenv(NULL);primitives(root,ivalue(target,"deck")),constants(root),dset(root,lmistr("me"),target);
 	lv*b=lmblk();lv*widgets=ivalue(target,"widgets");EACH(z,widgets)blk_lit(b,widgets->lv[z]),blk_loc(b,widgets->kv[z]),blk_op(b,DROP);
 	lv*s=ifield(ivalue(target,"def"),"script"),*sb=parse(s&&s->c?s->sv:"");if(perr()){sb=parse("");}blk_cat(b,sb),blk_op(b,DROP);
 	str n=str_new();str_addz(&n,prefix),str_addz(&n,name->sv);blk_get(b,lmstr(n)),blk_lit(b,arg?l_list(arg):lml(0)),blk_op(b,CALL);
-	pushstate(root);issue(root,b);int q=ATTR_QUOTA;while(running()&&q>0)runop(),q--;lv*r=running()?NONE:arg();popstate();return in_attr=0,r;
+	pushstate(root);issue(root,b);int q=ATTR_QUOTA;while(running()&&q>0)runop(),q--;lv*r=running()?NONE:arg();popstate();frame=bf;return in_attr=0,r;
 }
 lv* n_event(lv*self,lv*x){fire_async(self,ls(l_first(x)),l_drop(ONE,x),NULL,0);return self;}
 
-typedef struct {int x,y;} pair;
-typedef struct {double x,y;} fpair;
-typedef struct {int x,y,w,h;} rect;
 lv*interface_widget(lv*self,lv*i,lv*x); // forward reference
-
 int gcd(int x,int y){while(x!=y){if(x>y){x-=y;}else{y-=x;}}return x;}
 int lcm(int x,int y){int r=gcd(x,y);return (x*y)/(r?r:1);}
 int has_prefix(char*x,char*px){for(int z=0;px[z];z++)if(px[z]!=tolower(x[z]))return 0;return 1;}
@@ -626,12 +630,6 @@ void draw_frame(char*pal,lv*buffer,int*p,int pitch,int frame,int mask){
 }
 
 // Rendering
-
-typedef struct {
-	int brush, pattern;
-	pair size; rect clip;
-	lv *buffer, *font;
-} cstate; cstate frame;
 
 #define PIX(a,b)    frame.buffer->sv[(a)+((b)*frame.size.x)]
 #define BSH(z,x,y)  ((BRUSHES[(z*8)+y]>>(7-x))&1)
