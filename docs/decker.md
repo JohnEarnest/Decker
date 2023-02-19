@@ -1317,7 +1317,7 @@ First, let's give our prototype a name and description, so that it's easy to fin
 
 ![](images/protoprops.gif)
 
-Next, let's set a size for our prototype. Click the _Prototype &#8594; Size..._ menu item. This will switch the editor into a special mode with several draggable handles. For now, we're just interested in the bottom-right handle. Drag it until you're satisfied with the size, and then exit "sizing mode" with _Prototype &#8594; Confirm Size_ or by pressing "space" on the keyboard. (Note: if you have a specific pixel size in mind, you can also directly set the prototype size via the Listener without entering "sizing mode"- for example, `me.size:100,50`.)
+Next, let's set a size for our prototype. Choose the Widgets tool and drag the handle at the bottom-right corner of the prototype until you're satisfied with the size. (Note: if you have a specific pixel size in mind, you can also directly set the prototype size via the Listener- for example, `me.size:100,50`.)
 
 ![](images/protosize.gif)
 
@@ -1338,9 +1338,9 @@ Backgrounds and Resizability
 ----------------------------
 Let's give our prototype a bit of decoration by drawing a border using the "Box" tool. You can draw on the background of a prototype just like a card.
 
-By default, contraption instances have a fixed size, matching the prototype. If you make your contraption "Resizable" (_Prototype &#8594; Resizable_), every contraption instance can be resized with the "Widgets" tool. Enable this property, and return to "sizing mode".
+By default, contraption instances have a fixed size, matching the prototype. If you make your contraption "Resizable" (_Prototype &#8594; Resizable_), every contraption instance can be resized with the "Widgets" tool. Enable this property, check _Prototype &#8594; Show Margins_, and then ensure that you're using the Widgets tool. You should now see four draggable handles on the top and left edge of the prototype.
 
-The handles on the top and left edge of your prototype in "sizing mode" adjust the "margins". When a contraption is resized, the background is logically divided into 9 pieces. The corners are kept their original size, the top and bottom edge are repeated horizontally, the left and right edge are repeated vertically, and the center is repeated horizontally and vertically. Another way to think of it is that the part of the prototype _between_ the margins for each axis will be stretched out, while the rest is kept the same size. Widgets behave similarly: any widget corners that fall outside of the margins will keep a fixed position relative to the edges of the prototype, while the rest will be scaled proportionally.
+When a contraption is resized, the background is logically divided into 9 pieces based on the margins. The corners are kept their original size, the top and bottom edge are repeated horizontally, the left and right edge are repeated vertically, and the center is repeated horizontally and vertically. Another way to think of it is that the part of the prototype _between_ the margins for each axis will be stretched out, while the rest is kept the same size. Widgets behave similarly: any widget corners that fall outside of the margins will keep a fixed position relative to the edges of the prototype, while the rest will be scaled proportionally.
 
 A real example may be clearer. Set the margins of your prototype like so:
 
