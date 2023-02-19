@@ -1346,8 +1346,12 @@ void modal_exit(int value){
 	if(ms.subtype==modal_open_lil&&value){
 		lv*hint=ms.verb,*name=modal_open_path();lv*type=arg();ret(
 			array_is(type)?readbin(name):
-			has_suffix(name->sv,".gif")?n_readgif(NULL,lml2(name,hint)):
-			has_suffix(name->sv,".wav")?readwav(name->sv):
+			has_suffix(name->sv,".gif" )?n_readgif(NULL,lml2(name,hint)):
+			has_suffix(name->sv,".png" )?readimage(name->sv,!strcmp(ls(hint)->sv,"gray")):
+			has_suffix(name->sv,".bmp" )?readimage(name->sv,!strcmp(ls(hint)->sv,"gray")):
+			has_suffix(name->sv,".jpg" )?readimage(name->sv,!strcmp(ls(hint)->sv,"gray")):
+			has_suffix(name->sv,".jpeg")?readimage(name->sv,!strcmp(ls(hint)->sv,"gray")):
+			has_suffix(name->sv,".wav" )?readwav(name->sv):
 			n_read(NULL,l_list(name))
 		);
 	}
