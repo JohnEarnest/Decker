@@ -3164,7 +3164,10 @@ tick=_=>{
 	if(uimode=='script'){script_editor()}else{main_view()}
 	modals(),gestures(),menu_finish()
 	if(uimode=='draw'&&dr.fatbits)draw_icon(rect(frame.size.x-14,2),ZOOM,1)
-	if(uimode=='interact'&&ev.drag&&ob.sel.length&&lb(ifield(ob.sel[0],'draggable')))iwrite(ob.sel[0],lms('pos'),lmpair(rsub(ev.pos,ob.prev))),mark_dirty()
+	if(uimode=='interact'&&ev.drag&&ob.sel.length&&lb(ifield(ob.sel[0],'draggable'))){
+		const c=ob.sel[0].card, off=contraption_is(c)?getpair(ifield(c,'pos')):rect(0,0)
+		iwrite(ob.sel[0],lms('pos'),lmpair(rsub(rsub(ev.pos,ob.prev),off))),mark_dirty()
+	}
 	q('#display').style.cursor=uicursor||'default'
 	for(let x=0;x<=1;x++)for(let y=0;y<=1;y++)draw_icon(rect(x*(context.size.x-5),y*(context.size.y-5)),CORNERS[x+y*2],1)
 	const used=interpret()
