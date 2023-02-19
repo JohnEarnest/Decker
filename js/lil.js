@@ -1875,7 +1875,7 @@ con_copy=(card,z)=>{
 }
 merge_prototypes=(deck,defs,uses)=>{
 	const condefs=deck.contraptions;defs.v.map(def=>{
-		const name=dget(def,lms('name')),desc=dget(def,lms('description'));if(!lis(name))return;if(!desc)desc=lms('')
+		const name=dget(def,lms('name'));let desc=dget(def,lms('description'));if(!lis(name))return;if(!desc)desc=lms('')
 		if(condefs.v.some(con=>match(name,ifield(con,'name'))&&match(desc,ifield(con,'description'))))return
 		const p=prototype_read(def,deck),nn=ifield(p,'name');dset(condefs,nn,p)
 		uses.map(wid=>{

@@ -1516,7 +1516,7 @@ modals=_=>{
 		const choose=ui_table(gsize,[16],'Is',ms.grid)
 		let psize=rect(b.x,gsize.y+gsize.h+5,b.w,50);draw_box(psize,0,1),psize=inset(psize,2)
 		if(ms.grid.row>=0){
-			const desc=deck.contraptions.v[ms.grid.row].description
+			const desc=ls(ifield(deck.contraptions.v[ms.grid.row],'description'))
 			const l=layout_plaintext(desc,FONT_BODY,ALIGN.left,rect(psize.w,psize.h));draw_text_wrap(psize,l,1)
 		}
 		const c=rect(b.x+b.w-60,b.y+b.h-20)
