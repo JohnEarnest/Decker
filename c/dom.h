@@ -1102,6 +1102,11 @@ widget unpack_widget(lv*x){
 		lb(ifield(x,"locked")),
 	};
 }
+lv* value_inherit(lv*self,lv*key){
+	lv*card=dget(self->b,lmistr("card")),*r=dget(self->b,key);if(!contraption_is(card))return r;
+	lv*p=dget(ifield(ifield(card,"def"),"widgets"),ifield(self,"name"));if(!p)return r;
+	lv*v=iwrite(p,key,NULL);if(r&&v&&matchr(r,v))self->b=l_drop(key,self->b);return r?r:v;
+}
 
 // Canvas interface
 
@@ -1283,7 +1288,7 @@ lv* interface_button(lv*self,lv*i,lv*x){
 		ikey("text" ){dset(self->b,i,ls(x));return x;}
 		ikey("style"){dset(self->b,i,normalize_enum(x,button_styles));return x;}
 	}else{
-		ikey("value"){lv*r=dget(self->b,i);return r?r:NONE;}
+		ikey("value"){lv*r=value_inherit(self,i);return r?r:NONE;}
 		ikey("text" ){lv*r=dget(self->b,i);return r?r:lmistr("");}
 		ikey("style"){lv*r=dget(self->b,i);return r?r:lmistr(button_styles[0]);}
 		ikey("size" ){lv*r=dget(self->b,i);return r?r:lmpair((pair){60,20});}
@@ -1440,9 +1445,9 @@ lv* interface_field(lv*self,lv*i,lv*x){
 		ikey("style"    ){dset(data,i,normalize_enum(x,field_styles));iwrite(self,lmistr("value"),dget(data,lmistr("value")));return x;}
 		ikey("align"    ){dset(data,i,normalize_enum(x,field_aligns));return x;}
 	}else{
-		ikey("text"     ){lv*r=dget(data,lmistr("value"));return r?rtext_all(r):lmistr("");}
-		ikey("value"    ){lv*r=dget(data,i);return r?r:rtext_cast(NULL);}
-		ikey("scroll"   ){lv*r=dget(data,i);return r?r:NONE;}
+		ikey("text"     ){lv*r=value_inherit(self,lmistr("value"));return r?rtext_all(r):lmistr("");}
+		ikey("value"    ){lv*r=value_inherit(self,i);return r?r:rtext_cast(NULL);}
+		ikey("scroll"   ){lv*r=value_inherit(self,i);return r?r:NONE;}
 		ikey("scrollbar"){lv*r=dget(data,i);return r?r:NONE;}
 		ikey("border"   ){lv*r=dget(data,i);return r?r:ONE;}
 		ikey("style"    ){lv*r=dget(data,i);return r?r:lmistr(field_styles[0]);}
@@ -1510,7 +1515,7 @@ lv* interface_slider(lv*self,lv*i,lv*x){
 			iwrite(self,lmistr("value"),ifield(self,"value"));return x;
 		}
 	}else{
-		ikey("value"    ){lv*r=dget(data,i);pair v=getpair(ifield(self,"interval"));return r?r:lmn(CLAMP(v.x,0,v.y));}
+		ikey("value"    ){lv*r=value_inherit(self,i);pair v=getpair(ifield(self,"interval"));return r?r:lmn(CLAMP(v.x,0,v.y));}
 		ikey("step"     ){lv*r=dget(data,i);return r?r:ONE;}
 		ikey("interval" ){lv*r=dget(data,i);return r?r:lml2(NONE,lmn(100));}
 		ikey("format"   ){lv*r=dget(data,i);return r?r:lmistr("%f");}
@@ -1570,8 +1575,8 @@ lv* interface_grid(lv*self,lv*i,lv*x){
 		ikey("widths"   ){dset(data,i,normalize_ints(x,255));return x;}
 		ikey("format"   ){dset(data,i,ls(x));return x;}
 	}else{
-		ikey("value"    ){lv*r=dget(data,i);return r?r:lmt();}
-		ikey("scroll"   ){lv*r=dget(data,i);return r?r:NONE;}
+		ikey("value"    ){lv*r=value_inherit(self,i);return r?r:lmt();}
+		ikey("scroll"   ){lv*r=value_inherit(self,i);return r?r:NONE;}
 		ikey("scrollbar"){lv*r=dget(data,i);return r?r:ONE;}
 		ikey("headers"  ){lv*r=dget(data,i);return r?r:ONE;}
 		ikey("lines"    ){lv*r=dget(data,i);return r?r:ONE;}
@@ -1579,7 +1584,7 @@ lv* interface_grid(lv*self,lv*i,lv*x){
 		ikey("format"   ){lv*r=dget(data,i);return r?r:lmistr("");}
 		ikey("size"     ){lv*r=dget(data,i);return r?r:lmpair((pair){100,50});}
 		ikey("row"      ){
-			lv*r=dget(data,i),*v=ifield(self,"value");
+			lv*r=value_inherit(self,i),*v=ifield(self,"value");
 			if(!r)return lmn(-1); int n=ln(r); return lmn(CLAMP(-1,n,v->n-1));
 		}
 		ikey("rowvalue" ){int r=ln(ifield(self,"row"));lv*v=ifield(self,"value");return r<0||r>=v->n?lmd():l_at(v,lmn(r));}
@@ -1613,8 +1618,8 @@ lv* grid_write(lv*x){
 // Contraption interface
 
 pair corner_reflow(pair p,pair s,rect m,pair d){ // point, proto size, margins, dest size
-	p.x=(p.x<m.x)?p.x: (p.x>s.x-m.w)?d.x-(s.x-p.x): s.x==0?0:((1.0f*p.x)/s.x)*d.x; // left | right  | stretch horiz
-	p.y=(p.y<m.y)?p.y: (p.y>s.y-m.h)?d.y-(s.y-p.y): s.y==0?0:((1.0f*p.y)/s.y)*d.y; // top  | bottom | stretch vert
+	p.x=(p.x<m.x)?p.x: (p.x>s.x-m.w)?d.x-(s.x-p.x): s.x==0?0:round(((1.0f*p.x)/s.x)*d.x); // left | right  | stretch horiz
+	p.y=(p.y<m.y)?p.y: (p.y>s.y-m.h)?d.y-(s.y-p.y): s.y==0?0:round(((1.0f*p.y)/s.y)*d.y); // top  | bottom | stretch vert
 	return p;
 }
 void contraption_reflow(lv*c){
@@ -1919,7 +1924,6 @@ void contraption_update(lv*def){
 		lv*card=cards->lv[c],*widgets=ifield(card,"widgets");EACH(w,widgets){
 			lv*widget=widgets->lv[w];if(!contraption_is(widget)||ifield(widget,"def")!=def)continue;
 			lv*d=widget_write(widget),*n=ifield(widget,"name");
-			dset(d,lmistr("image"  ),image_clone(ifield(def,"image")));
 			dset(d,lmistr("widgets"),contraption_strip(widget));
 			widget->b=widget_read(d,card)->b;dset(widget->b,lmistr("name"),n);
 		}

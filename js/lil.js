@@ -75,7 +75,7 @@ amendv=(x,i,y,n,tla)=>{
 	return (!tla.v&&n+1 <i.length)?amendv(l_at(x,f),i,y,n+1,tla):
 	       (n+1<i.length)?amend(x,f,amendv(l_at(x,f),i,y,n+1,tla)): (n+1==i.length)?amend(x,f,y): y
 }
-lb=x=>lin(x)?x.v!=0: lis(x)?x.v!='': lil(x)||lid(x)?x.v.length: true
+lb=x=>lin(x)?x.v!=0: lis(x)?x.v!='': lil(x)||lid(x)?x.v.length: 1
 ln=x=>lin(x)?x.v: lis(x)?(isFinite(x.v)?+x.v:0): lil(x)||lid(x)?ln(x.v[0]): 0
 ls=x=>lin(x)?wnum(x.v): lis(x)?x.v: lil(x)?x.v.map(ls).join(''): ''
 ll=x=>lis(x)?x.v.split('').map(lms): lil(x)||lid(x)?x.v: lit(x)?rows(x).v: [x]
@@ -797,6 +797,12 @@ ivalue=(x,k,d)=>k in x?x[k]:d
 ifield=(x,k)  =>x.f(x,lms(k))
 iindex=(x,k,v)=>x.f(x,lmn(k),v)
 iwrite=(x,k,v)=>x.f(x,k,v)
+value_inherit=(self,key)=>{
+	let r=self[key];if(typeof r=='string')r=lms(r);if(typeof r=='number'||typeof r=='boolean')r=lmn(r);
+	const card=self.card;if(!contraption_is(card))return r
+	const p=dget(card.def.widgets,ifield(self,'name'));if(!p)return r
+	const v=ifield(p,key);if(r&&v&&match(r,v))delete self[key];return r||v
+}
 init_field=(dst,key,src)=>{const k=lms(key),v=dget(src,k);if(v)iwrite(dst,k,v)}
 normalize_enum=(x,v)=>v in x?v:Object.keys(x)[0]
 normalize_font=(x,v)=>ls(dkey(x,v)||x.k[dkix(x,v)]||lms('body'))
@@ -1469,7 +1475,7 @@ button_read=(x,card)=>{
 			if(ikey(i,'text' ))return self.text=ls(x),x
 			if(ikey(i,'style'))return self.style=normalize_enum(button_styles,ls(x)),x
 		}else{
-			if(ikey(i,'value'))return lmn(ivalue(self,ls(i),0))
+			if(ikey(i,'value'))return value_inherit(self,ls(i))||NONE
 			if(ikey(i,'text' ))return lms(ivalue(self,ls(i),''))
 			if(ikey(i,'style'))return lms(ivalue(self,ls(i),'round'))
 			if(ikey(i,'size' ))return lmpair(ivalue(self,ls(i),rect(60,20)))
@@ -1504,10 +1510,10 @@ field_read=(x,card)=>{
 			if(ikey(i,'style'    ))return self.style=normalize_enum(field_styles,ls(x)),iwrite(self,lms('value'),ifield(self,'value')),x
 			if(ikey(i,'align'    ))return self.align=normalize_enum(field_aligns,ls(x)),x
 		}else{
-			if(ikey(i,'text'     )){const v=ivalue(self,'value');return v!=undefined?rtext_string(v):lms('')}
+			if(ikey(i,'text'     )){const v=value_inherit(self,'value');return v!=undefined?rtext_string(v):lms('')}
 			if(ikey(i,'border'   ))return lmn(ivalue(self,ls(i),1))
-			if(ikey(i,'value'    ))return ivalue(self,ls(i))||rtext_cast()
-			if(ikey(i,'scroll'   ))return lmn(ivalue(self,ls(i),0))
+			if(ikey(i,'value'    ))return value_inherit(self,ls(i))||rtext_cast()
+			if(ikey(i,'scroll'   ))return value_inherit(self,ls(i))||NONE
 			if(ikey(i,'scrollbar'))return lmn(ivalue(self,ls(i),0))
 			if(ikey(i,'style'    ))return lms(ivalue(self,ls(i),'rich'))
 			if(ikey(i,'align'    ))return lms(ivalue(self,ls(i),'left'))
@@ -1551,7 +1557,7 @@ slider_read=(x,card)=>{
 			if(ikey(i,'style'   ))return self.style=normalize_enum(slider_styles,ls(x)),x
 			if(ikey(i,'interval')){const v=getpair(x);return self.interval=rect(min(v.x,v.y),max(v.x,v.y)),update(self),x}
 		}else{
-			if(ikey(i,'value'   )){const v=getpair(ifield(self,'interval'));return lmn(ivalue(self,ls(i),clamp(v.x,0,v.y)))}
+			if(ikey(i,'value'   )){const v=getpair(ifield(self,'interval'));return value_inherit(self,ls(i))||lmn(clamp(v.x,0,v.y))}
 			if(ikey(i,'format'  ))return lms(ivalue(self,ls(i),'%f'))
 			if(ikey(i,'step'    ))return lmn(ivalue(self,ls(i),1))
 			if(ikey(i,'interval'))return lmpair(ivalue(self,ls(i),rect(0,100)))
@@ -1589,15 +1595,15 @@ grid_read=(x,card)=>{
 			if(ikey(i,'widths'   ))return self.widths=ints(ll(x),255),x
 			if(ikey(i,'format'   ))return self.format=ls(x),x
 		}else{
-			if(ikey(i,'value'    ))return ivalue(self,ls(i),lmt({}))
-			if(ikey(i,'scroll'   ))return lmn(ivalue(self,ls(i),0))
+			if(ikey(i,'value'    ))return value_inherit(self,ls(i))||lmt({})
+			if(ikey(i,'scroll'   ))return value_inherit(self,ls(i))||NONE
 			if(ikey(i,'scrollbar'))return lmn(ivalue(self,ls(i),1))
 			if(ikey(i,'headers'  ))return lmn(ivalue(self,ls(i),1))
 			if(ikey(i,'lines'    ))return lmn(ivalue(self,ls(i),1))
 			if(ikey(i,'widths'   ))return lml((ivalue(self,ls(i),[])).map(lmn))
 			if(ikey(i,'format'   ))return lms(ivalue(self,ls(i),''))
 			if(ikey(i,'size'     ))return lmpair(ivalue(self,ls(i),rect(100,50)))
-			if(ikey(i,'row'      ))return lmn(clamp(-1,ivalue(self,ls(i),-1),count(ifield(self,'value'))-1))
+			if(ikey(i,'row'      )){const r=value_inherit(self,ls(i))||lmn(-1);return lmn(clamp(-1,ln(r),count(ifield(self,'value'))-1))}
 			if(ikey(i,'rowvalue' )){const r=ln(ifield(self,'row')),v=ifield(self,'value');return r<0||r>=count(v)?lmd():l_at(v,lmn(r))}
 		}return interface_widget(self,i,x)
 	},'grid');ri.card=card
@@ -1949,7 +1955,6 @@ contraption_update=(deck,def)=>{
 	deck.cards.v.map(card=>{
 		card.widgets.v.filter(x=>contraption_is(x)&&x.def==def).map(widget=>{
 			const d=widget_write(widget), n=widget.name
-			dset(d,lms('image'  ),image_copy(ifield(def,'image')))
 			dset(d,lms('widgets'),contraption_strip(widget))
 			for(var k in widget)delete widget[k];Object.assign(widget,widget_read(d,card));widget.name=n
 		})

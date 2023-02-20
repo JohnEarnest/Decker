@@ -1840,6 +1840,20 @@ def.script:"on set_rec x do x.rec:x end"
 con:deck.card.add["contraption" "recurser"]
 assert["recursive custom attrs are automatically halted" con con.rec:con]
 
+deck:readdeck[]
+def:deck.add["contraption" "hardfield"]
+fix:def.add["field" "fixed"]
+fix.text:"Hard Label"
+def.script:"on get_lab do fixed.text end   on set_lab x do fixed.text:x end"
+inst:deck.card.add["contraption" "hardfield"]
+assert["contraption value inheritance before" "Hard Label" inst.lab]
+fix.text:"Another Label"
+assert["contraption value inheritance after" "Another Label" inst.lab]
+inst.lab:"Override Label"
+assert["contraption value override" "Override Label" inst.lab]
+fix.text:"Cannot Override"
+assert["contraption value non-overridden" "Override Label" inst.lab]
+
 #######################################
 #
 #  Wrap Up
