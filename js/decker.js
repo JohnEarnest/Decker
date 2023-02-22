@@ -974,9 +974,9 @@ field_keys=(code,shift)=>{
 }
 
 draw_9seg=(r,dst,src,m,clip,opaque,pal)=>{
-	const o=rect(r.x,r.y), s=src.size, ss=s, ds=dst.size
+	const o=rect(r.x,r.y), s=src.size, ss=s, ds=dst.size; if(s.x<1||s.y<1)return
 	const draw_wrapped=(r,sr)=>{
-		r=rclip(r,clip);if(r.w==0||r.h==0||sr.w==0||sr.h==0)return
+		r=rclip(r,clip),sr=rclip(sr,rpair(rect(0,0),ss));if(r.w<=0||r.h<=0||sr.w<=0||sr.h<=0)return
 		if(!pal){ // solid/opaque
 			for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++){const c=src.pix[(sr.x+(x%sr.w))+(sr.y+(y%sr.h))*ss.x];if(opaque||c)dst.pix[(r.x+x)+(r.y+y)*ds.x]=c}
 		}

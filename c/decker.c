@@ -799,7 +799,7 @@ void handle_widgets(lv*x,pair offset){
 	}
 }
 void draw_wrapped(rect r,rect sr,lv*dst,lv*src,rect clip,int opaque,char*pal){
-	pair ss=buff_size(src),ds=buff_size(dst);r=box_intersect(r,clip);if(r.w==0||r.h==0||sr.w==0||sr.h==0)return;
+	pair ss=buff_size(src),ds=buff_size(dst);sr=box_intersect(sr,rect_pair((pair){0,0},ss)),r=box_intersect(r,clip);if(r.w<=0||r.h<=0||sr.w<=0||sr.h<=0)return;
 	if(!pal){for(int y=0;y<r.h;y++)for(int x=0;x<r.w;x++){int c=src->sv[(sr.x+(x%sr.w))+(sr.y+(y%sr.h))*ss.x];if(opaque||c)dst->sv[(r.x+x)+(r.y+y)*ds.x]=c;}return;}
 	for(int y=0;y<r.h;y++)for(int x=0;x<r.w;x++){
 		int dx=r.x+x,dy=r.y+y, c=draw_pattern(pal,src->sv[(sr.x+(x%sr.w))+(sr.y+(y%sr.h))*ss.x],dx,dy), di=(r.x+x)+(r.y+y)*ds.x;
@@ -807,7 +807,7 @@ void draw_wrapped(rect r,rect sr,lv*dst,lv*src,rect clip,int opaque,char*pal){
 	}
 }
 void draw_9seg(rect r,lv*dst,lv*src,rect m,rect clip,int opaque,char*inv){
-	pair o={r.x,r.y}, s=buff_size(src);
+	pair o={r.x,r.y}, s=buff_size(src);if(s.x<1||s.y<1)return;
 	draw_wrapped(rect_add((rect){0      ,0      ,m.x          ,m.y          },o),(rect){0      ,0      ,m.x          ,m.y          },dst,src,clip,opaque,inv); // NW
 	draw_wrapped(rect_add((rect){0      ,r.h-m.h,m.x          ,m.h          },o),(rect){0      ,s.y-m.h,m.x          ,m.h          },dst,src,clip,opaque,inv); // SW
 	draw_wrapped(rect_add((rect){r.w-m.w,0      ,m.w          ,m.y          },o),(rect){s.x-m.w,0      ,m.w          ,m.y          },dst,src,clip,opaque,inv); // NE

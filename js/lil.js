@@ -1304,6 +1304,7 @@ image_write=x=>{
 	return data_write('IMG'+f,t)
 }
 n_image=([size])=>lis(size)?image_read(ls(size)):image_make(getpair(size))
+is_blank=x=>!image_is(x)?0: !x.pix.some(x=>x>0)
 
 sound_make=data=>{
 	const sign_extend=x=>(x<<24>>24)
@@ -1912,7 +1913,7 @@ card_read=(x,deck,cdata)=>{
 			if(ikey(i,'index'  ))return lmn(dvix(deck.cards,self))
 			if(ikey(i,'script' ))return lms(self.script||'')
 			if(ikey(i,'widgets'))return self.widgets
-			if(ikey(i,'image'  ))return self.image||image_make(rect())
+			if(ikey(i,'image'  ))return self.image
 			if(ikey(i,'add'    ))return lmnat(([t,n1,n2])=>card_add(self,t,n1,n2))
 			if(ikey(i,'remove' ))return lmnat(([x])=>lmn(card_remove(self,x)))
 			if(ikey(i,'event'  ))return lmnat(args=>n_event(self,args))
@@ -1925,7 +1926,7 @@ card_read=(x,deck,cdata)=>{
 	ri.widgets=lmd()
 	ri.name=ls(ukey(deck.cards,n&&lis(n)&&count(n)==0?null:n,'card'))
 	ri.script=ls(dget(x,lms('script'))||lms(''))
-	{const v=dget(x,lms('image'));if(v)ri.image=image_read(ls(v))}
+	{const v=dget(x,lms('image'));ri.image=v?image_read(ls(v)):image_make(deck.size)}
 	ll(dget(x,lms('widgets'))||lml([])).filter(w=>dget(w,lms('name'))).map(w=>{const i=widget_read(w,ri);if(lii(i))dset(ri.widgets,ifield(i,'name'),i)})
 	return ri
 }
@@ -1933,7 +1934,7 @@ card_write=card=>{
 	const r=lmd(),wids=lmd()
 	dset(r,lms('name'),lms(card.name)),dset(r,lms('widgets'),wids)
 	if(card.script.length)dset(r,lms('script'),lms(card.script))
-	if(card.image)dset(r,lms('image'),lms(image_write(card.image)))
+	if(card.image&&!is_blank(card.image))dset(r,lms('image'),lms(image_write(card.image)))
 	card.widgets.k.map((k,i)=>{
 		let wid=widget_write(card.widgets.v[i]),n=dget(wid,lms('name'))
 		wid=dyad.drop(lms('name'),wid)
@@ -2008,9 +2009,9 @@ prototype_read=(x,deck)=>{
 	ri.deck   =deck
 	ri.widgets=lmd()
 	{const v=dget(x,lms('name'      ));ri.name=ls(ukey(deck.contraptions,v&&lis(v)&&count(v)==0?null:v,'prototype'))}
-	{const v=dget(x,lms('image'     ));ri.image=v?image_read(ls(v)):image_make(range(0,0))}
 	{const v=dget(x,lms('attributes'));if(v)iwrite(ri,lms('attributes'),monad.table(v))}
 	{const v=dget(x,lms('size'      ));ri.size=v?rint(getpair(v)):rect(100,100)}
+	{const v=dget(x,lms('image'     ));ri.image=v?image_read(ls(v)):image_make(ri.size)}
 	{const v=dget(x,lms('resizable' ));ri.resizable=v?lb(v):0}
 	let w=dget(x,lms('widgets'));if(lid(w)){w.v.map((v,i)=>dset(v,lms('name'),w.k[i]))}
 	(w?ll(w):[]).map(w=>{const n=dget(w,lms('name'));if(n){const i=widget_read(w,ri);if(lii(i))dset(ri.widgets,ifield(i,'name'),i)}})
@@ -2021,7 +2022,7 @@ prototype_read=(x,deck)=>{
 	return ri
 }
 prototype_write=x=>{
-	const r=lmd(), wids=lmd(), nice=x=>x&&image_is(x)&&x.size.x>0&&x.size.y>0
+	const r=lmd(), wids=lmd(), nice=x=>x&&image_is(x)&&x.size.x>0&&x.size.y>0&&!is_blank(x)
 	dset(r,lms('name'),lms(x.name))
 	dset(r,lms('size'),ifield(x,'size'))
 	if(x.resizable)dset(r,lms('resizable'),ONE)

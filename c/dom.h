@@ -415,6 +415,8 @@ lv* interface_image(lv*self,lv*i,lv*x){
 }
 lv* image_make(lv*buffer){return lmi(interface_image,lmistr("image"),buffer);}
 int is_empty(lv*x){pair s=image_size(x);return s.x==0&&s.y==0;}
+int is_blank(lv*x){if(!image_is(x))return 0;EACH(z,x->b)if(x->b->sv[z])return 0;return 1;}
+
 lv* image_read(lv*x){
 	char f=0;lv*data=data_read("IMG",&f,x);if(!data||data->c<4)return image_empty();
 	int w=read2(data->sv,0),h=read2(data->sv,2);lv*r=lmbuff((pair){w,h});
@@ -1876,7 +1878,7 @@ lv* interface_card(lv*self,lv*i,lv*x){
 		ikey("size"    )return dget(deck->b,i);
 		ikey("index"   )return lmn(dgeti(cards,name));
 		ikey("script"  ){lv*r=dget(data,i);return r?r:lmistr("");}
-		ikey("image"   ){lv*r=dget(data,i);return r?r:image_empty();}
+		ikey("image"   )return dget(data,i);
 		ikey("widgets" )return dget(data,i);
 		ikey("add"     )return lmnat(n_card_add,self);
 		ikey("remove"  )return lmnat(n_card_remove,self);
@@ -1889,7 +1891,7 @@ lv* card_write(lv*card){
 	lv*data=card->b, *r=lmd();
 	{lv*k=lmistr("name"  ),*v=dget(data,k);dset(r,k,v);}
 	{lv*k=lmistr("script"),*v=dget(data,k);if(v&&lis(v)&&v->c)dset(r,k,v);}
-	{lv*k=lmistr("image" ),*v=dget(data,k);if(v&&!is_empty(v))dset(r,k,image_write(v));}
+	{lv*k=lmistr("image" ),*v=dget(data,k);if(v&&!is_blank(v))dset(r,k,image_write(v));}
 	lv*w=dget(data,lmistr("widgets")),*wids=lmd();EACH(z,w){
 		lv*wid=widget_write(w->lv[z]),*n=dget(wid,lmistr("name"));
 		wid=l_drop(lmistr("name"),wid);if(wid->c)dset(wids,n,wid);
@@ -1899,7 +1901,7 @@ lv* card_read(lv*x,lv*deck){
 	x=ld(x);lv*r=lmd(),*widgets=lmd(),*ri=lmi(interface_card,lmistr("card"),r),*cards=ivalue(deck,"cards");
 	dset(r,lmistr("deck"),deck),dset(r,lmistr("widgets"),widgets);
 	{lv*k=lmistr("name"  );lv*v=dget(x,k);dset(r,k,ukey(cards,v&&lis(v)&&v->c==0?NULL:v,"card",NULL));}
-	{lv*k=lmistr("image" ),*v=dget(x,k);if(v)dset(r,k,image_read(v));}
+	{lv*k=lmistr("image" ),*v=dget(x,k);dset(r,k,v?image_read(v):image_make(lmbuff(getpair(ifield(deck,"size")))));}
 	init_field(ri,"script",x);lv*w=dget(x,lmistr("widgets"));w=w?ll(w):lml(0);
 	EACH(z,w){lv*n=dget(w->lv[z],lmistr("name"));if(n){lv*i=widget_read(w->lv[z],ri);if(lii(i))dset(widgets,ifield(i,"name"),i);}}
 	return ri;
@@ -1970,7 +1972,7 @@ lv* interface_prototype(lv*self,lv*i,lv*x){
 		ikey("size"       )return dget(data,i);
 		ikey("margin"     )return dget(data,i);
 		ikey("resizable"  )return dget(data,i);
-		ikey("image"      ){lv*r=dget(data,i);return r?r:image_empty();}
+		ikey("image"      )return dget(data,i);
 		ikey("widgets"    )return dget(data,i);
 		ikey("attributes" ){lv*r=dget(data,i);return r?r:normalize_attributes(NONE);}
 		ikey("add"        )return lmnat(n_con_add,self);
@@ -1987,7 +1989,7 @@ lv* prototype_write(lv*prototype){
 	{lv*k=lmistr("description"),*v=dget(data,k);if(v&&lis(v)&&v->c)dset(r,k,v);}
 	{lv*k=lmistr("script"     ),*v=dget(data,k);if(v&&lis(v)&&v->c)dset(r,k,v);}
 	{lv*k=lmistr("template"   ),*v=dget(data,k);if(v&&lis(v)&&v->c)dset(r,k,v);}
-	{lv*k=lmistr("image"      ),*v=dget(data,k);if(v&&!is_empty(v))dset(r,k,image_write(v));}
+	{lv*k=lmistr("image"      ),*v=dget(data,k);if(v&&!is_blank(v))dset(r,k,image_write(v));}
 	{lv*k=lmistr("attributes" ),*v=dget(data,k);if(v)dset(r,k,l_cols(v));}
 	lv*w=dget(data,lmistr("widgets")),*wids=lmd();EACH(z,w){
 		lv*wid=widget_write(w->lv[z]),*n=dget(wid,lmistr("name"));
@@ -1998,9 +2000,9 @@ lv* prototype_read(lv*x,lv*deck){
 	x=ld(x);lv*r=lmd(),*widgets=lmd(),*ri=lmi(interface_prototype,lmistr("prototype"),r),*defs=ivalue(deck,"contraptions");
 	dset(r,lmistr("deck"),deck),dset(r,lmistr("widgets"),widgets);
 	{lv*k=lmistr("name"       ),*v=dget(x,k);dset(r,k,ukey(defs,v&&lis(v)&&v->c==0?NULL:v,"prototype",NULL));}
-	{lv*k=lmistr("image"      ),*v=dget(x,k);dset(r,k,v?image_read(v):image_empty());}
 	{lv*k=lmistr("attributes" ),*v=dget(x,k);if(v)iwrite(ri,k,l_table(v));}
 	{lv*k=lmistr("size"       ),*v=dget(x,k);dset(r,k,v?normalize_pair(v):lmpair((pair){100,100}));}
+	{lv*k=lmistr("image"      ),*v=dget(x,k);dset(r,k,v?image_read(v):image_make(lmbuff(getpair(ifield(ri,"size")))));}
 	{lv*k=lmistr("resizable"  ),*v=dget(x,k);dset(r,k,v?lmn(lb(v)):NONE);}
 	lv*w=dget(x,lmistr("widgets"));if(lid(w)){EACH(z,w)dset(w->lv[z],lmistr("name"),ls(w->kv[z]));}w=w?ll(w):lml(0);
 	EACH(z,w){lv*n=dget(w->lv[z],lmistr("name"));if(n){lv*i=widget_read(w->lv[z],ri);if(lii(i))dset(widgets,ifield(i,"name"),i);}}
