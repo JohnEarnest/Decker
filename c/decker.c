@@ -2651,13 +2651,14 @@ void object_properties(lv*x){
 	if(grid_is       (x))modal_enter(modal_grid_props       );
 	if(contraption_is(x))modal_enter(modal_contraption_props);
 }
+int is_resizable(){return ob.sel->c==1&&(contraption_is(ob.sel->lv[0])?lb(ifield(ifield(ob.sel->lv[0],"def"),"resizable")):1);}
 void object_editor(){
 	char*pal=patterns_pal(ifield(deck,"patterns"));
 	lv*wids=con_wids();EACH(z,wids){ // forward pass for rendering
 		lv*wid=wids->lv[z];widget w=unpack_widget(wid);w.size=con_to_screenr(w.size);
 		int sel=0;EACH(z,ob.sel)if(ob.sel->lv[z]==wid){sel=1;break;}
 		if(sel){draw_box(inset(w.size,-1),0,ANTS);}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1));}
-		if(sel&&ob.sel->c==1&&(contraption_is(ob.sel->lv[0])?lb(ifield(ifield(ob.sel->lv[0],"def"),"resizable")):1)){draw_handles(w.size);}
+		if(sel&&is_resizable()){draw_handles(w.size);}
 		if(ob.show_bounds){
 			rect badge={w.size.x+w.size.w-10,w.size.y,10,10};
 			if(w.locked                  )draw_rect(badge,1),draw_icon((pair){badge.x+1,badge.y+1},LOCK,32),badge.y+=10;
@@ -2673,7 +2674,7 @@ void object_editor(){
 		if(ev.dir==dir_down )ob_move((pair){ 0, 1*(ev.shift?dr.grid_size.y:1)},1),nudge=1;
 		if(nudge&&ev.shift&&ob.sel->c==1)ob_move(snap_delta(getpair(ifield(ob.sel->lv[0],"pos"))),1);
 	}
-	int ish=ob.sel->c==1?in_handle(unpack_widget(ob.sel->lv[0]).size):-1;
+	int ish=is_resizable()?in_handle(unpack_widget(ob.sel->lv[0]).size):-1;
 	int isw=0;EACH(w,wids){rect wid=unpack_widget(wids->lv[w]).size;EACH(z,ob.sel)if(ob.sel->lv[z]==wids->lv[w]&&over(wid))isw=1;}
 	pair a=ev.pos,b=ob.prev;int dragged=a.x!=b.x||a.y!=b.y;
 	rect sr=normalize_rect((rect){ev.dpos.x,ev.dpos.y,ev.pos.x-ev.dpos.x,ev.pos.y-ev.dpos.y});int box=sr.w>1||sr.h>1;

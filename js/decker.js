@@ -2472,10 +2472,11 @@ object_properties=x=>{
 }
 object_editor=_=>{
 	const wids=con_wids(), pal=deck.patterns.pal.pix
+	const is_resizable=_=>ob.sel.length==1&&(contraption_is(ob.sel[0])?lb(ifield(ob.sel[0].def,'resizable')):1)
 	wids.v.map(wid=>{
 		const w=unpack_widget(wid), sel=ob.sel.some(x=>x==wid);w.size=con_to_screen(w.size)
 		if(sel){draw_box(inset(w.size,-1),0,ANTS)}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1))}
-		if(sel&&ob.sel.length==1&&(contraption_is(ob.sel[0])?lb(ifield(ob.sel[0].def,'resizable')):1))draw_handles(w.size)
+		if(sel&&is_resizable())draw_handles(w.size)
 		if(ob.show_bounds){
 			const badge=rect(w.size.x+w.size.w-10,w.size.y,10,10)
 			if(w.locked                  )draw_rect(badge,1),draw_icon(rect(badge.x+1,badge.y+1),LOCK,32),badge.y+=10
@@ -2491,7 +2492,7 @@ object_editor=_=>{
 		if(ev.dir=='down' )ob_move(rect( 0, 1*(ev.shift?dr.grid_size.y:1)),1),nudge=1
 		if(nudge&&ev.shift&&ob.sel.length==1)ob_move(snap_delta(getpair(ifield(ob.sel[0],'pos'))),1)
 	}
-	const ish=ob.sel.length==1?in_handle(unpack_widget(ob.sel[0]).size):-1
+	const ish=is_resizable()?in_handle(unpack_widget(ob.sel[0]).size):-1
 	const isw=wids.v.some(w=>over(unpack_widget(w).size)&&ob.sel.some(x=>x==w))
 	const a=ev.pos,b=ob.prev,dragged=a.x!=b.x||a.y!=b.y
 	const sr=rnorm(rect(ev.dpos.x,ev.dpos.y,ev.pos.x-ev.dpos.x,ev.pos.y-ev.dpos.y)), box=sr.w>1||sr.h>1;
