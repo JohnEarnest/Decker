@@ -485,6 +485,7 @@ on cardattrs x do
 	r.widgets: typeof x.widgets
 end
 assert["card default attributes and types" dattr cardattrs[card]]
+assert["card default image size" (512,342) card.image.size]
 
 w1:card.add["button" "thingy"]
 w2:card.add["field" "zoot"]
@@ -1853,6 +1854,19 @@ inst.lab:"Override Label"
 assert["contraption value override" "Override Label" inst.lab]
 fix.text:"Cannot Override"
 assert["contraption value non-overridden" "Override Label" inst.lab]
+
+deck:readdeck[]
+def:deck.add["contraption" "sizey"]
+def.size:12,34
+con:deck.card.add["contraption" "sizey"]
+assert["contraption inherit size" (12,34) con.size]
+con.size:45,67
+assert["contraption non-resizable" (12,34) con.size]
+def.resizable:1
+con.size:32,48
+assert["contraption is resizable" (32,48) con.size]
+def.resizable:0
+assert["contraption size snapback" (12,34) con.size]
 
 #######################################
 #

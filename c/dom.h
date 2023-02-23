@@ -1636,12 +1636,13 @@ void contraption_reflow(lv*c){
 }
 lv* interface_contraption(lv*self,lv*i,lv*x){
 	lv*data=self->b;char*masks[]={"name","index","image","script","locked","animated","pos","show","font","event","offset",NULL};
+	lv*def=dget(data,lmistr("def"));
 	if(!is_rooted(self))return NONE;
 	if(x){
 		ikey("def"  )return x; // not mutable!
 		ikey("image")return x; // not mutable!
 		ikey("size" ){
-			rect m=getrect(ifield(dget(data,lmistr("def")),"margin"));
+			rect m=getrect(ifield(def,"margin"));
 			dset(data,i,lmpair(pair_max((pair){m.x+m.w,m.y+m.h},getpair(normalize_pair(x)))));
 			contraption_reflow(self);return x;
 		}
@@ -1649,7 +1650,7 @@ lv* interface_contraption(lv*self,lv*i,lv*x){
 		fire_attr_sync(self,"set_",ls(i),x);return x;
 	}else{
 		ikey("def"  )return dget(data,i);
-		ikey("size" )return dget(data,i);
+		ikey("size" )return lb(ifield(def,"resizable"))?dget(data,i):ifield(def,"size");
 		ikey("image")return ifield(dget(data,lmistr("def")),"image");
 		if(lis(i))for(int z=0;masks[z];z++)if(!strcmp(i->sv,masks[z]))return interface_widget(self,i,NULL);
 		return fire_attr_sync(self,"get_",ls(i),NULL);
@@ -1901,7 +1902,7 @@ lv* card_read(lv*x,lv*deck){
 	x=ld(x);lv*r=lmd(),*widgets=lmd(),*ri=lmi(interface_card,lmistr("card"),r),*cards=ivalue(deck,"cards");
 	dset(r,lmistr("deck"),deck),dset(r,lmistr("widgets"),widgets);
 	{lv*k=lmistr("name"  );lv*v=dget(x,k);dset(r,k,ukey(cards,v&&lis(v)&&v->c==0?NULL:v,"card",NULL));}
-	{lv*k=lmistr("image" ),*v=dget(x,k);dset(r,k,v?image_read(v):image_make(lmbuff(getpair(ifield(deck,"size")))));}
+	{lv*k=lmistr("image" ),*v=dget(x,k);dset(r,k,v?image_read(v):image_make(lmbuff(getpair(dget(deck->b,lmistr("size"))))));}
 	init_field(ri,"script",x);lv*w=dget(x,lmistr("widgets"));w=w?ll(w):lml(0);
 	EACH(z,w){lv*n=dget(w->lv[z],lmistr("name"));if(n){lv*i=widget_read(w->lv[z],ri);if(lii(i))dset(widgets,ifield(i,"name"),i);}}
 	return ri;

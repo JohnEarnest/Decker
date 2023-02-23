@@ -1768,7 +1768,7 @@ contraption_read=(x,card)=>{
 			return fire_attr_sync(self,'set_'+ls(i),x),x
 		}else{
 			if(ikey(i,'def'  ))return self.def
-			if(ikey(i,'size' ))return lmpair(self.size)
+			if(ikey(i,'size' ))return lmpair((def.resizable?self.size:def.size)||def.size)
 			if(ikey(i,'image'))return ifield(self.def,'image')
 			if(lis(i)&&ls(i) in masks)return interface_widget(self,i,x)
 			return fire_attr_sync(self,'get_'+ls(i),null)
@@ -1777,11 +1777,10 @@ contraption_read=(x,card)=>{
 	ri.card   =card
 	ri.deck   =card.deck
 	ri.def    =def
-	ri.size   =getpair(dget(x,lms('size'))||ifield(def,'size'))
 	ri.widgets=lmd()
 	let w=dget(x,lms('widgets')),d=def.widgets;if(w){w=ld(w)}else{w=lmd();def.widgets.k.map(k=>dset(w,k,lmd()))}
 	d.k.map((k,i)=>{const a=widget_write(d.v[i]),o=dget(w,k);widget_add(ri,o?dyad[','](a,o):a)})
-	return ri
+	return reflow(ri),ri
 }
 contraption_write=x=>{
 	const wids=lmd(), r=lmd(['type','def','widgets'].map(lms),[lms('contraption'),ifield(x.def,'name'),wids])
