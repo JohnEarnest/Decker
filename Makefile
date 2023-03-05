@@ -6,6 +6,8 @@ ifeq ($(UNAME),Darwin)
 	OPEN=open
 	COMPILER=clang
 	FLAGS=-Wall -Werror -Wextra -Wpedantic -Os
+	# -Wno-misleading-indentation silences warnings which are entirely spurious.
+	FLAGS:=$(FLAGS) -Wno-misleading-indentation
 	# FLAGS:=$(FLAGS) -fsanitize=undefined
 	# FLAGS:=$(FLAGS) -fsanitize=address
 endif
