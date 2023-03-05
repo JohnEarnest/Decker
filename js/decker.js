@@ -3082,7 +3082,7 @@ main_view=_=>{
 		const cl=con_clip(),s=con_size()
 		if(back.size.x!=s.x||back.size.y!=s.y)image_resize(back,s),mark_dirty()
 		if(dr.fatbits){frame.image.pix.fill(46),draw_rect(cl,dr.trans_mask?45:32),draw_fat(cl,back,pal,frame_count,0,FAT,dr.offset)}
-		else if(s.x==frame.size.x&&s.y==frame.size.y){image_paste(rpair(rect(),back.size),frame.clip,back,frame.image,1)}
+		else if(s.x==frame.size.x&&s.y==frame.size.y){for(let z=0;z<back.pix.length;z++)frame.image.pix[z]=back.pix[z]}
 		else{frame.image.pix.fill(46),draw_rect(cl,dr.trans_mask?45:32),image_paste(cl,frame.clip,back,frame.image,0)}
 	}
 	ev=ev_to_con(ev)
@@ -3175,32 +3175,31 @@ tick=_=>{
 		draw_invert(deck.patterns.pal.pix,rect(r.x+1,r.y,ceil((r.w-2)*(used/FRAME_QUOTA)),r.h)),draw_box(r,0,1)
 	}
 	if(msg.pending_loop)sfx_doloop()
-}
-
-let id=null
-sync=_=>{
 	ev.shortcuts={}
 	ev.mu=ev.md=ev.click=ev.dclick=ev.tab=ev.action=ev.dir=ev.exit=ev.eval=ev.scroll=ev.rdown=ev.rup=0
 	if(ev.clicktime)ev.clicktime--;if(ev.clicklast)ev.clicklast--
 	if(ev.pos.x!=ev.dpos.x||ev.pos.y!=ev.dpos.y)ev.clicklast=0
 	wid.cursor_timer=(wid.cursor_timer+1)%(2*FIELD_CURSOR_DUTY)
 	if(wid.change_timer){wid.change_timer--;if(wid.change_timer==0)field_change()}
+	pending_tick=1,frame_count++
+}
+
+let id=null
+sync=_=>{
 	const anim=deck.patterns.anim, pal=deck.patterns.pal.pix, mask=dr.trans_mask&&uimode=='draw'
 	const anim_ants   =(x,y)=>(0|((x+y+(0|(frame_count/2)))/3))%2?15:0
 	const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][(0|(frame_count/4))%max(1,anim[pix-28].length)]
 	const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
 	const draw_color  =(pix,x,y)=>pix==ANTS?anim_ants(x,y): pix>47?0: pix>31?pix-32: draw_pattern(pix,x,y)?15:0
-	if(!id||id.width!=fb.size.x||id.height!=fb.size.y)id=new ImageData(fb.size.x,fb.size.y)
+	if(!id||id.width!=fb.size.x||id.height!=fb.size.y){id=new ImageData(fb.size.x,fb.size.y);id.data.fill(0xFF)}
 	for(let z=0,d=0,y=0;y<id.height;y++)for(let x=0;x<id.width;x++,z++,d+=4){
 		const pix=fb.pix[z], a=anim_pattern(pix,x,y), c=(a==0&&mask)?13:draw_color(a,x,y), cv=COLORS[c]
 		id.data[d  ]=0xFF&(cv>>16)
 		id.data[d+1]=0xFF&(cv>> 8)
 		id.data[d+2]=0xFF&(cv    )
-		id.data[d+3]=0xFF
 	}
 	const r=q('#render');r.getContext('2d').putImageData(id,0,0)
 	const g=q('#display').getContext('2d');g.imageSmoothingEnabled=zoom!=(0|zoom),g.save(),g.scale(zoom,zoom),g.drawImage(r,0,0),g.restore()
-	pending_tick=1,frame_count++
 }
 
 move=(x,y)=>{if(!msg.pending_drag)pointer.prev=pointer.pos;pointer.pos=ev.pos=rect(x,y);if(pointer.held)msg.pending_drag=1}
@@ -3218,7 +3217,12 @@ mouse=(e,f)=>{
 	f(0|((e.pageX-c.x)/zoom),0|((e.pageY-c.y)/zoom),e.button!=0)
 }
 touch=(e,f)=>{const t=e.targetTouches[0]||{}; mouse({pageX:t.clientX, pageY:t.clientY, button:0},f)}
-loop=_=>{tick(),sync(),pump=setTimeout(loop,1000/60)} // 60fps
+loop=_=>{
+	const f=1000/60, a=Date.now()
+	tick(),sync()
+	const d=Date.now()-a
+	pump=setTimeout(loop,max(0,f-d))
+}
 resize=_=>{
 	const b=q('body'), screen=rect(b.clientWidth,b.clientHeight), fs=min(screen.x/fb.size.x,screen.y/fb.size.y)
 	zoom=max(1,is_fullscreen()?fs:(0|fs))
