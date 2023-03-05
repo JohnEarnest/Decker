@@ -1020,7 +1020,7 @@ widget_attributes=b=>{
 		if(a.type=='number')ui_field(wb,a.value)
 		if(a.type=='string')ui_field(wb,a.value)
 		if(a.type=='code'  )ui_codeedit(wb,1,a.value)
-		if(a.type=='rich'  )ui_textedit(wb,1,a.value)
+		if(a.type=='rich'  )ui_richedit(wb,1,a.value)
 	});frame.clip=oc,ev.pos=bp,ev.dpos=bd,ev.scroll=bs
 }
 handle_widgets=(x,offset)=>{
@@ -1048,6 +1048,7 @@ ui_field   =(r,       value)=>widget_field(null,{size:r,font:FONT_BODY,show:'sol
 ui_dfield  =(r,enable,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:0,border:1,style:'plain',align:ALIGN.left,locked:!enable},value)
 ui_textedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:1,border  ,style:'plain',align:ALIGN.left,locked:0},value)
 ui_codeedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_MONO,show:'transparent',scrollbar:1,border  ,style:'code' ,align:ALIGN.left,locked:running()},value)
+ui_richedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:1,border  ,style:'rich' ,align:ALIGN.left,locked:0},value)
 ui_table   =(r,widths,format,value)=>widget_grid(null,{size:r,font:FONT_BODY,widths   ,format   ,headers:2,scrollbar:1,lines:0,show:'solid',locked:1},value)
 ui_list    =(r,              value)=>widget_grid(null,{size:r,font:FONT_BODY,widths:[],format:'',headers:0,scrollbar:1,lines:0,show:'solid',locked:1},value)
 
@@ -3320,7 +3321,7 @@ docopy=_=>{
 	return null
 }
 dopaste=x=>{
-	if(ms.type==null&&/^%%IMG[012]/.test(x)){
+	if((ms.type==null||(ms.type=='contraption_props'&&wid.fv))&&/^%%IMG[012]/.test(x)){
 		const i=image_read(x);if(i.size.x==0||i.size.y==0)return
 		if(wid.fv){
 			if(wid.f.style!='rich'){field_input(x)}

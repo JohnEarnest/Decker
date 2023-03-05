@@ -834,6 +834,7 @@ void ui_field   (rect r,           field_val*value){widget_field(NULL,(field){r,
 void ui_dfield  (rect r,int enable,field_val*value){widget_field(NULL,(field){r,FONT_BODY,show_solid,0,1     ,field_plain,align_left,!enable},value);}
 void ui_textedit(rect r,int border,field_val*value){widget_field(NULL,(field){r,FONT_BODY,show_solid,1,border,field_plain,align_left,0},value);}
 void ui_codeedit(rect r,int border,field_val*value){widget_field(NULL,(field){r,FONT_MONO,show_transparent,1,border,field_code ,align_left,running()},value);}
+void ui_richedit(rect r,int border,field_val*value){widget_field(NULL,(field){r,FONT_BODY,show_solid,1,border,field_rich ,align_left,0},value);}
 int  ui_table   (rect r,int w0,int w1,int w2,char*fmt,grid_val*value){return widget_grid(NULL,(grid){r,FONT_BODY,{w0,w1,w2,0,0},fmt,2,1,0,show_solid,1},value);}
 int  ui_list    (rect r,                              grid_val*value){return widget_grid(NULL,(grid){r,FONT_BODY,{0 },"" ,0,1,0,show_solid,1},value);}
 
@@ -852,7 +853,7 @@ void widget_attributes(rect b){
 		if(attrs[z].type==attr_number)ui_field(wb,&attrs[z].value);
 		if(attrs[z].type==attr_string)ui_field(wb,&attrs[z].value);
 		if(attrs[z].type==attr_code  )ui_codeedit(wb,1,&attrs[z].value);
-		if(attrs[z].type==attr_rich  )ui_textedit(wb,1,&attrs[z].value);
+		if(attrs[z].type==attr_rich  )ui_richedit(wb,1,&attrs[z].value);
 	}frame.clip=oc,ev.pos=bp,ev.dpos=bd,ev.scroll=bs;
 }
 
