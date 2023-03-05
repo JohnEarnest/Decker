@@ -326,6 +326,7 @@ void setmode(int mode){
 	msg.pending_loop=(uimode!=mode)&&mode==mode_interact;
 	uimode=mode;if(mode!=mode_interact)msg.pending_halt=1;
 	if(mode!=mode_draw&&!prototype_is(con()))dr.fatbits=0;
+	if(mode==mode_interact)dr.fatbits=0;
 }
 void settool(int tool){setmode(mode_draw);dr.tool=tool;}
 void setscript(lv*x){
