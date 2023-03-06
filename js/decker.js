@@ -1,6 +1,6 @@
 // Decker
 
-let pump=null, zoom=1, deck=null, fb=null, context=null, dirty=0
+let zoom=1, deck=null, fb=null, context=null, dirty=0
 let FONT_BODY=null,FONT_MENU=null,FONT_MONO=null
 
 const ELLIPSIS=String.fromCharCode(95+32)
@@ -3217,11 +3217,12 @@ mouse=(e,f)=>{
 	f(0|((e.pageX-c.x)/zoom),0|((e.pageY-c.y)/zoom),e.button!=0)
 }
 touch=(e,f)=>{const t=e.targetTouches[0]||{}; mouse({pageX:t.clientX, pageY:t.clientY, button:0},f)}
-loop=_=>{
-	const f=1000/60, a=Date.now()
-	tick(),sync()
-	const d=Date.now()-a
-	pump=setTimeout(loop,max(0,f-d))
+let prev_stamp=null, leftover=0
+loop=stamp=>{
+	if(!prev_stamp)prev_stamp=stamp
+	let delta=(stamp-prev_stamp)+leftover, frame=1000/60, tc=0
+	while(delta>frame){tick(),tc++,delta-=frame;if(tc==5){delta=0;break}};leftover=delta
+	sync(),prev_stamp=stamp,requestAnimationFrame(loop)
 }
 resize=_=>{
 	const b=q('body'), screen=rect(b.clientWidth,b.clientHeight), fs=min(screen.x/fb.size.x,screen.y/fb.size.y)
@@ -3383,4 +3384,4 @@ q('body').ondrop=e=>{
 
 pushstate(lmenv()),load_deck(deck_read(q('script[language="decker"]').innerText))
 const tag=decodeURI(document.URL.split('#')[1]||'');if(tag.length)iwrite(deck,lms('card'),lms(tag))
-resize(),(pump&&clearTimeout(pump)),loop()
+resize(),requestAnimationFrame(loop)
