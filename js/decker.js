@@ -522,6 +522,7 @@ menu_bar=(name,enabled)=>{
 }
 shortcut_w=c=>!c?0: 10+font_textsize(FONT_MENU,'^'+c).x
 menu_check=(name,enabled,check,shortcut,func)=>{
+	if(!last(menu.heads).enabled)return 0
 	const sc=enabled&&shortcut&&ev.shortcuts[shortcut]; if(sc)delete ev.shortcuts[shortcut];
 	if(menu.heads.length-1!=menu.active&&menu.heads.length-1!=menu.stick)return sc
 	const t=name?rpair(rect(menu.sz.x+5+8,menu.sz.y+menu.sz.h+2),font_textsize(FONT_MENU,name)): rect(menu.sz.x,menu.sz.y+menu.sz.h+2,1,1)

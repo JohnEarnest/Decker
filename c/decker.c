@@ -268,6 +268,7 @@ void menu_bar(char*name,int enabled){
 }
 int shortcut_w(char c){if(!c)return 0;char tn[8];snprintf(tn,8,"^%c",c);pair s=font_textsize(FONT_MENU,tn);return 10+s.x;}
 int menu_check(char*name,int enabled,int check,char shortcut){
+	if(!menu.heads[menu.head_count-1].enabled)return 0;
 	int sc=enabled&&shortcut&&ev.shortcuts[0xFF&shortcut]; if(sc)ev.shortcuts[0xFF&shortcut]=0;
 	if(menu.head_count-1!=menu.active&&menu.head_count-1!=menu.stick)return sc;
 	rect t=name?rect_pair((pair){menu.sz.x+5+8,menu.sz.y+menu.sz.h+2},font_textsize(FONT_MENU,name)): (rect){menu.sz.x,menu.sz.y+menu.sz.h+2,1,1};
