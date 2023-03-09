@@ -2296,7 +2296,7 @@ fire_attr_sync=(target,name,a)=>{
 	pushstate(root),issue(root,b);let q=ATTR_QUOTA;while(running()&&q>0)runop(),q--;const r=running()?NONE:arg();popstate();frame=bf;return in_attr=0,r
 }
 parent_deck=x=>deck_is(x)?x: card_is(x)||prototype_is(x)?x.deck: parent_deck(x.card)
-event_invoke=(target,name,arg,hunk,isolate)=>{
+event_invoke=(target,name,arg,hunk,isolate,noinner)=>{
 	const scopes=lmd([NONE],[parse(DEFAULT_HANDLERS)]); let deck=null
 	const ancestors=target=>{
 		if(deck_is(target)){deck=target;if(isolate)return}
@@ -2321,7 +2321,7 @@ event_invoke=(target,name,arg,hunk,isolate)=>{
 			t.cards  .v.map((v,i)=>bind(b,t.cards  .k[i],v                ))
 			sname='!deck_scope'
 		}
-		if(card_is(t)||prototype_is(t)||contraption_is(t)){
+		if(card_is(t)||prototype_is(t)||(contraption_is(t)&&!noinner)){
 			bind(b,lms('card'),t)
 			t.widgets.v.map((v,i)=>bind(b,t.widgets.k[i],v))
 			sname='!card_scope'
@@ -2341,4 +2341,7 @@ fire_async=(target,name,arg,hunk,nest)=>{
 }
 fire_event_async=(target,name,x)=>fire_async(target,name,lml([x]),null,1)
 fire_hunk_async=(target,hunk)=>fire_async(target,null,lml([]),hunk,1)
-n_event=(self,args)=>{fire_async(self,ls(args[0]),lml(args.slice(1)),null,0);return self}
+n_event=(self,args)=>{
+	const root=lmenv();primitives(root,parent_deck(self)),constants(root)
+	issue(root,event_invoke(self,ls(args[0]),lml(args.slice(1)),null,0,1));return self
+}

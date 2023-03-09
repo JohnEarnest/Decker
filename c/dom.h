@@ -162,7 +162,7 @@ lv* parent_deck(lv*x){
 	if(card_is(x)||prototype_is(x))return ivalue(x,"deck");
 	return parent_deck(ivalue(x,"card"));
 }
-lv* event_invoke(lv*target,lv*name,lv*arg,lv*hunk,int iso){
+lv* event_invokev(lv*target,lv*name,lv*arg,lv*hunk,int iso,int noinner){
 	lv*scopes=lmd();dset(scopes,NONE,parse(default_handlers));
 	lv*deck=NULL,*core=NULL;int isolate=iso;ancestors(target,scopes,&deck,&isolate);
 	for(int z=scopes->c-1;z>=0;z--){
@@ -174,7 +174,7 @@ lv* event_invoke(lv*target,lv*name,lv*arg,lv*hunk,int iso){
 			EACH(z,cards  )blk_lit(b,       cards  ->lv[z]         ),blk_loc(b,cards  ->kv[z]),blk_op(b,DROP);
 			sname="!deck_scope";
 		}
-		if(card_is(t)||prototype_is(t)||contraption_is(t)){
+		if(card_is(t)||prototype_is(t)||(contraption_is(t)&&!noinner)){
 			blk_lit(b,t),blk_loc(b,lmistr("card")),blk_op(b,DROP);
 			lv*widgets=ivalue(t,"widgets");
 			EACH(z,widgets)blk_lit(b,widgets->lv[z]),blk_loc(b,widgets->kv[z]),blk_op(b,DROP);
@@ -198,11 +198,17 @@ lv* event_invoke(lv*target,lv*name,lv*arg,lv*hunk,int iso){
 		blk_lit(b,ifield(deck,"patterns")),blk_loc(b,lmistr("patterns")),blk_op(b,DROP);
 	}blk_cat(b,core);return b;
 }
+lv* event_invoke(lv*target,lv*name,lv*arg,lv*hunk,int iso){return event_invokev(target,name,arg,hunk,iso,0);}
 int pending_popstate=0;
 void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
 	lv*root=lmenv(NULL);primitives(root,parent_deck(target)),constants(root);
 	lv*block=event_invoke(target,name,arg,hunk,0);
 	if(nest)pushstate(root),pending_popstate=1;issue(root,block);
+}
+lv* n_event(lv*self,lv*x){
+	lv*root=lmenv(NULL);primitives(root,parent_deck(self)),constants(root);
+	issue(root,event_invokev(self,ls(l_first(x)),l_drop(ONE,x),NULL,0,1));
+	return self;
 }
 void fire_event_async(lv*target,lv*name,lv*arg){fire_async(target,name,l_list(arg),NULL,1);}
 void fire_hunk_async(lv*target,lv*hunk){fire_async(target,NULL,lml(0),hunk,1);}
@@ -215,7 +221,6 @@ lv* fire_attr_sync(lv*target,char*prefix,lv*name,lv*arg){
 	str n=str_new();str_addz(&n,prefix),str_addz(&n,name->sv);blk_get(b,lmstr(n)),blk_lit(b,arg?l_list(arg):lml(0)),blk_op(b,CALL);
 	pushstate(root);issue(root,b);int q=ATTR_QUOTA;while(running()&&q>0)runop(),q--;lv*r=running()?NONE:arg();popstate();frame=bf;return in_attr=0,r;
 }
-lv* n_event(lv*self,lv*x){fire_async(self,ls(l_first(x)),l_drop(ONE,x),NULL,0);return self;}
 
 lv*interface_widget(lv*self,lv*i,lv*x); // forward reference
 int gcd(int x,int y){while(x!=y){if(x>y){x-=y;}else{y-=x;}}return x;}
