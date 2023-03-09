@@ -9,7 +9,7 @@
 #define MODULE_QUOTA   (10*4096)
 #define TRANS_QUOTA    ( 2*4096)
 #define LOOP_QUOTA     ( 1*4096)
-#define ATTR_QUOTA     ( 2*1024)
+#define ATTR_QUOTA     ( 1*4096)
 #define FRAME_QUOTA    (10*4096)
 #define CLAMP(a,x,b)   ((x)<(a)?(a): (x)>(b)?(b): (x))
 #define ivalue(x,k)    dget(x->b,lmistr(k))
