@@ -592,7 +592,8 @@ lv* interface_patterns(lv*self,lv*i,lv*x){
 		if(t>=32&&t<=47){COLORS[t-32]=0xFF000000|(int)ln(x);r=x;}
 	}
 	else{
-		if(t>= 0&&t<=27){r=image_make(buffer_copy(self->b->b,(rect){0,8*t,8,8}));}
+		if(t== 0       ){r=image_make(lmbuff((pair){8,8}));}
+		if(t>= 1&&t<=27){r=image_make(buffer_copy(self->b->b,(rect){0,8*t,8,8}));}
 		if(t>=28&&t<=31){r=lml(anim_count(pal,t-28));for(int z=0;z<r->c;z++)r->lv[z]=lmn(anim_frame(pal,t-28,z));}
 		if(t>=32&&t<=47){r=lmn(COLORS[t-32]&0xFFFFFF);}
 	}return r?r:x?x:NONE;
