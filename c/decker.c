@@ -2975,6 +2975,10 @@ void sync(){
 				int f[]={SDLK_F3,SDLK_F4,SDLK_F5,SDLK_F6,SDLK_F7,SDLK_F8,SDLK_F9,SDLK_F10,SDLK_F11,SDLK_F12};
 				for(int z=0;z<10;z++)if(c==f[z])settool(z);
 			}
+			if(uimode==mode_draw&&ms.type==modal_none){
+				if(c==SDLK_9)dr.brush=MAX( 0,dr.brush-1);
+				if(c==SDLK_0)dr.brush=MIN(23,dr.brush+1);
+			}
 		}
 		if(e.type==SDL_MOUSEMOTION){
 			pair b={(disp.x-(size.x*scale))/2,(disp.y-(size.y*scale))/2};
