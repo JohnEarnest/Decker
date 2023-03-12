@@ -1975,6 +1975,7 @@ prototype_read=(x,deck)=>{
 			if(type.length)r.v.name.push(n),r.v.label.push(lms(ls(sl[i]))),r.v.type.push(lms(type))
 		});return r
 	}
+	const prototype_pos=self=>lmpair(rcenter(rect(0,0,deck.size.x,deck.size.y),self.size))
 	const ri=lmi((self,i,x)=>{
 		if(self.dead)return NONE
 		if(x){
@@ -2001,6 +2002,8 @@ prototype_read=(x,deck)=>{
 			if(ikey(i,'image'      ))return self.image
 			if(ikey(i,'widgets'    ))return self.widgets
 			if(ikey(i,'attributes' ))return self.attributes||normalize_attributes(NONE)
+			if(ikey(i,'offset'     ))return prototype_pos(self)
+			if(ikey(i,'pos'        ))return prototype_pos(self)
 			if(ikey(i,'add'        ))return lmnat(([t,n1,n2])=>{const r=card_add(self,t,n1,n2);if(widget_is(r))contraption_update(deck,self);return r})
 			if(ikey(i,'remove'     ))return lmnat(([x])=>{const r=card_remove(self,x);if(lb(r))contraption_update(deck,self);return r})
 			if(ikey(i,'update'     ))return lmnat(_=>{contraption_update(deck,self);return NONE})

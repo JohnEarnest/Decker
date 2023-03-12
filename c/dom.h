@@ -1955,6 +1955,11 @@ lv* normalize_margin(lv*x,lv*p){
 	rect m=getrect(x);pair s=getpair(ifield(p,"size"));
 	return lmrect(rect_max((rect){MIN(m.x,s.x),MIN(m.y,s.y),MIN(m.w,s.x-m.x),MIN(m.h,s.y-m.y)},(rect){0,0,0,0}));
 }
+lv* prototype_pos(lv*self){
+	lv*data=self->b,*deck=dget(data,lmistr("deck"));
+	pair cs=getpair(dget(deck->b,lmistr("size"))),ps=getpair(dget(data,lmistr("size")));
+	rect c=box_center(rect_pair((pair){0,0},cs),ps);return lmpair((pair){c.x,c.y});
+}
 lv* interface_prototype(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	lv*data=self->b,*deck=dget(data,lmistr("deck")),*defs=ivalue(deck,"contraptions");
@@ -1982,6 +1987,8 @@ lv* interface_prototype(lv*self,lv*i,lv*x){
 		ikey("image"      )return dget(data,i);
 		ikey("widgets"    )return dget(data,i);
 		ikey("attributes" ){lv*r=dget(data,i);return r?r:normalize_attributes(NONE);}
+		ikey("offset"     )return prototype_pos(self); // (for compatibility with cards during editing)
+		ikey("pos"        )return prototype_pos(self); // (for compatibility with cards during editing)
 		ikey("add"        )return lmnat(n_con_add,self);
 		ikey("remove"     )return lmnat(n_con_remove,self);
 		ikey("update"     )return lmnat(n_prototype_update,self);

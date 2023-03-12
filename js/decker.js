@@ -3164,7 +3164,7 @@ tick=_=>{
 	modals(),gestures(),menu_finish()
 	if(uimode=='draw'&&dr.fatbits)draw_icon(rect(frame.size.x-14,2),ZOOM,1)
 	if(uimode=='interact'&&ev.drag&&ob.sel.length&&lb(ifield(ob.sel[0],'draggable'))){
-		const c=ob.sel[0].card, off=contraption_is(c)?getpair(ifield(c,'pos')):rect(0,0)
+		const c=ob.sel[0].card, off=(contraption_is(c)||prototype_is(c))?getpair(ifield(c,'pos')):rect(0,0)
 		iwrite(ob.sel[0],lms('pos'),lmpair(rsub(rsub(ev.pos,ob.prev),off))),mark_dirty()
 	}
 	q('#display').style.cursor=uicursor||'default'

@@ -3590,7 +3590,7 @@ void tick(lv*env){
 	modals(),gestures(),menu_finish();
 	if(uimode==mode_draw&&dr.fatbits)draw_icon((pair){frame.size.x-14,2},ZOOM,1);
 	if(uimode==mode_interact&&ev.drag&&ob.sel->c&&lb(ifield(ob.sel->lv[0],"draggable"))){
-		lv*c=ivalue(ob.sel->lv[0],"card");pair off=contraption_is(c)?getpair(ifield(c,"pos")):(pair){0,0};
+		lv*c=ivalue(ob.sel->lv[0],"card");pair off=(contraption_is(c)||prototype_is(c))?getpair(ifield(c,"pos")):(pair){0,0};
 		iwrite(ob.sel->lv[0],lmistr("pos"),lmpair(pair_sub((pair){ev.pos.x-ob.prev.x,ev.pos.y-ob.prev.y},off))),mark_dirty();
 	}
 	double used=interpret();
