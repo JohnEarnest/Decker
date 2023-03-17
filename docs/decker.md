@@ -496,7 +496,18 @@ The `type` argument allows you to specify the type of file(s) the user should be
 
 If a sound file is unreadable (or the user cancels), it will be loaded as a sound with `size` `0`.
 
-If an image file is unreadable (or the user cancels), it will be loaded as an image with `size` `(0,0)`. Only the first frame of an animated GIF will be loaded. If the image contains transparent pixels, they will be read as pattern 0. By default, other pixels will be adapted to Decker's 16-color palette (patterns 32-47). If the `hint` argument is `"gray"`, they will instead be converted to 256 grays based on a perceptual weighting of their RGB channels. Note that a 256 gray image is not suitable for direct display on e.g. a canvas, but can be re-paletted or posterized in a variety of ways via `image.map[]` or dithered with `image.transform["dither"]`.
+There are several possible `hint` arguments to control the interpretation of colors in an image:
+
+- `"color"` (or no hint): convert to Decker's 16-color palette (patterns 32-47). Read only the first frame of an animated GIF.
+- `"gray"`: convert to 256 grays based on a perceptual weighting of the RGB channels. Read only the first frame of an animated GIF.
+- `"frames"`: 16 colors, but read all frames of an animated GIF.
+- `"gray_frames"`: 256 grays, but read all frames of an animated GIF.
+
+The `"frames"` or `"gray_frames"` hints will cause `read[]` of a GIF to return a dictionary containing the following keys:
+- `frames`: a list of images.
+- `delays`: a list of integers representing interframe delays in 1/100ths of a second.
+
+If an image contains transparent pixels, they will be read as pattern 0.
 
 12) `write[]` recognizes several types of Lil value and will serialize each appropriately:
 - _array interfaces_ are written as binary files.

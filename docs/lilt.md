@@ -118,11 +118,22 @@ Built-in Functions
 2) `read[x hint]` recognizes several types of file by extension and will interpret each appropriately:
 
 - if the `hint` argument is the string `"array"`, the file will be read as an _array interface_ with a default `cast` of `u8`.
-- `.gif` files are read as _image interfaces_.
+- `.gif` files are read as _image interfaces_ (or a dictionary containing _image interfaces_, as noted below).
 - `.wav` files are read as _sound interfaces_.
 - anything else is treated as a UTF-8 text file and read as a string. A Byte-Order Mark, if present, is skipped. ASCII `\r` (Carriage-Return) characters are removed, tabs become a single space, "smart-quotes" are straightened, and anything else outside the range of valid Lil characters becomes a question mark (`?`).
 
-If a GIF file is unreadable or missing, it will be loaded as a 0x0 image. Only the first frame of a GIF will be loaded. If the image contains transparent pixels, they will be read as pattern 0. By default, other pixels will be adapted to Decker's 16-color palette (patterns 32-47). If the `hint` argument is `"gray"`, they will instead be converted to 256 grays based on a perceptual weighting of their RGB channels. Note that a 256 gray image is not suitable for direct display on e.g. a canvas, but can be re-paletted or posterized in a variety of ways via `image.map[]` or dithered with `image.transform["dither"]`.
+There are several possible `hint` arguments to control the interpretation of colors in an image:
+
+- `"color"` (or no hint): convert to Decker's 16-color palette (patterns 32-47). Read only the first frame of an animated GIF.
+- `"gray"`: convert to 256 grays based on a perceptual weighting of the RGB channels. Read only the first frame of an animated GIF.
+- `"frames"`: 16 colors, but read all frames of an animated GIF.
+- `"gray_frames"`: 256 grays, but read all frames of an animated GIF.
+
+The `"frames"` or `"gray_frames"` hints will cause `read[]` of a GIF to return a dictionary containing the following keys:
+- `frames`: a list of images.
+- `delays`: a list of integers representing interframe delays in 1/100ths of a second.
+
+If an image contains transparent pixels, they will be read as pattern 0.
 
 The [WAV file format](https://en.wikipedia.org/wiki/WAV) is much more complex than one might imagine. For this reason, and in order to avoid drawing in large dependencies, `read[]` in Lilt accepts only a very specific subset of valid WAV files corresponding to the output of `write[]`: monophonic, 8khz, with 8-bit unsigned PCM samples and no optional headers. Any other format (or an altogether invalid audio file) will be read as a `sound` with a `size` of 0. For reference, you can convert nearly any audio file into a compatible format using [ffmpeg](https://ffmpeg.org) like so:
 ```
@@ -177,3 +188,6 @@ v1.9:
 
 v1.10:
 - deprecated specialized widget event injectors in favor of `x.event[]`.
+
+v1.14:
+- introduced `read[]` hints for decoding the frames of animated GIF images.

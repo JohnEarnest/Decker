@@ -1,5 +1,5 @@
 
-readBinaryFile=path=>{const b=require('fs').readFileSync(path);return array_make(b.length,'u8',0,new Uint8Array(b))}
+readBinaryFile=path=>{try{const b=require('fs').readFileSync(path);return array_make(b.length,'u8',0,new Uint8Array(b))}catch(e){return array_make(0,'u8',0)}}
 writeBinaryFile=(path,x)=>require('fs').writeFileSync(path,Buffer.from(x.data))
 readTextFile=path=>clchars(require('fs').readFileSync(path,{encoding:'utf8'}).replace(/\uFEFF/g, ''))
 writeTextFile=(path,text)=>require('fs').writeFileSync(path,text,{encoding:'utf8'})
@@ -14,7 +14,7 @@ n_open   =(   )=>lms('')
 is_fullscreen=_=>0
 set_fullscreen=_=>0
 run      =prog=>{pushstate(env),state.external=1,issue(env,prog);while(running())runop();const r=arg();return popstate(),r}
-env.local('read',lmnat(([x,y])=>y&&ls(y)=='array'?readBinaryFile(ls(x)):lms(readTextFile(ls(x)))))
+env.local('read',lmnat(([x,y])=>y&&ls(y)=='array'?readBinaryFile(ls(x)):ls(x).toLowerCase().endsWith('.gif')?readgif(readBinaryFile(ls(x)).data,ls(y)):lms(readTextFile(ls(x)))))
 env.local('write',lmnat(([x,y])=>array_is(y)?writeBinaryFile(ls(x),y):writeTextFile(ls(x),ls(y))))
 env.local('exit',lmnat(([x])=>process.exit(ln(x))))
 env.local('print',lmnat(n_print))

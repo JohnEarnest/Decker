@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:13
+card:14
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -399,6 +399,20 @@ on change val do
  c.clear[]
  c.pattern:val
  c.fill[1,1]
+end
+{end}
+
+{card:gifimport}
+{widgets}
+frames:{"type":"field","size":[198,255],"pos":[275,52],"scrollbar":1}
+button1:{"type":"button","size":[119,44],"pos":[65,166],"script":"gifimport.0","text":"Import a GIF..."}
+
+{script:gifimport.0}
+on click do
+ i:read["image" "frames"]
+ frames.value:raze each f in i.frames
+  rtext.make["" "" f]
+ end
 end
 {end}
 

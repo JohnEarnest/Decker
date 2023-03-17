@@ -2331,25 +2331,29 @@ int readcolor(unsigned char cr,unsigned char cg,unsigned char cb,int grayscale){
 	}if(ci==15)return 1;return ci+32;
 }
 void readcolors(int*i,char*d,int*pal,int packed,int grayscale){
-	int c=1<<((packed&0x07)+1);
-	for(int z=0;z<c;z++)pal[z]=readcolor(d[*i],d[1+(*i)],d[2+(*i)],grayscale),(*i)+=3;
+	int c=1<<((packed&0x07)+1);for(int z=0;z<c;z++)pal[z]=readcolor(d[*i],d[1+(*i)],d[2+(*i)],grayscale),(*i)+=3;
 }
-lv* readgif(char*data,int size,int mode){
-	if(memcmp(data,"GIF89a",6)&&memcmp(data,"GIF87a",6))return free(data),image_empty();
-	int i=6, w=readshort(&i,data),h=readshort(&i,data),pal[256]={0};lv*r=lmbuff((pair){w,h});
-	int packed=data[i++],back=data[i++],trans=255;i++;
-	if(packed&0x80)readcolors(&i,data,pal,packed,mode>0);
+lv* empty_frames(){lv*r=lmd();dset(r,lmistr("frames"),lml(0)),dset(r,lmistr("delays"),lml(0));return r;}
+lv* readgif(char*data,int size,int gray,int frames){
+	if(memcmp(data,"GIF89a",6)&&memcmp(data,"GIF87a",6))return free(data),(frames?empty_frames():image_empty());
+	lv*r_frames=lml(0),*r_delays=lml(0),*r_disposal=lml(0),*r_dict=lmd();dset(r_dict,lmistr("frames"),r_frames),dset(r_dict,lmistr("delays"),r_delays);
+	int i=6, w=readshort(&i,data),h=readshort(&i,data),gpal[256]={0},lpal[256]={0};int packed=data[i++],back=data[i++],hastrans=0,trans=255,delay=0,dispose=0;i++;
+	if(packed&0x80)readcolors(&i,data,gpal,packed,gray);
+	lv*r=lmbuff((pair){w,h});
 	while(i<size){
 		unsigned char type=data[i++];
 		if(type==0x3B)break; // end
 		if(type==0x21){ // text, gce, comment, app...?
-			if((0xFF&data[i++])==0xF9&&data[i+1]){pal[trans=0xFF&data[i+4]]=(mode>0?255:0);} // gce w/ transparent background
-			while(1){unsigned char s=data[i++];if(!s)break;i+=s;}
+			if((0xFF&data[i++])==0xF9){
+				i++;int packed=data[i++];delay=readshort(&i,data);
+				int tindex=data[i++];i++;dispose=(packed>>2)&7;
+				if(packed&1){hastrans=1,trans=tindex;}else{hastrans=0;}
+			}else{while(1){unsigned char s=data[i++];if(!s)break;i+=s;}}
 		}
 		if(type==0x2C){ // image descriptor
-			int xo=readshort(&i,data),yo=readshort(&i,data),iw=readshort(&i,data),ih=readshort(&i,data),packed=data[i++];
-			if(packed&0x80)readcolors(&i,data,pal,packed,mode>0),pal[trans]=(mode>0?255:0);
-			int min_code=data[i++], si=0, di=0; char*src=calloc(iw*ih*2,1),*dst=calloc(iw*ih,1);
+			int xo=readshort(&i,data),yo=readshort(&i,data),iw=readshort(&i,data),ih=readshort(&i,data),packed=data[i++],local=packed&0x80;
+			if(local){readcolors(&i,data,lpal,packed,gray);}else{memcpy(lpal,gpal,sizeof(lpal));}if(hastrans)lpal[trans]=gray?255:0;
+			int min_code=0xFF&data[i++], si=0, di=0; unsigned char*src=calloc(iw*ih*2,1),*dst=calloc(iw*ih,1);
 			while(1){unsigned char s=data[i++];if(!s)break;for(int z=0;z<s;z++)src[si++]=data[i++];}
 			int prefix[4096]={0}, suffix[4096]={0}, code[4096]={0};
 			int clear=1<<min_code, size=min_code+1, mask=(1<<size)-1, next=clear+2, old=-1;
@@ -2371,12 +2375,12 @@ lv* readgif(char*data,int size,int mode){
 					old=tt;
 				}
 			}
-			memset(r->sv,pal[back],w*h);
-			for(int y=0;y<ih;y++)for(int x=0;x<iw;x++)if(xo+x>=0&&yo+y>=0&&xo+x<w&&yo+y<h)r->sv[(xo+x)+(yo+y)*w]=pal[0xFF&(int)dst[x+y*iw]];
-			free(src),free(dst);break;
+			for(int y=0;y<ih;y++)for(int x=0;x<iw;x++)if(xo+x>=0&&yo+y>=0&&xo+x<w&&yo+y<h&&(!hastrans||dst[x+y*iw]!=trans))r->sv[(xo+x)+(yo+y)*w]=lpal[0xFF&(int)dst[x+y*iw]];
+			free(src),free(dst);ll_add(r_frames,image_make(buffer_clone(r))),ll_add(r_delays,lmn(delay)),ll_add(r_disposal,lmn(dispose));if(!frames)break;
+			if(dispose==2){memset(r->sv,hastrans?0:lpal[back],r->c);} // dispose to background
+			if(dispose==3){int i=r_frames->c-2;while(i&&ln(r_disposal->lv[i])>=2)i--;memcpy(r->sv,r_frames->lv[i]->b->sv,r->c);}// dispose to previous
 		}
-	}
-	return free(data),image_make(r);
+	}return free(data),(frames?r_dict: r_frames->c?r_frames->lv[0]: image_empty());
 }
 #define add_byte(x)  str_addraw(&r,(x)&0xFF)
 #define add_short(x) str_addraw(&r,(x)&0xFF),str_addraw(&r,((x)>>8)&0xFF) // more like bug-endian, amirite?
@@ -2431,11 +2435,13 @@ char* writewav(lv*data,int*len){
 #include <sys/stat.h>
 #endif
 lv* n_readgif(lv*self,lv*a){
-	(void)self;lv*name=ls(l_first(a));lv*m=a->c>1?a->lv[1]:NONE;
-	struct stat st;if(stat(name->sv,&st)||st.st_size<13)return image_empty();
+	(void)self;lv*name=ls(l_first(a));lv*hint=a->c>1?ls(a->lv[1]):lmistr("color");
+	int gray=!strcmp("gray",hint->sv)||!strcmp("gray_frames",hint->sv);
+	int frames=!strcmp("frames",hint->sv)||!strcmp("gray_frames",hint->sv);
+	struct stat st;if(stat(name->sv,&st)||st.st_size<13)return frames?empty_frames():image_empty();
 	char*data=calloc(st.st_size,1);FILE*f=fopen(name->sv,"rb");
-	if(fread(data,1,st.st_size,f)!=(unsigned)st.st_size){fclose(f),free(data);return image_empty();}
-	fclose(f);return readgif(data,st.st_size,matchr(lmistr("gray"),m)?2:0);
+	if(fread(data,1,st.st_size,f)!=(unsigned)st.st_size){fclose(f),free(data);return frames?empty_frames():image_empty();}
+	fclose(f);return readgif(data,st.st_size,gray,frames);
 }
 lv* n_writegif(lv*self,lv*a){
 	(void)self;lv*name=ls(l_first(a));if(a->c<2)return NONE;a=lil(a->lv[1])?a->lv[1]:l_list(a->lv[1]);

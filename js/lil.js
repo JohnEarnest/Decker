@@ -2348,3 +2348,51 @@ n_event=(self,args)=>{
 	const root=lmenv();primitives(root,parent_deck(self)),constants(root)
 	issue(root,event_invoke(self,ls(args[0]),lml(args.slice(1)),null,0,1));return self
 }
+readgif=(data,hint)=>{
+	const gray=hint=='gray'||hint=='gray_frames', frames=hint=='frames'||hint=='gray_frames'
+	let i=0;const ub=_=>data[i++]||0, s=_=>ub()|(ub()<<8), struct=(f,d)=>lmd(['frames','delays'].map(lms),[lml(f),lml(d)])
+	function readcolors(r,packed){const c=1<<((packed&0x07)+1);for(let z=0;z<c;z++)r[z]=readcolor(ub(),ub(),ub(),gray);return r}
+	if(ub()!=71||ub()!=73||ub()!=70)return frames?struct([],[]):image_make(rect());i+=3;const r_frames=[],r_delays=[],r_disposal=[],r_dict=lmd()
+	const w=s(),h=s(),gpal=new Uint8Array(256),packed=ub(),back=ub();ub()
+	let hastrans=0,trans=255,delay=0,dispose=0,r=image_make(rect(w,h));if(packed&0x80)readcolors(gpal,packed)
+	while(i<data.length){
+		const type=ub()
+		if(type==0x3B)break // end
+		if(type==0x21){ // text, gce, comment, app...?
+			if((0xFF&ub())==0xF9){
+				ub();const packed=ub();delay=s()
+				const tindex=ub();ub();dispose=(packed>>2)&7
+				if(packed&1){hastrans=1,trans=tindex}else{hastrans=0}
+			}else{while(1){const s=ub();if(!s)break;i+=s}}
+		}
+		if(type==0x2C){ // image descriptor
+			const xo=s(),yo=s(),iw=s(),ih=s(),packed=ub(),local=packed&0x80
+			const lpal=new Uint8Array(gpal);if(local)readcolors(lpal,packed);if(hastrans)lpal[trans]=gray?255:0
+			const min_code=ub(),src=new Uint8Array(iw*ih*2),dst=new Uint8Array(iw*ih);let si=0, di=0
+			while(1){const s=ub();if(!s)break;for(let z=0;z<s;z++)src[si++]=ub()}
+			const prefix=new Int32Array(4096),suffix=new Int32Array(4096),code=new Int32Array(4096)
+			const clear=1<<min_code; let size=min_code+1, mask=(1<<size)-1, next=clear+2, old=-1, first=0, i=0,b=0,d=0
+			for(let z=0;z<clear;z++)suffix[z]=z
+			while(i<si){
+				while(b<size)d+=(0xFF&src[i++])<<b, b+=8
+				let t=d&mask; d>>=size, b-=size
+				if(t>next||t==clear+1)break
+				if(t==clear){size=min_code+1, mask=(1<<size)-1, next=clear+2, old=-1}
+				else if (old==-1) dst[di++]=suffix[old=first=t]
+				else{
+					let ci=0,tt=t
+					if   (t==next)code[ci++]=first,    t=old
+					while(t>clear)code[ci++]=suffix[t],t=prefix[t]
+					dst[di++]=first=suffix[t]
+					while(ci>0)dst[di++]=code[--ci]
+					if(next<4096){prefix[next]=old, suffix[next++]=first;if((next&mask)==0&&next<4096)size++, mask+=next}
+					old=tt
+				}
+			}
+			for(let y=0;y<ih;y++)for(let x=0;x<iw;x++)if(xo+x>=0&&yo+y>=0&&xo+x<w&&yo+y<h&&(!hastrans||dst[x+y*iw]!=trans))r.pix[(xo+x)+(yo+y)*w]=lpal[dst[x+y*iw]]
+			r_frames.push(image_copy(r)),r_delays.push(lmn(delay)),r_disposal.push(dispose);if(!frames)break
+			if(dispose==2){r.pix.fill(hastrans?0:lpal[back])} // dispose to background
+			if(dispose==3){let i=r_frames.length-2;while(i&&r_disposal[i]>=2)i--;for(let z=0;z<r.pix.length;z++)r.pix[z]=r_frames[i].pix[z];}// dispose to previous
+		}
+	}return frames?struct(r_frames,r_delays): r_frames.length?r_frames[0]: image_make(rect())
+}
