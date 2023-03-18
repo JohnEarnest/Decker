@@ -652,7 +652,7 @@ widget_slider=(target,x)=>{
 	}
 	const hv_tsz=(axis,tf,av,as)=>{
 		let drag=(wid.thumbid==wid.scrolls++)&&dover(b),
-		n=0|((x.max-x.min)/x.step), ts=0|max(16,axis/(1+n)), tp=0|(((x.value-x.min)/max(1,(x.max-x.min)))*(axis-ts)), thumb=rint(tf(tp,ts))
+		n=0|((x.max-x.min)/x.step), ts=0|max(min(axis,16),axis/(1+n)), tp=0|(((x.value-x.min)/max(1,(x.max-x.min)))*(axis-ts)), thumb=rint(tf(tp,ts))
 		if(!l){
 			if(ev.md&&over(thumb))wid.thumbid=wid.scrolls-1,wid.thumbo=ev.dpos[av]-thumb[av],drag=1
 			if(ev.drag&&drag){

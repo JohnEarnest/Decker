@@ -460,7 +460,7 @@ void widget_slider(lv*target,slider x){
 			if(o&&ev.md)x.value+=(dir*x.step); if(a)uicursor=cursor_point;\
 			draw_rect(bb,bcol),draw_box(bb,0,fcol),draw_icon((pair){bb.x+(bb.w-12)/2,bb.y+(bb.h-12)/2},ARROWS->lv[ba+(o?2:0)],fcol);}
 		#define hv_tsz(axis) int drag=(wid.thumbid==wid.scrolls++)&&dover(b),\
-		                     n=(x.max-x.min)/x.step, ts=MAX(16,axis/(1+n)), tp=((x.value-x.min)/MAX(1,(x.max-x.min)))*(axis-ts);
+		                     n=(x.max-x.min)/x.step, ts=MAX(MIN(axis,16),axis/(1+n)), tp=((x.value-x.min)/MAX(1,(x.max-x.min)))*(axis-ts);
 		#define hv_tmv(av,as) if(!l){\
 		    if(ev.md&&over(thumb))wid.thumbid=wid.scrolls-1,wid.thumbo=ev.dpos.av-thumb.av,drag=1;\
 		    if(ev.drag&&drag){\
