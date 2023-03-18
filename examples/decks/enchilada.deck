@@ -406,12 +406,34 @@ end
 {widgets}
 frames:{"type":"field","size":[198,255],"pos":[275,52],"scrollbar":1}
 button1:{"type":"button","size":[119,44],"pos":[65,166],"script":"gifimport.0","text":"Import a GIF..."}
+button2:{"type":"button","size":[119,44],"pos":[65,222],"script":"gifimport.1","text":"Import a GIF...\n(grayscale)"}
+button3:{"type":"button","size":[119,44],"pos":[66,275],"script":"gifimport.2","text":"Import a GIF...\n(grayscale 2)"}
 
 {script:gifimport.0}
 on click do
  i:read["image" "frames"]
  frames.value:raze each f in i.frames
   rtext.make["" "" f]
+ end
+end
+{end}
+
+{script:gifimport.1}
+on click do
+ i:read["image" "gray_frames"]
+ frames.value:raze each f in i.frames
+  rtext.make["" "" f.map[0 dict 255].transform["dither"]]
+ end
+end
+{end}
+
+{script:gifimport.2}
+on click do
+ i:read["image" "frames"]
+ g:"[255,0,255,246,148,108,132,51,61,147,144,86,66,111,185,134,69,0]"
+ grays:(0,1,32+range 16) dict "%j" parse g
+ frames.value:raze each f in i.frames
+  rtext.make["" "" f.map[grays].transform["dither"]]
  end
 end
 {end}

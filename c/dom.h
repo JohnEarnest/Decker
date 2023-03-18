@@ -351,7 +351,7 @@ lv* buffer_transpose(lv*x){pair s=buff_size(x);lv*r=lmbuff((pair){s.y,s.x});for(
 lv* n_image_map(lv*self,lv*z){
 	int m[256]={0};if(z->c>1){int f=ln(z->lv[1]);for(int z=0;z<256;z++)m[z]=f;}else{for(int z=0;z<256;z++)m[z]=z;}
 	z=ld(l_first(z));EACH(i,z)m[0xFF&(int)ln(z->kv[i])]=0xFF&(int)ln(z->lv[i]);
-	EACH(z,self->b)self->b->sv[z]=m[(int)self->b->sv[z]];return self;
+	EACH(z,self->b)self->b->sv[z]=m[0xFF&(int)self->b->sv[z]];return self;
 }
 lv* n_image_transform(lv*self,lv*z){
 	z=ls(l_first(z));
