@@ -2016,6 +2016,7 @@ n_open=([type,hint])=>{
 	if(t=='sound')ms.filter='audio/*',r=sound_make(new Uint8Array(0))
 	if(t=='image')ms.filter='image/*',r=image_make(rect())
 	if(t=='text')ms.filter='.csv,.txt'
+	if(image_is(r)&&hint&&(ls(hint)=='frames'||ls(hint)=='gray_frames'))r=readgif([],ls(hint))
 	ms.verb=t=='array'?lms(t): hint?ls(hint):'';return r
 }
 n_save=([x])=>{

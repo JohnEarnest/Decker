@@ -2043,12 +2043,13 @@ lv*n_alert(lv*self,lv*z){
 }
 lv*n_open(lv*self,lv*z){
 	(void)self,(void)z;modal_enter(modal_open_lil);
-	char*type=ls(l_first(z))->sv;lv*r=lms(0);
+	char*type=ls(l_first(z))->sv;lv*r=lms(0),*hint=z->c>1?z->lv[1]:NONE;
 	if(!strcmp(type,"array"))ms.desc="Open a binary file.",r=array_make(0,0,0,r);
 	if(!strcmp(type,"image"))ms.filter=filter_image,ms.desc="Open an image file.",r=image_empty();
 	if(!strcmp(type,"sound"))ms.filter=filter_sound,ms.desc="Open a .wav sound file.",r=sound_make(lms(0));
 	if(!strcmp(type,"text" ))ms.filter=filter_data ,ms.desc="Open any .csv or .txt file.";
-	ms.grid=(grid_val){directory_enumerate(ms.path,ms.filter,0),0,0},ms.verb=z->c>1?z->lv[1]:NONE;
+	if(image_is(r)&&(matchr(hint,lmistr("frames"))||matchr(hint,lmistr("gray_frames"))))r=empty_frames();
+	ms.grid=(grid_val){directory_enumerate(ms.path,ms.filter,0),0,0},ms.verb=hint;
 	return r;
 }
 lv*n_save(lv*self,lv*z){
