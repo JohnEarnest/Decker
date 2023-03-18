@@ -1273,6 +1273,14 @@ image_make=size=>{
 			for(let z=0;z<self.pix.length;z++)self.pix[z]=m[self.pix[z]]
 			return self
 		})
+		if(ikey(i,'merge'))return lmnat(z=>{
+			if(lil(z[0]))z=ll(z[0]);const nice=x=>x&&image_is(x)&&x.size.x>0&&x.size.y>0, size=self.size
+			for(let y=0,i=0;y<size.y;y++)for(let x=0;x<size.x;x++,i++){
+				const h=rect(x,y),p=self.pix[i];let c=0
+				if(nice(z[p])){const i=z[p];c=i.pix[(x%i.size.x)+(y%i.size.y)*i.size.x]}
+				self.pix[i]=c
+			}return self
+		})
 		if(ikey(i,'transform'))return lmnat(([x])=>{
 			if(x.v=='horiz')image_flip_h(self); if(x.v=='vert')image_flip_v(self); if(x.v=='flip')image_flip(self); if(x.v=='dither')image_dither(self)
 			if(x.v=='left' )image_flip_h(self),image_flip(self); if(x.v=='right')image_flip(self),image_flip_h(self)

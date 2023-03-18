@@ -353,6 +353,13 @@ lv* n_image_map(lv*self,lv*z){
 	z=ld(l_first(z));EACH(i,z)m[0xFF&(int)ln(z->kv[i])]=0xFF&(int)ln(z->lv[i]);
 	EACH(z,self->b)self->b->sv[z]=m[0xFF&(int)self->b->sv[z]];return self;
 }
+int is_empty(lv*x){pair s=image_size(x);return s.x==0&&s.y==0;}
+int is_blank(lv*x){if(!image_is(x))return 0;EACH(z,x->b)if(x->b->sv[z])return 0;return 1;}
+lv* n_image_merge(lv*self,lv*z){
+	if(lil(l_first(z)))z=l_first(z);pair s=image_size(self);char*pp=self->b->sv;for(int y=0,i=0;y<s.y;y++)for(int x=0;x<s.x;x++,i++){
+		int p=0xFF&pp[i],c=0;if(p<z->c&&image_is(z->lv[p])&&!is_empty(z->lv[p])){lv*i=z->lv[p];pair s=image_size(i);c=i->b->sv[(x%s.x)+(y%s.y)*s.x];}pp[i]=c;
+	}return self;
+}
 lv* n_image_transform(lv*self,lv*z){
 	z=ls(l_first(z));
 	if     (!strcmp("horiz" ,z->sv))buffer_flip_h(self->b);
@@ -412,6 +419,7 @@ lv* interface_image(lv*self,lv*i,lv*x){
 	}
 	ikey("size"     ){if(x){image_resize(self,getpair(x));return x;}return lmpair(s);}
 	ikey("map"      )return lmnat(n_image_map,self);
+	ikey("merge"    )return lmnat(n_image_merge,self);
 	ikey("transform")return lmnat(n_image_transform,self);
 	ikey("copy"     )return lmnat(n_image_copy,self);
 	ikey("paste"    )return lmnat(n_image_paste,self);
@@ -419,9 +427,6 @@ lv* interface_image(lv*self,lv*i,lv*x){
 	return x?x:NONE;
 }
 lv* image_make(lv*buffer){return lmi(interface_image,lmistr("image"),buffer);}
-int is_empty(lv*x){pair s=image_size(x);return s.x==0&&s.y==0;}
-int is_blank(lv*x){if(!image_is(x))return 0;EACH(z,x->b)if(x->b->sv[z])return 0;return 1;}
-
 lv* image_read(lv*x){
 	char f=0;lv*data=data_read("IMG",&f,x);if(!data||data->c<4)return image_empty();
 	int w=read2(data->sv,0),h=read2(data->sv,2);lv*r=lmbuff((pair){w,h});

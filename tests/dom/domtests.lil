@@ -329,6 +329,9 @@ assert_image["image paste onto itself"
 	self
 ]
 
+mi:image["%%IMG0AA4ADQAAA8AH4B/gP/A/8D/4P/gf+B/4D/AH4AAA"].merge[image["%%IMG1AAIAAyYkJCYmJA=="] image["%%IMG0AAYABviIqLiA/A=="]]
+assert["image merge" "%%IMG1AA4ADSYkJiQmJCYkJiQmJCYkJCYkJiQmAQAAACQmJCYmJCYkJgABAAEAASQmJCYkJgEBAAEAAQEBJCYkJCYAAAAAAQAAAAAAJCYmJAEBAQEBAQEBAQEmJCYkAQEBAAEBAQEBAAEkJCYAAAEAAQAAAAEAASYmJCYAAQABAAEAAQABJCYkJgEBAAEAAQEBAAEkJCYkJgAAAQAAAAAAJCYmJCYkJgEBAQEBASQmJCYkJiQmJCYkJiQmJCYk" mi.encoded]
+
 assert_image["read nonexistent gif"
 	list ()
 	read["tests/dom/fake.gif"]
