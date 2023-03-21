@@ -1274,12 +1274,11 @@ image_make=size=>{
 			return self
 		})
 		if(ikey(i,'merge'))return lmnat(z=>{
-			if(lil(z[0]))z=ll(z[0]);const nice=x=>x&&image_is(x)&&x.size.x>0&&x.size.y>0, size=self.size
-			for(let y=0,i=0;y<size.y;y++)for(let x=0;x<size.x;x++,i++){
-				const h=rect(x,y),p=self.pix[i];let c=0
-				if(nice(z[p])){const i=z[p];c=i.pix[(x%i.size.x)+(y%i.size.y)*i.size.x]}
-				self.pix[i]=c
-			}return self
+			if(lil(z[0]))z=ll(z[0]);const nice=x=>x&&image_is(x)&&x.size.x>0&&x.size.y>0, s=self.size
+			const v=new Uint8Array(256),sx=new Uint32Array(256),sy=new Uint32Array(256)
+			for(let p=0;p<z.length;p++)if(nice(z[p]))v[p]=1,sx[p]=z[p].size.x,sy[p]=z[p].size.y
+			for(let y=0,i=0;y<s.y;y++)for(let x=0;x<s.x;x++,i++){const p=self.pix[i],c=v[p]?z[p].pix[(x%sx[p])+(y%sy[p])*sx[p]]:0;self.pix[i]=c}
+			return self
 		})
 		if(ikey(i,'transform'))return lmnat(([x])=>{
 			if(x.v=='horiz')image_flip_h(self); if(x.v=='vert')image_flip_v(self); if(x.v=='flip')image_flip(self); if(x.v=='dither')image_dither(self)
@@ -1714,12 +1713,11 @@ canvas_read=(x,card)=>{
 				return NONE
 			})
 			if(ikey(i,'merge'))return lmnat(z=>{
-				canvas_pick(self);if(lil(z[0]))z=ll(z[0]);const nice=x=>x&&image_is(x)&&x.size.x>0&&x.size.y>0, size=frame.image.size
-				for(let y=0;y<size.y;y++)for(let x=0;x<size.x;x++){
-					const h=rect(x,y);if(!inclip(h))continue;let p=gpix(h),c=0;
-					if(nice(z[p])){const i=z[p];c=i.pix[(x%i.size.x)+(y%i.size.y)*i.size.x]}
-					pix(h,c)
-				}return NONE
+				canvas_pick(self);if(lil(z[0]))z=ll(z[0]);const nice=x=>x&&image_is(x)&&x.size.x>0&&x.size.y>0, s=frame.image.size
+				const v=new Uint8Array(256),sx=new Uint32Array(256),sy=new Uint32Array(256)
+				for(let p=0;p<z.length;p++)if(nice(z[p]))v[p]=1,sx[p]=z[p].size.x,sy[p]=z[p].size.y
+				for(let y=0;y<s.y;y++)for(let x=0;x<s.x;x++){const h=rect(x,y);if(inclip(h)){const p=gpix(h),c=v[p]?z[p].pix[(x%sx[p])+(y%sy[p])*sx[p]]:0;pix(h,c)}}
+				return NONE
 			})
 			if(ikey(i,'text'))return lmnat(([x,pos,a])=>(canvas_pick(self),text(x=lit(x)?rtext_cast(x):lms(ls(x)),pos,a)))
 		}return interface_widget(self,i,x)
