@@ -32,7 +32,7 @@ char*pangram="How razorback jumping-frogs can level six piqued gymnasts.";
 
 // State
 
-lv*env,*deck,*doc_hist; int doc_hist_cursor=0;
+lv*env,*deck=NULL,*doc_hist; int doc_hist_cursor=0;
 cstate context;
 SDL_Window  *win;
 SDL_Renderer*ren;
@@ -3758,7 +3758,12 @@ int main(int argc,char**argv){
 	CURSORS[3]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
 
 	if(file){load_deck(deck_get(n_read(NULL,l_list(lmcstr(file))))),set_path(file);}
-	else{str doc=str_new();str_add(&doc,(char*)examples_decks_tour_deck,examples_decks_tour_deck_len);load_deck(deck_get(lmstr(doc)));}
+	char*base=SDL_GetBasePath();struct stat buffer;if(!deck&&base){
+		char p[PATH_MAX];snprintf(p,sizeof(p),"%s/start.deck",base);
+		if(stat(p,&buffer)==0)load_deck(deck_get(n_read(NULL,l_list(lmcstr(p))))),set_path(p);
+	}
+	if(base)SDL_free(base);
+	if(!deck){str doc=str_new();str_add(&doc,(char*)examples_decks_tour_deck,examples_decks_tour_deck_len);load_deck(deck_get(lmstr(doc)));}
 	SDL_JoystickEventState(SDL_ENABLE),SDL_AddTimer((1000/60),tick_pump,NULL);if(!nosound)sfx_init();
 	while(1){tick(env);sync();}
 }

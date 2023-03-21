@@ -130,7 +130,7 @@ The Decker menu allows you to turn on "Nav Gestures", which are intended to make
 
 Web-Decker and Native-Decker
 ============================
-Decker is available as a native application for OSX, Linux, and Windows. If you save a deck with a `.html` extension, Decker produces a document that can be opened directly in a web browser- a self-contained "standalone deck". This web-based version of Decker can be referred to as "Web-Decker".
+Decker is available as a native application for MacOS, Linux, and Windows. If you save a deck with a `.html` extension, Decker produces a document that can be opened directly in a web browser- a self-contained "standalone deck". This web-based version of Decker can be referred to as "Web-Decker".
 
 Web-Decker has generally the same tools and functionality as Native-Decker, but the constraints of running in a web browser require many small changes. Most importantly:
 
@@ -1634,6 +1634,22 @@ on loop do
 end
 ```
 The `loop` event handler _must_ complete quickly; if it exceeds a small quota, it will be halted along with the background loop.
+
+
+Startup
+=======
+If you start Native-Decker from the commandline, you can specify a path to a deck to open:
+```
+% ./decker examples/decks/fontedit.deck
+```
+Native-Decker accepts several other optional CLI flags:
+- `--no-sound`: Disable sound playback and recording entirely.
+- `--no-scale`: Disable upscaling the display in windowed mode. Useful for recording screenshots.
+- `--fullscreen`: Open in fullscreen mode.
+
+If a file path is not specified (or you open Decker by double-clicking the application), Decker will next check for the existence of a file named `start.deck` in the same directory as the executable (or on MacOS within the `.app/Resources/` directory of the application bundle), opening it if available. This can be helpful if you wish to build a personal "home deck", or if you wish to distribute your own decks along with a Decker runtime.
+
+If neither an explicit file path nor a `start.deck` is available, Decker will open the built-in "guided tour" deck.
 
 
 See Also
