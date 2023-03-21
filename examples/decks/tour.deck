@@ -390,7 +390,7 @@ fancyBorder1:{"type":"contraption","size":[31,45],"pos":[125,166],"def":"fancyBo
 fancyBorder2:{"type":"contraption","size":[87,47],"pos":[163,166],"def":"fancyBorder","widgets":{}}
 fancyBorder3:{"type":"contraption","size":[124,29],"pos":[125,219],"def":"fancyBorder","widgets":{}}
 back:{"type":"button","size":[86,26],"pos":[12,304],"script":"Buttons.0","text":"Back","style":"rect"}
-field1:{"type":"field","size":[286,45],"pos":[123,290],"locked":1,"border":0,"style":"plain","align":"center","value":"Contraptions are \"custom widgets\" made out of simpler widgets.\nFrom the inside they act like cards, and from the inside they seem like widgets. They can be reused many times within a deck, and can optionally be resizable."}
+field1:{"type":"field","size":[286,45],"pos":[123,290],"locked":1,"border":0,"style":"plain","align":"center","value":"Contraptions are \"custom widgets\" made out of simpler widgets.\nFrom the inside they act like cards, and from the outside they seem like widgets. They can be reused many times within a deck, and can optionally be resizable."}
 field2:{"type":"field","size":[272,42],"pos":[114,24],"locked":1,"font":"deckbuilder","border":0,"align":"center","value":"Contraptions"}
 field6:{"type":"field","size":[52,24],"pos":[434,84],"locked":1,"border":0,"style":"plain","value":"a realtime clock"}
 field3:{"type":"field","size":[37,24],"pos":[437,193],"locked":1,"border":0,"style":"plain","value":"a date picker"}
