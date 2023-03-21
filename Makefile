@@ -23,6 +23,14 @@ ifeq ($(UNAME),Linux)
 	# -Wno-format-truncation likewise silences spurious warnings regarding snprintf() truncation.
 	FLAGS:=$(FLAGS) -Wno-misleading-indentation -Wno-format-truncation
 endif
+ifneq ("$(wildcard /usr/bin/olpc-hwinfo)","")
+	# building on an OLPC, disable some features:
+	FLAGS:=$(FLAGS) -DNO_AUDIO=1
+	FLAGS:=$(FLAGS) -DNO_SDL_IMAGE
+else
+	FLAGS:=$(FLAGS) -DNO_AUDIO=0
+	FLAGS:=$(FLAGS) -lSDL2_image
+endif
 
 resources:
 	@chmod +x ./scripts/resources.sh
@@ -34,7 +42,7 @@ lilt: resources
 
 decker: resources
 	@mkdir -p c/build
-	@$(COMPILER) ./c/decker.c -o ./c/build/decker $(SDL) -lSDL2_image $(FLAGS) -DVERSION="\"$(VERSION)\""
+	@$(COMPILER) ./c/decker.c -o ./c/build/decker $(SDL) $(FLAGS) -DVERSION="\"$(VERSION)\""
 
 clean:
 	@rm -rf ./c/build/

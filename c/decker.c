@@ -2,7 +2,6 @@
 #include "lil.h"
 #include "dom.h"
 #include <SDL.h>
-#include <SDL_image.h>
 
 void save_deck(lv*path); // forward refs
 void load_deck(lv*deck);
@@ -39,7 +38,7 @@ SDL_Renderer*ren;
 SDL_Texture *gfx,*gtool;
 SDL_Joystick*joy=NULL;
 SDL_mutex*gil=NULL;
-int toolbars_enable=1, autosave=0, nosound=0, noscale=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
+int toolbars_enable=1, autosave=0, nosound=NO_AUDIO, noscale=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
 #define AUTOSAVE_DELAY (10*60)
 lv* deck_get(lv*text){SDL_LockMutex(gil);lv*r=deck_read(text);SDL_UnlockMutex(gil);return r;}
 void mark_dirty(){dirty=1,dirty_timer=AUTOSAVE_DELAY;}
@@ -1202,6 +1201,10 @@ void modal_enter(int type){
 	if(type==modal_save||type==modal_input){ms.text=(field_val){rtext_cast(lmistr("")),0};}
 }
 void bg_paste(lv*b);void proto_prop(lv*target,char*key,lv*value);void proto_size(lv*target,pair size,rect margin); // forward refs
+#ifdef NO_SDL_IMAGE
+lv* readimage(char*path,int grayscale){return n_readgif(NULL,lml2(lmcstr(path),grayscale?lmistr("gray"):NONE));}
+#else
+#include <SDL_image.h>
 lv* readimage(char*path,int grayscale){
 	SDL_Surface*b=IMG_Load(path);if(b==NULL)return image_empty();lv*i=lmbuff((pair){b->w,b->h});
 	SDL_Surface*c=SDL_ConvertSurface(b,SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888),0);
@@ -1210,6 +1213,7 @@ lv* readimage(char*path,int grayscale){
 		SDL_GetRGBA(v,c->format,&cr,&cg,&cb,&ca),i->sv[x+y*b->w]=(ca!=0xFF)?(grayscale?0xFF:0x00):readcolor(cr,cg,cb,grayscale);
 	}SDL_FreeSurface(c),SDL_FreeSurface(b);return image_make(i);
 }
+#endif
 void import_image(char*path){
 	lv*i=readimage(path,0),*m=NULL;if(is_empty(i))return;
 	int color=0,c[256]={0};EACH(z,i->b)c[0xFF&(i->b->sv[z])]++;
