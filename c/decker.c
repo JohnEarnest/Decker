@@ -3045,7 +3045,7 @@ void sync(){
 	SDL_Rect src={0,0,size.x,size.y};
 	SDL_Rect dst={(disp.x-scale*size.x)/2,(disp.y-scale*size.y)/2,scale*size.x,scale*size.y};
 	SDL_SetRenderDrawColor(ren,0x00,0x00,0x00,0xFF);
-	SDL_RenderClear(ren);
+	if(!windowed)SDL_RenderClear(ren);
 	SDL_RenderCopy(ren,gfx,&src,&dst);
 	pair tsize=buff_size(TOOLB);int tscale=MIN((disp.x-scale*size.x)/(2*tsize.x),disp.y/tsize.y);if(tscale&&noscale)tscale=1;
 	int showwings=toolbars_enable&&tscale>0&&!(lb(ifield(deck,"locked")))&&ms.type==modal_none&&uimode!=mode_script;
