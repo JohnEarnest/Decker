@@ -39,7 +39,7 @@ SDL_Texture *gfx,*gtool;
 SDL_Joystick*joy=NULL;
 SDL_mutex*gil=NULL;
 
-int autosave=0, noscale=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
+int nosound=0, autosave=0, noscale=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
 #define AUTOSAVE_DELAY (10*60)
 lv* deck_get(lv*text){SDL_LockMutex(gil);lv*r=deck_read(text);SDL_UnlockMutex(gil);return r;}
 void mark_dirty(){dirty=1,dirty_timer=AUTOSAVE_DELAY;}
@@ -251,7 +251,7 @@ int has_clip(char*type){return strlen(clip_stash)>=strlen(type)&&memcmp(clip_sta
 #ifdef LOSPEC
 // a set of customizations intended to make Decker more portable
 // and more performant on extremely limited devices such as the OLPC XO-4.
-int nosound=1, toolbars_enable=0, parity=0;
+int toolbars_enable=0, parity=0;
 lv* readimage(char*path,int grayscale){return n_readgif(NULL,lml2(lmcstr(path),grayscale?lmistr("gray"):NONE));}
 int*sgfx=NULL;
 void framebuffer_alloc(pair size,int minscale){
@@ -275,7 +275,7 @@ int framebuffer_flip(pair disp,pair size,int scale){
 	return 1;
 }
 #else
-int nosound=0, toolbars_enable=1;
+int toolbars_enable=1;
 #include <SDL_image.h>
 lv* readimage(char*path,int grayscale){
 	SDL_Surface*b=IMG_Load(path);if(b==NULL)return image_empty();lv*i=lmbuff((pair){b->w,b->h});
