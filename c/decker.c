@@ -2969,7 +2969,7 @@ void sync(){
 	for(int z=0;z<256;z++)ev.shortcuts[z]=0;
 	SDL_Event e;
 	while(SDL_WaitEvent(&e)){
-		if(e.type==SDL_QUIT)ev.shortcuts['q']=1;
+		if(e.type==SDL_QUIT){if(lb(ifield(deck,"locked")))exit(0);ev.shortcuts['q']=1;}
 		if(e.type==SDL_USEREVENT)break;
 		if(e.type==SDL_TEXTINPUT&&wid.infield)field_input(e.text.text);
 		if(e.type==SDL_KEYDOWN){
