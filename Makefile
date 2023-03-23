@@ -24,11 +24,9 @@ ifeq ($(UNAME),Linux)
 	FLAGS:=$(FLAGS) -Wno-misleading-indentation -Wno-format-truncation
 endif
 ifneq ("$(wildcard /usr/bin/olpc-hwinfo)","")
-	# building on an OLPC, disable some features:
-	FLAGS:=$(FLAGS) -DNO_AUDIO=1
-	FLAGS:=$(FLAGS) -DNO_SDL_IMAGE
+	# building on an OLPC, disable some features and enable some performance boosts.
+	FLAGS:=$(FLAGS) -DLOSPEC
 else
-	FLAGS:=$(FLAGS) -DNO_AUDIO=0
 	FLAGS:=$(FLAGS) -lSDL2_image
 endif
 

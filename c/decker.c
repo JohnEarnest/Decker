@@ -38,7 +38,8 @@ SDL_Renderer*ren;
 SDL_Texture *gfx,*gtool;
 SDL_Joystick*joy=NULL;
 SDL_mutex*gil=NULL;
-int toolbars_enable=1, autosave=0, nosound=NO_AUDIO, noscale=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
+
+int autosave=0, noscale=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
 #define AUTOSAVE_DELAY (10*60)
 lv* deck_get(lv*text){SDL_LockMutex(gil);lv*r=deck_read(text);SDL_UnlockMutex(gil);return r;}
 void mark_dirty(){dirty=1,dirty_timer=AUTOSAVE_DELAY;}
@@ -244,6 +245,64 @@ int in_widgets(){return ms.type!=modal_none?ms.in_modal:1;}
 
 char clip_stash[16]={0};
 int has_clip(char*type){return strlen(clip_stash)>=strlen(type)&&memcmp(clip_stash,type,strlen(type))==0;}
+
+// Adaptation
+
+#ifdef LOSPEC
+// a set of customizations intended to make Decker more portable
+// and more performant on extremely limited devices such as the OLPC XO-4.
+int nosound=1, toolbars_enable=0, parity=0;
+lv* readimage(char*path,int grayscale){return n_readgif(NULL,lml2(lmcstr(path),grayscale?lmistr("gray"):NONE));}
+int*sgfx=NULL;
+void framebuffer_alloc(pair size,int minscale){
+	gfx=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,size.x*minscale,size.y*minscale);
+	sgfx=calloc(size.x*size.y,sizeof(int));
+}
+int framebuffer_flip(pair disp,pair size,int scale){
+	parity^=1;if(!parity)return 0;
+	int mask=dr.trans_mask&&uimode==mode_draw;
+	draw_frame(patterns_pal(ifield(deck,"patterns")),context.buffer,sgfx,size.x*4,dr.show_anim?frame_count:0,mask);
+	int*p, pitch;
+	SDL_LockTexture(gfx,NULL,(void**)&p,&pitch);
+	int stride=pitch/sizeof(int);
+	// SDL's X11 software renderer is outrageously slow at texture upscaling on the OLPC, so we'll do it by hand:
+	if(scale==1)for(int y=0,i=0,o=0;y<size.y;y++,o+=stride)for(int x=0;x<size.x;x++,i++     )p[o+x]=sgfx[i];
+	if(scale==2)for(int y=0,i=0,o=0;y<size.y;y++,o+=stride)for(int x=0;x<size.x;x++,i++,o+=2)p[o]=p[o+1]=p[o+stride]=p[o+stride+1]=sgfx[i];
+	SDL_UnlockTexture(gfx);
+	SDL_Rect dst={(disp.x-scale*size.x)/2,(disp.y-scale*size.y)/2,scale*size.x,scale*size.y};
+	if(!windowed)SDL_RenderClear(ren);
+	SDL_RenderCopy(ren,gfx,NULL,&dst);
+	return 1;
+}
+#else
+int nosound=0, toolbars_enable=1;
+#include <SDL_image.h>
+lv* readimage(char*path,int grayscale){
+	SDL_Surface*b=IMG_Load(path);if(b==NULL)return image_empty();lv*i=lmbuff((pair){b->w,b->h});
+	SDL_Surface*c=SDL_ConvertSurface(b,SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888),0);
+	for(int y=0;y<b->h;y++)for(int x=0;x<b->w;x++){
+		Uint32 v=((Uint32*)c->pixels)[x+(y*c->pitch/4)];Uint8 cr,cg,cb,ca;
+		SDL_GetRGBA(v,c->format,&cr,&cg,&cb,&ca),i->sv[x+y*b->w]=(ca!=0xFF)?(grayscale?0xFF:0x00):readcolor(cr,cg,cb,grayscale);
+	}SDL_FreeSurface(c),SDL_FreeSurface(b);return image_make(i);
+}
+void framebuffer_alloc(pair size,int minscale){
+	(void)minscale;
+	gfx=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,size.x,size.y);
+}
+int framebuffer_flip(pair disp,pair size,int scale){
+	int* p, pitch;
+	SDL_LockTexture(gfx,NULL,(void**)&p,&pitch);
+	int mask=dr.trans_mask&&uimode==mode_draw;
+	draw_frame(patterns_pal(ifield(deck,"patterns")),context.buffer,p,pitch,dr.show_anim?frame_count:0,mask);frame_count++;
+	SDL_UnlockTexture(gfx);
+	SDL_Rect src={0,0,size.x,size.y};
+	SDL_Rect dst={(disp.x-scale*size.x)/2,(disp.y-scale*size.y)/2,scale*size.x,scale*size.y};
+	SDL_SetRenderDrawColor(ren,0x00,0x00,0x00,0xFF);
+	if(!windowed)SDL_RenderClear(ren);
+	SDL_RenderCopy(ren,gfx,&src,&dst);
+	return 1;
+}
+#endif
 
 // Menus
 
@@ -1201,19 +1260,6 @@ void modal_enter(int type){
 	if(type==modal_save||type==modal_input){ms.text=(field_val){rtext_cast(lmistr("")),0};}
 }
 void bg_paste(lv*b);void proto_prop(lv*target,char*key,lv*value);void proto_size(lv*target,pair size,rect margin); // forward refs
-#ifdef NO_SDL_IMAGE
-lv* readimage(char*path,int grayscale){return n_readgif(NULL,lml2(lmcstr(path),grayscale?lmistr("gray"):NONE));}
-#else
-#include <SDL_image.h>
-lv* readimage(char*path,int grayscale){
-	SDL_Surface*b=IMG_Load(path);if(b==NULL)return image_empty();lv*i=lmbuff((pair){b->w,b->h});
-	SDL_Surface*c=SDL_ConvertSurface(b,SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888),0);
-	for(int y=0;y<b->h;y++)for(int x=0;x<b->w;x++){
-		Uint32 v=((Uint32*)c->pixels)[x+(y*c->pitch/4)];Uint8 cr,cg,cb,ca;
-		SDL_GetRGBA(v,c->format,&cr,&cg,&cb,&ca),i->sv[x+y*b->w]=(ca!=0xFF)?(grayscale?0xFF:0x00):readcolor(cr,cg,cb,grayscale);
-	}SDL_FreeSurface(c),SDL_FreeSurface(b);return image_make(i);
-}
-#endif
 void import_image(char*path){
 	lv*i=readimage(path,0),*m=NULL;if(is_empty(i))return;
 	int color=0,c[256]={0};EACH(z,i->b)c[0xFF&(i->b->sv[z])]++;
@@ -3037,43 +3083,37 @@ void sync(){
 		windowed=!windowed;
 		SDL_SetWindowFullscreen(win,windowed?0:SDL_WINDOW_FULLSCREEN_DESKTOP);
 	}
-	int* p, pitch;
-	SDL_LockTexture(gfx,NULL,(void**)&p,&pitch);
-	int mask=dr.trans_mask&&uimode==mode_draw;
-	draw_frame(patterns_pal(ifield(deck,"patterns")),context.buffer,p,pitch,dr.show_anim?frame_count:0,mask);frame_count++;
-	SDL_UnlockTexture(gfx);
-	SDL_Rect src={0,0,size.x,size.y};
-	SDL_Rect dst={(disp.x-scale*size.x)/2,(disp.y-scale*size.y)/2,scale*size.x,scale*size.y};
-	SDL_SetRenderDrawColor(ren,0x00,0x00,0x00,0xFF);
-	if(!windowed)SDL_RenderClear(ren);
-	SDL_RenderCopy(ren,gfx,&src,&dst);
-	pair tsize=buff_size(TOOLB);int tscale=MIN((disp.x-scale*size.x)/(2*tsize.x),disp.y/tsize.y);if(tscale&&noscale)tscale=1;
-	int showwings=toolbars_enable&&tscale>0&&!(lb(ifield(deck,"locked")))&&ms.type==modal_none&&uimode!=mode_script;
-	if(showwings){
-		SDL_Rect src={0,0,tsize.x,tsize.y},dst={0,(disp.y-tscale*tsize.y)/2,tscale*tsize.x,tscale*tsize.y};
-		ltoolbar(
-			(pair){(ev.rawpos .x-dst.x)/tscale,(ev.rawpos .y-dst.y)/tscale},
-			(pair){(ev.rawdpos.x-dst.x)/tscale,(ev.rawdpos.y-dst.y)/tscale}
-		);
-		SDL_LockTexture(gtool,NULL,(void**)&p,&pitch);
-		draw_frame(patterns_pal(ifield(deck,"patterns")),TOOLB,p,pitch,dr.show_anim?frame_count:0,0);
-		SDL_UnlockTexture(gtool);
-		SDL_RenderCopy(ren,gtool,&src,&dst);
+	if(framebuffer_flip(disp,size,scale)){
+		int*p, pitch;
+		pair tsize=buff_size(TOOLB);int tscale=MIN((disp.x-scale*size.x)/(2*tsize.x),disp.y/tsize.y);if(tscale&&noscale)tscale=1;
+		int showwings=toolbars_enable&&tscale>0&&!(lb(ifield(deck,"locked")))&&ms.type==modal_none&&uimode!=mode_script;
+		if(showwings){
+			SDL_Rect src={0,0,tsize.x,tsize.y},dst={0,(disp.y-tscale*tsize.y)/2,tscale*tsize.x,tscale*tsize.y};
+			ltoolbar(
+				(pair){(ev.rawpos .x-dst.x)/tscale,(ev.rawpos .y-dst.y)/tscale},
+				(pair){(ev.rawdpos.x-dst.x)/tscale,(ev.rawdpos.y-dst.y)/tscale}
+			);
+			SDL_LockTexture(gtool,NULL,(void**)&p,&pitch);
+			draw_frame(patterns_pal(ifield(deck,"patterns")),TOOLB,p,pitch,dr.show_anim?frame_count:0,0);
+			SDL_UnlockTexture(gtool);
+			SDL_RenderCopy(ren,gtool,&src,&dst);
+		}
+		if(showwings){
+			SDL_Rect src={0,0,tsize.x,tsize.y},dst={disp.x-tscale*tsize.x,(disp.y-tscale*tsize.y)/2,tscale*tsize.x,tscale*tsize.y};
+			rtoolbar(
+				(pair){(ev.rawpos .x-dst.x)/tscale,(ev.rawpos .y-dst.y)/tscale},
+				(pair){(ev.rawdpos.x-dst.x)/tscale,(ev.rawdpos.y-dst.y)/tscale}
+			);
+			int animate=box_in((rect){dst.x,dst.y,dst.w,dst.h},ev.rawpos)&&dr.show_anim?frame_count:0;
+			SDL_LockTexture(gtool,NULL,(void**)&p,&pitch);
+			draw_frame(patterns_pal(ifield(deck,"patterns")),TOOLB,p,pitch,animate,0);
+			SDL_UnlockTexture(gtool);
+			SDL_RenderCopy(ren,gtool,&src,&dst);
+		}
+		SDL_RenderPresent(ren);
 	}
-	if(showwings){
-		SDL_Rect src={0,0,tsize.x,tsize.y},dst={disp.x-tscale*tsize.x,(disp.y-tscale*tsize.y)/2,tscale*tsize.x,tscale*tsize.y};
-		rtoolbar(
-			(pair){(ev.rawpos .x-dst.x)/tscale,(ev.rawpos .y-dst.y)/tscale},
-			(pair){(ev.rawdpos.x-dst.x)/tscale,(ev.rawdpos.y-dst.y)/tscale}
-		);
-		int animate=box_in((rect){dst.x,dst.y,dst.w,dst.h},ev.rawpos)&&dr.show_anim?frame_count:0;
-		SDL_LockTexture(gtool,NULL,(void**)&p,&pitch);
-		draw_frame(patterns_pal(ifield(deck,"patterns")),TOOLB,p,pitch,animate,0);
-		SDL_UnlockTexture(gtool);
-		SDL_RenderCopy(ren,gtool,&src,&dst);
-	}
-	SDL_RenderPresent(ren);
 	SDL_SetCursor(CURSORS[uicursor]);
+	frame_count++;
 }
 
 // Runtime
@@ -3696,7 +3736,7 @@ void load_deck(lv*d){
 		win=SDL_CreateWindow("Decker",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,size.x*minscale,size.y*minscale,SDL_WINDOW_SHOWN|SDL_WINDOW_ALLOW_HIGHDPI);serr(win);
 		ren=SDL_CreateRenderer(win,-1,SDL_RENDERER_SOFTWARE);serr(ren);
 	}
-	gfx=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,size.x,size.y);
+	framebuffer_alloc(size,minscale);
 	SDL_SetWindowPosition(win,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED);
 	if(!gtool){pair s=buff_size(TOOLB);gtool=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,s.x,s.y);}
 	time_t now;time(&now);seed=0xFFFFFFFF&now;
