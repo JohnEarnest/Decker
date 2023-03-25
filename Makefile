@@ -27,7 +27,7 @@ ifneq ("$(wildcard /usr/bin/olpc-hwinfo)","")
 	# building on an OLPC, disable some features and enable some performance boosts.
 	FLAGS:=$(FLAGS) -DLOSPEC
 else
-	FLAGS:=$(FLAGS) -lSDL2_image
+	SDL:=$(SDL) -lSDL2_image
 endif
 
 resources:
