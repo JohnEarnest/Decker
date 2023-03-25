@@ -1375,10 +1375,11 @@ modals=_=>{
 	ms.in_modal=1
 	const pal=deck.patterns.pal.pix
 	if(ms.type=='about'){
-		const b=draw_modalbox(rect(190,70))
+		const b=draw_modalbox(rect(150,70))
 		if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'OK',1)||ev.exit)modal_exit(0)
 		draw_text(b,`Decker v${VERSION}`,FONT_MENU,1),b.y+=15
 		draw_text(b,'by John Earnest',FONT_BODY,1),b.y+=12
+		draw_text(b,'beyondloom.com/decker',FONT_BODY,1)
 	}
 	else if(ms.type=='listen'){
 		const size=LISTEN_SIZE(), th=li.hist.reduce((x,y)=>x+y[0].size.y+5,0), h=min(th,size.y)

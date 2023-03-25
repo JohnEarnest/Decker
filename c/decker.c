@@ -1435,10 +1435,11 @@ void modals(){
 	ms.in_modal=1;
 	char*pal=patterns_pal(ifield(deck,"patterns"));
 	if(ms.type==modal_about){
-		rect b=draw_modalbox((pair){190,70});char v[256];
+		rect b=draw_modalbox((pair){150,90});char v[256];
 		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"OK",1)||ev.exit)modal_exit(0);
 		snprintf(v,sizeof(v),"Decker v%s",VERSION);draw_text(b,v,FONT_MENU,1);b.y+=15;
 		draw_text(b,"by John Earnest",FONT_BODY,1);b.y+=12;
+		draw_text(b,"beyondloom.com/decker",FONT_BODY,1);b.y+=20;
 		snprintf(v,sizeof(v),"built on %s, %s",__DATE__,__TIME__);draw_text(b,v,FONT_BODY,1);
 	}
 	else if(ms.type==modal_listen){
