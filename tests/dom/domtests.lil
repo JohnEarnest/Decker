@@ -1388,6 +1388,8 @@ assert_image["canvas merge"
 	 (list 0,0,0,0,0,0,0,0,0,0))
 	c.copy[]
 ]
+# ensure bounds checks work:
+c.merge[512 take image[1,1]]
 
 deck:readdeck[]
 c:deck.card.add["canvas"]

@@ -357,7 +357,7 @@ int is_empty(lv*x){pair s=image_size(x);return s.x==0&&s.y==0;}
 int is_blank(lv*x){if(!image_is(x))return 0;EACH(z,x->b)if(x->b->sv[z])return 0;return 1;}
 lv* n_image_merge(lv*self,lv*z){
 	if(lil(l_first(z)))z=l_first(z);pair s=image_size(self);char*pp=self->b->sv;int v[256]={0};pair ss[256]={{0}};char*b[256]={0};
-	for(int p=0;p<z->c;p++)if(image_is(z->lv[p])&&!is_empty(z->lv[p]))v[p]=1,ss[p]=image_size(z->lv[p]),b[p]=z->lv[p]->b->sv;
+	for(int p=0;p<z->c&&p<256;p++)if(image_is(z->lv[p])&&!is_empty(z->lv[p]))v[p]=1,ss[p]=image_size(z->lv[p]),b[p]=z->lv[p]->b->sv;
 	for(int y=0,i=0;y<s.y;y++)for(int x=0;x<s.x;x++,i++){int p=0xFF&pp[i],c=v[p]?b[p][(x%ss[p].x)+(y%ss[p].y)*ss[p].x]:0;pp[i]=c;}
 	return self;
 }
@@ -1213,7 +1213,7 @@ lv* n_canvas_line(lv*self,lv*z){
 }
 lv* n_canvas_merge(lv*self,lv*z){
 	pick_canvas(self);if(lil(l_first(z)))z=l_first(z);int v[256]={0};pair s[256]={{0}};char*b[256]={0}; // valid src? size, buffer
-	for(int p=0;p<z->c;p++)if(image_is(z->lv[p])&&!is_empty(z->lv[p]))v[p]=1,s[p]=image_size(z->lv[p]),b[p]=z->lv[p]->b->sv;
+	for(int p=0;p<z->c&&p<256;p++)if(image_is(z->lv[p])&&!is_empty(z->lv[p]))v[p]=1,s[p]=image_size(z->lv[p]),b[p]=z->lv[p]->b->sv;
 	for(int y=0;y<frame.size.y;y++)for(int x=0;x<frame.size.x;x++)if(inclip(x,y)){int p=0xFF&PIX(x,y),c=v[p]?b[p][(x%s[p].x)+(y%s[p].y)*s[p].x]:0;PIX(x,y)=c;}
 	return NONE;
 }

@@ -1287,7 +1287,7 @@ image_make=size=>{
 		if(ikey(i,'merge'))return lmnat(z=>{
 			if(lil(z[0]))z=ll(z[0]);const nice=x=>x&&image_is(x)&&x.size.x>0&&x.size.y>0, s=self.size
 			const v=new Uint8Array(256),sx=new Uint32Array(256),sy=new Uint32Array(256)
-			for(let p=0;p<z.length;p++)if(nice(z[p]))v[p]=1,sx[p]=z[p].size.x,sy[p]=z[p].size.y
+			for(let p=0;p<z.length&&p<256;p++)if(nice(z[p]))v[p]=1,sx[p]=z[p].size.x,sy[p]=z[p].size.y
 			for(let y=0,i=0;y<s.y;y++)for(let x=0;x<s.x;x++,i++){const p=self.pix[i],c=v[p]?z[p].pix[(x%sx[p])+(y%sy[p])*sx[p]]:0;self.pix[i]=c}
 			return self
 		})
@@ -1726,7 +1726,7 @@ canvas_read=(x,card)=>{
 			if(ikey(i,'merge'))return lmnat(z=>{
 				canvas_pick(self);if(lil(z[0]))z=ll(z[0]);const nice=x=>x&&image_is(x)&&x.size.x>0&&x.size.y>0, s=frame.image.size
 				const v=new Uint8Array(256),sx=new Uint32Array(256),sy=new Uint32Array(256)
-				for(let p=0;p<z.length;p++)if(nice(z[p]))v[p]=1,sx[p]=z[p].size.x,sy[p]=z[p].size.y
+				for(let p=0;p<z.length&&p<256;p++)if(nice(z[p]))v[p]=1,sx[p]=z[p].size.x,sy[p]=z[p].size.y
 				for(let y=0;y<s.y;y++)for(let x=0;x<s.x;x++){const h=rect(x,y);if(inclip(h)){const p=gpix(h),c=v[p]?z[p].pix[(x%sx[p])+(y%sy[p])*sx[p]]:0;pix(h,c)}}
 				return NONE
 			})
