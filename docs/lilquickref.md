@@ -26,7 +26,9 @@ Primitives
 
 Flow
 ----
-- `if bool ... end` `if bool ... else ... end`
+- `if bool ... end`
+- `if bool ... else ... end`
+- `if bool ... elseif bool ... else ... end` (etc)
 - `each val key index in x ... end`
 - `while bool ... end`
 - `send name[args]`

@@ -44,3 +44,15 @@ end
 # 0
 # 1
 # 2
+
+on factrec n a do
+	# somewhat overly verbose tail-recursive factorial,
+	# demonstrating that ifelse interacts with TCE properly:
+	if     n=0 a
+	elseif n=1 factrec[n-1 n*a]
+	elseif n=2 factrec[n-1 n*a]
+	else       factrec[n-1 n*a] end
+end
+
+print[factrec[12 1]]
+print["deepest observed stack: %i" sys.workspace.depth]

@@ -362,7 +362,7 @@ parse=text=>{
 	const matchsp=k=>peek().t==k?(next(),1):0
 	const expect=t=>peek().t==t?next().v:er(`Expected ${t}, but found ${peek().t}.`)
 	const ident=n=>{
-		const kw={while:1,each:1,send:1,on:1,if:1,else:1,end:1,do:1,with:1,local:1,select:1,extract:1,update:1,insert:1,
+		const kw={while:1,each:1,send:1,on:1,if:1,elseif:1,else:1,end:1,do:1,with:1,local:1,select:1,extract:1,update:1,insert:1,
 			into:1,from:1,where:1,by:1,orderby:1,asc:1,desc:1};return !(n in kw||n in monad||n in dyad)
 	}
 	const name=n=>{const r=expect('name');if(!ident(r)&&n!='member')er(`'${r}' is a keyword, and cannot be used for a ${n} name.`);return r}
@@ -413,10 +413,21 @@ parse=text=>{
 		if(peek().t=='number'){blk_lit(b,lmn(next().v));return}
 		if(peek().t=='string'){blk_lit(b,lms(next().v));return}
 		if(match('if')){
-			expr(b);let bail=blk_opa(b,op.JUMPF,0),e=0,c=0
-			while(hasnext()&&!match('end')&&!(e=match('else'))){if(c)blk_op(b,op.DROP);expr(b),c++;}
-			if(!c)blk_lit(b,NONE);const exit=blk_opa(b,op.JUMP,0);blk_sets(b,bail,blk_here(b))
-			if(e){iblock(b)}else{blk_lit(b,NONE)}blk_sets(b,exit,blk_here(b));return
+			const fin=[];let c=0,e=0,next=-1;expr(b);next=blk_opa(b,op.JUMPF,0);while(hasnext()){
+				if(match('elseif')){
+					if(e)er(`Expected 'end'.`)
+					if(!c)blk_lit(b,NONE);c=0;fin.push(blk_opa(b,op.JUMP,0)),blk_sets(b,next,blk_here(b)),expr(b),next=blk_opa(b,op.JUMPF,0);continue
+				}
+				if(match('else')){
+					if(e)er(`Expected 'end'.`)
+					if(!c)blk_lit(b,NONE);c=0,e=1;fin.push(blk_opa(b,op.JUMP,0)),blk_sets(b,next,blk_here(b)),next=-1;continue
+				}
+				if(match('end')){
+					if(!c)blk_lit(b,NONE);c=0;if(!e)fin.push(blk_opa(b,op.JUMP,0));if(next!=-1)blk_sets(b,next,blk_here(b));if(!e)blk_lit(b,NONE)
+					fin.map(x=>blk_sets(b,x,blk_here(b)));return
+				}
+				if(c)blk_op(b,op.DROP);expr(b),c++
+			}
 		}
 		if(match('while')){
 			blk_lit(b,NONE);const head=blk_here(b);expr(b);const cond=blk_opa(b,op.JUMPF,0)

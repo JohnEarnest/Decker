@@ -154,7 +154,7 @@ Lil has a number of unary and binary operators- see appendix 1 and 2 for details
 (3*2)+5  # 11
 ```
 
-You can make decisions with `if`. The keyword `if` is followed by a conditional expression, one or more statements, and finally the keyword `end`. The statements inside the `if ... end` will only be executed if the conditional expression has a truthy value. You can also optionally include an `else` keyword to divide the body of the `if` into a truthy half and a falsey half.
+You can make decisions with `if`. The keyword `if` is followed by a conditional expression, one or more statements, and finally the keyword `end`. The statements inside the `if ... end` will only be executed if the conditional expression has a truthy value. You can also optionally include an `elseif` keyword (followed by a conditional expression) or just an `else` keyword to divide the body of the `if` into multiple cases.
 ```
 if 1>2
 	"narp"  # this doesn't happen
@@ -168,6 +168,14 @@ if 5
 	"also yarp"  # this happens...
 else
 	"also narp"  # but this does not!
+end
+
+if 1>2
+	"narp"    # this doesn't happen
+elseif 1<2
+	"yarp"    # but this does,
+else
+	"narp"    # so this doesn't
 end
 ``` 
 
@@ -1125,7 +1133,7 @@ LITERAL := NUMBER | STRING | '(' ')'
 NAME    := (ALPHA|'_'|'?') (ALPHA|'_'|'?'|DIGIT)*
 ITER    := (( each' NAME* 'in' ) | 'while') EXPR* 'end'
 ON      := 'on' NAME+ 'do' EXPR* 'end'
-IF      := 'if' EXPR* ( 'else' EXPR* )? 'end'
+IF      := 'if' EXPR* ('elseif' EXPR*)* ( 'else' EXPR* )? 'end'
 QUERY   := ('select'|'extract'|'update')((NAME|STRING ':')?EXPR)*('where'EXPR)?('by'EXPR)?('orderby'EXPR('asc'|'desc'))?'from' EXPR
 INSERT  := 'insert' (NAME|STRING ':' EXPR) 'into' EXPR
 SEND    := 'send' NAME '[' EXPR* ']'

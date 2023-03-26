@@ -10,3 +10,5 @@ false tail-calls
 0
 1
 2
+479001600
+deepest observed stack: 6

@@ -599,7 +599,7 @@ char nc(){
 }
 void num(token*r,char x,int sign){
 	if(x=='.'&&!isdigit(tc())){init_tok(r,'.');return;}
-	int len=0;double v=sign*rnum_len(par.text+(par.i-1),NUM,&len);par.i+=(len-1);
+	int len=0;double v=sign*rnum_len(par.text+(par.i-1),NUM,&len);for(int z=0;z<len-1;z++)nc();
 	init_tok(r,'d'),r->nv=v;
 }
 void tok(token*r){
@@ -658,7 +658,7 @@ str expect(char t,int alloc){
 }
 int ident(char*n){
 	char*kws[]={
-		"while","each","send","on","if","else","end","do","with","local",
+		"while","each","send","on","if","elseif","else","end","do","with","local",
 		"select","extract","update","insert","into","from","where","by","orderby","asc","desc"
 	};for(size_t z=0;z<(sizeof(kws)/sizeof(kws[0]));z++)if(strcmp(n,kws[z])==0)return 0;
 	return findop(n,monads)<0&&findop(n,dyads)<0;
@@ -728,11 +728,22 @@ void term(lv*b){
 	if(peek()->type=='d'){blk_lit(b,lmn(next()->nv));return;}
 	if(peek()->type=='s'){blk_lit(b,lmstr(literal_str(next())));return;}
 	if(match("if")){
-		expr(b);int bail=blk_opa(b,JUMPF,0),e=0,c=0;
-		while(hasnext()&&!match("end")&&!(e=match("else"))){if(c)blk_op(b,DROP);expr(b),c++;}
-		if(!c)blk_lit(b,NONE);
-		int exit=blk_opa(b,JUMP,0);blk_sets(b,bail,blk_here(b));
-		if(e){iblock(b);}else{blk_lit(b,NONE);}blk_sets(b,exit,blk_here(b));return;
+		int fin[4096]={0},fi=0,c=0,e=0,next=-1;expr(b);next=blk_opa(b,JUMPF,0);while(hasnext()){
+			if(fi>=4096){snprintf(par.error,sizeof(par.error),"Too many elseif clauses.");return;}
+			if(match("elseif")){
+				if(e){snprintf(par.error,sizeof(par.error),"Expected 'end'.");return;}
+				if(!c)blk_lit(b,NONE);c=0;fin[fi++]=blk_opa(b,JUMP,0);blk_sets(b,next,blk_here(b));expr(b);next=blk_opa(b,JUMPF,0);continue;
+			}
+			if(match("else")){
+				if(e){snprintf(par.error,sizeof(par.error),"Expected 'end'.");return;}
+				if(!c)blk_lit(b,NONE);c=0,e=1;fin[fi++]=blk_opa(b,JUMP,0);blk_sets(b,next,blk_here(b)),next=-1;continue;
+			}
+			if(match("end")){
+				if(!c)blk_lit(b,NONE);c=0;if(!e)fin[fi++]=blk_opa(b,JUMP,0);if(next!=-1)blk_sets(b,next,blk_here(b));if(!e)blk_lit(b,NONE);
+				for(int z=0;z<fi;z++)blk_sets(b,fin[z],blk_here(b));return;
+			}
+			if(c)blk_op(b,DROP);expr(b),c++;
+		}
 	}
 	if(match("while")){
 		blk_lit(b,NONE);int head=blk_here(b);expr(b);int cond=blk_opa(b,JUMPF,0);

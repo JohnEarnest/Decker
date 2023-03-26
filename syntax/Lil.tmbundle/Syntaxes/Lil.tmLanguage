@@ -22,7 +22,7 @@
 			<key>comment</key>
 			<string>Control flow keywords</string>
 			<key>match</key>
-			<string>(?&lt;=^|[^a-zA-Z_?\d.])(?:if|else|end|while|each|send|on|do|select|extract|update|insert|into|from|where|by|orderby|asc|desc|with|local)(?=$|[^a-zA-Z_?\d])</string>
+			<string>(?&lt;=^|[^a-zA-Z_?\d.])(?:if|else|elseif|end|while|each|send|on|do|select|extract|update|insert|into|from|where|by|orderby|asc|desc|with|local)(?=$|[^a-zA-Z_?\d])</string>
 			<key>name</key>
 			<string>keyword.control.lil</string>
 		</dict>
