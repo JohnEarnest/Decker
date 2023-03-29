@@ -101,8 +101,8 @@ typedef struct {
 	lv* scratch, *mask, *omask;
 	int pickfill;
 } draw_state;
-draw_state ddr={tool_pencil,3,1,0,0, 1,1,0,0,0,{0}, 0,0,{32,32}, {0},{0},NULL,0, NULL,NULL,NULL, 0};
-draw_state dr ={tool_pencil,3,1,0,0, 1,1,0,0,0,{0}, 0,0,{32,32}, {0},{0},NULL,0, NULL,NULL,NULL, 0};
+draw_state ddr={tool_pencil,3,1,0,0, 1,1,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0};
+draw_state dr ={tool_pencil,3,1,0,0, 1,1,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0};
 int bg_pat(){return dr.trans_mask&&dr.pattern==0?32:dr.pattern;}
 int bg_fill(){return dr.trans_mask&&dr.fill==0?32:dr.fill;}
 int bg_has_sel(){return dr.tool==tool_select&&(dr.sel_here.w>0||dr.sel_here.h>0);}
@@ -3582,8 +3582,15 @@ void main_view(){
 	ev=con_to_ev(ev);
 	if(((uimode==mode_object||uimode==mode_draw)&&dr.show_grid)||ms.type==modal_grid){
 		rect c=con_dim();
-		for(int x=dr.grid_size.x;x<c.w;x+=dr.grid_size.x){rect r=con_to_screenr((rect){x,0,1,c.h});r.w=1;draw_rect(r,44);}
-		for(int y=dr.grid_size.y;y<c.h;y+=dr.grid_size.y){rect r=con_to_screenr((rect){0,y,c.w,1});r.h=1;draw_rect(r,44);}
+		if(dr.fatbits){
+			for(int x=dr.grid_size.x;x<c.w;x+=dr.grid_size.x){rect r=con_to_screenr((rect){x,0,1,c.h});r.w=1;draw_rect(r,44);}
+			for(int y=dr.grid_size.y;y<c.h;y+=dr.grid_size.y){rect r=con_to_screenr((rect){0,y,c.w,1});r.h=1;draw_rect(r,44);}
+		}
+		else{
+			for(int x=dr.grid_size.x;x<c.w;x+=dr.grid_size.x)for(int y=dr.grid_size.y;y<c.h;y+=dr.grid_size.y){
+				pair r=con_to_screen((pair){x,y});draw_rect((rect){r.x,r.y,1,1},44);
+			}
+		}
 	}
 	lv*wids=con_wids();
 	event_state eb=ev;if(uimode!=mode_interact)ev=(event_state){0};

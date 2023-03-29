@@ -480,7 +480,7 @@ script_save=x=>{const k=lms('script');mark_dirty();if(sc.target)iwrite(sc.target
 draw_state=_=>({ // drawing tools state
 	tool:'pencil',brush:3,pattern:1,fill:0,erasing:0, dither_threshold:0,
 	show_widgets:1,show_anim:1,trans:0,trans_mask:0,fatbits:0,offset:rect(),
-	show_grid:0,snap:0,grid_size:rect(32,32), sel_here:rect(),sel_start:rect(),limbo:null,limbo_dither:0,
+	show_grid:0,snap:0,grid_size:rect(16,16), sel_here:rect(),sel_start:rect(),limbo:null,limbo_dither:0,
 	scratch:null,mask:null,omask:null, pickfill:0, poly:[]
 })
 let dr=draw_state()
@@ -3097,8 +3097,15 @@ main_view=_=>{
 	ev=con_to_ev(ev)
 	if(((uimode=='object'||uimode=='draw')&&dr.show_grid)||ms.type=='grid'){
 		const c=con_dim()
-		for(let x=dr.grid_size.x;x<c.w;x+=dr.grid_size.x){const r=con_to_screen(rect(c.x+x,c.y,1,c.h));draw_vline(r.x,r.y,r.y+r.h,44)}
-		for(let y=dr.grid_size.y;y<c.h;y+=dr.grid_size.y){const r=con_to_screen(rect(c.x,c.y+y,c.w,1));draw_hline(r.x,r.x+r.w,r.y,44)}
+		if(dr.fatbits){
+			for(let x=dr.grid_size.x;x<c.w;x+=dr.grid_size.x){const r=con_to_screen(rect(c.x+x,c.y,1,c.h));draw_vline(r.x,r.y,r.y+r.h,44)}
+			for(let y=dr.grid_size.y;y<c.h;y+=dr.grid_size.y){const r=con_to_screen(rect(c.x,c.y+y,c.w,1));draw_hline(r.x,r.x+r.w,r.y,44)}
+		}
+		else{
+			for(let x=dr.grid_size.x;x<c.w;x+=dr.grid_size.x)for(let y=dr.grid_size.y;y<c.h;y+=dr.grid_size.y){
+				const r=con_to_screen(rect(x,y));draw_rect(rect(r.x,r.y,1,1),44)
+			}
+		}
 	}
 	const eb=ev;if(uimode!='interact')ev=event_state()
 	if(uimode=='interact'||(dr.show_widgets&&!dr.fatbits)){handle_widgets(wids,con_offset())}
