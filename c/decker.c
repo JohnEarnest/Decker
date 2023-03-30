@@ -3114,7 +3114,6 @@ void sync(){
 		SDL_RenderPresent(ren);
 	}
 	SDL_SetCursor(CURSORS[uicursor]);
-	frame_count++;
 }
 
 // Runtime
