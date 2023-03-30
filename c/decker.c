@@ -261,7 +261,7 @@ void framebuffer_alloc(pair size,int minscale){
 int framebuffer_flip(pair disp,pair size,int scale){
 	parity^=1;if(!parity)return 0;
 	int mask=dr.trans_mask&&uimode==mode_draw;
-	draw_frame(patterns_pal(ifield(deck,"patterns")),context.buffer,sgfx,size.x*4,dr.show_anim?frame_count:0,mask);
+	draw_frame(patterns_pal(ifield(deck,"patterns")),context.buffer,sgfx,size.x*4,dr.show_anim?frame_count:0,mask);frame_count++;
 	int*p, pitch;
 	SDL_LockTexture(gfx,NULL,(void**)&p,&pitch);
 	int stride=pitch/sizeof(int);
