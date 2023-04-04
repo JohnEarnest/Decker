@@ -3459,8 +3459,8 @@ void all_menus(){
 		if(menu_item("Go to Next"    ,1,'\0'))n_go(deck,l_list(lmistr("Next")));
 		if(menu_item("Go to Last"    ,1,'\0'))n_go(deck,l_list(lmistr("Last")));
 		menu_separator();
-		if(menu_item("Cut Card" ,1,'\0')){SDL_SetClipboardText(n_deck_copy(deck,l_list(card))->sv);n_deck_remove(deck,l_list(card));mark_dirty();}
-		if(menu_item("Copy Card",1,'\0')){SDL_SetClipboardText(n_deck_copy(deck,l_list(card))->sv);}
+		if(menu_item("Cut Card" ,1,'\0')){SDL_SetClipboardText(ls(n_deck_copy(deck,l_list(card)))->sv);n_deck_remove(deck,l_list(card));mark_dirty();}
+		if(menu_item("Copy Card",1,'\0')){SDL_SetClipboardText(ls(n_deck_copy(deck,l_list(card)))->sv);}
 		menu_separator();
 		if(menu_item("Script..."    ,1,'e'))setscript(card);
 		if(menu_item("Properties...",1,'\0'))modal_enter(modal_card_props);
