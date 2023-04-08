@@ -2580,7 +2580,7 @@ void bg_tighten(){
 		dr.mask=lmbuff((pair){r.w,r.h}),memset(dr.mask->sv,1,r.w*r.h);
 		if(s.w>0&&s.h>0){dr.omask=lmbuff((pair){s.w,s.h}),memset(dr.omask->sv,1,s.w*s.h);}else{dr.omask=NULL;}
 	}
-	int changed=1,background=bg_fill();while(changed){changed=0; // erode the mask, iterating to a fixed point
+	int changed=1,background=dr.fill;while(changed){changed=0; // erode the mask, iterating to a fixed point
 		for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++)if(bg_mask_get((pair){b,a})&&dr.limbo->sv[b+a*r.w]==background){
 			int n=bg_mask_get((pair){b-1,a})&&bg_mask_get((pair){b,a-1})&&bg_mask_get((pair){b+1,a})&&bg_mask_get((pair){b,a+1});
 			if(!n)bg_mask_set((pair){b,a},0),changed=1;

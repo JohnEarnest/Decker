@@ -2391,7 +2391,7 @@ bg_tighten=_=>{
 		dr.mask=image_make(rect(r.w,r.h)),dr.mask.pix.fill(1)
 		if(s.w>0&&s.h>0){dr.omask=image_make(rect(s.w,s.h)),dr.omask.pix.fill(1)}else{dr.omask=null}
 	}
-	let changed=1,background=bg_fill();while(changed){changed=0 // erode the mask, iterating to a fixed point
+	let changed=1,background=dr.fill;while(changed){changed=0 // erode the mask, iterating to a fixed point
 		for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++)if(get(rect(b,a))&&dr.limbo.pix[b+a*r.w]==background){
 			const n=get(rect(b-1,a))&&get(rect(b,a-1))&&get(rect(b+1,a))&&get(rect(b,a+1));if(!n)set(rect(b,a),0),changed=1
 		}
