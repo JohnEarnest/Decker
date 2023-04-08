@@ -2596,6 +2596,8 @@ void bg_tighten(){
 
 int ob_by_index(const void*av,const void*bv){int a=ln(ifield((*((lv**)av)),"index")),b=ln(ifield((*((lv**)bv)),"index"));return a-b;}
 void ob_order(){qsort(ob.sel->lv,ob.sel->c,sizeof(lv*),ob_by_index);}
+void ob_move_up(){if(ob.sel->c<1)return;ob_order();EACHR(z,ob.sel){lv*o=ob.sel->lv[z];iwrite(o,lmistr("index"),lmn(ln(ifield(o,"index"))+1));}}
+void ob_move_dn(){if(ob.sel->c<1)return;ob_order();EACH( z,ob.sel){lv*o=ob.sel->lv[z];iwrite(o,lmistr("index"),lmn(ln(ifield(o,"index"))-1));}}
 
 void ob_edit_prop(char*key,lv*value){
 	lv*before=lmd(),*after=lmd();EACH(z,ob.sel){
@@ -2993,6 +2995,8 @@ void sync(){
 			}
 			else if(uimode==mode_object&&ms.type==modal_none){
 				if(c==SDLK_BACKSPACE||c==SDLK_DELETE)ob_destroy();
+				if(c==SDLK_LEFTBRACKET)ob_move_dn();
+				if(c==SDLK_RIGHTBRACKET)ob_move_up();
 			}
 			else if(ms.type==modal_recording&&!wid.infield&&au.mode==record_stopped){
 				if(c==SDLK_BACKSPACE||c==SDLK_DELETE)sound_delete();
@@ -3412,7 +3416,9 @@ void all_menus(){
 			menu_separator();
 			if(menu_item("Select All",1,'a')){lv*wids=con_wids();ob.sel->c=0;EACH(z,wids)ll_add(ob.sel,wids->lv[z]);}
 			if(menu_item("Move to Front",ob.sel->c,'\0')){ob_order();EACH(z,ob.sel){iwrite(ob.sel->lv[z],lmistr("index"),lmn(RTEXT_END));}mark_dirty();}
-			if(menu_item("Move to Back",ob.sel->c,'\0')){ob_order();EACHR(z,ob.sel){iwrite(ob.sel->lv[z],lmistr("index"),NONE);};mark_dirty();}
+			if(menu_item("Move Up"      ,ob.sel->c,'\0')){ob_move_up();}
+			if(menu_item("Move Down"    ,ob.sel->c,'\0')){ob_move_dn();}
+			if(menu_item("Move to Back" ,ob.sel->c,'\0')){ob_order();EACHR(z,ob.sel){iwrite(ob.sel->lv[z],lmistr("index"),NONE);};mark_dirty();}
 		}
 		if(wid.fv){
 			int selection=wid.fv!=NULL&&wid.cursor.x!=wid.cursor.y;

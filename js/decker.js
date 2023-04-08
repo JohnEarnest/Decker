@@ -2405,6 +2405,8 @@ bg_tighten=_=>{
 // Object Edit Mode
 
 ob_order=_=>{ob.sel.sort((av,bv)=>ln(ifield(av,'index'))-ln(ifield(bv,'index')))}
+ob_move_up=_=>{if(ob.sel.length<1)return;ob_order();ob.sel.slice(0).reverse().map(o=>iwrite(o,lms('index'),lmn(ln(ifield(o,'index'))+1)))}
+ob_move_dn=_=>{if(ob.sel.length<1)return;ob_order();ob.sel                   .map(o=>iwrite(o,lms('index'),lmn(ln(ifield(o,'index'))-1)))}
 ob_edit_prop=(key,value)=>{
 	const before={}, after={}
 	ob.sel.map(w=>{const n=ls(ifield(w,'name')),bp={},ap={}; bp[key]=ifield(w,key),ap[key]=value,before[n]=bp,after[n]=ap})
@@ -2938,6 +2940,8 @@ all_menus=_=>{
 			menu_separator()
 			if(menu_item('Select All',1,'a'))ob.sel=con_wids().v.slice(0)
 			if(menu_item('Move to Front',ob.sel.length))ob_order(),ob.sel                   .map(w=>iwrite(w,lms('index'),lmn(RTEXT_END))),mark_dirty()
+			if(menu_item('Move Up'      ,ob.sel.length))ob_move_up()
+			if(menu_item('Move Down'    ,ob.sel.length))ob_move_dn()
 			if(menu_item('Move to Back' ,ob.sel.length))ob_order(),ob.sel.slice(0).reverse().map(w=>iwrite(w,lms('index'),NONE          )),mark_dirty()
 		}
 		if(wid.fv&&wid.f){
@@ -3267,7 +3271,11 @@ q('body').onkeydown=e=>{
 	if(e.metaKey||e.ctrlKey)ev.alt=1,ev.shortcuts[e.shiftKey?(e.key.toUpperCase()):e.key]=1
 	else if(e.key.length==1&&wid.infield)field_input(e.key)
 	else if(uimode=='draw'&&ms.type==null){if(e.key=='Backspace'||e.key=='Delete')bg_delete_selection()}
-	else if(uimode=='object'&&ms.type==null){if(e.key=='Backspace'||e.key=='Delete')ob_destroy()}
+	else if(uimode=='object'&&ms.type==null){
+		if(e.key=='[')ob_move_dn()
+		if(e.key==']')ob_move_up()
+		if(e.key=='Backspace'||e.key=='Delete')ob_destroy()
+	}
 	else if(ms.type=='recording'&&!wid.infield&&au.mode=='stopped'){if(e.key=='Backspace'||e.key=='Delete')sound_delete()}
 	if     (wid.ingrid )grid_keys (e.key,e.shiftKey)
 	else if(wid.infield)field_keys(e.key,e.shiftKey)
