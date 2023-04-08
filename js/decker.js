@@ -2047,9 +2047,10 @@ go_notify=(deck,x,t,url)=>{
 	if(url&&/(http|https|ftp|gopher|gemini):\/\//.test(url))modal_enter('url'),ms.text=fieldstr(lms(url))
 	const moved=x!=ln(ifield(ifield(deck,'card'),'index'))
 	if(moved)con_set(null)
-	if(ms.type!='trans'&&x>=0&&t&&dget(deck.transit,lms(t))){
+	const tfun=t==null?null: lion(t)?t: dget(deck.transit,t)
+	if(ms.type!='trans'&&x>=0&&tfun){
 		modal_enter('trans'),ms.time_curr=0,ms.time_end=30,ms.time_start=-1;
-		ms.trans=dget(deck.transit,lms(t)), ms.canvas=free_canvas(deck)
+		ms.trans=tfun, ms.canvas=free_canvas(deck)
 		ms.carda=draw_con(ifield(deck,'card')), ms.cardb=draw_con(ifield(deck,'cards').v[x])
 	}
 	if(moved&&uimode=='interact')msg.pending_loop=1

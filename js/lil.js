@@ -2257,7 +2257,7 @@ deck_write=(x,html)=>{
 }
 
 n_go=([x,t],deck)=>{
-	let r=null, i=deck.card;t=t?ls(t):''
+	let r=null, i=deck.card
 	if(lin(x))r=clamp(0,ln(x),count(deck.cards)-1)
 	else if(card_is(x)){const i=dvix(deck.cards,x);if(i>=0)r=i}
 	else{

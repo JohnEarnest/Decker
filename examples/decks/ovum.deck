@@ -121,15 +121,14 @@ end
 {script:stage.2}
 on click do
  i:()
- transition[on snapshot c a b t do
+ name.locked:1
+ go[card on snapshot c a b t do
   i:a
   s:if t<.5 t else 1-t end
   c.paste[a]
   c.rect[       0,0 c.size*1, s]
   c.rect[c.size*0,1 c.size*1,-s]
  end]
- name.locked:1
- go[card "snapshot"]
  name.locked:0
  write[i.copy[outline.pos outline.size].map[0 dict 32]]
 end

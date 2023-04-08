@@ -2118,12 +2118,12 @@ void go_notify(lv*deck,lv*args,int dest){
 		int f=0;for(int z=0;p[z];z++)if(has_prefix(s,p[z])){f=1;break;}
 		if(f){modal_enter(modal_url);ms.text=(field_val){rtext_cast(l_first(args)),0};}
 	}
-	lv*trans=dget(deck->b,lmistr("transit"));
+	lv*tfun=args->c<2?NULL: lion(args->lv[1])?args->lv[1]: dget(dget(deck->b,lmistr("transit")),args->lv[1]);
 	int moved=dest!=ln(ifield(ifield(deck,"card"),"index"));
 	if(moved)con_set(NULL);
-	if(dest>=0&&args->c>=2&&lis(args->lv[1])&&dget(trans,args->lv[1])&&ms.type!=modal_trans){
+	if(dest>=0&&tfun!=NULL&&ms.type!=modal_trans){
 		modal_enter(modal_trans);ms.time_curr=0,ms.time_end=30;
-		ms.trans=dget(trans,args->lv[1]), ms.canvas=free_canvas(deck);
+		ms.trans=tfun, ms.canvas=free_canvas(deck);
 		ms.carda=draw_con(ifield(deck,"card"),0), ms.cardb=draw_con(ifield(deck,"cards")->lv[dest],0);
 	}
 	if(moved&&uimode==mode_interact)msg.pending_loop=1;

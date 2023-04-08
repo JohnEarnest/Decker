@@ -432,7 +432,7 @@ Decker provides a number of useful pre-defined functions:
 
 If the target of `go[]` begins with a URI protocol such as `http://`, `https://`, `ftp://`, `gopher://`, or `gemini://`, Decker will prompt the user for confirmation and then ask the operating system (or browser) to open an appropriate application (if any) to navigate to that URI. By design, there is no way to determine whether the user confirms, the OS finds an appropriate application, or the destination resouce is retrieved successfully. Opening a URI is strictly a _suggestion_, for user convenience, and not a means of accessing remote resources from a deck.
 
-The transition `y`, should be the name of a transition function installed with `transition[]`, or one of the built-in transition animations: {`"SlideRight"`, `"SlideLeft"`, `"SlideUp"`, `"SlideDown"`, `"WipeRight"`, `"WipeLeft"`, `"WipeUp"`, `"WipeDown"`, `"BoxIn"`, `"BoxOut"`}. Any other value will be ignored.
+The transition `y`, should be the name of a transition function installed with `transition[]` (a string), one of the built-in transition animations (`"SlideRight"`, `"SlideLeft"`, `"SlideUp"`, `"SlideDown"`, `"WipeRight"`, `"WipeLeft"`, `"WipeUp"`, `"WipeDown"`, `"BoxIn"`, `"BoxOut"`), or a Lil function. Any other value will be ignored.
 
 4) If `sleep[]` is provided the string `"play"` as an argument, instead of waiting for some number of frames to pass, it will pause script execution until all sound clips triggered with `play[]` complete.
 
@@ -1547,7 +1547,7 @@ This approach "pulls" values from other fields, whereas you might otherwise "pus
 
 Transitions
 ===========
-Whenever a user or script navigates to a new card with `go[]`, Decker can perform a brief transition animation, like a horizontal slide or wipe. Transitions add visual flair and aid users in finding their way around a deck by providing spatial relationship cues. Decker comes with a number of pre-defined transitions, and you can add more (or override existing ones) by writing appropriate Lil functions and installing them by calling the `transition[]` function.
+Whenever a user or script navigates to a new card with `go[]`, Decker can perform a brief transition animation, like a horizontal slide or wipe. Transitions add visual flair and aid users in finding their way around a deck by providing spatial relationship cues. Decker comes with a number of pre-defined transitions, and you can add more (or override existing ones) by writing appropriate Lil functions and installing them by calling the `transition[]` function, or by providing a function directly as the second argument to `go[]`.
 
 The Lil function you install as a transition will be called several times when an animation is required, with four arguments:
 - `canvas`: a _canvas interface_ the size of the current card.
@@ -1571,7 +1571,7 @@ transition[on BoxIn      c a b t do  c.rect[c.size/2   c.size*t   "center"]     
 transition[on BoxOut     c a b t do  c.rect[c.size/2   c.size*1-t "center"]     c.merge[b a] end]
 ```
 
-Transitions can be defined in any script, at any time, but it probably makes the most sense to set them up at the top level of a deck script or a [module](#modules). If custom transitions are bundled into a module, it is very easy for other users to re-use them in their own decks!
+Transitions can be defined in any script, at any time, but it usually makes the most sense to set them up at the top level of a deck script or a [module](#modules). If custom transitions are bundled into a module, it is very easy for other users to re-use them in their own decks!
 
 Playing Sound
 =============
