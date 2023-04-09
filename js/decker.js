@@ -1231,6 +1231,13 @@ res_enumerate=(source)=>{
 	return lmt(r)
 }
 title_caps=x=>{let w=1;return x.split('').map(c=>{if(w)c=c.toUpperCase();w=c==' '||c=='\n';return c}).join('')}
+do_transition=(tween,dest,errors)=>{
+	let f=frame;ms.canvas.image.size=dest.size,ms.canvas.image.pix=dest.pix,ms.canvas.image.pix.fill(0),canvas_clip(ms.canvas)
+	const a=lml([ms.canvas,ms.carda,ms.cardb,lmn(tween)]), p=lmblk();blk_lit(p,ms.trans),blk_lit(p,a),blk_op(p,op.CALL)
+	const e=lmenv();pushstate(e),issue(e,p);let quota=TRANS_QUOTA;while(quota&&running())runop(),quota--
+	if(running()&&errors){listen_show(ALIGN.right,1,lms(`warning: transition ${ms.trans.n} exceeded quota and was halted.`)),tween=2}
+	popstate(),frame=f,sleep_play=0,sleep_frames=0;return tween
+}
 
 // Modal Dialogues
 
@@ -1309,7 +1316,10 @@ modal_enter=type=>{
 		ms.act_go=1,ms.act_gomode=4,ms.act_trans=0,ms.act_sound=0,ms.act_card=ln(ifield(ifield(deck,'card'),'index'))
 		ms.verb   =lms('') // card name
 		ms.message=lms('') // sound name
-		ms.grid=gridtab(transit_enumerate())
+		ms.grid=gridtab(transit_enumerate(),0)
+		ms.canvas=free_canvas(deck),ms.canvas.size=rect(17,13)
+		ms.carda=image_read('%%IMG0ABEADQAAAAAAAACAAAFAAAIgAAIgAAQQAAfwAAgIAAgIAAgIAAAAAAAAAA==')
+		ms.cardb=image_read('%%IMG0ABEADf//gP//gPA/gPffgPffgPAPgPf3gPf3gPf3gPf3gPAPgP//gP//gA==')
 	}
 	const dname=(x,e)=>{x=x||'untitled';return lms(/\.(deck|html)$/.test(x)?x:x+e)}
 	if(type=='card_props')ms.name=fieldstr(ifield(ifield(deck,'card'),'name'))
@@ -1987,8 +1997,14 @@ modals=_=>{
 			}
 		}
 		if(ms.act_go){
-			if(ui_checkbox(rint(rect(b.x+b.w/2,b.y+20,b.w/2,16)),'With Transition',1,ms.act_trans))ms.act_trans^=1
-			if(ms.act_trans)ui_list(rect(b.x+b.w/2,b.y+36,b.w/2,55),ms.grid)
+			if(ui_checkbox(rint(rect(b.x+b.w/2,b.y+20,b.w/2-17,16)),'With Transition',1,ms.act_trans))ms.act_trans^=1
+			if(ms.act_trans){
+				ui_list(rect(b.x+b.w/2,b.y+36,b.w/2,55),ms.grid)
+				const pv=rpair(rect(b.x+b.w-16,b.y+20),ms.canvas.size), pi=image_make(ms.canvas.size)
+				ms.trans=dget(deck.transit,ms.grid.table.v.value[ms.grid.row])
+				do_transition((frame_count%60)/60.0,pi,0)
+				draw_scaled(pv,pi,1),draw_box(pv,0,1)
+			}
 		}
 	}
 	else if(ms.type=='pick_card'){
@@ -2002,12 +2018,7 @@ modals=_=>{
 	else if(ms.type=='trans'){
 		const now=new Date().getTime()/1000
 		const sofar=ms.time_start==-1?0:now-ms.time_start;if(ms.time_start==-1)ms.time_start=now
-		let f=frame, tween=min(sofar*(ms.time_end/15),1.0)
-		ms.canvas.image.pix=frame.image.pix;frame.image.pix.fill(0)
-		const a=lml([ms.canvas,ms.carda,ms.cardb,lmn(tween)]), p=lmblk();blk_lit(p,ms.trans),blk_lit(p,a),blk_op(p,op.CALL)
-		const e=lmenv();pushstate(e),issue(e,p);let quota=TRANS_QUOTA;while(quota&&running())runop(),quota--
-		if(running()){listen_show(ALIGN.right,1,lms(`warning: transition ${ms.trans.n} exceeded quota and was halted.`)),tween=2}
-		popstate(),frame=f,sleep_play=0,sleep_frames=0;if(tween>=1)modal_exit(0)
+		if(do_transition(min(sofar*(ms.time_end/15),1.0),frame.image,1)>=1)modal_exit(0)
 	}
 	ms.in_modal=0
 }

@@ -1107,6 +1107,18 @@ char* title_caps(char*name,char*suffix){
 	while(i+1<sizeof(title_buffer)&&name  [i]){char c=name[i];if(w)c=toupper(c);w=isspace(c);title_buffer[i++]=c;}
 	while(i+1<sizeof(title_buffer)&&suffix[j])title_buffer[i++]=suffix[j++];return title_buffer[i]='\0',title_buffer;
 }
+void do_transition(float tween,int errors){
+	cstate f=frame;n_canvas_clear(ms.canvas,lml(0));
+	lv*a=lml(4);a->lv[0]=ms.canvas,a->lv[1]=ms.carda,a->lv[2]=ms.cardb,a->lv[3]=lmn(tween);
+	lv*p=lmblk();blk_lit(p,ms.trans),blk_lit(p,a),blk_op(p,CALL);lv*e=lmenv(NULL);
+	SDL_LockMutex(gil),pushstate(e),issue(e,p);int quota=TRANS_QUOTA;while(quota&&running())runop(),quota--;
+	if(running()&&errors){
+		char e[4096];snprintf(e,sizeof(e),"warning: transition %s exceeded quota and was halted.",ms.trans->sv);
+		listen_show(align_right,1,lmcstr(e));ms.time_curr=ms.time_end;
+	}
+	popstate(),SDL_UnlockMutex(gil);frame=f;sleep_play=0,sleep_frames=0;
+}
+
 
 // Modal Dialogues
 
@@ -1233,6 +1245,10 @@ void modal_enter(int type){
 		ms.verb   =lmistr(""); // card name
 		ms.message=lmistr(""); // sound name
 		ms.grid=(grid_val){l_table(l_range(dget(deck->b,lmistr("transit")))),0,0};
+		pair ps={17,13};
+		ms.canvas=free_canvas(deck);dset(ms.canvas->b,lmistr("size"),lmpair(ps));
+		ms.carda=image_read(lmcstr("%%IMG0ABEADQAAAAAAAACAAAFAAAIgAAIgAAQQAAfwAAgIAAgIAAgIAAAAAAAAAA=="));
+		ms.cardb=image_read(lmcstr("%%IMG0ABEADf//gP//gPA/gPffgPffgPAPgPf3gPf3gPf3gPf3gPAPgP//gP//gA=="));
 	}
 	if(type==modal_card_props){ms.name=(field_val){rtext_cast(ifield(ifield(deck,"card"),"name")),0};}
 	if(type==modal_link||type==modal_gridcell||type==modal_query){wid.cursor=(pair){0,RTEXT_END};}
@@ -2031,8 +2047,12 @@ void modals(){
 			}
 		}
 		if(ms.act_go){
-			if(ui_checkbox((rect){b.x+b.w/2,b.y+20,b.w/2,16},"With Transition",1,ms.act_trans))ms.act_trans^=1;
-			if(ms.act_trans)ui_list((rect){b.x+b.w/2,b.y+36,b.w/2,55},&ms.grid);
+			if(ui_checkbox((rect){b.x+b.w/2,b.y+20,b.w/2-17,16},"With Transition",1,ms.act_trans))ms.act_trans^=1;
+			if(ms.act_trans){
+				ui_list((rect){b.x+b.w/2,b.y+36,b.w/2,55},&ms.grid);rect pv={b.x+b.w-16,b.y+20,17,13};
+				ms.trans=dget(dget(deck->b,lmistr("transit")),ms.grid.table->lv[0]->lv[ms.grid.row]);
+				do_transition((frame_count%60)/60.0,0),buffer_paste(pv,frame.clip,container_image(ms.canvas,1)->b,frame.buffer,1),draw_box(pv,0,1);
+			}
 		}
 	}
 	else if(ms.type==modal_pick_card){
@@ -2064,17 +2084,9 @@ void modals(){
 		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_exit(0);
 	}
 	else if(ms.type==modal_trans){
-		cstate f=frame;float tween=(ms.time_curr*1.0)/ms.time_end;n_canvas_clear(ms.canvas,lml(0));
-		lv*a=lml(4);a->lv[0]=ms.canvas,a->lv[1]=ms.carda,a->lv[2]=ms.cardb,a->lv[3]=lmn(tween);
-		lv*p=lmblk();blk_lit(p,ms.trans),blk_lit(p,a),blk_op(p,CALL);lv*e=lmenv(NULL);
-		SDL_LockMutex(gil),pushstate(e),issue(e,p);int quota=TRANS_QUOTA;while(quota&&running())runop(),quota--;
-		if(running()){
-			char e[4096];snprintf(e,sizeof(e),"warning: transition %s exceeded quota and was halted.",ms.trans->sv);
-			listen_show(align_right,1,lmcstr(e));ms.time_curr=ms.time_end;
-		}
-		popstate(),SDL_UnlockMutex(gil);
-		frame=f;lv*i=container_image(ms.canvas,1);buffer_paste(rect_pair((pair){0,0},frame.size),frame.clip,i->b,frame.buffer,1);
-		sleep_play=0,sleep_frames=0;ms.time_curr++;if(ms.time_curr>ms.time_end)modal_exit(0);
+		do_transition((ms.time_curr*1.0)/ms.time_end,1);
+		lv*i=container_image(ms.canvas,1);buffer_paste(rect_pair((pair){0,0},frame.size),frame.clip,i->b,frame.buffer,1);
+		ms.time_curr++;if(ms.time_curr>ms.time_end)modal_exit(0);
 	}
 	ms.in_modal=0;
 }
