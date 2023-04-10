@@ -2047,9 +2047,9 @@ void modals(){
 			}
 		}
 		if(ms.act_go){
-			if(ui_checkbox((rect){b.x+b.w/2,b.y+20,b.w/2-17,16},"With Transition",1,ms.act_trans))ms.act_trans^=1;
+			if(ui_checkbox((rect){b.x+b.w/2,b.y+20,b.w/2-19,16},"With Transition",1,ms.act_trans))ms.act_trans^=1;
 			if(ms.act_trans){
-				ui_list((rect){b.x+b.w/2,b.y+36,b.w/2,55},&ms.grid);rect pv={b.x+b.w-16,b.y+20,17,13};
+				ui_list((rect){b.x+b.w/2,b.y+36,b.w/2,55},&ms.grid);rect pv={b.x+b.w-17,b.y+20,17,13};
 				ms.trans=dget(dget(deck->b,lmistr("transit")),ms.grid.table->lv[0]->lv[ms.grid.row]);
 				do_transition((frame_count%60)/60.0,0),buffer_paste(pv,frame.clip,container_image(ms.canvas,1)->b,frame.buffer,1),draw_box(pv,0,1);
 			}
