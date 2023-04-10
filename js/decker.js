@@ -2018,7 +2018,7 @@ modals=_=>{
 	else if(ms.type=='trans'){
 		const now=new Date().getTime()/1000
 		const sofar=ms.time_start==-1?0:now-ms.time_start;if(ms.time_start==-1)ms.time_start=now
-		if(do_transition(min(sofar*(ms.time_end/15),1.0),frame.image,1)>=1)modal_exit(0)
+		if(do_transition(min((sofar*60)/ms.time_end,1.0),frame.image,1)>=1)modal_exit(0)
 	}
 	ms.in_modal=0
 }
@@ -2054,13 +2054,13 @@ free_canvas=deck=>{ // make a drawing surface that isn't attached to the parent 
 	iwrite(r,lms('size'),lmpair(deck.size)),d.fonts=deck.fonts,d.patterns=deck.patterns,r.free=1
 	container_image(r,1);return r
 }
-go_notify=(deck,x,t,url)=>{
+go_notify=(deck,x,t,url,delay)=>{
 	if(url&&/(http|https|ftp|gopher|gemini):\/\//.test(url))modal_enter('url'),ms.text=fieldstr(lms(url))
 	const moved=x!=ln(ifield(ifield(deck,'card'),'index'))
 	if(moved)con_set(null)
 	const tfun=t==null?null: lion(t)?t: dget(deck.transit,t)
 	if(ms.type!='trans'&&x>=0&&tfun){
-		modal_enter('trans'),ms.time_curr=0,ms.time_end=30,ms.time_start=-1;
+		modal_enter('trans'),ms.time_curr=0,ms.time_end=delay==null?30:0|max(1,ln(delay)),ms.time_start=-1;
 		ms.trans=tfun, ms.canvas=free_canvas(deck)
 		ms.carda=draw_con(ifield(deck,'card')), ms.cardb=draw_con(ifield(deck,'cards').v[x])
 	}

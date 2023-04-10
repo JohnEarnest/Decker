@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:15
+card:7
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -187,10 +187,24 @@ button14:{"type":"button","size":[68,20],"pos":[26,52],"script":"Transitions A.0
 button15:{"type":"button","size":[68,20],"pos":[395,229],"script":"Transitions A.0","text":"Dissolve"}
 button16:{"type":"button","size":[93,21],"pos":[394,255],"script":"Transitions A.0","text":"CircleInClick"}
 button17:{"type":"button","size":[93,21],"pos":[395,283],"script":"Transitions A.0","text":"CircleOutClick"}
+button18:{"type":"button","size":[89,20],"pos":[104,33],"script":"Transitions A.1","text":"HeartIn Slow"}
+button19:{"type":"button","size":[89,20],"pos":[105,56],"script":"Transitions A.2","text":"HeartIn Fast"}
 
 {script:Transitions A.0}
 on click do
   go["Transitions B" me.text]
+end
+{end}
+
+{script:Transitions A.1}
+on click do
+  go["Transitions B" "HeartIn" 120]
+end
+{end}
+
+{script:Transitions A.2}
+on click do
+  go["Transitions B" "HeartIn" 15]
 end
 {end}
 
@@ -214,10 +228,24 @@ button14:{"type":"button","size":[68,20],"pos":[26,52],"script":"Transitions B.0
 button15:{"type":"button","size":[68,20],"pos":[395,229],"script":"Transitions B.0","text":"Dissolve"}
 button16:{"type":"button","size":[93,21],"pos":[394,255],"script":"Transitions B.0","text":"CircleInClick"}
 button17:{"type":"button","size":[93,21],"pos":[395,283],"script":"Transitions B.0","text":"CircleOutClick"}
+button18:{"type":"button","size":[89,20],"pos":[104,33],"script":"Transitions B.1","text":"HeartIn Slow"}
+button19:{"type":"button","size":[89,20],"pos":[105,56],"script":"Transitions B.2","text":"HeartIn Fast"}
 
 {script:Transitions B.0}
 on click do
   go["Transitions A" me.text]
+end
+{end}
+
+{script:Transitions B.1}
+on click do
+  go["Transitions A" "HeartIn" 120]
+end
+{end}
+
+{script:Transitions B.2}
+on click do
+  go["Transitions A" "HeartIn" 15]
 end
 {end}
 
@@ -369,7 +397,7 @@ b:{"type":"contraption","size":[150,50],"pos":[40,150],"def":"spinner","widgets"
 contraption1:{"type":"contraption","size":[200,140],"pos":[276,89],"def":"enchilada","widgets":{"bool":{},"number":{},"string":{},"code":{},"rich":{}}}
 contraption2:{"type":"contraption","size":[150,90],"pos":[54,222],"def":"paintbox","widgets":{}}
 smol1:{"type":"contraption","size":[20,20],"pos":[222,268],"def":"smol","widgets":{}}
-viewCounter1:{"type":"contraption","size":[102,26],"pos":[326,29],"def":"viewCounter","widgets":{"c":{"value":"9"}}}
+viewCounter1:{"type":"contraption","size":[102,26],"pos":[326,29],"def":"viewCounter","widgets":{"c":{"value":"10"}}}
 
 {script:contraptions.0}
 on change do
@@ -382,7 +410,7 @@ end
 dieRoller1:{"type":"contraption","size":[137,23],"pos":[45,66],"def":"dieRoller","widgets":{"result":{"value":"1+1 = 2"},"button1":{}}}
 dieRoller2:{"type":"contraption","size":[229,23],"pos":[45,94],"def":"dieRoller","widgets":{"result":{"size":[143,19],"value":"2+10+7+6+10+5+2+4 = 46"},"button1":{"text":"5d10+3d6"}}}
 dieRoller3:{"type":"contraption","size":[137,23],"pos":[45,38],"def":"dieRoller","widgets":{"result":{"value":"1"},"button1":{"text":"1d6"}}}
-clock1:{"type":"contraption","size":[100,25],"pos":[375,39],"font":"menu","def":"clock","widgets":{"canvas1":{"size":[100,25],"font":"menu","image":"%%IMG0AGQAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAefh+OAMOAAAAAAAAAMwYDGAHGAAAAAAAAADMGxjBizAAAAAAAAAAzBs8+ZM+AAAAAAAAAMwwBswjMwAAAAAAAADMYAbMP7MAAAAAAAAAzGAGzAMzAAAAAAAAAMxjRs2DMwAAAAAAAAB4Yzx5gx4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="},"tz":{"size":[35,0],"pos":[6,19]},"mil":{"size":[31,0],"pos":[54,18]}}}
+clock1:{"type":"contraption","size":[100,25],"pos":[375,39],"font":"menu","def":"clock","widgets":{"canvas1":{"size":[100,25],"font":"menu","image":"%%IMG2AGQAGQD/AP8A2QEEAAIBBgAEAQYAAwECAAoBAgACAQYANAECAAIBAgABAQIACAECAAYBAwAJAQMAAgECADgBAgACAQIAAQECAAUBAgABAQIABwECAAMBAgADAQEAAQECAAIBAgA4AQIAAgECAAEBBQACAQIAAQEFAAQBAgADAQIAAgEBAAIBAgACAQUANQECAAIBAgAFAQIACAECAAMBAgAGAQEAAwECAAYBAgA0AQIAAgECAAUBAgAIAQIAAwECAAYBBwAFAQIANAECAAIBAgAFAQIACAECAAMBAgAKAQIABgECADQBAgACAQIAAQEBAAMBAgABAQIAAQEBAAMBAgADAQIAAwECAAUBAgACAQEAAwECADUBBAADAQQAAgECAAIBBAAEAQIAAwECAAUBAgADAQQA/wD/AP8Aog=="},"tz":{"size":[35,0],"pos":[6,19]},"mil":{"size":[31,0],"pos":[54,18]}}}
 datePicker1:{"type":"contraption","size":[109,123],"pos":[371,92],"def":"datePicker","widgets":{"canv":{"image":"%%IMG0AGcAZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIIAAAAAAAAAAAAAAADGAAAAAAAAAAAAAAAAqmSAAAAAAAAAAAAAAJIUgAAAAAAAAAAAAACCdIAAAAAAAAAAAAAAgpSAAAAAAAAAAAAAAIJzgAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAggHwBBAH0B4AHAAiAMYAQAQQARAQACIAIJCqYESCowEcELAgYByQkpBEgqSBEhzAHBACkIKQRIFHgRIQgAJwIpCCkESBRAESEIAikBxwgmBDgUMBEhCAHHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////////////+AAAgAIACAAgAIACAAgAAIACAAgAIACAAgAIAACAggcIPiAQg+IDCAAAgYIIiAQgMIICBAgAAICCAIgIIFCDwggIAACAggEIHCCQgCIPCAAAgIICCAIg+IAiCIgAAICCBAgiIBCCIgiIAACAgg+IHCAQgcIHCAAAgAIACAAgAIACAAgAAIACAAgAIACAAgAIAACAAgAIACAAgAIACD////////////////ggAIAD//gAIACAAgAIIACAA//4ACAAgAIACCD4gcP4+IciCIhyI+ggCIIj93mIphiYimBIIBCCI/d4iKIIiAogiCAQgcP4eIiiCIgSIcggIIIj/3iIogiIIiAoICCCI/74iKIIiEIiKCAggcP5+IciCIj6IcggAIAD//gAIACAAgAIIACAA//4ACAAgAIACCAAgAP/+AAgAIACAAg////////////////4IACAAgAIACAAgAIACCAAgAIACAAgAIACAAgiBIj6IMiPohyIcnHIJgyYgmEJgKYimIqKKCIUiPIiCIEiIoiKCigiJIgKI8iBIhyIehIoIj6ICiIogiIiiAoiKCIEiIoiKIIiIogSQigiBIhyIciCIhyIYvnIIACAAgAIACAAgAIACCAAgAIACAAgAIACAAggAIACAAgAIACAAgAIP///////////////+CAAgAIACAAgAIACAAggAIACAAgAIACAAgAIJwiccnPpwSc+nDJz6CiYooqISiMooKJCiCggiIIKCIglILyCgghIIQiEEhHISSEChPIQSCIIiCIgKI+iAoiKIIgkCJBCQikBJCKQikCIL4i++vnL4S+cvnL4iCAAgAIACAAgAIACAAggAIACAAgAIACAAgAIIACAAgAIACAAgAIACD////////////////ggAIACAAgAIAAAAAAAIACAAgAIACAAAAAAACccnHL5y+IgAAAAAAAooqKKEihGIAAAAAAAIKKCiiIogiAAAAAAACEchHpyKcIgAAAAAAAiIogKCigiIAAAAAAAJCKQEooqIiAAAAAAAC+cvmJxycIgAAAAAAAgAIACAAgAIAAAAAAAIACAAgAIACAAAAAAACAAgAIACAAgAAAAAAA/////////4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="},"val":{"value":"2023-05-09"},"next":{},"prev":{}}}
 fancyBorder1:{"type":"contraption","size":[31,45],"pos":[76,142],"def":"fancyBorder","widgets":{}}
 fancyBorder2:{"type":"contraption","size":[87,47],"pos":[114,142],"def":"fancyBorder","widgets":{}}

@@ -2134,7 +2134,7 @@ void go_notify(lv*deck,lv*args,int dest){
 	int moved=dest!=ln(ifield(ifield(deck,"card"),"index"));
 	if(moved)con_set(NULL);
 	if(dest>=0&&tfun!=NULL&&ms.type!=modal_trans){
-		modal_enter(modal_trans);ms.time_curr=0,ms.time_end=30;
+		modal_enter(modal_trans);ms.time_curr=0,ms.time_end=args->c<3?30: MAX(1,ln(args->lv[2]));
 		ms.trans=tfun, ms.canvas=free_canvas(deck);
 		ms.carda=draw_con(ifield(deck,"card"),0), ms.cardb=draw_con(ifield(deck,"cards")->lv[dest],0);
 	}

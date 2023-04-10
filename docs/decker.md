@@ -403,7 +403,7 @@ Decker provides a number of useful pre-defined functions:
 | `show[x...]`           | Print a human-comprehensible representation of the value `x` to _stdout_ followed by a newline, and return `x`.           | Console    |
 | `print[x...]`          | Display a string `x` in the Listener. (1)                                                                                 | Console    |
 | `play[x mode]`         | Play a sound. `x` can be either the name of a sound or a sound interface. (2)                                             | Decker     |
-| `go[x y]`              | Navigate to another card by _name_, _value_, or _index_ `x` with transition `y`. (3)                                      | Decker     |
+| `go[x y z]`            | Navigate to another card by _name_, _value_, or _index_ `x` with transition `y`, playing for `z` frames (3).              | Decker     |
 | `transition[x]`        | Install a [transition](#transitions) `x` for use with `go[]`, and return a dictionary of installed transitions.           | Decker     |
 | `sleep[x]`             | Wait for `x` 60hz frames before proceeding, minimum 1 frame. Allows for performing simple animation. (4)                  | Decker     |
 | `array[x y]`           | Create a new [Array Interface](#arrayinterface) with size `x` and cast string `y`, or decode an array string `x`.         | Decker     |
@@ -433,6 +433,8 @@ Decker provides a number of useful pre-defined functions:
 If the target of `go[]` begins with a URI protocol such as `http://`, `https://`, `ftp://`, `gopher://`, or `gemini://`, Decker will prompt the user for confirmation and then ask the operating system (or browser) to open an appropriate application (if any) to navigate to that URI. By design, there is no way to determine whether the user confirms, the OS finds an appropriate application, or the destination resouce is retrieved successfully. Opening a URI is strictly a _suggestion_, for user convenience, and not a means of accessing remote resources from a deck.
 
 The transition `y`, should be the name of a transition function installed with `transition[]` (a string), one of the built-in transition animations (`"SlideRight"`, `"SlideLeft"`, `"SlideUp"`, `"SlideDown"`, `"WipeRight"`, `"WipeLeft"`, `"WipeUp"`, `"WipeDown"`, `"BoxIn"`, `"BoxOut"`), or a Lil function. Any other value will be ignored.
+
+If specified, the transition time `z` is the number of frames (at 60 frames/second) the transition should take to complete, with a minimum of 1 frames. By default, transitions take 30 frames, or half a second.
 
 4) If `sleep[]` is provided the string `"play"` as an argument, instead of waiting for some number of frames to pass, it will pause script execution until all sound clips triggered with `play[]` complete.
 

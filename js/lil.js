@@ -2256,21 +2256,21 @@ deck_write=(x,html)=>{
 	return r+'\n'+(html?'<\/script>\nRuntime stub is NYI.':'')
 }
 
-n_go=([x,t],deck)=>{
+n_go=([x,t,delay],deck)=>{
 	let r=null, i=deck.card
 	if(lin(x))r=clamp(0,ln(x),count(deck.cards)-1)
 	else if(card_is(x)){const i=dvix(deck.cards,x);if(i>=0)r=i}
 	else{
 		x=ls(x);if(deck.history.length>1&&x=='Back'){
 			deck.history.pop();const ix=last(deck.history);
-			if(ix>=0&&ix<count(deck.cards)){go_notify(deck,ix,t,x),deck.card=ix;return lmn(deck.card)}
+			if(ix>=0&&ix<count(deck.cards)){go_notify(deck,ix,t,x,delay),deck.card=ix;return lmn(deck.card)}
 		}
 		else if(x=='First')r=0
 		else if(x=='Last' )r=count(deck.cards)-1
 		else if(x=='Prev' )r=mod(i-1,count(deck.cards))
 		else if(x=='Next' )r=mod(i+1,count(deck.cards))
 		else{const ix=dkix(deck.cards,lms(x));if(ix>=0)r=ix}
-	}if(r!=null){go_notify(deck,r,t,x),deck.card=r;if(i!=r)deck.history.push(r)}else{go_notify(deck,-1,t,x)}return lmn(deck.card)
+	}if(r!=null){go_notify(deck,r,t,x,delay),deck.card=r;if(i!=r)deck.history.push(r)}else{go_notify(deck,-1,t,x,delay)}return lmn(deck.card)
 }
 n_sleep=([z])=>{if(lis(z)&&ls(z)=='play'){sleep_play=1}else{sleep_frames=max(1,ln(z))};return z}
 n_transition=(f,deck)=>{const t=deck.transit;if(lion(f))dset(t,lms(f.n),f);return t}
@@ -2290,7 +2290,7 @@ primitives=(env,deck)=>{
 	env.local('show'      ,lmnat(n_show    ))
 	env.local('print'     ,lmnat(n_print   ))
 	env.local('play'      ,lmnat(n_play    ))
-	env.local('go'        ,lmnat(([x,t])=>n_go([x,t],deck)))
+	env.local('go'        ,lmnat(([x,t,d])=>n_go([x,t,d],deck)))
 	env.local('transition',lmnat(([f])=>n_transition(f,deck)))
 	env.local('sleep'     ,lmnat(n_sleep   ))
 	env.local('eval'      ,lmnat(n_eval    ))
