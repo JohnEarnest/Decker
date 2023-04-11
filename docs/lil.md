@@ -786,6 +786,7 @@ Pattern types are as follows:
 | `b`  | `0`    | reads like `s`; value is `1` iff first char is in `tTyYx1`.    | any value to `true` or `false` based on truthiness.  |
 | `f`  | `0.0`  | Lil float. allows any number of decimals.                      | show `D` decimal places or however many are needed.  |
 | `c`  | `0.0`  | currency. parses values like `-$1.23` to Lil floats.           | show `D` or 2 decimal places, like `-$1.23`.         |
+| `C`  | `0.0`  | plain currency. parses values like `-1.23` to Lil floats.      | show `D` or 2 decimal places, like `-1.23`.          |
 | `i`  | `0`    | signed integer.                                                | signed integer.                                      |
 | `h`  | `0`    | hexadecimal integer. parses lower- or uppercase.               | format int as hexadecimal in lowercase.              |
 | `H`  | `0`    | hexadecimal integer. parses lower- or uppercase.               | format int as hexadecimal in uppercase.              |

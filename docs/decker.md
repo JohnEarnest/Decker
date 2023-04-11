@@ -240,6 +240,7 @@ Grids can be drawn with or without column headers, with or without a scrollbar, 
 - `b`: Boolean, shown as `true` or `false`.
 - `f`: Floating-point number.
 - `c`: Signed currency, with two decimal places, like `-$1.23`.
+- `C`: Signed plain currency, with two decimal places, like `1.23`.
 - `i`: Signed integer.
 - `e`: Unix epoch int displayed as an [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) date-time.
 

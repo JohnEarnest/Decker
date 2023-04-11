@@ -200,7 +200,7 @@ dyad={
 			else if(t=='i'){v=lmn(0);const s=(y[h]=='-')?(h++,-1):1;m&=id(y[h]);while(hn()&&id(y[h]))v.v=v.v*10+(+y[h++]);v.v*=s}
 			else if(t=='h'||t=='H'){v=lmn(0),                       m&=ix();    while(hn()&&ix())v.v=v.v*16+parseInt(y[h++],16)}
 			else if(t=='j'){if(m){const j=pjson(y,h,n);h=j.index,v=j.value}else{v=NONE}}
-			else if(t=='f'||t=='c'){
+			else if(t=='f'||t=='c'||t=='C'){
 				v=lmn(0);let p=10,s=(y[h]=='-')?(h++,-1):1; if(t=='c'&&m&&y[h]=='$')h++
 				m&=id(y[h])||y[h]=='.';  while(hn()&&id(y[h]))v.v=v.v*10+(+y[h++])
 				m&&hn()&&y[h]=='.'&&h++; while(hn()&&id(y[h]))v.v+=(+y[h++])/p,p*=10;v.v*=s
@@ -237,12 +237,13 @@ dyad={
 			else if(t=='b'){o=lb(a)?'true':'false'}
 			else if(t=='f'){o=d?ln(a).toFixed(min(100,d)):wnum(ln(a))}
 			else if(t=='c'){const v=ln(a);o=(v<0?'-':'')+'$'+abs(v).toFixed(min(100,d)||2)}
+			else if(t=='C'){const v=ln(a);o=(v<0?'-':'')    +abs(v).toFixed(min(100,d)||2)}
 			else if(t=='i'){o=''+Math.trunc(ln(a))}
 			else if(t=='h'||t=='H'){o=ln(a).toString(16);if(t=='H')o=o.toUpperCase()}
 			else if(t=='e'){o=new Date(ln(a)*1000).toISOString().split('.')[0]+'Z'}
 			else if(t=='p'){const d=ld(a);o=dyad.format(ISODATE,lml(PARTS.map(x=>dget(d,x)))).v}
 			else if(t=='j'){o=fjson(a);}
-			let vn=o.length; if(d&&(t=='f'||t=='c'))d=0;if(d&&lf)vn=min(d,vn)
+			let vn=o.length; if(d&&(t=='f'||t=='c'||t=='C'))d=0;if(d&&lf)vn=min(d,vn)
 			if(n&&!lf)for(let z=0;z<n-vn;z++)r+=pz?'0':' '
 			for(let z=d&&!lf?max(0,vn-d):0;z<vn;z++)r+=o[z]
 			if(n&&lf)for(let z=0;z<n-vn;z++)r+=pz?'0':' '

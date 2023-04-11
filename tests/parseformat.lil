@@ -18,6 +18,7 @@ show["%*h%n,%*i%n%m"  parse "AB,42"                 ] # skip ints
 # floats
 show["%f%n %f%n %f%n" parse "-3 .3 0.997"           ] # basics
 show["%c %c %c"       parse "$23 -$3.5 420.69"      ] # currency ($ optional)
+show["%C %C %C"       parse "23 -3.5 420.69"        ] # plain currency (no $)
 show["%5f%f"          parse "12.3456.7"             ] # fixed-width
 show["%*f%n,%*f%n%m"  parse ".3,1.2"                ] # skip floats
 # strings
@@ -64,6 +65,7 @@ show["%h %H %h"       format 171,171                ] # hex ints
 show["%f:%f"          format -123.456,333           ] # natural floats
 show["%.3f/%.2f"      format -123.456,333           ] # floats with decimal places
 show["%c,%.3c"        format 3.5,-93.99             ] # currency
+show["%C,%.3C"        format 3.5,-93.99             ] # plain currency
 show["%s [%s]"        format "one","two"            ] # strings
 show["%l:%u"          format "One","Two"            ] # case conversion
 show["%-2.2rAB%2r!%r!"format "one","b","anylength"  ] # char class

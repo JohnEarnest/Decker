@@ -415,7 +415,7 @@ dyad(l_parse){
 				if(mc==lf?1:0){if(n)m=0;break;}str_addc(&r,hc);h++;if(t=='o')break;
 			}if(!m)r.c=0;v=lmstr(r);
 		}
-		else if(t=='f'||t=='c'){
+		else if(t=='f'||t=='c'||t=='C'){
 			double r=0,p=10,s=hc=='-'?(h++,-1):1;if(t=='c'&&m&&hc=='$')h++;
 			m&=!!isdigit(hc)||hc=='.';while(hn&&isdigit(hc))r=r*10+hc-'0',h++;
 			if(hn&&hc=='.')h++;while(hn&&isdigit(hc))r+=(hc-'0')/p,p*=10,h++;v=lmn(r*s);
@@ -455,6 +455,7 @@ void format_type(str*r,lv*a,char t,int n,int d,int lf,int pz,int*f,char*c){
 	else if(t=='b')snprintf(o,NUM,"%s",lb(a)?"true":"false");
 	else if(t=='f'){if(d){snprintf(o,NUM,"%.*f",d,ln(a));}else{str v=str_new();wnum(&v,ln(a));op=lmstr(v)->sv;}}
 	else if(t=='c'){double v=ln(a);snprintf(o,NUM,"%s$%.*f",v<0?"-":"",d?d:2,fabs(v));}
+	else if(t=='C'){double v=ln(a);snprintf(o,NUM,"%s%.*f" ,v<0?"-":"",d?d:2,fabs(v));}
 	else if(t=='i')snprintf(o,NUM,"%lld",(long long)ln(a));
 	else if(t=='h')snprintf(o,NUM,"%llx",(long long)ln(a));
 	else if(t=='H')snprintf(o,NUM,"%llX",(long long)ln(a));
@@ -466,7 +467,7 @@ void format_type(str*r,lv*a,char t,int n,int d,int lf,int pz,int*f,char*c){
 		pg("year",year,1900)pg("month",mon,1)pg("day",mday,0)pg("hour",hour,0)pg("minute",min,0)pg("second",sec,0)
 		strftime(o,NUM,"%FT%TZ",&v);
 	}
-	int vn=strlen(op); if(d&&strchr("fc",t))d=0; if(d&&lf)vn=MIN(d,vn);
+	int vn=strlen(op); if(d&&strchr("fcC",t))d=0; if(d&&lf)vn=MIN(d,vn);
 	if(n&&!lf)for(int z=0;z<n-vn;z++)str_addc(r,pz?'0':' ');
 	for(int z=d&&!lf?MAX(0,vn-d):0;z<vn;z++)str_addc(r,ulc(op[z]));
 	if(n&&lf)for(int z=0;z<n-vn;z++)str_addc(r,pz?'0':' ');
