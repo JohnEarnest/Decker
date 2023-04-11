@@ -140,8 +140,12 @@ draw_text_outlined=(pos,text,f)=>{
 	([[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]).map(([x,y])=>draw_text(rect(pos.x+x,pos.y+y),text,f,32))
 	draw_text(pos,text,f,1)
 }
+draw_textr=(r,text,font,pattern)=>{
+	const size=font_textsize(font,text)
+	if(size.x<r.w){draw_text(rect(r.x+r.w-size.x,r.y+ceil((r.h-size.y)/2),size.x,r.h),text,font,pattern)}else{draw_text_fit(r,text,font,pattern)}
+}
 draw_textc=(r,text,font,pattern)=>{
-	const size=font_textsize(font,text);
+	const size=font_textsize(font,text)
 	if(pattern==-1){draw_text_outlined(rcenter(r,size),text,font)}
 	else if(size.x<r.w){draw_text(rcenter(r,size),text,font,pattern)}else{draw_text_fit(r,text,font,pattern)}
 }
@@ -750,7 +754,7 @@ widget_grid=(target,x,value)=>{
 			const oc=frame.clip; frame.clip=rclip(cell,frame.clip)
 			if     (x.format[z]=='I'){const i=clamp(0,ln(v),8);if(i<8)draw_icon(ip,ICONS[i],fcol)}
 			else if(x.format[z]=='B'){if(lb(v))draw_icon(ip,ICONS[ICON.chek],fcol)}
-			else{draw_text_fit(rect(hs.x+1,bb.y+rh*y,hs.w-2,rh),cf,fnt,fcol)}
+			else{('fcCihH'.indexOf(x.format[z])>=0?draw_textr:draw_text_fit)(rect(hs.x+1,bb.y+rh*y,hs.w-2,rh),cf,fnt,fcol)} // right-align numeric
 			frame.clip=oc
 			if(sel&&ev.dclick&&!x.locked&&over(cell)){
 				const f=x.format[z]||'s', tc=rect(z,y+value.scroll)

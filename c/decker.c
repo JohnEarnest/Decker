@@ -614,7 +614,10 @@ int widget_grid(lv*target,grid x,grid_val*value){
 			rect oc=frame.clip; frame.clip=box_intersect(cell,frame.clip);
 			if     (z<fk&&x.format[z]=='I'){int i=MAX(0,MIN(8,ln(v)));if(i<8)draw_icon(ip,ICONS[i],fcol);}
 			else if(z<fk&&x.format[z]=='B'){if(lb(v))draw_icon(ip,ICONS[icon_chek],fcol);}
-			else{draw_text_fit((rect){hs.x+1,bb.y+rh*y,hs.w-2,rh},cf.sv,fnt,fcol);}
+			else{
+				rect r={hs.x+1,bb.y+rh*y,hs.w-2,rh}; // right-align numeric columns:
+				if(z<fk&&strchr("fcCihH",x.format[z])){draw_textr(r,cf.sv,fnt,fcol);}else{draw_text_fit(r,cf.sv,fnt,fcol);}
+			}
 			frame.clip=oc;
 			if(sel&&ev.dclick&&!x.locked&&over(cell)){
 				char f=z<fk?x.format[z]:'s';pair tc=(pair){z,y+value->scroll};

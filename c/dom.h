@@ -824,6 +824,10 @@ void draw_text_fit(rect r,char*text,lv*f,int pattern){
 		font_each(f,g.c)if(font_gpix(f,g.c,b,a)&&inclip(g.pos.x+b,g.pos.y+a))PIX(g.pos.x+b,g.pos.y+a)=pattern;
 	}
 }
+void draw_textr(rect r,char*text,lv*font,int pattern){
+	pair size=font_textsize(font,text);
+	if(size.x<r.w){draw_text((rect){r.x+r.w-size.x,r.y+ceil((r.h-size.y)/2.0),size.x,r.h},text,font,pattern);}else{draw_text_fit(r,text,font,pattern);}
+}
 void draw_textc(rect r,char*text,lv*font,int pattern){
 	pair size=font_textsize(font,text);
 	if(pattern==-1){draw_text_outlined(box_center(r,size),text,font);}
