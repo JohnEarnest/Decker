@@ -1679,7 +1679,7 @@ void modals(){
 		else{draw_box(gsize,0,1);draw_textc(gsize,"Working...",FONT_BODY,1);}
 	}
 	else if(ms.type==modal_url){
-		rect b=draw_modalbox((pair){170,90});
+		rect b=draw_modalbox((pair){200,90});
 		draw_textc((rect){b.x,b.y,b.w,20},"Do you wish to open this URL?",FONT_BODY,1);
 		ui_textedit((rect){b.x,b.y+20+5,b.w,40},1,&ms.text);
 		pair c={b.x+b.w-(b.w-(2*60+5))/2-60,b.y+b.h-20};
@@ -3583,6 +3583,11 @@ void all_menus(){
 		menu_separator();
 		if(menu_item("Show Locals"  ,1,'\0')){listen_show(align_right,0,li.vars);}
 	}
+	menu_bar("Help",1);
+	if(menu_item("Decker Website..."  ,1,'\0'))n_go(deck,l_list(lmcstr("http://beyondloom.com/decker/index.html"          )));
+	if(menu_item("Decker Community...",1,'\0'))n_go(deck,l_list(lmcstr("https://internet-janitor.itch.io/decker/community")));
+	if(menu_item("Decker Reference...",1,'\0'))n_go(deck,l_list(lmcstr("http://beyondloom.com/decker/decker.html"         )));
+	if(menu_item("Lil Reference..."   ,1,'\0'))n_go(deck,l_list(lmcstr("http://beyondloom.com/decker/lil.html"            )));
 }
 
 void main_view(){

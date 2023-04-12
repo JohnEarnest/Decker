@@ -60,6 +60,7 @@ In order, the main menus are:
 - _Edit_: operations for altering the selected item, if any. Some options will change based on the selected _Tool_ (below).
 - _Card_: operations for altering the current card or navigating between cards.
 - _Tool_: choose between interacting with widgets, editing widgets, or drawing.
+- _Help_: open links to reference documentation and useful websites. Maybe this is how you got here?
 
 If you're exploring an existing deck, you will usually want to have the _Interact_ tool chosen, which allows you to click buttons and edit grids or fields. Widgets only produce [events](#events) and execute [scripts](#scripting) with this tool active.
 

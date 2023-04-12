@@ -1684,7 +1684,7 @@ modals=_=>{
 		else{draw_box(gsize,0,1),draw_textc(gsize,'Working...',FONT_BODY,1)}
 	}
 	else if(ms.type=='url'){
-		const b=draw_modalbox(rect(170,90))
+		const b=draw_modalbox(rect(200,90))
 		draw_textc(rect(b.x,b.y,b.w,20),'Do you wish to open this URL?',FONT_BODY,1)
 		ui_textedit(rect(b.x,b.y+20+5,b.w,40),1,ms.text)
 		const c=rect(b.x+b.w-(b.w-(2*60+5))/2-60,b.y+b.h-20)
@@ -3096,6 +3096,11 @@ all_menus=_=>{
 		menu_separator()
 		if(menu_item('Show Locals',1))listen_show(ALIGN.right,0,lmd(Object.keys(li.vars).map(lms),Object.values(li.vars)))
 	}
+	menu_bar('Help',1)
+	if(menu_item('Decker Website...'  ,1))n_go([lms('http://beyondloom.com/decker/index.html'          )],deck)
+	if(menu_item('Decker Community...',1))n_go([lms('https://internet-janitor.itch.io/decker/community')],deck)
+	if(menu_item('Decker Reference...',1))n_go([lms('http://beyondloom.com/decker/decker.html'         )],deck)
+	if(menu_item('Lil Reference...'   ,1))n_go([lms('http://beyondloom.com/decker/lil.html'            )],deck)
 }
 
 main_view=_=>{
