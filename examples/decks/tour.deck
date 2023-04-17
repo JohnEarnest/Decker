@@ -346,7 +346,7 @@ field2:{"type":"field","size":[272,42],"pos":[114,24],"locked":1,"font":"deckbui
 four:{"type":"canvas","size":[105,74],"pos":[70,83],"border":1,"brush":16,"pattern":35}
 board:{"type":"canvas","size":[96,93],"pos":[143,176],"script":"Canvases.1","show":"invert","image":"%%IMG0AAwADAAAf+BJIEkgTyBJIEkgTyBBIEEgf+AAAA==","scale":8}
 field3:{"type":"field","size":[63,26],"pos":[182,92],"locked":1,"border":0,"style":"plain","value":"a canvas you can draw on"}
-field4:{"type":"field","size":[62,43],"pos":[71,187],"locked":1,"border":0,"style":"plain","value":"a scaled canvas that acts like a pixel editor"}
+field4:{"type":"field","size":[62,44],"pos":[71,187],"locked":1,"border":0,"style":"plain","value":"a scaled canvas that acts like a pixel editor"}
 target:{"type":"canvas","size":[141,128],"pos":[297,130],"image":"%%IMG2AI0AgAD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wB/AQQAhgEHAAwBAgB1AQoADAEEAHEBDAAMAQYAcAEMAAoBCABvAQwACgEKAG4BCwAKAQwAbAELAAkBDQBtAQoACQEMAG4BCgAJAQsAcAEJAAkBCgBjAQEADQEJAAgBCwBiAQMADQEIAAgBCgBjAQQADQEHAAgBCQBjAQcACwEHAAcBCQBkAQgACwEHAAYBCABkAQoACgEHAAYBBwBlAQsACgEGAAUBCAAPAQIAUwENAAkBBgAFAQcADgEEAFMBDwAIAQUABQEGAA0BBgBSAREABwEFAAQBBgAMAQkAUAETAAcBBAAEAQUACwELAFIBEgAGAQQABAEEAAoBDQBVARAABgEDAAMBBQAIARAAVwEPAAQBAwADAQQABwESAFsBDAAEAQIAAwEDAAYBFABeAQoAAwEDAAIBAgAGARUAYQEIAAMBAgABAQIABQEYAGMBBgACAQIAAQEBAAQBGgBnAQQAAQEBAAEBAQACARIAdAEEAAEBCQD/AAUBCQABAQQAdAESAAIBAQABAQEAAQEEAGcBGgAEAQEAAQECAAIBBgBjARgABQECAAEBAgADAQgAYQEVAAYBAgACAQMAAwEKAF4BFAAGAQMAAwECAAQBDABbARIABwEEAAMBAwAEAQ8AVwEQAAgBBQADAQMABgEQAFUBDQAKAQQABAEEAAYBEgBSAQsACwEFAAQBBAAHARMAUAEJAAwBBgAEAQUABwERAFIBBgANAQYABQEFAAgBDwBTAQQADgEHAAUBBgAJAQ0AUwECAA8BCAAFAQYACgELAGUBBwAGAQcACgEKAGQBCAAGAQcACwEIAGQBCQAHAQcACwEHAGMBCQAIAQcADQEEAGMBCgAIAQgADQEDAGIBCwAIAQkADQEBAGMBCgAJAQkAcAELAAkBCgBuAQwACQEKAG0BDQAJAQsAbAEMAAoBCwBuAQoACgEMAG8BCAAKAQwAcAEGAAwBDABxAQQADAEKAHUBAgAMAQcAhgEEAP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wDw","scale":1}
 field5:{"type":"field","size":[102,24],"pos":[314,258],"locked":1,"border":0,"style":"plain","align":"center","value":"a canvas being drawn on by a card script"}
 field6:{"type":"field","size":[58,34],"pos":[274,75],"locked":1,"border":0,"style":"plain","value":"a canvas you can drag around"}
@@ -395,7 +395,7 @@ field2:{"type":"field","size":[272,42],"pos":[114,24],"locked":1,"font":"deckbui
 field6:{"type":"field","size":[52,24],"pos":[434,84],"locked":1,"border":0,"style":"plain","value":"a realtime clock"}
 field3:{"type":"field","size":[37,24],"pos":[437,193],"locked":1,"border":0,"style":"plain","value":"a date picker"}
 field4:{"type":"field","size":[56,34],"pos":[29,185],"locked":1,"border":0,"style":"plain","value":"resizable decorative borders"}
-field5:{"type":"field","size":[58,33],"pos":[26,98],"locked":1,"border":0,"style":"plain","value":"a die roller for board games"}
+field5:{"type":"field","size":[58,34],"pos":[26,98],"locked":1,"border":0,"style":"plain","value":"a die roller for board games"}
 
 {script:Contraptions.0}
 on change x do
