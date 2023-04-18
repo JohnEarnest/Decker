@@ -1317,7 +1317,7 @@ modal_enter=type=>{
 	}
 	if(type=='action'){
 		sc.target=ob.sel[0],sc.others=[]
-		ms.act_go=1,ms.act_gomode=4,ms.act_trans=0,ms.act_sound=0,ms.act_card=ln(ifield(ifield(deck,'card'),'index'))
+		ms.act_go=1,ms.act_gomode=5,ms.act_trans=0,ms.act_sound=0,ms.act_card=ln(ifield(ifield(deck,'card'),'index'))
 		ms.verb   =lms('') // card name
 		ms.message=lms('') // sound name
 		ms.grid=gridtab(transit_enumerate(),0)
@@ -1365,7 +1365,7 @@ modal_exit=value=>{
 		if(ms.act_sound)r+=`  play[${show(ms.message)}]\n`
 		if(ms.act_go){
 			r+='  go['
-			r+=ms.act_gomode==0?'"First"': ms.act_gomode==1?'"Prev"': ms.act_gomode==2?'"Next"': ms.act_gomode==3?'"Last"': show(ms.verb)
+			r+=ms.act_gomode==0?'"First"': ms.act_gomode==1?'"Prev"': ms.act_gomode==2?'"Next"': ms.act_gomode==3?'"Last"': ms.act_gomode==4?'"Back"': show(ms.verb)
 			if(ms.act_trans)r+=` ${show(ms.grid.table.v.value[ms.grid.row])}`
 			r+=']\n'
 		}r+='end',script_save(lms(r))
@@ -1975,10 +1975,10 @@ modals=_=>{
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='action'){
-		const b=draw_modalbox(rect(220,180))
+		const b=draw_modalbox(rect(220,190))
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Button Action',FONT_MENU,1)
 		const c=rect(b.x+b.w-60,b.y+b.h-20), cr=rect(b.x,b.y+36)
-		const ready=(ms.act_go||ms.act_sound)&&(ms.act_go?(ms.act_gomode!=4||count(ms.verb)):1)&&(ms.act_sound?count(ms.message):1)
+		const ready=(ms.act_go||ms.act_sound)&&(ms.act_go?(ms.act_gomode!=5||count(ms.verb)):1)&&(ms.act_sound?count(ms.message):1)
 		if(ui_button(rect(c.x,c.y,60,20),'OK',ready))modal_exit(1);c.x-=65
 		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_exit(0)
 		if(ui_checkbox(rint(rect(b.x,b.y+20,b.w/2,16)),'Go to Card',1,ms.act_go))ms.act_go^=1
@@ -1986,11 +1986,12 @@ modals=_=>{
 		if(ui_radio(rect(cr.x+5,cr.y,80,16),'Previous',ms.act_go,ms.act_gomode==1))ms.act_gomode=1;cr.y+=16
 		if(ui_radio(rect(cr.x+5,cr.y,80,16),'Next'    ,ms.act_go,ms.act_gomode==2))ms.act_gomode=2;cr.y+=16
 		if(ui_radio(rect(cr.x+5,cr.y,80,16),'Last'    ,ms.act_go,ms.act_gomode==3))ms.act_gomode=3;cr.y+=16
-		if(ui_radio(rect(cr.x+5,cr.y,45,16),'Pick:'   ,ms.act_go,ms.act_gomode==4))ms.act_gomode=4
-		if(ms.act_go&&ms.act_gomode==4){
+		if(ui_radio(rect(cr.x+5,cr.y,80,16),'Back'    ,ms.act_go,ms.act_gomode==4))ms.act_gomode=4;cr.y+=16
+		if(ui_radio(rect(cr.x+5,cr.y,45,16),'Pick:'   ,ms.act_go,ms.act_gomode==5))ms.act_gomode=5
+		if(ms.act_go&&ms.act_gomode==5){
 			const l=rect(cr.x+5+45,cr.y,b.w-5-45-5-60,16)
 			draw_hline(l.x,l.x+l.w,l.y+l.h,13),draw_text_fit(inset(l,1),ls(ms.verb),FONT_BODY,1)
-			if(ui_button(rect(b.x+b.w-60,cr.y,60,20),'Choose...',ms.act_go&&ms.act_gomode==4))ms.type='pick_card'
+			if(ui_button(rect(b.x+b.w-60,cr.y,60,20),'Choose...',ms.act_go&&ms.act_gomode==5))ms.type='pick_card'
 		}cr.y+=26;
 		if(ui_checkbox(rect(cr.x,cr.y,80,16),'Play a Sound',1,ms.act_sound))ms.act_sound^=1
 		if(ms.act_sound){
@@ -2003,7 +2004,7 @@ modals=_=>{
 		if(ms.act_go){
 			if(ui_checkbox(rint(rect(b.x+b.w/2,b.y+20,b.w/2-19,16)),'With Transition',1,ms.act_trans))ms.act_trans^=1
 			if(ms.act_trans){
-				ui_list(rect(b.x+b.w/2,b.y+36,b.w/2,55),ms.grid)
+				ui_list(rect(b.x+b.w/2,b.y+36,b.w/2,70),ms.grid)
 				const pv=rpair(rect(b.x+b.w-17,b.y+20),ms.canvas.size), pi=image_make(ms.canvas.size)
 				ms.trans=dget(deck.transit,ms.grid.table.v.value[ms.grid.row])
 				do_transition((frame_count%60)/60.0,pi,0),draw_scaled(pv,pi,1),draw_box(pv,0,1)
