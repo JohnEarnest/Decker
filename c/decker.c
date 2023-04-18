@@ -2044,19 +2044,19 @@ void modals(){
 			if(ui_button((rect){b.x+b.w-60,cr.y,60,20},"Choose...",ms.act_go&&ms.act_gomode==5))ms.type=modal_pick_card;
 		}cr.y+=26;
 		if(ui_checkbox((rect){cr.x,cr.y,80,16},"Play a Sound",1,ms.act_sound))ms.act_sound^=1;
-		if(ms.act_sound){
-			rect l={cr.x+5+75,cr.y,b.w-5-75-5-60,16};
-			draw_hline(l.x,l.x+l.w,l.y+l.h,13),draw_text_fit(inset(l,1),ms.message->sv,FONT_BODY,1);
-			if(ui_button((rect){b.x+b.w-60,cr.y,60,20},"Choose...",ms.act_sound)){
-				ms.act_transno=ms.grid.row,ms.grid=(grid_val){sounds_enumerate(),0,-1},ms.from_action=1,ms.type=modal_sounds;
-			}
-		}
 		if(ms.act_go){
 			if(ui_checkbox((rect){b.x+b.w/2,b.y+20,b.w/2-19,16},"With Transition",1,ms.act_trans))ms.act_trans^=1;
 			if(ms.act_trans){
 				ui_list((rect){b.x+b.w/2,b.y+36,b.w/2,70},&ms.grid);rect pv={b.x+b.w-17,b.y+20,17,13};
 				ms.trans=dget(dget(deck->b,lmistr("transit")),ms.grid.table->lv[0]->lv[ms.grid.row]);
 				do_transition((frame_count%60)/60.0,0),buffer_paste(pv,frame.clip,container_image(ms.canvas,1)->b,frame.buffer,1),draw_box(pv,0,1);
+			}
+		}
+		if(ms.act_sound){
+			rect l={cr.x+5+75,cr.y,b.w-5-75-5-60,16};
+			draw_hline(l.x,l.x+l.w,l.y+l.h,13),draw_text_fit(inset(l,1),ms.message->sv,FONT_BODY,1);
+			if(ui_button((rect){b.x+b.w-60,cr.y,60,20},"Choose...",ms.act_sound)){
+				ms.act_transno=ms.grid.row,ms.grid=(grid_val){sounds_enumerate(),0,-1},ms.from_action=1,ms.type=modal_sounds;
 			}
 		}
 	}

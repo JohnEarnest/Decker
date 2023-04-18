@@ -1994,13 +1994,6 @@ modals=_=>{
 			if(ui_button(rect(b.x+b.w-60,cr.y,60,20),'Choose...',ms.act_go&&ms.act_gomode==5))ms.type='pick_card'
 		}cr.y+=26;
 		if(ui_checkbox(rect(cr.x,cr.y,80,16),'Play a Sound',1,ms.act_sound))ms.act_sound^=1
-		if(ms.act_sound){
-			const l=rect(cr.x+5+75,cr.y,b.w-5-75-5-60,16)
-			draw_hline(l.x,l.x+l.w,l.y+l.h,13),draw_text_fit(inset(l,1),ls(ms.message),FONT_BODY,1)
-			if(ui_button(rect(b.x+b.w-60,cr.y,60,20),'Choose...',ms.act_sound)){
-				ms.act_transno=ms.grid.row,ms.grid=gridtab(sounds_enumerate()),ms.from_action=1,ms.type='sounds'
-			}
-		}
 		if(ms.act_go){
 			if(ui_checkbox(rint(rect(b.x+b.w/2,b.y+20,b.w/2-19,16)),'With Transition',1,ms.act_trans))ms.act_trans^=1
 			if(ms.act_trans){
@@ -2008,6 +2001,13 @@ modals=_=>{
 				const pv=rpair(rect(b.x+b.w-17,b.y+20),ms.canvas.size), pi=image_make(ms.canvas.size)
 				ms.trans=dget(deck.transit,ms.grid.table.v.value[ms.grid.row])
 				do_transition((frame_count%60)/60.0,pi,0),draw_scaled(pv,pi,1),draw_box(pv,0,1)
+			}
+		}
+		if(ms.act_sound){
+			const l=rect(cr.x+5+75,cr.y,b.w-5-75-5-60,16)
+			draw_hline(l.x,l.x+l.w,l.y+l.h,13),draw_text_fit(inset(l,1),ls(ms.message),FONT_BODY,1)
+			if(ui_button(rect(b.x+b.w-60,cr.y,60,20),'Choose...',ms.act_sound)){
+				ms.act_transno=ms.grid.row,ms.grid=gridtab(sounds_enumerate()),ms.from_action=1,ms.type='sounds'
 			}
 		}
 	}
