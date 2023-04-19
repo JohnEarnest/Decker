@@ -3481,6 +3481,7 @@ void all_menus(){
 		if(menu_item("Go to Previous",1,'\0'))n_go(deck,l_list(lmistr("Prev")));
 		if(menu_item("Go to Next"    ,1,'\0'))n_go(deck,l_list(lmistr("Next")));
 		if(menu_item("Go to Last"    ,1,'\0'))n_go(deck,l_list(lmistr("Last")));
+		if(menu_item("Go Back",dget(deck->b,lmistr("history"))->c>1,'\0'))n_go(deck,l_list(lmistr("Back")));
 		menu_separator();
 		if(menu_item("Cut Card" ,1,'\0')){SDL_SetClipboardText(ls(n_deck_copy(deck,l_list(card)))->sv);n_deck_remove(deck,l_list(card));mark_dirty();}
 		if(menu_item("Copy Card",1,'\0')){SDL_SetClipboardText(ls(n_deck_copy(deck,l_list(card)))->sv);}

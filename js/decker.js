@@ -2996,6 +2996,7 @@ all_menus=_=>{
 		if(menu_item('Go to Previous',1))n_go([lms('Prev' )],deck)
 		if(menu_item('Go to Next'    ,1))n_go([lms('Next' )],deck)
 		if(menu_item('Go to Last'    ,1))n_go([lms('Last' )],deck)
+		if(menu_item('Go Back',deck.history.length>1))n_go([lms('Back')],deck)
 		menu_separator()
 		if(menu_item('Cut Card',1,0,cutcard)){}
 		if(menu_item('Copy Card',1,0,copycard)){}
