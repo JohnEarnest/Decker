@@ -463,14 +463,20 @@ wid_state=_=>({ // widget state
 	cursor:rect(),cursor_timer:0,
 	hist:[],hist_cursor:0,
 })
+wid_state_clone=x=>{const r=Object.assign({},x);r.cursor=rcopy(r.cursor),r.hist=r.hist.slice(0);return r}
 let wid=wid_state()
-let ms={ // modal state
+modal_state=_=>({ // modal state
 	type:null,subtype:null,in_modal:0,edit_json:0,old_wid:null,
 	filter:0, grid:null,grid2:null, text:null,name:null,form0:null,form1:null,form2:null,
 	desc:'',path:'',filter:'', message:null,verb:null, cell:rect(),
 	from_listener:0,from_action:0, act_go:0,act_card:0,act_gomode:0,act_trans:0,act_transo:0,act_sound:0,
 	time_curr:0,time_end:0,time_start:0, carda:null,cardb:null,trans:null,canvas:null,
-}
+})
+modal_state_clone=x=>{const r=Object.assign({},x);r.cell=rcopy(r.cell);return r}
+let ms=modal_state(), ms_stack=[]
+modal_push=type=>{if(ms.type){ms_stack.push({ms:modal_state_clone(ms),wid:wid_state_clone(wid)})}modal_enter(type)}
+modal_pop=value=>{modal_exit(value);if(ms_stack.length){const c=ms_stack.pop();ms=c.ms,wid=c.wid}}
+
 let msg={ // interpreter event messages
 	pending_drag:0,pending_halt:0,pending_view:0,pending_loop:0,next_view:0,overshoot:0,
 	target_click:null,target_drag:null,target_release:null,target_order:null,target_run:null,target_link:null,target_change:null,target_navigate:null,
@@ -1520,12 +1526,12 @@ modals=_=>{
 			const l=layout_plaintext(PANGRAM,deck.fonts.v[ms.grid.row],ALIGN.left,rect(psize.w,psize.h));draw_text_wrap(psize,l,1)}
 		const c=rect(b.x+b.w-60,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,60,20),'OK',ms.grid.row>=0)||choose){
-			const nf=ms.grid.table.v.name[ms.grid.row];modal_exit(1)
-			if(uimode=='object'){ob_edit_prop('font',nf)}
-			else if(wid.ft&&wid.cursor.x!=wid.cursor.y){const c=wid.cursor;field_stylespan(nf,lms('')),wid.cursor=c,mark_dirty()}
+			const nf=ms.grid.table.v.name[ms.grid.row],nested=ms_stack.length>0;modal_pop(1)
+			if(uimode=='object'&&!nested){ob_edit_prop('font',nf)}
+			else if(wid.fv&&wid.cursor.x!=wid.cursor.y){const c=wid.cursor;field_stylespan(nf,lms('')),wid.cursor=c,mark_dirty()}
 			else if(wid.ft){iwrite(wid.ft,lms('font'),nf),wid.f=unpack_field(ms.old_wid.ft),wid.fv=unpack_field_value(ms.old_wid.ft),mark_dirty()}
 		};c.x-=65
-		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_exit(0)
+		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_pop(0)
 	}
 	else if(ms.type=='contraptions'||ms.type=='pick_contraption'){
 		const b=draw_modalbox(rect(250,170))
@@ -1697,10 +1703,10 @@ modals=_=>{
 		ui_field(rect(b.x,b.y+20+5,b.w,20),ms.text)
 		const c=rint(rect(b.x+b.w-(b.w-(2*60+5))/2-60,b.y+b.h-20))
 		if(ui_button(rect(c.x,c.y,60,20),'OK',1)){
-			const l=rtext_string(ms.text.table);modal_exit(0)
+			const l=rtext_string(ms.text.table);modal_pop(0)
 			const c=rcopy(wid.cursor);field_stylespan(lms(''),l),wid.cursor=c
 		};c.x-=65
-		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_exit(0)
+		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_pop(0)
 	}
 	else if(ms.type=='gridcell'){
 		const b=draw_modalbox(rect(170,70))
@@ -1890,13 +1896,14 @@ modals=_=>{
 		draw_text(rect(b.x,b.y+22,42,20),'Name',FONT_MENU,1)
 		draw_text(rect(b.x,b.y+42,42,60),'Text',FONT_MENU,1)
 		ui_field(rect(b.x+42,b.y+20,b.w-42,18),ms.name)
-		widget_field(null,{size:rect(b.x+42,b.y+40,b.w-42,58),font:p.font,show:'solid',scrollbar:1,border:1,style:'plain',align:p.align,locked:0},ms.text)
+		const style=ls(ifield(f,'style'))
+		widget_field(null,{size:rect(b.x+42,b.y+40,b.w-42,58),font:p.font,show:'solid',scrollbar:1,border:1,style,align:p.align,locked:0},ms.text)
 		iwrite(f,lms('name' ),rtext_string(ms.name.table))
 		iwrite(f,lms('value'),ms.text.table),mark_dirty()
 		let border=lb(ifield(f,'border')), scrollbar=lb(ifield(f,"scrollbar")), cb=rect(b.x,b.y+50+60)
 		if(ui_checkbox(rect(cb.x,cb.y,b.w,16),'Border'   ,1,border   )){border   ^=1,iwrite(f,lms('border'   ),lmn(border   )),mark_dirty()}cb.y+=16
 		if(ui_checkbox(rect(cb.x,cb.y,b.w,16),'Scrollbar',1,scrollbar)){scrollbar^=1,iwrite(f,lms('scrollbar'),lmn(scrollbar)),mark_dirty()}cb.y+=16
-		const style=ls(ifield(f,'style')), sb=rect(b.x,cb.y+10);let cp=0
+		const sb=rect(b.x,cb.y+10);let cp=0
 		if(ui_radio(rint(rect(sb.x,sb.y,b.w/2,16)),'Rich Text' ,1,style=='rich' )){iwrite(f,lms('style'),lms('rich' )),mark_dirty()     }sb.y+=16
 		if(ui_radio(rint(rect(sb.x,sb.y,b.w/2,16)),'Plain Text',1,style=='plain')){iwrite(f,lms('style'),lms('plain')),mark_dirty(),cp=1}sb.y+=16
 		if(ui_radio(rint(rect(sb.x,sb.y,b.w/2,16)),'Code'      ,1,style=='code' )){iwrite(f,lms('style'),lms('code' )),mark_dirty(),cp=1}sb.y+=16
@@ -2961,12 +2968,12 @@ all_menus=_=>{
 		}
 		if(wid.fv&&wid.f){
 			const selection=wid.fv!=null&&wid.cursor.x!=wid.cursor.y
-			menu_bar('Text',ms.type!='field_props')
+			menu_bar('Text',selection&&wid.f.style!='plain')
 			if(wid.f.style=='rich'){
 				if(menu_item('Heading'    ,selection))field_stylespan(lms('menu'),lms(''))
 				if(menu_item('Body'       ,selection))field_stylespan(lms(''    ),lms(''))
 				if(menu_item('Fixed Width',selection))field_stylespan(lms('mono'),lms(''))
-				if(menu_item('Link...'    ,selection))modal_enter('link')
+				if(menu_item('Link...'    ,selection))modal_push('link')
 			}
 			else if(wid.f.style=='code'){
 				if(menu_item('Indent'        ,1    ))field_indent(1)
@@ -2974,7 +2981,7 @@ all_menus=_=>{
 				if(menu_item('Toggle Comment',1,'/'))field_comment()
 			}
 			if(wid.f&&wid.f.style!='code'){
-				if(menu_item('Font...',wid.f.style!='plain'))modal_enter('fonts')
+				if(menu_item('Font...',wid.f.style!='plain'))modal_push('fonts')
 			}
 		}
 	}
