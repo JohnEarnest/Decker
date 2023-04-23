@@ -170,6 +170,17 @@ assert["array write field"  (11,22,33,44,55,66) cpy[13,6]]
 cpy.here:0
 assert["array read field"   "GIF89a" cpy.struct["char",6]]
 
+blob:array["%%DAT08J+SqQ=="]
+a:array[0 "u16l"]
+a.cat["TEXT"]
+a.cat[345,9000]
+a.cat[blob]
+b:array[0 "u16l"].cat["TEXT"].cat[345,9000].cat[blob]
+c:array[0 "u16l"].cat["TEXT" 345,9000 blob]
+assert["array cat"          "%%DAT3VEVYVFkBKCPwn5Kp" a.encoded]
+assert["array cat, chained" "%%DAT3VEVYVFkBKCPwn5Kp" b.encoded]
+assert["array cat, multi"   "%%DAT3VEVYVFkBKCPwn5Kp" c.encoded]
+assert["array cat payload"  "%%DAT38J+SqQ=="         c.slice[4].encoded]
 
 #######################################
 #

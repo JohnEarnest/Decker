@@ -729,6 +729,7 @@ While arrays do not benefit from the full range of operators Lil can bring to be
 | `x.slice[offset cast]` | Create a lightweight view of a subset of this array, potentially with a different cast.                                  |
 | `x.copy [offset cast]` | Create a new, distinct array by copying a subset of this array, potentially with a different cast.                       |
 | `x.struct[shape x]`    | Read or write structured values starting at `here` and post-incrementing `here` based on `shape`.                        |
+| `x.cat[x...]`          | Append one or more numbers, strings, lists, or arrays to this array, starting at and post-incrementing `here`.           |
 
 Several parts of the array interface take an `offset` argument. An `offset` may be either a single number (an index from the beginning of the array), or a pair of numbers (an index from the beginning of the array and a length). A single index refers to reading or writing a single value, whereas an index and length refer to reading or writing multiple values. For reads, multiple numbers will be read as a list, and any number of `char`s will be read as a Lil string. For writes, any sort of listy value (list, string, or _array_) will be truncated or padded with 0 to fit the specified length, and a single number will be replicated to fill the specified length.
 
@@ -762,6 +763,23 @@ gif.aspect     :"u8"      # pixel aspect ratio (almost always zero).
 
 header: bin.struct[gif]
 colors: bin.struct["u8",header.gct.present*3*2^header.gct.size+1]
+```
+
+The `cat[]` function can be viewed as a convenience wrapper for `struct[]` which makes it easier to concatenate together a series of values. Lists are interpreted as lists of numbers, all numbers are interpreted based on the `cast` of the destination array, strings are always interpreted as a series of `char` bytes, and appended arrays are interpreted based on their own `cast`. By the end of the following examples, `a`, `b`, and `c` contain equivalent data:
+```
+blob:array["%%DAT08J+SqQ=="]
+
+a:array[0 "u16l"]
+a.struct[("char",4) "TEXT"]
+a.struct[("u16l",2) 345,9000]
+a.struct[(blob.cast,blob.size) blob]
+
+b:array[0 "u16l"]
+b.cat["TEXT"]
+b.cat[345,9000]
+b.cat[blob]
+
+c:array[0 "u16l"].cat["TEXT" 345,9000 blob]
 ```
 
 

@@ -110,7 +110,7 @@ Built-in Functions
 | `image[x]`       | Create a new _image_ interface with size `x` (`(width,height)`) or decode an encoded image string.                          | Decker  |
 | `sound[x]`       | Create a new _sound_ interface with size `x` (sample count) or decode an encoded sound string.                              | Decker  |
 
-0) If `print[]` or `error[]` are given a single _array interface_ as an argument, the raw bytes of that array will be sent to _stdout_ or _stderr_, respectively, with no trailing newline. In this way it is possible to print characters which do not have a valid representation as Lil strings, like Unicode block characters.
+0) If `print[]` or `error[]` are given a single _array interface_ as an argument, the raw bytes of that array will be sent to _stdout_ or _stderr_, respectively, with no trailing newline added. In this way it is possible to print characters which do not have a valid representation as Lil strings, like Unicode block characters.
 
 1) `dir[]` of a file results in an empty table. Directory tables contain:
 - `dir`:  if an item is a directory `1`, and otherwise `0`.

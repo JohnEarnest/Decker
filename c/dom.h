@@ -1070,6 +1070,15 @@ lv* n_array_struct(lv*self,lv*z){
 	if(value&&a.here+size>=a.size){array_resize(self,a.here+size),a=unpack_array(self);}
 	lv*r=value?(struct_write(&a,shape,value),value):struct_read(&a,shape);dset(self->b,lmistr("here"),lmn(a.here));return r;
 }
+lv* n_array_cat(lv*self,lv*z){
+	array a=unpack_array(self);EACH(i,z){lv*v=z->lv[i];
+		lv*s=lin(v)     ?     lmistr(casts[a.cast])             :
+		     lil(v)     ?lml2(lmistr(casts[a.cast]),l_count(v)) :
+		     array_is(v)?lml2(ifield(v,"cast"),ifield(v,"size")):
+		     (v=ls(v),   lml2(lmistr("char")       ,l_count(v)));
+		n_array_struct(self,lml2(s,v));
+	}return self;
+}
 lv* array_write(lv*x){
 	if(!array_is(x))return lms(0);array a=unpack_array(x);int f=a.cast+'0';a.cast=0;
 	lv*r=lms(a.size);for(int z=0;z<a.size;z++)r->sv[z]=0xFF&(int)array_get_raw(a,z);return data_write("DAT",f,r);
@@ -1094,6 +1103,7 @@ lv* interface_array(lv*self,lv*i,lv*x){
 		ikey("struct" )return lmnat(n_array_struct,self);
 		ikey("slice"  )return lmnat(n_array_slice,self);
 		ikey("copy"   )return lmnat(n_array_copy,self);
+		ikey("cat"    )return lmnat(n_array_cat,self);
 	}return x?x:NONE;
 }
 

@@ -1163,7 +1163,7 @@ array_make=(size,cast,base,buffer)=>{
 	}
 	const set=(a,index,len,v)=>{
 		if(len<0)len=1
-		if(array_is(v)){for(let z=0;z<len;z++)set_raw(a,index+z,array_get_raw(b,z))}       // array copy
+		if(array_is(v)){for(let z=0;z<len;z++)set_raw(a,index+z,get_raw(v,z))}             // array copy
 		else if(lis(v)){for(let z=0;z<len;z++)set_raw(a,index+z,z>=count(v)?0:v.v[z])}     // copy chars up to len
 		else if(lil(v)){for(let z=0;z<len;z++)set_raw(a,index+z,z>=count(v)?0:ln(v.v[z]))} // copy numbers up to len
 		else{const vv=ln(v);for(let z=0;z<len;z++)set_raw(a,index+z,vv)}                   // spread a number up to len
@@ -1218,6 +1218,13 @@ array_make=(size,cast,base,buffer)=>{
 		const oc=a.cast, shape=z[0]||NONE, value=z[1], size=struct_size(shape);if(value&&a.here+size>=a.size)resize(a,a.here+size)
 		const r=value?(struct_write(a,shape,value),value):struct_read(a,shape);return a.cast=oc,r
 	}
+	const cat=(a,z)=>{
+		return z.map(v=>{
+			const s=lin(v)?lms(a.cast): lil(v)?lml([lms(a.cast),monad.count(v)]):
+			      array_is(v)?lml([ifield(v,'cast'),ifield(v,'size')]): (v=lms(ls(v)),lml([lms('char'),monad.count(v)]))
+			struct(a,[s,v])
+		}),a
+	}
 	const ri=lmi((self,i,x)=>{
 		if(!lis(i)){const o=offset(i);if(x){set(self,o.offset,o.len,x);return x;}else{return get(self,o.offset,o.len);}}
 		if(x){
@@ -1232,6 +1239,7 @@ array_make=(size,cast,base,buffer)=>{
 			if(ikey(i,'slice'  ))return lmnat(z=>slice (self,z))
 			if(ikey(i,'copy'   ))return lmnat(z=>copy  (self,z))
 			if(ikey(i,'struct' ))return lmnat(z=>struct(self,z))
+			if(ikey(i,'cat'    ))return lmnat(z=>cat   (self,z))
 		}return x?x:NONE
 	},'array')
 	ri.size=size*casts[cast],ri.here=0,ri.base=base,ri.cast=cast,ri.data=buffer||new Uint8Array(ri.size)
