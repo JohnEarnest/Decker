@@ -64,10 +64,13 @@ lv*runfile(char*path,lv*env){
 	struct stat st;if(stat(path,&st)){fprintf(stderr,"unable to open '%s'\n",path);return NONE;}
 	return runstring(n_read(NULL,l_list(lmcstr(path)))->sv,env);
 }
+lv* print_array(lv*arr,FILE*out){array a=unpack_array(arr);for(int z=0;z<a.size;z++)fputc(0xFF&(int)array_get_raw(a,z),out);return arr;}
+lv*n_print(lv*self,lv*a){(void)self;return a->c==1&&array_is(a->lv[0])?print_array(l_first(a),stdout):n_printf(a,1,stdout);}
+lv*n_error(lv*self,lv*a){(void)self;return a->c==1&&array_is(a->lv[0])?print_array(l_first(a),stderr):n_printf(a,1,stderr);}
+
 extern char **environ;
 
 void go_notify(lv*deck,lv*args,int dest){(void)deck,(void)args,(void)dest;}
-lv* n_print(lv*self,lv*a){(void)self;return n_printf(a,1,stdout);}
 lv* n_alert(lv*self,lv*z){(void)self,(void)z;return ONE;}
 lv* n_open (lv*self,lv*z){(void)self,(void)z;return lmistr("");}
 lv* n_save (lv*self,lv*z){(void)self,(void)z;return NONE;}

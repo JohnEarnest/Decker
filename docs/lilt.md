@@ -90,8 +90,8 @@ Built-in Functions
 | :--------------- | :-------------------------------------------------------------------------------------------------------------------------- | :------ |
 | `input[x]`       | Read a line from _stdin_ as a string, optionally displaying `x` as if with `print[]`, without the newline.                  | Console |
 | `show[x...]`     | Print a human-comprehensible representation of the value `x` to _stdout_ followed by a newline, and return `x`.             | Console |
-| `print[x...]`    | Print a string `x` to _stdout_ followed by a newline. If more args are provided, `format` all but the first using `x`.      | Console |
-| `error[x...]`    | Print a string `x` to _stderr_ followed by a newline. If more args are provided, `format` all but the first using `x`.      | Console |
+| `print[x...]`    | Print a string `x` to _stdout_ followed by a newline. If more args are provided, `format` all but the first using `x`.(0)   | Console |
+| `error[x...]`    | Print a string `x` to _stderr_ followed by a newline. If more args are provided, `format` all but the first using `x`.(0)   | Console |
 | `dir[x]`         | List the content of a directory as a table.(1)                                                                              | Files   |
 | `path[x y]`      | Canonical path `x` (joined with `y`, if given) via [realpath()](https://www.man7.org/linux/man-pages/man3/realpath.3.html). | Files   |
 | `read[x hint]`   | Read a file `x` using `hint` as necessary to control its interpretation.(2)                                                 | Files   |
@@ -109,6 +109,8 @@ Built-in Functions
 | `array[x y]`     | Create a new _array_ with size `x` and cast string `y`, or decode an encoded array string `x`.                              | Decker  |
 | `image[x]`       | Create a new _image_ interface with size `x` (`(width,height)`) or decode an encoded image string.                          | Decker  |
 | `sound[x]`       | Create a new _sound_ interface with size `x` (sample count) or decode an encoded sound string.                              | Decker  |
+
+0) If `print[]` or `error[]` are given a single _array interface_ as an argument, the raw bytes of that array will be sent to _stdout_ or _stderr_, respectively, with no trailing newline. In this way it is possible to print characters which do not have a valid representation as Lil strings, like Unicode block characters.
 
 1) `dir[]` of a file results in an empty table. Directory tables contain:
 - `dir`:  if an item is a directory `1`, and otherwise `0`.

@@ -981,7 +981,6 @@ lv*n_printf(lv*a,int newline,FILE*out){
 	else{a=l_format(ls(l_first(a)),l_drop(ONE,a));fprintf(out,"%s",a->sv);}
 	if(newline)fprintf(out,"\n");return a;
 }
-lv*n_error(lv*self,lv*a){(void)self;return n_printf(a,1,stderr);}
 #define fchar(x) (x=='I'?'i': x=='B'?'b': x=='L'?'s': x)
 lv*n_readcsv(lv*self,lv*a){
 	#define cm(x) t->sv[i]==x?(i++,1):0
