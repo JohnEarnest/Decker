@@ -88,7 +88,8 @@ runweb: web-decker
 
 .PHONY: docs
 docs:
-	@multimarkdown docs/lil.md    > docs/lil.html
-	@multimarkdown docs/lilt.md   > docs/lilt.html
-	@multimarkdown docs/decker.md > docs/decker.html
-	@multimarkdown docs/format.md > docs/format.html
+	@multimarkdown docs/lil.md         > docs/lil.html
+	@multimarkdown docs/lilt.md        > docs/lilt.html
+	@multimarkdown docs/decker.md      > docs/decker.html
+	@multimarkdown docs/format.md      > docs/format.html
+	@multimarkdown docs/lilquickref.md > docs/lilquickref.html
