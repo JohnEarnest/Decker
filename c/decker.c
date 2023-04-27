@@ -266,7 +266,11 @@ int no_menu(){return menu.active==-1&&menu.stick==-1;}
 int in_layer(){return no_menu()&&(ms.type?ms.in_modal:1)&&((!running()&&!msg.overshoot)||ms.type!=modal_none);}
 int in_widgets(){return ms.type!=modal_none?ms.in_modal:1;}
 
+// Clipboard
+
 char clip_stash[16]={0};
+lv* get_clip(){char*t=SDL_GetClipboardText();lv*r=lmcstr(t);SDL_free(t);return r;}
+void set_clip(lv*x){SDL_SetClipboardText(ls(x)->sv);}
 int has_clip(char*type){return strlen(clip_stash)>=strlen(type)&&memcmp(clip_stash,type,strlen(type))==0;}
 
 // Adaptation
@@ -333,7 +337,7 @@ int menus_off(){return lb(ifield(deck,"locked"))||(uimode==mode_draw&&ev.hidemen
 void menus_clear(){menu.active=-1,menu.stick=-1;}
 void menu_setup(){
 	menu.x=10,menu.head_count=0,menu.sz=(rect){0,0,0,0},menu.active=-1;
-	if(0==(frame_count%8)){char*t=SDL_GetClipboardText();snprintf(clip_stash,sizeof(clip_stash),"%s",t);SDL_free(t);}
+	if(0==(frame_count%8)){snprintf(clip_stash,sizeof(clip_stash),"%s",get_clip()->sv);}
 }
 void menu_bar(char*name,int enabled){
 	if(menus_off())enabled=0;
@@ -3226,15 +3230,15 @@ int interpret(){
 }
 void paste_any(){
 	if(has_clip("%%IMG")){if(menu_item("Paste Image",1,'v')){
-		char*t=SDL_GetClipboardText();lv*b=image_read(lmcstr(t))->b;SDL_free(t);setmode(mode_draw);bg_paste(b);
+		lv*b=image_read(get_clip())->b;setmode(mode_draw);bg_paste(b);
 	}}
 	else if(has_clip("%%WGT")){if(menu_item("Paste Widgets",1,'v')){
-		char*t=SDL_GetClipboardText();int f=1,i=6,n=strlen(t)-i;lv*v=pjson(t,&i,&f,&n);SDL_free(t);
+		lv*t=get_clip();int f=1,i=6,n=t->c-i;lv*v=pjson(t->sv,&i,&f,&n);
 		lv*defs=dget(v,lmistr("d")),*wids=dget(v,lmistr("w"));wids=wids?ll(wids):lml(0);
 		merge_prototypes(deck,defs?ld(defs):lmd(),wids),ob_create(wids);
 	}}
 	else if(has_clip("%%CRD")){if(menu_item("Paste Card",1,'v')){
-		char*t=SDL_GetClipboardText();lv*c=n_deck_paste(deck,l_list(lmcstr(t)));SDL_free(t);con_set(NULL);
+		lv*c=n_deck_paste(deck,l_list(get_clip()));con_set(NULL);
 		lv*card=ifield(deck,"card");int n=ln(ifield(card,"index"));iwrite(c,lmistr("index"),lmn(n+1));n_go(deck,l_list(c));
 	}}
 	else{menu_item("Paste",0,'v');}
@@ -3256,17 +3260,13 @@ void text_edit_menu(){
 	if(menu_item("Undo",wid.hist_cursor>0          ,'z'))field_undo();
 	if(menu_item("Redo",wid.hist_cursor<wid.hist->c,'Z'))field_redo();
 	menu_separator();
-	if(menu_item("Cut",selection,'x')){SDL_SetClipboardText(rtext_string(wid.fv->table,wid.cursor)->sv);field_keys(SDLK_DELETE,0);}
+	if(menu_item("Cut",selection,'x')){set_clip(rtext_string(wid.fv->table,wid.cursor));field_keys(SDLK_DELETE,0);}
 	if(menu_item("Copy",selection,'c')){
 		lv*s=rtext_span(wid.fv->table,wid.cursor),*i=rtext_is_image(s);
-		SDL_SetClipboardText((i?image_write(i):rtext_all(s))->sv);
+		set_clip((i?image_write(i):rtext_all(s)));
 	}
-	if(has_clip("%%IMG")&&rich&&menu_item("Paste Inline Image",wid.fv!=NULL,'v')){
-		char*t=SDL_GetClipboardText();field_edit(lmistr(""),image_read(lmcstr(t)),"i",wid.cursor);SDL_free(t);
-	}
-	else if(menu_item("Paste",wid.fv!=NULL&&strlen(clip_stash),'v')){
-		char*t=SDL_GetClipboardText();field_input(t);SDL_free(t);
-	}
+	if(has_clip("%%IMG")&&rich&&menu_item("Paste Inline Image",wid.fv!=NULL,'v')){field_edit(lmistr(""),image_read(get_clip()),"i",wid.cursor);}
+	else if(menu_item("Paste",wid.fv!=NULL&&strlen(clip_stash),'v')){field_input(get_clip()->sv);}
 	if(menu_item("Clear",wid.fv!=NULL,0)){wid.cursor=(pair){0,RTEXT_END};field_keys(SDLK_DELETE,0);}
 	menu_separator();
 	if(menu_item("Select All",wid.fv!=NULL,'a')){wid.cursor=(pair){0,RTEXT_END};}
@@ -3357,12 +3357,10 @@ void all_menus(){
 			if(menu_item("Redo",wid.hist_cursor<wid.hist->c,'Z'))grid_redo();
 			menu_separator();
 			if(menu_item("Copy Table",1,'c')){
-				SDL_SetClipboardText(n_writecsv(NULL,lml2(wid.gv->table,grid_format()))->sv);
+				set_clip(n_writecsv(NULL,lml2(wid.gv->table,grid_format())));
 			}
 			if(menu_item("Paste Table",mutable&&strlen(clip_stash),'v')){
-				char*t=SDL_GetClipboardText();
-				grid_edit(n_readcsv(NULL,lml2(lmcstr(t),lmcstr(wid.g.format))));
-				SDL_free(t);
+				grid_edit(n_readcsv(NULL,lml2(get_clip(),lmcstr(wid.g.format))));
 			}
 			menu_separator();
 			if(menu_item("Delete Row",mutable&&wid.gv->row!=-1,'\0'))grid_deleterow();
@@ -3383,11 +3381,11 @@ void all_menus(){
 			menu_separator();
 			if(menu_item("Cut Image",sel,'x')){
 				lv*i=bg_has_lasso()?buffer_mask(dr.limbo,dr.mask): dr.limbo?bg_scaled_limbo():bg_copy_selection(dr.sel_here);
-				bg_scoop_selection(),SDL_SetClipboardText(image_write(image_make(i))->sv);bg_delete_selection();
+				bg_scoop_selection(),set_clip(image_write(image_make(i)));bg_delete_selection();
 			}
 			if(menu_item("Copy Image",sel,'c' )){
 				lv*i=bg_has_lasso()?buffer_mask(dr.limbo,dr.mask): dr.limbo?bg_scaled_limbo():bg_copy_selection(dr.sel_here);
-				SDL_SetClipboardText(image_write(image_make(i))->sv);
+				set_clip(image_write(image_make(i)));
 			}
 			paste_any();
 			if(menu_item("Clear",1,'\0')){int t=dr.tool;if(!sel){settool(tool_select),dr.sel_here=con_dim();}bg_delete_selection();settool(t);}
@@ -3440,18 +3438,17 @@ void all_menus(){
 			if(menu_item("Undo",has_undo(),'z'))undo();
 			if(menu_item("Redo",has_redo(),'Z'))redo();
 			menu_separator();
-			if(menu_item("Cut Widgets" ,ob.sel->c,'x' )){ob_order();SDL_SetClipboardText(n_con_copy(con(),l_list(ob.sel))->sv);ob_destroy();}
-			if(menu_item("Copy Widgets",ob.sel->c,'c' )){ob_order();SDL_SetClipboardText(n_con_copy(con(),l_list(ob.sel))->sv);}
-			if(menu_item("Copy Image",ob.sel->c==1,'\0')){SDL_SetClipboardText(image_write(draw_widget(ob.sel->lv[0]))->sv);frame=context;}
+			if(menu_item("Cut Widgets" ,ob.sel->c,'x' )){ob_order();set_clip(n_con_copy(con(),l_list(ob.sel)));ob_destroy();}
+			if(menu_item("Copy Widgets",ob.sel->c,'c' )){ob_order();set_clip(n_con_copy(con(),l_list(ob.sel)));}
+			if(menu_item("Copy Image",ob.sel->c==1,'\0')){set_clip(image_write(draw_widget(ob.sel->lv[0])));frame=context;}
 			paste_any();
 			menu_separator();
 			if(menu_item("Paste as new Canvas",has_clip("%%IMG"),'\0')){
 				lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas")),dset(p,lmistr("locked"),ONE);
-				char*t=SDL_GetClipboardText();dset(p,lmistr("image"),lmcstr(t));SDL_free(t);
-				ob_create(l_list(p));frame=context;
+				dset(p,lmistr("image"),get_clip()),ob_create(l_list(p));frame=context;
 			}
 			if(menu_item("Paste into Canvas",has_clip("%%IMG")&&ob.sel->c==1&&canvas_is(ob.sel->lv[0]),'\0')){
-				char*t=SDL_GetClipboardText();lv*i=image_read(lmcstr(t));SDL_free(t);
+				lv*i=image_read(get_clip());
 				lv*c=ob.sel->lv[0];iwrite(c,lmistr("size"),ifield(i,"size")),dset(c->b,lmistr("image"),i);
 			}
 			menu_separator();
@@ -3485,10 +3482,10 @@ void all_menus(){
 		if(menu_item("Undo",au.hist_cursor>0         ,'z'))sound_undo();
 		if(menu_item("Redo",au.hist_cursor<au.hist->c,'Z'))sound_redo();
 		menu_separator();
-		if(menu_item("Cut Sound"  ,1,'x' )){SDL_SetClipboardText(sound_write(sound_selected())->sv);sound_delete();}
-		if(menu_item("Copy Sound" ,1,'c' )){SDL_SetClipboardText(sound_write(sound_selected())->sv);}
+		if(menu_item("Cut Sound"  ,1,'x' )){set_clip(sound_write(sound_selected()));sound_delete();}
+		if(menu_item("Copy Sound" ,1,'c' )){set_clip(sound_write(sound_selected()));}
 		if(menu_item("Paste Sound",has_clip("%%SND"),'v')){
-			char*t=SDL_GetClipboardText();lv*s=sound_read(lmcstr(t));SDL_free(t);
+			lv*s=sound_read(get_clip());
 			lv*r=sound_slice((pair){0,au.sel.x});int i=au.sel.x; au.head=i;
 			for(int z=0       ;z<s->b->c        &&i<(10*SFX_RATE);z++)r->b->sv[i++]=s->b->sv[z];int a=i;
 			for(int z=au.sel.y;z<au.target->b->c&&i<(10*SFX_RATE);z++)r->b->sv[i++]=au.target->b->sv[z];
@@ -3507,8 +3504,8 @@ void all_menus(){
 		if(menu_item("Go to Last"    ,1,'\0'))n_go(deck,l_list(lmistr("Last")));
 		if(menu_item("Go Back",dget(deck->b,lmistr("history"))->c>1,'\0'))n_go(deck,l_list(lmistr("Back")));
 		menu_separator();
-		if(menu_item("Cut Card" ,1,'\0')){SDL_SetClipboardText(ls(n_deck_copy(deck,l_list(card)))->sv);n_deck_remove(deck,l_list(card));mark_dirty();}
-		if(menu_item("Copy Card",1,'\0')){SDL_SetClipboardText(ls(n_deck_copy(deck,l_list(card)))->sv);}
+		if(menu_item("Cut Card" ,1,'\0')){set_clip(ls(n_deck_copy(deck,l_list(card))));n_deck_remove(deck,l_list(card));mark_dirty();}
+		if(menu_item("Copy Card",1,'\0')){set_clip(ls(n_deck_copy(deck,l_list(card))));}
 		menu_separator();
 		if(menu_item("Script..."    ,1,'e'))setscript(card);
 		if(menu_item("Properties...",1,'\0'))modal_enter(modal_card_props);
