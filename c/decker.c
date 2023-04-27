@@ -36,7 +36,6 @@ cstate context;
 SDL_Window  *win;
 SDL_Renderer*ren;
 SDL_Texture *gfx,*gtool;
-SDL_Joystick*joy=NULL;
 SDL_mutex*gil=NULL;
 
 int nosound=0, autosave=0, noscale=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
@@ -3881,6 +3880,6 @@ int main(int argc,char**argv){
 	}
 	if(base)SDL_free(base);
 	if(!deck){str doc=str_new();str_add(&doc,(char*)examples_decks_tour_deck,examples_decks_tour_deck_len);load_deck(deck_get(lmstr(doc)));}
-	SDL_JoystickEventState(SDL_ENABLE),SDL_AddTimer((1000/60),tick_pump,NULL);if(!nosound)sfx_init();
+	SDL_AddTimer((1000/60),tick_pump,NULL);if(!nosound)sfx_init();
 	while(1){tick(env);sync();}
 }
