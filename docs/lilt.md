@@ -193,3 +193,7 @@ v1.10:
 
 v1.14:
 - introduced `read[]` hints for decoding the frames of animated GIF images.
+
+v1.18:
+- generalized `print[]` and `error[]` to accept a array interfaces as arguments.
+
