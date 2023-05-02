@@ -13,7 +13,7 @@ lv*CHECK,*LOCK,*ANIM,*ZOOM,*CHECKS[4],*CORNERS[4],*RADIOS[4],*ICONS[8],*GESTURES
 lv*FONT_BODY,*FONT_MENU,*FONT_MONO,*TOOLS,*ARROWS,*TOOLB,*PLAYING,*ATTRS;
 enum mini_icons {icon_dir,icon_doc,icon_sound,icon_font,icon_app,icon_lil,icon_pat,icon_chek,icon_none};
 enum cursor_styles {cursor_default,cursor_point,cursor_ibeam,cursor_drag};
-SDL_Cursor*CURSORS[4]; int uicursor=0, enable_gestures=0, profiler=0;
+SDL_Cursor*CURSORS[4]; int uicursor=0, enable_gestures=0, enable_keycaps=0, profiler=0;
 
 char*TOOL_ICONS=
 	"%%IMG0ABAAwAMABIAEgASABIAEgGTwlKxMqiQKJAIQAggCCAQEBAQEAAAAAAAAAAA//EACgAGAAYABgAFAAz/+H/wAAAAAAA"
@@ -80,7 +80,7 @@ typedef struct {
 #define DOUBLE_CLICK_DELAY 20
 enum dirs{dir_none,dir_left,dir_right,dir_up,dir_down};
 typedef struct {
-	int mu,md, clicktime;
+	int mu,md, clicktime, down_modal, down_uimode, down_caps;
 	int click, rdown, rup; pair pos, rawpos, opos;
 	int dclick, clicklast;
 	int drag;  pair dpos, rawdpos, odpos;
@@ -234,13 +234,13 @@ typedef struct {
 	grid_val grid,grid2;field_val text,name,form0,form1,form2;
 	char*desc;char path[PATH_MAX];
 	lv*message,*verb;pair cell;
-	int from_listener, from_action;
+	int from_listener, from_action, from_keycaps;
 	int act_go, act_card, act_gomode, act_trans, act_transno, act_sound;
 	int time_curr, time_end; lv*carda, *cardb, *trans, *canvas;
 } modal_state; modal_state ms={0};
 typedef struct {modal_state ms;widget_state wid;} modal_context;
 modal_context ms_stack[8]={0};int ms_index=0;
-void modal_enter(int type);void modal_exit(int value); // forward refs
+void modal_enter(int type);void modal_exit(int value);void field_stylespan(lv*font,lv*arg); // forward refs
 void modal_push(int type){
 	if(ms.type!=modal_none){
 		ms_stack[ms_index]=(modal_context){ms,wid};
@@ -253,6 +253,7 @@ void modal_push(int type){
 	}modal_enter(type);
 }
 void modal_pop(int value){
+	lv*l=(ms.type==modal_link&&value)?rtext_all(ms.text.table):NULL;
 	modal_exit(value);if(ms_index>0){
 		ms_index--,ms=ms_stack[ms_index].ms,wid=ms_stack[ms_index].wid;
 		#define unswizzle_slot(x,slot) if(x==&ms_stack[ms_index].slot)x=&slot;
@@ -261,10 +262,15 @@ void modal_pop(int value){
 		unswizzle_slot(ms.old_wid.gv,ms.old_wid.gv_slot)
 		unswizzle_slot(ms.old_wid.fv,ms.old_wid.fv_slot)
 	}
+	if(l){pair c=wid.cursor;field_stylespan(lmistr(""),l);wid.cursor=c;}
 }
 int no_menu(){return menu.active==-1&&menu.stick==-1;}
 int in_layer(){return no_menu()&&(ms.type?ms.in_modal:1)&&((!running()&&!msg.overshoot)||ms.type!=modal_none);}
 int in_widgets(){return ms.type!=modal_none?ms.in_modal:1;}
+
+typedef struct {int shift,lock,on;char*heading;} keycaps_state;keycaps_state kc={0};
+int keydown[4096]={0};
+void keycaps_enter(){if(!enable_keycaps||kc.on)return;kc.shift=0,kc.lock=0,kc.on=1,ev.mu=ev.md=0;}
 
 // Clipboard
 
@@ -399,7 +405,7 @@ void grid_exit(){
 	if(wid.hist)wid.hist->c=0,wid.hist_cursor=0;
 }
 void field_exit(){
-	field_change();
+	field_change();kc.on=0;
 	wid.infield=0,wid.fv=NULL,wid.ft=NULL,wid.cursor=(pair){0,0};
 	if(wid.hist)wid.hist->c=0,wid.hist_cursor=0;
 	wid.field_dirty=0,wid.change_timer=0;
@@ -434,7 +440,7 @@ void finish_script(){if(sc.next){setscript(sc.next),sc.next=NULL;}else{setmode(s
 void widget_setup(){
 	if(ev.mu||wid.active==-1)wid.col_drag=0;
 	if(wid.active>=wid.count)wid.active=0;
-	if((uimode==mode_interact||ms.type!=modal_none)&&ev.tab&&wid.count&&!(wid.infield&&wid.f.style==field_code)){
+	if((uimode==mode_interact||ms.type!=modal_none)&&ev.tab&&wid.count&&!(wid.infield&&wid.f.style==field_code)&&!kc.on){
 		if(wid.ingrid)grid_exit();
 		if(wid.infield)field_exit();
 		wid.active+=ev.shift?-1:1;
@@ -751,10 +757,10 @@ void widget_field(lv*target,field x,field_val*value){
 		}
 		rect c=layout_cursor(wid.cursor.y,fnt,x);c.y-=value->scroll;int ch=MIN(bi.h,c.h);
 		if(c.y<0)value->scroll-=4;if(c.y+ch>bi.h)value->scroll+=CLAMP(1,(c.y+ch)-bi.h,4); // drag to scroll!
-		if(!sel&&wid.fv)field_exit(); wid.active=wid.count,sel=1;
+		if(!sel&&wid.fv&&!kc.on)field_exit(); wid.active=wid.count,sel=1;
 	}
-	if(sel&&in_layer()&&!over(b)&&ev.md){sel=0;wid.active=-1;field_exit();}
-	if(sel){if(wid.gv)grid_exit();wid.infield=1,wid.f=x,wid.fv=value,wid.ft=target;}
+	if(sel&&in_layer()&&!over(b)&&ev.md&&!kc.on){sel=0;wid.active=-1;field_exit();}
+	if(sel){if(wid.gv)grid_exit();wid.infield=1,wid.f=x,wid.fv=value,wid.ft=target;keycaps_enter();}
 	// render
 	rect bc=box_intersect(frame.clip,bi); rect oc=frame.clip;frame.clip=bc; char*pal=patterns_pal(ifield(deck,"patterns"));
 	for(int z=0;z<layout_count;z++){
@@ -987,7 +993,7 @@ lv* draw_lil(pair size,int align,int bare,lv*x){
 
 // The Listener
 
-#define LISTEN_W (frame.size.x-20)
+#define LISTEN_W (frame.size.x-22)
 #define LISTEN_H 100
 void listen_show(int align,int bare,lv*x){
 	frame=context;while(li.hist->c>=LISTEN_LINES)ll_unshift(li.hist);
@@ -1014,6 +1020,32 @@ lv* n_post_listen(lv*self,lv*a){
 }
 lv* n_post_query(lv*self,lv*a){
 	(void)self;ms.grid=(grid_val){lt(a),0,-1};return a;
+}
+void listener_eval(){
+	lv*str=rtext_all(ms.text.table);if(str->c<1)return;
+	lv*prog=parse(str->sv);if(perr()){char e[4096];snprintf(e,sizeof(e),"error: %s",par.error);listen_show(align_right,1,lmcstr(e));return;}
+	ms.text=(field_val){rtext_cast(lmistr("")),0};listen_show(align_left,1,str);lv*b=lmblk();
+	lv*target=uimode==mode_script?sc.target: ob.sel->c==1?ob.sel->lv[0]: con();
+	blk_lit(b,lmnat(n_pre_listen ,NULL)),blk_lit(b,NONE),blk_op(b,CALL),blk_op(b,DROP);blk_cat(b,prog);
+	blk_lit(b,lmnat(n_post_listen,NULL)),blk_op (b,SWAP),blk_op(b,CALL),blk_op(b,DROP);fire_hunk_async(target,b);
+}
+void listener(rect r){
+	int th=0;EACH(z,li.hist)th+=buff_size(li.hist->lv[z]->lv[0]).y+5;int h=MIN(th,LISTEN_H);
+	rect esize={r.x+(r.w-LISTEN_W)/2,r.y+r.h-49,LISTEN_W,50};
+	rect tsize={esize.x,esize.y-(h?h+5:0),esize.w,h};
+	rect bsize={esize.x-5,esize.y-5-(h?tsize.h+5:0),esize.w+10,(h?tsize.h+5:0)+esize.h+20};
+	char*pal=patterns_pal(ifield(deck,"patterns"));
+	draw_shadow(bsize,1,32,1),ui_codeedit(esize,1,&ms.text);
+	if(h){
+		rect b=scrollbar(tsize,MAX(0,th-LISTEN_H),10,tsize.h,&li.scroll,h>=LISTEN_H,0);
+		int cy=0;EACH(z,li.hist){
+			lv*l=li.hist->lv[z]->lv[0],*t=li.hist->lv[z]->lv[1]; pair s=buff_size(l); rect lb={b.x,b.y+cy-li.scroll,s.x,s.y};
+			buffer_paste(lb,b,l,frame.buffer,0);cy+=s.y+5;
+			lb=box_intersect(b,lb);int v=lis(t)&&over(lb), a=v&&dover(lb);
+			if(v)uicursor=cursor_point,draw_box(inset(lb,-1),0,13); if(a&&(ev.md||ev.drag))draw_invert(pal,lb);
+			if(a&&ev.mu)ms.text=(field_val){rtext_cast(t),0};
+		}
+	}
 }
 
 // Audio Editor
@@ -1149,7 +1181,6 @@ void do_transition(float tween,int errors){
 	popstate(),SDL_UnlockMutex(gil);frame=f;sleep_play=0,sleep_frames=0;
 }
 
-
 // Modal Dialogues
 
 void modal_enter(int type){
@@ -1157,11 +1188,13 @@ void modal_enter(int type){
 	menus_clear(); // modals may have their own menus; clear selection as a sanity-check.
 	if(ms.type==modal_trans)return;
 	ms.from_listener=ms.type==modal_listen;
+	ms.from_keycaps=kc.on;
 	ms.type=ms.subtype=type;
 	ms.old_wid=wid;
 	if(wid.gv==&wid.gv_slot)ms.old_wid.gv=&ms.old_wid.gv_slot;
 	if(wid.fv==&wid.fv_slot)ms.old_wid.fv=&ms.old_wid.fv_slot;
 	wid=(widget_state){0};wid.hist=lml(0);
+	if(enable_keycaps){wid.active=type==modal_link||type==modal_gridcell||type==modal_listen?0:-1;}
 	if(type==modal_query){
 		ms.grid=(grid_val){ms.old_wid.gv->table,0,-1};
 		ms.text=(field_val){rtext_cast(lmistr("select from me.value")),0};
@@ -1476,6 +1509,7 @@ void modal_exit(int value){
 	if(ms.subtype==modal_choose_lil ){arg();ret(ms.verb->lv[ms.grid.row]);}
 	ms.type=modal_none;
 	if(ms.from_listener)modal_enter(modal_listen);
+	if(enable_keycaps&&ms.from_keycaps)kc.on=1;
 	if(ms.type==modal_none&&uimode==mode_interact)msg.next_view=1;
 }
 void modals(){
@@ -1490,29 +1524,8 @@ void modals(){
 		snprintf(v,sizeof(v),"built on %s, %s",__DATE__,__TIME__);draw_text(b,v,FONT_BODY,1);
 	}
 	else if(ms.type==modal_listen){
-		int th=0;EACH(z,li.hist)th+=buff_size(li.hist->lv[z]->lv[0]).y+5;int h=MIN(th,LISTEN_H);
-		rect esize={(frame.size.x-LISTEN_W)/2,frame.size.y-49,LISTEN_W,50};
-		rect tsize={esize.x,esize.y-(h?h+5:0),esize.w,h};
-		rect bsize={esize.x-5,esize.y-5-(h?tsize.h+5:0),esize.w+10,(h?tsize.h+5:0)+esize.h+20};
-		draw_shadow(bsize,1,32,1),ui_codeedit(esize,1,&ms.text);
-		if(h){
-			rect b=scrollbar(tsize,MAX(0,th-LISTEN_H),10,tsize.h,&li.scroll,h>=LISTEN_H,0);
-			int cy=0;EACH(z,li.hist){
-				lv*l=li.hist->lv[z]->lv[0],*t=li.hist->lv[z]->lv[1]; pair s=buff_size(l); rect lb={b.x,b.y+cy-li.scroll,s.x,s.y};
-				buffer_paste(lb,b,l,frame.buffer,0);cy+=s.y+5;
-				lb=box_intersect(b,lb);int v=lis(t)&&over(lb), a=v&&dover(lb);
-				if(v)uicursor=cursor_point,draw_box(inset(lb,-1),0,13); if(a&&(ev.md||ev.drag))draw_invert(pal,lb);
-				if(a&&ev.mu)ms.text=(field_val){rtext_cast(t),0};
-			}
-		}
-		if(ev.eval){
-			lv*str=rtext_all(ms.text.table);if(str->c<1)return;
-			lv*prog=parse(str->sv);if(perr()){char e[4096];snprintf(e,sizeof(e),"error: %s",par.error);listen_show(align_right,1,lmcstr(e));return;}
-			ms.text=(field_val){rtext_cast(lmistr("")),0};listen_show(align_left,1,str);lv*b=lmblk();
-			lv*target=uimode==mode_script?sc.target: ob.sel->c==1?ob.sel->lv[0]: con();
-			blk_lit(b,lmnat(n_pre_listen ,NULL)),blk_lit(b,NONE),blk_op(b,CALL),blk_op(b,DROP);blk_cat(b,prog);
-			blk_lit(b,lmnat(n_post_listen,NULL)),blk_op (b,SWAP),blk_op(b,CALL),blk_op(b,DROP);fire_hunk_async(target,b);
-		}if(ev.exit)modal_exit(0);
+		if(!kc.on){listener((rect){0,0,frame.size.x,frame.size.y});if(ev.eval)listener_eval();}
+		if(ev.exit)modal_exit(0);
 	}
 	else if(ms.type==modal_cards){
 		rect b=draw_modalbox((pair){210,frame.size.y-46});
@@ -1722,18 +1735,15 @@ void modals(){
 	}
 	else if(ms.type==modal_link){
 		rect b=draw_modalbox((pair){170,70});
-		draw_textc((rect){b.x,b.y,b.w,20},"Enter a link string for\nthe selected text span:",FONT_BODY,1);
+		draw_textc((rect){b.x,b.y,b.w,20},kc.heading="Enter a link string for\nthe selected text span:",FONT_BODY,1);
 		ui_field((rect){b.x,b.y+20+5,b.w,20},&ms.text);
 		pair c={b.x+b.w-(b.w-(2*60+5))/2-60,b.y+b.h-20};
-		if(ui_button((rect){c.x,c.y,60,20},"OK",1)){
-			lv*l=rtext_all(ms.text.table);modal_pop(0);
-			pair c=wid.cursor;field_stylespan(lmistr(""),l);wid.cursor=c;
-		};c.x-=65;
+		if(ui_button((rect){c.x,c.y,60,20},"OK",1))modal_pop(1);c.x-=65;
 		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_pop(0);
 	}
 	else if(ms.type==modal_gridcell){
 		rect b=draw_modalbox((pair){170,70});
-		draw_textc((rect){b.x,b.y,b.w,20},"Enter a new value for\nthe selected cell:",FONT_BODY,1);
+		draw_textc((rect){b.x,b.y,b.w,20},kc.heading="Enter a new value for\nthe selected cell:",FONT_BODY,1);
 		ui_field((rect){b.x,b.y+20+5,b.w,20},&ms.text);
 		pair c={b.x+b.w-(b.w-(2*60+5))/2-60,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,60,20},"OK",1))modal_exit(1);c.x-=65;
@@ -2190,8 +2200,8 @@ void validate_modules(){
 		break;
 	}
 }
-void script_editor(){
-	int mh=3+font_h(FONT_MENU);rect b={0,mh,frame.size.x+1,frame.size.y-2*mh};
+void script_editor(rect r){
+	int mh=3+font_h(FONT_MENU);
 	lv*overw=NULL;if(sc.xray){
 		lv*wids=con_wids();EACH(z,wids){
 			lv*wid=wids->lv[z];rect size=con_to_screenr(unpack_widget(wid).size);
@@ -2201,9 +2211,9 @@ void script_editor(){
 			if(ev.alt&&ev.mu&&over(size)&&dover(size)){close_script(wid);ev.md=ev.mu=0;break;}
 		}if(ev.alt&&ev.mu)close_script(con()),ev.md=ev.mu=0;
 	}
-	ui_codeedit(b,0,&sc.f),draw_hline(0,frame.size.x,frame.size.y-mh-1,1);
+	ui_codeedit((rect){r.x,r.y,r.w,r.h-mh},0,&sc.f),draw_hline(r.x,r.x+r.w,r.y+r.h-mh-1,1);
 	if(overw){uicursor=cursor_point;draw_textc(con_to_screenr(unpack_widget(overw).size),ifield(overw,"name")->sv,FONT_BODY,-1);}
-	if(strlen(sc.status)){draw_text_fit((rect){3,frame.size.y-mh+3,frame.size.x,mh-6},sc.status,FONT_BODY,1);}
+	if(strlen(sc.status)){draw_text_fit((rect){r.x+3,r.y+r.h-mh+3,r.w,mh-6},sc.status,FONT_BODY,1);}
 	else{
 		char stat[4096]={0};
 		if(in_layer()&&wid.infield){
@@ -2213,12 +2223,84 @@ void script_editor(){
 				snprintf(stat,sizeof(stat),"%d line%s, %d character%s selected",l,l==1?"":"s",c,c==1?"":"s");
 			}else{pair p=field_position(MIN(a,b));snprintf(stat,sizeof(stat),"Line %d, Column %d",p.x,p.y);}
 		}
-		pair l=font_textsize(FONT_BODY,stat);draw_text((rect){3,frame.size.y-mh+3,l.x,l.y},stat,FONT_BODY,1);
+		pair l=font_textsize(FONT_BODY,stat);draw_text((rect){3,r.y+r.h-mh+3,l.x,l.y},stat,FONT_BODY,1);
 		if(sc.others->c){snprintf(stat,sizeof(stat),"script of %s  '%s' and %d more",sc.target->a->sv,ifield(sc.target,"name")->sv,sc.others->c);}
 		else{snprintf(stat,sizeof(stat),"script of %s  '%s'",sc.target->a->sv,ifield(sc.target,"name")->sv);}
-		pair t=layout_plaintext(stat,FONT_BODY,align_right,(pair){frame.size.x-6-20-l.x,font_h(FONT_BODY)});
-		draw_text_wrap((rect){3+l.x+20,frame.size.y-mh+3,t.x,t.y},1);
+		pair t=layout_plaintext(stat,FONT_BODY,align_right,(pair){r.x+r.w-6-20-l.x,font_h(FONT_BODY)});
+		draw_text_wrap((rect){3+l.x+20,r.y+r.h-mh+3,t.x,t.y},1);
 	}if(in_layer()&&ev.exit)close_script(NULL),ev.exit=0;
+}
+
+// Keycaps
+
+typedef struct {int v;char*l;float w;} keycap;
+typedef struct {int c;keycap caps[16];} keyrow;
+#define K(x,l) {(x-' ')+SDLK_SPACE,l,1.0}
+#define KS(x,l,w) {x,l,w}
+#define KROWS 5
+keyrow LCAPS[KROWS]={
+	{14,{K('`',"`"),K('1',"1"),K('2',"2"),K('3',"3"),K('4',"4"),K('5',"5"),K('6',"6"),K('7',"7"),K('8',"8"),K('9',"9"),K('0',"0"),K('-',"-"),K('=',"="),KS(SDLK_BACKSPACE,"delete",1.5)}},
+	{14,{KS(SDLK_TAB,"tab",1.5),K('q',"q"),K('w',"w"),K('e',"e"),K('r',"r"),K('t',"t"),K('y',"y"),K('u',"u"),K('i',"i"),K('o',"o"),K('p',"p"),K('[',"["),K(']',"]"),K('\\',"\\")}},
+	{13,{KS(SDLK_CAPSLOCK,"capslock",2),K('a',"a"),K('s',"s"),K('d',"d"),K('f',"f"),K('g',"g"),K('h',"h"),K('j',"j"),K('k',"k"),K('l',"l"),K(';',";"),K('\'',"'"),KS(SDLK_RETURN,"return",2)}},
+	{12,{KS(SDLK_LSHIFT,"shift",2.5),K('z',"z"),K('x',"x"),K('c',"c"),K('v',"v"),K('b',"b"),K('n',"n"),K('m',"m"),K(',',","),K('.',"."),K('/',"/"),KS(SDLK_RSHIFT,"shift",2.5)}},
+	{8,{KS(SDLK_LEFT,"",1),KS(SDLK_DOWN,"",1),KS(SDLK_UP,"",1),KS(SDLK_RIGHT,"",1),KS(0,"",1),KS(SDLK_SPACE," ",5),KS(0,"",1),KS(-1,"OK",4)}},
+};
+keyrow UCAPS[KROWS]={
+	{14,{K('~',"~"),K('!',"!"),K('@',"@"),K('#',"#"),K('$',"$"),K('%',"%"),K('^',"^"),K('&',"&"),K('*',"*"),K('(',"("),K(')',")"),K('_',"_"),K('+',"+"),KS(SDLK_BACKSPACE,"delete",1.5)}},
+	{14,{KS(SDLK_TAB,"tab",1.5),K('Q',"Q"),K('W',"W"),K('E',"E"),K('R',"R"),K('T',"T"),K('Y',"Y"),K('U',"U"),K('I',"I"),K('O',"O"),K('P',"P"),K('{',"{"),K('}',"}"),K('|',"|")}},
+	{13,{KS(SDLK_CAPSLOCK,"capslock",2.0),K('A',"A"),K('S',"S"),K('D',"D"),K('F',"F"),K('G',"G"),K('H',"H"),K('J',"J"),K('K',"K"),K('L',"L"),K(':',":"),K('"',"\""),KS(SDLK_RETURN,"return",2)}},
+	{12,{KS(SDLK_LSHIFT,"shift",2.5),K('Z',"Z"),K('X',"X"),K('C',"C"),K('V',"V"),K('B',"B"),K('N',"N"),K('M',"M"),K('<',"<"),K('>',">"),K('?',"?"),KS(SDLK_RSHIFT,"shift",2.5)}},
+	{8,{KS(SDLK_LEFT,"",1),KS(SDLK_DOWN,"",1),KS(SDLK_UP,"",1),KS(SDLK_RIGHT,"",1),KS(0,"",1),KS(SDLK_SPACE," ",5),KS(0,"",1),KS(-1,"OK",4)}},
+};
+void soft_keyboard(rect r,int*exit,int*eval){
+	int y=r.y, kh=r.h/KROWS, sh=ev.shift^kc.lock^kc.shift;char*pal=patterns_pal(ifield(deck,"patterns"));
+	for(int row=0;row<KROWS;row++){
+		float w=0;for(int z=0;z<LCAPS[row].c;z++)w+=LCAPS[row].caps[z].w;
+		for(int z=0,x=0;z<LCAPS[row].c;z++){
+			keycap k=(sh?UCAPS:LCAPS)[row].caps[z];
+			rect b={r.x+x+1,y,z==LCAPS[row].c-1?(r.w-x):(k.w*(r.w/w)),kh+1};x+=b.w-1;
+			draw_box(b,0,1);
+			int e=k.v==SDLK_RETURN&&ms.type==modal_listen&&sh;
+			if     (k.v==SDLK_LEFT )draw_iconc(b,ARROWS->lv[4],1);
+			else if(k.v==SDLK_DOWN )draw_iconc(b,ARROWS->lv[1],1);
+			else if(k.v==SDLK_UP   )draw_iconc(b,ARROWS->lv[0],1);
+			else if(k.v==SDLK_RIGHT)draw_iconc(b,ARROWS->lv[5],1);
+			else                    draw_textc(b,e?"run":k.l,FONT_MENU,1);
+			int kd=k.v>0&&k.v<4096&&keydown[k.v];b=inset(b,2);
+			int a=dover(b)&&over(b)&&ev.down_modal==ms.type&&ev.down_uimode==uimode&&ev.down_caps==1;if(k.v&&a&&(ev.md||ev.drag))kd=1;
+			if(k.v==-1){draw_box(b,0,13);if(ev.mu&&a)*exit=1;}
+			else if(e){if(ev.mu&a)*eval=1,kc.shift=0;}
+			else if(k.v==SDLK_LSHIFT||k.v==SDLK_RSHIFT){if(ev.mu&&a)kc.shift^=1;if(kc.shift)kd=1;}
+			else if(k.v==SDLK_CAPSLOCK){if(ev.mu&&a)kc.lock^=1;if(kc.lock)kd=1;}
+			else if(ev.mu&&a&&k.v){
+				if((k.v>=' '&&k.v<='~')||k.v=='\n'){char t[4]={0};snprintf(t,4,"%c",k.v);field_input(t);}
+				else{field_keys(k.v,sh);}
+				kc.shift=0;
+			}
+			if(kd)draw_invert(pal,b);
+		}y+=kh;
+	}
+}
+void keycaps(){
+	if(!enable_keycaps||!wid.fv)kc.on=0;if(!kc.on)return;
+	memset(frame.buffer->sv,0,frame.buffer->c);
+	int mh=3+font_h(FONT_MENU);
+	rect r={0,mh,frame.size.x+1,(frame.size.y/2)-mh};
+	if(kc.heading){pair s=font_textsize(FONT_MENU,kc.heading);rect h={r.x,r.y,r.w,s.y+5};draw_textc(h,kc.heading,FONT_MENU,1);r.h-=h.h,r.y+=h.h;}
+	if(ms.type)ms.in_modal=1;
+	if(uimode==mode_script){script_editor(r);}
+	else if(ms.type==modal_listen){rect c=frame.clip;frame.clip=(rect){r.x,r.y,r.w,r.h+6};wid.count=0,listener(r);frame.clip=c;}
+	else{wid.count=wid.active;widget_field(wid.ft,(field){inset(r,5),wid.f.font,show_solid,1,1,wid.f.style,wid.f.align,0},wid.fv),ms.in_modal=0;}
+	int exit=0, eval=0;
+	soft_keyboard(inset((rect){r.x,r.y+r.h+1,r.w-2,frame.size.y-(r.y+r.h)},5),&exit,&eval);
+	if(ms.type==modal_listen&&(eval||ev.eval))listener_eval();
+	if(exit||ev.exit){
+		field_exit();wid.active=-1;
+		if(uimode==mode_script)close_script(NULL);
+		if(ms.type==modal_gridcell)modal_exit(1);
+		if(ms.type==modal_link    )modal_pop(1);
+		if(ms.type==modal_listen  )modal_exit(0);
+	}
 }
 
 // General Purpose History
@@ -3022,6 +3104,7 @@ void sync(){
 		if(e.type==SDL_TEXTINPUT&&wid.infield)field_input(e.text.text);
 		if(e.type==SDL_KEYDOWN){
 			int c=e.key.keysym.sym, m=e.key.keysym.mod, cmd=m&(KMOD_LCTRL|KMOD_RCTRL|KMOD_LGUI|KMOD_RGUI);
+			if(c>0&&c<4096)keydown[c]=1;
 			if(c==SDLK_LSHIFT||c==SDLK_RSHIFT)ev.shift=1;
 			if(c==SDLK_UP   )ev.dir=dir_up;
 			if(c==SDLK_DOWN )ev.dir=dir_down;
@@ -3058,6 +3141,7 @@ void sync(){
 		}
 		if(e.type==SDL_KEYUP){
 			int c=e.key.keysym.sym;
+			if(c>0&&c<4096)keydown[c]=0;
 			if(c==SDLK_LCTRL||c==SDLK_RCTRL||c==SDLK_LGUI||c==SDLK_RGUI)ev.alt=0;
 			if(c==SDLK_RETURN&&ev.shift)ev.eval=1;
 			if(c==SDLK_LSHIFT||c==SDLK_RSHIFT)ev.shift=0;
@@ -3070,7 +3154,7 @@ void sync(){
 				if(c==SDLK_LEFT )msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("left");
 				if(c==SDLK_RIGHT)msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("right");
 			}
-			if((uimode==mode_interact||uimode==mode_object||uimode==mode_draw)&&ms.type==modal_none){
+			if((uimode==mode_interact||uimode==mode_object||uimode==mode_draw)&&ms.type==modal_none&&!kc.on){
 				if(c==SDLK_F1)setmode(mode_interact);
 				if(c==SDLK_F2)setmode(mode_object);
 				int f[]={SDLK_F3,SDLK_F4,SDLK_F5,SDLK_F6,SDLK_F7,SDLK_F8,SDLK_F9,SDLK_F10,SDLK_F11,SDLK_F12};
@@ -3098,6 +3182,7 @@ void sync(){
 		if(e.type==SDL_MOUSEBUTTONDOWN){
 			ev.rawdpos=ev.rawpos;
 			pointer_held=ev.drag=1;pointer_start=ev.dpos=pointer;ev.md=1;ev.clicktime=10;
+			ev.down_modal=ms.type,ev.down_uimode=uimode,ev.down_caps=kc.on;
 			if(e.button.button!=SDL_BUTTON_LEFT)ev.rdown=1;
 		}
 		if(e.type==SDL_DROPFILE){
@@ -3136,7 +3221,7 @@ void sync(){
 	if(framebuffer_flip(disp,size,scale)){
 		int*p, pitch;
 		pair tsize=buff_size(TOOLB);int tscale=MIN((disp.x-scale*size.x)/(2*tsize.x),disp.y/tsize.y);if(tscale&&noscale)tscale=1;
-		int showwings=toolbars_enable&&tscale>0&&!(lb(ifield(deck,"locked")))&&ms.type==modal_none&&uimode!=mode_script;
+		int showwings=!kc.on&&toolbars_enable&&tscale>0&&!(lb(ifield(deck,"locked")))&&ms.type==modal_none&&uimode!=mode_script;
 		if(showwings){
 			SDL_Rect src={0,0,tsize.x,tsize.y},dst={0,(disp.y-tscale*tsize.y)/2,tscale*tsize.x,tscale*tsize.y};
 			ltoolbar(
@@ -3274,12 +3359,13 @@ void text_edit_menu(){
 void all_menus(){
 	int blocked=running()||msg.overshoot;
 	int canlisten=!blocked&&(ms.type==modal_listen||ms.type==modal_none);
-	menu_bar("Decker",canlisten);
+	menu_bar("Decker",canlisten&&!kc.on);
 	if(menu_item("About...",1,'\0'))modal_enter(modal_about);
 	if(menu_check("Listener",canlisten,ms.type==modal_listen,'l')){if(ms.type!=modal_listen){modal_enter(modal_listen);}else{modal_exit(0);}}
 	menu_separator();
 	if(menu_check("Fullscreen"     ,1                    ,!windowed      ,'f' ))toggle_fullscreen=1;
 	if(menu_check("Nav Gestures"   ,1                    ,enable_gestures,'\0'))enable_gestures^=1;
+	if(menu_check("Touch Keyboard" ,1                    ,enable_keycaps ,'\0'))enable_keycaps^=1;
 	if(menu_check("Script Profiler",1                    ,profiler       ,'\0'))profiler^=1;
 	if(menu_check("Toolbars"       ,!windowed            ,toolbars_enable,'\0'))toolbars_enable^=1;
 	if(menu_check("Auto-Save"      ,strlen(document_path),autosave       ,'\0'))autosave^=1;
@@ -3292,7 +3378,7 @@ void all_menus(){
 		text_edit_menu();
 		return;
 	}
-	menu_bar("File",ms.type==modal_none||ms.type==modal_recording);
+	menu_bar("File",(ms.type==modal_none||ms.type==modal_recording)&&(!kc.on||uimode==mode_script));
 	if(uimode==mode_script){
 		if(menu_item("Close Script",1,'\0'))close_script(NULL);
 		if(menu_item("Save Script",1,'s')){
@@ -3308,7 +3394,7 @@ void all_menus(){
 		lv*container=con();
 		if(prototype_is(container)){if(menu_item("Go to Prototype",sc.target!=container,'\0'))close_script(container);}
 		else                       {if(menu_item("Go to Card"     ,sc.target!=container,'\0'))close_script(container);}
-		if(menu_check("X-Ray Specs",1,sc.xray,'r'))sc.xray^=1;
+		if(menu_check("X-Ray Specs",!kc.on,sc.xray,'r'))sc.xray^=1;
 	}
 	else if(ms.type==modal_recording){
 		if(menu_item("Import Sound...",1,'\0'))modal_enter(modal_import_sound);
@@ -3496,7 +3582,7 @@ void all_menus(){
 		if(menu_item("Select All",1,'a')){au.head=0;au.sel=(pair){0,au.target->b->c-1};}
 	}
 	if((uimode==mode_interact||uimode==mode_draw||uimode==mode_object)&&card_is(con())){
-		menu_bar("Card",ms.type==modal_none);
+		menu_bar("Card",ms.type==modal_none&&!kc.on);
 		lv*card=con();
 		if(menu_item("Go to First"   ,1,'\0'))n_go(deck,l_list(lmistr("First")));
 		if(menu_item("Go to Previous",1,'\0'))n_go(deck,l_list(lmistr("Prev")));
@@ -3511,7 +3597,7 @@ void all_menus(){
 		if(menu_item("Properties...",1,'\0'))modal_enter(modal_card_props);
 	}
 	if((uimode==mode_interact||uimode==mode_draw||uimode==mode_object)&&prototype_is(con())){
-		menu_bar("Prototype",ms.type==modal_none);
+		menu_bar("Prototype",ms.type==modal_none&&!kc.on);
 		lv*def=con(),*defs=ifield(deck,"contraptions");
 		if(menu_item("Close",1,'\0'))con_set(NULL);
 		if(menu_item("Go to Previous",defs->c>1,'\0')){ev.dir=dir_left ;tracking();ev.dir=dir_none;}
@@ -3526,7 +3612,7 @@ void all_menus(){
 		if(menu_check("Resizable",1,r,'\0')){r^=1,iwrite(def,lmistr("resizable"),lmn(r)),mark_dirty();}
 	}
 	if(uimode==mode_interact||uimode==mode_draw||uimode==mode_object){
-		menu_bar("Tool",ms.type==modal_none);
+		menu_bar("Tool",ms.type==modal_none&&!kc.on);
 		if(menu_check("Interact",1,uimode==mode_interact,0))setmode(mode_interact);
 		if(menu_check("Widgets" ,1,uimode==mode_object  ,0))setmode(mode_object);
 		menu_separator();
@@ -3542,7 +3628,7 @@ void all_menus(){
 		if(menu_check("Polygon"    ,1,uimode==mode_draw&&dr.tool==tool_poly       ,0))settool(tool_poly       );
 	}
 	if(uimode==mode_draw||uimode==mode_object){
-		menu_bar("View",ms.type==modal_none);
+		menu_bar("View",ms.type==modal_none&&!kc.on);
 		if(menu_check("Show Widgets"      ,1,dr.show_widgets,'\0'))dr.show_widgets^=1;
 		if(menu_check("Show Widget Bounds",1,ob.show_bounds ,'\0'))ob.show_bounds ^=1;
 		if(menu_check("Show Widget Names" ,1,ob.show_names  ,'\0'))ob.show_names  ^=1;
@@ -3560,7 +3646,7 @@ void all_menus(){
 		}
 	}
 	if(uimode==mode_draw){
-		menu_bar("Style",ms.type==modal_none);
+		menu_bar("Style",ms.type==modal_none&&!kc.on);
 		if(menu_item("Stroke...",1,'\0'))modal_enter(modal_pattern);
 		if(menu_item("Fill..."  ,1,'\0'))modal_enter(modal_fill);
 		if(menu_item("Brush..." ,1,'\0'))modal_enter(modal_brush);
@@ -3720,13 +3806,17 @@ void tick(lv*env){
 	frame=context,uicursor=0;
 	menu_setup(),all_menus(),widget_setup();
 	memset(frame.buffer->sv,0,frame.buffer->c);
-	if(uimode==mode_script){script_editor();}else{main_view();}
-	modals(),gestures(),menu_finish();
-	if(uimode==mode_draw&&dr.fatbits)draw_icon((pair){frame.size.x-14,2},ZOOM,1);
+	event_state ev_stash=ev;kc.heading=NULL;if(kc.on){ev=(event_state){0};}
+	if(uimode==mode_script){int mh=3+font_h(FONT_MENU);if(!kc.on)script_editor((rect){0,mh,frame.size.x+1,frame.size.y-mh});}else{main_view();}
+	modals(),gestures();
 	if(uimode==mode_interact&&ev.drag&&ob.sel->c&&lb(ifield(ob.sel->lv[0],"draggable"))){
 		lv*c=ivalue(ob.sel->lv[0],"card");pair off=(contraption_is(c)||prototype_is(c))?getpair(ifield(c,"pos")):(pair){0,0};
 		iwrite(ob.sel->lv[0],lmistr("pos"),lmpair(pair_sub((pair){ev.pos.x-ob.prev.x,ev.pos.y-ob.prev.y},off))),mark_dirty();
 	}
+	if(kc.on){ev=ev_stash;keycaps();}
+	if(uimode==mode_script&&enable_keycaps&&ms.type==modal_none)wid.active=0;
+	menu_finish();
+	if(uimode==mode_draw&&dr.fatbits)draw_icon((pair){frame.size.x-14,2},ZOOM,1);
 	double used=interpret();
 	if(uimode==mode_interact&&profiler){
 		rect r={frame.size.x-60,2,50,12};char*pal=patterns_pal(ifield(deck,"patterns"));
@@ -3817,6 +3907,8 @@ int main(int argc,char**argv){
 		if(!strcmp("--no-sound"   ,argv[z])){nosound=1;continue;}
 		if(!strcmp("--no-scale"   ,argv[z])){noscale=1;continue;}
 		if(!strcmp("--fullscreen" ,argv[z])){toggle_fullscreen=1;continue;}
+		if(!strcmp("--gestures"   ,argv[z])){enable_gestures=1;continue;}
+		if(!strcmp("--keycaps"    ,argv[z])){enable_keycaps=1;continue;}
 		file=argv[z],set_path(argv[z]);
 	}
 	init_interns();gil=SDL_CreateMutex();

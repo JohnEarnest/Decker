@@ -679,6 +679,7 @@ void draw_icon(pair pos,lv*i,int pattern){
 	pair s=image_size(i);
 	for(int a=0;a<s.y;a++)for(int b=0;b<s.x;b++)if(i->b->sv[b+(a*s.x)]&&inclip(pos.x+b,pos.y+a))PIX(pos.x+b,pos.y+a)=pattern;
 }
+void draw_iconc(rect r,lv*i,int pattern){rect s=box_center(r,image_size(i));draw_icon((pair){s.x,s.y},i,pattern);}
 void draw_line(rect r,int brush,int pattern){
 	int dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1; while(1){
 		for(int b=0;b<8;b++)for(int a=0;a<8;a++)if(BSH(brush,a,b)&&inclip(r.x+a-3,r.y+b-3))PIX(r.x+a-3,r.y+b-3)=pattern;

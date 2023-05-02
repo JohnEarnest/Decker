@@ -8,7 +8,7 @@ const DOUBLE_CLICK_DELAY=20
 const FIELD_CURSOR_DUTY =20
 const FIELD_CHANGE_DELAY=60
 const LISTEN_LINES      =30
-const LISTEN_SIZE       =_=>rect(frame.size.x-20,100)
+const LISTEN_SIZE       =_=>rect(frame.size.x-22,100)
 const MASTER_VOLUME     =0.3
 const BG_MASK           =100
 
@@ -389,7 +389,7 @@ PANGRAM='How razorback jumping-frogs can level six piqued gymnasts.'
 
 // State
 
-let uimode='interact', ui_container=null, uicursor=0, enable_gestures=0, profiler=0
+let uimode='interact', ui_container=null, uicursor=0, enable_gestures=0, enable_keycaps=0, set_keycaps=0, profiler=0
 mark_dirty=_=>{dirty=1}
 con_set=x=>{
 	if(x!=ui_container)setmode(uimode),msg.next_view=1
@@ -447,7 +447,7 @@ setmode=mode=>{
 }
 
 event_state=_=>({ // event state
-	mu:0,md:0, clicktime:0,click:0,rdown:0,rup:0, dclick:0, clicklast:0,
+	mu:0,md:0, clicktime:0,click:0,rdown:0,rup:0, dclick:0, clicklast:0, down_modal:0, down_uimode:0, down_caps:0,
 	drag:0, tab:0, shift:0, alt:0, action:0, dir:0, exit:0, eval:0, scroll:0, hidemenu:0,
 	pos:rect(), dpos:rect(), rawpos:rect(), rawdpos:rect(), shortcuts:{}, opos:rect(),odpos:rect(),
 	callback:null, callback_rect:null, callback_drag:0
@@ -469,13 +469,19 @@ modal_state=_=>({ // modal state
 	type:null,subtype:null,in_modal:0,edit_json:0,old_wid:null,
 	filter:0, grid:null,grid2:null, text:null,name:null,form0:null,form1:null,form2:null,
 	desc:'',path:'',filter:'', message:null,verb:null, cell:rect(),
-	from_listener:0,from_action:0, act_go:0,act_card:0,act_gomode:0,act_trans:0,act_transo:0,act_sound:0,
+	from_listener:0,from_action:0,from_keycaps:0, act_go:0,act_card:0,act_gomode:0,act_trans:0,act_transo:0,act_sound:0,
 	time_curr:0,time_end:0,time_start:0, carda:null,cardb:null,trans:null,canvas:null,
 })
 modal_state_clone=x=>{const r=Object.assign({},x);r.cell=rcopy(r.cell);return r}
 let ms=modal_state(), ms_stack=[]
 modal_push=type=>{if(ms.type){ms_stack.push({ms:modal_state_clone(ms),wid:wid_state_clone(wid)})}modal_enter(type)}
-modal_pop=value=>{modal_exit(value);if(ms_stack.length){const c=ms_stack.pop();ms=c.ms,wid=c.wid}}
+modal_pop=value=>{
+	const l=ms.type=='link'&&value?rtext_string(ms.text.table):null
+	modal_exit(value);if(ms_stack.length){const c=ms_stack.pop();ms=c.ms,wid=c.wid}
+	if(l){const c=rcopy(wid.cursor);field_stylespan(lms(''),l),wid.cursor=c}
+}
+let kc={shift:0,lock:0,on:0,heading:null}, keydown={}
+keycaps_enter=_=>{if(!enable_keycaps||kc.on)return;kc.shift=0,kc.lock=0,kc.on=1,ev.mu=ev.md=0}
 
 let msg={ // interpreter event messages
 	pending_drag:0,pending_halt:0,pending_view:0,pending_loop:0,next_view:0,overshoot:0,
@@ -567,7 +573,7 @@ menu_finish=_=>{
 
 widget_setup=_=>{
 	if(ev.mu||wid.active==-1)wid.col_drag=0;if(wid.active>=wid.count)wid.active=0
-	if((uimode=='interact'||ms.type!=null)&&ev.tab&&wid.count&&!(wid.infield&&wid.f.style=='code')){
+	if((uimode=='interact'||ms.type!=null)&&ev.tab&&wid.count&&!(wid.infield&&wid.f.style=='code')&&!kc.on){
 		if(wid.ingrid)grid_exit()
 		if(wid.infield)field_exit()
 		wid.active+=ev.shift?-1:1
@@ -847,7 +853,7 @@ field_change=_=>{
 	iwrite(wid.ft,lms('value'),wid.fv.table),mark_dirty()
 	msg.target_change=wid.ft, msg.arg_change=rtext_string(wid.fv.table)
 }
-field_exit=_=>{field_change();wid.infield=0,wid.fv=null,wid.ft=null,wid.cursor=rect(),wid.field_dirty=0,wid.change_timer=0}
+field_exit=_=>{field_change(),kc.on=0;wid.infield=0,wid.fv=null,wid.ft=null,wid.cursor=rect(),wid.field_dirty=0,wid.change_timer=0}
 widget_field=(target,x,value)=>{
 	if(x.show=='none')return; if(x.size.h<=50||x.size.w<16)x.scrollbar=0
 	const l=!in_layer(), fnt=x.font?x.font: x.style=='code'?FONT_MONO: FONT_BODY, b=x.size, pal=deck.patterns.pal.pix
@@ -874,10 +880,10 @@ widget_field=(target,x,value)=>{
 		}
 		const c=layout_cursor(layout,wid.cursor.y,fnt,x);c.y-=value.scroll, ch=min(bi.h,c.h)
 		if(c.y<0)value.scroll-=4;if(c.y+ch>bi.h)value.scroll+=clamp(1,(c.y+ch)-bi.h,4) // drag to scroll!
-		if(!sel&&wid.fv)field_exit(); wid.active=wid.count,sel=1
+		if(!sel&&wid.fv&&!kc.on)field_exit(); wid.active=wid.count,sel=1
 	}
-	if(sel&&in_layer()&&!over(b)&&ev.md)sel=0,wid.active=-1,field_exit()
-	if(sel){if(wid.gv)grid_exit();wid.infield=1,wid.f=x,wid.fv=value,wid.ft=target}
+	if(sel&&in_layer()&&!over(b)&&ev.md&&!kc.on)sel=0,wid.active=-1,field_exit()
+	if(sel){if(wid.gv)grid_exit();wid.infield=1,wid.f=x,wid.fv=value,wid.ft=target,keycaps_enter()}
 	// render
 	const bc=rclip(frame.clip,bi); const oc=frame.clip;frame.clip=bc
 	for(let z=0;z<layout.layout.length;z++){
@@ -1083,6 +1089,31 @@ n_post_listen=([a])=>{
 	li.vars['_']=a,listen_show(ALIGN.right,0,a);return a
 }
 n_post_query=([a])=>{ms.grid=gridtab(lt(a));return a}
+listener_eval=_=>{
+	const str=rtext_string(ms.text.table);if(count(str)<1)return
+	try{
+		const prog=parse(ls(str)), b=lmblk(); ms.text=fieldstr(lms('')),listen_show(ALIGN.left,1,str)
+		const target=uimode=='script'?sc.target: ob.sel.length==1?ob.sel[0]: con()
+		blk_opa(b,op.BUND,1),blk_lit(b,lmnat(n_pre_listen )),blk_lit(b,NONE   ),blk_op(b,op.CALL),blk_op(b,op.DROP),blk_cat(b,prog)
+		blk_opa(b,op.BUND,1),blk_lit(b,lmnat(n_post_listen)),blk_op (b,op.SWAP),blk_op(b,op.CALL),blk_op(b,op.DROP),fire_hunk_async(target,b)
+	}catch(e){listen_show(ALIGN.right,1,lms(`error: ${e.x}`));return}
+}
+listener=r=>{
+	const size=LISTEN_SIZE(), th=li.hist.reduce((x,y)=>x+y[0].size.y+5,0), h=min(th,size.y)
+	const esize=rect(0|(r.x+(r.w-size.x)/2),r.y+r.h-49,size.x,50), tsize=rect(esize.x,esize.y-(h?h+5:0),esize.w,h)
+	const bsize=rect(esize.x-5,esize.y-5-(h?tsize.h+5:0),esize.w+10,(h?tsize.h+5:0)+esize.h+20), pal=deck.patterns.pal.pix
+	draw_shadow(bsize,1,32,1),ui_codeedit(esize,1,ms.text)
+	if(h){
+		const sbar=scrollbar(tsize,max(0,th-size.y),10,tsize.h,li.scroll,h>=size.y,0), b=sbar.size; li.scroll=sbar.scroll
+		let cy=0;li.hist.map(x=>{
+			const l=x[0], t=x[1], s=l.size; let lb=rect(b.x,b.y+cy-li.scroll,s.x,s.y)
+			image_paste(lb,b,l,frame.image,0),cy+=s.y+5
+			lb=rclip(b,lb);const v=lis(t)&&over(lb), a=v&&dover(lb)
+			if(v)uicursor=cursor.point,draw_box(inset(lb,-1),0,13); if(a&&(ev.md||ev.drag))draw_invert(pal,lb)
+			if(a&&ev.mu)ms.text=fieldstr(t)
+		})
+	}
+}
 
 // Audio
 
@@ -1255,8 +1286,10 @@ modal_enter=type=>{
 	ev.md=ev.mu=ev.dclick=0,menus_clear()
 	if(ms.type=='trans')return
 	ms.from_listener=ms.type=='listen'
+	ms.from_keycaps=kc.on
 	ms.type=ms.subtype=type
 	ms.old_wid=wid,wid=wid_state()
+	if(enable_keycaps){wid.active=type in {link:1,gridcell:1,listen:1}?0:-1}
 	if(type=='listen'){
 		if(uimode=='script'){
 			try{const text=ls(rtext_string(sc.f.table));parse(text),script_save(text)}
@@ -1389,6 +1422,7 @@ modal_exit=value=>{
 	if(ms.subtype=='choose_lil' )arg(),ret(ms.verb.v[ms.grid.row])
 	ms.type=null
 	if(ms.from_listener)modal_enter('listen')
+	if(enable_keycaps&&ms.from_keycaps)kc.on=1
 	if(ms.type==null&&uimode=='interact')msg.next_view=1
 }
 modals=_=>{
@@ -1402,29 +1436,8 @@ modals=_=>{
 		draw_text(b,'beyondloom.com/decker',FONT_BODY,1)
 	}
 	else if(ms.type=='listen'){
-		const size=LISTEN_SIZE(), th=li.hist.reduce((x,y)=>x+y[0].size.y+5,0), h=min(th,size.y)
-		const esize=rect(0|((frame.size.x-size.x)/2),frame.size.y-49,size.x,50), tsize=rect(esize.x,esize.y-(h?h+5:0),esize.w,h)
-		const bsize=rect(esize.x-5,esize.y-5-(h?tsize.h+5:0),esize.w+10,(h?tsize.h+5:0)+esize.h+20)
-		draw_shadow(bsize,1,32,1),ui_codeedit(esize,1,ms.text)
-		if(h){
-			const sbar=scrollbar(tsize,max(0,th-size.y),10,tsize.h,li.scroll,h>=size.y,0), b=sbar.size; li.scroll=sbar.scroll
-			let cy=0;li.hist.map(x=>{
-				const l=x[0], t=x[1], s=l.size; let lb=rect(b.x,b.y+cy-li.scroll,s.x,s.y)
-				image_paste(lb,b,l,frame.image,0),cy+=s.y+5
-				lb=rclip(b,lb);const v=lis(t)&&over(lb), a=v&&dover(lb)
-				if(v)uicursor=cursor.point,draw_box(inset(lb,-1),0,13); if(a&&(ev.md||ev.drag))draw_invert(pal,lb)
-				if(a&&ev.mu)ms.text=fieldstr(t)
-			})
-		}
-		if(ev.eval){
-			const str=rtext_string(ms.text.table);if(count(str)<1)return
-			try{
-				const prog=parse(ls(str)), b=lmblk(); ms.text=fieldstr(lms('')),listen_show(ALIGN.left,1,str)
-				const target=uimode=='script'?sc.target: ob.sel.length==1?ob.sel[0]: con()
-				blk_opa(b,op.BUND,1),blk_lit(b,lmnat(n_pre_listen )),blk_lit(b,NONE   ),blk_op(b,op.CALL),blk_op(b,op.DROP),blk_cat(b,prog)
-				blk_opa(b,op.BUND,1),blk_lit(b,lmnat(n_post_listen)),blk_op (b,op.SWAP),blk_op(b,op.CALL),blk_op(b,op.DROP),fire_hunk_async(target,b)
-			}catch(e){listen_show(ALIGN.right,1,lms(`error: ${e.x}`));return}
-		}if(ev.exit)modal_exit(0)
+		if(!kc.on){listener(rect(0,0,frame.size.x,frame.size.y));if(ev.eval)listener_eval()}
+		if(ev.exit)modal_exit(0)
 	}
 	else if(ms.type=='cards'){
 		const b=draw_modalbox(rect(210,frame.size.y-46)), gsize=rect(b.x,b.y+15,b.w,b.h-20-20)
@@ -1699,18 +1712,15 @@ modals=_=>{
 	}
 	else if(ms.type=='link'){
 		const b=draw_modalbox(rect(170,70))
-		draw_textc(rect(b.x,b.y,b.w,20),'Enter a link string for\nthe selected text span:',FONT_BODY,1)
+		draw_textc(rect(b.x,b.y,b.w,20),kc.heading='Enter a link string for\nthe selected text span:',FONT_BODY,1)
 		ui_field(rect(b.x,b.y+20+5,b.w,20),ms.text)
 		const c=rint(rect(b.x+b.w-(b.w-(2*60+5))/2-60,b.y+b.h-20))
-		if(ui_button(rect(c.x,c.y,60,20),'OK',1)){
-			const l=rtext_string(ms.text.table);modal_pop(0)
-			const c=rcopy(wid.cursor);field_stylespan(lms(''),l),wid.cursor=c
-		};c.x-=65
+		if(ui_button(rect(c.x,c.y,60,20),'OK',1))modal_pop(1);c.x-=65
 		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_pop(0)
 	}
 	else if(ms.type=='gridcell'){
 		const b=draw_modalbox(rect(170,70))
-		draw_textc(rect(b.x,b.y,b.w,20),'Enter a new value for\nthe selected cell:',FONT_BODY,1)
+		draw_textc(rect(b.x,b.y,b.w,20),kc.heading='Enter a new value for\nthe selected cell:',FONT_BODY,1)
 		ui_field(rect(b.x,b.y+20+5,b.w,20),ms.text)
 		const c=rect(b.x+b.w-(b.w-(2*60+5))/2-60,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,60,20),'OK',1))modal_exit(1);c.x-=65
@@ -2080,6 +2090,72 @@ go_notify=(deck,x,t,url,delay)=>{
 		grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel=[],wid.active=ms.type=='listen'?0:-1,mark_dirty()
 	}
 	if(uimode=='interact')msg.next_view=1
+}
+
+// Keycaps
+
+KS=(v,l,w)=>({v,l,w}), K=v=>KS(v,v,1)
+const LCAPS=[
+	[K('`'),K('1'),K('2'),K('3'),K('4'),K('5'),K('6'),K('7'),K('8'),K('9'),K('0'),K('-'),K('='),KS('Backspace','delete',1.5)],
+	[KS('Tab','tab',1.5),K('q'),K('w'),K('e'),K('r'),K('t'),K('y'),K('u'),K('i'),K('o'),K('p'),K('['),K(']'),K('\\')],
+	[KS('CapsLock','capslock',2),K('a'),K('s'),K('d'),K('f'),K('g'),K('h'),K('j'),K('k'),K('l'),K(';'),K('\''),KS('Enter','return',2)],
+	[KS('Shift','shift',2.5),K('z'),K('x'),K('c'),K('v'),K('b'),K('n'),K('m'),K(','),K('.'),K('/'),KS('Shift','shift',2.5)],
+	[KS('ArrowLeft','',1),KS('ArrowDown','',1),KS('ArrowUp','',1),KS('ArrowRight','',1),KS(0,'',1),KS(' ',' ',5),KS(0,'',1),KS(-1,'OK',4)],
+]
+const UCAPS=[
+	[K('~'),K('!'),K('@'),K('#'),K('$'),K('%'),K('^'),K('&'),K('*'),K('('),K(')'),K('_'),K('+'),KS('Backspace','delete',1.5)],
+	[KS('Tab','tab',1.5),K('Q'),K('W'),K('E'),K('R'),K('T'),K('Y'),K('U'),K('I'),K('O'),K('P'),K('{'),K('}'),K('|')],
+	[KS('CapsLock','capslock',2),K('A'),K('S'),K('D'),K('F'),K('G'),K('H'),K('J'),K('K'),K('L'),K(':'),K('"'),KS('Enter','return',2)],
+	[KS('Shift','shift',2.5),K('Z'),K('X'),K('C'),K('V'),K('B'),K('N'),K('M'),K('<'),K('>'),K('?'),KS('Shift','shift',2.5)],
+	[KS('ArrowLeft','',1),KS('ArrowDown','',1),KS('ArrowUp','',1),KS('ArrowRight','',1),KS(0,'',1),KS(' ',' ',5),KS(0,'',1),KS(-1,'OK',4)],
+]
+soft_keyboard=r=>{
+	let ex=0, el=0, y=r.y, kh=0|(r.h/LCAPS.length), sh=ev.shift^kc.lock^kc.shift, pal=deck.patterns.pal.pix
+	for(let row=0;row<LCAPS.length;row++){
+		const w=LCAPS[row].reduce((a,x)=>a+x.w,0), keys=(sh?UCAPS:LCAPS)[row]; let x=0
+		keys.forEach((k,i,arr)=>{
+			let b=rint(rect(r.x+x+1,y,i==arr.length-1?(r.w-x):(k.w*(r.w/w)),kh+1));x+=b.w-1
+			draw_box(b,0,1)
+			const e=k.v=='Enter'&&ms.type=='listen'&&sh
+			if     (k.v=='ArrowLeft' )draw_iconc(b,ARROWS[4],1)
+			else if(k.v=='ArrowDown' )draw_iconc(b,ARROWS[1],1)
+			else if(k.v=='ArrowUp'   )draw_iconc(b,ARROWS[0],1)
+			else if(k.v=='ArrowRight')draw_iconc(b,ARROWS[5],1)
+			else                      draw_textc(b,e?'run':k.l,FONT_MENU,1)
+			let kd=keydown[k.v];b=inset(b,2)
+			const a=dover(b)&&over(b)&&ev.down_modal==ms.type&&ev.down_uimode==uimode&&ev.down_caps==1;if(k.v&&a&&(ev.md||ev.drag))kd=1
+			if(k.v==-1){draw_box(b,0,13);if(ev.mu&&a)ex=1}
+			else if(e){if(ev.mu&a)el=1,kc.shift=0}
+			else if(k.v=='Shift'   ){if(ev.mu&&a)kc.shift^=1;if(kc.shift)kd=1}
+			else if(k.v=='CapsLock'){if(ev.mu&&a)kc.lock^=1;if(kc.lock)kd=1}
+			else if(ev.mu&&a&&k.v){if(k.v.length==1){field_input(k.v)}else{field_keys(k.v,sh)};kc.shift=0}
+			if(kd)draw_invert(pal,b)
+		});y+=kh
+	}return {exit:ex,eval:el}
+}
+keycaps=_=>{
+	if(!enable_keycaps||!wid.fv)kc.on=0;if(!kc.on)return
+	frame.image.pix.fill(32)
+	const mh=3+font_h(FONT_MENU)
+	const r=rect(0,mh,frame.size.x+1,0|((frame.size.y/2)-mh))
+	if(kc.heading){const s=font_textsize(FONT_MENU,kc.heading);const h=rect(r.x,r.y,r.w,s.y+5);draw_textc(h,kc.heading,FONT_MENU,1),r.h-=h.h,r.y+=h.h}
+	if(ms.type)ms.in_modal=1
+	if(uimode=='script'){script_editor(r)}
+	else if(ms.type=='listen'){const c=frame.clip;frame.clip=rect(r.x,r.y,r.w,r.h+6);wid.count=0,listener(r),frame.clip=c}
+	else{
+		wid.count=wid.active
+		widget_field(wid.ft,{size:inset(r,5),font:wid.f.font,show:'solid',scrollbar:1,border:1,style:wid.f.style,align:wid.f.align,locked:0},wid.fv)
+		ms.in_modal=0
+	}
+	const modes=soft_keyboard(inset(rect(r.x,r.y+r.h+1,r.w-2,frame.size.y-(r.y+r.h)),5))
+	if(ms.type=='listen'&&(modes.eval||ev.eval))listener_eval()
+	if(modes.exit||ev.exit){
+		field_exit();wid.active=-1
+		if(uimode=='script')close_script()
+		if(ms.type=='gridcell')modal_exit(1)
+		if(ms.type=='link'    )modal_pop(1)
+		if(ms.type=='listen'  )modal_exit(0)
+	}
 }
 
 // General Purpose Edit History
@@ -2625,7 +2701,7 @@ const tooltypes=['select','pencil','lasso','line','fill','poly','rect','fillrect
 const patorder=[0,1,4,5,8,9,16,17,12,13,18,19,20,21,22,23,24,25,26,27,2,6,3,7,10,11,14,15,28,29,30,31] // pleasing visual ramps for 2 columns
 
 toolbars=_=>{
-	if(!toolbars_enable)return
+	if(!toolbars_enable||kc.on)return
 	const toolbar=(element,render,behavior)=>{
 		const c=element.getBoundingClientRect()
 		const pos =rint(rect((ev.rawpos .x-c.x)/tzoom,(ev.rawpos .y-c.y)/tzoom))
@@ -2707,13 +2783,13 @@ close_script=next=>{
 		ms.message=lms(`The current script contains errors:\n\n${e.x}\n\nDo you wish to discard your changes?`),ms.verb=lms('Discard')
 	}
 }
-script_editor=_=>{
+script_editor=r=>{
 	const field_position=(x,cursor)=>{
 		if(x.layout.length<1)return rect(1,1);cursor=max(0,min(cursor,x.layout.length+1))
 		const e=cursor>=x.layout.length?1:0, i=cursor-e, l=x.layout[i].line, c=i-x.lines[l].range.x
 		return rect(l+1,c+1+e)
 	}
-	const mh=3+font_h(FONT_MENU), bb=rect(0,mh,frame.size.x+1,frame.size.y-2*mh)
+	const mh=3+font_h(FONT_MENU)
 	let overw=null;if(sc.xray){
 		const wids=con_wids();for(let z=0;z<wids.v.length;z++){
 			const wid=wids.v[z],size=con_to_screen(unpack_widget(wid).size), o=ev.alt&&over(size), col=o?(overw=wid,13):44
@@ -2722,12 +2798,12 @@ script_editor=_=>{
 			if(ev.alt&&ev.mu&&over(size)&&dover(size)){close_script(wid),ev.md=ev.mu=0;break}
 		}if(ev.alt&&ev.mu)close_script(con()),ev.md=ev.mu=0
 	}
-	ui_codeedit(bb,0,sc.f),draw_hline(0,frame.size.x,frame.size.y-mh-1,1)
+	ui_codeedit(rect(r.x,r.y,r.w,r.h-mh),0,sc.f),draw_hline(r.x,r.x+r.w,r.y+r.h-mh-1,1)
 	if(overw){uicursor=cursor.point;draw_textc(con_to_screen(unpack_widget(overw).size),ls(ifield(overw,'name')),FONT_BODY,-1)}
-	if(sc.status.length){draw_text_fit(rect(3,frame.size.y-mh+3,frame.size.x,mh-6),sc.status,FONT_BODY,1)}
+	if(sc.status.length){draw_text_fit(rect(r.x+3,r.y+r.h-mh+3,r.w,mh-6),sc.status,FONT_BODY,1);}
 	else{
 		let stat='';if(in_layer()&&wid.infield){
-			const x=layout_richtext(deck,sc.f.table,FONT_MONO,ALIGN.left,bb.w)
+			const x=layout_richtext(deck,sc.f.table,FONT_MONO,ALIGN.left,r.w)
 			let a=min(wid.cursor.x,wid.cursor.y), b=max(wid.cursor.x,wid.cursor.y)
 			if(a!=b&&a<x.layout.length){
 				a=max(0,min(a,x.layout.length)), b=max(0,min(b,x.layout.length))
@@ -2735,10 +2811,10 @@ script_editor=_=>{
 				stat=`${l} line${l==1?'':'s'}, ${c} character${c==1?'':'s'} selected`
 			}else{const p=field_position(x,min(a,b));stat=`Line ${p.x}, Column ${p.y}`}
 		}
-		const l=font_textsize(FONT_BODY,stat);draw_text(rect(3,frame.size.y-mh+3,l.x,l.y),stat,FONT_BODY,1)
+		const l=font_textsize(FONT_BODY,stat);draw_text(rect(3,r.y+r.h-mh+3,l.x,l.y),stat,FONT_BODY,1)
 		stat=`script of ${sc.target.n}  '${ls(ifield(sc.target,'name'))}'${sc.others.length?` and ${sc.others.length} more`:''}`
-		const t=layout_plaintext(stat,FONT_BODY,ALIGN.right,rect(frame.size.x-6-20-l.x,font_h(FONT_BODY)))
-		draw_text_wrap(rect(3+l.x+20,frame.size.y-mh+3,t.size.x,t.size.y),t,1)
+		const t=layout_plaintext(stat,FONT_BODY,ALIGN.right,rect(r.x+r.w-6-20-l.x,font_h(FONT_BODY)))
+		draw_text_wrap(rect(3+l.x+20,r.y+r.h-mh+3,t.size.x,t.size.y),t,1)
 	}if(in_layer()&&ev.exit)close_script(),ev.exit=0
 }
 
@@ -2810,12 +2886,13 @@ text_edit_menu=_=>{
 all_menus=_=>{
 	const blocked=running()||msg.overshoot
 	const canlisten=!blocked&&(ms.type=='listen'||ms.type==null)
-	menu_bar('Decker',canlisten)
+	menu_bar('Decker',canlisten&&!kc.on)
 	if(menu_item('About...',1))modal_enter('about')
 	if(menu_check('Listener',canlisten,ms.type=='listen','l')){if(ms.type!='listen'){modal_enter('listen')}else{modal_exit(0)}}
 	menu_separator()
 	menu_check('Fullscreen',1,is_fullscreen(),null,toggle_fullscreen)
 	if(menu_check('Nav Gestures',1,enable_gestures))enable_gestures^=1
+	if(menu_check('Touch Keyboard',1,enable_keycaps))enable_keycaps^=1,set_keycaps=1
 	if(menu_check('Script Profiler',1,profiler))profiler^=1
 	if(menu_check('Toolbars',tzoom>0,toolbars_enable))toolbars_enable^=1,resize()
 	if(blocked){
@@ -2825,7 +2902,7 @@ all_menus=_=>{
 		text_edit_menu()
 		return
 	}
-	menu_bar('File',ms.type==null||ms.type=='recording')
+	menu_bar('File',(ms.type==null||ms.type=='recording')&&(!kc.on||uimode=='script'))
 	if(uimode=='script'){
 		if(menu_item('Close Script',1))close_script()
 		if(menu_item('Save Script',1,'s')){
@@ -2839,7 +2916,7 @@ all_menus=_=>{
 		if(menu_item('Go to Deck',!deck_is(sc.target)           ))close_script(deck)
 		const container=con()
 		if(menu_item(`Go to ${prototype_is(container)?'Prototype':'Card'}`,sc.target!=container))close_script(container)
-		if(menu_check('X-Ray Specs',1,sc.xray))sc.xray^=1
+		if(menu_check('X-Ray Specs',!kc.on,sc.xray))sc.xray^=1
 	}
 	else if(ms.type=='recording'){
 		menu_item('Import Sound...',1,0,_=>open_file('audio/*',load_sound))
@@ -2998,7 +3075,7 @@ all_menus=_=>{
 		if(menu_item('Select All',1,'a'))au.head=0,au.sel=rect(0,au.target.data.length-1)
 	}
 	if((uimode=='interact'||uimode=='draw'||uimode=='object')&&card_is(con())){
-		menu_bar('Card',ms.type==null)
+		menu_bar('Card',ms.type==null&&!kc.on)
 		if(menu_item('Go to First'   ,1))n_go([lms('First')],deck)
 		if(menu_item('Go to Previous',1))n_go([lms('Prev' )],deck)
 		if(menu_item('Go to Next'    ,1))n_go([lms('Next' )],deck)
@@ -3012,7 +3089,7 @@ all_menus=_=>{
 		if(menu_item('Properties...',1))modal_enter('card_props')
 	}
 	if((uimode=='interact'||uimode=='draw'||uimode=='object')&&prototype_is(con())){
-		menu_bar('Prototype',ms.type==null)
+		menu_bar('Prototype',ms.type==null&&!kc.on)
 		const def=con(), defs=deck.contraptions
 		if(menu_item('Close',1))con_set(null)
 		if(menu_item('Go to Previous',count(defs)>1)){ev.dir='left' ,tracking(),ev.dir=0}
@@ -3027,7 +3104,7 @@ all_menus=_=>{
 		if(menu_check('Resizable',1,r,0)){r^=1,iwrite(def,lms('resizable'),lmn(r)),mark_dirty()}
 	}
 	if(uimode=='interact'||uimode=='draw'||uimode=='object'){
-		menu_bar('Tool',ms.type==null)
+		menu_bar('Tool',ms.type==null&&!kc.on)
 		if(menu_check('Interact',1,uimode=='interact',0))setmode('interact')
 		if(menu_check('Widgets' ,1,uimode=='object'  ,0))setmode('object')
 		menu_separator()
@@ -3043,7 +3120,7 @@ all_menus=_=>{
 		if(menu_check('Polygon'    ,1,uimode=='draw'&&dr.tool=='poly'       ))settool('poly'       )
 	}
 	if(uimode=='draw'||uimode=='object'){
-		menu_bar('View',ms.type==null)
+		menu_bar('View',ms.type==null&&!kc.on)
 		if(menu_check('Show Widgets'      ,1,dr.show_widgets))dr.show_widgets^=1
 		if(menu_check('Show Widget Bounds',1,ob.show_bounds ))ob.show_bounds ^=1
 		if(menu_check('Show Widget Names' ,1,ob.show_names  ))ob.show_names  ^=1
@@ -3061,7 +3138,7 @@ all_menus=_=>{
 		}
 	}
 	if(uimode=='draw'){
-		menu_bar('Style',ms.type==null)
+		menu_bar('Style',ms.type==null&&!kc.on)
 		if(menu_item('Stroke...',1))modal_enter('pattern')
 		if(menu_item('Fill...'  ,1))modal_enter('fill'   )
 		if(menu_item('Brush...' ,1))modal_enter('brush'  )
@@ -3203,8 +3280,12 @@ tick=_=>{
 	toolbars()
 	msg.pending_drag=0,msg.pending_halt=0,frame=context,uicursor=0,fb.pix.fill(0)
 	menu_setup(),all_menus(),widget_setup()
-	if(uimode=='script'){script_editor()}else{main_view()}
-	modals(),gestures(),menu_finish()
+	const ev_stash=ev;kc.heading=null;if(kc.on)ev=event_state()
+	if(uimode=='script'){const mh=3+font_h(FONT_MENU);if(!kc.on)script_editor(rect(0,mh,frame.size.x+1,frame.size.y-mh))}else{main_view()}
+	modals(),gestures()
+	if(kc.on){ev=ev_stash,keycaps()}
+	if(uimode=='script'&&enable_keycaps&&ms.type==null)wid.active=0
+	menu_finish()
 	if(uimode=='draw'&&dr.fatbits)draw_icon(rect(frame.size.x-14,2),ZOOM,1)
 	if(uimode=='interact'&&ev.drag&&ob.sel.length&&lb(ifield(ob.sel[0],'draggable'))){
 		const c=ob.sel[0].card, off=(contraption_is(c)||prototype_is(c))?getpair(ifield(c,'pos')):rect(0,0)
@@ -3248,7 +3329,7 @@ sync=_=>{
 
 move=(x,y)=>{if(!msg.pending_drag)pointer.prev=pointer.pos;pointer.pos=ev.pos=rect(x,y);if(pointer.held)msg.pending_drag=1}
 down=(x,y,alt)=>{
-	ev.rawdpos=ev.rawpos
+	ev.rawdpos=ev.rawpos,ev.down_modal=ms.type,ev.down_uimode=uimode,ev.down_caps=kc.on
 	move(x,y),pointer.held=ev.drag=1;pointer.start=ev.dpos=pointer.pos,ev.md=1,ev.clicktime=10;if(alt)ev.rdown=1;initaudio()}
 up=(x,y,alt)=>{
 	move(x,y),pointer.held=ev.drag=0,pointer.end=pointer.pos,ev.mu=1;if(alt)ev.rup=1
@@ -3260,7 +3341,7 @@ mouse=(e,f)=>{
 	ev.rawpos=rect(e.pageX,e.pageY);const c=q('#display').getBoundingClientRect()
 	f(0|((e.pageX-c.x)/zoom),0|((e.pageY-c.y)/zoom),e.button!=0)
 }
-touch=(e,f)=>{const t=e.targetTouches[0]||{}; mouse({pageX:t.clientX, pageY:t.clientY, button:0},f)}
+touch=(e,f)=>{const t=e.targetTouches[0]||{}; mouse({pageX:t.clientX, pageY:t.clientY, button:0},f);if(!set_keycaps)enable_keycaps=1}
 let prev_stamp=null, leftover=0
 loop=stamp=>{
 	if(!prev_stamp)prev_stamp=stamp
@@ -3291,6 +3372,7 @@ q('body').addEventListener('touchmove'  ,e=>touch(e,move))
 q('body').onwheel=e=>ev.scroll=e.deltaY<0?-1:e.deltaY>0?1:0
 q('body').onkeydown=e=>{
 	initaudio()
+	keydown[e.key]=1
 	if(e.shiftKey)ev.shift=1
 	if(e.key=='ArrowUp'   )ev.dir='up'
 	if(e.key=='ArrowDown' )ev.dir='down'
@@ -3319,6 +3401,7 @@ q('body').onkeydown=e=>{
 	else{e.preventDefault()}
 }
 q('body').onkeyup=e=>{
+	keydown[e.key]=0
 	if(e.key=='Meta'||e.key=='Control'||e.metaKey||e.ctrlKey)ev.alt=0
 	if(e.key=='Enter'&&e.shiftKey)ev.eval=1
 	if(e.key=='Shift'||e.shiftKey)ev.shift=0
