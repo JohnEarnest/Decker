@@ -13,7 +13,7 @@ lv*CHECK,*LOCK,*ANIM,*ZOOM,*CHECKS[4],*CORNERS[4],*RADIOS[4],*ICONS[8],*GESTURES
 lv*FONT_BODY,*FONT_MENU,*FONT_MONO,*TOOLS,*ARROWS,*TOOLB,*PLAYING,*ATTRS;
 enum mini_icons {icon_dir,icon_doc,icon_sound,icon_font,icon_app,icon_lil,icon_pat,icon_chek,icon_none};
 enum cursor_styles {cursor_default,cursor_point,cursor_ibeam,cursor_drag};
-SDL_Cursor*CURSORS[4]; int uicursor=0, enable_gestures=0, enable_keycaps=0, profiler=0;
+SDL_Cursor*CURSORS[4]; int uicursor=0, enable_touch=0, set_touch=0, profiler=0;
 
 char*TOOL_ICONS=
 	"%%IMG0ABAAwAMABIAEgASABIAEgGTwlKxMqiQKJAIQAggCCAQEBAQEAAAAAAAAAAA//EACgAGAAYABgAFAAz/+H/wAAAAAAA"
@@ -270,7 +270,7 @@ int in_widgets(){return ms.type!=modal_none?ms.in_modal:1;}
 
 typedef struct {int shift,lock,on;char*heading;} keycaps_state;keycaps_state kc={0};
 int keydown[4096]={0};
-void keycaps_enter(){if(!enable_keycaps||kc.on)return;kc.shift=0,kc.lock=0,kc.on=1,ev.mu=ev.md=0;}
+void keycaps_enter(){if(!enable_touch||kc.on)return;kc.shift=0,kc.lock=0,kc.on=1,ev.mu=ev.md=0;}
 
 // Clipboard
 
@@ -1194,7 +1194,7 @@ void modal_enter(int type){
 	if(wid.gv==&wid.gv_slot)ms.old_wid.gv=&ms.old_wid.gv_slot;
 	if(wid.fv==&wid.fv_slot)ms.old_wid.fv=&ms.old_wid.fv_slot;
 	wid=(widget_state){0};wid.hist=lml(0);
-	if(enable_keycaps){wid.active=type==modal_link||type==modal_gridcell||type==modal_listen?0:-1;}
+	if(enable_touch){wid.active=type==modal_link||type==modal_gridcell||type==modal_listen?0:-1;}
 	if(type==modal_query){
 		ms.grid=(grid_val){ms.old_wid.gv->table,0,-1};
 		ms.text=(field_val){rtext_cast(lmistr("select from me.value")),0};
@@ -1509,7 +1509,7 @@ void modal_exit(int value){
 	if(ms.subtype==modal_choose_lil ){arg();ret(ms.verb->lv[ms.grid.row]);}
 	ms.type=modal_none;
 	if(ms.from_listener)modal_enter(modal_listen);
-	if(enable_keycaps&&ms.from_keycaps)kc.on=1;
+	if(enable_touch&&ms.from_keycaps)kc.on=1;
 	if(ms.type==modal_none&&uimode==mode_interact)msg.next_view=1;
 }
 void modals(){
@@ -2243,14 +2243,14 @@ keyrow LCAPS[KROWS]={
 	{14,{KS(SDLK_TAB,"tab",1.5),K('q',"q"),K('w',"w"),K('e',"e"),K('r',"r"),K('t',"t"),K('y',"y"),K('u',"u"),K('i',"i"),K('o',"o"),K('p',"p"),K('[',"["),K(']',"]"),K('\\',"\\")}},
 	{13,{KS(SDLK_CAPSLOCK,"capslock",2),K('a',"a"),K('s',"s"),K('d',"d"),K('f',"f"),K('g',"g"),K('h',"h"),K('j',"j"),K('k',"k"),K('l',"l"),K(';',";"),K('\'',"'"),KS(SDLK_RETURN,"return",2)}},
 	{12,{KS(SDLK_LSHIFT,"shift",2.5),K('z',"z"),K('x',"x"),K('c',"c"),K('v',"v"),K('b',"b"),K('n',"n"),K('m',"m"),K(',',","),K('.',"."),K('/',"/"),KS(SDLK_RSHIFT,"shift",2.5)}},
-	{8,{KS(SDLK_LEFT,"",1),KS(SDLK_DOWN,"",1),KS(SDLK_UP,"",1),KS(SDLK_RIGHT,"",1),KS(0,"",1),KS(SDLK_SPACE," ",5),KS(0,"",1),KS(-1,"OK",4)}},
+	{9,{KS(SDLK_LEFT,"",1),KS(SDLK_DOWN,"",1),KS(SDLK_UP,"",1),KS(SDLK_RIGHT,"",1),KS(0,"",1),KS(SDLK_SPACE," ",5),KS(0,"",1),KS(-2,"",2),KS(-1,"OK",2)}},
 };
 keyrow UCAPS[KROWS]={
 	{14,{K('~',"~"),K('!',"!"),K('@',"@"),K('#',"#"),K('$',"$"),K('%',"%"),K('^',"^"),K('&',"&"),K('*',"*"),K('(',"("),K(')',")"),K('_',"_"),K('+',"+"),KS(SDLK_BACKSPACE,"delete",1.5)}},
 	{14,{KS(SDLK_TAB,"tab",1.5),K('Q',"Q"),K('W',"W"),K('E',"E"),K('R',"R"),K('T',"T"),K('Y',"Y"),K('U',"U"),K('I',"I"),K('O',"O"),K('P',"P"),K('{',"{"),K('}',"}"),K('|',"|")}},
 	{13,{KS(SDLK_CAPSLOCK,"capslock",2.0),K('A',"A"),K('S',"S"),K('D',"D"),K('F',"F"),K('G',"G"),K('H',"H"),K('J',"J"),K('K',"K"),K('L',"L"),K(':',":"),K('"',"\""),KS(SDLK_RETURN,"return",2)}},
 	{12,{KS(SDLK_LSHIFT,"shift",2.5),K('Z',"Z"),K('X',"X"),K('C',"C"),K('V',"V"),K('B',"B"),K('N',"N"),K('M',"M"),K('<',"<"),K('>',">"),K('?',"?"),KS(SDLK_RSHIFT,"shift",2.5)}},
-	{8,{KS(SDLK_LEFT,"",1),KS(SDLK_DOWN,"",1),KS(SDLK_UP,"",1),KS(SDLK_RIGHT,"",1),KS(0,"",1),KS(SDLK_SPACE," ",5),KS(0,"",1),KS(-1,"OK",4)}},
+	{9,{KS(SDLK_LEFT,"",1),KS(SDLK_DOWN,"",1),KS(SDLK_UP,"",1),KS(SDLK_RIGHT,"",1),KS(0,"",1),KS(SDLK_SPACE," ",5),KS(0,"",1),KS(-2,"",2),KS(-1,"OK",2)}},
 };
 void soft_keyboard(rect r,int*exit,int*eval){
 	int y=r.y, kh=r.h/KROWS, sh=ev.shift^kc.lock^kc.shift;char*pal=patterns_pal(ifield(deck,"patterns"));
@@ -2260,16 +2260,16 @@ void soft_keyboard(rect r,int*exit,int*eval){
 			keycap k=(sh?UCAPS:LCAPS)[row].caps[z];
 			rect b={r.x+x+1,y,z==LCAPS[row].c-1?(r.w-x):(k.w*(r.w/w)),kh+1};x+=b.w-1;
 			draw_box(b,0,1);
-			int e=k.v==SDLK_RETURN&&ms.type==modal_listen&&sh;
+			int e=k.v==-2&&wid.f.style==field_code&&uimode==mode_interact;
 			if     (k.v==SDLK_LEFT )draw_iconc(b,ARROWS->lv[4],1);
 			else if(k.v==SDLK_DOWN )draw_iconc(b,ARROWS->lv[1],1);
 			else if(k.v==SDLK_UP   )draw_iconc(b,ARROWS->lv[0],1);
 			else if(k.v==SDLK_RIGHT)draw_iconc(b,ARROWS->lv[5],1);
 			else                    draw_textc(b,e?"run":k.l,FONT_MENU,1);
 			int kd=k.v>0&&k.v<4096&&keydown[k.v];b=inset(b,2);
-			int a=dover(b)&&over(b)&&ev.down_modal==ms.type&&ev.down_uimode==uimode&&ev.down_caps==1;if(k.v&&a&&(ev.md||ev.drag))kd=1;
+			int a=dover(b)&&over(inset(b,-4))&&ev.down_modal==ms.type&&ev.down_uimode==uimode&&ev.down_caps==1;if(k.v&&a&&(ev.md||ev.drag))kd=1;
 			if(k.v==-1){draw_box(b,0,13);if(ev.mu&&a)*exit=1;}
-			else if(e){if(ev.mu&a)*eval=1,kc.shift=0;}
+			else if(e){if(ev.mu&a)*eval=1;}
 			else if(k.v==SDLK_LSHIFT||k.v==SDLK_RSHIFT){if(ev.mu&&a)kc.shift^=1;if(kc.shift)kd=1;}
 			else if(k.v==SDLK_CAPSLOCK){if(ev.mu&&a)kc.lock^=1;if(kc.lock)kd=1;}
 			else if(ev.mu&&a&&k.v){
@@ -2282,7 +2282,7 @@ void soft_keyboard(rect r,int*exit,int*eval){
 	}
 }
 void keycaps(){
-	if(!enable_keycaps||!wid.fv)kc.on=0;if(!kc.on)return;
+	if(!enable_touch||!wid.fv)kc.on=0;if(!kc.on)return;
 	memset(frame.buffer->sv,0,frame.buffer->c);
 	int mh=3+font_h(FONT_MENU);
 	rect r={0,mh,frame.size.x+1,(frame.size.y/2)-mh};
@@ -2294,6 +2294,7 @@ void keycaps(){
 	int exit=0, eval=0;
 	soft_keyboard(inset((rect){r.x,r.y+r.h+1,r.w-2,frame.size.y-(r.y+r.h)},5),&exit,&eval);
 	if(ms.type==modal_listen&&(eval||ev.eval))listener_eval();
+	if(ms.type!=modal_listen&&(eval||ev.eval))field_keys(SDLK_RETURN,1);
 	if(exit||ev.exit){
 		field_exit();wid.active=-1;
 		if(uimode==mode_script)close_script(NULL);
@@ -3185,6 +3186,7 @@ void sync(){
 			ev.down_modal=ms.type,ev.down_uimode=uimode,ev.down_caps=kc.on;
 			if(e.button.button!=SDL_BUTTON_LEFT)ev.rdown=1;
 		}
+		if(e.type==SDL_FINGERDOWN){if(!set_touch)enable_touch=1;}
 		if(e.type==SDL_DROPFILE){
 			char*p=e.drop.file;
 			if(has_suffix(p,".html")||has_suffix(p,".deck")){
@@ -3329,7 +3331,7 @@ void paste_any(){
 	else{menu_item("Paste",0,'v');}
 }
 void gestures(){
-	if(!enable_gestures||!card_is(con()))return;lv*wids=con_wids();
+	if(!enable_touch||!card_is(con()))return;lv*wids=con_wids();
 	if(!in_layer()||uimode!=mode_interact||(!ev.drag&&!ev.mu))return;                              // must be in the right state of mind
 	if(ev.drag&&ob.sel->c&&lb(ifield(ob.sel->lv[0],"draggable")))return;                           // must not be dragging a canvas
 	int outside=1;EACH(z,wids)outside&=!dover(unpack_widget(wids->lv[z]).size);if(!outside)return; // must touch grass
@@ -3364,8 +3366,7 @@ void all_menus(){
 	if(menu_check("Listener",canlisten,ms.type==modal_listen,'l')){if(ms.type!=modal_listen){modal_enter(modal_listen);}else{modal_exit(0);}}
 	menu_separator();
 	if(menu_check("Fullscreen"     ,1                    ,!windowed      ,'f' ))toggle_fullscreen=1;
-	if(menu_check("Nav Gestures"   ,1                    ,enable_gestures,'\0'))enable_gestures^=1;
-	if(menu_check("Touch Keyboard" ,1                    ,enable_keycaps ,'\0'))enable_keycaps^=1;
+	if(menu_check("Touch Input"    ,1                    ,enable_touch   ,'\0'))enable_touch^=1,set_touch=1;
 	if(menu_check("Script Profiler",1                    ,profiler       ,'\0'))profiler^=1;
 	if(menu_check("Toolbars"       ,!windowed            ,toolbars_enable,'\0'))toolbars_enable^=1;
 	if(menu_check("Auto-Save"      ,strlen(document_path),autosave       ,'\0'))autosave^=1;
@@ -3814,7 +3815,7 @@ void tick(lv*env){
 		iwrite(ob.sel->lv[0],lmistr("pos"),lmpair(pair_sub((pair){ev.pos.x-ob.prev.x,ev.pos.y-ob.prev.y},off))),mark_dirty();
 	}
 	if(kc.on){ev=ev_stash;keycaps();}
-	if(uimode==mode_script&&enable_keycaps&&ms.type==modal_none)wid.active=0;
+	if(uimode==mode_script&&enable_touch&&ms.type==modal_none)wid.active=0;
 	menu_finish();
 	if(uimode==mode_draw&&dr.fatbits)draw_icon((pair){frame.size.x-14,2},ZOOM,1);
 	double used=interpret();
@@ -3906,9 +3907,8 @@ int main(int argc,char**argv){
 	char*file=NULL;for(int z=1;z<argc;z++){
 		if(!strcmp("--no-sound"   ,argv[z])){nosound=1;continue;}
 		if(!strcmp("--no-scale"   ,argv[z])){noscale=1;continue;}
+		if(!strcmp("--no-touch"   ,argv[z])){set_touch=1;continue;}
 		if(!strcmp("--fullscreen" ,argv[z])){toggle_fullscreen=1;continue;}
-		if(!strcmp("--gestures"   ,argv[z])){enable_gestures=1;continue;}
-		if(!strcmp("--keycaps"    ,argv[z])){enable_keycaps=1;continue;}
 		file=argv[z],set_path(argv[z]);
 	}
 	init_interns();gil=SDL_CreateMutex();

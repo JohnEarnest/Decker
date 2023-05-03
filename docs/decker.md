@@ -126,9 +126,12 @@ You can drag and drop files directly onto the Decker window, and it will take an
 - `.csv`: switch to the widgets tool and create a new grid containing the data in the CSV file, as if parsed with `readcsv[text]`.
 - `.psv`: switch to the widgets tool and create a new grid containing the data in the PSV file, as if parsed with `readcsv[text 0 "|"]`.
 
-The Decker menu allows you to turn on "Nav Gestures", which are intended to make it easier to move around a deck without using a keyboard. With Nav Gestures on and the _Interact_ tool active, click anywhere outside a widget on the current card and drag in a cardinal direction until an arrow appears under your cursor. While the arrow is visible, releasing your drag will navigate to a card in that "direction", if any. Nav Gestures produce the same `navigate` event as the cursor keys, so their behavior can be modified by scripts on a per-deck or per-card basis.
+The Decker menu allows you to turn on "Touch Input", which modifies several aspects of the user interface to be more suitable for use on touch- or pen-based devices which may not have a physical keyboard:
 
-The Decker menu also allows you to turn on "Touch Keyboard", which will adapt the UI to provide an on-screen keyboard whenever an editable field has focus, as well as in the script editor and some modal dialogs. The touch keyboard makes Decker usable on touchscreen and pen-based devices which may not have a physical keyboard.
+- Nav Gestures: With the _Interact_ tool active, click anywhere outside a widget on the current card and drag in a cardinal direction until an arrow appears under your cursor. While the arrow is visible, releasing your drag will navigate to a card in that "direction", if any. Nav Gestures produce the same `navigate` event as the cursor keys, so their behavior can be modified by scripts on a per-deck or per-card basis.
+- Touch Keyboard: An on-screen keyboard is provided whenever an editable field has focus, as well as in the script editor and some modal dialogs.
+
+Decker automatically enables touch mode the first time it observes a touch event.
 
 
 Web-Decker and Native-Decker
@@ -143,7 +146,6 @@ Web-Decker has generally the same tools and functionality as Native-Decker, but 
 - Opening or importing files uses the browser's native "Open" dialog instead of Decker's UI.
 - Saving or exporting files _cannot_ display a file browser to choose a destination, so Web-Decker provides a simplified dialog which only prompts for a filename. For similar reasons there is no "Autosave" functionality.
 - Web-Decker always fills the browser window. The toolbars are hidden by default, but can be toggled on (if space is available) from the _Decker_ menu.
-- Web-Decker automatically enables the touch keyboard the first time it observes a touch event, under the assumption that it may be used on a mobile device without a physical keyboard.
 - Web-Decker will always report `sys.platform` as `"web"`, irrespective of the operating system the browser is running on.
 - The Web-Decker implementation of Lil uses the browser's garbage collector, so less information is available in `sys.workspace`.
 - Most web browsers do not allow programs to play audio until the user has interacted with a page, so any `play[]` commands issued before a user has clicked, tapped, or pressed a keyboard key will have no effect.
@@ -1672,8 +1674,7 @@ If you start Native-Decker from the commandline, you can specify a path to a dec
 Native-Decker accepts several other optional CLI flags:
 - `--no-sound`: Disable sound playback and recording entirely.
 - `--no-scale`: Disable upscaling the display in windowed mode. Useful for recording screenshots.
-- `--gestures`: Enable navigation gestures. Disabled by default.
-- `--keycaps`: Enable onscreen keyboard. Disabled by default.
+- `--no-touch`: Disable touch input unless explicitly opted-in.
 - `--fullscreen`: Open in fullscreen mode.
 
 If a file path is not specified (or you open Decker by double-clicking the application), Decker will next check for the existence of a file named `start.deck` in the same directory as the executable (or on MacOS within the `.app/Resources/` directory of the application bundle), opening it if available. This can be helpful if you wish to build a personal "home deck", or if you wish to distribute your own decks along with a Decker runtime.

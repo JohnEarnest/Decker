@@ -389,7 +389,7 @@ PANGRAM='How razorback jumping-frogs can level six piqued gymnasts.'
 
 // State
 
-let uimode='interact', ui_container=null, uicursor=0, enable_gestures=0, enable_keycaps=0, set_keycaps=0, profiler=0
+let uimode='interact', ui_container=null, uicursor=0, enable_touch=0, set_touch=0, profiler=0
 mark_dirty=_=>{dirty=1}
 con_set=x=>{
 	if(x!=ui_container)setmode(uimode),msg.next_view=1
@@ -481,7 +481,7 @@ modal_pop=value=>{
 	if(l){const c=rcopy(wid.cursor);field_stylespan(lms(''),l),wid.cursor=c}
 }
 let kc={shift:0,lock:0,on:0,heading:null}, keydown={}
-keycaps_enter=_=>{if(!enable_keycaps||kc.on)return;kc.shift=0,kc.lock=0,kc.on=1,ev.mu=ev.md=0}
+keycaps_enter=_=>{if(!enable_touch||kc.on)return;kc.shift=0,kc.lock=0,kc.on=1,ev.mu=ev.md=0}
 
 let msg={ // interpreter event messages
 	pending_drag:0,pending_halt:0,pending_view:0,pending_loop:0,next_view:0,overshoot:0,
@@ -1289,7 +1289,7 @@ modal_enter=type=>{
 	ms.from_keycaps=kc.on
 	ms.type=ms.subtype=type
 	ms.old_wid=wid,wid=wid_state()
-	if(enable_keycaps){wid.active=type in {link:1,gridcell:1,listen:1}?0:-1}
+	if(enable_touch){wid.active=type in {link:1,gridcell:1,listen:1}?0:-1}
 	if(type=='listen'){
 		if(uimode=='script'){
 			try{const text=ls(rtext_string(sc.f.table));parse(text),script_save(text)}
@@ -1422,7 +1422,7 @@ modal_exit=value=>{
 	if(ms.subtype=='choose_lil' )arg(),ret(ms.verb.v[ms.grid.row])
 	ms.type=null
 	if(ms.from_listener)modal_enter('listen')
-	if(enable_keycaps&&ms.from_keycaps)kc.on=1
+	if(enable_touch&&ms.from_keycaps)kc.on=1
 	if(ms.type==null&&uimode=='interact')msg.next_view=1
 }
 modals=_=>{
@@ -2100,14 +2100,14 @@ const LCAPS=[
 	[KS('Tab','tab',1.5),K('q'),K('w'),K('e'),K('r'),K('t'),K('y'),K('u'),K('i'),K('o'),K('p'),K('['),K(']'),K('\\')],
 	[KS('CapsLock','capslock',2),K('a'),K('s'),K('d'),K('f'),K('g'),K('h'),K('j'),K('k'),K('l'),K(';'),K('\''),KS('Enter','return',2)],
 	[KS('Shift','shift',2.5),K('z'),K('x'),K('c'),K('v'),K('b'),K('n'),K('m'),K(','),K('.'),K('/'),KS('Shift','shift',2.5)],
-	[KS('ArrowLeft','',1),KS('ArrowDown','',1),KS('ArrowUp','',1),KS('ArrowRight','',1),KS(0,'',1),KS(' ',' ',5),KS(0,'',1),KS(-1,'OK',4)],
+	[KS('ArrowLeft','',1),KS('ArrowDown','',1),KS('ArrowUp','',1),KS('ArrowRight','',1),KS(0,'',1),KS(' ',' ',5),KS(0,'',1),KS(-2,'',2),KS(-1,'OK',2)],
 ]
 const UCAPS=[
 	[K('~'),K('!'),K('@'),K('#'),K('$'),K('%'),K('^'),K('&'),K('*'),K('('),K(')'),K('_'),K('+'),KS('Backspace','delete',1.5)],
 	[KS('Tab','tab',1.5),K('Q'),K('W'),K('E'),K('R'),K('T'),K('Y'),K('U'),K('I'),K('O'),K('P'),K('{'),K('}'),K('|')],
 	[KS('CapsLock','capslock',2),K('A'),K('S'),K('D'),K('F'),K('G'),K('H'),K('J'),K('K'),K('L'),K(':'),K('"'),KS('Enter','return',2)],
 	[KS('Shift','shift',2.5),K('Z'),K('X'),K('C'),K('V'),K('B'),K('N'),K('M'),K('<'),K('>'),K('?'),KS('Shift','shift',2.5)],
-	[KS('ArrowLeft','',1),KS('ArrowDown','',1),KS('ArrowUp','',1),KS('ArrowRight','',1),KS(0,'',1),KS(' ',' ',5),KS(0,'',1),KS(-1,'OK',4)],
+	[KS('ArrowLeft','',1),KS('ArrowDown','',1),KS('ArrowUp','',1),KS('ArrowRight','',1),KS(0,'',1),KS(' ',' ',5),KS(0,'',1),KS(-2,'',2),KS(-1,'OK',2)],
 ]
 soft_keyboard=r=>{
 	let ex=0, el=0, y=r.y, kh=0|(r.h/LCAPS.length), sh=ev.shift^kc.lock^kc.shift, pal=deck.patterns.pal.pix
@@ -2116,16 +2116,16 @@ soft_keyboard=r=>{
 		keys.forEach((k,i,arr)=>{
 			let b=rint(rect(r.x+x+1,y,i==arr.length-1?(r.w-x):(k.w*(r.w/w)),kh+1));x+=b.w-1
 			draw_box(b,0,1)
-			const e=k.v=='Enter'&&ms.type=='listen'&&sh
+			const e=k.v==-2&&wid.f.style=='code'&&uimode=='interact'
 			if     (k.v=='ArrowLeft' )draw_iconc(b,ARROWS[4],1)
 			else if(k.v=='ArrowDown' )draw_iconc(b,ARROWS[1],1)
 			else if(k.v=='ArrowUp'   )draw_iconc(b,ARROWS[0],1)
 			else if(k.v=='ArrowRight')draw_iconc(b,ARROWS[5],1)
 			else                      draw_textc(b,e?'run':k.l,FONT_MENU,1)
 			let kd=keydown[k.v];b=inset(b,2)
-			const a=dover(b)&&over(b)&&ev.down_modal==ms.type&&ev.down_uimode==uimode&&ev.down_caps==1;if(k.v&&a&&(ev.md||ev.drag))kd=1
+			const a=dover(b)&&over(inset(b,-4))&&ev.down_modal==ms.type&&ev.down_uimode==uimode&&ev.down_caps==1;if(k.v&&a&&(ev.md||ev.drag))kd=1
 			if(k.v==-1){draw_box(b,0,13);if(ev.mu&&a)ex=1}
-			else if(e){if(ev.mu&a)el=1,kc.shift=0}
+			else if(e){if(ev.mu&a)el=1}
 			else if(k.v=='Shift'   ){if(ev.mu&&a)kc.shift^=1;if(kc.shift)kd=1}
 			else if(k.v=='CapsLock'){if(ev.mu&&a)kc.lock^=1;if(kc.lock)kd=1}
 			else if(ev.mu&&a&&k.v){if(k.v.length==1){field_input(k.v)}else{field_keys(k.v,sh)};kc.shift=0}
@@ -2134,7 +2134,7 @@ soft_keyboard=r=>{
 	}return {exit:ex,eval:el}
 }
 keycaps=_=>{
-	if(!enable_keycaps||!wid.fv)kc.on=0;if(!kc.on)return
+	if(!enable_touch||!wid.fv)kc.on=0;if(!kc.on)return
 	frame.image.pix.fill(32)
 	const mh=3+font_h(FONT_MENU)
 	const r=rect(0,mh,frame.size.x+1,0|((frame.size.y/2)-mh))
@@ -2149,6 +2149,7 @@ keycaps=_=>{
 	}
 	const modes=soft_keyboard(inset(rect(r.x,r.y+r.h+1,r.w-2,frame.size.y-(r.y+r.h)),5))
 	if(ms.type=='listen'&&(modes.eval||ev.eval))listener_eval()
+	if(ms.type!='listen'&&(modes.eval||ev.eval))field_keys('Enter',1)
 	if(modes.exit||ev.exit){
 		field_exit();wid.active=-1
 		if(uimode=='script')close_script()
@@ -2891,8 +2892,7 @@ all_menus=_=>{
 	if(menu_check('Listener',canlisten,ms.type=='listen','l')){if(ms.type!='listen'){modal_enter('listen')}else{modal_exit(0)}}
 	menu_separator()
 	menu_check('Fullscreen',1,is_fullscreen(),null,toggle_fullscreen)
-	if(menu_check('Nav Gestures',1,enable_gestures))enable_gestures^=1
-	if(menu_check('Touch Keyboard',1,enable_keycaps))enable_keycaps^=1,set_keycaps=1
+	if(menu_check('Touch Input',1,enable_touch))enable_touch^=1,set_touch=1
 	if(menu_check('Script Profiler',1,profiler))profiler^=1
 	if(menu_check('Toolbars',tzoom>0,toolbars_enable))toolbars_enable^=1,resize()
 	if(blocked){
@@ -3253,7 +3253,7 @@ main_view=_=>{
 	if(in_layer()&&ev.exit&&!dr.fatbits&&!card_is(con()))con_set(null),ev.exit=0
 }
 gestures=_=>{
-	if(!enable_gestures||!card_is(con()))return
+	if(!enable_touch||!card_is(con()))return
 	if(!in_layer()||uimode!='interact'||(!ev.drag&&!ev.mu))return          // must be in the right state of mind
 	if(ev.drag&&ob.sel.length&&lb(ifield(ob.sel[0],'draggable')))return    // must not be dragging a canvas
 	if(con_wids().v.some(x=>dover(unpack_widget(x).size)))return           // must touch grass
@@ -3284,7 +3284,7 @@ tick=_=>{
 	if(uimode=='script'){const mh=3+font_h(FONT_MENU);if(!kc.on)script_editor(rect(0,mh,frame.size.x+1,frame.size.y-mh))}else{main_view()}
 	modals(),gestures()
 	if(kc.on){ev=ev_stash,keycaps()}
-	if(uimode=='script'&&enable_keycaps&&ms.type==null)wid.active=0
+	if(uimode=='script'&&enable_touch&&ms.type==null)wid.active=0
 	menu_finish()
 	if(uimode=='draw'&&dr.fatbits)draw_icon(rect(frame.size.x-14,2),ZOOM,1)
 	if(uimode=='interact'&&ev.drag&&ob.sel.length&&lb(ifield(ob.sel[0],'draggable'))){
@@ -3341,7 +3341,7 @@ mouse=(e,f)=>{
 	ev.rawpos=rect(e.pageX,e.pageY);const c=q('#display').getBoundingClientRect()
 	f(0|((e.pageX-c.x)/zoom),0|((e.pageY-c.y)/zoom),e.button!=0)
 }
-touch=(e,f)=>{const t=e.targetTouches[0]||{}; mouse({pageX:t.clientX, pageY:t.clientY, button:0},f);if(!set_keycaps)enable_keycaps=1}
+touch=(e,f)=>{const t=e.targetTouches[0]||{}; mouse({pageX:t.clientX, pageY:t.clientY, button:0},f);if(!set_keycaps)enable_touch=1}
 let prev_stamp=null, leftover=0
 loop=stamp=>{
 	if(!prev_stamp)prev_stamp=stamp
@@ -3401,8 +3401,8 @@ q('body').onkeydown=e=>{
 	else{e.preventDefault()}
 }
 q('body').onkeyup=e=>{
-	keydown[e.key]=0
-	if(e.key=='Meta'||e.key=='Control'||e.metaKey||e.ctrlKey)ev.alt=0
+	keydown[e.key]=0;
+	if(e.key=='Meta'||e.key=='Control'||e.metaKey||e.ctrlKey)ev.alt=0,keydown={}
 	if(e.key=='Enter'&&e.shiftKey)ev.eval=1
 	if(e.key=='Shift'||e.shiftKey)ev.shift=0
 	if(e.key=='m'&&uimode=='draw'&&in_layer())ev.hidemenu^=1
