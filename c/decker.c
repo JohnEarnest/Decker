@@ -13,7 +13,7 @@ lv*CHECK,*LOCK,*ANIM,*ZOOM,*CHECKS[4],*CORNERS[4],*RADIOS[4],*ICONS[8],*GESTURES
 lv*FONT_BODY,*FONT_MENU,*FONT_MONO,*TOOLS,*ARROWS,*TOOLB,*PLAYING,*ATTRS;
 enum mini_icons {icon_dir,icon_doc,icon_sound,icon_font,icon_app,icon_lil,icon_pat,icon_chek,icon_none};
 enum cursor_styles {cursor_default,cursor_point,cursor_ibeam,cursor_drag};
-SDL_Cursor*CURSORS[4]; int uicursor=0, enable_touch=0, set_touch=0, profiler=0;
+SDL_Cursor*CURSORS[4]; int uicursor=0, enable_touch=0, set_touch=0, profiler=0, should_exit=0;
 
 char*TOOL_ICONS=
 	"%%IMG0ABAAwAMABIAEgASABIAEgGTwlKxMqiQKJAIQAggCCAQEBAQEAAAAAAAAAAA//EACgAGAAYABgAFAAz/+H/wAAAAAAA"
@@ -1499,7 +1499,7 @@ void modal_exit(int value){
 			n_write(NULL,lml2(path,ls(value)))
 		);
 	}
-	if(ms.subtype==modal_confirm_quit&&value)exit(0);
+	if(ms.subtype==modal_confirm_quit&&value)should_exit=1;
 	if(ms.subtype==modal_confirm_new&&value)load_deck(deck_get(lmistr(""))),set_path("");
 	if(ms.subtype==modal_confirm_script&&value)finish_script();
 	if(ms.subtype==modal_multiscript&&value)setscript(l_drop(NONE,ob.sel));
@@ -3100,7 +3100,7 @@ void sync(){
 	for(int z=0;z<256;z++)ev.shortcuts[z]=0;
 	SDL_Event e;
 	while(SDL_WaitEvent(&e)){
-		if(e.type==SDL_QUIT){if(lb(ifield(deck,"locked")))exit(0);ev.shortcuts['q']=1;}
+		if(e.type==SDL_QUIT){if(lb(ifield(deck,"locked")))should_exit=1;ev.shortcuts['q']=1;}
 		if(e.type==SDL_USEREVENT)break;
 		if(e.type==SDL_TEXTINPUT&&wid.infield)field_input(e.text.text);
 		if(e.type==SDL_KEYDOWN){
@@ -3860,8 +3860,8 @@ void tick(lv*env){
 
 void quit(){
 	if(ms.type!=modal_none)return;
-	if(!dirty||lb(ifield(deck,"locked")))exit(0);
-	if(autosave&&strlen(document_path)){save_deck(lmcstr(document_path));exit(0);}
+	if(!dirty||lb(ifield(deck,"locked"))){should_exit=1;return;}
+	if(autosave&&strlen(document_path)){save_deck(lmcstr(document_path));should_exit=1;return;}
 	modal_enter(modal_confirm_quit);
 	ms.message=lmcstr("The current deck has unsaved changes.\nAre you sure you want to quit?");
 	ms.verb=lmcstr("Quit");
@@ -3970,5 +3970,5 @@ int main(int argc,char**argv){
 	if(base)SDL_free(base);
 	if(!deck){str doc=str_new();str_add(&doc,(char*)examples_decks_tour_deck,examples_decks_tour_deck_len);load_deck(deck_get(lmstr(doc)));}
 	SDL_AddTimer((1000/60),tick_pump,NULL);if(!nosound)sfx_init();
-	while(1){tick(env);sync();}
+	while(!should_exit){tick(env);sync();}
 }
