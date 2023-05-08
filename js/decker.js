@@ -1293,7 +1293,7 @@ modal_enter=type=>{
 	if(type=='listen'){
 		if(uimode=='script'){
 			try{const text=ls(rtext_string(sc.f.table));parse(text),script_save(text)}
-			catch(e){listen_show(align_right,1,lms('note: this script contains an error.\nexecuting under last saved version!'))}
+			catch(e){listen_show(ALIGN.right,1,lms('note: this script contains an error.\nexecuting under last saved version!'))}
 		}
 		ms.text=fieldstr(lms('')),li.scroll=RTEXT_END
 	}
