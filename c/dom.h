@@ -162,7 +162,7 @@ lv* parent_deck(lv*x){
 	if(card_is(x)||prototype_is(x))return ivalue(x,"deck");
 	return parent_deck(ivalue(x,"card"));
 }
-lv* event_invokev(lv*target,lv*name,lv*arg,lv*hunk,int iso,int noinner){
+lv* event_invokev(lv*target,lv*name,lv*arg,lv*hunk,int iso,int noinner,int nodiscard){
 	lv*scopes=lmd();dset(scopes,NONE,parse(default_handlers));
 	lv*deck=NULL,*core=NULL;int isolate=iso;ancestors(target,scopes,&deck,&isolate);
 	for(int z=scopes->c-1;z>=0;z--){
@@ -183,14 +183,14 @@ lv* event_invokev(lv*target,lv*name,lv*arg,lv*hunk,int iso,int noinner){
 		blk_cat(b,scopes->lv[z]),blk_op(b,DROP);
 		if(!core&&hunk){
 			str n=str_new();str_addz(&n,"!hunk");
-			blk_lit(b,lmon(n,lml(0),blk_end(hunk))),blk_op(b,BIND);
+			blk_lit(b,lmon(n,lml(0),blk_end(hunk))),blk_op(b,BIND),blk_op(b,DROP);
 			name=lmistr("!hunk"),arg=lml(0);
 		}else if(core){
 			str n=str_new();str_addz(&n,sname);
-			blk_lit(b,lmon(n,lml(0),blk_end(core))),blk_op(b,BIND);
+			blk_lit(b,lmon(n,lml(0),blk_end(core))),blk_op(b,BIND),blk_op(b,DROP);
 			name=lmistr(sname),arg=lml(0);
 		}
-		blk_get(b,name),blk_lit(b,arg),blk_op(b,CALL);if(!hunk)blk_op(b,DROP);core=b;
+		blk_get(b,name),blk_lit(b,arg),blk_op(b,CALL);if(!hunk&&!nodiscard)blk_op(b,DROP);core=b;
 	}
 	lv*b=lmblk();blk_lit(b,target),blk_loc(b,lmistr("me")),blk_op(b,DROP);
 	if(!isolate){
@@ -198,7 +198,7 @@ lv* event_invokev(lv*target,lv*name,lv*arg,lv*hunk,int iso,int noinner){
 		blk_lit(b,ifield(deck,"patterns")),blk_loc(b,lmistr("patterns")),blk_op(b,DROP);
 	}blk_cat(b,core);return b;
 }
-lv* event_invoke(lv*target,lv*name,lv*arg,lv*hunk,int iso){return event_invokev(target,name,arg,hunk,iso,0);}
+lv* event_invoke(lv*target,lv*name,lv*arg,lv*hunk,int iso){return event_invokev(target,name,arg,hunk,iso,0,0);}
 int pending_popstate=0;
 void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
 	lv*root=lmenv(NULL);primitives(root,parent_deck(target)),constants(root);
@@ -207,8 +207,8 @@ void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
 }
 lv* n_event(lv*self,lv*x){
 	lv*root=lmenv(NULL);primitives(root,parent_deck(self)),constants(root);
-	issue(root,event_invokev(self,ls(l_first(x)),l_drop(ONE,x),NULL,0,1));
-	return self;
+	lv*b=lmblk();blk_op(b,DROP),blk_cat(b,event_invokev(self,ls(l_first(x)),l_drop(ONE,x),NULL,0,1,1));
+	issue(root,b);return NONE;
 }
 void fire_event_async(lv*target,lv*name,lv*arg){fire_async(target,name,l_list(arg),NULL,1);}
 void fire_hunk_async(lv*target,lv*hunk){fire_async(target,NULL,lml(0),hunk,1);}

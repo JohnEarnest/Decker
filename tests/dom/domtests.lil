@@ -1685,13 +1685,17 @@ deck.cards.home.event["another"]
 assert["custom events from cards" "called by home" f.text]
 deck.event["another"]
 assert["custom events from decks" "called by synthetic event tests" f.text]
-r:deck.event["another"]
-assert["custom event rvalue" deck r]
 
 d:readdeck["examples/decks/enchilada.deck"]
 c:d.cards["Sound Loops"]
 b:c.widgets["button1"]
 b.event["click"]
+
+deck:readdeck[]
+b:deck.card.add["button" "doit"]
+b.script:"on custom x do 2+3*x end"
+r:b.event["custom" 100]
+assert["custom event rvalue" 302 r]
 
 #######################################
 #

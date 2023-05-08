@@ -657,7 +657,7 @@ The deck interface represents the global attributes of a Decker document.
 | `x.card`          | The current _card_. Writing this attribute behaves the same as calling `go[x]`. |
 | `x.add[x y z]`    | Add a resource to this deck, and return it.                                     |
 | `x.remove[x]`     | Remove a resource from this deck. Returns 1 on success.                         |
-| `x.event[n x...]` | Issue an event named `n` at this deck with argument(s) `x`, and return the deck.|
+| `x.event[n x...]` | Issue an event named `n` at this deck with argument(s) `x`.                     |
 
 `deck.add[x y z]` can add new cards, sounds, modules, prototypes and fonts to the deck:
 
@@ -911,7 +911,7 @@ The card interface gives access to the contents of a given card.
 | `x.index`         | The ordinal position of this card in the deck, counting from 0. r/w.                              |
 | `x.add[x y z]`    | Add a widget to this card, and return it.                                                         |
 | `x.remove[x]`     | Remove a widget `x` from this card. Returns 1 on success.                                         |
-| `x.event[n x...]` | Issue an event named `n` at this card with argument(s) `x`, and return the card.                  |
+| `x.event[n x...]` | Issue an event named `n` at this card with argument(s) `x`.                                       |
 
 `card.add[x y]` can add a new widget to the card. If `x` is a string {`"button"`, `"field"`, `"slider"`, `"canvas"`, or `"grid"`}, insert a new widget of the appropriate type using `y` as a name (or an appropriate default name). If `x` is the string `"contraption"`, insert a new instance of the prototype with name `y` using `z` as a name (or an appropriate default name). If `x` is a widget interface, insert a copy of it, again using `y` as a name or an appropriate default.
 
@@ -937,7 +937,7 @@ The button widget is a clickable button, possibly with a stateful checkbox.
 | `x.text`                | String. The label shown on this button. r/w.                                                          |
 | `x.value`               | Bool. Is this checkbox checked? r/w.                                                                  |
 | `x.style`               | The style of button; one of {`"round"`, `"rect"`, `"check"`, `"invisible"`}. r/w.                     |
-| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`, and return the widget.                  |
+| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 
 Field Interface
 ---------------
@@ -963,7 +963,7 @@ The field widget displays and possibly allows the editing of text.
 | `x.scrollbar`           | Bool. Draw a scrollbar for this widget? r/w.                                                          |
 | `x.style`               | The style of field; one of {`"rich"`, `"plain"`, `"code"`}. r/w.                                      |
 | `x.align`               | The text alignment of the field; one of {`"left"`, `"center"`, `"right"`}. r/w.                       |
-| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`, and return the widget.                  |
+| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 
 If a field has a `style` other than `rich`, any rtext written to the `value` attribute will be coalesced into a single run of ordinary text with the default font.
 
@@ -991,7 +991,7 @@ The slider widget represents a single number, constrained within a configurable 
 | `x.interval`            | A list of numbers giving a minimum and maximum for the value, inclusive. r/w.                         |
 | `x.format`              | A `format` string controlling how the value is shown in `"bar"` or `"compact"` styles. r/w.           |
 | `x.style`               | The style of slider; one of {`"horiz"`, `"vert"`, `"bar"`, `"compact"`}. r/w.                         |
-| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`, and return the widget.                  |
+| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 
 Grid Interface
 --------------
@@ -1019,7 +1019,7 @@ The grid widget represents an interactive spreadsheet-style view of a table.
 | `x.row`                 | Int. The index of the selected row of the table, or -1 for no selection. r/w.                         |
 | `x.rowvalue`            | Dict. The selected row of the table, or an empty dictionary for no selection.                         |
 | `x.format`              | String. A column spec for formatting columns of the table. See `writecsv[]`. r/w.                     |
-| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`, and return the widget.                  |
+| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 
 Canvas Interface
 ----------------
@@ -1061,7 +1061,7 @@ The canvas will scale _up_ logical pixels to display them on the card (resulting
 | `x.text[x pos a]`       | Draw a string or rtext `x` at `pos`, from an anchor position `a`.                                                 |
 | `x.copy[pos size a]`    | Grab an _image_ at `pos`/`size`.                                                                                  |
 | `x.paste[image pos t]`  | Draw an _image_ at `pos`. If `t` is truthy, treat pattern 0 as transparent.                                       |
-| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`, and return the widget.                              |
+| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                                     |
 
 The `canvas.line[]` and `canvas.poly[]` functions can take any number of arguments, which may `(x,y)` points, or lists of `(x,y)` points. For example, either of the following would draw an identical small triangle:
 ```
@@ -1108,7 +1108,7 @@ Contraptions are custom widgets, defined in a [Prototype](#prototypeinterface). 
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
 | `x.def`                 | The Prototype of this contraption.                                                                    |
-| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`, and return the widget.                  |
+| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 
 Contraption interfaces may expose additional attributes. Reads or writes to properties aside from those listed above (such as `.zami`) will invoke the `script` of the Prototype corresponding to this Contraption, calling either a function `get_zami` on a read, or `set_zami` (with a value) on a write.
 

@@ -2326,7 +2326,7 @@ fire_attr_sync=(target,name,a)=>{
 	pushstate(root),issue(root,b);let q=ATTR_QUOTA;while(running()&&q>0)runop(),q--;const r=running()?NONE:arg();popstate();frame=bf;return in_attr=0,r
 }
 parent_deck=x=>deck_is(x)?x: card_is(x)||prototype_is(x)?x.deck: parent_deck(x.card)
-event_invoke=(target,name,arg,hunk,isolate,noinner)=>{
+event_invoke=(target,name,arg,hunk,isolate,noinner,nodiscard)=>{
 	const scopes=lmd([NONE],[parse(DEFAULT_HANDLERS)]); let deck=null
 	const ancestors=target=>{
 		if(deck_is(target)){deck=target;if(isolate)return}
@@ -2341,7 +2341,7 @@ event_invoke=(target,name,arg,hunk,isolate,noinner)=>{
 		catch(e){dset(scopes,target,lmblk());}
 	};ancestors(target)
 	const bind=(b,n,v)=>{blk_lit(b,v),blk_loc(b,n),blk_op(b,op.DROP)}
-	const func=(b,n,v)=>{blk_lit(b,lmon(n,[],blk_end(v))),blk_op(b,op.BIND),name=n,arg=lml([])}
+	const func=(b,n,v)=>{blk_lit(b,lmon(n,[],blk_end(v))),blk_op(b,op.BIND),blk_op(b,op.DROP),name=n,arg=lml([])}
 	let core=null
 	for(let z=scopes.v.length-1;z>=0;z--){
 		let t=scopes.k[z], b=lmblk(), sname='!widget_scope'
@@ -2359,7 +2359,7 @@ event_invoke=(target,name,arg,hunk,isolate,noinner)=>{
 		blk_cat(b,scopes.v[z]),blk_op(b,op.DROP)
 		if(!core&&hunk){func(b,'!hunk',hunk)}
 		else if(core){func(b,sname,core)}
-		blk_get(b,lms(name)),blk_lit(b,arg),blk_op(b,op.CALL);if(!hunk)blk_op(b,op.DROP);core=b
+		blk_get(b,lms(name)),blk_lit(b,arg),blk_op(b,op.CALL);if(!hunk&&!nodiscard)blk_op(b,op.DROP);core=b
 	}
 	const r=lmblk();bind(r,lms('me'),target)
 	if(!isolate)bind(r,lms('deck'),deck),bind(r,lms('patterns'),deck.patterns)
@@ -2367,13 +2367,14 @@ event_invoke=(target,name,arg,hunk,isolate,noinner)=>{
 }
 fire_async=(target,name,arg,hunk,nest)=>{
 	const root=lmenv();primitives(root,parent_deck(target)),constants(root)
-	if(nest)pushstate(root),pending_popstate=1;issue(root,event_invoke(target,name,arg,hunk,0))
+	if(nest)pushstate(root),pending_popstate=1;issue(root,event_invoke(target,name,arg,hunk,0,0,0))
 }
 fire_event_async=(target,name,x)=>fire_async(target,name,lml([x]),null,1)
 fire_hunk_async=(target,hunk)=>fire_async(target,null,lml([]),hunk,1)
 n_event=(self,args)=>{
 	const root=lmenv();primitives(root,parent_deck(self)),constants(root)
-	issue(root,event_invoke(self,ls(args[0]),lml(args.slice(1)),null,0,1));return self
+	const b=lmblk();blk_op(b,op.DROP),blk_cat(b,event_invoke(self,ls(args[0]),lml(args.slice(1)),null,0,1,1))
+	return issue(root,b),NONE
 }
 readgif=(data,hint)=>{
 	const gray=hint=='gray'||hint=='gray_frames', frames=hint=='frames'||hint=='gray_frames'
