@@ -153,13 +153,13 @@ ffmpeg -i input.mp3 -bitexact -map_metadata -1 -ac 1 -ar 8000 -acodec pcm_u8 out
 - `exit`: the exit code of the process, as a number. If the process halted abnormally (i.e. due to a signal), this will be -1.
 - `out`: _stdout_ of the process, as a string.
 
-5) See the [Decker Manual](decker.html) for details of `eval[]`, `readcsv[]`, `writecsv[]`, `readxml[]`, and `writexml[]`.
+5) See the Decker Manual for details of `eval[]`, `readcsv[]`, `writecsv[]`, `readxml[]`, and `writexml[]`.
 
 6) If the path given to `writedeck[]` ends in a `.html` suffix, the deck will be written as a "standalone" deck with a bundled HTML+JS runtime. Otherwise, the deck will be written as a "bare" deck, which is smaller.
 
 Working With Decks
 ------------------
-The `readdeck[]` and `writedeck[]` functions allow Lilt to operate on [Decker](decker.html) documents. Lilt can load, create, and manipulate multiple decks simultaneously, providing options for automated testing, data import/export, accessibility, and interacting with other technology from outside the Decker ecosystem.
+The `readdeck[]` and `writedeck[]` functions allow Lilt to operate on Decker documents. Lilt can load, create, and manipulate multiple decks simultaneously, providing options for automated testing, data import/export, accessibility, and interacting with other technology from outside the Decker ecosystem.
 
 Just as in Decker, you can simulate "injecting" events into widgets, cards, or the deck with the `x.event[name args...]` function they provide, running the appropriate scripts to completion and producing any appropriate side-effects on the deck. For example, clicking on the first widget on the active card:
 
