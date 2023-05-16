@@ -3187,7 +3187,7 @@ void sync(){
 			if(e.button.button!=SDL_BUTTON_LEFT)ev.rdown=1;
 		}
 		if(e.type==SDL_FINGERDOWN){if(!set_touch)enable_touch=1;}
-		if(e.type==SDL_DROPFILE){
+		if(e.type==SDL_DROPFILE&&!lb(ifield(deck,"locked"))){
 			char*p=e.drop.file;
 			if(has_suffix(p,".html")||has_suffix(p,".deck")){
 				modal_enter(modal_resources);

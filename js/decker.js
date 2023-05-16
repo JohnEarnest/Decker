@@ -3499,7 +3499,7 @@ document.onpaste=e=>{
 }
 q('body').ondragover=e=>e.preventDefault()
 q('body').ondrop=e=>{
-	e.preventDefault();const file=e.dataTransfer.files.item(0);if(!file)return
+	e.preventDefault();const file=e.dataTransfer.files.item(0);if((!file)||lb(ifield(deck,'locked')))return
 	if(/\.(psv|csv)$/i.test(file.name)){
 		file.text().then(t=>{
 			const data=n_readcsv([lms(t),NONE,lms(file.type=='text/csv'?',':'|')])
