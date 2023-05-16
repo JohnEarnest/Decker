@@ -43,7 +43,7 @@ load_image=(file,hint,after)=>{
 		if(color){i=read_image(1)}else if(ow&&!tw){i.pix.forEach((p,z)=>i.pix[z]=p!=32)}
 		setmode('draw'),bg_paste(i);dr.limbo_dither=color,dr.dither_threshold=0.5,dr.fatbits=0,dr.omask=m
 	}
-	if(file.type=='image/gif'){const r=new FileReader();r.onload=_=>{after(readgif(new Uint8Array(r.result),hint))};r.readAsArrayBuffer(file)}
+	if(file.type=='image/gif'&&after){const r=new FileReader();r.onload=_=>{after(readgif(new Uint8Array(r.result),hint))};r.readAsArrayBuffer(file)}
 	else{const r=new FileReader();r.onload=_=>{q('#loader').src=r.result;setTimeout(import_image,100)};r.readAsDataURL(file)}
 }
 save_text=(n,x)=>{
