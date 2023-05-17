@@ -32,9 +32,7 @@ on step do
 end
 
 on steps x do
- each in range floor x
-  step[]
- end
+ step @ range floor x
 end
 {end}
 
