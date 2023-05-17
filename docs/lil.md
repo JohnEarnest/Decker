@@ -1078,7 +1078,7 @@ The `&` and `|` operator calculate the minimum or maximum of their arguments. As
 
 `x , y` is the concatenation operator. It is used for joining items together into lists. If `x` is a dictionary, `y` will be converted to a dictionary, and the operator will take the union of their key-value mappings, preferring any bindings in `y` over `x` when both are present. If applied to two tables, their rows will be concatenated, with any missing columns supplied as 0. Note that using `,` on two strings will result in a list of two strings, whereas `"" fuse x,y` will concatenate the strings together.
 
-`x @ y` is spread-indexing: `x` is indexed with each element of `y`. For example, `(11,22,33) @ 0,1,0,1,0` is `(11,22,11,22,11)`. With an appropriate index `y`, this operator can be used to reorder, duplicate, or filter elements of a list `x`. The expression `x @ y` is essentially equivalent to `each v k i in y (x[v k i]) end`, and so it can also be used as shorthand for any `each` loop that would otherwise simply be applying a function to each element of its source.
+`x @ y` is spread-indexing: `x` is indexed with each element of `y`. For example, `(11,22,33) @ 0,1,0,1,0` is `(11,22,11,22,11)`. With an appropriate index `y`, this operator can be used to reorder, duplicate, or filter elements of a list `x`. The expression `x @ y` is essentially equivalent to `each v k i in y (x[v k i]) end`, and so it can also be used as shorthand for any `each` loop that would otherwise simply be applying a function to each element of its source. This also works if `x` is a unary primitive: `count @ "one","two","three","four"` is `(3,3,5,4)`.
 
 `x split y` breaks a string `y` apart on any instance of the string `x`, resulting in a list of strings.
 

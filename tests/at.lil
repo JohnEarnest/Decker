@@ -33,3 +33,7 @@ on bar x do
 end
 show[      bar @ range 3]
 show[foo @ bar @ range 3]
+
+# mapping with monadic primitives
+show[count @ "one","two","three","four"]
+show[last  @ ((list 11,22),(list 33,44,55))]

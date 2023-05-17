@@ -455,7 +455,12 @@ parse=text=>{
 			blk_opa(b,op.BUND,count(n)),blk_lit(b,n),expr(b),blk_op3(b,'@ins');return
 		}
 		if(matchsp('(')){if(matchsp(')')){blk_lit(b,lml([]));return}expr(b),expect(')');return}
-		const s=peek().v;if(findop(s,monad)>=0&&peek().t in{'symbol':1,'name':1}){next(),expr(b),blk_op1(b,s);return}
+		const s=peek().v;if(findop(s,monad)>=0&&peek().t in{'symbol':1,'name':1}){
+			next();if(matchsp('@')){
+				expr(b),blk_op(b,op.ITER);const head=blk_here(b);blk_lit(b,['v']);const each=blk_opa(b,op.EACH,0);
+				blk_get(b,lms('v')),blk_op1(b,s),blk_opa(b,op.NEXT,head),blk_sets(b,each,blk_here(b))
+			}else{expr(b),blk_op1(b,s)};return
+		}
 		const n=lms(name('variable'));if(matchsp(':')){expr(b),blk_set(b,n);return}blk_get(b,n),parseindex(b,n)
 	}
 	const expr=b=>{

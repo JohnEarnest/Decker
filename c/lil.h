@@ -773,7 +773,13 @@ void term(lv*b){
 	}
 	if(matchsp('(')){if(matchsp(')')){blk_lit(b,lml(0));return;}expr(b);expect(')',0);return;}
 	str s=token_str(peek());
-	if(findop(s.sv,monads)>=0&&strchr("mn",peek()->type)){next(),expr(b),blk_op1(b,s.sv),free(s.sv);return;}
+	if(findop(s.sv,monads)>=0&&strchr("mn",peek()->type)){
+		next();if(matchsp('@')){
+			lv*names=l_list(lmistr("v"));
+			expr(b),blk_op(b,ITER);int head=blk_here(b);blk_lit(b,names);int each=blk_opa(b,EACH,0);
+			blk_get(b,names->lv[0]),blk_op1(b,s.sv),blk_opa(b,NEXT,head),blk_sets(b,each,blk_here(b));
+		}else{expr(b),blk_op1(b,s.sv);}free(s.sv);return;
+	}
 	free(s.sv);lv* n=lmstr(name("variable"));
 	if(matchsp(':')){expr(b),blk_set(b,n);return;}
 	blk_get(b,n);parseindex(b,n);
