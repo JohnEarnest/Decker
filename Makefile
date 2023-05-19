@@ -23,6 +23,14 @@ ifeq ($(UNAME),Linux)
 	# -Wno-format-truncation likewise silences spurious warnings regarding snprintf() truncation.
 	FLAGS:=$(FLAGS) -Wno-misleading-indentation -Wno-format-truncation
 endif
+ifeq ($(UNAME),OpenBSD)
+	OPEN=xdg-open
+	COMPILER=clang
+	FLAGS=-Wall -Werror -Wextra -Wpedantic -O2
+	# -Wno-misleading-indentation silences warnings which are entirely spurious.
+	FLAGS:=$(FLAGS) -Wno-misleading-indentation -Wno-unknown-warning-option
+	FLAGS:=$(FLAGS) -lm
+endif
 ifneq ("$(wildcard /usr/bin/olpc-hwinfo)","")
 	# building on an OLPC, disable some features and enable some performance boosts.
 	FLAGS:=$(FLAGS) -DLOSPEC

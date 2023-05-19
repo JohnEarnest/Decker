@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # build the browser version of decker
 
 set -e

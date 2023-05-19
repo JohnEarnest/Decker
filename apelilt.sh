@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script builds an "Actually-Portable Executable" version of Lilt,
 # the standalone Lil interpreter, producing a single binary which

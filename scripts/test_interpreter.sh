@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # integration tests for lil based on
 # a collection of blessed reference outputs and error logs.
 

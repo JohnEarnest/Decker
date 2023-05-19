@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # install lilt, decker and lil support resources
 
 DESTDIR=""

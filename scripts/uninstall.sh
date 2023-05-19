@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # uninstall lilt, and lil support resources
 
 DESTDIR=""

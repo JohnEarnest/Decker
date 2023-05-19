@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # bundle the HTML/JS of the web-decker implementation as a c header file,
 # for inclusion with the native versions of decker and lilt.
 
