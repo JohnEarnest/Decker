@@ -2470,9 +2470,10 @@ void bg_lasso_preview(){
 		}
 	}else{bg_draw_lasso(con_to_screenr(r),con_to_screenr(dr.sel_start),1,dr.fill);}
 }
+void bg_cancel(){bg_scratch();poly_count=0;}
 void bg_tools(){
-	if     (!dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=1;center_fatbits(ev.pos);return;}
-	else if( dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=0;return;}if(ev.alt)return;
+	if     (!dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=1;center_fatbits(ev.pos);bg_cancel();return;}
+	else if( dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=0;bg_cancel();return;}if(ev.alt)return;
 	if(ev.md)pointer_prev=ev.pos;
 	if(!dover(con_view_dim()))ev.md=ev.mu=ev.drag=0;
 	if(dr.tool==tool_pencil||dr.tool==tool_line||dr.tool==tool_rect||dr.tool==tool_fillrect||dr.tool==tool_ellipse||dr.tool==tool_fillellipse){

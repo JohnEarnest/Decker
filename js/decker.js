@@ -2299,8 +2299,9 @@ bg_lasso_preview=_=>{
 	}
 }
 bg_tools=_=>{
-	if     (!dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=1,center_fatbits(ev.pos);return}
-	else if( dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=0;return}if(ev.alt)return
+	const bg_cancel=_=>{bg_scratch(),dr.poly=[]}
+	if     (!dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=1,center_fatbits(ev.pos),bg_cancel();return}
+	else if( dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=0,bg_cancel();return}if(ev.alt)return
 	if(ev.md)pointer.prev=ev.pos
 	if(!dover(con_view_dim()))ev.md=ev.mu=ev.drag=0
 	if(dr.tool=='pencil'||dr.tool=='line'||dr.tool=='rect'||dr.tool=='fillrect'||dr.tool=='ellipse'||dr.tool=='fillellipse'){
