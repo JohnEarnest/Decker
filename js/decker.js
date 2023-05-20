@@ -41,7 +41,7 @@ load_image=(file,hint,after)=>{
 		let tw=c[0],ow=c[32];c[32]=0,c[47]=0;for(let z=2;z<256;z++)if(c[z]){color=1;break}
 		if(color&&tw)i.pix.forEach((p,z)=>i.pix[z]=p!=0),m=i
 		if(color){i=read_image(1)}else if(ow&&!tw){i.pix.forEach((p,z)=>i.pix[z]=p!=32)}
-		setmode('draw'),bg_paste(i);dr.limbo_dither=color,dr.dither_threshold=0.5,dr.fatbits=0,dr.omask=m
+		setmode('draw'),bg_paste(i,1);dr.limbo_dither=color,dr.dither_threshold=0.5,dr.fatbits=0,dr.omask=m
 	}
 	if(file.type=='image/gif'&&after){const r=new FileReader();r.onload=_=>{after(readgif(new Uint8Array(r.result),hint))};r.readAsArrayBuffer(file)}
 	else{const r=new FileReader();r.onload=_=>{q('#loader').src=r.result;setTimeout(import_image,100)};r.readAsDataURL(file)}
@@ -2415,9 +2415,9 @@ bg_delete_selection=_=>{
 	if(dr.sel_start.w<=0&&dr.sel_start.h<=0)dr.sel_start=rcopy(dr.sel_here)
 	dr.sel_here=rect(),dr.limbo=image_make(rect(1,1)),dr.limbo_dither=0,bg_edit_sel(),dr.sel_start=rcopy(ev.dpos),dr.sel_here=rcopy(ev.dpos)
 }
-bg_paste=image=>{
+bg_paste=(image,fit)=>{
 	const clip=con_dim(), f=rect(clip.w*.75,clip.h*.75);let s=image.size
-	if(s.x>f.x||s.y>f.y){const scale=min(f.x/s.x,f.y/s.y);s=rect(s.x*scale,s.y*scale)}if(!s.x)return
+	if(fit&&(s.x>f.x||s.y>f.y)){const scale=min(f.x/s.x,f.y/s.y);s=rect(s.x*scale,s.y*scale)}if(!s.x)return
 	if(bg_has_sel()){bg_scoop_selection(),dr.limbo=image,dr.limbo_dither=0}
 	else{settool('select'),dr.sel_start=rect(),dr.sel_here=rcenter(con_view_dim(),s),dr.limbo=image,dr.limbo_dither=0}
 }
@@ -3464,7 +3464,7 @@ dopaste=x=>{
 		if(wid.fv){
 			if(wid.f.style!='rich'){field_input(x)}
 			else{field_edit(lms(''),i,'i',wid.cursor)}
-		}else{setmode('draw'),bg_paste(i)}
+		}else{setmode('draw'),bg_paste(i,0)}
 	}
 	else if(ms.type=='recording'&&au.mode=='stopped'&&/^%%SND0/.test(x)){sound_edit(sound_replace(sound_read(x)))}
 	else if(ms.type==null&&/^%%WGT0/.test(x)){

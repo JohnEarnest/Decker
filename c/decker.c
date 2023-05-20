@@ -1338,14 +1338,14 @@ void modal_enter(int type){
 	if(type==modal_open||type==modal_save){ms.grid=(grid_val){directory_enumerate(ms.path,ms.filter,0),0,0};}
 	if(type==modal_save||type==modal_input){ms.text=(field_val){rtext_cast(lmistr("")),0};}
 }
-void bg_paste(lv*b);void proto_prop(lv*target,char*key,lv*value);void proto_size(lv*target,pair size,rect margin); // forward refs
+void bg_paste(lv*b,int fit);void proto_prop(lv*target,char*key,lv*value);void proto_size(lv*target,pair size,rect margin); // forward refs
 void import_image(char*path){
 	lv*i=readimage(path,0),*m=NULL;if(is_empty(i))return;
 	int color=0,c[256]={0};EACH(z,i->b)c[0xFF&(i->b->sv[z])]++;
 	int tw=c[0],ow=c[32];c[32]=0,c[47]=0;for(int z=2;z<256;z++)if(c[z]){color=1;break;}
 	if(color&&tw){EACH(z,i->b)i->b->sv[z]=i->b->sv[z]!=0;m=i->b;}
 	if(color){i=readimage(path,1);}else if(ow&&!tw){EACH(z,i->b)i->b->sv[z]=i->b->sv[z]!=32;}
-	setmode(mode_draw),bg_paste(i->b);if(color)dr.limbo_dither=1,dither_threshold=0.5;dr.fatbits=0;dr.omask=m;
+	setmode(mode_draw),bg_paste(i->b,1);if(color)dr.limbo_dither=1,dither_threshold=0.5;dr.fatbits=0;dr.omask=m;
 }
 lv* table_decode(lv*text,lv*format){return ms.edit_json?l_table(l_parse(lmistr("%j"),text)): n_readcsv(NULL,format->c?lml2(text,format):l_list(text));}
 lv* modal_open_path(){
@@ -2607,9 +2607,9 @@ void bg_delete_selection(){
 	dr.sel_here=(rect){0,0,0,0};dr.limbo=lmbuff((pair){1,1}),dr.limbo_dither=0;bg_edit_sel();
 	dr.sel_start=dr.sel_here=(rect){ev.dpos.x,ev.dpos.y,0,0};
 }
-void bg_paste(lv*b){
+void bg_paste(lv*b,int fit){
 	rect clip=con_dim();pair s=buff_size(b);fpair f={clip.w*.75,clip.h*.75};
-	if(s.x>f.x||s.y>f.y){float scale=MIN(f.x/s.x,f.y/s.y);s=(pair){s.x*scale,s.y*scale};}if(!s.x)return;
+	if(fit&&(s.x>f.x||s.y>f.y)){float scale=MIN(f.x/s.x,f.y/s.y);s=(pair){s.x*scale,s.y*scale};}if(!s.x)return;
 	if(bg_has_sel()){bg_scoop_selection();dr.limbo=b,dr.limbo_dither=0;}
 	else{settool(tool_select);dr.sel_start=(rect){0,0,0,0};dr.sel_here=box_center(con_view_dim(),s);dr.limbo=b,dr.limbo_dither=0;}
 }
@@ -3317,7 +3317,7 @@ int interpret(){
 }
 void paste_any(){
 	if(has_clip("%%IMG")){if(menu_item("Paste Image",1,'v')){
-		lv*b=image_read(get_clip())->b;setmode(mode_draw);bg_paste(b);
+		lv*b=image_read(get_clip())->b;setmode(mode_draw);bg_paste(b,0);
 	}}
 	else if(has_clip("%%WGT")){if(menu_item("Paste Widgets",1,'v')){
 		lv*t=get_clip();int f=1,i=6,n=t->c-i;lv*v=pjson(t->sv,&i,&f,&n);
