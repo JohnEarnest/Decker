@@ -230,7 +230,8 @@ monad(l_typeof){
 	if(linat(x))return lmistr("function");if(lii(x))return x->a;
 	char*n[]={"number","string","list","dict","table","function","INTERNAL"};return lmistr(n[MIN(6,x->t)]);
 }
-monad(l_range){if(!lin(x)){x=ld(x);MAP(r,x)x->kv[z];return r;}int n=ln(x);if(n<0)n=0;GEN(r,n)lmn(z);return r;}
+monad(l_keys){if(lii(x))return lml(0);x=ld(x);MAP(r,x)x->kv[z];return r;}
+monad(l_range){if(!lin(x))return ll(x);int n=ln(x);if(n<0)n=0;GEN(r,n)lmn(z);return r;}
 monad(l_rows){x=lt(x);lv*r=lml(x->n);for(int w=0;w<x->n;w++){DMAP(t,x,x->lv[z]->lv[w]);r->lv[w]=t;}return r;}
 monad(l_cols){x=lt(x);DMAP(r,x,x->lv[z]);return r;}
 monad(l_ltable){
@@ -519,8 +520,8 @@ primitive monads[]={
 	prim("tan",l_tan),prim("exp",l_exp),prim("ln",l_ln),prim("sqrt",l_sqrt),
 	prim("sum",l_sum),prim("raze",l_raze),prim("max",l_amax),prim("min",l_amin),
 	prim("count",l_count),prim("first",l_first),prim("last",l_last),prim("flip",l_flip),
-	prim("range",l_range),prim("list",l_list),prim("rows",l_rows),prim("cols",l_cols),
-	prim("table",l_table),prim("typeof",l_typeof),prim("@tab",l_tab),
+	prim("range",l_range),prim("keys",l_keys),prim("list",l_list),prim("rows",l_rows),
+	prim("cols",l_cols),prim("table",l_table),prim("typeof",l_typeof),prim("@tab",l_tab),
 	prim("mag",l_mag),prim("heading",l_heading),prim("unit",l_unit),prim("",NULL)
 };
 primitive dyads[]={
@@ -699,7 +700,7 @@ void parsequery(lv*b,char*op,int dcol){
 	expr(b),blk_op1(b,"@tab");
 	blk_lit(b,cw),blk_op(b,COL);blk_lit(b,cb),blk_op(b,COL);blk_lit(b,co),blk_op(b,COL);
 	blk_lit(b,lmn(dir));blk_opa(b,QUERY,!strcmp(op,"@upd"));
-	lv*name=tempname(),*names=l_list(name),*keys=l_comma(l_range(cols),lmistr("@index"));
+	lv*name=tempname(),*names=l_list(name),*keys=l_comma(l_keys(cols),lmistr("@index"));
 	blk_op(b,ITER);int head=blk_here(b);blk_lit(b,names);
 	int each=blk_opa(b,EACH,0);
 		blk_lit(b,keys);blk_get(b,name);EACH(z,cols){blk_lit(b,cols->lv[z]);blk_op(b,COL);}

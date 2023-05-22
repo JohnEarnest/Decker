@@ -1248,7 +1248,7 @@ sound_record=_=>{
 // Modal Helpers
 
 table_decode=(text,format)=>ms.edit_json?monad.table(dyad.parse(lms('%j'),text)): n_readcsv(count(format)?[text,format]:[text])
-transit_enumerate=_=>monad.table(monad.range(deck.transit))
+transit_enumerate=_=>monad.table(monad.keys(deck.transit))
 sounds_enumerate=_=>{
 	const r={icon:[],name:[],bytes:[],secs:[]};deck.sounds.v.map((sn,i)=>{
 		r.icon .push(lmn(ICON.sound)),r.name.push(deck.sounds.k[i])
@@ -2065,7 +2065,7 @@ n_alert=([t,p,x,y])=>{
 	else if(ls(p)=='choose'){
 		modal_enter('choose_lil')
 		ms.verb=!x?ld(NONE): lil(x)?dyad.dict(x,x): ld(x); if(count(ms.verb)<1)ms.verb=ld(monad.list(NONE))
-		ms.grid=gridtab(lt(monad.range(ms.verb)), y?dvix(ms.verb,y):-1)
+		ms.grid=gridtab(lt(monad.keys(ms.verb)), y?dvix(ms.verb,y):-1)
 	}else{modal_enter('alert_lil')}
 	ms.message=plain_or_rich(t);return NONE
 }

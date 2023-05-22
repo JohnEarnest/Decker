@@ -37,7 +37,7 @@ on example do
 end
 
 on view do
- options.value:table range PublicTransit.descs
+ options.value:table keys PublicTransit.descs
  descript.text:PublicTransit.descs[options.rowvalue.value]
 end
 {end}

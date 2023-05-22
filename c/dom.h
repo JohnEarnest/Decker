@@ -1780,7 +1780,7 @@ lv* widget_write(lv*x){
 // Keystore interface
 
 lv* interface_keystore(lv*self,lv*i,lv*x){
-	i=ls(i);ikey("keys")return l_range(self->b);
+	i=ls(i);ikey("keys")return l_keys(self->b);
 	if(x){
 		lv*f=lmistr("%j");x=l_parse(f,l_format(f,x));
 		if(matchr(NONE,x)){self->b=l_drop(i,self->b);}else{dset(self->b,i,x);}return x;

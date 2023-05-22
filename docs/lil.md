@@ -50,7 +50,7 @@ There are 7 types of value in Lil: numbers, strings, lists, dictionaries, tables
 - _Numbers_ are floating-point values, possibly with a sign: `42 37.5 -29999`.
 - _Strings_ are a sequence of characters, written enclosed in double-quotes. The special characters backslash, double-quote, and the newline character (`\n`) are preceded with a backslash escape: `"apple" "foo\nbar"`. The binary `fuse` and `format` operators can both be used for concatenating strings.
 - _Lists_ are ordered sequences of values which can be indexed by numbers. The empty list is written as `()`, and the unary operator `list` constructs a single-element list from any value. Lists can be joined with the `,` operator.
-- _Dictionaries_ are ordered sequences of pairings between _keys_ and _values_, both of which can be any type. Dictionaries can be made by the binary operator `dict`, the `extract` statement, or a list can be promoted to a dictionary by assigning at non-numeric keys. Dictionaries can be unioned together with the `,` operator.
+- _Dictionaries_ are ordered sequences of pairings between _keys_ and _values_, both of which can be any type. Dictionaries can be made by the binary operator `dict`, the `extract` statement, or a list can be promoted to a dictionary by assigning at non-numeric keys. Dictionaries can be unioned together with the `,` operator. The `keys` operator extracts the keys of a dictionary, and the `range` operator extracts the values of a dictionary.
 - _Tables_ are a rectangular array of values for which every column has a string as its _key_. Tables can be made with the unary operator `table` or with the `insert` statement. The binary operators `,` (append), `join` (natural join), and `cross` (cartesian join) offer a selection of tabular joins.
 - _Functions_ have a name, take arguments, and return a result. They are declared with `on`, and may be freely passed around or stored in variables, but are otherwise totally opaque values.
 - _Interfaces_ are opaque dictionary-like values used to represent system resources or Input/Output devices. Accessing or writing to an interface may produce side-effects.
@@ -1007,7 +1007,7 @@ An _interface_ appears similar to a dictionary, but indexing or assignment throu
   time.now
 1636682495
 ```
-Interfaces cannot be defined from Lil programs- they are furnished by a host application like Decker. Consult Decker's manual for a description of the interfaces you can use in your scripts. It is also not possible to enumerate the keys of an interface; they may have infinitely many keys, populated on the fly. Thus, the `in` operator will always return `0` when an interface is its right argument.
+Interfaces cannot be defined from Lil programs- they are furnished by a host application like Decker. Consult Decker's manual for a description of the interfaces you can use in your scripts. It is also not possible to enumerate the keys of an interface; they may have infinitely many keys, populated on the fly. Thus, the `in` operator will always return `0` when an interface is its right argument, and the `keys` operator will always return `()`.
 
 Interfaces can be compared with `~` and `=` using _reference equality_ and concatenated into lists using `,` like any other datatype:
 ```
@@ -1045,7 +1045,9 @@ The unary aggregation primitives `sum`, `raze`, `min`, and `max` take a list and
 
 `first` and `last` extract the first or last elements of a value.
 
-`range` of a number produces a list of the integers `[0,x)`. Applied to anything else, it will produce a list of the _keys_ of its dictionary equivalent.
+`range` of a number produces a list of the integers `[0,x)`. Applied to anything else, it will produce a list of the _values_ of its dictionary equivalent.
+
+`keys` produces a list of the _keys_ of a value's dictionary equivalent.
 
 `list` of anything produces a list of length 1 containing that value.
 
@@ -1123,8 +1125,8 @@ Appendix 3: Language Grammar
 The following is a slightly hand-waved EBNF description of Lil's syntax. The production `ALPHA` is taken as any alphabetic character (upper- or lowercase), and the production `NON_ESC` is any ASCII character between 32 and 126 (except backslash). All whitespace is interchangeable in Lil, any amount of whitespace may appear between tokens, and line comments begin with `#`.
 
 ```
-MONAD   := '-'|'!'|'floor'|'cos'|'sin'|'tan'|'exp'|'ln'|'sqrt'|'count'|'first'|'last'
-           'sum'|'min'|'max'|'raze'|'range'|'list'|'rows'|'cols'|'table'|'typeof'|'flip'|'mag'|'unit'|'heading'
+MONAD   := '-'|'!'|'floor'|'cos'|'sin'|'tan'|'exp'|'ln'|'sqrt'|'count'|'first'|'last'|'sum'|'min'|'max'|
+           'raze'|'range'|'keys'|'list'|'rows'|'cols'|'table'|'typeof'|'flip'|'mag'|'unit'|'heading'
 DYAD    := '+'|'-'|'*'|'/'|'%'|'^'|'<'|'>'|'='|'&'|'|'|','|'~'|'@'|'split'|'fuse'|'dict'|'take'|'drop'|
            'in'|'join'|'cross'|'parse'|'format'|'unless'|'limit'
 DIGIT   := '0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'

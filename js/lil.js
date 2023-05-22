@@ -134,7 +134,8 @@ monad={
 	count:  x=>lmn(count(x)),
 	first:  x=>lit(x)?monad.first(rows(x)): count(x)?ll(x)[0]: NONE,
 	last:   x=>lit(x)?monad.last (rows(x)): count(x)?ll(x)[count(x)-1]: NONE,
-	range:  x=>lml(lin(x)?range(max(0,0|ln(x))).map(lmn): ld(x).k),
+	keys:   x=>lml(lii(x)?[]: ld(x).k),
+	range:  x=>lml(lin(x)?range(max(0,0|ln(x))).map(lmn): ld(x).v),
 	list:   x=>lml([x]),
 	typeof: x=>lms(({num:"number",str:"string",lst:"list",dic:"dict",tab:"table",on:"function",nat:"function"})[x.t]||x.n||"interface"),
 	flip:   x=>lit(x)?tflip(x):lml(range(ll(x).reduce((w,z)=>max(w,lil(z)?count(z):1),0)).map(i=>lml(ll(x).map(c=> !lil(c)?c: i<count(c)?c.v[i]: NONE)))),
@@ -1063,7 +1064,7 @@ pointer={f:(self,i,x)=>{
 keystore_read=x=>{
 	let store=lmd();if(x)x.k.filter((k,i)=>!match(NONE,x.v[i])).map((k,i)=>dset(store,k,x.v[i]))
 	return {f:(self,i,x)=>{
-		i=ls(i);if(i=='keys')return monad.range(self.data)
+		i=ls(i);if(i=='keys')return monad.keys(self.data)
 		if(x){
 			const f=lms('%j'),val=dyad.parse(f,dyad.format(f,x))
 			if(match(NONE,val)){self.data=dyad.drop(lms(i),self.data)}else{dset(self.data,lms(i),val)}

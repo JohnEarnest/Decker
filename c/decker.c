@@ -1307,7 +1307,7 @@ void modal_enter(int type){
 		ms.act_go=1,ms.act_gomode=5,ms.act_trans=0,ms.act_sound=0,ms.act_card=ln(ifield(ifield(deck,"card"),"index"));
 		ms.verb   =lmistr(""); // card name
 		ms.message=lmistr(""); // sound name
-		ms.grid=(grid_val){l_table(l_range(dget(deck->b,lmistr("transit")))),0,0};
+		ms.grid=(grid_val){l_table(l_keys(dget(deck->b,lmistr("transit")))),0,0};
 		pair ps={17,13};
 		ms.canvas=free_canvas(deck);dset(ms.canvas->b,lmistr("size"),lmpair(ps));
 		ms.carda=image_read(lmcstr("%%IMG0ABEADQAAAAAAAACAAAFAAAIgAAIgAAQQAAfwAAgIAAgIAAgIAAAAAAAAAA=="));
@@ -1580,7 +1580,7 @@ void modals(){
 		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"OK",1)||ev.exit){
 			if(ms.from_action){
 				if(ms.grid.row>=0)ms.message=ifield(deck,"sounds")->kv[ms.grid.row];
-				ms.grid=(grid_val){l_table(l_range(dget(deck->b,lmistr("transit")))),0,ms.act_transno},ms.type=modal_action;ms.from_action=0;
+				ms.grid=(grid_val){l_table(l_keys(dget(deck->b,lmistr("transit")))),0,ms.act_transno},ms.type=modal_action;ms.from_action=0;
 			}else{modal_exit(1);}
 		}
 		pair c={b.x,b.y+b.h-20};
@@ -2142,7 +2142,7 @@ lv*n_alert(lv*self,lv*z){
 	else if(!strcmp(type,"choose")){
 		modal_enter(modal_choose_lil);
 		ms.verb=z->c<=2?ld(NONE): lil(z->lv[2])?l_dict(z->lv[2],z->lv[2]): ld(z->lv[2]);if(ms.verb->c<1)ms.verb=ld(l_list(NONE));
-		ms.grid=(grid_val){lt(l_range(ms.verb)), 0, z->c<=3?-1:dgeti(ms.verb,z->lv[3])};
+		ms.grid=(grid_val){lt(l_keys(ms.verb)), 0, z->c<=3?-1:dgeti(ms.verb,z->lv[3])};
 	}
 	else{modal_enter(modal_alert_lil);}
 	ms.message=plain_or_rich(z);return NONE;

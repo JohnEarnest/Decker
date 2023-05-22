@@ -1533,9 +1533,9 @@ assert_file["write a basic kitchen sink." "tests/dom/sink1.deck" "temp.deck"]
 deck:readdeck["tests/dom/sink1.deck"]
 assert["read a deck" "deck" typeof deck]
 assert["read a deck: metadata" ("everything but the sink","just some guy") (deck.name,deck.author)]
-assert["read a deck: card names" ("home","other") (range deck.cards)]
+assert["read a deck: card names" ("home","other") (keys deck.cards)]
 assert["read a deck: script" "show[\"</script> is a perfectly valid string in Lil.\"]" deck.script]
-assert["read a deck: widget names" ("output","richval","go","widget with :, { and } in the name") (range deck.card.widgets)]
+assert["read a deck: widget names" ("output","richval","go","widget with :, { and } in the name") (keys deck.card.widgets)]
 assert["read a deck: widget font" (deck.fonts.mono) (deck.card.widgets.richval.font)]
 assert["read a deck: sounds" (126,127,-128,-127,-126,5) (deck.sounds.short[0,5],deck.sounds.short.size)]
 assert_image["read a deck: inline rtext image"
@@ -1554,7 +1554,7 @@ assert["read a deck: custom regular pattern:"  "%%IMG0AAgACAsMDQ4PEBES"  deck.pa
 
 deck:readdeck["tests/dom/bare.deck"]
 assert["read a bare deck" "deck" typeof deck]
-assert["read a bare deck: widget names" ("pusher","outfield","expenses","frame") (range deck.card.widgets)]
+assert["read a bare deck: widget names" ("pusher","outfield","expenses","frame") (keys deck.card.widgets)]
 
 #######################################
 #
@@ -1569,14 +1569,14 @@ c3:deck.add["card"]
 assert["build unique card names" ("home","card1","card2") (c1.name,c2.name,c3.name)]
 c3.name:"home"
 assert["set unique card names" "home1" c3.name]
-assert["confirm renamed card keys" ("home","card1","home1") (range deck.cards)]
+assert["confirm renamed card keys" ("home","card1","home1") (keys deck.cards)]
 assert["confirm renamed card lookup" c3 deck.cards.home1]
 
 assert["read card indices" (0,1,2) (c1.index,c2.index,c3.index)]
 c2.index:0
-assert["move card to start" ("card1","home","home1") (range deck.cards)]
+assert["move card to start" ("card1","home","home1") (keys deck.cards)]
 c2.index:2
-assert["move card to end"   ("home","home1","card1") (range deck.cards)]
+assert["move card to end"   ("home","home1","card1") (keys deck.cards)]
 
 card:deck.card
 f1:card.add["field"]
@@ -1585,27 +1585,27 @@ f3:card.add["field"]
 assert["build unique widget names" ("field1","unique","field2") (f1.name,f2.name,f3.name)]
 f3.name:"unique"
 assert["set unique widget names" "unique1" f3.name]
-assert["confirm renamed widget keys" ("field1","unique","unique1") (range card.widgets)]
+assert["confirm renamed widget keys" ("field1","unique","unique1") (keys card.widgets)]
 assert["confirm renamed widget lookup" f3 card.widgets.unique1]
 
 assert["read widget indices" (0,1,2) (f1.index,f2.index,f3.index)]
 f3.index:0
-assert["move widget to back"  ("unique1","field1","unique") (range card.widgets)]
+assert["move widget to back"  ("unique1","field1","unique") (keys card.widgets)]
 f3.index:2
-assert["move widget to front" ("field1","unique","unique1") (range card.widgets)]
+assert["move widget to front" ("field1","unique","unique1") (keys card.widgets)]
 f2.index:1
-assert["move widget identity" ("field1","unique","unique1") (range card.widgets)]
+assert["move widget identity" ("field1","unique","unique1") (keys card.widgets)]
 f2.index:99
-assert["move widget boundary" ("field1","unique1","unique") (range card.widgets)]
+assert["move widget boundary" ("field1","unique1","unique") (keys card.widgets)]
 
 deck:readdeck[]
 c1:deck.card
 c1.add["button" "clickme"]
 c2:deck.add[c1]
-assert["add card to deck: cardlist" ("home","card1") (range deck.cards)]
-assert["add card to deck: wids"     (list "clickme") (range c2.widgets)]
+assert["add card to deck: cardlist" ("home","card1") (keys deck.cards)]
+assert["add card to deck: wids"     (list "clickme") (keys c2.widgets)]
 c3:deck.add[c1 "named"]
-assert["add card to deck with name" ("home","card1","named") (range deck.cards)]
+assert["add card to deck with name" ("home","card1","named") (keys deck.cards)]
 
 #######################################
 #
@@ -1713,15 +1713,15 @@ f.text:"Some Nice Text"
 copied:deck.copy[home]
 v:deck.paste[copied]
 assert["copy card: return value" "card"           (typeof v)]
-assert["copy card: added card"   ("home","card1") (range deck.cards)]
-assert["copy card: made widgets" (list "thing")   (range v.widgets)]
+assert["copy card: added card"   ("home","card1") (keys deck.cards)]
+assert["copy card: made widgets" (list "thing")   (keys v.widgets)]
 assert["copy card: made values"  "Some Nice Text" (v.widgets.thing.text)]
 
 copied:v.copy[v.widgets.thing]
 v.widgets.thing.text:"another"
 vv:v.paste[copied]
 assert["copy widgets: return value" "field"                      (typeof first vv)]
-assert["copy widgets: added widget" ("thing","field1")           (range v.widgets)]
+assert["copy widgets: added widget" ("thing","field1")           (keys v.widgets)]
 assert["copy widgets: added value"  "Some Nice Text"             vv[0].text]
 assert["copy widgets: no sharing"   ("another","Some Nice Text") (v.widgets.thing.text, v.widgets.field1.text)]
 
@@ -1733,15 +1733,15 @@ m:deck.card.add["contraption" "moveable" "instance"]
 target:readdeck[]
 copied:deck.card.copy[m]
 target.card.paste[copied]
-assert["copy contraption: instance" (list "instance") (range target.card.widgets)]
-assert["copy contraption: def"      (list "moveable") (range target.contraptions)]
-assert["copy contraption: def wids" (list "clicky"  ) (range target.contraptions.moveable.widgets)]
+assert["copy contraption: instance" (list "instance") (keys target.card.widgets)]
+assert["copy contraption: def"      (list "moveable") (keys target.contraptions)]
+assert["copy contraption: def wids" (list "clicky"  ) (keys target.contraptions.moveable.widgets)]
 target:readdeck[]
 copied:deck.copy[deck.cards.home]
 c:target.paste[copied]
-assert["copy contraption card: instance" (list "instance") (range c.widgets)]
-assert["copy contraption card: def"      (list "moveable") (range target.contraptions)]
-assert["copy contraption card: def wids" (list "clicky"  ) (range target.contraptions.moveable.widgets)]
+assert["copy contraption card: instance" (list "instance") (keys c.widgets)]
+assert["copy contraption card: def"      (list "moveable") (keys target.contraptions)]
+assert["copy contraption card: def wids" (list "clicky"  ) (keys target.contraptions.moveable.widgets)]
 
 #######################################
 #
@@ -1802,7 +1802,7 @@ def:deck.add["contraption" "spinner"]
 defaults:def @ "type","description","script","size"
 assert["prototype default attributes" ("prototype","","",(list 100,100)) defaults]
 assert["deck contraptions"        "dict"                  (typeof deck.contraptions)]
-assert["deck contraption content" ("prototype","spinner") (typeof deck.contraptions.spinner),(range deck.contraptions)]
+assert["deck contraption content" ("prototype","spinner") (typeof deck.contraptions.spinner),(keys deck.contraptions)]
 
 def.description:"unbounded numeric picker"
 def.size:150,50
@@ -1844,12 +1844,12 @@ writedeck["temp.deck" deck]
 assert_file["write a deck with contraptions/prototypes." "tests/dom/contraptions.deck" "temp.deck"]
 deck.remove[def]
 assert["contraption deletion" 0 (count deck.contraptions)]
-assert["contraption deletion scrubs instances" () (range deck.card.widgets)]
+assert["contraption deletion scrubs instances" () (keys deck.card.widgets)]
 
 deck:readdeck["tests/dom/contraptions.deck"]
 def:deck.contraptions.spinner
 assert["read contraption def" ("prototype","spinner",150,50) (def.type,def.name,def.size)]
-assert["read contraption instances" ("a","b","contraption","contraption") ((range deck.card.widgets),(deck.card.widgets..type))]
+assert["read contraption instances" ("a","b","contraption","contraption") ((keys deck.card.widgets),(deck.card.widgets..type))]
 assert["read contraption base attr"      1 deck.card.widgets.a.step ]
 assert["read contraption instance attr" 42 deck.card.widgets.b.value]
 

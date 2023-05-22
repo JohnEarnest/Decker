@@ -152,7 +152,7 @@ end
 
 on plot_series c data draw do
  if !"table"~typeof data
-  data:select x:range data y:value from data
+  data:select x:keys data y:value from data
  end
  nd.x:if "x" in data data.x else (update x:gindex by g from data).x end
  nd.y:if "y" in data data.y else data end
