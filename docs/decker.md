@@ -1661,7 +1661,7 @@ end
 But you might want to have other side effects, or choose the next background loop sound based on some algorithm:
 ```
 on loop do
-	iteration_count.value:iteration_count+1
+	iteration_count.value:iteration_count.value+1
 	random["clip1","clip2","clip3"]
 end
 ```
