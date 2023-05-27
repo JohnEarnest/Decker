@@ -14,6 +14,7 @@ lv*FONT_BODY,*FONT_MENU,*FONT_MONO,*TOOLS,*ARROWS,*TOOLB,*PLAYING,*ATTRS;
 enum mini_icons {icon_dir,icon_doc,icon_sound,icon_font,icon_app,icon_lil,icon_pat,icon_chek,icon_none};
 enum cursor_styles {cursor_default,cursor_point,cursor_ibeam,cursor_drag};
 SDL_Cursor*CURSORS[4]; int uicursor=0, enable_touch=0, set_touch=0, profiler=0, should_exit=0;
+int set_tracing=0, tracing=0;
 
 char*TOOL_ICONS=
 	"%%IMG0ABAAwAMABIAEgASABIAEgGTwlKxMqiQKJAIQAggCCAQEBAQEAAAAAAAAAAA//EACgAGAAYABgAFAAz/+H/wAAAAAAA"
@@ -3149,6 +3150,7 @@ void sync(){
 			if(c==SDLK_LSHIFT||c==SDLK_RSHIFT)ev.shift=0;
 			if(c==SDLK_m&&uimode==mode_draw&&in_layer())ev.hidemenu^=1;
 			if(c==SDLK_t&&uimode==mode_draw&&in_layer())dr.trans^=1;
+			if(c==SDLK_y&&uimode==mode_draw&&in_layer())set_tracing=!tracing;
 			if(c==SDLK_ESCAPE)ev.exit=1;
 			if(!wid.infield&&uimode==mode_interact&&card_is(con())){
 				if(c==SDLK_UP   )msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("up");
@@ -3221,6 +3223,8 @@ void sync(){
 		windowed=!windowed;
 		SDL_SetWindowFullscreen(win,windowed?0:SDL_WINDOW_FULLSCREEN_DESKTOP);
 	}
+	if(!windowed||uimode!=mode_draw)set_tracing=0;
+	if(set_tracing!=tracing){tracing=set_tracing,SDL_SetWindowOpacity(win,tracing?0.7:1.0);}
 	if(framebuffer_flip(disp,size,scale)){
 		int*p, pitch;
 		pair tsize=buff_size(TOOLB);int tscale=MIN((disp.x-scale*size.x)/(2*tsize.x),disp.y/tsize.y);if(tscale&&noscale)tscale=1;
@@ -3642,6 +3646,9 @@ void all_menus(){
 		menu_separator();
 		if(menu_check("Show Animation"   ,1,dr.show_anim   ,0))dr.show_anim   ^=1;
 		if(menu_check("Transparency Mask",1,dr.trans_mask  ,0))dr.trans_mask  ^=1;
+		#ifndef LOSPEC
+		if(menu_check("Tracing Mode"     ,1,tracing        ,0))set_tracing=!tracing;
+		#endif
 		if(menu_check("Fat Bits"         ,1,dr.fatbits     ,0)){
 			if(ms.type==modal_none&&uimode!=mode_draw)setmode(mode_draw);
 			dr.fatbits^=1;if(dr.fatbits){center_fatbits(box_midpoint(bg_has_sel()||bg_has_lasso()?dr.sel_here:con_dim()));}
