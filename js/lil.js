@@ -2325,7 +2325,7 @@ primitives=(env,deck)=>{
 let in_attr=0
 fire_attr_sync=(target,name,a)=>{
 	if(in_attr)return NONE;in_attr=1;const bf=frame;
-	const root=lmenv();primitives(root,target.deck),constants(root),root.local('me',target)
+	const root=lmenv();primitives(root,target.deck),constants(root),root.local('me',target),root.local('card',target)
 	const b=lmblk();target.widgets.v.map((v,i)=>{blk_lit(b,v),blk_loc(b,target.widgets.k[i]),blk_op(b,op.DROP)})
 	try{blk_cat(b,parse(target.def.script)),blk_op(b,op.DROP)}catch(e){}
 	blk_get(b,lms(name)),blk_lit(b,lml(a?[a]:[])),blk_op(b,op.CALL)

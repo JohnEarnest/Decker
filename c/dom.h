@@ -215,7 +215,7 @@ void fire_hunk_async(lv*target,lv*hunk){fire_async(target,NULL,lml(0),hunk,1);}
 int in_attr=0;
 lv* fire_attr_sync(lv*target,char*prefix,lv*name,lv*arg){
 	if(in_attr)return NONE;in_attr=1;cstate bf=frame;
-	lv*root=lmenv(NULL);primitives(root,ivalue(target,"deck")),constants(root),dset(root,lmistr("me"),target);
+	lv*root=lmenv(NULL);primitives(root,ivalue(target,"deck")),constants(root),dset(root,lmistr("me"),target),dset(root,lmistr("card"),target);
 	lv*b=lmblk();lv*widgets=ivalue(target,"widgets");EACH(z,widgets)blk_lit(b,widgets->lv[z]),blk_loc(b,widgets->kv[z]),blk_op(b,DROP);
 	lv*s=ifield(ivalue(target,"def"),"script"),*sb=parse(s&&s->c?s->sv:"");if(perr()){sb=parse("");}blk_cat(b,sb),blk_op(b,DROP);
 	str n=str_new();str_addz(&n,prefix),str_addz(&n,name->sv);blk_get(b,lmstr(n)),blk_lit(b,arg?l_list(arg):lml(0)),blk_op(b,CALL);

@@ -1901,6 +1901,14 @@ assert["contraption is resizable" (32,48) con.size]
 def.resizable:0
 assert["contraption size snapback" (12,34) con.size]
 
+deck:readdeck[]
+def:deck.add["contraption" "dispatcher"]
+def.script:"on get_prop1 do 100+me.event[\"test\"] end on get_prop2 do 200+card.event[\"test\"] end"
+con:deck.card.add["contraption" "dispatcher"]
+con.script:"on test do 2+3 end"
+assert["contraption attribute from event"   105 con.prop1]
+assert["contraption attribute from event 2" 205 con.prop2]
+
 #######################################
 #
 #  Wrap Up

@@ -1113,7 +1113,7 @@ Contraptions are custom widgets, defined in a [Prototype](#prototypeinterface). 
 | `x.def`                 | The Prototype of this contraption.                                                                    |
 | `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 
-Contraption interfaces may expose additional attributes. Reads or writes to properties aside from those listed above (such as `.zami`) will invoke the `script` of the Prototype corresponding to this Contraption, calling either a function `get_zami` on a read, or `set_zami` (with a value) on a write.
+Contraption interfaces may expose additional attributes. Reads or writes to properties aside from those listed above (such as `.zami`) will invoke the `script` of the Prototype corresponding to this Contraption, calling either a function `get_zami` on a read, or `set_zami` (with a value) on a write. Inside an attribute handler both `me` and `card` are bound to the target Contraption instance, for consistency with event handlers.
 
 
 Module Interface
