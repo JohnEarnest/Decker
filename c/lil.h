@@ -44,6 +44,7 @@ int  idx_pop (idx*x){if(x->c<1)printf("pop empty idx stack!\n");return x->iv[--(
 void idx_push(idx*x,int n){if(x->size<x->c+1)x->iv=realloc(x->iv,(x->size+=32)*sizeof(int));x->iv[x->c++]=n;}
 str str_new(){return(str){0,32,calloc(32,1)};}
 char cl(char x){return x=='\t'?' ':(x>=32&&x<=126)||x=='\n'?x:'?';}
+void str_provision(str*s,int size){if(s->size<size)s->sv=realloc(s->sv,s->size=size);}
 void str_addraw(str*s,int x){if(s->c+1>=s->size)s->sv=realloc(s->sv,s->size+=32);s->sv[s->c++]=x;}
 void str_term(str*s){str_addraw(s,'\0');}
 void str_addc(str*s,char x){if(x!='\r')str_addraw(s,cl(x));}

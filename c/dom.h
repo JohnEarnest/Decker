@@ -1009,7 +1009,8 @@ void array_set_raw(array a,int index,long long int v){
 lv* array_get(array a,int index,int len){
 	if(a.cast==10&&len<0)len=1;
 	if(a.cast==10){
-		str r=str_new(),s=str_new();a.cast=0;for(int z=0;z<len;z++)str_addraw(&r,array_get_raw(a,index+z));
+		str r=str_new(),s=str_new();a.cast=0;str_provision(&r,len),str_provision(&s,len);
+		for(int z=0;z<len;z++)str_addraw(&r,array_get_raw(a,index+z));
 		str_add(&s,r.sv,len),lmstr(r),a.cast=10;return lmstr(s);
 	}
 	if(len<0)return lmn(array_get_raw(a,index));GEN(r,len)lmn(array_get_raw(a,index+z));return r;
@@ -2414,6 +2415,7 @@ char* writegif(lv*frames,int*len){
 	for(int z=0;z<16;z++)add_byte(COLORS[z]>>16),add_byte(COLORS[z]>>8),add_byte(COLORS[z]); // global colortable
 	for(int z=0;z<16;z++)add_byte(0xFF),add_byte(0xFF),add_byte(0xFF); // padding entries
 	add_short(0xFF21),add_byte(11),str_addz(&r,"NETSCAPE2.0"),add_byte(3),add_byte(1),add_short(0),add_byte(0); // NAB; loop gif forever
+	str_provision(&r,r.size+frames->c*(20+(size.x*size.y*2)));
 	EACH(frame,frames)if(image_is(frames->lv[frame])){
 		add_byte(0x21),add_byte(0xF9),add_byte(4); // graphic control extension
 		add_byte(9),add_short(1),add_byte(16); // dispose to bg + has transparency, 1/100th of a second delay, color 16 is transparent
@@ -2446,6 +2448,7 @@ char* writewav(lv*data,int*len){
 	add_short(8);   // 8 bits per sample
 	str_addz(&r,"data");
 	add_long(data->c);
+	str_provision(&r,r.size+data->c+1);
 	for(int z=0;z<data->c;z++)str_addraw(&r,(128+data->sv[z]));
 	if(data->c%2)str_addraw(&r,0);
 	return *len=r.c, r.sv;
