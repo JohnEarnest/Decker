@@ -3646,9 +3646,6 @@ void all_menus(){
 		menu_separator();
 		if(menu_check("Show Animation"   ,1,dr.show_anim   ,0))dr.show_anim   ^=1;
 		if(menu_check("Transparency Mask",1,dr.trans_mask  ,0))dr.trans_mask  ^=1;
-		#ifndef LOSPEC
-		if(menu_check("Tracing Mode"     ,1,tracing        ,0))set_tracing=!tracing;
-		#endif
 		if(menu_check("Fat Bits"         ,1,dr.fatbits     ,0)){
 			if(ms.type==modal_none&&uimode!=mode_draw)setmode(mode_draw);
 			dr.fatbits^=1;if(dr.fatbits){center_fatbits(box_midpoint(bg_has_sel()||bg_has_lasso()?dr.sel_here:con_dim()));}
@@ -3661,6 +3658,9 @@ void all_menus(){
 		if(menu_item("Brush..." ,1,'\0'))modal_enter(modal_brush);
 		menu_separator();
 		if(menu_check("Transparency",1,dr.trans,0))dr.trans^=1;
+		#ifndef LOSPEC
+		if(menu_check("Tracing Mode",windowed,tracing,0))set_tracing=!tracing;
+		#endif
 	}
 	if(uimode==mode_object){
 		menu_bar("Widgets",ms.type==modal_none);

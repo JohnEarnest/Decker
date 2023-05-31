@@ -96,7 +96,6 @@ The _View_ menu will be available when the _Widgets_ or drawing tools are chosen
 - _Grid Size..._: Change the width and height of the "cells" in the _Grid Overlay_.
 - _Show Animation_: Toggle animating the special patterns 28-31.
 - _Transparency Mask_: Toggle displaying pattern 0 in a distinct color, revealing transparent elements. While the transparency mask is shown, using drawing tools with the first pattern will use pattern index 32 (opaque white) instead of the "true" pattern 0 (transparent white). Erasing with the pencil tool and deleting selections will still result in transparency.
-- _Tracing Mode_: Toggle drawing the Decker window in a semi-transparent fashion, to allow you to trace images underneath the window.
 - _Fat Bits_: Toggle displaying the card background zoomed-in, to aid in editing individual pixels. In this mode, the cursor keys can be used to scroll the viewport and "escape" will exit Fat Bits mode.
 
 The _Style_ menu will be available whenever drawing tools are chosen:
@@ -105,12 +104,13 @@ The _Style_ menu will be available whenever drawing tools are chosen:
 - _Fill..._: Select a background pattern used for the _Filled Box_ and _Filled Oval_ tool as well as empty space behind a deleted or moved selection.
 - _Brush..._: Select a brush shape used for most drawing tools.
 - _Transparency_: Toggle treating pattern 0 as transparent when moving selections. Also applies to imported and exported images!
+- _Tracing Mode_: Toggle drawing the Decker window in a semi-transparent fashion, to allow you to trace images underneath the window.
 
 A number of shortcuts are available with any of the drawing tools selected:
 
 - Pressing `m` toggles the visibility of Decker's main menu.
 - Pressing `t` toggles transparency mode (_Style &#8594; Transparency_).
-- Pressing `y` toggles tracing mode (_View &#8594; Tracing Mode_).
+- Pressing `y` toggles tracing mode (_Style &#8594; Tracing Mode_).
 - If you have imported a color image, you can press `j` or `k` to lighten or darken the image, respectively. This adjustment can only be performed while the box selection remains active.
 - Pressing `9` or `0` will decrement or increment the current brush shape, respectively.
 - Holding control or command while clicking will enter Fat Bits mode centered on the position you click, or exit Fat Bits mode.
