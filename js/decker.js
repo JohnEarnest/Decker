@@ -69,7 +69,7 @@ writegif=frames=>{
 	for(let z=0;z<frames.length;z++){
 		const frame=frames[z]
 		s(0xF921),b(4)                            // graphic control extension
-		b(9),s(20),b(16)                          // dispose to bg + has transparency, 20/100th of a second delay, color 16 is transparent
+		b(9),s(3),b(16)                           // dispose to bg + has transparency, 3/100th of a second delay, color 16 is transparent
 		b(0)                                      // end GCE
 		b(0x2C)                                   // image descriptor
 		s(0),s(0),s(frame.size.x),s(frame.size.y) // dimensions

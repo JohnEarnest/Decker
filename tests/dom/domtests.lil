@@ -382,7 +382,7 @@ ae:"%%IMG0AAgACwA8Rj5mZmY+AAAA"
 be:"%%IMG0AAgACwBgYHxmZmZmZnwA"
 each s in ("opt","blessed")
 	f:read[("tests/dom/ab-%s.gif" format s) "frames"]
-	assert[("read animated %s.gif delays" format s) (1,1)   f.delays]
+	assert[("read animated %s.gif delays" format s) (3,3)   f.delays]
 	assert[("read animated %s.gif frames" format s) (ae,be) f.frames..encoded]
 end
 

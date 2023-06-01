@@ -2418,7 +2418,7 @@ char* writegif(lv*frames,int*len){
 	str_provision(&r,r.size+frames->c*(20+(size.x*size.y*2)));
 	EACH(frame,frames)if(image_is(frames->lv[frame])){
 		add_byte(0x21),add_byte(0xF9),add_byte(4); // graphic control extension
-		add_byte(9),add_short(1),add_byte(16); // dispose to bg + has transparency, 1/100th of a second delay, color 16 is transparent
+		add_byte(9),add_short(3),add_byte(16); // dispose to bg + has transparency, 3/100ths of a second delay, color 16 is transparent
 		add_byte(0); // end GCE
 		add_byte(0x2C); // image descriptor
 		size=image_size(frames->lv[frame]);add_short(0),add_short(0),add_short(size.x),add_short(size.y); // window {x,y,width,height}
