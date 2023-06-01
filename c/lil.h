@@ -38,14 +38,14 @@ lv*debug_show(lv*x);      // version of l_show() which _always_ goes to stdout, 
 #define monad(n)     lv*n(lv*x)
 #define dyad(n)      lv*n(lv*x,lv*y)
 void idx_free(idx*x){free(x->iv);}
-idx  idx_new(int n){return(idx){n,n,calloc(n,sizeof(int))};}
+idx  idx_new(int n){int c=MAX(n,16);return(idx){n,c,calloc(c,sizeof(int))};}
 int* idx_peek(idx*x){if(x->c<1)printf("peek empty idx stack!\n");return &x->iv[x->c-1];}
 int  idx_pop (idx*x){if(x->c<1)printf("pop empty idx stack!\n");return x->iv[--(x->c)];}
-void idx_push(idx*x,int n){if(x->size<x->c+1)x->iv=realloc(x->iv,(x->size+=32)*sizeof(int));x->iv[x->c++]=n;}
+void idx_push(idx*x,int n){if(x->size<x->c+1)x->iv=realloc(x->iv,(x->size*=2)*sizeof(int));x->iv[x->c++]=n;}
 str str_new(){return(str){0,32,calloc(32,1)};}
 char cl(char x){return x=='\t'?' ':(x>=32&&x<=126)||x=='\n'?x:'?';}
 void str_provision(str*s,int size){if(s->size<size)s->sv=realloc(s->sv,s->size=size);}
-void str_addraw(str*s,int x){if(s->c+1>=s->size)s->sv=realloc(s->sv,s->size+=32);s->sv[s->c++]=x;}
+void str_addraw(str*s,int x){if(s->c+1>=s->size)s->sv=realloc(s->sv,s->size*=2);s->sv[s->c++]=x;}
 void str_term(str*s){str_addraw(s,'\0');}
 void str_addc(str*s,char x){if(x!='\r')str_addraw(s,cl(x));}
 void str_add(str*s,char*x,int n){
@@ -544,7 +544,7 @@ int tnames=0;lv* tempname(){char t[64];snprintf(t,sizeof(t),"@t%d",tnames++);ret
 enum opcodes {JUMP,JUMPF,LIT,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,QUERY,IPRE,IPOST};
 int oplens[]={3   ,3    ,3  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3    ,3   ,3    };
 void blk_addb(lv*x,int n){
-	if(x->ns<x->n+1)x->sv=realloc(x->sv,(x->ns+=32)*sizeof(int));x->sv[x->n++]=n;
+	if(x->ns<x->n+1)x->sv=realloc(x->sv,(x->ns*=2)*sizeof(int));x->sv[x->n++]=n;
 	if(x->n>=65536||x->c>=65536)printf("TOO MUCH BYTECODE!\n"),exit(1);
 }
 int  blk_here(lv*x){return x->n;}
