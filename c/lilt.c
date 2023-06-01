@@ -42,7 +42,7 @@ lv*n_writefile(lv*self,lv*a){
 	lv*value=a->c>1?a->lv[1]:lms(0);
 	if(array_is(value))return writebin(l_first(a),value);
 	if(sound_is(value))return n_writewav(self,a);
-	if(image_is(value))return n_writegif(self,a);
+	if(image_is(value)||lid(value))return n_writegif(self,a);
 	if(lil(value)){EACH(z,value)if(image_is(value->lv[z]))return n_writegif(self,a);}
 	return n_write(self,a);
 }

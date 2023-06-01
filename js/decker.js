@@ -54,7 +54,7 @@ save_bin=(n,x)=>{
 	const u=URL.createObjectURL(new Blob([Uint8Array.from(x)])), t=q('#target')
 	t.download=n,t.href=u,t.click(),setTimeout(_=>URL.revokeObjectURL(u),200)
 }
-writegif=frames=>{
+writegif=(frames,delays)=>{
 	const size=frames.reduce((s,f)=>rmax(s,f.size),rect(1,1)), pal=deck.patterns.pal.pix; let frame_index=0, payload=[]
 	const anim_ants       =(x,y)=>(0|((x+y+frame_index)/3))%2?15:0
 	const draw_pattern    =(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
@@ -69,7 +69,7 @@ writegif=frames=>{
 	for(let z=0;z<frames.length;z++){
 		const frame=frames[z]
 		s(0xF921),b(4)                            // graphic control extension
-		b(9),s(3),b(16)                           // dispose to bg + has transparency, 3/100th of a second delay, color 16 is transparent
+		b(9),s(delays[z]),b(16)                   // dispose to bg + has transparency, 100ths of a second delay, color 16 is transparent
 		b(0)                                      // end GCE
 		b(0x2C)                                   // image descriptor
 		s(0),s(0),s(frame.size.x),s(frame.size.y) // dimensions
@@ -1764,11 +1764,16 @@ modals=_=>{
 			if(subtype=='export_table' )field_exit(),save_text(name,ls(n_writecsv([grid.table,format])))
 			if(subtype=='export_image' )save_image()
 			if(subtype=='save_lil'){
-				let x=ms.verb;ret(ONE);if(image_is(x))x=lml([x])
-				if(lil(x)&&ll(x).some(image_is)&&count(x)>0){save_bin(name,writegif(ll(x).filter(image_is)))}
-				else if(sound_is(x))                        {save_bin(name,writewav(x))}
-				else if(array_is(x))                        {save_bin(name,writearray(x))}
-				else                                        {save_text(name,ls(x))}
+				let x=ms.verb;ret(ONE)
+				let f=image_is(x)?[x]: lid(x)?ll(dget(x,lms('frames'))||lml([])): lil(x)?ll(x): []
+				let d=image_is(x)?[ ]: lid(x)?ll(dget(x,lms('delays'))||lml([])): []
+				let ff=[],fd=[];f.map((v,i)=>{if(image_is(v))ff.push(v),fd.push(i>=d.length?3: clamp(1,0|ln(d[i]),65535))})
+				console.log('save lil',ff,fd)
+
+				if((lil(x)||lid(x)||image_is(x))&&f.length){save_bin(name,writegif(ff,fd))}
+				else if(sound_is(x))                       {save_bin(name,writewav(x))}
+				else if(array_is(x))                       {save_bin(name,writearray(x))}
+				else                                       {save_text(name,ls(x))}
 			}
 		}))modal_exit(1);c.x-=65;
 		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_exit(0)
@@ -2054,9 +2059,9 @@ n_open=([type,hint])=>{
 }
 n_save=([x])=>{
 	modal_enter('save_lil');x=x||NONE
-	if(array_is(x)                              )ms.desc='Save a binary file.'    ,ms.text=fieldstr(lms('untitled.bin'))
-	if(sound_is(x)                              )ms.desc='Save a .wav sound file.',ms.text=fieldstr(lms('sound.wav'))
-	if(image_is(x)||(lil(x)&&x.v.some(image_is)))ms.desc='Save a .gif image file.',ms.text=fieldstr(lms('image.gif'))
+	if(array_is(x)                                      )ms.desc='Save a binary file.'    ,ms.text=fieldstr(lms('untitled.bin'))
+	if(sound_is(x)                                      )ms.desc='Save a .wav sound file.',ms.text=fieldstr(lms('sound.wav'))
+	if(image_is(x)||lid(x)||(lil(x)&&x.v.some(image_is)))ms.desc='Save a .gif image file.',ms.text=fieldstr(lms('image.gif'))
 	ms.verb=x;return NONE
 }
 n_alert=([t,p,x,y])=>{

@@ -526,7 +526,9 @@ If an image contains transparent pixels, they will be read as pattern 0.
 12) `write[]` recognizes several types of Lil value and will serialize each appropriately:
 - _array interfaces_ are written as binary files.
 - _sound interfaces_ are written as a .WAV audio file, and a `.wav` extension will be appended to any filename without it.
-- _image interfaces_ are written as GIF89a images, and a `.gif` extension will be appended to any filename without it. A list of _image interfaces_ is written as an animated gif.
+- _image interfaces_ are written as GIF89a images, and a `.gif` extension will be appended to any filename without it.
+- A list of _image interfaces_ is written as an animated gif.
+- A dictionary is written as an animated gif. The dictionary should contain the keys `frames` (a list of _image interfaces_) and `delays` (a list of integers representing interframe delays in 1/100ths of a second).
 - anything else is converted to a string and written as a text file, using exactly the filename provided.
 
 

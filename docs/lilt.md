@@ -147,6 +147,7 @@ ffmpeg -i input.mp3 -bitexact -map_metadata -1 -ac 1 -ar 8000 -acodec pcm_u8 out
 - _sound interfaces_ are written as a .WAV audio file.
 - _image interfaces_ are written as GIF89a images.
 - a list of _image interfaces_ is written as an animated GIF89a image, with each image in the list written as one frame.
+- A dictionary is written as an animated GIF89a image. The dictionary should contain the keys `frames` (a list of _image interfaces_) and `delays` (a list of integers representing interframe delays in 1/100ths of a second).
 - anything else is converted to a string and written as a text file.
 
 4) `shell[]` returns a dictionary containing:

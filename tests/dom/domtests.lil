@@ -398,6 +398,13 @@ if !sys.platform~"web"
 	write["temp.gif" (frame_a,frame_b)]
 	assert_file["write animated gif with different frame sizes" "tests/dom/ab-blessed.gif" "temp.gif"]
 
+	parts:()
+	parts.frames:frame_a,frame_b,frame_a
+	parts.delays:7,5,0
+	write["temp.gif" parts]
+	f:read["temp.gif" "frames"]
+	assert["round-trip animated gif frame delays" (7,5,1) f.delays]
+
 	frame_a.size:0,0
 	assert["cannot write out a gif of dimension 0 on either axis." 0 write["temp.gif" frame_a]]
 end

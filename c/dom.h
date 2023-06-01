@@ -2406,7 +2406,7 @@ lv* readgif(char*data,int size,int gray,int frames){
 #define add_byte(x)  str_addraw(&r,(x)&0xFF)
 #define add_short(x) str_addraw(&r,(x)&0xFF),str_addraw(&r,((x)>>8)&0xFF) // more like bug-endian, amirite?
 #define add_long(x)  str_addraw(&r,(x)&0xFF),str_addraw(&r,((x)>>8)&0xFF),str_addraw(&r,((x)>>16)&0xFF),str_addraw(&r,((x)>>24)&0xFF)
-char* writegif(lv*frames,int*len){
+char* writegif(lv*frames,lv*delays,int*len){
 	lv*patterns=patterns_read(lmd());str r=str_new();pair size={1,1};
 	EACH(z,frames)size=pair_max(size,image_size(frames->lv[z]));
 	str_addz(&r,"GIF89a");add_short(size.x),add_short(size.y);
@@ -2418,7 +2418,7 @@ char* writegif(lv*frames,int*len){
 	str_provision(&r,r.size+frames->c*(20+(size.x*size.y*2)));
 	EACH(frame,frames)if(image_is(frames->lv[frame])){
 		add_byte(0x21),add_byte(0xF9),add_byte(4); // graphic control extension
-		add_byte(9),add_short(3),add_byte(16); // dispose to bg + has transparency, 3/100ths of a second delay, color 16 is transparent
+		add_byte(9),add_short(((int)ln(delays->lv[frame]))),add_byte(16); // dispose to bg + has transparency, 100ths of a second delay, color 16 is transparent
 		add_byte(0); // end GCE
 		add_byte(0x2C); // image descriptor
 		size=image_size(frames->lv[frame]);add_short(0),add_short(0),add_short(size.x),add_short(size.y); // window {x,y,width,height}
@@ -2467,9 +2467,11 @@ lv* n_readgif(lv*self,lv*a){
 	fclose(f);return readgif(data,st.st_size,gray,frames);
 }
 lv* n_writegif(lv*self,lv*a){
-	(void)self;lv*name=ls(l_first(a));if(a->c<2)return NONE;a=lil(a->lv[1])?a->lv[1]:l_list(a->lv[1]);
-	lv*i=lml(0);EACH(z,a)if(image_is(a->lv[z])&&!is_empty(a->lv[z]))ll_add(i,a->lv[z]);if(i->c<1)return NONE;
-	int len=0;char*data=writegif(i,&len);
+	(void)self;lv*name=ls(l_first(a));if(a->c<2)return NONE;lv*i=lml(0),*d=lml(0);
+	lv*si=lil(a->lv[1])?a->lv[1]: lid(a->lv[1])?dget(a->lv[1],lmistr("frames")): l_list(a->lv[1]);
+	lv*sd=lid(a->lv[1])?dget(a->lv[1],lmistr("delays")) :lml(0);
+	EACH(z,si)if(image_is(si->lv[z])&&!is_empty(si->lv[z]))ll_add(i,si->lv[z]),ll_add(d,lmn(z>=sd->c?3: CLAMP(1,ln(sd->lv[z]),65535)));
+	if(i->c<1)return NONE;int len=0;char*data=writegif(i,d,&len);
 	FILE*f=fopen(name->sv,"wb");if(f)fwrite(data,1,len,f),fclose(f);free(data);return f?ONE:NONE;
 }
 lv* n_writewav(lv*self,lv*a){
