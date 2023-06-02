@@ -1468,7 +1468,7 @@ void modal_exit(int value){
 				frame->b->sv[x+(s.x*y)]=c>=32?c: p?1:bg;
 			}
 			if(bg_has_lasso())r->lv[z]->b=buffer_mask(r->lv[z]->b,dr.mask);
-		}if(!a)r->c=1;n_writegif(NULL,lml2(path,r));
+		}if(!a)r->c=1;lv*rd=lmd();dset(rd,lmistr("frames"),r),dset(rd,lmistr("delays"),l_take(lmn(r->c),lmn(10))),n_writegif(NULL,lml2(path,rd));
 	}
 	if((ms.subtype==modal_save_deck||ms.subtype==modal_save_locked)&&value){
 		lv*path=modal_save_path("");

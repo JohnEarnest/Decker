@@ -1756,7 +1756,7 @@ modals=_=>{
 						const c=anim_pattern(v,x,y,z),p=draw_pattern(c,x+off.x,y+off.y)
 						frame.pix[x+(i.size.x*y)]=c>=32?c: p?1:bg
 					}frames.push(bg_has_lasso()?image_mask(frame,dr.mask):frame)
-				}save_bin(name,writegif(a?frames:[frames[0]]))
+				}save_bin(name,writegif(a?frames:[frames[0]], a?frames.map(x=>10):[10]))
 			}
 			if(subtype=='save_deck'    )savedeck()
 			if(subtype=='save_locked'  )iwrite(deck,lms('locked'),ONE),savedeck(),iwrite(deck,lms('locked'),NONE)
