@@ -80,12 +80,11 @@ lv* n_show(lv*self,lv*a){
 	printf("%s\n",lmstr(s)->sv);return l_first(a);
 }
 
-// Entrypoint
+// Environment
 
-int main(int argc,char**argv){
-	init_interns();
-	state.external=1;
-	lv* env=lmenv(NULL);
+lv*n_import(lv*self,lv*a); // forward ref
+lv* globals(){
+	lv*env=lmenv(NULL);
 	dset(env,lmistr("show"     ),lmnat(n_show,NULL));
 	dset(env,lmistr("print"    ),lmnat(n_print,NULL));
 	dset(env,lmistr("error"    ),lmnat(n_error,NULL));
@@ -97,6 +96,7 @@ int main(int argc,char**argv){
 	dset(env,lmistr("exit"     ),lmnat(n_exit,NULL));
 	dset(env,lmistr("shell"    ),lmnat(n_shell,NULL));
 	dset(env,lmistr("eval"     ),lmnat(n_eval,NULL));
+	dset(env,lmistr("import"   ),lmnat(n_import,NULL));
 	dset(env,lmistr("random"   ),lmnat(n_random,NULL));
 	dset(env,lmistr("array"    ),lmnat(n_array,NULL));
 	dset(env,lmistr("image"    ),lmnat(n_image,NULL));
@@ -108,6 +108,22 @@ int main(int argc,char**argv){
 	dset(env,lmistr("readdeck" ),lmnat(n_readdeck,NULL));
 	dset(env,lmistr("writedeck"),lmnat(n_writedeck,NULL));
 	constants(env);
+	return env;
+}
+lv*n_import(lv*self,lv*a){
+	lv*file=n_read(self,a);if(!file->c)return NONE;
+	lv*prog=parse(ls(file)->sv);if(perr())return NONE;
+	lv*root=lmenv(globals());pushstate(root),issue(root,prog);
+	int c=0;while(running()){runop(),c++;if(c%100==0)lv_collect();}
+	DMAP(r,root,root->lv[z]);return popstate(),r;
+}
+
+// Entrypoint
+
+int main(int argc,char**argv){
+	init_interns();
+	state.external=1;
+	lv* env=globals();
 	lv* a=lml(argc);for(int z=0;z<argc;z++)a->lv[z]=lmutf8(argv[z]);
 	dset(env,lmistr("args"),a);
 	lv* e=lmd();for(int z=0;environ[z];z++){

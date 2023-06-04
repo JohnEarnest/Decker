@@ -1,0 +1,8 @@
+# import[] test
+
+on triple x do
+ x,x,x
+end
+
+alpha:"abcdefghijklmnopqrstuvwxyz"
+beta:2+3

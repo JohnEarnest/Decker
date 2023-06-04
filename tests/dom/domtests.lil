@@ -1918,6 +1918,21 @@ assert["contraption attribute from event 2" 205 con.prop2]
 
 #######################################
 #
+#  Lilt features
+#
+#######################################
+
+if !sys.platform~"web"
+	alpha:999
+	i:import["tests/dom/import.lil"]
+	assert["import keys" ("triple","alpha","beta") (keys i)]
+	assert["import apply" ("A","A","A") i.triple["A"]]
+	assert["import isolated" 999 alpha]
+	assert["import nonexistent file" 0 import["does_not_exist.lil"]]
+end
+
+#######################################
+#
 #  Wrap Up
 #
 #######################################
