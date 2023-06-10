@@ -348,7 +348,7 @@ void buffer_dither(lv*r){
 void buffer_flip_h(lv*x){pair s=buff_size(x);for(int z=0;z<s.y;z++){int a=z*s.x,b=(z+1)*s.x-1;while(a<b){char t=x->sv[a];x->sv[a]=x->sv[b];x->sv[b]=t;a++;b--;}}}
 void buffer_flip_v(lv*x){pair s=buff_size(x);for(int z=0;z<s.x;z++){int a=z,b=z+s.x*(s.y-1);while(a<b){char t=x->sv[a];x->sv[a]=x->sv[b];x->sv[b]=t;a+=s.x;b-=s.x;}}}
 lv* buffer_transpose(lv*x){pair s=buff_size(x);lv*r=lmbuff((pair){s.y,s.x});for(int a=0;a<s.y;a++)for(int b=0;b<s.x;b++)r->sv[a+s.y*b]=x->sv[b+s.x*a];return r;}
-lv* n_image_map(lv*self,lv*z){
+lv* n_buffer_map(lv*self,lv*z){
 	int m[256]={0};if(z->c>1){int f=ln(z->lv[1]);for(int z=0;z<256;z++)m[z]=f;}else{for(int z=0;z<256;z++)m[z]=z;}
 	z=ld(l_first(z));EACH(i,z)m[0xFF&(int)ln(z->kv[i])]=0xFF&(int)ln(z->lv[i]);
 	EACH(z,self->b)self->b->sv[z]=m[0xFF&(int)self->b->sv[z]];return self;
@@ -419,7 +419,7 @@ lv* interface_image(lv*self,lv*i,lv*x){
 		return ib?lmn(0xFF&(self->b->sv[p.x+p.y*s.x])):NONE;
 	}
 	ikey("size"     ){if(x){image_resize(self,getpair(x));return x;}return lmpair(s);}
-	ikey("map"      )return lmnat(n_image_map,self);
+	ikey("map"      )return lmnat(n_buffer_map,self);
 	ikey("merge"    )return lmnat(n_image_merge,self);
 	ikey("transform")return lmnat(n_image_transform,self);
 	ikey("copy"     )return lmnat(n_image_copy,self);
@@ -951,6 +951,7 @@ lv* interface_sound(lv*self,lv*i,lv*x){
 	ikey("size"){if(x){sound_resize(self,ln(x));return x;}return lmn(data->c);}
 	ikey("duration")return lmn(data->c/(1.0*SFX_RATE));
 	ikey("encoded")return sound_write(self);
+	ikey("map")return lmnat(n_buffer_map,self);
 	return x?x:NONE;
 }
 lv* sound_make(lv*buffer){buffer->c=MIN(buffer->c,10*SFX_RATE);return lmi(interface_sound,lmistr("sound"),buffer);}

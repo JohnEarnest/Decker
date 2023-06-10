@@ -1284,6 +1284,11 @@ image_resize=(i,size)=>{
 	i.pix=new Uint8Array(size.x*size.y),i.size=size;
 	for(let a=0;a<size.y;a++)for(let b=0;b<size.x;b++)i.pix[b+a*size.x]=a>=os.y||b>=os.x?0: ob[b+a*os.x];return i
 }
+buffer_map=(buff,x,fill)=>{
+	const m=new Uint8Array(256);for(let z=0;z<256;z++)m[z]=fill?ln(fill):z;x=ld(x)
+	for(let z=0;z<x.k.length;z++)m[0xFF&ln(x.k[z])]=0xFF&ln(x.v[z])
+	for(let z=0;z<buff.length;z++)buff[z]=m[buff[z]]
+}
 image_make=size=>{
 	const f=(self,i,x)=>{
 		const s=self.size
@@ -1294,12 +1299,7 @@ image_make=size=>{
 		}
 		if(ikey(i,'encoded'))return lms(image_write(self))
 		if(ikey(i,'size'))return x?(image_resize(self,getpair(x)),x): lmpair(self.size)
-		if(ikey(i,'map'))return lmnat(([x,fill])=>{
-			const m=new Uint8Array(256);for(let z=0;z<256;z++)m[z]=fill?ln(fill):z;x=ld(x)
-			for(let z=0;z<x.k.length;z++)m[0xFF&ln(x.k[z])]=0xFF&ln(x.v[z])
-			for(let z=0;z<self.pix.length;z++)self.pix[z]=m[self.pix[z]]
-			return self
-		})
+		if(ikey(i,'map'))return lmnat(([x,fill])=>(buffer_map(self.pix,x,fill),self))
 		if(ikey(i,'merge'))return lmnat(z=>{
 			if(lil(z[0]))z=ll(z[0]);const nice=x=>x&&image_is(x)&&x.size.x>0&&x.size.y>0, s=self.size
 			const v=new Uint8Array(256),sx=new Uint32Array(256),sy=new Uint32Array(256)
@@ -1362,6 +1362,7 @@ sound_make=data=>{
 			for(let z=0;z<o.length&&z<n;z++)self.data[z]=o[z];return x
 		}
 		if(ikey(i,'duration'))return lmn(self.data.length/SFX_RATE)
+		if(ikey(i,'map'))return lmnat(([x,fill])=>(buffer_map(self.data,x,fill),self))
 		return x?x:NONE
 	},'sound')
 	if(data&&data.length>10*SFX_RATE)data=data.slice(0,10*SFX_RATE)

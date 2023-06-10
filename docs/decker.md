@@ -846,6 +846,7 @@ Sounds are dynamically created interfaces, each representing a mutable buffer of
 | `x.size`     | An integer giving the number of samples in the sound. Resizing pads with `0` or truncates, as needed. r/w. |
 | `x.duration` | A float giving the play time of the sound in seconds.                                                      |
 | `x[y]`       | The value of sample `y`. Reads `0` out of bounds, ignores out of bounds writes. r/w.                       |
+| `x.map[x y]` | Replace every sample of the sound by indexing the dictionary `x`, using `y` as a default if provided.      |
 
 The following example creates a new sound and then writes a 1 second long A-4 (440hz) sine wave to it:
 ```

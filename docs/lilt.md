@@ -199,3 +199,6 @@ v1.14:
 v1.18:
 - generalized `print[]` and `error[]` to accept a array interfaces as arguments.
 
+v1.22:
+- introduced `import[]` to simplify building multi-file scripts.
+
