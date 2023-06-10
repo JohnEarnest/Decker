@@ -928,7 +928,10 @@ assert["sound decode" (11,44,110,-36,126) sound["%%SND0Cyxu3H4="][0,5]]
 snd.size:5
 snd[0,5]:11,22,33,44,126
 snd.map[(22,33) dict 44,55 77]
-assert["sound map" (77,44,55,77,77) snd[0,5]]
+assert["sound map"        (77,44,55,77,77)    snd[0,5]]
+snd.map[(44,55) dict -37,-120]
+assert["sound map signed" (77,-37,-120,77,77) snd[0,5]]
+
 
 #######################################
 #
