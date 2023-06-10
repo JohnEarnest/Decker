@@ -1951,8 +1951,8 @@ card_read=(x,deck,cdata)=>{
 			if(ikey(i,'add'    ))return lmnat(([t,n1,n2])=>card_add(self,t,n1,n2))
 			if(ikey(i,'remove' ))return lmnat(([x])=>lmn(card_remove(self,x)))
 			if(ikey(i,'event'  ))return lmnat(args=>n_event(self,args))
-			if(ikey(i,'copy'    )&&state.external)return lmnat(([z])=>con_copy(self,z))
-			if(ikey(i,'paste'   )&&state.external)return lmnat(([z])=>con_paste(self,z))
+			if(ikey(i,'copy'   ))return lmnat(([z])=>con_copy(self,z))
+			if(ikey(i,'paste'  ))return lmnat(([z])=>con_paste(self,z))
 		}return x?x:NONE
 	},'card')
 	const n=dget(x,lms('name'))
@@ -2184,8 +2184,8 @@ deck_read=x=>{
 			if(ikey(i,'add'     ))return lmnat(([x,y,z])=>deck_add(self,x,y,z))
 			if(ikey(i,'remove'  ))return lmnat(([x])=>lmn(deck_remove(self,x)))
 			if(ikey(i,'event'   ))return lmnat(args=>n_event(self,args))
-			if(ikey(i,'copy' )&&state.external)return lmnat(([x])=>deck_copy(self,x))
-			if(ikey(i,'paste')&&state.external)return lmnat(([x])=>deck_paste(self,x))
+			if(ikey(i,'copy'    ))return lmnat(([x])=>deck_copy(self,x))
+			if(ikey(i,'paste'   ))return lmnat(([x])=>deck_paste(self,x))
 		}return x?x:NONE
 	},'deck')
 	ri.fonts       =fonts

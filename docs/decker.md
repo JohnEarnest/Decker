@@ -647,22 +647,24 @@ Deck Interface
 --------------
 The deck interface represents the global attributes of a Decker document.
 
-| Name              | Description                                                                     |
-| :---------------- | :------------------------------------------------------------------------------ |
-| `typeof x`        | `"deck"`                                                                        |
-| `x.version`       | Number. The version of the deck file format.                                    |
-| `x.locked`        | Bool. Is this deck _locked_ (editing and drawing mode disabled)? r/w.           |
-| `x.name`          | String. A descriptive title for the deck. r/w.                                  |
-| `x.author`        | String. The name of the author of the deck. r/w.                                |
-| `x.script`        | String. The Lil source code of the deck's script, or `""`. r/w.                 |
-| `x.patterns`      | An instance of the _patterns_ interface.                                        |
-| `x.sounds`        | A dictionary of _sound_ interfaces stored in this deck, keyed by name.          |
-| `x.fonts`         | A dictionary of _font_ interfaces stored in this deck, keyed by name.           |
-| `x.cards`         | A dictionary of _card_ interfaces stored in this deck, keyed by name.           |
-| `x.card`          | The current _card_. Writing this attribute behaves the same as calling `go[x]`. |
-| `x.add[x y z]`    | Add a resource to this deck, and return it.                                     |
-| `x.remove[x]`     | Remove a resource from this deck. Returns 1 on success.                         |
-| `x.event[n x...]` | Issue an event named `n` at this deck with argument(s) `x`.                     |
+| Name              | Description                                                                                 |
+| :---------------- | :------------------------------------------------------------------------------------------ |
+| `typeof x`        | `"deck"`                                                                                    |
+| `x.version`       | Number. The version of the deck file format.                                                |
+| `x.locked`        | Bool. Is this deck _locked_ (editing and drawing mode disabled)? r/w.                       |
+| `x.name`          | String. A descriptive title for the deck. r/w.                                              |
+| `x.author`        | String. The name of the author of the deck. r/w.                                            |
+| `x.script`        | String. The Lil source code of the deck's script, or `""`. r/w.                             |
+| `x.patterns`      | An instance of the _patterns_ interface.                                                    |
+| `x.sounds`        | A dictionary of _sound_ interfaces stored in this deck, keyed by name.                      |
+| `x.fonts`         | A dictionary of _font_ interfaces stored in this deck, keyed by name.                       |
+| `x.cards`         | A dictionary of _card_ interfaces stored in this deck, keyed by name.                       |
+| `x.card`          | The current _card_. Writing this attribute behaves the same as calling `go[x]`.             |
+| `x.add[x y z]`    | Add a resource to this deck, and return it.                                                 |
+| `x.remove[x]`     | Remove a resource from this deck. Returns 1 on success.                                     |
+| `x.copy[card]`    | Save a card and its contents as an opaque string starting with `%%CRD0`.                    |
+| `x.paste[text]`   | Append a card and its contents from a `%%CRD0` string to this deck, returning the new card. |
+| `x.event[n x...]` | Issue an event named `n` at this deck with argument(s) `x`.                                 |
 
 `deck.add[x y z]` can add new cards, sounds, modules, prototypes and fonts to the deck:
 
@@ -917,6 +919,8 @@ The card interface gives access to the contents of a given card.
 | `x.index`         | The ordinal position of this card in the deck, counting from 0. r/w.                              |
 | `x.add[x y z]`    | Add a widget to this card, and return it.                                                         |
 | `x.remove[x]`     | Remove a widget `x` from this card. Returns 1 on success.                                         |
+| `x.copy[list]`    | Save a list of widgets on this card as an opaque string starting with `%%WGT0`.                   |
+| `x.paste[text]`   | Append the widgets within a `%%WGT0` string to this card, returning a list of the new widgets.    |
 | `x.event[n x...]` | Issue an event named `n` at this card with argument(s) `x`.                                       |
 
 `card.add[x y]` can add a new widget to the card. If `x` is a string {`"button"`, `"field"`, `"slider"`, `"canvas"`, or `"grid"`}, insert a new widget of the appropriate type using `y` as a name (or an appropriate default name). If `x` is the string `"contraption"`, insert a new instance of the prototype with name `y` using `z` as a name (or an appropriate default name). If `x` is a widget interface, insert a copy of it, again using `y` as a name or an appropriate default.

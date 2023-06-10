@@ -170,18 +170,6 @@ d:readdeck["demo.deck"]
 (first d.card.widgets).event["click"]
 ```
 
-Lilt can also "copy" and "paste" entire cards from a deck or lists of widgets within a card:
-
-| Name                  | Description                                                                                                |
-| :-------------------- | :--------------------------------------------------------------------------------------------------------- |
-| `card.copy[list]`     | Save a list of widgets on `card` as a string.                                                              |
-| `card.paste[text]`    | Append the widgets within a string to `card`, returning a list of the new widgets.                         |
-| `deck.copy[card]`     | Save a card and its contents as a string.                                                                  |
-| `deck.paste[text]`    | Append a card and its contents from a string to `deck`, returning the new `card`.                          |
-
-All of these operations work with a serialized form of the corresponding deck components as a string. The format of these strings is subject to change in the future and should be treated as opaque, but a valid string will always begin with the prefix `%%CRD0` (a copied card) or `%%WGT0` (a list of copied widgets). Strings can be freely copied and pasted between decks, and even pasted multiple times. As with `deck.add[]` and `card.add[]`, the `name` fields of pasted objects will be changed if they would collide with existing parts of the deck.
-
-
 Changelog
 ---------
 v1.0:
