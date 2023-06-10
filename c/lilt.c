@@ -122,7 +122,6 @@ lv*n_import(lv*self,lv*a){
 
 int main(int argc,char**argv){
 	init_interns();
-	state.external=1;
 	lv* env=globals();
 	lv* a=lml(argc);for(int z=0;z<argc;z++)a->lv[z]=lmutf8(argv[z]);
 	dset(env,lmistr("args"),a);

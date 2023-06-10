@@ -11,7 +11,7 @@
 typedef struct{int c,size;char*sv;}str;
 typedef struct lvs{int t,c,n,s,ns,g;double nv;char*sv;struct lvs**lv,**kv,*a,*b,*env;void*f;}lv;
 typedef struct{int c,size,*iv;}idx;
-typedef struct{lv*p,*t,*e;idx pcs;int external;}pstate;pstate state={0}; // parameters, tasks, envs, index
+typedef struct{lv*p,*t,*e;idx pcs;}pstate;pstate state={0}; // parameters, tasks, envs, index
 typedef struct{int lo,hi,live,size,g,ss;lv**heap;long frees,allocs,depth;pstate st[4];}gc_state;gc_state gc={0};
 typedef struct{char*name;void*func;}primitive;
 int seed=0x12345;lv interned[512]={{0}};int intern_count=100;
@@ -921,7 +921,7 @@ void init_interns(){for(int z=0;z<100;z++){lv*t=&interned[z];t->t=0,t->c=1,t->nv
 void init(lv*e){state.p=lml(0),state.t=lml(0),state.e=lml(0),state.pcs=idx_new(0);ll_add(state.e,e);}
 void pushstate(lv*e){
 	if(!state.p)printf("trying to save an uninitialized state!\n");
-	gc.st[gc.ss++]=state;state.external=0;init(e);
+	gc.st[gc.ss++]=state;init(e);
 }
 void popstate(){
 	idx_free(&state.pcs);
