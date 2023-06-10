@@ -1912,8 +1912,8 @@ lv* interface_card(lv*self,lv*i,lv*x){
 		ikey("add"     )return lmnat(n_card_add,self);
 		ikey("remove"  )return lmnat(n_card_remove,self);
 		ikey("event"   )return lmnat(n_event,self);
-		ikey("copy"    )if(state.external)return lmnat(n_con_copy,self);
-		ikey("paste"   )if(state.external)return lmnat(n_con_paste,self);
+		ikey("copy"    )return lmnat(n_con_copy,self);
+		ikey("paste"   )return lmnat(n_con_paste,self);
 	}return x?x:NONE;
 }
 lv* card_write(lv*card){
@@ -2168,8 +2168,8 @@ lv* interface_deck(lv*self,lv*i,lv*x){
 		ikey("remove"  )return lmnat(n_deck_remove,self);
 		ikey("event"   )return lmnat(n_event,self);
 		ikey("card"    ){int n=ln(dget(data,lmistr("card")));return cards->lv[MIN(cards->c-1,n)];}
-		ikey("copy"    )if(state.external)return lmnat(n_deck_copy,self);
-		ikey("paste"   )if(state.external)return lmnat(n_deck_paste,self);
+		ikey("copy"    )return lmnat(n_deck_copy,self);
+		ikey("paste"   )return lmnat(n_deck_paste,self);
 	}return x?x:NONE;
 }
 lv* deck_read(lv*x){
