@@ -1111,7 +1111,7 @@ lv* n_random(lv*self,lv*z){
 	for(int i=x->c-1;i>0;i--){int j=randint(i+1);int t=pv.iv[j];pv.iv[j]=pv.iv[i],pv.iv[i]=t;}
 	GEN(r,abs(y))x->lv[pv.iv[z%x->c]];idx_free(&pv);return r;
 }
-int frame_count=0,audio_playing=0,windowed=1,toggle_fullscreen=0;
+int frame_count=0;
 #if defined(__APPLE__) && defined(__MACH__)
 #define PLATFORM "mac"
 #elif defined(__unix__) || defined(__unix)
@@ -1125,14 +1125,11 @@ int frame_count=0,audio_playing=0,windowed=1,toggle_fullscreen=0;
 lv*interface_sys(lv*self,lv*i,lv*x){
 	if(x&&lis(i)){
 		ikey("seed"      ){seed=0xFFFFFFFF&(long long int)ln(x);return x;}
-		ikey("fullscreen"){toggle_fullscreen=windowed!=!lb(x);return x;}
 	}else if(lis(i)){
 		ikey("version"   )return lmistr(VERSION);
 		ikey("platform"  )return lmistr(PLATFORM);
 		ikey("seed"      )return lmn(seed);
-		ikey("fullscreen")return lmn(!windowed);
 		ikey("frame"     )return lmn(frame_count);
-		ikey("playing"   )return lmn(audio_playing);
 		ikey("now"       ){time_t now;time(&now);return lmn(now);}
 		ikey("ms"        )return time_ms();
 		ikey("workspace"){

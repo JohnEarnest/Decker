@@ -105,9 +105,9 @@ script:"Busywaiting.0"
 button1:{"type":"button","size":[60,20],"pos":[15,307],"script":"TheBasics.0","text":"Back"}
 button2:{"type":"button","size":[60,20],"pos":[436,307],"script":"TheBasics.1","text":"Next"}
 field1:{"type":"field","size":[204,19],"pos":[148,28],"locked":1,"font":"menu","border":0,"style":"plain","align":"center","value":"Busy Waiting"}
-field2:{"type":"field","size":[316,47],"pos":[101,292],"locked":1,"border":0,"style":"plain","align":"center","value":"If you want to do something else while waiting for a sound to finish, \nyou can consult \"sys.playing\",\nwhich is truthy as long as some sound is playing.\nIn this case we use it to keep a canvas animation going."}
+field2:{"type":"field","size":[316,47],"pos":[101,292],"locked":1,"border":0,"style":"plain","align":"center","value":"If you want to do something else while waiting for a sound to finish, \nyou can consult \"app.playing\",\nwhich is truthy as long as some sound is playing.\nIn this case we use it to keep a canvas animation going."}
 button3:{"type":"button","size":[103,32],"pos":[117,220],"script":"Busywaiting.1","text":"Busy Wait"}
-field3:{"type":"field","size":[133,96],"pos":[275,187],"locked":1,"style":"code","value":"on click do\n play[\"amen\"]\n while sys.playing\n  view[]\n  sleep[1]\n end\n play[\"sosumi\"]\nend"}
+field3:{"type":"field","size":[133,96],"pos":[275,187],"locked":1,"style":"code","value":"on click do\n play[\"amen\"]\n while app.playing\n  view[]\n  sleep[1]\n end\n play[\"sosumi\"]\nend"}
 target:{"type":"canvas","size":[66,62],"pos":[220,51],"locked":1,"image":"%%IMG2AEIAPgD/AP8A/wD/AP8A/wCZAQMAOwECAAIBAgA8AQMAAQECAAIBAgA5AQIAAQECAAEBAwA2AQEAAwEDAAEBAwA3AQQAAQEEADkBDQA5AQQAAQEEADcBAwABAQMAAwEBADYBAwABAQIAAQECADkBAgACAQIAAQEDADwBAgACAQIAOwEDAP8A/wD/AP8A/wD/AFY=","scale":1}
 button4:{"type":"button","size":[103,32],"pos":[116,135],"script":"Busywaiting.2","text":"Blocking Wait"}
 field4:{"type":"field","size":[133,65],"pos":[275,119],"locked":1,"style":"code","value":"on click do\n play[\"amen\"]\n sleep[\"play\"]\n play[\"sosumi\"]\nend"}
@@ -133,7 +133,7 @@ end
 {script:Busywaiting.1}
 on click do
  play["amen"]
- while sys.playing
+ while app.playing
   view[]
   sleep[1]
  end

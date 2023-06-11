@@ -64,8 +64,10 @@ lv* n_go(lv*self,lv*z){
 
 lv* interface_rtext(lv*self,lv*i,lv*x); // forward ref
 lv* interface_pointer(lv*self,lv*i,lv*x); // forward ref
+lv* interface_app(lv*self,lv*i,lv*x); // forward ref
 void constants(lv*env){
 	dset(env,lmistr("sys"    ),lmi(interface_sys,    lmistr("system" ),NULL));
+	dset(env,lmistr("app"    ),lmi(interface_app,    lmistr("app"    ),NULL));
 	dset(env,lmistr("rtext"  ),lmi(interface_rtext,  lmistr("rtext"  ),NULL));
 	dset(env,lmistr("pointer"),lmi(interface_pointer,lmistr("pointer"),NULL));
 	dset(env,lmistr("pi"),lmn(3.141592653589793));

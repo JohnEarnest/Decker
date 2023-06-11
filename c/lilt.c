@@ -79,6 +79,7 @@ lv* n_show(lv*self,lv*a){
 	(void)self;str s=str_new();EACH(z,a){if(z)str_addc(&s,' ');show(&s,a->lv[z],a->c==1);}
 	printf("%s\n",lmstr(s)->sv);return l_first(a);
 }
+lv*interface_app(lv*self,lv*i,lv*x){(void)self;(void)i;return x?x:NONE;}
 
 // Environment
 

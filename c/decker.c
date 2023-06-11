@@ -38,7 +38,7 @@ SDL_Window  *win;
 SDL_Renderer*ren;
 SDL_Texture *gfx,*gtool;
 SDL_mutex*gil=NULL;
-
+int audio_playing=0,windowed=1,toggle_fullscreen=0;
 int nosound=0, autosave=0, noscale=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
 #define AUTOSAVE_DELAY (10*60)
 lv* deck_get(lv*text){SDL_LockMutex(gil);lv*r=deck_read(text);SDL_UnlockMutex(gil);return r;}
@@ -337,6 +337,21 @@ int framebuffer_flip(pair disp,pair size,int scale){
 	return 1;
 }
 #endif
+
+// App Interface
+
+lv*n_appsave(lv*self,lv*z){if(strlen(document_path)){save_deck(lmcstr(document_path));}else{modal_enter(modal_save_deck);}return NONE;(void)self;(void)z;}
+lv*n_appexit(lv*self,lv*z){should_exit=1;return NONE;(void)self;(void)z;}
+lv*interface_app(lv*self,lv*i,lv*x){
+	if(x&&lis(i)){
+		ikey("fullscreen"){toggle_fullscreen=windowed!=!lb(x);return x;}
+	}else if(lis(i)){
+		ikey("fullscreen")return lmn(!windowed);
+		ikey("playing"   )return lmn(audio_playing);
+		ikey("save"      )return lmnat(n_appsave,NULL);
+		ikey("exit"      )return lmnat(n_appexit,NULL);
+	}return x?x:NONE;(void)self;
+}
 
 // Menus
 
@@ -3296,7 +3311,8 @@ int interpret(){
 	int quota=FRAME_QUOTA;
 	while(1){
 		#define nomodal (ms.type==modal_none||ms.type==modal_query||ms.type==modal_listen)
-		while(nomodal&&running()&&sleep_frames==0&&sleep_play==0&&quota>0){runop();quota--;mark_dirty();}frame=context;
+		while(nomodal&&running()&&sleep_frames==0&&sleep_play==0&&quota>0&&!should_exit){runop();quota--;mark_dirty();}frame=context;
+		if(should_exit)break;
 		if(quota<=0&&running())msg.overshoot=1;
 		if(!nomodal||quota<=0||sleep_frames||sleep_play){if(sleep_frames)sleep_frames--;break;}
 		if(!running()&&pending_popstate){popstate();pending_popstate=0;}

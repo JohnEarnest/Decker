@@ -384,7 +384,7 @@ end
 {script:Sound Loops.4}
 on click do
  play["amen"]
- while sys.playing end
+ while app.playing end
  alert["finished"]
 end
 {end}

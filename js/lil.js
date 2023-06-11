@@ -639,18 +639,13 @@ n_random=z=>{
 	for(let i=x.length-1;i>0;i--){const j=randint(i+1),t=p[j];p[j]=p[i],p[i]=t}
 	for(let z=0;z<abs(y);z++)r.push(x[p[z%x.length]]);return lml(r)
 }
-let frame_count=0,audio_playing=0
+let frame_count=0
 interface_system=lmi((self,i,x)=>{
 	if(!i)return NONE
-	if(x){
-		if(lis(i)&&i.v=='seed'){seed=0|ln(x);return x}
-		if(lis(i)&&i.v=='fullscreen')return set_fullscreen(lb(x)),x
-	}
+	if(x){if(lis(i)&&i.v=='seed'){seed=0|ln(x);return x}}
 	if(lis(i)&&i.v=='version'   )return lms(VERSION)
 	if(lis(i)&&i.v=='platform'  )return lms('web')
 	if(lis(i)&&i.v=='seed'      )return lmn(seed)
-	if(lis(i)&&i.v=='fullscreen')return lmn(is_fullscreen())
-	if(lis(i)&&i.v=='playing'   )return lmn(audio_playing)
 	if(lis(i)&&i.v=='frame'     )return lmn(frame_count)
 	if(lis(i)&&i.v=='now'       )return lmn(0|(new Date().getTime()/1000))
 	if(lis(i)&&i.v=='ms'        )return lmn(0|(Date.now()))
@@ -897,6 +892,18 @@ readcolor=(cr,cg,cb,grayscale)=>{
 		if(diff<cd)ci=c,cd=diff
 	}if(ci==15)return 1;return ci+32
 }
+
+let audio_playing=0
+interface_app=lmi((self,i,x)=>{
+	if(x&&lis(i)){
+		if(i.v=='fullscreen')return set_fullscreen(lb(x)),x
+	}else if(lis(i)){
+		if(i.v=='fullscreen')return lmn(is_fullscreen())
+		if(i.v=='playing'   )return lmn(audio_playing)
+		if(i.v=='save'      )return lmnat(_=>((modal_enter&&modal_enter('save_deck'),NONE)))
+		if(i.v=='exit'      )return lmnat(_=>NONE) // does nothing in web-decker
+	}return x?x:NONE
+},'app')
 
 let frame=null
 inclip=p=>rin(frame.clip,p)
@@ -2294,6 +2301,7 @@ n_transition=(f,deck)=>{const t=deck.transit;if(lion(f))dset(t,lms(f.n),f);retur
 
 constants=env=>{
 	env.local('sys'    ,interface_system)
+	env.local('app'    ,interface_app)
 	env.local('rtext'  ,interface_rtext)
 	env.local('pointer',pointer)
 	env.local('pi'   ,lmn(3.141592653589793))

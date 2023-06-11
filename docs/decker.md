@@ -146,7 +146,8 @@ Web-Decker has generally the same tools and functionality as Native-Decker, but 
 - Copying, cutting, and pasting from the keyboard _must_ be done using the native OS/Browser keyboard shortcuts. Copying and pasting using the menus may require you to confirm the action with a browser modal. When pasting via the keyboard, it _may_ be possible to paste images and sounds from the OS clipboard. Clipboard access is _very_ flaky and inconsistent between browsers: Web-Decker tries several strategies to interact with the OS clipboard, but if nothing works it will store clipboard contents in a local window-only clipboard instead, accessible via the browser console as the `local_clipboard` variable.
 - Importing, reading, dragging and dropping, or pasting images and sounds supports _any_ graphics or audio formats understood by the web browser, which may include several formats Native-Decker does not understand.
 - Opening or importing files uses the browser's native "Open" dialog instead of Decker's UI.
-- Saving or exporting files _cannot_ display a file browser to choose a destination, so Web-Decker provides a simplified dialog which only prompts for a filename. For similar reasons there is no "Autosave" functionality.
+- Saving or exporting files _cannot_ display a file browser to choose a destination, so Web-Decker provides a simplified dialog which only prompts for a filename. For similar reasons there is no "Autosave" functionality, and `app.save[]` downloads a copy of the deck instead of saving in-place.
+- Web-Decker does nothing if `app.exit[]` is called.
 - Web-Decker always fills the browser window. The toolbars are hidden by default, but can be toggled on (if space is available) from the _Decker_ menu.
 - Web-Decker will always report `sys.platform` as `"web"`, irrespective of the operating system the browser is running on.
 - The Web-Decker implementation of Lil uses the browser's garbage collector, so less information is available in `sys.workspace`.
@@ -539,6 +540,7 @@ Decker also provides pre-defined constants:
 | Name            | Description                                                            |
 | :-------------- | :--------------------------------------------------------------------- |
 | `sys`           | An instance of the _system_ interface.                                 |
+| `app`           | An instance of the _app_ interface.                                    |
 | `rtext`         | An instance of the _rtext_ interface.                                  |
 | `pi`            | The ratio of a circle's circumference to its diameter. Roughly 3.141.  |
 | `e`             | Euler's number; the base of the natural logarithm. Roughly 2.718.      |
@@ -555,7 +557,7 @@ Decker's interfaces break down into several general categories:
 
 | :--------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
 | Datatypes  | [Font](#fontinterface), [Image](#imageinterface), [Sound](#soundinterface), [Array](#arrayinterface)                                       |
-| Utilities  | [System](#systeminterface), [RText](#rtextinterface), [Pointer](#pointerinterface)                                                         |
+| Utilities  | [System](#systeminterface), [App](#appinterface), [RText](#rtextinterface), [Pointer](#pointerinterface)                                   |
 | Deck Parts | [Deck](#deckinterface), [Card](#cardinterface), [Patterns](#patternsinterface), [Module](#moduleinterface), [KeyStore](#keystoreinterface), [Prototype](#prototypeinterface) |
 | Widgets    | [Button](#buttoninterface), [Field](#fieldinterface), [Slider](#sliderinterface), [Grid](#gridinterface), [Canvas](#canvasinterface), [Contraption](#contraptioninterface) |
 
@@ -585,8 +587,6 @@ The _system_ interface exposes information about the Lil runtime. It is availabl
 | `x.version`                | Decker's version number as a string in `x.y` format.                                                  |
 | `x.platform`               | The host operating system; one of {`"mac"`,`"unix"`,`"win"`,`"web"`,`"other"`}.                       |
 | `x.seed`                   | The `random[]` number generator's numeric seed.(1)                                                    |
-| `x.fullscreen`             | Is Decker in fullscreen mode? On write, attempt to switch if possible; may not succeed. (r/w)         |
-| `x.playing`                | If any audio is currently playing (not counting a background `loop`), `1`. Otherwise, `0`.            |
 | `x.frame`                  | An integer that counts up every time a frame is rendered, at 60hz.                                    |
 | `x.now`                    | The current GMT as a Unix epoch.                                                                      |
 | `x.ms`                     | The current time in milliseconds- useful for timing intervals.                                        |
@@ -601,6 +601,20 @@ The _system_ interface exposes information about the Lil runtime. It is availabl
 - `live`: the most recent count of the number of "live" (reachable) Lil values in the heap.
 - `heap`: the size of Lil's heap, in value slots. This grows automatically as needed and shows a high-water mark.
 - `depth`: the maximum observed stack depth so far, counting by activation records.
+
+App Interface
+-------------
+The _app_ interface exposes control over the Decker application itself. It is available as a global constant named `app`.
+
+| Name                       | Description
+| :------------------------- | :---------------------------------------------------------------------------------------------------- |
+| `typeof x`                 | `"app"`                                                                                               |
+| `x.fullscreen`             | Is Decker in fullscreen mode? On write, attempt to switch if possible; may not succeed. (r/w)         |
+| `x.playing`                | If any audio is currently playing (not counting a background `loop`), `1`. Otherwise, `0`.            |
+| `x.save[]`                 | Save the current deck, in-place if possible. May prompt the user for a save location.                 |
+| `x.exit[]`                 | Immediately close Decker without saving (see `x.save[]`).                                             |
+
+Note that `app.exit[]` doesn't do anything in Web-Decker. Exposing a button for closing Decker is very handy in locked decks, but you may want to hide or disable it when `sys.platform~"web"`.
 
 
 RText Interface
@@ -1626,10 +1640,10 @@ play["firstClip"]
 sleep["play"]
 play["secondClip"]
 ```
-The `sys.playing` property is truthy if sound is playing. You can use this as a "non-blocking" way to wait for sounds to stop:
+The `app.playing` property is truthy if sound is playing. You can use this as a "non-blocking" way to wait for sounds to stop:
 ```
 play["firstClip"]
-while sys.playing
+while app.playing
 	doSomethingElse[]
 	sleep[1]
 end
