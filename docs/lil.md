@@ -914,7 +914,9 @@ When parsing JSON, the value `true` will become the number `1`, and `false` or `
 
 Lil, the Vector Language
 ------------------------
-Lil has a number of features influenced by "Vector-oriented" languages like APL, J, K, and Q. The most obvious is _conforming_, in which a number of primitive operators like `+` and `-` can be applied either to single numbers or entire lists. This functionality is essential to how Lil manipulates columns within queries.
+Lil has a number of features influenced by "Vector-oriented" languages like APL, J, K, and Q. The essence of vector-oriented languages is thinking about manipulating entire data structures _at once_, rather than manipulating their elements serially.
+
+The most obvious vector-oriented feature in Lil is _conforming_, in which a number of primitive operators like `+` and `-` can be applied either to single numbers or entire lists. This functionality is essential to how Lil manipulates columns within queries.
 
 Let's start with a unary operator. Applied to a list, `-` "penetrates" to each list element:
 ```
@@ -973,6 +975,42 @@ count needle take haystack                             # functional (filter)
 
 sum needle=haystack                                    # vector-oriented (spread-conforming =)
 ```
+
+The `@` operator is another powerful tool. Given a data structure on the left and a list of indices on the right it extracts the element at each index. This operation can be used to replicate, filter, or permute the elements of the source:
+```
+ "ABC" @ 0,0,1,2,1,2,0
+("A","A","B","C","B","C","A")
+
+ ("AB" dict 11,22) @ "BAAB"
+(22,11,11,22)
+```
+
+If the left argument is a function, it is applied to each element of the right argument, like a more concise `each` loop:
+```
+ on triple x do x,x,x end
+
+ each x in 11,22,33 triple[x] end
+((11,11,11),(22,22,22),(33,33,33))
+
+ triple @ 11,22,33
+((11,11,11),(22,22,22),(33,33,33))
+```
+
+This also works if the "left argument" is a primitive unary operator, "pushing" the operator onto each element of a list or dictionary:
+```
+ first "Cherry","Olive","Orange","Lime"
+"Cherry"
+
+ first @ "Cherry","Olive","Orange","Lime"
+("C","O","O","L")
+
+ count ("Alpha","Beta") dict (list 11,22,33),(list 44,55)
+2
+
+ count @ ("Alpha","Beta") dict (list 11,22,33),(list 44,55)
+{"Alpha":3,"Beta":2}
+```
+
 
 Lil, the Decker Language
 ------------------------
