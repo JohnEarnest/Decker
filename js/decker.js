@@ -440,7 +440,7 @@ set_fullscreen=x=>{
 }
 setmode=mode=>{
 	n_play([NONE,lms('loop')])
-	grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel=[],wid.active=-1,sc.others=[],dr.poly=[]
+	grid_exit(),field_exit(),menus_clear(),bg_end_selection(),bg_end_lasso(),ob.sel=[],wid.active=-1,sc.others=[],dr.poly=[]
 	msg.next_view   =(uimode!=mode)&&mode=='interact'
 	msg.pending_loop=(uimode!=mode)&&mode=='interact'
 	uimode=mode;if(mode!='interact')msg.pending_halt=1;if(mode!='draw'&&!prototype_is(con()))dr.fatbits=0;if(mode=='interact')dr.fatbits=0
