@@ -2542,7 +2542,7 @@ void directory_fetch(char*path,int filter){
 	}while(FindNextFileA(d,&find));FindClose(d);
 }
 #include "shlwapi.h"
-void directory_normalize(char*x,char*src){PathCanonicalizeA(x,src);}
+void directory_normalize(char*x,const char*src){PathCanonicalizeA(x,src);}
 void directory_parent(char*x){
 	if(strlen(x)==3){snprintf(x,PATH_MAX,"");return;} // parent of a drive root
 	char t[PATH_MAX];snprintf(t,PATH_MAX,"%s%s..",x,SEPARATOR);directory_normalize(x,t);
@@ -2563,7 +2563,7 @@ void directory_fetch(char*path,int filter){
 		if(test!=NULL)closedir(test);
 	}closedir(d);
 }
-void directory_normalize(char*x,char*src){if(realpath(src,x)==NULL){x[0]='\0';}}
+void directory_normalize(char*x,const char*src){if(realpath(src,x)==NULL){x[0]='\0';}}
 void directory_parent(char*x){char t[PATH_MAX];snprintf(t,PATH_MAX,"%s%s..",x,SEPARATOR);directory_normalize(x,t);}
 #endif
 

@@ -341,7 +341,12 @@ int framebuffer_flip(pair disp,pair size,int scale){
 // App Interface
 
 lv*n_appsave(lv*self,lv*z){if(strlen(document_path)){save_deck(lmcstr(document_path));}else{modal_enter(modal_save_deck);}return NONE;(void)self;(void)z;}
-lv*n_appexit(lv*self,lv*z){should_exit=1;return NONE;(void)self;(void)z;}
+lv*n_appexit(lv*self,lv*z){
+	#ifndef __ANDROID__
+		should_exit=1;
+	#endif
+	return NONE;(void)self;(void)z;
+}
 lv*interface_app(lv*self,lv*i,lv*x){
 	if(x&&lis(i)){
 		ikey("fullscreen"){toggle_fullscreen=windowed!=!lb(x);return x;}
@@ -3386,13 +3391,17 @@ void all_menus(){
 	if(menu_item("About...",1,'\0'))modal_enter(modal_about);
 	if(menu_check("Listener",canlisten,ms.type==modal_listen,'l')){if(ms.type!=modal_listen){modal_enter(modal_listen);}else{modal_exit(0);}}
 	menu_separator();
-	if(menu_check("Fullscreen"     ,1                    ,!windowed      ,'f' ))toggle_fullscreen=1;
+	#ifndef __ANDROID__
+		if(menu_check("Fullscreen",1,!windowed,'f' ))toggle_fullscreen=1;
+	#endif
 	if(menu_check("Touch Input"    ,1                    ,enable_touch   ,'\0'))enable_touch^=1,set_touch=1;
 	if(menu_check("Script Profiler",1                    ,profiler       ,'\0'))profiler^=1;
 	if(menu_check("Toolbars"       ,!windowed            ,toolbars_enable,'\0'))toolbars_enable^=1;
 	if(menu_check("Auto-Save"      ,strlen(document_path),autosave       ,'\0'))autosave^=1;
-	menu_separator();
-	if(menu_item("Quit",ms.type==modal_none&&uimode!=mode_script,'q'))quit();
+	#ifndef __ANDROID__
+		menu_separator();
+		if(menu_item("Quit",ms.type==modal_none&&uimode!=mode_script,'q'))quit();
+	#endif
 	if(blocked){
 		menu_bar("Script",1);
 		if(menu_item("Stop",1,'\0')){msg.pending_halt=1;if(ms.type!=modal_none&&ms.type!=modal_query&&ms.type!=modal_listen)modal_exit(0);}
@@ -3936,7 +3945,13 @@ int main(int argc,char**argv){
 		file=argv[z],set_path(argv[z]);
 	}
 	init_interns();gil=SDL_CreateMutex();
-	if(file){directory_normalize(ms.path,file),directory_parent(ms.path);}else{directory_normalize(ms.path,getenv(HOME));}
+	if(file){directory_normalize(ms.path,file),directory_parent(ms.path);}else{
+		#ifdef __ANDROID__
+			directory_normalize(ms.path,SDL_AndroidGetExternalStoragePath());
+		#else
+			directory_normalize(ms.path,getenv(HOME));
+		#endif
+	}
 	env=lmenv(NULL);init(env);
 	{lv*i=image_read(lmcstr(TOOL_ICONS ));TOOLS =lml(12);EACH(z,TOOLS )TOOLS ->lv[z]=image_make(buffer_copy(i->b,(rect){0,z*16,16,16}));}
 	{lv*i=image_read(lmcstr(ARROW_ICONS));ARROWS=lml( 8);EACH(z,ARROWS)ARROWS->lv[z]=image_make(buffer_copy(i->b,(rect){0,z*12,12,12}));}
@@ -3995,4 +4010,5 @@ int main(int argc,char**argv){
 	if(!deck){str doc=str_new();str_add(&doc,(char*)examples_decks_tour_deck,examples_decks_tour_deck_len);load_deck(deck_get(lmstr(doc)));}
 	SDL_AddTimer((1000/60),tick_pump,NULL);if(!nosound)sfx_init();
 	while(!should_exit){tick(env);sync();}
+	return 0;
 }
