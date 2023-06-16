@@ -962,6 +962,16 @@ The button widget is a clickable button, possibly with a stateful checkbox.
 | `x.value`               | Bool. Is this checkbox checked? r/w.                                                                  |
 | `x.style`               | The style of button; one of {`"round"`, `"rect"`, `"check"`, `"invisible"`}. r/w.                     |
 | `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
+| `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`.                  |
+
+The `toggle[]` function alters the `x.show` property of widgets:
+
+- `x.toggle[]` sets the widget to show `"none"` if it isn't already, and otherwise sets it to `"solid"`.
+- `x.toggle[s]` sets the widget to show `"none"` if it isn't already, and otherwise sets it to `s`.
+- `x.toggle[s v]` sets the widget to show `"none"` if `v` is truthy and `v` is not the string `"none"`, and otherwise sets it to `s`.
+
+In all cases, the `toggle[]` function returns the final value of `x.show`. This function makes a number of common scenarios for manipulating `x.show` simpler and more straightforward.
+
 
 Field Interface
 ---------------
@@ -988,6 +998,7 @@ The field widget displays and possibly allows the editing of text.
 | `x.style`               | The style of field; one of {`"rich"`, `"plain"`, `"code"`}. r/w.                                      |
 | `x.align`               | The text alignment of the field; one of {`"left"`, `"center"`, `"right"`}. r/w.                       |
 | `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
+| `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
 
 If a field has a `style` other than `rich`, any rtext written to the `value` attribute will be coalesced into a single run of ordinary text with the default font.
 
@@ -1016,6 +1027,7 @@ The slider widget represents a single number, constrained within a configurable 
 | `x.format`              | A `format` string controlling how the value is shown in `"bar"` or `"compact"` styles. r/w.           |
 | `x.style`               | The style of slider; one of {`"horiz"`, `"vert"`, `"bar"`, `"compact"`}. r/w.                         |
 | `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
+| `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
 
 Grid Interface
 --------------
@@ -1044,6 +1056,7 @@ The grid widget represents an interactive spreadsheet-style view of a table.
 | `x.rowvalue`            | Dict. The selected row of the table, or an empty dictionary for no selection.                         |
 | `x.format`              | String. A column spec for formatting columns of the table. See `writecsv[]`. r/w.                     |
 | `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
+| `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
 
 Canvas Interface
 ----------------
@@ -1086,6 +1099,7 @@ The canvas will scale _up_ logical pixels to display them on the card (resulting
 | `x.copy[pos size a]`    | Grab an _image_ at `pos`/`size`.                                                                                  |
 | `x.paste[image pos t]`  | Draw an _image_ at `pos`. If `t` is truthy, treat pattern 0 as transparent.                                       |
 | `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                                     |
+| `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
 
 The `canvas.line[]` and `canvas.poly[]` functions can take any number of arguments, which may `(x,y)` points, or lists of `(x,y)` points. For example, either of the following would draw an identical small triangle:
 ```
@@ -1133,6 +1147,7 @@ Contraptions are custom widgets, defined in a [Prototype](#prototypeinterface). 
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
 | `x.def`                 | The Prototype of this contraption.                                                                    |
 | `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
+| `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
 
 Contraption interfaces may expose additional attributes. Reads or writes to properties aside from those listed above (such as `.zami`) will invoke the `script` of the Prototype corresponding to this Contraption, calling either a function `get_zami` on a read, or `set_zami` (with a value) on a write. Inside an attribute handler both `me` and `card` are bound to the target Contraption instance, for consistency with event handlers.
 

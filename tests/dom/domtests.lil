@@ -623,6 +623,17 @@ b.name:"foof"
 b.name:"foof"
 assert["button identity renaming" "foof" b.name]
 
+b.toggle[]
+assert["button toggle off" "none" b.show]
+s:b.toggle[]
+assert["button toggle on" ("solid","solid") s,b.show]
+s:(b.toggle["transparent"],b.toggle["transparent"],b.toggle["transparent"])
+assert["button toggle with mode" ("none","transparent","none") s]
+s:(b.toggle["solid" 1],b.toggle["solid" 37],b.toggle["solid" 0],b.toggle["solid" 0])
+assert["button toggle with value" ("solid","solid","none","none") s]
+s:(b.toggle["transparent" b.show],b.toggle["transparent" "solid"])
+assert["button toggle with svalue" ("none","transparent") s]
+
 #######################################
 #
 #  Field

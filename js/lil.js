@@ -1795,7 +1795,7 @@ contraption_read=(x,card)=>{
 			iwrite(dwid,lms('pos'),lmpair(a)),iwrite(dwid,lms('size'),lmpair(rsub(b,a)))
 		})
 	}
-	const masks={name:1,index:1,image:1,script:1,locked:1,animated:1,pos:1,show:1,font:1,event:1,offset:1}
+	const masks={name:1,index:1,image:1,script:1,locked:1,animated:1,pos:1,show:1,font:1,toggle:1,event:1,offset:1}
 	const ri=lmi((self,i,x)=>{
 		if(!is_rooted(self))return NONE
 		if(x){
@@ -1855,6 +1855,10 @@ interface_widget=(self,i,x)=>{
 		if(ikey(i,'show'    ))return lms(ivalue(self,ls(i),'solid'))
 		if(ikey(i,'font'    ))return dget(self.card.deck.fonts,lms(ivalue(self,ls(i),button_is(self)?'menu':'body')))
 		if(ikey(i,'event'   ))return lmnat(args=>n_event(self,args))
+		if(ikey(i,'toggle'  ))return lmnat(([s,v])=>{
+			const a=v==undefined;s=s||lms('solid'),v=v||NONE;const o=ifield(self,'show'),n=lms('none')
+			const r=(a?match(o,n):(lb(v)&&!match(v,n)))?s:n;iwrite(self,lms('show'),r);return r
+		})
 		if(ikey(i,'offset')){
 			let c=getpair(ifield(self.card,'size')), p=self.pos, d=self.card.deck.size, con=self.card
 			while(contraption_is(con)){p=radd(p,con.pos),con=con.card,c=getpair(ifield(con,'size'))}
