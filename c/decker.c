@@ -434,7 +434,7 @@ void field_exit(){
 void bg_end_selection();void bg_end_lasso(); // forward-ref
 void setmode(int mode){
 	n_play(NULL,lml2(NONE,lmistr("loop")));
-	grid_exit(),field_exit(),menus_clear(),bg_end_selection(),bg_end_lasso(),ob.sel->c=0,wid.active=-1;poly_count=0;sc.others=NULL;
+	grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel->c=0,wid.active=-1;poly_count=0;sc.others=NULL;
 	msg.next_view   =(uimode!=mode)&&mode==mode_interact;
 	msg.pending_loop=(uimode!=mode)&&mode==mode_interact;
 	uimode=mode;if(mode!=mode_interact)msg.pending_halt=1;
