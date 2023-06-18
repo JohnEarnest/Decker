@@ -96,7 +96,7 @@ The _View_ menu will be available when the _Widgets_ or drawing tools are chosen
 - _Grid Size..._: Change the width and height of the "cells" in the _Grid Overlay_.
 - _Show Animation_: Toggle animating the special patterns 28-31.
 - _Transparency Mask_: Toggle displaying pattern 0 in a distinct color, revealing transparent elements. While the transparency mask is shown, using drawing tools with the first pattern will use pattern index 32 (opaque white) instead of the "true" pattern 0 (transparent white). Erasing with the pencil tool and deleting selections will still result in transparency.
-- _Fat Bits_: Toggle displaying the card background zoomed-in, to aid in editing individual pixels. In this mode, the cursor keys can be used to scroll the viewport and "escape" will exit Fat Bits mode.
+- _Fat Bits_: Toggle displaying the card background zoomed-in, to aid in editing individual pixels.  Select the part of the card to zoom into with the _Select_ or _Lasso_ tool; in other cases, the center of the card is defaulted to.  In this mode, the cursor keys can be used to scroll the viewport and "escape" will exit Fat Bits mode.
 
 The _Style_ menu will be available whenever drawing tools are chosen:
 
