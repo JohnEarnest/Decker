@@ -1052,7 +1052,7 @@ lv*readxmltext(char*t,int*i,char stop){
 		#define xs      while(isspace(t[*i]))++*i
 		#define xi(a,b) !strncmp(&t[*i],a,strlen(a))? ((*i)+=strlen(a),b):
 		#define xr(a,b) xi("&" #a ";",b)
-		int w=0;xs,w=1;if(w)str_addc(&r,' ');if(stop==t[*i])break;
+		int w=0;xs,w=1;if(w)str_addc(&r,' ');if(stop==t[*i]||!t[*i])break;
 		str_addc(&r,xr(amp,'&')xr(apos,'\'')xr(quot,'"')xr(gt,'>')xr(lt,'<')xr(nbsp,' ')((*i)++,t[*i-1]));
 	}if(strchr("'\"",stop)&&t[*i])++*i;return lmstr(r);
 }

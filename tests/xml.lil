@@ -64,6 +64,9 @@ show[readxml["<foo><![CDATA[some text"]]
 header["no tag name"]
 show[readxml["<>"]]
 
+header["empty"]
+show[readxml[" "]]
+
 # ----- squash --------------
 
 # transform rss-style XML into a more compact structure

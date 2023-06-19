@@ -615,7 +615,7 @@ n_readxml=([x])=>{
 	const name=_=>{let r='';xs();while(t[i]&&!/[>/= \n]/.test(t[i]))r+=t[i++];xs();return r.toLowerCase()}
 	const text=stop=>{
 		let r='';while(t[i]&&!(stop==' '&&/[>/ \n]/.test(t[i]))){
-			if(xs())r+=' ';if(stop==t[i])break;r+=xe('amp','&')||xe('apos',"'")||xe('quot','"')||xe('lt','<')||xe('gt','>')||xe('nbsp',' ')||t[i++]
+			if(xs())r+=' ';if(stop==t[i]||!t[i])break;r+=xe('amp','&')||xe('apos',"'")||xe('quot','"')||xe('lt','<')||xe('gt','>')||xe('nbsp',' ')||t[i++]
 		}if(/['"]/.test(stop)&&t[i])i++;return lms(r)
 	}
 	const rec=ctag=>{
