@@ -1771,9 +1771,9 @@ void modals(){
 		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_exit(0);
 	}
 	else if(ms.type==modal_open){
-		rect b=draw_modalbox((pair){250,frame.size.y-16-30});
+		rect b=draw_modalbox((pair){300,frame.size.y-16-30});
 		rect gsize={b.x,b.y+25,b.w,b.h-(25+25)};
-		rect dsize={b.x+16,b.y,b.w-(16+5+60),20};
+		rect dsize={b.x+16,b.y,b.w-(16+5+60+5+60),20};
 		draw_text_fit((rect){b.x,b.y+b.h-20,b.w-60+5+60,20},ms.desc,FONT_BODY,1);
 		draw_icon((pair){b.x,b.y+3},ICONS[icon_dir],1);
 		draw_box(dsize,0,13);draw_text_fit(inset(dsize,3),directory_last(ms.path),FONT_BODY,1);
@@ -1786,14 +1786,17 @@ void modals(){
 			}else{modal_exit(1);}
 		};c.x-=65;
 		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_exit(0);
+		if(ui_button((rect){b.x+b.w-125,b.y,60,20},"Home",!directory_is_home(ms.path))){
+			directory_home(ms.path);ms.grid=(grid_val){directory_enumerate(ms.path,ms.filter,0),0,0};
+		}
 		if(ui_button((rect){b.x+b.w-60,b.y,60,20},"Parent",directory_has_parent(ms.path))){
 			directory_parent(ms.path);ms.grid=(grid_val){directory_enumerate(ms.path,ms.filter,0),0,0};
 		}
 	}
 	else if(ms.type==modal_save){
-		rect b=draw_modalbox((pair){250,frame.size.y-16-30});
+		rect b=draw_modalbox((pair){300,frame.size.y-16-30});
 		rect gsize={b.x,b.y+25,b.w,b.h-(25+25+25)};
-		rect dsize={b.x+16,b.y,b.w-(16+5+60),20};
+		rect dsize={b.x+16,b.y,b.w-(16+5+60+5+60),20};
 		rect fsize={b.x+45,gsize.y+gsize.h+5,b.w-45,20};
 		int ename=ms.text.table->n==0||dget(ms.text.table,lmistr("text"))->lv[0]->c==0;
 		int vname=1;if(!ename){lv*t=dget(ms.text.table,lmistr("text"))->lv[0];EACH(z,t)if(strchr("\n\\/:*?\"<>|#%$",t->sv[z])){vname=0;break;}}
@@ -1812,6 +1815,9 @@ void modals(){
 		pair c={b.x+b.w-60,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,60,20},"Save",vname&&!ename)||(wid.infield&&ev.action))modal_exit(1);c.x-=65;
 		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_exit(0);
+		if(ui_button((rect){b.x+b.w-125,b.y,60,20},"Home",!directory_is_home(ms.path))){
+			directory_home(ms.path);ms.grid=(grid_val){directory_enumerate(ms.path,ms.filter,0),0,0};
+		}
 		if(ui_button((rect){b.x+b.w-60,b.y,60,20},"Parent",directory_has_parent(ms.path))){
 			directory_parent(ms.path);ms.grid=(grid_val){directory_enumerate(ms.path,ms.filter,0),0,0};
 		}
@@ -3945,13 +3951,7 @@ int main(int argc,char**argv){
 		file=argv[z],set_path(argv[z]);
 	}
 	init_interns();gil=SDL_CreateMutex();
-	if(file){directory_normalize(ms.path,file),directory_parent(ms.path);}else{
-		#ifdef __ANDROID__
-			directory_normalize(ms.path,SDL_AndroidGetExternalStoragePath());
-		#else
-			directory_normalize(ms.path,getenv(HOME));
-		#endif
-	}
+	if(file){directory_normalize(ms.path,file),directory_parent(ms.path);}else{directory_home(ms.path);}
 	env=lmenv(NULL);init(env);
 	{lv*i=image_read(lmcstr(TOOL_ICONS ));TOOLS =lml(12);EACH(z,TOOLS )TOOLS ->lv[z]=image_make(buffer_copy(i->b,(rect){0,z*16,16,16}));}
 	{lv*i=image_read(lmcstr(ARROW_ICONS));ARROWS=lml( 8);EACH(z,ARROWS)ARROWS->lv[z]=image_make(buffer_copy(i->b,(rect){0,z*12,12,12}));}

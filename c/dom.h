@@ -2572,6 +2572,14 @@ void directory_normalize(char*x,const char*src){if(realpath(src,x)==NULL){x[0]='
 void directory_parent(char*x){char t[PATH_MAX];snprintf(t,PATH_MAX,"%s%s..",x,SEPARATOR);directory_normalize(x,t);}
 #endif
 
+void directory_home(char*path){
+	#ifdef __ANDROID__
+		directory_normalize(path,"/sdcard/");
+	#else
+		directory_normalize(path,getenv(HOME));
+	#endif
+}
+int directory_is_home(char*path){char t[PATH_MAX];directory_home(t);return !strcmp(path,t);}
 int directory_sort(const void*a,const void*b){
 	const dir_item*ia=((dir_item*)a);
 	const dir_item*ib=((dir_item*)b);
