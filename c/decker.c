@@ -2645,9 +2645,10 @@ rect keep_ratio(rect r,pair s){
 	if(!ev.shift||s.x==0||s.y==0)return r;
 	float scale=MAX(r.w/(s.x*1.0),r.h/(s.y*1.0));return (rect){r.x,r.y,scale*s.x,scale*s.y};
 }
+int handle_size(){return enable_touch?10:5;}
 void draw_handles(rect r){
 	char*pal=patterns_pal(ifield(deck,"patterns"));
-	int h=5; // resize handle size
+	int h=handle_size();
 	int x0=r.x+1-h, x2=r.x+r.w-1, x1=(x2-x0)/2+x0;
 	int y0=r.y+1-h, y2=r.y+r.h-1, y1=(y2-y0)/2+y0;
 	draw_invert(pal,box_intersect((rect){x0,y0,h,h},frame.clip));
@@ -2660,7 +2661,7 @@ void draw_handles(rect r){
 	draw_invert(pal,box_intersect((rect){x0,y1,h,h},frame.clip));
 }
 int in_handle(rect r){
-	int h=5; // resize handle size
+	int h=handle_size();
 	int x0=r.x+1-h, x2=r.x+r.w-1, x1=(x2-x0)/2+x0;
 	int y0=r.y+1-h, y2=r.y+r.h-1, y1=(y2-y0)/2+y0;
 	if(over((rect){x0,y0,h,h}))return 4;
@@ -2678,7 +2679,7 @@ rect bg_select(){
 	rect s=dr.sel_here; int has_sel=s.w>0||s.h>0, in_sel=has_sel&&dover(s);
 	int ax=MIN(ev.dpos.x,ev.pos.x), bx=MAX(ev.dpos.x,ev.pos.x);
 	int ay=MIN(ev.dpos.y,ev.pos.y), by=MAX(ev.dpos.y,ev.pos.y);
-	int h=5; // resize handle size
+	int h=handle_size();
 	int x0=s.x+1-h, x2=s.x+s.w-1, x1=(x2-x0)/2+x0;
 	int y0=s.y+1-h, y2=s.y+s.h-1, y1=(y2-y0)/2+y0;
 	int dx=ev.pos.x-ev.dpos.x;

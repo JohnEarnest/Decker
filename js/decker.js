@@ -2427,8 +2427,9 @@ bg_paste=(image,fit)=>{
 	if(bg_has_sel()){bg_scoop_selection(),dr.limbo=image,dr.limbo_dither=0}
 	else{settool('select'),dr.sel_start=rect(),dr.sel_here=rcenter(con_view_dim(),s),dr.limbo=image,dr.limbo_dither=0}
 }
+handle_size=_=>enable_touch?10:5
 draw_handles=r=>{
-	const h=5, pal=deck.patterns.pal.pix
+	const h=handle_size(), pal=deck.patterns.pal.pix
 	const x0=r.x+1-h, x2=r.x+r.w-1, y0=r.y+1-h, y2=r.y+r.h-1, x1=0|((x2-x0)/2+x0), y1=0|((y2-y0)/2+y0)
 	draw_invert(pal,rclip(rect(x0,y0,h,h),frame.clip))
 	draw_invert(pal,rclip(rect(x0,y2,h,h),frame.clip))
@@ -2440,7 +2441,7 @@ draw_handles=r=>{
 	draw_invert(pal,rclip(rect(x0,y1,h,h),frame.clip))
 }
 in_handle=r=>{
-	const h=5, x0=r.x+1-h, x2=r.x+r.w-1, y0=r.y+1-h, y2=r.y+r.h-1, x1=0|((x2-x0)/2+x0), y1=0|((y2-y0)/2+y0)
+	const h=handle_size(), x0=r.x+1-h, x2=r.x+r.w-1, y0=r.y+1-h, y2=r.y+r.h-1, x1=0|((x2-x0)/2+x0), y1=0|((y2-y0)/2+y0)
 	if(over(rect(x0,y0,h,h)))return 4
 	if(over(rect(x0,y2,h,h)))return 6
 	if(over(rect(x2,y0,h,h)))return 2
@@ -2453,7 +2454,7 @@ in_handle=r=>{
 bg_select=_=>{
 	if(uimode!='draw'||dr.tool!='select')return rect(0,0,0,0)
 	let s=rcopy(dr.sel_here), has_sel=s.w>0||s.h>0, in_sel=has_sel&&dover(s)
-	const ax=min(ev.dpos.x,ev.pos.x), bx=max(ev.dpos.x,ev.pos.x), ay=min(ev.dpos.y,ev.pos.y), by=max(ev.dpos.y,ev.pos.y), h=5
+	const ax=min(ev.dpos.x,ev.pos.x), bx=max(ev.dpos.x,ev.pos.x), ay=min(ev.dpos.y,ev.pos.y), by=max(ev.dpos.y,ev.pos.y), h=handle_size()
 	const x0=s.x+1-h, x2=s.x+s.w-1, y0=s.y+1-h, y2=s.y+s.h-1, x1=0|((x2-x0)/2+x0), y1=0|((y2-y0)/2+y0), dx=ev.pos.x-ev.dpos.x, dy=ev.pos.y-ev.dpos.y
 	const sz=dr.limbo?dr.limbo.size:rect(dr.sel_start.w,dr.sel_start.h)
 	handle=(rw,rh,ox,oy,ow,oh)=>{if(has_sel&&(ev.mu||ev.drag)&&dover(rect(rw,rh,h,h))){
