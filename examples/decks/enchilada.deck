@@ -717,7 +717,7 @@ on roll x do
   if x[i]="+"
    i:i+1
   else
-   p:("n","die","match","i") dict "%id%i%m%n" parse i drop x
+   p:"%[n]id%[die]i%[match]m%[i]n" parse i drop x
    r:r,if p.match 1+random[p.die p.n] else p.n end
    i:i+p.i
   end

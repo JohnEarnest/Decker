@@ -388,14 +388,22 @@ time_t parts_to_epoch(struct tm *p){
 	return p->tm_sec+p->tm_min*60+p->tm_hour*3600+
 	       (p->tm_mday-1)*86400+(p->tm_year-70)*31536000+((p->tm_year-69)/4)*86400-((p->tm_year-1)/100)*86400+((p->tm_year+299)/400)*86400;
 }
+int format_has_names(lv*x){
+	#define fc x->sv[f]
+	int f=0;while(fc){
+		if(fc!='%'){f++;continue;}f++;if(fc=='[')return 1;
+		if(fc=='*')f++;if(fc=='-')f++;if(fc=='0')f++;while(isdigit(fc))f++;if(fc=='.')f++;
+		int d=0;while(isdigit(fc))d=d*10+fc-'0',f++;if(!fc)break;char t=fc;f++;if(t=='r'||t=='o')while(d&&fc)d--,f++;
+	}return 0;
+}
 dyad(l_parse){
 	if(lil(y)){MAP(r,y)l_parse(x,y->lv[z]);return r;}
-	#define fc x->sv[f]
 	#define hc y->sv[h]
 	#define hn m&&hc&&(n?h-si<n:1)
 	#define ulc(x) t=='l'?tolower(x):t=='u'?toupper(x):x
-	lv*r=lml(0);x=ls(x),y=ls(y);int f=0,h=0,m=1;while(fc){
+	x=ls(x),y=ls(y);int f=0,h=0,m=1,pi=0,named=format_has_names(x);lv*r=named?lmd():lml(0);while(fc){
 		if(fc!='%'){if(m&&fc==hc){h++;}else{m=0;}f++;continue;}f++;
+		str nk={0};if(fc=='['){f++;nk=str_new();while(fc&&fc!=']')str_addc(&nk,fc),f++;if(fc==']')f++;}
 		int n=0,d=0,si=h,sk=fc=='*'&&(f++,1),lf=fc=='-'&&(f++,1);if(fc=='0')f++;
 		while(isdigit(fc))n=n*10+fc-'0',f++;if(fc=='.')f++;
 		while(isdigit(fc))d=d*10+fc-'0',f++;if(!fc)break;char t=fc;f++;
@@ -433,8 +441,8 @@ dyad(l_parse){
 			if(t=='e'){v=lmn(m?parts_to_epoch(&tm):0);}
 			else{v=lmd();ps("year",year,1900)ps("month",mon,1)ps("day",mday,0)ps("hour",hour,0)ps("minute",min,0)ps("second",sec,0)}
 		}
-		else{m=0;}while(n&&hc&&h-si<n)h++,m=0;if(!sk&&v)ll_add(r,v);
-	}return r->c==1?r->lv[0]:r;
+		else{m=0;}while(n&&hc&&h-si<n)h++,m=0;if(!sk&&v){named?dset(r,nk.sv?lmstr(nk):lmn(pi),v):ll_add(r,v);pi++;}
+	}return named?r: r->c==1?r->lv[0]:r;
 }
 void fjson(str*s,lv*x){
 	if(lin(x)){wnum(s,x->nv);}
@@ -477,18 +485,21 @@ void format_type(str*r,lv*a,char t,int n,int d,int lf,int pz,int*f,char*c){
 void format_type_simple(str*r,lv*value,char t){int f=0;format_type(r,value,t,0,0,0,0,&f,"");}
 lv* format_rec(int i,lv*x,lv*y){
 	if(i>=x->c)return y;
-	int fuse=(x->c-i)%2?0:1;lv*a=lit(y)?l_rows(y):ll(y);MAP(r,a)l_format(x->lv[i+fuse],format_rec(i+fuse+1,x,lit(y)?ll(a->lv[z]):a->lv[z]));
+	int fuse=(x->c-i)%2?0:1,named=format_has_names(ls(x->lv[i+fuse]));lv*a=lit(y)?l_rows(y):ll(y);
+	MAP(r,a)l_format(x->lv[i+fuse],format_rec(i+fuse+1,x,lit(y)&&!named?ll(a->lv[z]):a->lv[z]));
 	return fuse?l_fuse(x->lv[i],r):r;
 }
 dyad(l_format){
 	if(lil(x))return format_rec(0,x,y);
-	str r=str_new();x=ls(x),y=lil(y)?y:l_list(y);int f=0,h=0;while(fc){
+	str r=str_new();x=ls(x);int f=0,h=0,named=format_has_names(x);y=named?ld(y):lil(y)?y:l_list(y);while(fc){
 		if(fc!='%'){str_addc(&r,fc),f++;continue;}f++;
+		str nk={0};if(fc=='['){f++;nk=str_new();while(fc&&fc!=']')str_addc(&nk,fc),f++;if(fc==']')f++;}
 		int n=0,d=0,sk=fc=='*'&&(f++,1),lf=fc=='-'&&(f++,1),pz=fc=='0'&&(f++,1);
 		while(isdigit(fc))n=n*10+fc-'0',f++;if(fc=='.')f++;
 		while(isdigit(fc))d=d*10+fc-'0',f++;if(!fc)break;char t=fc;f++;
-		lv*a=t=='%'?NONE: (!sk&&h<y->c)?y->lv[h++]: strchr("sluro",t)?lmistr(""):NONE;
-		format_type(&r,a,t,n,d,lf,pz,&f,x->sv);
+		lv*a=strchr("sluro",t)?lmistr(""):NONE,*an=named?dget(y,nk.sv?lmstr(nk):lmn(h)): NULL;
+		a=t=='%'?NONE: named?(an?an:a): (!sk&&h<y->c)?y->lv[h]: a;
+		format_type(&r,a,t,n,d,lf,pz,&f,x->sv);if(t!='%'&&!sk)h++;
 	}return lmstr(r);
 }
 lv* l_ins(lv*v,lv*n,lv*x){lv*r=torect(l_table(l_dict(n,v)));return lin(x)?r:l_comma(lt(x),r);}

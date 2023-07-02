@@ -114,6 +114,13 @@ pjson=(y,h,n)=>{
 		const ns=h;jm('-'),jd(),jm('.'),jd();if(jm('e')||jm('E')){jm('-')||jm('+');jd();}return h<=ns?(f=0,NONE): lmn(+y.slice(ns,h))
 	}, r=rec();return {value:r,index:h}
 }
+format_has_names=x=>{
+	let f=0;while(x[f]){
+		if(x[f]!='%'){f++;continue;}f++;if(x[f]=='[')return 1
+		if(x[f]=='*')f++;if(x[f]=='-')f++;if(x[f]=='0')f++;while(/[0-9]/.test(x[f]))f++;if(x[f]=='.')f++
+		let d=0;while(/[0-9]/.test(x[f]))d=d*10+(+x[f++]);if(!x[f])break;const t=x[f++];if(t=='r'||t=='o')while(d&&x[f])d--,f++
+	}return 0
+}
 monad={
 	'-':    vm(x=>lmn(-ln(x))),
 	'!':    vm(x=>lb(x)?NONE:ONE),
@@ -184,8 +191,9 @@ dyad={
 	},
 	parse: (x,y)=>{
 		if(lil(y))return lml(y.v.map(y=>dyad.parse(x,y)))
-		x=ls(x),y=ls(y);let r=[],f=0,h=0,m=1;while(x[f]){
+		x=ls(x),y=ls(y);let f=0,h=0,m=1,pi=0,named=format_has_names(x),r=named?lmd():lml([]);while(x[f]){
 			if(x[f]!='%'){if(m&&x[f]==y[h]){h++}else{m=0}f++;continue}f++
+			let nk=null;if(x[f]=='['){f++;nk='';while(x[f]&&x[f]!=']')nk+=x[f++];if(x[f]==']')f++}
 			let n=0,d=0,v=null,si=h,sk=x[f]=='*'&&(f++,1),lf=x[f]=='-'&&(f++,1);if(x[f]=='0')f++
 			const hn=_=>m&&y[h]&&(n?h-si<n:1), id=x=>/[0-9]/.test(x), ix=_=>/[0-9a-fA-F]/.test(y[h]), iw=_=>/[ \n]/.test(y[h])
 			while(id(x[f]))n=n*10+(+x[f++]);x[f]=='.'&&f++
@@ -213,22 +221,25 @@ dyad={
 			else if(t=='e'||t=='p'){
 				const [dy,dm,dd,dh,dmi,ds,dl,dma]=ll(dyad.parse(ISODATE,lms(y.slice(h)))), l=ln(dl), d=new Date(y.slice(h,h+l))
 				if(l&&ln(dma)){h+=l}else{m=0}; v=t=='e'?lmn(m?0|(d.getTime()/1000):0):lmd(PARTS,[dy,dm,dd,dh,dmi,ds])
-			}else{m=0}while(n&&y[h]&&h-si<n)h++,m=0;if(!sk&&v!=null)r.push(v)
-		}return r.length==1?r[0]:lml(r)
+			}else{m=0}while(n&&y[h]&&h-si<n)h++,m=0;if(!sk&&v!=null){named?dset(r,nk!=null?lms(nk):lmn(pi),v):r.v.push(v);pi++}
+		}return named?r: r.v.length==1?r.v[0]:r
 	},
 	format: (x,y)=>{
 		const frec=(i,x,y)=>{
 			if(i>=count(x))return y
-			const fuse=(count(x)-i)%2?0:1,r=lml(ll(lit(y)?rows(y):y).map(z=>dyad.format(x.v[i+fuse],frec(i+fuse+1,x,lit(y)?lml(ll(z)):z))))
+			const fuse=(count(x)-i)%2?0:1,named=format_has_names(ls(x.v[i+fuse]))
+			const r=lml(ll(lit(y)?rows(y):y).map(z=>dyad.format(x.v[i+fuse],frec(i+fuse+1,x,lit(y)&&!named?lml(ll(z)):z))))
 			return fuse?dyad.fuse(x.v[i],r):r
 		};if(lil(x))return frec(0,x,y)
-		x=ls(x),y=lil(y)?y:monad.list(y);let r='',f=0,h=0;while(x[f]){
+		x=ls(x);let r='',f=0,h=0,named=format_has_names(x);y=named?ld(y):lil(y)?y:monad.list(y);while(x[f]){
 			if(x[f]!='%'){r+=x[f++];continue}f++
+			let nk=null;if(x[f]=='['){f++;nk='';while(x[f]&&x[f]!=']')nk+=x[f++];if(x[f]==']')f++}
 			let n=0,d=0,sk=x[f]=='*'&&(f++,1),lf=x[f]=='-'&&(f++,1),pz=x[f]=='0'&&(f++,1)
 			const hn=_=>m&&y[h]&&(n?h-si<n:1), id=x=>/[0-9]/.test(x)
 			while(id(x[f]))n=n*10+(+x[f++]);x[f]=='.'&&f++
 			while(id(x[f]))d=d*10+(+x[f++]);if(!x[f])break;const t=x[f++]
-			let o='', a=t=='%'?NONE: (!sk&&h<count(y))?y.v[h++]: 'sluro'.indexOf(t)>=0?lms(''):NONE
+			let o='', a='sluro'.indexOf(t)>=0?lms(''):NONE, an=named?dget(y,nk!=null?lms(nk):lmn(h)):null
+			a=t=='%'?NONE: named?(an?an:a): (!sk&&h<count(y))?y.v[h]:a;if(t!='%'&&!sk)h++
 			if     (t=='%'){o='%'}
 			else if(t=='s'){o=ls(a)}
 			else if(t=='l'){o=ls(a).toLowerCase()}

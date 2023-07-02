@@ -57,7 +57,7 @@ end
 on pubDateToISO x do
 	m:("|" split "Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec") dict 1+range 12
 	each v in x
-		p:("day","month","year","hour","minute","second") dict "%*s, %i %s %i %i:%i:%i" parse v
+		p:"%*s, %[day]i %[month]s %[year]i %[hour]i:%[minute]i:%[second]i" parse v
 		"%p" format p.month:m[p.month]
 	end
 end

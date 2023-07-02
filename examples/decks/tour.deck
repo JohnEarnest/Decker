@@ -444,7 +444,7 @@ on roll x do
   if x[i]="+"
    i:i+1
   else
-   p:("n","die","match","i") dict "%id%i%m%n" parse i drop x
+   p:"%[n]id%[die]i%[match]m%[i]n" parse i drop x
    r:r,if p.match 1+random[p.die p.n] else p.n end
    i:i+p.i
   end
@@ -514,8 +514,7 @@ next:{"type":"button","size":[19,13],"pos":[84,6],"script":"datePicker.3","text"
 prev:{"type":"button","size":[19,13],"pos":[6,6],"script":"datePicker.4","text":"<","style":"rect"}
 
 {script:datePicker.0}
-dateparts: "year","month","day"
-dateform: "%04i-%02i-%02i"
+dateform: "%[year]04i-%[month]02i-%[day]02i"
 
 on do_change do
  card.event["change" get_value[]]
@@ -523,8 +522,8 @@ end
 
 on get_text    do val.text end
 on set_text  x do val.text:x view[] end
-on get_value   do dateparts dict dateform parse val.text end
-on set_value x do val.text:dateform format x @ dateparts view[] end
+on get_value   do dateform parse val.text end
+on set_value x do val.text:dateform format x view[] end
 
 cellsize:15,11
 day_names:"Su","Mo","Tu","We","Th","Fr","Sa"

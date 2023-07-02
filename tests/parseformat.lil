@@ -102,6 +102,25 @@ show[table ("name","price","amt") dict flip "%6s%6c%2i" parse "\n" split data]
 show["%s!" parse "foo!","bar!"]
 show["%*4i-%*2i-%*2iT%*2i:%*2i:%*2iZ%n%m" parse "2003-invalid"]
 
+print["named:"]
+show["%[banana]i %[apple]i"  parse "11 22"                               ] # basic named fields
+show["%[]s"                  parse "fruity"                              ] # empty name
+show["%i %[n]s %i"           parse "111 222 333"                         ] # mixed names/positionals
+show["%[one]i %[two]i"       parse "34 56","78 99"                       ] # tabular parsing
+show["%[unbounded"           parse "11 22"                               ] # missing close bracket
+show["%[unterminated]"       parse "11 22"                               ] # missing typecode
+show["%[name]s:%[name]s"     parse "one:two"                             ] # duplicate key
+
+show["%[banana]s %[apple]s"  format ("apple","banana") dict (22,"fruit") ] # basic named fields
+show["%[]s"                  format (list "") dict list 234              ] # empty name
+show["%i %[n]s %i"           format (2,"n",0) dict 333,222,111           ] # mixed names/positionals
+show[      "%[one]j %[two]j" format insert two:111,222 one:333,444 into 0] # tabular formatting 0 (column-wise)
+show[(list "%[one]i,%[two]i")format insert two:111,222 one:333,444 into 0] # tabular formatting 1 (row-wise)
+show[("\n","%[one]i,%[two]i")format insert two:111,222 one:333,444 into 0] # tabular formatting 2 (row-wise with join)
+show["<%[no]s>:%[nope]i"     format () dict ()                           ] # missing keys
+show["%[name]s:%[name]s"     format ().name:"multiplicity"               ] # duplicate keys
+show["%[banana]i %[apple]i"  format "not a dictionary"                   ] # inappropriate argument
+
 print["json:"]
 # formatting
 show["%j" format 42                              ]

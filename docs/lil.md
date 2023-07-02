@@ -761,8 +761,9 @@ f format 123      # "0x007b"
 f parse "0x007b"  # 123
 ```
 
-Format strings consist of a sequence of _patterns_ and _literals_. Patterns always begin with a `%` character, may contain several optional _flags_, and end in an alphabetic character. Pattern _flags_ configure the details of how each pattern behaves, and may appear in the structure `%*-0N.DX`, where `N` and `D` may be 1 or more digits 0-9, and `X` is a pattern type. All flags are optional. If present, their meanings are as follows:
+Format strings consist of a sequence of _patterns_ and _literals_. Patterns always begin with a `%` character, may contain several optional _flags_, and end in an alphabetic character. Pattern _flags_ configure the details of how each pattern behaves, and may appear in the structure `%[name]*-0N.DX`, where `N` and `D` may be 1 or more digits 0-9, and `X` is a pattern type. All flags are optional. If present, their meanings are as follows:
 
+- `name` may contain any number of non-`]` characters. If any pattern in a format string has an explicit name, any other patterns without an explicit name are assigned a default name corresponding to their index, starting from `0`.
 - `*` this pattern will be validated, but will not produce output values. When formatting, instead of consuming an input value, these patterns will use the appropriate null value.
 - `-` specifies left-justification for `N`, as decribed below. The default is right-justification. The `%r`/`%o` patterns use `-` to invert the set of valid characters.
 - `0` specifies padding with `0` for `N`, as described below. The default is padding with spaces.
@@ -910,6 +911,12 @@ When parsing JSON, the value `true` will become the number `1`, and `false` or `
 ```
 "%j" parse "[true,false,null,1]"   # (1,0,0,1)
 "%j" parse "{11:22,33:44"          # {11:22,33:44}
+```
+
+If any patterns specify names, the result of `parse` will be a dictionary, and `format` will likewise expect a dictionary as its right argument:
+```
+"%[one]i %[two]i" parse "34 56"                     # {"one":34,"two":56}
+"%[one]i %[two]i" format ("one","two") dict 34,56   # "34 56"
 ```
 
 Lil, the Vector Language
