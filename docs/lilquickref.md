@@ -61,7 +61,7 @@ Queries
 
 Formatting
 ----------
-A format is `%*-0N.DX`: `*` skip, `0` pad, `N` width.<br/>
+A format is `%[name]*-0N.DX`: `*` skip, `0` pad, `N` width.<br/>
 `-` is invert char class (`ro`) or left justify.<br/>
 `.D` is decimal places (`fc`), size of char class (`ro`), or truncate to `D` characters.
 
