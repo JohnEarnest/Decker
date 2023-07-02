@@ -835,7 +835,7 @@ i.map[(0,1) dict (colors.red,colors.green) colors.blue]
 ```
 Some additional examples:
 ```
-i.map[()!() 0]                                  # replace all pixels with 0 (clear the image)
+i.map[(() dict ()) 0]                           # replace all pixels with 0 (clear the image)
 i.map[1,0]                                      # replace black with white, and white with black
 image[i.size+4].map[() colors.red].paste[i 2,2] # add a 2 pixel red border around i
 ```
