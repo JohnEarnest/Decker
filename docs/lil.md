@@ -983,6 +983,16 @@ count needle take haystack                             # functional (filter)
 sum needle=haystack                                    # vector-oriented (spread-conforming =)
 ```
 
+Transforming iterative code into parallel, vector-oriented algorithms makes Lil _much_ faster and more efficient, and may result in simpler and clearer code. Consider the following two approaches for replacing values in an array that are less than 5 with the number "99":
+```
+each v in x                # iterative loop
+ if v<5 99 else v end
+end
+
+m:x<5                      # compute a "mask" of 0 or 1
+(99*m) + x*!m              # multiply and add to combine masked and unmasked values
+```
+
 The `@` operator is another powerful tool. Given a data structure on the left and a list of indices on the right it extracts the element at each index. This operation can be used to replicate, filter, or permute the elements of the source:
 ```
  "ABC" @ 0,0,1,2,1,2,0
