@@ -627,7 +627,7 @@ Rich text is represented as a table with columns `text`, `font`, and `arg`. The 
 - if `arg` is a non-zero-length string, the run is a hyperlink. Hyperlinks are clickable if the field is `locked`, and clicking them will produce a `link` event with the contents of the corresponding `arg`.
 - otherwise, the run is ordinary text.
 
-The `rtext` interface contains a number of helper routines for building and manipulating rtext tables:
+The `rtext` interface contains a number of helper routines for building and manipulating rtext tables. It is available as a global constant named `rtext`.
 
 | Name                         | Description                                                                      |
 | :--------------------------- | :------------------------------------------------------------------------------- |
@@ -645,7 +645,7 @@ Dictionary arguments to `rtext.cat[]` are promoted to tables, and any other argu
 
 Pointer Interface
 -----------------
-The pointer interface represents the global state of the user's pointing device, such as a mouse, pen, or touchscreen. Its attributes will update live at 60hz, even if a script is running. The coordinates of the pointer are always in "screen space"; pixels relative to the top-left corner of the card. If you want to compare pointer coordinates to the position of a widget, you should use `widget.offset` rather than `widget.pos`, to properly reflect the screen coordinates of widgets nested within contraptions or prototypes.
+The pointer interface represents the global state of the user's pointing device, such as a mouse, pen, or touchscreen. It is available as a global constant named `pointer`. Its attributes will update live at 60hz, even if a script is running. The coordinates of the pointer are always in "screen space"; pixels relative to the top-left corner of the card. If you want to compare pointer coordinates to the position of a widget, you should use `widget.offset` rather than `widget.pos`, to properly reflect the screen coordinates of widgets nested within contraptions or prototypes.
 
 | Name       | Description                                                             |
 | :--------- | :---------------------------------------------------------------------- |
@@ -659,7 +659,7 @@ The pointer interface represents the global state of the user's pointing device,
 
 Deck Interface
 --------------
-The deck interface represents the global attributes of a Decker document.
+The deck interface represents the global attributes of a Decker document. The open deck is available to Decker as a global constant named `deck`, except when executing a contraption prototype's internal scripts.
 
 | Name              | Description                                                                                 |
 | :---------------- | :------------------------------------------------------------------------------------------ |
@@ -693,7 +693,7 @@ The deck interface represents the global attributes of a Decker document.
 
 Patterns Interface
 ------------------
-The patterns interface stores a global palette and set of 1-bit textures used by Decker itself, as well as the canvas widget. Any pattern aside from 0 (transparent) and 1 (solid black) may be altered on the fly. There are names for each of the default color slots starting at 32 in the global `colors` constant. The animated patterns (28, 29, 30 and 31) automatically cycle between their indices at 15hz.
+The patterns interface stores a global palette and set of 1-bit textures used by Decker itself, as well as the canvas widget. The open deck's patterns interface is available to Decker as a global constant named `patterns`, except when executing a contraption prototype's internal scripts. Any pattern aside from 0 (transparent) and 1 (solid black) may be altered on the fly. There are names for each of the default color slots starting at 32 in the global `colors` constant. The animated patterns (28, 29, 30 and 31) automatically cycle between their indices at 15hz.
 
 | Name       | Description                                                   |
 | :--------- | :------------------------------------------------------------ |
