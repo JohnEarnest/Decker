@@ -270,7 +270,7 @@ int in_layer(){return no_menu()&&(ms.type?ms.in_modal:1)&&((!running()&&!msg.ove
 int in_widgets(){return ms.type!=modal_none?ms.in_modal:1;}
 
 typedef struct {int shift,lock,on;char*heading;} keycaps_state;keycaps_state kc={0};
-int keydown[4096]={0};
+int keydown[4096]={0},keyup[4096]={0};
 void keycaps_enter(){if(!enable_touch||kc.on)return;kc.shift=0,kc.lock=0,kc.on=1,ev.mu=ev.md=0;}
 
 // Clipboard
@@ -525,7 +525,10 @@ int widget_button(lv*target,button x,int value){
 	int l=x.locked||!in_layer(); if(!x.font)x.font=FONT_MENU; rect b=x.size; char*pal=patterns_pal(ifield(deck,"patterns"));
 	int fcol=l?13:x.show==show_invert?32:1, bcol=x.show==show_invert?1:32, scol=x.show==show_invert?32:1;
 	int sel=!l&&x.show!=show_none&&x.style!=button_invisible&&wid.active==wid.count;
-	int a=!l&&dover(b)&&over(b), cs=sel&&ev.action, cl=cs||((ev.md||ev.drag)&&a), cr=cs||(ev.mu&&a);
+	int sh=0,shh=0;if(!l&&uimode==mode_interact&&!wid.fv&&!ev.shift&&x.show!=show_none&&x.shortcut){
+		if(keyup[(int)x.shortcut]){shh=1;}else if(keydown[(int)x.shortcut]){sh=1;}
+	}
+	int a=!l&&dover(b)&&over(b), cs=(sel&&ev.action), cl=cs||sh||((ev.md||ev.drag)&&a), cr=cs||shh|(ev.mu&&a);
 	if(!l&&over(b)&&!ev.drag)uicursor=cursor_point;
 	if(x.show==show_none)return cr; rect ar=inset(b,2);
 	if(x.style==button_round){
@@ -943,10 +946,10 @@ void widget_contraption(lv*x){
 	handle_widgets(ivalue(x,"widgets"),(pair){b.x,b.y});frame.clip=oc;
 }
 
-int  ui_button  (rect r,char*label,int enable          ){return widget_button(NULL,(button){label,r,FONT_MENU,button_round,show_solid,!enable},0);}
-int  ui_toggle  (rect r,char*label,int inv,int enable  ){return widget_button(NULL,(button){label,r,FONT_MENU,button_round,inv?show_invert:show_solid,!enable},0);}
-int  ui_radio   (rect r,char*label,int enable,int value){return widget_button(NULL,(button){label,r,FONT_BODY,button_radio,show_solid,!enable},value);}
-int  ui_checkbox(rect r,char*label,int enable,int value){return widget_button(NULL,(button){label,r,FONT_BODY,button_check,show_solid,!enable},value);}
+int  ui_button  (rect r,char*label,int enable          ){return widget_button(NULL,(button){label,r,FONT_MENU,button_round,show_solid,!enable,0},0);}
+int  ui_toggle  (rect r,char*label,int inv,int enable  ){return widget_button(NULL,(button){label,r,FONT_MENU,button_round,inv?show_invert:show_solid,!enable,0},0);}
+int  ui_radio   (rect r,char*label,int enable,int value){return widget_button(NULL,(button){label,r,FONT_BODY,button_radio,show_solid,!enable,0},value);}
+int  ui_checkbox(rect r,char*label,int enable,int value){return widget_button(NULL,(button){label,r,FONT_BODY,button_check,show_solid,!enable,0},value);}
 void ui_field   (rect r,           field_val*value){widget_field(NULL,(field){r,FONT_BODY,show_solid,0,1     ,field_plain,align_left,0},value);}
 void ui_dfield  (rect r,int enable,field_val*value){widget_field(NULL,(field){r,FONT_BODY,show_solid,0,1     ,field_plain,align_left,!enable},value);}
 void ui_textedit(rect r,int border,field_val*value){widget_field(NULL,(field){r,FONT_BODY,show_solid,1,border,field_plain,align_left,0},value);}
@@ -1271,6 +1274,7 @@ void modal_enter(int type){
 		lv*w=ob.sel->lv[0];
 		ms.name=(field_val){rtext_cast(ifield(w,"name")),0};
 		ms.text=(field_val){rtext_cast(ifield(w,"text")),0};
+		ms.form0=(field_val){rtext_cast(ifield(w,"shortcut")),0};
 	}
 	if(type==modal_field_props){
 		lv*w=ob.sel->lv[0];
@@ -1918,7 +1922,13 @@ void modals(){
 		ui_field((rect){b.x+42,b.y+20,b.w-42,18},&ms.name);
 		ui_field((rect){b.x+42,b.y+40,b.w-42,18},&ms.text);
 		iwrite(button,lmistr("name"),rtext_all(ms.name.table));
-		iwrite(button,lmistr("text"),rtext_all(ms.text.table));mark_dirty();
+		iwrite(button,lmistr("text"),rtext_all(ms.text.table));
+		draw_text((rect){b.x+b.w/2,b.y+72,54,20},"Shortcut",FONT_MENU,1);
+		lv*s=normalize_shortcut(rtext_all(ms.form0.table));ms.form0.table=rtext_cast(s);
+		if(wid.fv==&ms.form0)wid.cursor=(pair){CLAMP(0,wid.cursor.x,s->c),CLAMP(0,wid.cursor.y,s->c)};
+		ui_field((rect){b.x+b.w/2+54,b.y+70,b.w/2-54,18},&ms.form0);
+		iwrite(button,lmistr("shortcut"),rtext_all(ms.form0.table));
+		mark_dirty();
 		int style=ordinal_enum(ifield(button,"style"),button_styles);pair sb={b.x,b.y+70};
 		if(ui_radio((rect){sb.x,sb.y,b.w/2,16},"Round"    ,1,style==button_round    )){iwrite(button,lmistr("style"),lmistr("round"    )),mark_dirty();}sb.y+=16;
 		if(ui_radio((rect){sb.x,sb.y,b.w/2,16},"Rectangle",1,style==button_rect     )){iwrite(button,lmistr("style"),lmistr("rect"     )),mark_dirty();}sb.y+=16;
@@ -3126,7 +3136,7 @@ void sync(){
 	if(ev.pos.x!=ev.dpos.x||ev.pos.y!=ev.dpos.y)ev.clicklast=0;
 	wid.cursor_timer=(wid.cursor_timer+1)%(2*FIELD_CURSOR_DUTY);
 	if(wid.change_timer){wid.change_timer--;if(wid.change_timer==0)field_change();}
-	for(int z=0;z<256;z++)ev.shortcuts[z]=0;
+	for(int z=0;z<256;z++)ev.shortcuts[z]=0;memset(keyup,0,sizeof(keyup));
 	SDL_Event e;
 	while(SDL_WaitEvent(&e)){
 		if(e.type==SDL_QUIT){if(lb(ifield(deck,"locked")))should_exit=1;ev.shortcuts['q']=1;}
@@ -3165,13 +3175,13 @@ void sync(){
 			if(c==SDLK_SPACE&&!wid.infield)ev.action=1;
 			if(c==SDLK_RETURN)ev.action=1;
 			if(c==SDLK_TAB   )ev.tab=1;
-			if(c==SDLK_l&&ms.type==modal_none&&!wid.ingrid&&!wid.infield)ev.shortcuts['l']=1;
+			if(c==SDLK_l&&ms.type==modal_none&&!wid.ingrid&&!wid.infield&&ev.shift)ev.shortcuts['l']=1;
 			if(c==SDLK_j&&ms.type==modal_none&&!cmd&&dr.limbo_dither&&dither_threshold>-2.0)dither_threshold-=.1;
 			if(c==SDLK_k&&ms.type==modal_none&&!cmd&&dr.limbo_dither&&dither_threshold< 2.0)dither_threshold+=.1;
 		}
 		if(e.type==SDL_KEYUP){
 			int c=e.key.keysym.sym;
-			if(c>0&&c<4096)keydown[c]=0;
+			if(c>0&&c<4096)keydown[c]=0,keyup[c]=1;
 			if(c==SDLK_LCTRL||c==SDLK_RCTRL||c==SDLK_LGUI||c==SDLK_RGUI)ev.alt=0;
 			if(c==SDLK_RETURN&&ev.shift)ev.eval=1;
 			if(c==SDLK_LSHIFT||c==SDLK_RSHIFT)ev.shift=0;

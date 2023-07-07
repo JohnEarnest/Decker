@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:7
+card:9
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -305,6 +305,30 @@ on release pos do
  else
   me.pos:pos # snap back to original position
  end
+end
+{end}
+
+{card:Shortcuts}
+script:"Shortcuts.0"
+{widgets}
+button1:{"type":"button","size":[50,42],"pos":[40,111],"text":"a","shortcut":"a"}
+button2:{"type":"button","size":[50,42],"pos":[101,112],"text":"s","shortcut":"s"}
+button3:{"type":"button","size":[50,42],"pos":[101,59],"text":"w","shortcut":"w"}
+button4:{"type":"button","size":[50,42],"pos":[163,111],"text":"d","shortcut":"d"}
+log:{"type":"field","size":[114,126],"pos":[260,59],"scrollbar":1}
+button5:{"type":"button","size":[60,20],"pos":[393,117],"script":"Shortcuts.1","text":"clear"}
+field1:{"type":"field","size":[100,20],"pos":[263,196]}
+
+{script:Shortcuts.0}
+on click do
+ log.text:"%s\n%s" format log.text,me.text
+ log.scroll:1000000
+end
+{end}
+
+{script:Shortcuts.1}
+on click do
+ log.text:""
 end
 {end}
 

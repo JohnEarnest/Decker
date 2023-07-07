@@ -1301,7 +1301,7 @@ lv* canvas_write(lv*x){
 // Button interface
 
 enum button_style{button_round,button_rect,button_check,button_invisible,button_radio};
-typedef struct {char*text;rect size;lv*font;int style,show,locked;} button;
+typedef struct {char*text;rect size;lv*font;int style,show,locked;char shortcut;} button;
 char*button_styles[]={"round","rect","check","invisible",NULL};
 button unpack_button(lv*x){
 	return (button){
@@ -1311,26 +1311,31 @@ button unpack_button(lv*x){
 		ordinal_enum(ifield(x,"style"),button_styles),
 		ordinal_enum(ifield(x,"show"),widget_shows),
 		lb(ifield(x,"locked")),
+		ifield(x,"shortcut")->sv[0],
 	};
 }
+lv* normalize_shortcut(lv*x){char c=tolower(ls(x)->sv[0]);if((c>='0'&&c<='9')||(c>='a'&&c<='z')||c==' '){lv*r=lms(1);r->sv[0]=c;return r;}return lms(0);}
 lv* interface_button(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	if(x){
-		ikey("value"){dset(self->b,i,lmn(lb(x)));return x;}
-		ikey("text" ){dset(self->b,i,ls(x));return x;}
-		ikey("style"){dset(self->b,i,normalize_enum(x,button_styles));return x;}
+		ikey("value"   ){dset(self->b,i,lmn(lb(x)));return x;}
+		ikey("text"    ){dset(self->b,i,ls(x));return x;}
+		ikey("style"   ){dset(self->b,i,normalize_enum(x,button_styles));return x;}
+		ikey("shortcut"){dset(self->b,i,normalize_shortcut(x));return x;}
 	}else{
-		ikey("value"){lv*r=value_inherit(self,i);return r?r:NONE;}
-		ikey("text" ){lv*r=dget(self->b,i);return r?r:lmistr("");}
-		ikey("style"){lv*r=dget(self->b,i);return r?r:lmistr(button_styles[0]);}
-		ikey("size" ){lv*r=dget(self->b,i);return r?r:lmpair((pair){60,20});}
+		ikey("value"   ){lv*r=value_inherit(self,i);return r?r:NONE;}
+		ikey("text"    ){lv*r=dget(self->b,i);return r?r:lmistr("");}
+		ikey("style"   ){lv*r=dget(self->b,i);return r?r:lmistr(button_styles[0]);}
+		ikey("size"    ){lv*r=dget(self->b,i);return r?r:lmpair((pair){60,20});}
+		ikey("shortcut"){lv*r=dget(self->b,i);return r?r:lmistr("");}
 	}return interface_widget(self,i,x);
 }
 lv* button_read(lv*x,lv*r){
 	x=ld(x),r=lmi(interface_button,lmistr("button"),r);
-	init_field(r,"text" ,x);
-	init_field(r,"style",x);
-	init_field(r,"value",x);
+	init_field(r,"text"    ,x);
+	init_field(r,"style"   ,x);
+	init_field(r,"value"   ,x);
+	init_field(r,"shortcut",x);
 	return r;
 }
 lv* button_write(lv*x){
@@ -1338,6 +1343,7 @@ lv* button_write(lv*x){
 	{lv*k=lmistr("text" ),*v=dget(data,k);if(v&&v->c)dset(r,k,v);}
 	{lv*k=lmistr("style"),*v=dget(data,k);if(v&&strcmp(button_styles[0],v->sv))dset(r,k,v);}
 	{lv*k=lmistr("value"),*v=dget(data,k);if(v)dset(r,k,v);}
+	{lv*k=lmistr("shortcut"),*v=dget(data,k);if(v&&v->c)dset(r,k,v);}
 	return r;
 }
 

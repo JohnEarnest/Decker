@@ -199,6 +199,7 @@ Each `type` of widget has its own additional optional fields:
 	- `text`: a string; the button label.
 	- `style`: one of { `"round"` (default), `"rect"`, `"check"`, `"invisible"` }. The `"round"` and `"rect"` styles are normal buttons. The `"check"` style is displayed as a checkbox with a label and an underlying boolean value. An `"invisible"` button cannot be selected by pressing tab and has no appearance except its `"text"` (if any) and inverting its boundary while depressed.
 	- `value`: one of {`0` or `1`}; used for checkbox state.
+	- `shortcut`: a 0- or 1-character string; a keyboard key which can be used as an alternative to clicking this button to activate it. Shortcuts must be a lowercase letter (`a-z`), a digit (`0-9`), or a space character (` `).
 
 - `"field"`:
 	Fields are the basic widget for storing information. They can contain "formatted" text or plain user-entered text, and may have a vertical scrollbar. Locked fields may also be useful for labels, headings, or displaying information computed by a script.
@@ -387,3 +388,6 @@ Changelog
 1.12:
 - Introduced the `{contraption:ID}` section and the `contraption` widget type.
 - Introduced the `animated` property for all widgets.
+
+1.23:
+- Introduced the `button.shortcut` field.

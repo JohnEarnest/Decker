@@ -1521,23 +1521,27 @@ interface_rtext=lmi((self,i,x)=>{
 	return x?x:NONE
 },'rtext')
 button_styles={round:1,rect:1,check:1,invisible:1}
+normalize_shortcut=x=>ls(x).toLowerCase().replace(/[^a-z0-9 ]/g,'').slice(0,1)
 button_read=(x,card)=>{
 	const ri=lmi((self,i,x)=>{
 		if(!is_rooted(self))return NONE
 		if(x){
-			if(ikey(i,'value'))return self.value=lb(x),x
-			if(ikey(i,'text' ))return self.text=ls(x),x
-			if(ikey(i,'style'))return self.style=normalize_enum(button_styles,ls(x)),x
+			if(ikey(i,'value'   ))return self.value=lb(x),x
+			if(ikey(i,'text'    ))return self.text=ls(x),x
+			if(ikey(i,'style'   ))return self.style=normalize_enum(button_styles,ls(x)),x
+			if(ikey(i,'shortcut'))return self.shortcut=normalize_shortcut(x),x
 		}else{
-			if(ikey(i,'value'))return value_inherit(self,ls(i))||NONE
-			if(ikey(i,'text' ))return lms(ivalue(self,ls(i),''))
-			if(ikey(i,'style'))return lms(ivalue(self,ls(i),'round'))
-			if(ikey(i,'size' ))return lmpair(ivalue(self,ls(i),rect(60,20)))
+			if(ikey(i,'value'   ))return value_inherit(self,ls(i))||NONE
+			if(ikey(i,'text'    ))return lms(ivalue(self,ls(i),''))
+			if(ikey(i,'style'   ))return lms(ivalue(self,ls(i),'round'))
+			if(ikey(i,'size'    ))return lmpair(ivalue(self,ls(i),rect(60,20)))
+			if(ikey(i,'shortcut'))return lms(ivalue(self,ls(i),''))
 		}return interface_widget(self,i,x)
 	},'button');ri.card=card
-	init_field(ri,'text' ,x)
-	init_field(ri,'style',x)
-	init_field(ri,'value',x)
+	init_field(ri,'text'    ,x)
+	init_field(ri,'style'   ,x)
+	init_field(ri,'value'   ,x)
+	init_field(ri,'shortcut',x)
 	return ri
 }
 button_write=x=>{
@@ -1545,6 +1549,7 @@ button_write=x=>{
 	if(x.text)dset(r,lms('text' ),lms(x.text))
 	if(x.style&&x.style!='round')dset(r,lms('style'),lms(x.style))
 	if(x.value!=undefined)dset(r,lms('value'),lmn(x.value))
+	if(x.shortcut)dset(r,lms('shortcut'),lms(x.shortcut))
 	return r
 }
 field_styles={rich:1,plain:1,code:1}

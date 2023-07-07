@@ -179,6 +179,8 @@ Double-clicking a newly created widget with the widgets tool, pressing space/ent
 
 In this dialog, the "name" of the widget is an internal identifier used by [scripts](#scripting) for referring to the button. Giving your widgets meaningful names will make scripting a lot easier. Every widget type has a "name" property.
 
+If you set a "shortcut" for a button (which may be a lowercase letter, a digit, or space), pressing and releasing that key on the keyboard will behave the same as clicking the button.
+
 Clicking "Action..." brings up a special dialog that can help you give buttons behavior when you click on them:
 
 ![](images/action.gif)
@@ -960,6 +962,7 @@ The button widget is a clickable button, possibly with a stateful checkbox.
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
 | `x.text`                | String. The label shown on this button. r/w.                                                          |
 | `x.value`               | Bool. Is this checkbox checked? r/w.                                                                  |
+| `x.shortcut`            | String. A keyboard key which can be used as an alternative to pressing this button. r/w.              |
 | `x.style`               | The style of button; one of {`"round"`, `"rect"`, `"check"`, `"invisible"`}. r/w.                     |
 | `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`.                  |
@@ -971,6 +974,8 @@ The `toggle[]` function alters the `x.show` property of widgets:
 - `x.toggle[s v]` sets the widget to show `"none"` if `v` is truthy and `v` is not the string `"none"`, and otherwise sets it to `s`.
 
 In all cases, the `toggle[]` function returns the final value of `x.show`. This function makes a number of common scenarios for manipulating `x.show` simpler and more straightforward.
+
+The `button.shortcut` attribute may be `""` (the default), or it may contain a single lowercase letter, digit, or space. If the keyboard key corresponding to such a character is pressed and released while in Interact mode (with no fields focused), the button will behave as if it were clicked. While it is technically possible to build simple purely keyboard-driven user interfaces in this manner by hiding the buttons, keep in mind that Decks may be used on tablet devices, kiosks, or phones which do not have a physical keyboard; this feature is intended as a _supplement to_ rather than a _replacement for_ ordinary buttons.
 
 
 Field Interface
@@ -1258,7 +1263,7 @@ Events are as follows:
 
 | Target      | Name       | Argument                                     | When                                                           |
 | :---------- | :--------- | :------------------------------------------- | :------------------------------------------------------------- |
-| button      | `click`    | None.                                        | The user clicks the button.                                    |
+| button      | `click`    | None.                                        | The user clicks the button or activates its _shortcut_.        |
 | grid        | `click`    | Row number.                                  | The user selects a row in the grid.                            |
 | grid        | `order`    | Column name as a string.                     | The user clicks a header cell on the grid.                     |
 | grid        | `change`   | `grid.value` (table).                        | The user alters the data in the the grid.                      |

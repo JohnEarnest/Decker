@@ -570,6 +570,7 @@ dattr.show:    "solid"
 dattr.text:    ""
 dattr.value:   0
 dattr.style:   "round"
+dattr.shortcut:""
 on buttonattrs x do
 	r:()
 	r.name:    x.name
@@ -583,6 +584,7 @@ on buttonattrs x do
 	r.text:    x.text
 	r.value:   x.value
 	r.style:   x.style
+	r.shortcut:x.shortcut
 end
 assert["button default attributes and types" dattr buttonattrs[b]]
 
@@ -597,6 +599,7 @@ dattr.show:     b.show:     "invert"
 dattr.text:     b.text:     "Click Me!"
 dattr.value:    b.value:    1
 dattr.style:    b.style:    "check"
+dattr.shortcut: b.shortcut: "x"
 assert["button mutable attributes" dattr buttonattrs[b]]
 
 dattr.name:"23"             b.name: 23
@@ -610,6 +613,7 @@ dattr.show:"solid"          b.show:"frizzle"
 dattr.text:""               b.text:()
 dattr.value:1               b.value:"anything"
 dattr.style:"round"         b.style:0
+dattr.shortcut:"a"          b.shortcut:"Axe"
 assert["button attribute sanitizing" dattr buttonattrs[b]]
 
 b.pos:13.5,7.9

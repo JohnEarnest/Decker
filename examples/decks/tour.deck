@@ -175,7 +175,7 @@ field7:{"type":"field","size":[127,55],"pos":[279,175],"locked":1,"border":0,"st
 next:{"type":"button","size":[86,26],"pos":[415,305],"script":"home.1","text":"Next","style":"rect"}
 prev:{"type":"button","size":[86,26],"pos":[12,304],"script":"What's a Card?.0","text":"Previous","style":"rect"}
   :{"type":"field","size":[273,44],"pos":[114,24],"locked":1,"font":"deckbuilder","border":0,"align":"center","value":"The Listener"}
- :{"type":"field","size":[301,44],"pos":[103,73],"locked":1,"border":0,"style":"plain","align":"center","value":"The listener lets you try out scripts interactively.\nPress \"L\" on your keyboard to open the listener.\nType one of the expressions below and press shift + enter to get a result. When you're done, press escape."}
+ :{"type":"field","size":[301,44],"pos":[103,73],"locked":1,"border":0,"style":"plain","align":"center","value":"The listener lets you try out scripts interactively.\nPress \"shift + L\" on your keyboard to open the listener.\nType one of the expressions below and press shift + enter to get a result. When you're done, press escape."}
    :{"type":"field","size":[122,60],"pos":[190,127],"locked":1,"border":1,"style":"code","value":"  2+3\n\n  alert[\"Hello!\"]\n\n  range 10"}
 postscript:{"type":"field","size":[253,49],"pos":[128,303],"locked":1,"border":0,"style":"plain","align":"center","value":"Anything you can do in a script, you can try interactively with the listener, and vice versa!"}
 

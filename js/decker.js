@@ -274,12 +274,13 @@ unpack_widget=x=>({
 	locked:lb(ifield(x,'locked')),
 })
 unpack_button=x=>({
-	size  :rpair(getpair(ifield(x,'pos')),getpair(ifield(x,'size'))),
-	text  :ls(ifield(x,'text'  )),
-	font  :   ifield(x,'font'  ) ,
-	style :ls(ifield(x,'style' )),
-	show  :ls(ifield(x,'show'  )),
-	locked:lb(ifield(x,'locked')),
+	size    :rpair(getpair(ifield(x,'pos')),getpair(ifield(x,'size'))),
+	text    :ls(ifield(x,'text'  )),
+	font    :   ifield(x,'font'  ) ,
+	style   :ls(ifield(x,'style' )),
+	show    :ls(ifield(x,'show'  )),
+	locked  :lb(ifield(x,'locked')),
+	shortcut:ls(ifield(x,'shortcut')),
 })
 unpack_slider=x=>({
 	size  :rpair(getpair(ifield(x,'pos')),getpair(ifield(x,'size'))),
@@ -480,7 +481,7 @@ modal_pop=value=>{
 	modal_exit(value);if(ms_stack.length){const c=ms_stack.pop();ms=c.ms,wid=c.wid}
 	if(l){const c=rcopy(wid.cursor);field_stylespan(lms(''),l),wid.cursor=c}
 }
-let kc={shift:0,lock:0,on:0,heading:null}, keydown={}
+let kc={shift:0,lock:0,on:0,heading:null}, keydown={},keyup={}
 keycaps_enter=_=>{if(!enable_touch||kc.on)return;kc.shift=0,kc.lock=0,kc.on=1,ev.mu=ev.md=0}
 
 let msg={ // interpreter event messages
@@ -625,7 +626,8 @@ widget_button=(target,x,value,func)=>{
 	const l=x.locked||!in_layer(), pal=deck.patterns.pal.pix, font=x.font||FONT_MENU;let b=x.size
 	const fcol=l?13:x.show=='invert'?32:1, bcol=x.show=='invert'?1:32, scol=x.show=='invert'?32:1
 	const sel=!l&&x.show!='none'&&x.style!='invisible'&&wid.active==wid.count
-	const a=!l&&dover(b)&&over(b), cs=sel&&!func&&ev.action, cl=cs||((ev.md||ev.drag)&&a), cr=cs||(ev.mu&&a)
+	let sh=0,shh=0;if(!l&&uimode=='interact'&&!wid.fv&&!ev.shift&&x.show!='none'&&x.shortcut){if(keyup[x.shortcut]){shh=1}else if(keydown[x.shortcut]){sh=1}}
+	const a=!l&&dover(b)&&over(b), cs=sel&&!func&&ev.action, cl=cs||sh||((ev.md||ev.drag)&&a), cr=cs||shh|(ev.mu&&a)
 	if(func&&a){ev.callback=func,ev.callback_rect=rcopy(b)}
 	if(!l&&over(b)&&!ev.drag)uicursor=cursor.point
 	if(x.show=='none')return cr; let ar=inset(b,2)
@@ -1320,7 +1322,7 @@ modal_enter=type=>{
 	}
 	if(type=='grid'        )ms.name=fieldstr(lmn(dr.grid_size.x     )),ms.text=fieldstr(lmn(dr.grid_size.y       ))
 	if(type=='deck_props'  )ms.name=fieldstr(ifield(deck     ,'name')),ms.text=fieldstr(ifield(deck     ,'author'))
-	if(type=='button_props')ms.name=fieldstr(ifield(ob.sel[0],'name')),ms.text=fieldstr(ifield(ob.sel[0],'text'  ))
+	if(type=='button_props')ms.name=fieldstr(ifield(ob.sel[0],'name')),ms.text=fieldstr(ifield(ob.sel[0],'text'  )),ms.form0=fieldstr(ifield(ob.sel[0],'shortcut'))
 	if(type=='field_props' )ms.name=fieldstr(ifield(ob.sel[0],'name')),ms.text=fieldstr(ifield(ob.sel[0],'value' ))
 	if(type=='grid_props'  )ms.name=fieldstr(ifield(ob.sel[0],'name')),ms.text=fieldstr(ifield(ob.sel[0],'format'))
 	if(type=='grid_props'  )ms.form0=fieldstr(lms(fjson(monad.cols(ifield(ob.sel[0],'value'))))),ms.edit_json=1
@@ -1894,7 +1896,13 @@ modals=_=>{
 		ui_field(rect(b.x+42,b.y+20,b.w-42,18),ms.name)
 		ui_field(rect(b.x+42,b.y+40,b.w-42,18),ms.text)
 		iwrite(button,lms('name'),rtext_string(ms.name.table))
-		iwrite(button,lms('text'),rtext_string(ms.text.table)),mark_dirty()
+		iwrite(button,lms('text'),rtext_string(ms.text.table))
+		draw_text(rect(b.x+(0|(b.w/2)),b.y+72,54,20),'Shortcut',FONT_MENU,1)
+		const s=normalize_shortcut(rtext_string(ms.form0.table));ms.form0.table=rtext_cast(lms(s))
+		if(wid.fv==ms.form0)wid.cursor=rect(clamp(0,wid.cursor.x,s.length),clamp(0,wid.cursor.y,s.length))
+		ui_field(rect(b.x+(0|(b.w/2))+54,b.y+70,(0|(b.w/2))-54,18),ms.form0)
+		iwrite(button,lms('shortcut'),rtext_string(ms.form0.table))
+		mark_dirty()
 		const style=ls(ifield(button,'style')), sb=rect(b.x,b.y+70)
 		if(ui_radio(rint(rect(sb.x,sb.y,b.w/2,16)),'Round'    ,1,style=='round'    )){iwrite(button,lms('style'),lms('round'    )),mark_dirty()}sb.y+=16
 		if(ui_radio(rint(rect(sb.x,sb.y,b.w/2,16)),'Rectangle',1,style=='rect'     )){iwrite(button,lms('style'),lms('rect'     )),mark_dirty()}sb.y+=16
@@ -3314,7 +3322,7 @@ tick=_=>{
 	if(ev.pos.x!=ev.dpos.x||ev.pos.y!=ev.dpos.y)ev.clicklast=0
 	wid.cursor_timer=(wid.cursor_timer+1)%(2*FIELD_CURSOR_DUTY)
 	if(wid.change_timer){wid.change_timer--;if(wid.change_timer==0)field_change()}
-	pending_tick=1,frame_count++
+	keyup={},pending_tick=1,frame_count++
 }
 
 let id=null
@@ -3401,7 +3409,7 @@ q('body').onkeydown=e=>{
 	if(e.key==' '&&!wid.infield)ev.action=1
 	if(e.key=='Enter')ev.action=1
 	if(e.key=='Tab')ev.tab=1
-	if(e.key=='l'&&ms.type==null&&!wid.ingrid&&!wid.infield)ev.shortcuts['l']=1
+	if(e.key=='L'&&ms.type==null&&!wid.ingrid&&!wid.infield)ev.shortcuts['l']=1
 	if(e.key=='f'&&ms.type==null&&!wid.ingrid&&!wid.infield)toggle_fullscreen
 	if(e.key=='j'&&ms.type==null&&dr.limbo_dither&&dr.dither_threshold>-2.0)dr.dither_threshold-=.1
 	if(e.key=='k'&&ms.type==null&&dr.limbo_dither&&dr.dither_threshold< 2.0)dr.dither_threshold+=.1
@@ -3409,7 +3417,7 @@ q('body').onkeydown=e=>{
 	else{e.preventDefault()}
 }
 q('body').onkeyup=e=>{
-	keydown[e.key]=0;
+	keydown[e.key]=0,keyup[e.key]=1
 	if(e.key=='Meta'||e.key=='Control'||e.metaKey||e.ctrlKey)ev.alt=0,keydown={}
 	if(e.key=='Enter'&&e.shiftKey)ev.eval=1
 	if(e.key=='Shift'||e.shiftKey)ev.shift=0
