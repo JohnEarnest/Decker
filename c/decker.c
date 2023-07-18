@@ -3262,15 +3262,19 @@ void sync(){
 	}
 	if(!windowed||uimode!=mode_draw)set_tracing=0;
 	if(set_tracing!=tracing){tracing=set_tracing,SDL_SetWindowOpacity(win,tracing?0.7:1.0);}
+	pair tsize=buff_size(TOOLB);int dpi=1,tscale=MIN((disp.x-scale*size.x)/(2*tsize.x),disp.y/tsize.y),tmscale=tscale;if(tscale&&noscale)tscale=tmscale=1;
+	#if SDL_VERSION_ATLEAST(2,26,0)
+		pair disp_pixels={0,0};SDL_GetWindowSizeInPixels(win,&disp_pixels.x,&disp_pixels.y);
+		if(disp_pixels.x>disp.x){int s=disp_pixels.x/disp.x;disp.x*=s,disp.y*=s,scale*=s,tscale*=s,dpi=s;}
+	#endif
 	if(framebuffer_flip(disp,size,scale)){
 		int*p, pitch;
-		pair tsize=buff_size(TOOLB);int tscale=MIN((disp.x-scale*size.x)/(2*tsize.x),disp.y/tsize.y);if(tscale&&noscale)tscale=1;
 		int showwings=!kc.on&&toolbars_enable&&tscale>0&&!(lb(ifield(deck,"locked")))&&ms.type==modal_none&&uimode!=mode_script;
 		if(showwings){
 			SDL_Rect src={0,0,tsize.x,tsize.y},dst={0,(disp.y-tscale*tsize.y)/2,tscale*tsize.x,tscale*tsize.y};
 			ltoolbar(
-				(pair){(ev.rawpos .x-dst.x)/tscale,(ev.rawpos .y-dst.y)/tscale},
-				(pair){(ev.rawdpos.x-dst.x)/tscale,(ev.rawdpos.y-dst.y)/tscale}
+				(pair){(ev.rawpos .x-dst.x/dpi)/tmscale,(ev.rawpos .y-dst.y/dpi)/tmscale},
+				(pair){(ev.rawdpos.x-dst.x/dpi)/tmscale,(ev.rawdpos.y-dst.y/dpi)/tmscale}
 			);
 			SDL_LockTexture(gtool,NULL,(void**)&p,&pitch);
 			draw_frame(patterns_pal(ifield(deck,"patterns")),TOOLB,p,pitch,dr.show_anim?frame_count:0,0);
@@ -3280,8 +3284,8 @@ void sync(){
 		if(showwings){
 			SDL_Rect src={0,0,tsize.x,tsize.y},dst={disp.x-tscale*tsize.x,(disp.y-tscale*tsize.y)/2,tscale*tsize.x,tscale*tsize.y};
 			rtoolbar(
-				(pair){(ev.rawpos .x-dst.x)/tscale,(ev.rawpos .y-dst.y)/tscale},
-				(pair){(ev.rawdpos.x-dst.x)/tscale,(ev.rawdpos.y-dst.y)/tscale}
+				(pair){(ev.rawpos .x-dst.x/dpi)/tmscale,(ev.rawpos .y-dst.y/dpi)/tmscale},
+				(pair){(ev.rawdpos.x-dst.x/dpi)/tmscale,(ev.rawdpos.y-dst.y/dpi)/tmscale}
 			);
 			int animate=box_in((rect){dst.x,dst.y,dst.w,dst.h},ev.rawpos)&&dr.show_anim?frame_count:0;
 			SDL_LockTexture(gtool,NULL,(void**)&p,&pitch);
