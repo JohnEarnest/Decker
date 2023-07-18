@@ -72,3 +72,4 @@ A format is `%[name]*-0N.DX`: `*` skip, `0` pad, `N` width.<br/>
 | `sula`    | String   | string, uppercase string, lowercase string, ASCII chars                                        |
 | `bficChH` | Number   | bool, float, int, currency (`-$1.23`), plain currency (`-1.23`), hex lowercase, hex uppercase  |
 | `jep`     | Misc.    | JSON, unix epoch, time-parts {`year`, `month`, `day`, `hour`, `minute`, `second`}              |
+| `qv`      | Lil      | quoted Lil string literal, Lil variable name                                                   |

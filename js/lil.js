@@ -198,7 +198,7 @@ dyad={
 			const hn=_=>m&&y[h]&&(n?h-si<n:1), id=x=>/[0-9]/.test(x), ix=_=>/[0-9a-fA-F]/.test(y[h]), iw=_=>/[ \n]/.test(y[h])
 			while(id(x[f]))n=n*10+(+x[f++]);x[f]=='.'&&f++
 			while(id(x[f]))d=d*10+(+x[f++]);if(!x[f])break;const t=x[f++]
-			if('%mnzsluaro'.indexOf(t)<0)while(hn()&&iw())h++
+			if('%mnzsluqaroj'.indexOf(t)<0)while(hn()&&iw())h++
 			if(t=='%'){if(m&&t==y[h]){h++}else{m=0}}
 			else if(t=='m'){v=m?ONE:NONE}
 			else if(t=='n'){v=lmn(h)}
@@ -209,6 +209,12 @@ dyad={
 			else if(t=='i'){v=lmn(0);const s=(y[h]=='-')?(h++,-1):1;m&=id(y[h]);while(hn()&&id(y[h]))v.v=v.v*10+(+y[h++]);v.v*=s}
 			else if(t=='h'||t=='H'){v=lmn(0),                       m&=ix();    while(hn()&&ix())v.v=v.v*16+parseInt(y[h++],16)}
 			else if(t=='j'){if(m){const j=pjson(y,h,n);h=j.index,v=j.value}else{v=NONE}}
+			else if(t=='v'){v=lms(''),m&=!id(y[h]);while(hn()&&/[0-9a-zA-Z_?]/.test(y[h]))v.v+=y[h++]}
+			else if(t=='q'){
+				v=lms(''),m&=y[h++]=='"';while(hn()&&y[h]!='"'){
+					if(y[h]=='\\'){h++;if(/[n\\"]/.test(y[h])){v.v+=y[h]=='n'?'\n':y[h]}else{m=0}}else{v.v+=y[h]}h++
+				}if(m&=y[h]=='"')h++
+			}
 			else if(t=='f'||t=='c'||t=='C'){
 				v=lmn(0);let p=10,s=(y[h]=='-')?(h++,-1):1; if(t=='c'&&m&&y[h]=='$')h++
 				m&=id(y[h])||y[h]=='.';  while(hn()&&id(y[h]))v.v=v.v*10+(+y[h++])
@@ -241,7 +247,7 @@ dyad={
 			let o='', a='sluro'.indexOf(t)>=0?lms(''):NONE, an=named?dget(y,nk!=null?lms(nk):lmn(h)):null
 			a=t=='%'?NONE: named?(an?an:a): (!sk&&h<count(y))?y.v[h]:a;if(t!='%'&&!sk)h++
 			if     (t=='%'){o='%'}
-			else if(t=='s'){o=ls(a)}
+			else if(t=='s'||t=='v'){o=ls(a)}
 			else if(t=='l'){o=ls(a).toLowerCase()}
 			else if(t=='u'){o=ls(a).toUpperCase()}
 			else if(t=='r'||t=='o'){o=ls(a),lf=1;d=max(1,d);while(d&&x[f])d--,f++;d=n;}
@@ -254,7 +260,8 @@ dyad={
 			else if(t=='h'||t=='H'){o=ln(a).toString(16);if(t=='H')o=o.toUpperCase()}
 			else if(t=='e'){o=new Date(ln(a)*1000).toISOString().split('.')[0]+'Z'}
 			else if(t=='p'){const d=ld(a);o=dyad.format(ISODATE,lml(PARTS.map(x=>dget(d,x)))).v}
-			else if(t=='j'){o=fjson(a);}
+			else if(t=='j'){o=fjson(a)}
+			else if(t=='q'){o=fjson(lms(ls(a)))}
 			let vn=o.length; if(d&&(t=='f'||t=='c'||t=='C'))d=0;if(d&&lf)vn=min(d,vn)
 			if(n&&!lf)for(let z=0;z<n-vn;z++)r+=pz?'0':' '
 			for(let z=d&&!lf?max(0,vn-d):0;z<vn;z++)r+=o[z]

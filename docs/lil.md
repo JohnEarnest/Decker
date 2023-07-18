@@ -792,6 +792,8 @@ Pattern types are as follows:
 | `h`  | `0`    | hexadecimal integer. parses lower- or uppercase.               | format int as hexadecimal in lowercase.              |
 | `H`  | `0`    | hexadecimal integer. parses lower- or uppercase.               | format int as hexadecimal in uppercase.              |
 | `j`  | `0`    | a [JSON](https://www.json.org) value.                          | any value to a JSON string.                          |
+| `q`  | `""`   | quoted. a Lil string literal, like `"foo\nbar"`.               | any string to a Lil string literal.                  |
+| `v`  | `""`   | variable. a Lil variable name, like `ice_9`.                   | any string.                                          |
 | `e`  | `0`    | read ISO-8601 date-time into a unix epoch int.                 | format unix epoch int as ISO-8601 date-time.         |
 | `p`  | `()`   | read ISO-8601 date-time as a dictionary of time parts.         | format dict as ISO-8601.                             |
 
@@ -899,6 +901,12 @@ The `%r` pattern is followed by one or more "valid" characters, the count given 
 "%o-"        parse "A","-A","--A" # ("","-","-")     # grab at most one minus sign
 "%*o-%i"     parse "-45"          # 45               # discard any sign, and read an unsigned int
 "#%-r\n\n%s" parse "# comment\nA" # (" comment","A") # read a Lil-style line comment until a newline
+```
+
+The `%q` and `%v` patterns are useful for manipulating Lil source code, parsing/matching and formatting Lil string literals and Lil variable names, respectively:
+```
+"%v[%q]%m" parse "func[\"foo\"]"    # ("func","foo",1)
+"%q" format "a string"              # "\"a string\""
 ```
 
 The `%j` pattern can be used to format or parse data as JSON. When formatting JSON, Lil dictionary keys will be cast to strings, and anything other than a number, string, list, or dictionary will become a JSON `null`:

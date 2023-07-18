@@ -32,6 +32,15 @@ show["%*s,%s,%*s"     parse "one,two,three"         ] # skip strings
 # case conversion
 show["%u,%u,%u"       parse "one,Two,THREE"         ] # to uppercase
 show["%l,%l,%l"       parse "one,Two,THREE"         ] # to lowercase
+# quoted
+show["%q"             parse "\"str\\n\""            ] # basics
+show["%q%m"           parse "\"str"                 ] # unterminated
+show["%q%m"           parse "\"foo\\zbar\""         ] # bogus escape
+show["%q%m"           parse " \"nope\""             ] # %q does not skip leading whitespace
+# variable names
+show["%v%m"           parse "aGood_Nam3? suffix"    ] # alphanumeric, ?, _
+show["%v%m"           parse "3name"                 ] # may not start with a digit
+
 # date-time
 show["%e%n"           parse "2021-01-02T03:04:57Z!" ] # epoch
 show["%p%m"           parse "2021-01-02T03:04:57Z!" ] # parts
@@ -75,8 +84,11 @@ show["%a"             format list 65,10,127,-5,67   ] # invalid ascii chars beco
 show["%2.2a"          format list 65,66,67          ] # fit ascii chars (trunc)
 show["%2a"            format list 65                ] # fit ascii chars (extend)
 show["%a"             format 65                     ] # widen scalar to ascii list if needed
+show["%q"             format "a\n\"b"               ] # quoted
+show["%v"             format "fooBar"               ] # variable
 show["%e"             format 1609556697             ] # epoch
 show["%p" format "%p" parse  "2021-02-03T04:05:58Z" ] # parts
+
 d.year:1984 d.month:5 d.day:25
 show["%p"             format d                      ] # partial parts
 # skips

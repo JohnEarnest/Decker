@@ -396,6 +396,7 @@ int format_has_names(lv*x){
 		int d=0;while(isdigit(fc))d=d*10+fc-'0',f++;if(!fc)break;char t=fc;f++;if(t=='r'||t=='o')while(d&&fc)d--,f++;
 	}return 0;
 }
+char*ncc; // forward ref
 dyad(l_parse){
 	if(lil(y)){MAP(r,y)l_parse(x,y->lv[z]);return r;}
 	#define hc y->sv[h]
@@ -407,7 +408,7 @@ dyad(l_parse){
 		int n=0,d=0,si=h,sk=fc=='*'&&(f++,1),lf=fc=='-'&&(f++,1);if(fc=='0')f++;
 		while(isdigit(fc))n=n*10+fc-'0',f++;if(fc=='.')f++;
 		while(isdigit(fc))d=d*10+fc-'0',f++;if(!fc)break;char t=fc;f++;
-		if(!strchr("%mnzsluaroj",t))while(hn&&isspace(hc))h++;lv*v=NULL;
+		if(!strchr("%mnzsluqaroj",t))while(hn&&isspace(hc))h++;lv*v=NULL;
 		if     (t=='%'){if(m&&t==hc){h++;}else{m=0;}}
 		else if(t=='m')v=m?ONE:NONE;
 		else if(t=='n')v=lmn(h);
@@ -418,6 +419,12 @@ dyad(l_parse){
 		else if(t=='a'){v=lml(0);while(hn&&(n?1:hc!=fc))ll_add(v,lmn(hc)),h++;}
 		else if(t=='b'){v=strchr("tTyYx1",hc)?ONE:NONE;while(hn&&n?1:hc!=fc)h++;}
 		else if(t=='j'){int f=1,c=n?n:y->c;v=m?pjson(y->sv,&h,&f,&c):NONE;}
+		else if(t=='v'){str r=str_new();m&=!isdigit(hc);while(hn&&ncc[hc-32]=='n')str_addc(&r,hc),h++;v=lmstr(r);}
+		else if(t=='q'){
+			str r=str_new();m&=hc=='"',h++;while(hn&&hc!='"'){
+				if(hc=='\\'){h++;if(m&=!!strchr("\\\"n",hc)){str_addc(&r,hc=='n'?'\n':hc);}}else{str_addc(&r,hc);}h++;
+			}if(m&=hc=='"')h++;v=lmstr(r);
+		}
 		else if(t=='r'||t=='o'){
 			str r=str_new();d=MAX(1,d);
 			int cc=f;for(int z=0;m&&z<d;z++){if(!fc){m=0;}else{f++;}}while(hn){
@@ -459,7 +466,7 @@ void fjson(str*s,lv*x){
 void format_type(str*r,lv*a,char t,int n,int d,int lf,int pz,int*f,char*c){
 	char o[NUM]={0},*op=o;
 	if     (t=='%')snprintf(o,NUM,"%%");
-	else if(t=='s'||t=='l'||t=='u'){op=ls(a)->sv;}
+	else if(t=='s'||t=='l'||t=='u'||t=='v'){op=ls(a)->sv;}
 	else if(t=='r'||t=='o'){op=ls(a)->sv,lf=1;d=MAX(1,d);while(d&&c[*f])d--,(*f)++;d=n;}
 	else if(t=='a'){str v=str_new();lv*l=ll(a);EACH(z,l)str_addc(&v,0xFF&((int)ln(l->lv[z])));op=lmstr(v)->sv;}
 	else if(t=='b')snprintf(o,NUM,"%s",lb(a)?"true":"false");
@@ -469,7 +476,8 @@ void format_type(str*r,lv*a,char t,int n,int d,int lf,int pz,int*f,char*c){
 	else if(t=='i')snprintf(o,NUM,"%lld",(long long)ln(a));
 	else if(t=='h')snprintf(o,NUM,"%llx",(long long)ln(a));
 	else if(t=='H')snprintf(o,NUM,"%llX",(long long)ln(a));
-	else if(t=='j'){str v=str_new();fjson(&v,a);op=lmstr(v)->sv;}
+	else if(t=='j'){str v=str_new();fjson(&v,a    );op=lmstr(v)->sv;}
+	else if(t=='q'){str v=str_new();fjson(&v,ls(a));op=lmstr(v)->sv;}
 	else if(t=='e'){time_t v=ln(a);strftime(o,NUM,"%FT%TZ",gmtime(&v));}
 	else if(t=='p'){
 		struct tm v={0};lv*d=ld(a);
