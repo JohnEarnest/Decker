@@ -952,7 +952,7 @@ The button widget is a clickable button, possibly with a stateful checkbox.
 | `typeof x`              | `"field"`                                                                                             |
 | `x.name`                | String. The name of this widget. r/w.                                                                 |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
-| `x.locked`              | Bool. If false, the user cannot modify the value of this checkbox. r/w.                               |
+| `x.locked`              | Bool. If true, the user cannot modify the value of this checkbox. r/w.                                |
 | `x.animated`            | Bool. If true, this widget will be sent `view[]` events at 60hz while on the current card. r/w.       |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
@@ -987,7 +987,7 @@ The field widget displays and possibly allows the editing of text.
 | `typeof x`              | `"field"`                                                                                             |
 | `x.name`                | String. The name of this widget. r/w.                                                                 |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
-| `x.locked`              | Bool. If false, the user cannot edit the text of this field. r/w.                                     |
+| `x.locked`              | Bool. If true, the user cannot edit the text of this field. r/w.                                      |
 | `x.animated`            | Bool. If true, this widget will be sent `view[]` events at 60hz while on the current card. r/w.       |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
@@ -1018,7 +1018,7 @@ The slider widget represents a single number, constrained within a configurable 
 | `typeof x`              | `"slider"`                                                                                            |
 | `x.name`                | String. The name of this widget. r/w.                                                                 |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
-| `x.locked`              | Bool. If false, the user cannot change the value of this slider. r/w.                                 |
+| `x.locked`              | Bool. If true, the user cannot change the value of this slider. r/w.                                  |
 | `x.animated`            | Bool. If true, this widget will be sent `view[]` events at 60hz while on the current card. r/w.       |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
@@ -1043,7 +1043,7 @@ The grid widget represents an interactive spreadsheet-style view of a table.
 | `typeof x`              | `"grid"`                                                                                              |
 | `x.name`                | String. The name of this widget. r/w.                                                                 |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
-| `x.locked`              | Bool. If false, the user cannot select a row of the grid. r/w.                                        |
+| `x.locked`              | Bool. If true, the user cannot select a row of the grid. r/w.                                         |
 | `x.animated`            | Bool. If true, this widget will be sent `view[]` events at 60hz while on the current card. r/w.       |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
