@@ -2480,12 +2480,15 @@ lv* n_readgif(lv*self,lv*a){
 	if(fread(data,1,st.st_size,f)!=(unsigned)st.st_size){fclose(f),free(data);return frames?empty_frames():image_empty();}
 	fclose(f);return readgif(data,st.st_size,gray,frames);
 }
-lv* n_writegif(lv*self,lv*a){
-	(void)self;lv*name=ls(l_first(a));if(a->c<2)return NONE;lv*i=lml(0),*d=lml(0);
+char* n_writegif_raw(lv*a,int*len){
+	if(a->c<2)return NULL;lv*i=lml(0),*d=lml(0);
 	lv*si=lil(a->lv[1])?a->lv[1]: lid(a->lv[1])?dget(a->lv[1],lmistr("frames")): l_list(a->lv[1]);
 	lv*sd=lid(a->lv[1])?dget(a->lv[1],lmistr("delays")) :lml(0);
 	EACH(z,si)if(image_is(si->lv[z])&&!is_empty(si->lv[z]))ll_add(i,si->lv[z]),ll_add(d,lmn(z>=sd->c?3: CLAMP(1,ln(sd->lv[z]),65535)));
-	if(i->c<1)return NONE;int len=0;char*data=writegif(i,d,&len);
+	if(i->c<1)return NULL;return writegif(i,d,len);
+}
+lv* n_writegif(lv*self,lv*a){
+	(void)self;lv*name=ls(l_first(a));int len=0;char*data=n_writegif_raw(a,&len);if(!data)return NONE;
 	FILE*f=fopen(name->sv,"wb");if(f)fwrite(data,1,len,f),fclose(f);free(data);return f?ONE:NONE;
 }
 lv* n_writewav(lv*self,lv*a){
