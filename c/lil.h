@@ -505,7 +505,7 @@ dyad(l_format){
 		int n=0,d=0,sk=fc=='*'&&(f++,1),lf=fc=='-'&&(f++,1),pz=fc=='0'&&(f++,1);
 		while(isdigit(fc))n=n*10+fc-'0',f++;if(fc=='.')f++;
 		while(isdigit(fc))d=d*10+fc-'0',f++;if(!fc)break;char t=fc;f++;
-		lv*a=strchr("sluro",t)?lmistr(""):NONE,*an=named?dget(y,nk.sv?lmstr(nk):lmn(h)): NULL;
+		lv*a=strchr("sluvroq",t)?lmistr(""):NONE,*an=named?dget(y,nk.sv?lmstr(nk):lmn(h)): NULL;
 		a=t=='%'?NONE: named?(an?an:a): (!sk&&h<y->c)?y->lv[h]: a;
 		format_type(&r,a,t,n,d,lf,pz,&f,x->sv);if(t!='%'&&!sk)h++;
 	}return lmstr(r);
@@ -1020,14 +1020,14 @@ lv*n_readcsv(lv*self,lv*a){
 		if(t->sv[i++]=='\n')break;css;cm(delim);
 	}while(s&&n<s->c)if(s->sv[n++]!='_')snprintf(b,32,"c%d",n-1),dset(r,lmcstr(b),lml(0));
 	if(!s)s=l_take(lmn(r->c),lmistr("s"));EACH(z,s)if(s->sv[z]!='_')slots++;slots=MIN(slots,r->c);
-	n=0;while(i<t->c){
+	n=0;while(i<=t->c){
 		css;str val=str_new();
 		if(cm('"'))while(i<t->c)if(cm('"')){if(cm('"'))str_addc(&val,'"');else break;}else str_addc(&val,t->sv[i++]);
 		else{while(i<t->c&&!strchr("\n\"",t->sv[i])&&t->sv[i]!=delim)str_addc(&val,t->sv[i++]);}
 		if(n<s->c&&s->sv[n]!='_'){char f[]={'%',fchar(s->sv[n]),0};ll_add(r->lv[slot++],l_parse(lmcstr(f),lmstr(val)));}
 		else{free(val.sv);}n++;
 		if(i>=t->c||t->sv[i]=='\n'){
-			while(n<s->c){char u=s->sv[n++];if(u!='_'&&slot<slots)ll_add(r->lv[slot++],strchr("sluro",u)?lms(0):NONE);}
+			while(n<s->c){char u=s->sv[n++];if(u!='_'&&slot<slots)ll_add(r->lv[slot++],strchr("sluvroq",u)?lms(0):NONE);}
 			if(t->sv[i]=='\n'&&i==t->c-1)break;i++,n=0,slot=0;
 		}else{css;cm(delim);}
 	}return torect(r);

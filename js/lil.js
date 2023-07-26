@@ -244,7 +244,7 @@ dyad={
 			const hn=_=>m&&y[h]&&(n?h-si<n:1), id=x=>/[0-9]/.test(x)
 			while(id(x[f]))n=n*10+(+x[f++]);x[f]=='.'&&f++
 			while(id(x[f]))d=d*10+(+x[f++]);if(!x[f])break;const t=x[f++]
-			let o='', a='sluro'.indexOf(t)>=0?lms(''):NONE, an=named?dget(y,nk!=null?lms(nk):lmn(h)):null
+			let o='', a='sluvroq'.indexOf(t)>=0?lms(''):NONE, an=named?dget(y,nk!=null?lms(nk):lmn(h)):null
 			a=t=='%'?NONE: named?(an?an:a): (!sk&&h<count(y))?y.v[h]:a;if(t!='%'&&!sk)h++
 			if     (t=='%'){o='%'}
 			else if(t=='s'||t=='v'){o=ls(a)}
@@ -610,7 +610,7 @@ n_readcsv=([x,y,d])=>{
 			r.v[k].push(dyad.parse(lms('%'+fchar(s)),lms(val))),slot++
 		};n++
 		if(i>=text.length||text[i]=='\n'){
-			while(n<spec.length){const u=spec[n++];if(u!='_'&&slot<slots)r.v[Object.keys(r.v)[slot++]].push(u=='s'?lms(''):NONE);}
+			while(n<spec.length){const u=spec[n++];if(u!='_'&&slot<slots)r.v[Object.keys(r.v)[slot++]].push('sluvroq'.indexOf(u)>=0?lms(''):NONE);}
 			if(text[i]=='\n'&&i==text.length-1)break;i++,n=0,slot=0
 		}else{while(match(' '));match(d)}
 	};return r

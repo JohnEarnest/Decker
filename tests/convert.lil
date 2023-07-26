@@ -22,6 +22,8 @@ show[readcsv["A,B\none,-12.3\ntwo,45.999" "sisi"]]    # pad out missing columns
 show[readcsv[""]]                                     # no headers or data
 show[readcsv["first,second,third"]]                   # headers only
 show[readcsv["first,second,third\n  "]]               # headers only, with whitespace
+show[readcsv["a,b\n,99\n,"]]                          # ragged last cell, no spec
+show[readcsv["a,b\n,99\n," "si"]]                     # ragged last cell, spec
 
 # custom delimiters
 t3:insert foo:"C|D" bar:789 into t2
