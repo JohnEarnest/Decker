@@ -420,6 +420,7 @@ Decker provides a number of useful pre-defined functions:
 | `play[x mode]`         | Play a sound. `x` can be either the name of a sound or a sound interface. (2)                                             | Decker     |
 | `go[x y z]`            | Navigate to another card by _name_, _value_, or _index_ `x` with transition `y`, playing for `z` frames (3).              | Decker     |
 | `transition[x]`        | Install a [transition](#transitions) `x` for use with `go[]`, and return a dictionary of installed transitions.           | Decker     |
+| `brush[x y]`           | Install a [brush](#brushes) `x` for use with `canvas.brush`, and return a dictionary of installed brushes.                | Decker     |
 | `sleep[x]`             | Wait for `x` 60hz frames before proceeding, minimum 1 frame. Allows for performing simple animation. (4)                  | Decker     |
 | `array[x y]`           | Create a new [Array Interface](#arrayinterface) with size `x` and cast string `y`, or decode an array string `x`.         | Decker     |
 | `image[x]`             | Create a new [Image Interface](#imageinterface) with size `x` (`(width,height)`), or decode an image string.              | Decker     |
@@ -1087,7 +1088,7 @@ The canvas will scale _up_ logical pixels to display them on the card (resulting
 | `x.size`                | The `size` of the canvas widget in pixels. r/w.                                                                   |
 | `x.lsize`               | the _logical_ `size` (before scaling) of the canvas in pixels. r/w.                                               |
 | `x.scale`               | The scaling factor of the canvas. r/w.                                                                            |
-| `x.brush`               | The current brush shape, used by `canvas.line[]` and `canvas.box[]`. r/w.                                         |
+| `x.brush`               | The current brush index, used by `canvas.line[]` and `canvas.box[]`. Write accepts the _name_ of a custom brush.  |
 | `x.pattern`             | The current drawing pattern, used by all drawing operations. r/w.                                                 |
 | `x.font`                | The current drawing font. Can be set by font name or a font interface. r/w.                                       |
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                            |
@@ -1127,10 +1128,6 @@ If the `pos` argument to `canvas.paste[]` is a list of four coordinates instead 
 ```
 c.paste[i (0,0),2*i.size]
 ```
-
-The following brush shapes are supported:
-
-![](images/brushes.png)
 
 Contraption Interface
 ---------------------
@@ -1645,6 +1642,57 @@ transition[on BoxOut     c a b t do  c.rect[c.size/2   c.size*1-t "center"]     
 ```
 
 Transitions can be defined in any script, at any time, but it usually makes the most sense to set them up at the top level of a deck script or a [module](#modules). If custom transitions are bundled into a module, it is very easy for other users to re-use them in their own decks!
+
+Brushes
+=======
+Both Decker's drawing tools and Canvas widgets support drawing lines (and shapes composed of lines, like polygons or boxes) using a "brush". The following brush shapes are built in:
+
+![](images/brushes.png)
+
+It is also possible to install new brushes using the `brush[]` function. This can be called in three ways:
+
+- `brush[name image]`: define a _static brush_ with a given string `name` using the `image` as a mask.
+- `brush[function]`: define a _functional brush_, with a name corresponding to the name of the supplied function.
+- `brush[]`: retrieve a dictionary of custom brushes, keyed by name.
+
+Static brushes work like the built-in brushes: as a line is drawn, the mask is continuously "stamped" along it. Functional brushes call the supplied function repeatedly, and each time it should return a mask image. Functional brushes _must_ complete their work _very quickly_: if they exceed a brief quota, they will be halted prematurely, and nothing will be drawn. Likewise, if the function returns anything that is not an image, nothing will be drawn at that step. A brush function is called with two arguments:
+
+- `delta`: a pair of numbers indicating the `(x,y)` offset of the current line's end from its origin. This can be used to determine the magnitude of the line, its direction, or both. 
+- `newLine`: a boolean; `1` for the first call of a new line, otherwise `0`.
+
+An example static brush:
+```
+brush["Oval" image["%%IMG0AAwADAHgB/AP8B/wP/B/4H/g/8D/gP8A/gB8AA=="]]
+```
+
+Remember that you can obtain the encoded strings used by `image[]` by drawing something in Decker and copying it to the clipboard!
+
+An example functional brush, a round brush which gets smaller for faster strokes:
+```
+# 11 round brush images ranging from 8px to 1px:
+
+b:image @ "\n" split 1 drop "
+%%IMG0AAgACDx+/////348
+%%IMG0AAcAB3z+/v7+/nw=
+%%IMG0AAcABzh8/v7+fDg=
+%%IMG0AAYABnj8/Pz8eA==
+%%IMG0AAYABjB4/Px4MA==
+%%IMG0AAUABXD4+Phw
+%%IMG0AAQABGDw8GA=
+%%IMG0AAMAA+Dg4A==
+%%IMG0AAMAA0DgQA==
+%%IMG0AAIAAsDA
+%%IMG0AAEAAYA="
+
+# pre-computing the above table outside the function avoids
+# unnecessary work every time Velocity[] is called!
+
+brush[on Sumi delta do
+	b[10 & .5 * mag delta]
+end]
+```
+
+Like transition functions, brushes can be defined in any script, at any time, but it usually makes the most sense to set them up at the top level of a deck script or a [module](#modules).
 
 Playing Sound
 =============

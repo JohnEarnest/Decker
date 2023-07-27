@@ -687,7 +687,8 @@ show=(x,toplevel)=>linat(x)?'on native x do ... end':
 
 // dom + utilities
 
-FORMAT_VERSION=1, RTEXT_END=2147483647, SFX_RATE=8000, FRAME_QUOTA=MODULE_QUOTA=10*4096, TRANS_QUOTA=2*4096, LOOP_QUOTA=1*4096, ATTR_QUOTA=1*4096, ANTS=255
+FORMAT_VERSION=1, RTEXT_END=2147483647, SFX_RATE=8000, ANTS=255
+FRAME_QUOTA=MODULE_QUOTA=10*4096, TRANS_QUOTA=2*4096, LOOP_QUOTA=1*4096, ATTR_QUOTA=1*4096, BRUSH_QUOTA=128
 sleep_frames=0, sleep_play=0, pending_popstate=0
 DEFAULT_HANDLERS=`
 on link x do go[x] end
@@ -941,7 +942,8 @@ draw_rect=(r,pattern)=>{r=rclip(r,frame.clip);for(let a=r.y;a<r.y+r.h;a++)for(le
 draw_invert_raw=(pal,r)=>{r=rclip(r,frame.clip);for(let a=r.y;a<r.y+r.h;a++)for(let b=r.x;b<r.x+r.w;b++){const h=rect(b,a);pix(h,1^draw_pattern(pal,gpix(h),h))}}
 draw_icon=(p,i,pattern)=>{const s=i.size;for(let a=0;a<s.y;a++)for(let b=0;b<s.x;b++){const h=rect(p.x+b,p.y+a);if(i.pix[b+(a*s.x)]&&inclip(h))pix(h,pattern)}}
 draw_iconc=(r,i,pattern)=>draw_icon(rcenter(r,i.size),i,pattern)
-draw_line=(r,brush,pattern)=>{
+
+draw_line_simple=(r,brush,pattern)=>{
 	r=rint(r);const bsh=(z,x,y)=>(BRUSHES[(z*8)+y]>>(7-x))&1
 	let dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1;while(1){
 		if(brush==0){if(inclip(r))pix(r,pattern)}
@@ -949,15 +951,46 @@ draw_line=(r,brush,pattern)=>{
 		if(r.x==r.w&&r.y==r.h)break;let e2=err*2; if(e2>=dy)err+=dy,r.x+=sx; if(e2<=dx)err+=dx,r.y+=sy
 	}
 }
+draw_line_custom=(r,mask,pattern)=>{
+	let dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1, ms=mask.size, mc=rint(rdiv(ms,2));while(1){
+		for(let b=0;b<ms.x;b++)for(let a=0;a<ms.y;a++){const h=rect(r.x+a-mc.x,r.y+b-mc.y);if(mask.pix[a+b*ms.x]&&inclip(h))pix(h,pattern)}
+		if(r.x==r.w&&r.y==r.h)break;let e2=err*2; if(e2>=dy)err+=dy,r.x+=sx; if(e2<=dx)err+=dx,r.y+=sy
+	}
+}
+draw_line_function=(r,func,pattern)=>{
+	const a=lml([lmpair(rect(r.w-r.x,r.h-r.y)),ONE]),p=lmblk(),e=lmenv();blk_lit(p,func),blk_lit(p,a),blk_op(p,op.CALL),pushstate(e)
+	let dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1;while(1){
+		state.e=[e],state.t=[],state.pcs=[];issue(e,p);let quota=BRUSH_QUOTA;while(quota&&running())runop(),quota--;const v=running()?NONE:arg()
+		if(image_is(v)){
+			const ms=v.size, mc=rint(rdiv(ms,2))
+			for(let b=0;b<ms.x;b++)for(let a=0;a<ms.y;a++){const h=rect(r.x+a-mc.x,r.y+b-mc.y);if(v.pix[a+b*ms.x]&&inclip(h))pix(h,pattern)}
+		}if(r.x==r.w&&r.y==r.h)break;let e2=err*2; if(e2>=dy)err+=dy,r.x+=sx; if(e2<=dx)err+=dx,r.y+=sy; a.v[1]=NONE
+	}popstate()
+}
+draw_line=(r,brush,pattern,deck)=>{
+	if(brush>=0&&brush<=23){draw_line_simple(r,brush,pattern);return}
+	const b=deck.brushes;if(brush<0||brush-24>=b.v.length)return;const f=b.v[brush-24]
+	if(image_is(f)){draw_line_custom(r,f,pattern)}else if(lion(f)){draw_line_function(r,f,pattern)}
+}
+n_brush=(z,deck)=>{const b=deck.brushes,f=z[0],s=z[1];if(lion(f))dset(b,lms(f.n),f);if(lis(f)&&s&&image_is(s))dset(b,f,s);return b}
+
 draw_box=(r,brush,pattern)=>{
 	const size=frame.image.size
 	if(r.w==0||r.h==0||!ron(r,rect(0,0,size.x,size.y)))return
-	if(r.y         >=0)draw_line(rect(r.x      ,r.y      ,r.x+r.w-1,r.y      ),brush,pattern)
-	if(r.y+r.h<=size.y)draw_line(rect(r.x      ,r.y+r.h-1,r.x+r.w-1,r.y+r.h-1),brush,pattern)
-	if(r.x         >=0)draw_line(rect(r.x      ,r.y      ,r.x      ,r.y+r.h-1),brush,pattern)
-	if(r.x+r.w<=size.x)draw_line(rect(r.x+r.w-1,r.y      ,r.x+r.w-1,r.y+r.h-1),brush,pattern)
+	if(r.y         >=0)draw_line_simple(rect(r.x      ,r.y      ,r.x+r.w-1,r.y      ),brush,pattern)
+	if(r.y+r.h<=size.y)draw_line_simple(rect(r.x      ,r.y+r.h-1,r.x+r.w-1,r.y+r.h-1),brush,pattern)
+	if(r.x         >=0)draw_line_simple(rect(r.x      ,r.y      ,r.x      ,r.y+r.h-1),brush,pattern)
+	if(r.x+r.w<=size.x)draw_line_simple(rect(r.x+r.w-1,r.y      ,r.x+r.w-1,r.y+r.h-1),brush,pattern)
 }
-draw_lines=(poly,brush,pattern)=>{for(let z=0;z<poly.length-1;z++)draw_line(rpair(poly[z],poly[z+1]),brush,pattern)}
+draw_boxf=(r,brush,pattern,deck)=>{
+	const size=frame.image.size
+	if(r.w==0||r.h==0||!ron(r,rect(0,0,size.x,size.y)))return
+	if(r.y         >=0)draw_line(rect(r.x      ,r.y      ,r.x+r.w-1,r.y      ),brush,pattern,deck)
+	if(r.y+r.h<=size.y)draw_line(rect(r.x      ,r.y+r.h-1,r.x+r.w-1,r.y+r.h-1),brush,pattern,deck)
+	if(r.x         >=0)draw_line(rect(r.x      ,r.y      ,r.x      ,r.y+r.h-1),brush,pattern,deck)
+	if(r.x+r.w<=size.x)draw_line(rect(r.x+r.w-1,r.y      ,r.x+r.w-1,r.y+r.h-1),brush,pattern,deck)
+}
+draw_lines=(poly,brush,pattern,deck)=>{for(let z=0;z<poly.length-1;z++)draw_line(rpair(poly[z],poly[z+1]),brush,pattern,deck)}
 poly_bounds=poly=>{
 	const d=rect(frame.clip.x+frame.clip.w,frame.clip.y+frame.clip.h,frame.clip.x,frame.clip.y)
 	for(let z=0;z<poly.length;z++){const p=poly[z];d.x=min(d.x,p.x),d.y=min(d.y,p.y),d.w=max(d.w,p.x),d.h=max(d.h,p.y)}
@@ -1736,7 +1769,7 @@ canvas_read=(x,card)=>{
 	const ri=lmi((self,i,x)=>{
 		if(!is_rooted(self))return NONE
 		if(x){
-			if(ikey(i,'brush'    ))return self.brush  =0|clamp(0,ln(x), 23),x
+			if(ikey(i,'brush'    )){let n=0|max(0,ln(x));if(lis(x)){const v=dkix(self.card.deck.brushes,x);if(v!=-1)n=24+v};return self.brush=n,x}
 			if(ikey(i,'pattern'  ))return self.pattern=0|clamp(0,ln(x),255),x
 			if(ikey(i,'font'     ))return self.font=normalize_font(self.card.deck.fonts,x),x
 			if(!lis(i)){const img=container_image(self,1);return img.f(img,i,x)}
@@ -1756,13 +1789,13 @@ canvas_read=(x,card)=>{
 			if(ikey(i,'scale'    ))return lmn(ivalue(self,ls(i),1.0))
 			if(ikey(i,'lsize'    )){const s=getpair(ifield(self,'size')),z=ln(ifield(self,'scale'));return lmpair(rect(ceil(s.x/z),ceil(s.y/z)))}
 			if(ikey(i,'clip'     ))return lmnat(z=>(canvas_clip(self,z),NONE))
-			if(ikey(i,'clear'    ))return lmnat(z=>(canvas_pick(self),draw_rect(wid_crect(self,z),0            )           ,NONE))
-			if(ikey(i,'rect'     ))return lmnat(z=>(canvas_pick(self),draw_rect(wid_crect(self,z),frame.pattern)           ,NONE))
-			if(ikey(i,'invert'   ))return lmnat(z=>(canvas_pick(self),draw_invert_raw(wid_pal(self),wid_crect(self,z))     ,NONE))
-			if(ikey(i,'box'      ))return lmnat(z=>(canvas_pick(self),draw_box(wid_rect(self,z),frame.brush,frame.pattern) ,NONE))
-			if(ikey(i,'poly'     ))return lmnat(z=>(canvas_pick(self),draw_poly(unpack_poly(z),frame.pattern)              ,NONE))
-			if(ikey(i,'line'     ))return lmnat(z=>(canvas_pick(self),draw_lines(unpack_poly(z),frame.brush,frame.pattern) ,NONE))
-			if(ikey(i,'fill'     ))return lmnat(([pos])=>(canvas_pick(self),draw_fill(rint(getpair(pos)),self.pattern)     ,NONE))
+			if(ikey(i,'clear'    ))return lmnat(z=>(canvas_pick(self),draw_rect(wid_crect(self,z),0            )                          ,NONE))
+			if(ikey(i,'rect'     ))return lmnat(z=>(canvas_pick(self),draw_rect(wid_crect(self,z),frame.pattern)                          ,NONE))
+			if(ikey(i,'invert'   ))return lmnat(z=>(canvas_pick(self),draw_invert_raw(wid_pal(self),wid_crect(self,z))                    ,NONE))
+			if(ikey(i,'box'      ))return lmnat(z=>(canvas_pick(self),draw_boxf(wid_rect(self,z),frame.brush,frame.pattern,self.card.deck),NONE))
+			if(ikey(i,'poly'     ))return lmnat(z=>(canvas_pick(self),draw_poly(unpack_poly(z),frame.pattern)                             ,NONE))
+			if(ikey(i,'line'     ))return lmnat(z=>(canvas_pick(self),draw_lines(unpack_poly(z),frame.brush,frame.pattern,self.card.deck) ,NONE))
+			if(ikey(i,'fill'     ))return lmnat(([pos])=>(canvas_pick(self),draw_fill(rint(getpair(pos)),self.pattern)                    ,NONE))
 			if(ikey(i,'copy'     ))return lmnat(z=>{const img=container_image(self,1);return image_copy(img,unpack_rect(z,img.size))})
 			if(ikey(i,'paste'    ))return lmnat(([img,pos,t])=>{
 				canvas_pick(self);const dst=container_image(self,1)
@@ -2228,6 +2261,7 @@ deck_read=x=>{
 	ri.cards       =lmd()
 	ri.modules     =lmd()
 	ri.transit     =lmd()
+	ri.brushes     =lmd()
 	ri.patterns    =patterns_read(deck)
 	ri.version     ='version' in deck?ln(deck.version):1
 	ri.locked      ='locked'  in deck?lb(deck.locked ):0
@@ -2344,6 +2378,7 @@ primitives=(env,deck)=>{
 	env.local('play'      ,lmnat(n_play    ))
 	env.local('go'        ,lmnat(([x,t,d])=>n_go([x,t,d],deck)))
 	env.local('transition',lmnat(([f])=>n_transition(f,deck)))
+	env.local('brush'     ,lmnat(x=>n_brush(x,deck)))
 	env.local('sleep'     ,lmnat(n_sleep   ))
 	env.local('eval'      ,lmnat(n_eval    ))
 	env.local('random'    ,lmnat(n_random  ))

@@ -8,6 +8,7 @@
 #define ANTS           255
 #define MODULE_QUOTA   (10*4096)
 #define TRANS_QUOTA    ( 2*4096)
+#define BRUSH_QUOTA    (    128)
 #define LOOP_QUOTA     ( 1*4096)
 #define ATTR_QUOTA     ( 1*4096)
 #define FRAME_QUOTA    (10*4096)
@@ -65,6 +66,7 @@ lv* n_go(lv*self,lv*z){
 lv* interface_rtext(lv*self,lv*i,lv*x); // forward ref
 lv* interface_pointer(lv*self,lv*i,lv*x); // forward ref
 lv* interface_app(lv*self,lv*i,lv*x); // forward ref
+lv* n_brush(lv*self,lv*z); // forward ref
 void constants(lv*env){
 	dset(env,lmistr("sys"    ),lmi(interface_sys,    lmistr("system" ),NULL));
 	dset(env,lmistr("app"    ),lmi(interface_app,    lmistr("app"    ),NULL));
@@ -98,6 +100,7 @@ void primitives(lv*env,lv*deck){
 	dset(env,lmistr("play"      ),lmnat(n_play      ,deck));
 	dset(env,lmistr("go"        ),lmnat(n_go        ,deck));
 	dset(env,lmistr("transition"),lmnat(n_transition,deck));
+	dset(env,lmistr("brush"     ),lmnat(n_brush     ,deck));
 	dset(env,lmistr("sleep"     ),lmnat(n_sleep     ,NULL));
 	dset(env,lmistr("eval"      ),lmnat(n_eval      ,NULL));
 	dset(env,lmistr("random"    ),lmnat(n_random    ,NULL));
@@ -648,7 +651,6 @@ void draw_frame(char*pal,lv*buffer,int*p,int pitch,int frame,int mask){
 // Rendering
 
 #define PIX(a,b)    frame.buffer->sv[(a)+((b)*frame.size.x)]
-#define BSH(z,x,y)  ((BRUSHES[(z*8)+y]>>(7-x))&1)
 #define inclip(x,y) box_in(frame.clip,(pair){x,y})
 
 char BRUSHES[]={
@@ -665,6 +667,38 @@ char BRUSHES[]={
 	0x00,0x00,0x00,0xAA,0x00,0x00,0x00,0x00, 0x00,0x00,0x20,0x10,0x08,0x00,0x00,0x00,
 	0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x00, 0x80,0x00,0x20,0x00,0x08,0x00,0x02,0x00,
 };
+void draw_line_simple(rect r,int brush,int pattern){
+	int dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1;while(1){
+		for(int b=0;b<8;b++)for(int a=0;a<8;a++)if(((BRUSHES[(brush*8)+b]>>(7-a))&1)&&inclip(r.x+a-3,r.y+b-3))PIX(r.x+a-3,r.y+b-3)=pattern;
+		if(r.x==r.w&&r.y==r.h)break;int e2=err*2;if(e2>=dy)err+=dy,r.x+=sx;if(e2<=dx)err+=dx,r.y+=sy;
+	}
+}
+void draw_line_custom(rect r,lv*mask,int pattern){
+	int dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1;pair ms=buff_size(mask),mc={ms.x/2,ms.y/2};while(1){
+		for(int b=0;b<ms.x;b++)for(int a=0;a<ms.y;a++)if(mask->sv[a+b*ms.x]&&inclip(r.x+a-mc.x,r.y+b-mc.y))PIX(r.x+a-mc.x,r.y+b-mc.y)=pattern;
+		if(r.x==r.w&&r.y==r.h)break;int e2=err*2;if(e2>=dy)err+=dy,r.x+=sx;if(e2<=dx)err+=dx,r.y+=sy;
+	}
+}
+void draw_line_function(rect r,lv*func,int pattern){
+	lv*a=lml2(lmpair((pair){r.w-r.x,r.h-r.y}),ONE),*p=lmblk(),*e=lmenv(NULL);blk_lit(p,func),blk_lit(p,a),blk_op(p,CALL),pushstate(e);
+	int dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1;while(1){
+		state.e->c=1,state.t->c=0,state.p->c=0,state.pcs.c=0;issue(e,p);int quota=BRUSH_QUOTA;while(quota&&running())runop(),quota--;lv*v=running()?NONE:arg();
+		if(image_is(v)){
+			lv*mask=v->b;pair ms=buff_size(mask),mc={ms.x/2,ms.y/2};
+			for(int b=0;b<ms.x;b++)for(int a=0;a<ms.y;a++)if(mask->sv[a+b*ms.x]&&inclip(r.x+a-mc.x,r.y+b-mc.y))PIX(r.x+a-mc.x,r.y+b-mc.y)=pattern;
+		}if(r.x==r.w&&r.y==r.h)break;int e2=err*2;if(e2>=dy)err+=dy,r.x+=sx;if(e2<=dx)err+=dx,r.y+=sy;a->lv[1]=NONE;
+	}popstate();
+}
+void draw_line(rect r,int brush,int pattern,lv*deck){
+	if(brush>=0&&brush<=23){draw_line_simple(r,brush,pattern);return;}
+	lv*b=dget(deck->b,lmistr("brushes"));if(brush<0||brush-24>=b->c)return;lv*f=b->lv[brush-24];
+	if(image_is(f)){draw_line_custom(r,f->b,pattern);}else if(lion(f)){draw_line_function(r,f,pattern);}
+}
+lv* n_brush(lv*self,lv*z){
+	lv*b=dget(self->b,lmistr("brushes")),*f=l_first(z);
+	if(lion(f)){dset(b,lmcstr(f->sv),f);}if(lis(f)&&z->c>1&&image_is(z->lv[1])){dset(b,f,z->lv[1]);}
+	return b;
+}
 
 void draw_pix(int x,int y,int pattern){if(inclip(x,y))PIX(x,y)=pattern;}
 void draw_hline(int x0,int x1,int y,int pattern){
@@ -682,19 +716,19 @@ void draw_icon(pair pos,lv*i,int pattern){
 	for(int a=0;a<s.y;a++)for(int b=0;b<s.x;b++)if(i->b->sv[b+(a*s.x)]&&inclip(pos.x+b,pos.y+a))PIX(pos.x+b,pos.y+a)=pattern;
 }
 void draw_iconc(rect r,lv*i,int pattern){rect s=box_center(r,image_size(i));draw_icon((pair){s.x,s.y},i,pattern);}
-void draw_line(rect r,int brush,int pattern){
-	int dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1; while(1){
-		for(int b=0;b<8;b++)for(int a=0;a<8;a++)if(BSH(brush,a,b)&&inclip(r.x+a-3,r.y+b-3))PIX(r.x+a-3,r.y+b-3)=pattern;
-		if(r.x==r.w&&r.y==r.h)break;
-		int e2=err*2; if(e2>=dy)err+=dy,r.x+=sx; if(e2<=dx)err+=dx,r.y+=sy;
-	}
-}
 void draw_box(rect r,int brush,int pattern){
 	if(r.w==0||r.h==0||!box_overlap(r,(rect){0,0,frame.size.x,frame.size.y}))return;
-	if(r.y               >=0)draw_line((rect){r.x      ,r.y      ,r.x+r.w-1,r.y      },brush,pattern);
-	if(r.y+r.h<=frame.size.y)draw_line((rect){r.x      ,r.y+r.h-1,r.x+r.w-1,r.y+r.h-1},brush,pattern);
-	if(r.x               >=0)draw_line((rect){r.x      ,r.y      ,r.x      ,r.y+r.h-1},brush,pattern);
-	if(r.x+r.w<=frame.size.x)draw_line((rect){r.x+r.w-1,r.y      ,r.x+r.w-1,r.y+r.h-1},brush,pattern);
+	if(r.y               >=0)draw_line_simple((rect){r.x      ,r.y      ,r.x+r.w-1,r.y      },brush,pattern);
+	if(r.y+r.h<=frame.size.y)draw_line_simple((rect){r.x      ,r.y+r.h-1,r.x+r.w-1,r.y+r.h-1},brush,pattern);
+	if(r.x               >=0)draw_line_simple((rect){r.x      ,r.y      ,r.x      ,r.y+r.h-1},brush,pattern);
+	if(r.x+r.w<=frame.size.x)draw_line_simple((rect){r.x+r.w-1,r.y      ,r.x+r.w-1,r.y+r.h-1},brush,pattern);
+}
+void draw_box_fancy(rect r,int brush,int pattern,lv*deck){
+	if(r.w==0||r.h==0||!box_overlap(r,(rect){0,0,frame.size.x,frame.size.y}))return;
+	if(r.y               >=0)draw_line((rect){r.x      ,r.y      ,r.x+r.w-1,r.y      },brush,pattern,deck);
+	if(r.y+r.h<=frame.size.y)draw_line((rect){r.x      ,r.y+r.h-1,r.x+r.w-1,r.y+r.h-1},brush,pattern,deck);
+	if(r.x               >=0)draw_line((rect){r.x      ,r.y      ,r.x      ,r.y+r.h-1},brush,pattern,deck);
+	if(r.x+r.w<=frame.size.x)draw_line((rect){r.x+r.w-1,r.y      ,r.x+r.w-1,r.y+r.h-1},brush,pattern,deck);
 }
 void draw_shadow(rect r,int fcol,int bcol,int solid){
 	if(solid)draw_rect(box_intersect(r,frame.clip),bcol);draw_box(r,0,fcol),draw_hline(r.x+3,r.x+r.w,r.y+r.h,fcol),draw_vline(r.x+r.w,r.y+2,r.y+r.h+1,fcol);
@@ -1189,9 +1223,12 @@ lv* n_canvas_invert(lv*self,lv*z){
 	lv*card=dget(self->b,lmistr("card")),*deck=dget(card->b,lmistr("deck")),*patterns=dget(deck->b,lmistr("patterns"));
 	pick_canvas(self);draw_invert_raw(patterns_pal(patterns),box_intersect(unpack_rect(z),frame.clip));return NONE;
 }
+lv* n_canvas_box(lv*self,lv*z){
+	lv*card=dget(self->b,lmistr("card")),*deck=dget(card->b,lmistr("deck"));
+	pick_canvas(self);draw_box_fancy(unpack_rect(z),frame.brush,frame.pattern,deck);return NONE;
+}
 lv* n_canvas_rect (lv*self,lv*z){pick_canvas(self);draw_rect(box_intersect(unpack_rect(z),frame.clip),frame.pattern);return NONE;}
 lv* n_canvas_clear(lv*self,lv*z){pick_canvas(self);draw_rect(box_intersect(unpack_rect(z),frame.clip),0);return NONE;}
-lv* n_canvas_box(lv*self,lv*z){pick_canvas(self);draw_box(unpack_rect(z),frame.brush,frame.pattern);return NONE;}
 lv* n_canvas_fill(lv*self,lv*z){pick_canvas(self);draw_fill(unpack_pair(z,0),frame.pattern,NULL);return NONE;}
 lv* n_canvas_copy(lv*self,lv*z){return n_image_copy(container_image(self,1),z);}
 lv* n_canvas_paste(lv*self,lv*z){
@@ -1227,8 +1264,8 @@ void unpack_poly(lv*z){
 }
 lv* n_canvas_poly(lv*self,lv*z){pick_canvas(self);unpack_poly(z);draw_poly(frame.pattern);return NONE;}
 lv* n_canvas_line(lv*self,lv*z){
-	pick_canvas(self);unpack_poly(z);
-	for(int z=0;z<poly_count-1;z++)draw_line(rect_pair(pcast(poly[z]),pcast(poly[z+1])),frame.brush,frame.pattern);return NONE;
+	pick_canvas(self);unpack_poly(z);lv*deck=dget(dget(self->b,lmistr("card"))->b,lmistr("deck"));
+	for(int z=0;z<poly_count-1;z++)draw_line(rect_pair(pcast(poly[z]),pcast(poly[z+1])),frame.brush,frame.pattern,deck);return NONE;
 }
 lv* n_canvas_merge(lv*self,lv*z){
 	pick_canvas(self);if(lil(l_first(z)))z=l_first(z);int v[256]={0};pair s[256]={{0}};char*b[256]={0}; // valid src? size, buffer
@@ -1240,7 +1277,7 @@ lv* interface_canvas(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	lv*data=self->b;lv*card=dget(data,lmistr("card")),*deck=dget(card->b,lmistr("deck")),*fonts=dget(deck->b,lmistr("fonts"));
 	if(x){
-		ikey("brush"  ){int n=CLAMP(0,ln(x), 23);dset(data,i,lmn(n));return x;}
+		ikey("brush"  ){int n=MAX(0,ln(x));if(lis(x)){int v=dgeti(dget(deck->b,lmistr("brushes")),x);if(v!=-1)n=24+v;}dset(data,i,lmn(n));return x;}
 		ikey("pattern"){int n=CLAMP(0,ln(x),255);dset(data,i,lmn(n));return x;}
 		ikey("font"   ){dset(data,i,normalize_font(fonts,x));return x;}
 		if(!lis(i)    ){return interface_image(container_image(self,1),i,x);}
@@ -2240,6 +2277,7 @@ lv* deck_read(lv*x){
 	{lv*k=lmistr("author"  ),*f=dget(deck,k);dset(r,k,str_read(f,""));}
 	{lv*k=lmistr("script"  ),*f=dget(deck,k);dset(r,k,str_read(f,""));}
 	{lv*k=lmistr("card"    ),*f=dget(deck,k);int n=f?ln(f):0;dset(r,k,lmn(CLAMP(0,n,cards->c-1)));}
+	dset(r,lmistr("brushes"),lmd());
 	lv*trans=lmd();dset(r,lmistr("transit"),trans);lv*root=lmenv(NULL);constants(root);dset(root,lmistr("transition"),lmnat(n_transition,ri));
 	pushstate(root),issue(root,parse(default_transitions));while(running())runop();arg();popstate();
 	MAP(ddata,defs )defs ->lv[z];

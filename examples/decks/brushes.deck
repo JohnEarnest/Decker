@@ -1,0 +1,104 @@
+{deck}
+version:1
+card:0
+size:[512,342]
+name:"brushes.deck"
+
+{card:home}
+script:"home.0"
+{widgets}
+c:{"type":"canvas","size":[326,253],"pos":[44,48],"brush":32,"scale":1}
+button1:{"type":"button","size":[42,20],"pos":[387,48],"script":"home.1","text":"Clear"}
+b:{"type":"grid","size":[96,169],"pos":[386,131],"script":"home.2","scrollbar":0,"lines":0,"value":{"brush":["OvalSml","OvalMed","OvalLrg","Dot","SumiLrg","SumiSml","StippleSml","StippleLrg"]}}
+preview:{"type":"canvas","size":[96,44],"pos":[386,77],"animated":1,"brush":32,"scale":2}
+button2:{"type":"button","size":[45,20],"pos":[437,48],"script":"home.3","text":"Invert"}
+
+{script:home.0}
+on view do
+ b.value:insert brush:keys brush[] into 0
+end
+{end}
+
+{script:home.1}
+on click do
+ c.clear[]
+end
+{end}
+
+{script:home.2}
+on click row do
+ c.brush:me.rowvalue.brush
+ preview.clear[]
+ preview.brush:c.brush
+ preview.line[preview.lsize/2]
+end
+{end}
+
+{script:home.3}
+on click do
+ c.invert[]
+end
+{end}
+
+{module:ovals}
+description:"Oval-shaped brushes"
+{script}
+brush["OvalSml" image["%%IMG0AAYABhg8fPjwYA=="]]
+brush["OvalMed" image["%%IMG0AAgACA4/f3/+/vxw"]]
+brush["OvalLrg" image["%%IMG0AAwADAHgB/AP8B/wP/B/4H/g/8D/gP8A/gB8AA=="]]
+{end}
+
+{module:dotted}
+description:"Dotted-line brush"
+{script}
+pix:image["%%IMG0AAEAAYA="] # a single pixel
+i:0 brush[on Dot do i:i+1 if 2%i pix end end]
+{end}
+
+{module:sumi}
+description:"Velocity-sensitive sumi-style brushes"
+{script}
+# 11 round brush images ranging from 1px to 8px:
+b:image@"\n"split 1 drop "
+%%IMG0AAgACDx+/////348
+%%IMG0AAcAB3z+/v7+/nw=
+%%IMG0AAcABzh8/v7+fDg=
+%%IMG0AAYABnj8/Pz8eA==
+%%IMG0AAYABjB4/Px4MA==
+%%IMG0AAUABXD4+Phw
+%%IMG0AAQABGDw8GA=
+%%IMG0AAMAA+Dg4A==
+%%IMG0AAMAA0DgQA==
+%%IMG0AAIAAsDA
+%%IMG0AAEAAYA="
+brush[on SumiLrg delta do b[  10&.5*mag delta]end]
+brush[on SumiSml delta do b[5+ 5&.2*mag delta]end]
+{end}
+
+{module:stipplers}
+description:"Stippling brushes"
+{script}
+# 8x8 stipples; 4 sparse, 4 dense:
+s:image@"\n"split 1 drop"
+%%IMG0AAgACAAQAIIgACAI
+%%IMG0AAgACAASAARCEAQA
+%%IMG0AAgACAAQAEAEoAgA
+%%IMG0AAgACCAEAIgCQAgg
+%%IMG0AAgACAAYGANjYAAA
+%%IMG0AAgACBgYAMDYGAAA
+%%IMG0AAgACAAAGBgGxsAA
+%%IMG0AAgACAAMbGAADAwA"
+# 16x16 stipples; 4 sparse, 4 dense:
+l:image@"\n"split 1 drop"
+%%IMG0ABAAEAAAAAAAAAIAAAAAQCACAAAAAAIAAAgIAACAAAAAIAAA
+%%IMG0ABAAEAAAAAACEAAAAAABAABAIAgAAQAAAAAAiAgAAAAAQAAA
+%%IMG0ABAAEAAAAAAEAAAAACAQAAAAAIAACAAAEAABAAAAABAAAAAA
+%%IMG0ABAAEAAAAEAQAAEAAAEIIAAAAAAACCAAAgAAAAAQAgAAAAAA
+%%IMG0ABAAEAAAAAAAAAGAAYAYABgAAAAAGAGYAYAAAAwADAAAAAAA
+%%IMG0ABAAEAAAAAAAAADAGMAYAAAAAAAYABgYABgAAAwADAAAAAAA
+%%IMG0ABAAEAAAAAAAAAAAAGAMYAwAAAAAwADAAAAGGAYYAAAAAAAA
+%%IMG0ABAAEAAAAAAAAAAADAAMYABgAAAAAAYABgAAYABgAAAAAAAA"
+brush[on StippleSml do random[s] end]
+brush[on StippleLrg do random[l] end]
+{end}
+

@@ -1956,6 +1956,55 @@ end
 
 #######################################
 #
+#  Brushes
+#
+#######################################
+
+deck:readdeck[]
+c:deck.card.add["canvas"]
+c.size:15,11
+deck.card.script:"
+	on install do
+		brush[\"star\" image[\"%%IMG0AAkACQgAHAAcAP+AfwA+AH8AdwDjgA==\"]]
+	end
+"
+deck.card.event["install"]
+c.brush:"star"
+assert["custom brush index by name" 24 c.brush]
+c.line[(5,5) (9,5)]
+assert["custom brush line: star" "%%IMG0AA8ACwAAB8AP4A/gf/w/+B/wP/g/+H/8AAA=" c.copy[].encoded]
+
+deck.card.script:"
+	on install do
+		brush[\"diag\" image[\"%%IMG0AAIAAkCA\"]]
+	end
+"
+deck.card.event["install"]
+c.clear[]
+c.brush:"diag"
+c.box[1,1 13,9]
+assert["custom brush box: diag" "%%IMG0AA8AC3/8//zADMAMwAzADMAMwAz//P/4AAA=" c.copy[].encoded]
+
+deck.card.script:"
+	on install do
+		i:0
+		brush[on dotted do
+			i:!i
+			if i image[1,1].map[0 dict 1] end
+		end]
+	end
+"
+deck.card.event["install"]
+c.clear[]
+c.brush:"dotted"
+c.line[1,1 13,9]
+assert["custom brush line: dotted" "%%IMG0AA8ACwAAQAAQAAAABAABAABAAAAAEAAEAAA=" c.copy[].encoded]
+
+deck.card.script:"on install do brush[] end"
+assert["custom brush enumeration" ("star","diag","dotted") (keys deck.card.event["install"])]
+
+#######################################
+#
 #  Wrap Up
 #
 #######################################

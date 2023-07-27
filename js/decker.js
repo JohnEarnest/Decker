@@ -1825,8 +1825,8 @@ modals=_=>{
 		const b=draw_modalbox(rect(m+(grid.x*gs)+m,m+(grid.y*gs)+lh+m))
 		draw_textc(rect(b.x,b.y+b.h-lh,b.w,lh),'Choose a brush shape.',FONT_BODY,1)
 		for(let z=0;z<grid.x*grid.y;z++){
-			const s=rect(b.x+m+2+gs*(z%grid.x),b.y+m+2+gs*(0|(z/grid.x)),ss,ss);
-			const c=rint(rect(s.x+s.w/2,s.y+s.h/2));draw_line(rpair(c,c),z,1)
+			const s=rect(b.x+m+2+gs*(z%grid.x),b.y+m+2+gs*(0|(z/grid.x)),ss,ss)
+			const c=rint(rect(s.x+s.w/2,s.y+s.h/2));draw_line(rpair(c,c),z,1,deck)
 			if(z==dr.brush)draw_box(inset(s,-2),0,1)
 			const a=dover(s)&&over(s), cs=(z==dr.brush&&ev.action), cl=cs||((ev.md||ev.drag)&&a), cr=cs||(ev.mu&&a)
 			if(cl)draw_invert(pal,inset(s,-1)); if(cr){dr.brush=z,modal_exit(z);break}
@@ -2323,7 +2323,7 @@ bg_tools=_=>{
 		else if(ev.mu||ev.drag){
 			const t=frame;frame=draw_frame(dr.scratch)
 			if(dr.tool=='pencil'||dr.erasing){
-				draw_line(rpair(pointer.prev,ev.pos),dr.brush,dr.erasing?0:bg_pat())
+				draw_line(rpair(pointer.prev,ev.pos),dr.brush,dr.erasing?0:bg_pat(),deck)
 			}
 			else if(dr.tool=='line'){
 				let b=rcopy(snap(ev.dpos)),t=rcopy(snap(ev.pos));if(ev.shift){ // snap to isometric angles
@@ -2333,12 +2333,12 @@ bg_tools=_=>{
 					else if(Math.abs(d.x)*2<Math.abs(d.y)){t.x+=sign(d.x)*Math.abs(d.y)/2,t.y+=d.y}
 					else if(Math.abs(d.y)*2<Math.abs(d.x)){t.y+=sign(d.y)*Math.abs(d.x)/2,t.x+=d.x}
 					else {t.x+=sign(d.x)*Math.abs(max(d.x,d.y)),t.y+=sign(d.y)*Math.abs(max(d.x,d.y))}
-				}bg_scratch_clear(),draw_line(rpair(rint(b),rint(t)),dr.brush,bg_pat())
+				}bg_scratch_clear(),draw_line(rpair(rint(b),rint(t)),dr.brush,bg_pat(),deck)
 			}
 			else if(dr.tool=='rect'||dr.tool=='fillrect'){
 				const b=snap(ev.dpos),a=snap(ev.pos),t=rsub(a,b);if(ev.shift){t.x=t.y=max(t.x,t.y)} // snap to square
 				bg_scratch_clear();const r=rnorm(rpair(b,t));r.w++,r.h++
-				if(dr.tool=='fillrect')draw_rect(r,bg_fill());draw_box(r,dr.brush,bg_pat())
+				if(dr.tool=='fillrect')draw_rect(r,bg_fill());draw_boxf(r,dr.brush,bg_pat(),deck)
 			}
 			else if(dr.tool=='ellipse'||dr.tool=='fillellipse'){
 				const b=snap(ev.dpos),a=snap(ev.pos),t=rsub(a,b);if(ev.shift){t.x=t.y=max(t.x,t.y)} // snap to circle
@@ -2346,7 +2346,7 @@ bg_tools=_=>{
 				const c=rect(r.x+(r.w/2.0),r.y+(r.h/2.0)), divs=100, poly=range(divs).map(z=>{
 					const a=z*(2*Math.PI)/divs;return rint(rect(c.x+(0.5+r.w/2.0)*Math.cos(a),c.y+(0.5+r.h/2.0)*Math.sin(a)))
 				});poly.push(poly[0])
-				if(dr.tool=='fillellipse')draw_poly(poly,bg_fill());draw_lines(poly,dr.brush,bg_pat())
+				if(dr.tool=='fillellipse')draw_poly(poly,bg_fill());draw_lines(poly,dr.brush,bg_pat(),deck)
 			}
 			frame=t;if(ev.mu)bg_edit(),clear=1
 		}
@@ -2368,7 +2368,7 @@ bg_tools=_=>{
 				dr.mask=image_make(rect(r.w,r.h))
 				const t=frame;frame=draw_frame(dr.mask)
 				for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++)if(poly_in(dr.poly,rect(b+r.x,a+r.y)))pix(rect(b,a),1); dr.omask=image_copy(dr.mask)
-				if(dr.poly.length>0)draw_lines(dr.poly.concat(dr.poly[0]).map(p=>rsub(p,rect(r.x,r.y))),0,ANTS)
+				if(dr.poly.length>0)draw_lines(dr.poly.concat(dr.poly[0]).map(p=>rsub(p,rect(r.x,r.y))),0,ANTS,deck)
 				frame=t,dr.sel_here=rcopy(r),dr.sel_start=rcopy(r),bg_scoop_selection()
 			}dr.poly=[]
 		}
@@ -2385,12 +2385,12 @@ bg_tools=_=>{
 		else if(ev.drag&&dr.poly.length>0){const l=last(dr.poly);if(ev.pos.x!=l.x||ev.pos.y!=l.y)dr.poly.push(rcopy(ev.pos))}
 		else if(ev.mu){
 			dr.poly.push(rcopy(ev.dpos)),bg_scratch();const t=frame;frame=draw_frame(dr.scratch)
-			draw_poly(dr.poly,bg_fill()),draw_lines(dr.poly,dr.brush,bg_pat()),frame=t,bg_edit(),bg_scratch_clear(),dr.poly=[]
+			draw_poly(dr.poly,bg_fill()),draw_lines(dr.poly,dr.brush,bg_pat(),deck),frame=t,bg_edit(),bg_scratch_clear(),dr.poly=[]
 		}
 	}
 	if(dr.tool=='lasso'||dr.tool=='poly'){
 		const o=rsub(dr.sel_here,dr.sel_start);o.w=o.h=0
-		draw_lines(dr.poly.map(p=>radd(o,con_to_screen(p))),dr.tool=='lasso'?0:dr.brush,dr.tool=='lasso'?ANTS:bg_pat())
+		draw_lines(dr.poly.map(p=>radd(o,con_to_screen(p))),dr.tool=='lasso'?0:dr.brush,dr.tool=='lasso'?ANTS:bg_pat(),deck)
 	}
 	if(dr.tool=='fill'&&ev.mu){
 		const bg=container_image(con(),1), t=frame;bg_scratch(),frame=draw_frame(dr.scratch)
@@ -2746,7 +2746,7 @@ toolbars=_=>{
 	}
 	const brushbtn=(pos,dn,b,brush)=>{
 		const i=rint(rect(b.x+(b.w/2),b.y+(b.h/2)))
-		draw_box(b,0,1),draw_line(rect(i.x,i.y,i.x,i.y),brush,1)
+		draw_box(b,0,1),draw_line(rect(i.x,i.y,i.x,i.y),brush,1,deck)
 		if(dr.brush==brush)draw_box(inset(b,2),0,1); if(!rin(b,pos))return
 		uicursor=cursor.point;if(!ev.mu||!rin(b,dn))return
 		setmode('draw');if(dr.tool=='select'||dr.tool=='lasso'||dr.tool=='fill')settool('pencil');dr.brush=brush

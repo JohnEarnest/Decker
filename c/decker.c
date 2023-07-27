@@ -1852,7 +1852,7 @@ void modals(){
 		draw_textc((rect){b.x,b.y+b.h-lh,b.w,lh},"Choose a brush shape.",FONT_BODY,1);
 		for(int z=0;z<grid.x*grid.y;z++){
 			rect s={b.x+m+2+gs*(z%grid.x),b.y+m+2+gs*(z/grid.x),ss,ss};
-			pair c={s.x+s.w/2,s.y+s.h/2}; draw_line((rect){c.x,c.y,c.x,c.y},z,1);
+			pair c={s.x+s.w/2,s.y+s.h/2}; draw_line_simple((rect){c.x,c.y,c.x,c.y},z,1);
 			if(z==dr.brush)draw_box(inset(s,-2),0,1);
 			int a=dover(s)&&over(s), cs=(z==dr.brush&&ev.action), cl=cs||((ev.md||ev.drag)&&a), cr=cs||(ev.mu&&a);
 			if(cl)draw_invert(pal,inset(s,-1)); if(cr){dr.brush=z;modal_exit(z);break;}
@@ -2519,7 +2519,7 @@ void bg_tools(){
 		else if(ev.mu||ev.drag){
 			cstate t=frame;frame=draw_buffer(dr.scratch);
 			if(dr.tool==tool_pencil||dr.erasing){
-				draw_line((rect){pointer_prev.x,pointer_prev.y,ev.pos.x,ev.pos.y},dr.brush,dr.erasing?0:bg_pat());
+				draw_line((rect){pointer_prev.x,pointer_prev.y,ev.pos.x,ev.pos.y},dr.brush,dr.erasing?0:bg_pat(),deck);
 			}
 			else if(dr.tool==tool_line){
 				pair b=snap(ev.dpos),t=snap(ev.pos);if(ev.shift){ // snap to isometric angles
@@ -2531,13 +2531,13 @@ void bg_tools(){
 					else {t.x+=SIGN(d.x)*abs(MAX(d.x,d.y));t.y+=SIGN(d.y)*abs(MAX(d.x,d.y));}
 				}
 				bg_scratch_clear();
-				draw_line((rect){b.x,b.y,t.x,t.y},dr.brush,bg_pat());
+				draw_line((rect){b.x,b.y,t.x,t.y},dr.brush,bg_pat(),deck);
 			}
 			else if(dr.tool==tool_rect||dr.tool==tool_fillrect){
 				pair b=snap(ev.dpos),a=snap(ev.pos);
 				pair t={a.x-b.x,a.y-b.y};if(ev.shift){t.x=t.y=MAX(t.x,t.y);} // snap to square
 				bg_scratch_clear();rect r=normalize_rect((rect){b.x,b.y,t.x,t.y});r.w++,r.h++;
-				if(dr.tool==tool_fillrect)draw_rect(r,bg_fill());draw_box(r,dr.brush,bg_pat());
+				if(dr.tool==tool_fillrect)draw_rect(r,bg_fill());draw_box_fancy(r,dr.brush,bg_pat(),deck);
 			}
 			else if(dr.tool==tool_ellipse||dr.tool==tool_fillellipse){
 				pair b=snap(ev.dpos),a=snap(ev.pos);
@@ -2548,7 +2548,7 @@ void bg_tools(){
 				#define divs      100
 				poly_count=0;fpair c={r.x+(r.w/2.0),r.y+(r.h/2.0)};for(int z=0;z<=divs;z++)poly_push(circ(z));
 				if(dr.tool==tool_fillellipse)draw_poly(bg_fill());
-				for(int z=0;z<poly_count-1;z++)draw_line(rect_pair(pcast(poly[z]),pcast(poly[z+1])),dr.brush,bg_pat());
+				for(int z=0;z<poly_count-1;z++)draw_line(rect_pair(pcast(poly[z]),pcast(poly[z+1])),dr.brush,bg_pat(),deck);
 			}
 			frame=t;if(ev.mu)bg_edit(),clear=1;
 		}
@@ -2570,7 +2570,7 @@ void bg_tools(){
 				dr.mask=lmbuff((pair){r.w,r.h});
 				cstate t=frame;frame=draw_buffer(dr.mask);
 				for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++)if(poly_in((fpair){b+r.x,a+r.y}))PIX(b,a)=1; dr.omask=buffer_clone(dr.mask);
-				for(int z=0;z<poly_count;z++)draw_line((rect){poly[z].x-r.x,poly[z].y-r.y,poly[(z+1)%poly_count].x-r.x,poly[(z+1)%poly_count].y-r.y},0,ANTS);
+				for(int z=0;z<poly_count;z++)draw_line_simple((rect){poly[z].x-r.x,poly[z].y-r.y,poly[(z+1)%poly_count].x-r.x,poly[(z+1)%poly_count].y-r.y},0,ANTS);
 				frame=t;dr.sel_here=dr.sel_start=r;bg_scoop_selection();
 			}poly_count=0;
 		}
@@ -2588,7 +2588,7 @@ void bg_tools(){
 		else if(ev.mu){
 			poly_push((fpair){ev.dpos.x,ev.dpos.y});
 			bg_scratch();cstate t=frame;frame=draw_buffer(dr.scratch);
-			draw_poly(bg_fill());for(int z=0;z<poly_count-1;z++)draw_line(rect_pair(pcast(poly[z]),pcast(poly[z+1])),dr.brush,bg_pat());
+			draw_poly(bg_fill());for(int z=0;z<poly_count-1;z++)draw_line(rect_pair(pcast(poly[z]),pcast(poly[z+1])),dr.brush,bg_pat(),deck);
 			frame=t;bg_edit();bg_scratch_clear();poly_count=0;
 		}
 	}
@@ -2597,7 +2597,7 @@ void bg_tools(){
 		int br=dr.tool==tool_lasso?0:dr.brush, pat=dr.tool==tool_lasso?ANTS:bg_pat();
 		for(int z=0;z<poly_count-1;z++){
 			fpair a=con_to_screenf(poly[z]),b=con_to_screenf(poly[z+1]);
-			draw_line((rect){a.x+o.x,a.y+o.y,b.x+o.x,b.y+o.y},br,pat);
+			draw_line((rect){a.x+o.x,a.y+o.y,b.x+o.x,b.y+o.y},br,pat,deck);
 		}
 	}
 	if(dr.tool==tool_fill&&ev.mu){
@@ -3081,7 +3081,7 @@ int modebtn(pair pos,pair dn,rect b,char*text,int active){
 }
 void brushbtn(pair pos,pair dn,rect b,int brush){
 	pair i={b.x+(b.w/2),b.y+(b.h/2)};
-	draw_box(b,0,1),draw_line((rect){i.x,i.y,i.x,i.y},brush,1);
+	draw_box(b,0,1),draw_line((rect){i.x,i.y,i.x,i.y},brush,1,deck);
 	if(dr.brush==brush)draw_box(inset(b,2),0,1);
 	if(!box_in(b,pos))return;
 	uicursor=cursor_point;if(!ev.mu||!box_in(b,dn))return;
