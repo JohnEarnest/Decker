@@ -14,7 +14,7 @@ lv*FONT_BODY,*FONT_MENU,*FONT_MONO,*TOOLS,*ARROWS,*TOOLB,*PLAYING,*ATTRS;
 enum mini_icons {icon_dir,icon_doc,icon_sound,icon_font,icon_app,icon_lil,icon_pat,icon_chek,icon_none};
 enum cursor_styles {cursor_default,cursor_point,cursor_ibeam,cursor_drag};
 SDL_Cursor*CURSORS[4]; int uicursor=0, enable_touch=0, set_touch=0, profiler=0, should_exit=0;
-int set_tracing=0, tracing=0;
+int set_tracing=0, tracing=0, toolbar_scroll=0;
 
 char*TOOL_ICONS=
 	"%%IMG0ABAAwAMABIAEgASABIAEgGTwlKxMqiQKJAIQAggCCAQEBAQEAAAAAAAAAAA//EACgAGAAYABgAFAAz/+H/wAAAAAAA"
@@ -1848,11 +1848,13 @@ void modals(){
 	}
 	else if(ms.type==modal_brush){
 		pair grid={6,4};int ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY);
+		lv*br=dget(deck->b,lmistr("brushes"));grid.y+=ceil(br->c/(1.0*grid.x));
 		rect b=draw_modalbox((pair){m+(grid.x*gs)+m,m+(grid.y*gs)+lh+m});
-		draw_textc((rect){b.x,b.y+b.h-lh,b.w,lh},"Choose a brush shape.",FONT_BODY,1);
+		char*lab=dr.brush>=(6*4)?br->kv[dr.brush-(6*4)]->sv:"Choose a brush shape.";
+		draw_textc((rect){b.x,b.y+b.h-lh,b.w,lh},lab,FONT_BODY,1);
 		for(int z=0;z<grid.x*grid.y;z++){
 			rect s={b.x+m+2+gs*(z%grid.x),b.y+m+2+gs*(z/grid.x),ss,ss};
-			pair c={s.x+s.w/2,s.y+s.h/2}; draw_line_simple((rect){c.x,c.y,c.x,c.y},z,1);
+			pair c={s.x+s.w/2,s.y+s.h/2}; draw_line((rect){c.x,c.y,c.x,c.y},z,1,deck);
 			if(z==dr.brush)draw_box(inset(s,-2),0,1);
 			int a=dover(s)&&over(s), cs=(z==dr.brush&&ev.action), cl=cs||((ev.md||ev.drag)&&a), cr=cs||(ev.mu&&a);
 			if(cl)draw_invert(pal,inset(s,-1)); if(cr){dr.brush=z;modal_exit(z);break;}
@@ -1862,6 +1864,7 @@ void modals(){
 		if(ev.dir==dir_right)dr.brush=((dr.brush/grid.x)*grid.x)+((dr.brush+       1)%grid.x);
 		if(ev.dir==dir_up   )dr.brush=(dr.brush+(grid.x*(grid.y-1)))%(grid.x*grid.y);
 		if(ev.dir==dir_down )dr.brush=(dr.brush+grid.x             )%(grid.x*grid.y);
+		dr.brush=CLAMP(0,dr.brush,(6*4)+br->c-1);
 	}
 	else if(ms.type==modal_pattern||ms.type==modal_fill){
 		pair grid={8,4};int ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY); int*v=ms.type==modal_pattern?&dr.pattern:&dr.fill;
@@ -3079,13 +3082,24 @@ int modebtn(pair pos,pair dn,rect b,char*text,int active){
 	draw_box(b,0,1);if(active)draw_rect(inset(b,2),1);draw_textc(b,text,FONT_BODY,active?0:1);
 	if(box_in(b,pos))uicursor=cursor_point;return box_in(b,pos)&&box_in(b,dn)&&ev.mu;
 }
+int scrollbtn(pair pos,pair dn,rect b,int icon){
+	rect i=box_center(b,(pair){12,12});int active=box_in(b,dn)&&(ev.mu||ev.drag);
+	draw_box(b,0,1);if(active)draw_rect(b,1);draw_icon((pair){i.x,i.y},ARROWS->lv[icon],active?0:1);
+	if(box_in(b,pos))uicursor=cursor_point;return box_in(b,pos)&&active&&ev.mu;
+}
 void brushbtn(pair pos,pair dn,rect b,int brush){
 	pair i={b.x+(b.w/2),b.y+(b.h/2)};
 	draw_box(b,0,1),draw_line((rect){i.x,i.y,i.x,i.y},brush,1,deck);
 	if(dr.brush==brush)draw_box(inset(b,2),0,1);
-	if(!box_in(b,pos))return;
-	uicursor=cursor_point;if(!ev.mu||!box_in(b,dn))return;
-	setmode(mode_draw);
+	if(!box_in(b,pos))return;uicursor=cursor_point;if(!ev.mu||!box_in(b,dn))return;setmode(mode_draw);
+	if(dr.tool==tool_select||dr.tool==tool_lasso||dr.tool==tool_fill)settool(tool_pencil);
+	dr.brush=brush;
+}
+void cbrushbtn(pair pos,pair dn,rect b,int brush,lv*bt){
+	lv*icon=bt->lv[brush-24];rect oc=frame.clip;frame.clip=b;
+	rect p=box_center(b,image_size(icon));draw_icon((pair){p.x,p.y},icon,1);frame.clip=oc;draw_box(b,0,1);
+	if(dr.brush==brush)draw_box(inset(b,2),0,1);
+	if(!box_in(b,pos))return;uicursor=cursor_point;if(!ev.mu||!box_in(b,dn))return;setmode(mode_draw);
 	if(dr.tool==tool_select||dr.tool==tool_lasso||dr.tool==tool_fill)settool(tool_pencil);
 	dr.brush=brush;
 }
@@ -3099,12 +3113,24 @@ void palbtn(pair pos,pair dn,rect b,int pattern){
 #define tcellh 19
 #define tgap   1
 void ltoolbar(pair pos,pair dn){
+	lv*bs=dget(deck->b,lmistr("brushes")),*bt=dget(deck->b,lmistr("brusht"));
+	toolbar_scroll=CLAMP(0,toolbar_scroll,bs->c);int th=bs->c?17:tcellh;
 	pair size=buff_size(TOOLB);frame=draw_buffer(TOOLB);
 	memset(frame.buffer->sv,0,frame.buffer->c),draw_box((rect){0,0,size.x,size.y},0,1),draw_rect((rect){0,6*tcellh,size.x,tgap},1);
 	if(toolbtn(pos,dn,(rect){0     ,0,tcellw+1,tcellh+1},0,uimode==mode_interact))setmode(mode_interact),ev.mu=ev.md=0;
 	if(toolbtn(pos,dn,(rect){tcellw,0,tcellw+1,tcellh+1},1,uimode==mode_object  ))setmode(mode_object  ),ev.mu=ev.md=0;
 	for(int z=0;z<10;z++){if(toolbtn(pos,dn,(rect){(z%2)*tcellw,(1+(z/2))*tcellh,tcellw+1,tcellh+1},z+2,uimode==mode_draw&&dr.tool==z))settool(z),ev.mu=ev.md=0;}
-	for(int z=0;z<2*12;z++)brushbtn(pos,dn,(rect){(z%2)*tcellw,(6+(z/2))*tcellh+tgap,tcellw+1,tcellh+1},((z*12)+(z/2))%24);
+	int cy=(6*tcellh)+tgap;int brow=0;for(int z=0;z<12-toolbar_scroll;z++){
+		brushbtn(pos,dn,(rect){0     ,cy,tcellw+1,th+1},z   +toolbar_scroll);
+		brushbtn(pos,dn,(rect){tcellw,cy,tcellw+1,th+1},z+12+toolbar_scroll);
+		cy+=th,brow++;
+	}
+	if(bs->c){
+		for(int bi=0;brow<12;bi++,cy+=th,brow++)cbrushbtn(pos,dn,(rect){0,cy,size.x,th+1},24+bi+MAX(toolbar_scroll-12,0),bt);
+		draw_rect((rect){0,cy+1,size.x,tgap},1);cy+=tgap;
+		if(toolbar_scroll>0    )if(scrollbtn(pos,dn,(rect){0     ,cy,tcellw+1,size.y-cy},0))toolbar_scroll--;
+		if(toolbar_scroll<bs->c)if(scrollbtn(pos,dn,(rect){tcellw,cy,tcellw+1,size.y-cy},1))toolbar_scroll++;
+	}
 }
 void rtoolbar(pair pos,pair dn){
 	int pp[]={0,1,4,5,8,9,16,17,12,13,18,19,20,21,22,23,24,25,26,27,2,6,3,7,10,11,14,15,28,29,30,31}; // pleasing visual ramps
@@ -3202,8 +3228,9 @@ void sync(){
 				for(int z=0;z<10;z++)if(c==f[z])settool(z);
 			}
 			if(uimode==mode_draw&&ms.type==modal_none){
-				if(c==SDLK_9)dr.brush=MAX( 0,dr.brush-1);
-				if(c==SDLK_0)dr.brush=MIN(23,dr.brush+1);
+				int brush_count=24+dget(deck->b,lmistr("brushes"))->c;
+				if(c==SDLK_9)dr.brush=MAX(            0,dr.brush-1);
+				if(c==SDLK_0)dr.brush=MIN(brush_count-1,dr.brush+1);
 			}
 		}
 		if(e.type==SDL_MOUSEMOTION){

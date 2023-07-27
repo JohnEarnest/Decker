@@ -675,7 +675,7 @@ void draw_line_simple(rect r,int brush,int pattern){
 }
 void draw_line_custom(rect r,lv*mask,int pattern){
 	int dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1;pair ms=buff_size(mask),mc={ms.x/2,ms.y/2};while(1){
-		for(int b=0;b<ms.x;b++)for(int a=0;a<ms.y;a++)if(mask->sv[a+b*ms.x]&&inclip(r.x+a-mc.x,r.y+b-mc.y))PIX(r.x+a-mc.x,r.y+b-mc.y)=pattern;
+		for(int b=0;b<ms.y;b++)for(int a=0;a<ms.x;a++)if(mask->sv[a+b*ms.x]&&inclip(r.x+a-mc.x,r.y+b-mc.y))PIX(r.x+a-mc.x,r.y+b-mc.y)=pattern;
 		if(r.x==r.w&&r.y==r.h)break;int e2=err*2;if(e2>=dy)err+=dy,r.x+=sx;if(e2<=dx)err+=dx,r.y+=sy;
 	}
 }
@@ -685,7 +685,7 @@ void draw_line_function(rect r,lv*func,int pattern){
 		state.e->c=1,state.t->c=0,state.p->c=0,state.pcs.c=0;issue(e,p);int quota=BRUSH_QUOTA;while(quota&&running())runop(),quota--;lv*v=running()?NONE:arg();
 		if(image_is(v)){
 			lv*mask=v->b;pair ms=buff_size(mask),mc={ms.x/2,ms.y/2};
-			for(int b=0;b<ms.x;b++)for(int a=0;a<ms.y;a++)if(mask->sv[a+b*ms.x]&&inclip(r.x+a-mc.x,r.y+b-mc.y))PIX(r.x+a-mc.x,r.y+b-mc.y)=pattern;
+			for(int b=0;b<ms.y;b++)for(int a=0;a<ms.x;a++)if(mask->sv[a+b*ms.x]&&inclip(r.x+a-mc.x,r.y+b-mc.y))PIX(r.x+a-mc.x,r.y+b-mc.y)=pattern;
 		}if(r.x==r.w&&r.y==r.h)break;int e2=err*2;if(e2>=dy)err+=dy,r.x+=sx;if(e2<=dx)err+=dx,r.y+=sy;a->lv[1]=NONE;
 	}popstate();
 }
@@ -695,8 +695,16 @@ void draw_line(rect r,int brush,int pattern,lv*deck){
 	if(image_is(f)){draw_line_custom(r,f->b,pattern);}else if(lion(f)){draw_line_function(r,f,pattern);}
 }
 lv* n_brush(lv*self,lv*z){
-	lv*b=dget(self->b,lmistr("brushes")),*f=l_first(z);
-	if(lion(f)){dset(b,lmcstr(f->sv),f);}if(lis(f)&&z->c>1&&image_is(z->lv[1])){dset(b,f,z->lv[1]);}
+	lv*b=dget(self->b,lmistr("brushes")),*bt=dget(self->b,lmistr("brusht")),*f=l_first(z);
+	if(lion(f)){
+		lv*k=lmcstr(f->sv),*v=lmbuff((pair){64,32});cstate t=frame;frame=(cstate){0,0,(pair){64,32},(rect){0,0,64,32},v,NULL},dset(b,k,f);
+		draw_line((rect){16,16,32,16},24+dgeti(b,k),1,self);
+		draw_line((rect){32,16,40,16},24+dgeti(b,k),1,self);
+		draw_line((rect){40,16,44,16},24+dgeti(b,k),1,self);
+		draw_line((rect){44,16,48,16},24+dgeti(b,k),1,self);
+		frame=t,dset(bt,k,image_make(v));
+	}
+	if(lis(f)&&z->c>1&&image_is(z->lv[1])){dset(b,f,z->lv[1]),dset(bt,f,z->lv[1]);}
 	return b;
 }
 
@@ -2277,7 +2285,7 @@ lv* deck_read(lv*x){
 	{lv*k=lmistr("author"  ),*f=dget(deck,k);dset(r,k,str_read(f,""));}
 	{lv*k=lmistr("script"  ),*f=dget(deck,k);dset(r,k,str_read(f,""));}
 	{lv*k=lmistr("card"    ),*f=dget(deck,k);int n=f?ln(f):0;dset(r,k,lmn(CLAMP(0,n,cards->c-1)));}
-	dset(r,lmistr("brushes"),lmd());
+	dset(r,lmistr("brushes"),lmd()),dset(r,lmistr("brusht"),lmd());
 	lv*trans=lmd();dset(r,lmistr("transit"),trans);lv*root=lmenv(NULL);constants(root);dset(root,lmistr("transition"),lmnat(n_transition,ri));
 	pushstate(root),issue(root,parse(default_transitions));while(running())runop();arg();popstate();
 	MAP(ddata,defs )defs ->lv[z];

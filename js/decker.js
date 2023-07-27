@@ -390,7 +390,7 @@ PANGRAM='How razorback jumping-frogs can level six piqued gymnasts.'
 
 // State
 
-let uimode='interact', ui_container=null, uicursor=0, enable_touch=0, set_touch=0, profiler=0
+let uimode='interact', ui_container=null, uicursor=0, enable_touch=0, set_touch=0, profiler=0, toolbar_scroll=0
 mark_dirty=_=>{dirty=1}
 con_set=x=>{
 	if(x!=ui_container)setmode(uimode),msg.next_view=1
@@ -1821,9 +1821,10 @@ modals=_=>{
 		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_exit(0)
 	}
 	else if(ms.type=='brush'){
-		const grid=rect(6,4), ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY)
+		const grid=rect(6,4), ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY), br=deck.brushes;grid.y+=ceil(count(br)/grid.x)
 		const b=draw_modalbox(rect(m+(grid.x*gs)+m,m+(grid.y*gs)+lh+m))
-		draw_textc(rect(b.x,b.y+b.h-lh,b.w,lh),'Choose a brush shape.',FONT_BODY,1)
+		const lab=dr.brush>=(6*4)?ls(br.k[dr.brush-(6*4)]):'Choose a brush shape.'
+		draw_textc(rect(b.x,b.y+b.h-lh,b.w,lh),lab,FONT_BODY,1)
 		for(let z=0;z<grid.x*grid.y;z++){
 			const s=rect(b.x+m+2+gs*(z%grid.x),b.y+m+2+gs*(0|(z/grid.x)),ss,ss)
 			const c=rint(rect(s.x+s.w/2,s.y+s.h/2));draw_line(rpair(c,c),z,1,deck)
@@ -1836,6 +1837,7 @@ modals=_=>{
 		if(ev.dir=='right')dr.brush=((0|(dr.brush/grid.x))*grid.x)+((dr.brush+       1)%grid.x)
 		if(ev.dir=='up'   )dr.brush=(dr.brush+(grid.x*(grid.y-1)))%(grid.x*grid.y)
 		if(ev.dir=='down' )dr.brush=(dr.brush+grid.x             )%(grid.x*grid.y)
+		dr.brush=clamp(0,dr.brush,(6*4)+count(br)-1)
 	}
 	else if(ms.type=='pattern'||ms.type=='fill'){
 		const grid=rect(8,4), ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY), v=ms.type=='pattern'?dr.pattern:dr.fill
@@ -2744,11 +2746,23 @@ toolbars=_=>{
 		draw_box(b,0,1);if(active)draw_rect(inset(b,2),1);draw_textc(b,text,FONT_BODY,active?0:1)
 		if(rin(b,pos))uicursor=cursor.point;return rin(b,pos)&&rin(b,dn)&&ev.mu
 	}
+	const scrollbtn=(pos,dn,b,icon)=>{
+		const i=rcenter(b,rect(12,12)),active=rin(b,dn)&&(ev.mu||ev.drag)
+		draw_box(b,0,1);if(active)draw_rect(b,1);draw_icon(i,ARROWS[icon],active?0:1)
+		if(rin(b,pos))uicursor=cursor.point;return rin(b,pos)&&active&&ev.mu
+	}
 	const brushbtn=(pos,dn,b,brush)=>{
 		const i=rint(rect(b.x+(b.w/2),b.y+(b.h/2)))
 		draw_box(b,0,1),draw_line(rect(i.x,i.y,i.x,i.y),brush,1,deck)
-		if(dr.brush==brush)draw_box(inset(b,2),0,1); if(!rin(b,pos))return
-		uicursor=cursor.point;if(!ev.mu||!rin(b,dn))return
+		if(dr.brush==brush)draw_box(inset(b,2),0,1)
+		if(!rin(b,pos))return;uicursor=cursor.point;if(!ev.mu||!rin(b,dn))return
+		setmode('draw');if(dr.tool=='select'||dr.tool=='lasso'||dr.tool=='fill')settool('pencil');dr.brush=brush
+	}
+	const cbrushbtn=(pos,dn,b,brush,bt)=>{
+		const icon=bt.v[brush-24],oc=frame.clip;frame.clip=b
+		draw_icon(rcenter(b,icon.size),icon,1),frame.clip=oc,draw_box(b,0,1)
+		if(dr.brush==brush)draw_box(inset(b,2),0,1)
+		if(!rin(b,pos))return;uicursor=cursor.point;if(!ev.mu||!rin(b,dn))return
 		setmode('draw');if(dr.tool=='select'||dr.tool=='lasso'||dr.tool=='fill')settool('pencil');dr.brush=brush
 	}
 	const palbtn=(pos,dn,b,pattern)=>{
@@ -2756,14 +2770,25 @@ toolbars=_=>{
 		if(rin(b,pos)){uicursor=cursor.point;if(ev.mu&&rin(b,dn)){if(dr.pickfill){dr.fill=pattern}else{dr.pattern=pattern}}}draw_box(b,0,1)
 	}
 	toolbar(q('#ltools'),q('#lrender'),(pos,dn)=>{
+		const bs=deck.brushes,bt=deck.brusht,th=count(bs)?17:tcellh;toolbar_scroll=clamp(0,toolbar_scroll,count(bs))
 		draw_rect(rect(0,6*tcellh,toolsize.x,tgap),1)
 		if(toolbtn(pos,dn,rect(0     ,0,tcellw+1,tcellh+1),0,uimode=='interact'))setmode('interact'),ev.mu=ev.md=0
 		if(toolbtn(pos,dn,rect(tcellw,0,tcellw+1,tcellh+1),1,uimode=='object'  ))setmode('object'  ),ev.mu=ev.md=0
-		for(let z=0;z<2*12;z++)brushbtn(pos,dn,rect((z%2)*tcellw,(6+(0|(z/2)))*tcellh+tgap,tcellw+1,tcellh+1),((z*12)+(0|(z/2)))%24)
 		for(let z=0;z<10;z++){
 			if(toolbtn(pos,dn,rect((z%2)*tcellw,(1+(0|(z/2)))*tcellh,tcellw+1,tcellh+1),z+2,uimode=='draw'&&dr.tool==tooltypes[z])){
 				settool(tooltypes[z]),ev.mu=ev.md=0
 			}
+		}
+		let cy=(6*tcellh)+tgap,brow=0;for(let z=0;z<12-toolbar_scroll;z++){
+			brushbtn(pos,dn,rect(0     ,cy,tcellw+1,th+1),z   +toolbar_scroll)
+			brushbtn(pos,dn,rect(tcellw,cy,tcellw+1,th+1),z+12+toolbar_scroll)
+			cy+=th,brow++
+		}
+		if(count(bs)){
+			for(let bi=0;brow<12;bi++,cy+=th,brow++)cbrushbtn(pos,dn,rect(0,cy,toolsize.x,th+1),24+bi+max(toolbar_scroll-12,0),bt)
+			draw_rect(rect(0,cy+1,toolsize.x,tgap),1),cy+=tgap
+			if(toolbar_scroll>0        )if(scrollbtn(pos,dn,rect(0     ,cy,tcellw+1,toolsize.y-cy),0))toolbar_scroll--
+			if(toolbar_scroll<count(bs))if(scrollbtn(pos,dn,rect(tcellw,cy,tcellw+1,toolsize.y-cy),1))toolbar_scroll++
 		}
 	})
 	toolbar(q('#rtools'),q('#rrender'),(pos,dn)=>{
@@ -3423,8 +3448,9 @@ q('body').onkeyup=e=>{
 	if(e.key=='Shift'||e.shiftKey)ev.shift=0
 	if(e.key=='m'&&uimode=='draw'&&in_layer())ev.hidemenu^=1
 	if(e.key=='t'&&uimode=='draw'&&in_layer())dr.trans^=1
-	if(e.key=='9'&&uimode=='draw'&&ms.type==null)dr.brush=max( 0,dr.brush-1)
-	if(e.key=='0'&&uimode=='draw'&&ms.type==null)dr.brush=min(23,dr.brush+1)
+	const brush_count=24+count(deck.brushes)
+	if(e.key=='9'&&uimode=='draw'&&ms.type==null)dr.brush=max(            0,dr.brush-1)
+	if(e.key=='0'&&uimode=='draw'&&ms.type==null)dr.brush=min(brush_count-1,dr.brush+1)
 	if(e.key=='Escape')ev.exit=1
 	if(!wid.infield&&uimode=='interact'&&card_is(con())){
 		if(e.key=='ArrowUp'   )msg.target_navigate=ifield(deck,'card'),msg.arg_navigate=lms('up'   )

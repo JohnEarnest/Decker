@@ -953,7 +953,7 @@ draw_line_simple=(r,brush,pattern)=>{
 }
 draw_line_custom=(r,mask,pattern)=>{
 	let dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1, ms=mask.size, mc=rint(rdiv(ms,2));while(1){
-		for(let b=0;b<ms.x;b++)for(let a=0;a<ms.y;a++){const h=rect(r.x+a-mc.x,r.y+b-mc.y);if(mask.pix[a+b*ms.x]&&inclip(h))pix(h,pattern)}
+		for(let b=0;b<ms.y;b++)for(let a=0;a<ms.x;a++){const h=rect(r.x+a-mc.x,r.y+b-mc.y);if(mask.pix[a+b*ms.x]&&inclip(h))pix(h,pattern)}
 		if(r.x==r.w&&r.y==r.h)break;let e2=err*2; if(e2>=dy)err+=dy,r.x+=sx; if(e2<=dx)err+=dx,r.y+=sy
 	}
 }
@@ -963,7 +963,7 @@ draw_line_function=(r,func,pattern)=>{
 		state.e=[e],state.t=[],state.pcs=[];issue(e,p);let quota=BRUSH_QUOTA;while(quota&&running())runop(),quota--;const v=running()?NONE:arg()
 		if(image_is(v)){
 			const ms=v.size, mc=rint(rdiv(ms,2))
-			for(let b=0;b<ms.x;b++)for(let a=0;a<ms.y;a++){const h=rect(r.x+a-mc.x,r.y+b-mc.y);if(v.pix[a+b*ms.x]&&inclip(h))pix(h,pattern)}
+			for(let b=0;b<ms.y;b++)for(let a=0;a<ms.x;a++){const h=rect(r.x+a-mc.x,r.y+b-mc.y);if(v.pix[a+b*ms.x]&&inclip(h))pix(h,pattern)}
 		}if(r.x==r.w&&r.y==r.h)break;let e2=err*2; if(e2>=dy)err+=dy,r.x+=sx; if(e2<=dx)err+=dx,r.y+=sy; a.v[1]=NONE
 	}popstate()
 }
@@ -972,7 +972,19 @@ draw_line=(r,brush,pattern,deck)=>{
 	const b=deck.brushes;if(brush<0||brush-24>=b.v.length)return;const f=b.v[brush-24]
 	if(image_is(f)){draw_line_custom(r,f,pattern)}else if(lion(f)){draw_line_function(r,f,pattern)}
 }
-n_brush=(z,deck)=>{const b=deck.brushes,f=z[0],s=z[1];if(lion(f))dset(b,lms(f.n),f);if(lis(f)&&s&&image_is(s))dset(b,f,s);return b}
+n_brush=(z,deck)=>{
+	const b=deck.brushes,bt=deck.brusht,f=z[0],s=z[1]
+	if(lion(f)){
+		const k=lms(f.n),v=image_make(rect(64,32)),t=frame; dset(b,k,f),frame=({size:v.size,clip:rect(0,0,64,32),image:v})
+		draw_line(rect(16,16,32,16),24+dkix(b,k),1,deck)
+		draw_line(rect(32,16,40,16),24+dkix(b,k),1,deck)
+		draw_line(rect(40,16,44,16),24+dkix(b,k),1,deck)
+		draw_line(rect(44,16,48,16),24+dkix(b,k),1,deck)
+		frame=t,dset(bt,lms(f.n),v)
+	}
+	if(lis(f)&&s&&image_is(s))dset(b,f,s),dset(bt,f,s)
+	return b
+}
 
 draw_box=(r,brush,pattern)=>{
 	const size=frame.image.size
@@ -2262,6 +2274,7 @@ deck_read=x=>{
 	ri.modules     =lmd()
 	ri.transit     =lmd()
 	ri.brushes     =lmd()
+	ri.brusht      =lmd()
 	ri.patterns    =patterns_read(deck)
 	ri.version     ='version' in deck?ln(deck.version):1
 	ri.locked      ='locked'  in deck?lb(deck.locked ):0

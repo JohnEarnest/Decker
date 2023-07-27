@@ -7,11 +7,12 @@ name:"brushes.deck"
 {card:home}
 script:"home.0"
 {widgets}
-c:{"type":"canvas","size":[326,253],"pos":[44,48],"brush":32,"scale":1}
-button1:{"type":"button","size":[42,20],"pos":[387,48],"script":"home.1","text":"Clear"}
-b:{"type":"grid","size":[96,169],"pos":[386,131],"script":"home.2","scrollbar":0,"lines":0,"value":{"brush":["OvalSml","OvalMed","OvalLrg","Dot","SumiLrg","SumiSml","StippleSml","StippleLrg"]}}
-preview:{"type":"canvas","size":[96,44],"pos":[386,77],"animated":1,"brush":32,"scale":2}
-button2:{"type":"button","size":[45,20],"pos":[437,48],"script":"home.3","text":"Invert"}
+c:{"type":"canvas","size":[291,224],"pos":[54,88],"brush":32,"scale":1}
+button1:{"type":"button","size":[42,20],"pos":[361,58],"script":"home.1","text":"Clear"}
+b:{"type":"grid","size":[96,169],"pos":[360,141],"script":"home.2","scrollbar":0,"lines":0,"value":{"brush":["OvalSml","OvalMed","OvalLrg","OvalHuge","A","SumiSml","SumiMed","SumiLrg","Dotted","SoftSml","SoftLrg","StippleSml","StippleLrg"]}}
+preview:{"type":"canvas","size":[96,48],"pos":[360,87],"locked":1,"animated":1,"brush":32,"scale":2}
+button2:{"type":"button","size":[45,20],"pos":[411,58],"script":"home.3","text":"Invert"}
+field1:{"type":"field","size":[289,36],"pos":[54,43],"locked":1,"border":0,"value":"This deck contains a number of modules which define new brushes, grouped by style. Try them out here, and then import them into your own decks using the Font/DA mover!"}
 
 {script:home.0}
 on view do
@@ -43,23 +44,22 @@ end
 {module:ovals}
 description:"Oval-shaped brushes"
 {script}
-brush["OvalSml" image["%%IMG0AAYABhg8fPjwYA=="]]
-brush["OvalMed" image["%%IMG0AAgACA4/f3/+/vxw"]]
-brush["OvalLrg" image["%%IMG0AAwADAHgB/AP8B/wP/B/4H/g/8D/gP8A/gB8AA=="]]
+brush["OvalSml"  image["%%IMG0AAYABhg8fPjwYA=="]]
+brush["OvalMed"  image["%%IMG0AAgACA4/f3/+/vxw"]]
+brush["OvalLrg"  image["%%IMG0AAwADAHgB/AP8B/wP/B/4H/g/8D/gP8A/gB8AA=="]]
+brush["OvalHuge" image["%%IMG0ABIAEgAHgAAfwAB/wAH/wAP/wAf/gA//gB//AB//AD/+AD/+AH/8AH/4AP/wAP/gAP/AAP8AAHwAAA=="]]
 {end}
 
-{module:dotted}
-description:"Dotted-line brush"
-{script}
-pix:image["%%IMG0AAEAAYA="] # a single pixel
-i:0 brush[on Dot do i:i+1 if 2%i pix end end]
-{end}
-
-{module:sumi}
+{module:sumis}
 description:"Velocity-sensitive sumi-style brushes"
 {script}
-# 11 round brush images ranging from 1px to 8px:
+# 16 round brush images ranging from 1px to 13px:
 b:image@"\n"split 1 drop "
+%%IMG0AA0ADQ+AP+B/8H/w//j/+P/4//j/+H/wf/A/4A+A
+%%IMG0AAwADB+AP8B/4P/w//D/8P/w//D/8H/gP8AfgA==
+%%IMG0AAsACx8AP4B/wP/g/+D/4P/g/+B/wD+AHwA=
+%%IMG0AAoACh4Af4B/gP/A/8D/wP/Af4B/gB4A
+%%IMG0AAkACT4AfwD/gP+A/4D/gP+AfwA+AA==
 %%IMG0AAgACDx+/////348
 %%IMG0AAcAB3z+/v7+/nw=
 %%IMG0AAcABzh8/v7+fDg=
@@ -71,13 +71,55 @@ b:image@"\n"split 1 drop "
 %%IMG0AAMAA0DgQA==
 %%IMG0AAIAAsDA
 %%IMG0AAEAAYA="
-brush[on SumiLrg delta do b[  10&.5*mag delta]end]
-brush[on SumiSml delta do b[5+ 5&.2*mag delta]end]
+brush[on SumiSml delta do b[10+ 5&.2*mag delta]end]
+brush[on SumiMed delta do b[ 5+10&.5*mag delta]end]
+brush[on SumiLrg delta do b[   15&.8*mag delta]end]
 {end}
 
 {module:stipplers}
 description:"Stippling brushes"
 {script}
+# a rough dotted line:
+pix:image["%%IMG0AAEAAYA="] # a single pixel
+i:0 brush[on Dotted do i:i+1 if 2%i pix end end]
+
+# 4x4 stipples: very soft
+# explicitly crack a 4x4 circle into masks of each individual set pixel:
+mask:image["%%IMG0AAQABGDw8GA="]
+ss:each p in extract value where mask @ value from 4 cross 4
+ i:image[4,4] i[p]:1 i
+end
+brush[on SoftSml do random[ss] end]
+
+# 8x8 stipples: very soft
+# explicitly crack an 8x8 circle into masks of each individual set pixel:
+mask:image["%%IMG0AAgACDx+/////348"]
+sm:each p in extract value where mask @ value from 8 cross 8
+ i:image[8,8] i[p]:1 i
+end
+brush[on SoftMed do random[sm] end]
+
+# 16x16 stipples: very soft
+# this uses a table of pre-permuted combinations of 4 pixels which, together, fill a 16x16 circle:
+sl:each t in data:"%j" parse "[
+  [[ 5, 1],[ 4,10],[ 9,10],[10, 1]],[[12, 2],[ 8,13],[ 7,14],[ 4,13]],[[ 4, 9],[ 7,10],[12, 9],[14, 4]],[[ 4, 3],[ 9, 2],[ 9, 8],[ 6, 8]],
+  [[13, 9],[ 7, 9],[13, 5],[11, 9]],[[10,12],[ 8, 3],[11, 7],[ 3, 7]],[[ 1, 9],[ 6, 2],[ 4,12],[ 3, 6]],[[ 5,14],[ 8,14],[11,12],[15, 5]],
+  [[ 1, 3],[11, 1],[ 3, 4],[ 2, 5]],[[ 3,11],[ 5, 4],[10, 3],[ 0, 8]],[[14, 9],[11, 5],[10, 8],[ 8, 4]],[[11, 2],[10, 0],[ 2,10],[11,14]],
+  [[ 5, 7],[14, 5],[ 0, 9],[ 4, 2]],[[ 1, 7],[13, 4],[ 2, 3],[13, 3]],[[ 3,14],[ 3,10],[ 7, 4],[12, 8]],[[ 6, 0],[ 3, 9],[ 1, 8],[12, 7]],
+  [[ 4,14],[14,10],[ 5, 0],[ 9, 3]],[[14, 3],[ 3,12],[11, 3],[ 9, 1]],[[ 3, 3],[13, 6],[ 2,12],[ 7, 6]],[[ 3, 2],[11, 8],[ 4, 8],[ 8, 0]],
+  [[ 7, 2],[ 2, 4],[ 8,11],[12,10]],[[ 8, 1],[ 9, 7],[ 8,12],[13, 7]],[[15, 7],[13, 8],[10,11],[ 2, 2]],[[ 6, 1],[ 8, 6],[ 8, 7],[ 0, 6]],
+  [[ 4, 4],[10, 2],[ 4, 1],[ 4, 5]],[[ 5, 2],[ 6,10],[14, 6],[ 9, 4]],[[ 5, 5],[10, 6],[ 5, 3],[ 7,13]],[[12,13],[ 3, 1],[14, 8],[ 5,12]],
+  [[ 5,15],[ 8,15],[11, 6],[12,11]],[[ 3, 8],[12,14],[ 6, 9],[ 6, 5]],[[ 0, 7],[ 3, 5],[ 7,11],[ 1, 6]],[[ 6, 7],[ 4, 6],[12, 6],[ 2,11]],
+  [[13, 2],[ 6, 3],[10, 9],[10, 4]],[[ 6,15],[ 8, 9],[13,10],[ 8, 8]],[[ 8, 5],[10, 5],[ 5,11],[15, 6]],[[ 4, 7],[ 0,10],[ 8, 2],[10,13]],
+  [[11, 4],[13,11],[14,11],[ 5,10]],[[12, 1],[ 7, 7],[14, 7],[14,12]],[[ 6,11],[ 5, 9],[ 3,13],[ 9,13]],[[ 7, 8],[10,10],[ 7, 3],[ 7,15]],
+  [[ 9,11],[ 6, 6],[ 4,11],[ 2,13]],[[ 7,12],[11,11],[ 9,14],[ 7, 1]],[[15,10],[ 2, 8],[ 1, 5],[ 9, 0]],[[15, 8],[10,14],[10, 7],[ 9,12]],
+  [[ 1,10],[ 9, 5],[15, 9],[ 1,11]],[[ 0, 5],[ 6,14],[ 1, 4],[ 7, 5]],[[ 1,12],[ 9,15],[10,15],[ 5, 8]],[[ 5, 6],[12,12],[11,10],[12, 3]],
+  [[ 9, 6],[ 6,12],[ 7, 0],[12, 5]],[[11,13],[ 8,10],[ 2, 7],[ 6,13]],[[13,13],[ 9, 9],[ 2, 9],[12, 4]],[[ 5,13],[13,12],[ 2, 6],[ 6, 4]]
+ ]"
+ i:image[16,16] each v in t i[v]:1 end i
+end
+brush[on SoftLrg do random[sl] end]
+
 # 8x8 stipples; 4 sparse, 4 dense:
 s:image@"\n"split 1 drop"
 %%IMG0AAgACAAQAIIgACAI
@@ -88,6 +130,8 @@ s:image@"\n"split 1 drop"
 %%IMG0AAgACBgYAMDYGAAA
 %%IMG0AAgACAAAGBgGxsAA
 %%IMG0AAgACAAMbGAADAwA"
+brush[on StippleSml do random[s] end]
+
 # 16x16 stipples; 4 sparse, 4 dense:
 l:image@"\n"split 1 drop"
 %%IMG0ABAAEAAAAAAAAAIAAAAAQCACAAAAAAIAAAgIAACAAAAAIAAA
@@ -98,7 +142,6 @@ l:image@"\n"split 1 drop"
 %%IMG0ABAAEAAAAAAAAADAGMAYAAAAAAAYABgYABgAAAwADAAAAAAA
 %%IMG0ABAAEAAAAAAAAAAAAGAMYAwAAAAAwADAAAAGGAYYAAAAAAAA
 %%IMG0ABAAEAAAAAAAAAAADAAMYABgAAAAAAYABgAAYABgAAAAAAAA"
-brush[on StippleSml do random[s] end]
 brush[on StippleLrg do random[l] end]
 {end}
 
