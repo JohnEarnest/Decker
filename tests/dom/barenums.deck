@@ -1,0 +1,12 @@
+{deck}
+version:1
+card:0
+size:[512,342]
+
+{card:0}
+
+{card:55}
+{widgets}
+button1:{"type":"button","pos":[219,128],"text":"Fine"}
+
+{card:2}

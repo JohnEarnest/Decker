@@ -2219,10 +2219,10 @@ deck_read=x=>{
 		else if(match('{fonts}\n'  ))m=2
 		else if(match('{sounds}\n' ))m=3
 		else if(match('{widgets}\n'))m=4
-		else if(match('{card:')){const k=str('}');cards[k]=lmd(['name','widgets'].map(lms),[lms(k),lml([])]),m=5,lc=0}
+		else if(match('{card:')){const k=str('}');cards['~'+k]=lmd(['name','widgets'].map(lms),[lms(k),lml([])]),m=5,lc=0}
 		else if(match('{script:')){const k=str('}\n');scripts[k]=str('\n{end}')}
-		else if(match('{module:')){const k=str('}');modules[k]=lmd(['name','script','data'].map(lms),[lms(k),lms(''),lmd()]),m=6,md=0}
-		else if(match('{contraption:')){const k=str('}');defs[k]=lmd(['name','widgets'].map(lms),[lms(k),lml([])]),m=7,lc=1}
+		else if(match('{module:')){const k=str('}');modules['~'+k]=lmd(['name','script','data'].map(lms),[lms(k),lms(''),lmd()]),m=6,md=0}
+		else if(match('{contraption:')){const k=str('}');defs['~'+k]=lmd(['name','widgets'].map(lms),[lms(k),lml([])]),m=7,lc=1}
 		else if(m==6&&match('{data}\n')){md=1}
 		else if(m==6&&match('{script}\n')){dset(last(modules),lms('script'),lms(str('\n{end}'))),m=1}
 		else{
