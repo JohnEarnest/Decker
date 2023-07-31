@@ -1154,7 +1154,7 @@ n_play=([x,hint])=>{
 		for(let z=0;z<sfx.data.length;z++)for(let b=0;b<8;b++)dest[z*8+b]=MASTER_VOLUME*byte_to_sample(sfx.data[z])
 		const playing=audio.createBufferSource();playing.buffer=playback,playing.connect(audio.destination);return playing
 	}
-	if(hint&&ls(hint)=='loop'){
+	if(hint&&ls(hint)=='loop'&&audio){
 		if(lis(x))x=dget(ifield(deck,"sounds"),x)
 		if(x&&audio_loop==x){} // don't re-trigger
 		else if(sound_is(x)&&ln(ifield(x,'size'))>0){
@@ -1166,7 +1166,7 @@ n_play=([x,hint])=>{
 		else if(audio_loop){sfx_stoploop()}
 		return NONE
 	}
-	const sfx=!x?x: sound_is(x)?x: dget(deck.sounds,lms(ls(x)));if(!sfx||ln(ifield(sfx,'size'))<1)return NONE;initaudio()
+	const sfx=!x?x: sound_is(x)?x: dget(deck.sounds,lms(ls(x)));if(!sfx||ln(ifield(sfx,'size'))<1)return NONE;initaudio();if(!audio)return
 	const playing=prepare(sfx);playing.addEventListener('ended',_=>{samples_playing--,audio_playing=samples_playing>0})
 	playing.start(),samples_playing++,audio_playing=1;return NONE
 }
