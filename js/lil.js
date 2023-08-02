@@ -211,7 +211,7 @@ dyad={
 			else if(t=='j'){if(m){const j=pjson(y,h,n);h=j.index,v=j.value}else{v=NONE}}
 			else if(t=='v'){v=lms(''),m&=!id(y[h]);while(hn()&&/[0-9a-zA-Z_?]/.test(y[h]))v.v+=y[h++]}
 			else if(t=='q'){
-				v=lms(''),m&=y[h++]=='"';while(hn()&&y[h]!='"'){
+				v=lms(''),m&=y[h]=='"';if(m)h++;while(hn()&&y[h]!='"'){
 					if(y[h]=='\\'){h++;if(/[n\\"]/.test(y[h])){v.v+=y[h]=='n'?'\n':y[h]}else{m=0}}else{v.v+=y[h]}h++
 				}if(m&=y[h]=='"')h++
 			}

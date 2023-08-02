@@ -1337,6 +1337,22 @@ void modal_enter(int type){
 		ms.canvas=free_canvas(deck);dset(ms.canvas->b,lmistr("size"),lmpair(ps));
 		ms.carda=image_read(lmcstr("%%IMG0ABEADQAAAAAAAACAAAFAAAIgAAIgAAQQAAfwAAgIAAgIAAgIAAAAAAAAAA=="));
 		ms.cardb=image_read(lmcstr("%%IMG0ABEADf//gP//gPA/gPffgPffgPAPgPf3gPf3gPf3gPf3gPAPgP//gP//gA=="));
+		// parse action script, if any:
+		lv*scr=ifield(sc.target,"script");
+		lv*p0=l_parse(lmcstr("on click do\n  play[%q]\nend%m"             ),scr); // sound, no go
+		lv*p1=l_parse(lmcstr("on click do\n  play[%q]\n  go[%q %q]\nend%m"),scr); // sound, go + trans
+		lv*p2=l_parse(lmcstr("on click do\n  play[%q]\n  go[%q]\nend%m"   ),scr); // sound, just go
+		lv*p3=l_parse(lmcstr("on click do\n  go[%q %q]\nend%m"            ),scr); // no sound, go, trans
+		lv*p4=l_parse(lmcstr("on click do\n  go[%q]\nend%m"               ),scr); // no sound, just go
+		lv*fs=lb(l_last(p0))||lb(l_last(p1))||lb(l_last(p2))?ls(l_first(p0)): NULL;
+		lv*fg=lb(l_last(p1))||lb(l_last(p2))?ls(p1->lv[1]): lb(l_last(p3))||lb(l_last(p4))?ls(l_first(p3)): NULL;
+		lv*ft=lb(l_last(p1))?ls(p1->lv[2]): lb(l_last(p3))?ls(p3->lv[1]): NULL;
+		char*fk[]={"First","Prev","Next","Last","Back"};
+		if(fs!=NULL||fg!=NULL||ft!=NULL){
+			if(fs!=NULL){ms.act_sound=1,ms.message=fs;}
+			if(ft!=NULL){for(int r=0;r<ms.grid.table->n;r++)if(matchr(ft,ms.grid.table->lv[0]->lv[r]))ms.act_trans=1,ms.grid.row=r;}
+			ms.act_go=fg!=NULL;if(fg!=NULL){for(int z=0;z<5;z++)if(!strcmp(fk[z],fg->sv))ms.act_gomode=z;if(ms.act_gomode==5)ms.verb=fg;}
+		}
 	}
 	if(type==modal_card_props){ms.name=(field_val){rtext_cast(ifield(ifield(deck,"card"),"name")),0};}
 	if(type==modal_link||type==modal_gridcell||type==modal_query){wid.cursor=(pair){0,RTEXT_END};}

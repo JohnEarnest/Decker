@@ -1365,6 +1365,22 @@ modal_enter=type=>{
 		ms.canvas=free_canvas(deck),ms.canvas.size=rect(17,13)
 		ms.carda=image_read('%%IMG0ABEADQAAAAAAAACAAAFAAAIgAAIgAAQQAAfwAAgIAAgIAAgIAAAAAAAAAA==')
 		ms.cardb=image_read('%%IMG0ABEADf//gP//gPA/gPffgPffgPAPgPf3gPf3gPf3gPf3gPAPgP//gP//gA==')
+		// parse action script, if any:
+		const scr=ifield(sc.target,'script')
+		const p0=dyad.parse(lms('on click do\n  play[%q]\nend%m'             ),scr) // sound, no go
+		const p1=dyad.parse(lms('on click do\n  play[%q]\n  go[%q %q]\nend%m'),scr) // sound, go + trans
+		const p2=dyad.parse(lms('on click do\n  play[%q]\n  go[%q]\nend%m'   ),scr) // sound, just go
+		const p3=dyad.parse(lms('on click do\n  go[%q %q]\nend%m'            ),scr) // no sound, go, trans
+		const p4=dyad.parse(lms('on click do\n  go[%q]\nend%m'               ),scr) // no sound, just go
+		const fs=lb(monad.last(p0))||lb(monad.last(p1))||lb(monad.last(p2))?ls(monad.first(p0)): null
+		const fg=lb(monad.last(p1))||lb(monad.last(p2))?ls(p1.v[1]): lb(monad.last(p3))||lb(monad.last(p4))?ls(monad.first(p3)): null
+		const ft=lb(monad.last(p1))?ls(p1.v[2]): lb(monad.last(p3))?ls(p3.v[1]): null
+		const fk={First:0,Prev:1,Next:2,Last:3,Back:4}
+		if(fs!=null||fg!=null||ft!=null){
+			if(fs!=null){ms.act_sound=1,ms.message=lms(fs)}
+			if(ft!=null){ms.grid.table.v.value.map((x,i)=>{if(ft==ls(x))ms.act_trans=1,ms.grid.row=i})}
+			ms.act_go=fg!=null;if(fg!=null){if(fg in fk)ms.act_gomode=fk[fg];if(ms.act_gomode==5)ms.verb=lms(fg)}
+		}
 	}
 	const dname=(x,e)=>{x=x||'untitled';return lms(/\.(deck|html)$/.test(x)?x:x+e)}
 	if(type=='card_props')ms.name=fieldstr(ifield(ifield(deck,'card'),'name'))
