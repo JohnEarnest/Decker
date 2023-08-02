@@ -371,7 +371,7 @@ The Listener is a flexible tool for debugging scripts and performing bulk edits 
 
 ![](images/listener.gif)
 
-Type a Lil statement, such as `card.widgets`, and press shift+return. Your input will appear left-justified, and the response from the Lil interpreter will appear right-justified beneath it. This sort of question-and-answer interaction with a programming language is sometimes called a Read-Evaluate-Print Loop (REPL). You can click on text you've entered previously in the command history to paste it into the text box.
+Type a Lil statement, such as `card.widgets`, and press shift+return or choose _Listener &#8594; Evaluate_ from the menu. Your input will appear left-justified, and the response from the Lil interpreter will appear right-justified beneath it. This sort of question-and-answer interaction with a programming language is sometimes called a Read-Evaluate-Print Loop (REPL). You can click on text you've entered previously in the command history to paste it into the text box.
 
 The Listener automatically has access to a number of variables as context, depending on what you're doing when it is opened. The variable `me` will be bound as a _target_:
 

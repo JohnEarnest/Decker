@@ -3774,6 +3774,8 @@ void all_menus(){
 		if(menu_item("Clear Locals" ,1,'\0')){li.vars->c=0;}
 		menu_separator();
 		if(menu_item("Show Locals"  ,1,'\0')){listen_show(align_right,0,li.vars);}
+		menu_separator();
+		if(menu_item("Evaluate"     ,rtext_len(ms.text.table),'\0'))listener_eval();
 	}
 	menu_bar("Help",1);
 	if(menu_item("Decker Website..."  ,1,'\0'))n_go(deck,l_list(lmcstr("http://beyondloom.com/decker/index.html"          )));

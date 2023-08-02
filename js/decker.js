@@ -3221,6 +3221,8 @@ all_menus=_=>{
 		if(menu_item('Clear Locals' ,1))li.vars={}
 		menu_separator()
 		if(menu_item('Show Locals',1))listen_show(ALIGN.right,0,lmd(Object.keys(li.vars).map(lms),Object.values(li.vars)))
+		menu_separator()
+		if(menu_item('Evaluate',rtext_len(ms.text.table)))listener_eval()
 	}
 	menu_bar('Help',1)
 	if(menu_item('Decker Website...'  ,1))n_go([lms('http://beyondloom.com/decker/index.html'          )],deck)
