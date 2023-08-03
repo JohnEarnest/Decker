@@ -198,10 +198,9 @@ lv* event_invokev(lv*target,lv*name,lv*arg,lv*hunk,int iso,int noinner,int nodis
 		blk_get(b,name),blk_lit(b,arg),blk_op(b,CALL);if(!hunk&&!nodiscard)blk_op(b,DROP);core=b;
 	}
 	lv*b=lmblk();blk_lit(b,target),blk_loc(b,lmistr("me")),blk_op(b,DROP);
-	if(!isolate){
-		blk_lit(b,deck                   ),blk_loc(b,lmistr("deck"    )),blk_op(b,DROP);
-		blk_lit(b,ifield(deck,"patterns")),blk_loc(b,lmistr("patterns")),blk_op(b,DROP);
-	}blk_cat(b,core);return b;
+	blk_lit(b,deck                   ),blk_loc(b,lmistr("deck"    )),blk_op(b,DROP);
+	blk_lit(b,ifield(deck,"patterns")),blk_loc(b,lmistr("patterns")),blk_op(b,DROP);
+	blk_cat(b,core);return b;
 }
 lv* event_invoke(lv*target,lv*name,lv*arg,lv*hunk,int iso){return event_invokev(target,name,arg,hunk,iso,0,0);}
 int pending_popstate=0;
@@ -220,7 +219,9 @@ void fire_hunk_async(lv*target,lv*hunk){fire_async(target,NULL,lml(0),hunk,1);}
 int in_attr=0;
 lv* fire_attr_sync(lv*target,char*prefix,lv*name,lv*arg){
 	if(in_attr)return NONE;in_attr=1;cstate bf=frame;
-	lv*root=lmenv(NULL);primitives(root,ivalue(target,"deck")),constants(root),dset(root,lmistr("me"),target),dset(root,lmistr("card"),target);
+	lv*root=lmenv(NULL),*deck=ivalue(target,"deck");primitives(root,deck),constants(root);
+	dset(root,lmistr("me"),target),dset(root,lmistr("card"),target);
+	dset(root,lmistr("deck"),deck),dset(root,lmistr("patterns"),ifield(deck,"patterns"));
 	lv*b=lmblk();lv*widgets=ivalue(target,"widgets");EACH(z,widgets)blk_lit(b,widgets->lv[z]),blk_loc(b,widgets->kv[z]),blk_op(b,DROP);
 	lv*s=ifield(ivalue(target,"def"),"script"),*sb=parse(s&&s->c?s->sv:"");if(perr()){sb=parse("");}blk_cat(b,sb),blk_op(b,DROP);
 	str n=str_new();str_addz(&n,prefix),str_addz(&n,name->sv);blk_get(b,lmstr(n)),blk_lit(b,arg?l_list(arg):lml(0)),blk_op(b,CALL);

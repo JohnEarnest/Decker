@@ -1942,6 +1942,8 @@ con:deck.card.add["contraption" "dispatcher"]
 con.script:"on test do 2+3 end"
 assert["contraption attribute from event"   105 con.prop1]
 assert["contraption attribute from event 2" 205 con.prop2]
+def.script:"on get_d1 do (deck,patterns) end"
+assert["contraption prop: access globals" (deck,deck.patterns) con.d1]
 
 #######################################
 #

@@ -662,7 +662,7 @@ The pointer interface represents the global state of the user's pointing device,
 
 Deck Interface
 --------------
-The deck interface represents the global attributes of a Decker document. The open deck is available to Decker as a global constant named `deck`, except when executing a contraption prototype's internal scripts.
+The deck interface represents the global attributes of a Decker document. The open deck is available to Decker as a global constant named `deck`.
 
 | Name              | Description                                                                                 |
 | :---------------- | :------------------------------------------------------------------------------------------ |
@@ -696,7 +696,7 @@ The deck interface represents the global attributes of a Decker document. The op
 
 Patterns Interface
 ------------------
-The patterns interface stores a global palette and set of 1-bit textures used by Decker itself, as well as the canvas widget. The open deck's patterns interface is available to Decker as a global constant named `patterns`, except when executing a contraption prototype's internal scripts. Any pattern aside from 0 (transparent) and 1 (solid black) may be altered on the fly. There are names for each of the default color slots starting at 32 in the global `colors` constant. The animated patterns (28, 29, 30 and 31) automatically cycle between their indices at 15hz.
+The patterns interface stores a global palette and set of 1-bit textures used by Decker itself, as well as the canvas widget. The open deck's patterns interface is available to Decker as a global constant named `patterns`. Any pattern aside from 0 (transparent) and 1 (solid black) may be altered on the fly. There are names for each of the default color slots starting at 32 in the global `colors` constant. The animated patterns (28, 29, 30 and 31) automatically cycle between their indices at 15hz.
 
 | Name       | Description                                                   |
 | :--------- | :------------------------------------------------------------ |
@@ -1254,7 +1254,7 @@ When a card or widget script executes, the following constants will be defined i
 
 Finally, Decker will find the most recent function definition which matches the event name and execute it with an appropriate argument. Thus, if a button's script does not define a `click[]` function, Decker will effectively look for a definition in the containing card, and then finally the deck. If no definition is found, the event will be discarded harmlessly.
 
-For widgets within a contraption, `deck` and `patterns` will not be available, and `card` will be the contraption. While editing/previewing a Prototype, `card` will be the prototype.
+For widgets within a contraption, `card` will be the contraption. While editing/previewing a Prototype, `card` will be the prototype.
 
 Events are as follows:
 
@@ -1513,7 +1513,6 @@ Limitations
 Contraptions and prototypes have a few important limitations to keep in mind:
 
 - Prototypes cannot contain contraptions. In other words, contraptions are non-recursive.
-- Unlike card scripts or scripts on card widgets, prototype scripts do not have access to `deck`, `card`, or `patterns` globals. From inside a contraption you don't know anything about the deck within which you reside. This constraint is essential to make contraptions "portable" and re-usable.
 - Unlike a card, contraption instances cannot add or remove "child" widgets dynamically.
 - Custom attribute reads and writes (from the outside) run in a brief quota, just like transition functions and module startup. If they take too long to execute, they halt and return `0`.
 - Custom attributes cannot be invoked recursively or directly call other custom attributes. If this is attempted, they halt and return `0`. For example, a script inside a prototype should use `get_value[]` instead of `card.value` to access the `value` attribute.
