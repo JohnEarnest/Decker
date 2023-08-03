@@ -3916,7 +3916,7 @@ void tick(lv*env){
 	if(kc.on){ev=ev_stash;keycaps();}
 	if(uimode==mode_script&&enable_touch&&ms.type==modal_none)wid.active=0;
 	menu_finish();
-	if(uimode==mode_draw&&dr.fatbits)draw_icon((pair){frame.size.x-14,2},ZOOM,1);
+	if(uimode==mode_draw&&dr.fatbits&&!ev.hidemenu)draw_icon((pair){frame.size.x-14,2},ZOOM,1);
 	double used=interpret();
 	if(uimode==mode_interact&&profiler){
 		rect r={frame.size.x-60,2,50,12};char*pal=patterns_pal(ifield(deck,"patterns"));
