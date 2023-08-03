@@ -103,6 +103,7 @@ The _Style_ menu will be available whenever drawing tools are chosen:
 - _Stroke..._: Select a pattern for most drawing tools.
 - _Fill..._: Select a background pattern used for the _Filled Box_ and _Filled Oval_ tool as well as empty space behind a deleted or moved selection.
 - _Brush..._: Select a brush shape used for most drawing tools.
+- _Color_: Toggle offering Decker's 16-color palette instead of its 28  1-bit drawing patterns.
 - _Transparency_: Toggle treating pattern 0 as transparent when moving selections. Also applies to imported and exported images!
 - _Tracing Mode_: Toggle drawing the Decker window in a semi-transparent fashion, to allow you to trace images underneath the window.
 

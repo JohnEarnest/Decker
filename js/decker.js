@@ -496,7 +496,7 @@ script_save=x=>{const k=lms('script');mark_dirty();if(sc.target)iwrite(sc.target
 
 draw_state=_=>({ // drawing tools state
 	tool:'pencil',brush:3,pattern:1,fill:0,erasing:0, dither_threshold:0,
-	show_widgets:1,show_anim:1,trans:0,trans_mask:0,fatbits:0,offset:rect(),
+	show_widgets:1,show_anim:1,trans:0,trans_mask:0,color:0,fatbits:0,offset:rect(),
 	show_grid:0,snap:0,grid_size:rect(16,16), sel_here:rect(),sel_start:rect(),limbo:null,limbo_dither:0,
 	scratch:null,mask:null,omask:null, pickfill:0, poly:[]
 })
@@ -1856,21 +1856,24 @@ modals=_=>{
 		dr.brush=clamp(0,dr.brush,(6*4)+count(br)-1)
 	}
 	else if(ms.type=='pattern'||ms.type=='fill'){
-		const grid=rect(8,4), ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY), v=ms.type=='pattern'?dr.pattern:dr.fill
+		const grid=rect(8,dr.color?2:4), ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY)
+		const getv=_=>ms.type=='pattern'?dr.pattern  :dr.fill
 		const setv=x=>ms.type=='pattern'?dr.pattern=x:dr.fill=x
-		const b=draw_modalbox(rect(m+(grid.x*gs)+m,m+(grid.y*gs)+lh+m))
-		draw_textc(rect(b.x,b.y+b.h-lh,b.w,lh),`Choose a ${ms.type=='fill'?'fill':'stroke'} pattern.`,FONT_BODY,1)
+		const b=draw_modalbox(rect(m+(grid.x*gs)+m,m+(grid.y*gs)+lh+m)); let v=getv()
+		draw_textc(rect(b.x,b.y+b.h-lh,b.w,lh),`Choose a ${ms.type=='fill'?'fill':'stroke'} ${dr.color?'color':'pattern'}.`,FONT_BODY,1)
 		for(let z=0;z<grid.x*grid.y;z++){
-			const s=rint(rect(b.x+m+2+gs*(z%grid.x),b.y+m+2+gs*(0|(z/grid.x)),ss,ss))
-			draw_rect(s,z); if(z==v)draw_box(inset(s,-2),0,1)
-			const a=dover(s)&&over(s), cs=(z==v&&ev.action), cl=cs||((ev.md||ev.drag)&&a), cr=cs||(ev.mu&&a)
-			if(cl)draw_invert(pal,inset(s,-1)); if(cr){setv(z),modal_exit(z);break}
+			const s=rint(rect(b.x+m+2+gs*(z%grid.x),b.y+m+2+gs*(0|(z/grid.x)),ss,ss)), ci=!dr.color?z: z<2?z: 31+z
+			draw_rect(s,ci); if(ci==v)draw_box(inset(s,-2),0,1)
+			const a=dover(s)&&over(s), cs=(ci==v&&ev.action), cl=cs||((ev.md||ev.drag)&&a), cr=cs||(ev.mu&&a)
+			if(cl)draw_invert(pal,inset(s,-1)); if(cr){setv(ci),modal_exit(ci);break}
 		}
 		if(ev.exit||(ev.mu&&!dover(b)&&!over(b)))modal_exit(-1),ev.mu=0
+		if(ev.dir&&dr.color&&v>=2)v=v-31
 		if(ev.dir=='left' )setv(((0|(v/grid.x))*grid.x)+((v+grid.x-1)%grid.x))
 		if(ev.dir=='right')setv(((0|(v/grid.x))*grid.x)+((v+       1)%grid.x))
 		if(ev.dir=='up'   )setv((v+(grid.x*(grid.y-1)))%(grid.x*grid.y))
 		if(ev.dir=='down' )setv((v+grid.x             )%(grid.x*grid.y))
+		if(ev.dir&&dr.color&&getv()>=2)setv(getv()+31)
 	}
 	else if(ms.type=='grid'){
 		const b=draw_modalbox(rect(120,100))
@@ -2811,7 +2814,9 @@ toolbars=_=>{
 		draw_rect(rect(0,16*tcellh,toolsize.x,tgap),1)
 		if(modebtn(pos,dn,rect(0,0     ,tcellw*2+1,tcellh+1),'Stroke',dr.pickfill==0))dr.pickfill=0
 		if(modebtn(pos,dn,rect(0,tcellh,tcellw*2+1,tcellh+1),'Fill'  ,dr.pickfill==1))dr.pickfill=1
-		for(let z=0;z<4*8;z++)palbtn(pos,dn,rect((z%2)*tcellw,(2+(0|(z/2)))*tcellh+(z>=28?tgap:0),tcellw+1,tcellh+1),patorder[z])
+		if(dr.color){for(let z=0;z<16 ;z++)palbtn(pos,dn,rect(0,(2*tcellh)+z*tcellh,2*tcellw+1,tcellh+1),(z>=2?31:0)+z)}
+		else        {for(let z=0;z<4*8;z++)palbtn(pos,dn,rect((z%2)*tcellw,(2*tcellh)+(0|(z/2))*tcellh+(z>=28?tgap:0),tcellw+1,tcellh+1),patorder[z])}
+		//for(let z=0;z<4*8;z++)palbtn(pos,dn,rect((z%2)*tcellw,(2+(0|(z/2)))*tcellh+(z>=28?tgap:0),tcellw+1,tcellh+1),patorder[z])
 	})
 }
 
@@ -3199,6 +3204,7 @@ all_menus=_=>{
 		if(menu_item('Fill...'  ,1))modal_enter('fill'   )
 		if(menu_item('Brush...' ,1))modal_enter('brush'  )
 		menu_separator()
+		if(menu_check('Color'       ,1,dr.color))dr.color^=1
 		if(menu_check('Transparency',1,dr.trans))dr.trans^=1
 	}
 	if(uimode=='object'){

@@ -95,14 +95,14 @@ int dover(rect r){return box_in(r,ev.dpos);}
 enum tools{tool_select,tool_pencil,tool_lasso,tool_line,tool_fill,tool_poly,tool_rect,tool_fillrect,tool_ellipse,tool_fillellipse};
 typedef struct {
 	int tool, brush, pattern, fill, erasing;
-	int show_widgets, show_anim, trans, trans_mask, fatbits; pair offset;
+	int show_widgets, show_anim, trans, trans_mask, color, fatbits; pair offset;
 	int show_grid, snap; pair grid_size;
 	rect sel_here, sel_start; lv*limbo; int limbo_dither;
 	lv* scratch, *mask, *omask;
 	int pickfill;
 } draw_state;
-draw_state ddr={tool_pencil,3,1,0,0, 1,1,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0};
-draw_state dr ={tool_pencil,3,1,0,0, 1,1,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0};
+draw_state ddr={tool_pencil,3,1,0,0, 1,1,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0};
+draw_state dr ={tool_pencil,3,1,0,0, 1,1,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0};
 int bg_pat(){return dr.trans_mask&&dr.pattern==0?32:dr.pattern;}
 int bg_fill(){return dr.trans_mask&&dr.fill==0?32:dr.fill;}
 int bg_has_sel(){return dr.tool==tool_select&&(dr.sel_here.w>0||dr.sel_here.h>0);}
@@ -1883,20 +1883,25 @@ void modals(){
 		dr.brush=CLAMP(0,dr.brush,(6*4)+br->c-1);
 	}
 	else if(ms.type==modal_pattern||ms.type==modal_fill){
-		pair grid={8,4};int ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY); int*v=ms.type==modal_pattern?&dr.pattern:&dr.fill;
+		pair grid={8,dr.color?2:4};int ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY); int*v=ms.type==modal_pattern?&dr.pattern:&dr.fill;
 		rect b=draw_modalbox((pair){m+(grid.x*gs)+m,m+(grid.y*gs)+lh+m});
-		draw_textc((rect){b.x,b.y+b.h-lh,b.w,lh},ms.type==modal_fill?"Choose a fill pattern.":"Choose a stroke pattern.",FONT_BODY,1);
+		char*label=dr.color?(ms.type==modal_fill?"Choose a fill color."  :"Choose a stroke color."  ):
+		                    (ms.type==modal_fill?"Choose a fill pattern.":"Choose a stroke pattern.");
+		draw_textc((rect){b.x,b.y+b.h-lh,b.w,lh},label,FONT_BODY,1);
 		for(int z=0;z<grid.x*grid.y;z++){
 			rect s={b.x+m+2+gs*(z%grid.x),b.y+m+2+gs*(z/grid.x),ss,ss};
-			draw_rect(s,z); if(z==*v)draw_box(inset(s,-2),0,1);
-			int a=dover(s)&&over(s), cs=(z==*v&&ev.action), cl=cs||((ev.md||ev.drag)&&a), cr=cs||(ev.mu&&a);
-			if(cl)draw_invert(pal,inset(s,-1)); if(cr){*v=z;modal_exit(z);break;}
+			int ci=!dr.color?z: z<2?z: 31+z;
+			draw_rect(s,ci); if(ci==*v)draw_box(inset(s,-2),0,1);
+			int a=dover(s)&&over(s), cs=(ci==*v&&ev.action), cl=cs||((ev.md||ev.drag)&&a), cr=cs||(ev.mu&&a);
+			if(cl)draw_invert(pal,inset(s,-1)); if(cr){*v=ci;modal_exit(ci);break;}
 		}
 		if(ev.exit||(ev.mu&&!dover(b)&&!over(b)))modal_exit(-1),ev.mu=0;
+		if(ev.dir&&dr.color&&*v>=2)*v=*v-31;
 		if(ev.dir==dir_left )*v=((*v/grid.x)*grid.x)+((*v+grid.x-1)%grid.x);
 		if(ev.dir==dir_right)*v=((*v/grid.x)*grid.x)+((*v+       1)%grid.x);
 		if(ev.dir==dir_up   )*v=(*v+(grid.x*(grid.y-1)))%(grid.x*grid.y);
 		if(ev.dir==dir_down )*v=(*v+grid.x             )%(grid.x*grid.y);
+		if(ev.dir&&dr.color&&*v>=2)*v=*v+31;
 	}
 	else if(ms.type==modal_grid){
 		rect b=draw_modalbox((pair){120,100});
@@ -3154,7 +3159,8 @@ void rtoolbar(pair pos,pair dn){
 	memset(frame.buffer->sv,0,frame.buffer->c),draw_box((rect){0,0,size.x,size.y},0,1),draw_rect((rect){0,16*tcellh,size.x,tgap},1);
 	if(modebtn(pos,dn,(rect){0,0     ,tcellw*2+1,tcellh+1},"Stroke",dr.pickfill==0))dr.pickfill=0;
 	if(modebtn(pos,dn,(rect){0,tcellh,tcellw*2+1,tcellh+1},"Fill"  ,dr.pickfill==1))dr.pickfill=1;
-	for(int z=0;z<4*8;z++)palbtn(pos,dn,(rect){(z%2)*tcellw,(2+(z/2))*tcellh+(z>=28?tgap:0),tcellw+1,tcellh+1},pp[z]);
+	if(dr.color){for(int z=0;z<16 ;z++)palbtn(pos,dn,(rect){0,(2*tcellh)+z*tcellh,2*tcellw+1,tcellh+1},(z>=2?31:0)+z);}
+	else        {for(int z=0;z<4*8;z++)palbtn(pos,dn,(rect){(z%2)*tcellw,(2*tcellh)+(z/2)*tcellh+(z>=28?tgap:0),tcellw+1,tcellh+1},pp[z]);}
 }
 
 // Input and Events
@@ -3747,6 +3753,7 @@ void all_menus(){
 		if(menu_item("Fill..."  ,1,'\0'))modal_enter(modal_fill);
 		if(menu_item("Brush..." ,1,'\0'))modal_enter(modal_brush);
 		menu_separator();
+		if(menu_check("Color"       ,1,dr.color,0))dr.color^=1;
 		if(menu_check("Transparency",1,dr.trans,0))dr.trans^=1;
 		#ifndef LOSPEC
 		if(menu_check("Tracing Mode",windowed,tracing,0))set_tracing=!tracing;
