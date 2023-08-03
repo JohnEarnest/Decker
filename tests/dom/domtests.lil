@@ -994,6 +994,9 @@ p[38]:peachpuff
 assert["pattern color write/read" peachpuff p[38]]
 assert["pattern tolerate bogus write" 420 p[3]:420]
 
+op:readdeck[].patterns
+assert["pattern color isolation" 202 op[38]]
+
 #######################################
 #
 #  Canvas

@@ -3370,6 +3370,7 @@ tick=_=>{
 
 let id=null
 sync=_=>{
+	pick_palette(deck)
 	const anim=deck.patterns.anim, pal=deck.patterns.pal.pix, mask=dr.trans_mask&&uimode=='draw'
 	const anim_ants   =(x,y)=>(0|((x+y+(0|(frame_count/2)))/3))%2?15:0
 	const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][(0|(frame_count/4))%max(1,anim[pix-28].length)]

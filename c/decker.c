@@ -3310,6 +3310,7 @@ void sync(){
 		pair disp_pixels={0,0};SDL_GetWindowSizeInPixels(win,&disp_pixels.x,&disp_pixels.y);
 		if(disp_pixels.x>disp.x){int s=disp_pixels.x/disp.x;disp.x*=s,disp.y*=s,scale*=s,tscale*=s,dpi=s;}
 	#endif
+	pick_palette(deck);
 	if(framebuffer_flip(disp,size,scale)){
 		int*p, pitch;
 		int showwings=!kc.on&&toolbars_enable&&tscale>0&&!(lb(ifield(deck,"locked")))&&ms.type==modal_none&&uimode!=mode_script;

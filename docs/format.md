@@ -153,7 +153,7 @@ The Deck chunk contains a number of optional properties with metadata pertaining
 - `script`: a number or string corresponding to a `{script:ID}` chunk, representing top-level event handlers applying to the entire deck.
 - `size`: an array of 2 integers providing the width and height of the deck, respectively, in pixels. This applies to every card. The minimum valid size is `[320,240]`, and the default is `[512,342]`. Note that the background _Image Records_ of cards, if present, contain redundant information about their dimensions- this permits hand-altering the size of a deck without mangling its contents.
 - `card`: an integer giving the index of the card which will be shown when the deck is opened. If this index is invalid, reset it to `0`.
-- `patterns`: an 8x224 _Image Record_ representing a vertical strip of 28 8x8 patterns. Pattern 0 will always be overruled as "all white" and pattern 1 will always be overruled as "all black". If any of these patterns are modified, they will alter the appearance of Decker's UI pervasively. If this property is not provided, Decker will supply a default palette.
+- `patterns`: an _Image Record_ representing a vertical strip of 28 8x8 patterns. Pattern 0 will always be overruled as "all white" and pattern 1 will always be overruled as "all black". If any of these patterns are modified, they will alter the appearance of Decker's UI pervasively. If this property is not provided, Decker will supply a default palette. Normally this will be a 8x224 image; if it is instead 8x230, the last 6 rows of the image contain a sequence of 16 records comprising a supplementary _color_ palette, each record consisting of a byte for a red channel, a byte for a green channel, and a byte for a blue channel.
 - `animations`: an array of four arrays, each of which may contain up to 8 integers. Each integer is an index to a pattern. These four sequences represent the animated patterns 28, 29, 30, and 31. Animation sequences may not themselves reference indices 28, 29, 30, or 31. If this property is not provided, Decker will supply default animation sequences: `[[13,9,5,1,5,9],[4,4,8,14,14,8],[18,18,20,19,19,20],[0,0,0,0,1,1,1,1]]`.
 
 The `{card:ID}` Chunk
@@ -391,3 +391,6 @@ Changelog
 
 1.23:
 - Introduced the `button.shortcut` field.
+
+1.25:
+- Add a provision for the `patterns` _image record_ to optionally contain a custom 16-color palette.
