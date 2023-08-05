@@ -14,7 +14,7 @@ lv*FONT_BODY,*FONT_MENU,*FONT_MONO,*TOOLS,*ARROWS,*TOOLB,*PLAYING,*ATTRS;
 enum mini_icons {icon_dir,icon_doc,icon_sound,icon_font,icon_app,icon_lil,icon_pat,icon_chek,icon_none};
 enum cursor_styles {cursor_default,cursor_point,cursor_ibeam,cursor_drag};
 SDL_Cursor*CURSORS[4]; int uicursor=0, enable_touch=0, set_touch=0, profiler=0, should_exit=0;
-int set_tracing=0, tracing=0, toolbar_scroll=0;
+int set_tracing=0, tracing=0, toolbar_scroll=0, toolbars_enable=0;
 
 char*TOOL_ICONS=
 	"%%IMG0ABAAwAMABIAEgASABIAEgGTwlKxMqiQKJAIQAggCCAQEBAQEAAAAAAAAAAA//EACgAGAAYABgAFAAz/+H/wAAAAAAA"
@@ -285,7 +285,7 @@ int has_clip(char*type){return strlen(clip_stash)>=strlen(type)&&memcmp(clip_sta
 #ifdef LOSPEC
 // a set of customizations intended to make Decker more portable
 // and more performant on extremely limited devices such as the OLPC XO-4.
-int toolbars_enable=0, parity=0;
+int parity=0;
 lv* readimage(char*path,int grayscale){return n_readgif(NULL,lml2(lmcstr(path),grayscale?lmistr("gray"):NONE));}
 int*sgfx=NULL;
 void framebuffer_alloc(pair size,int minscale){
@@ -309,7 +309,6 @@ int framebuffer_flip(pair disp,pair size,int scale){
 	return 1;
 }
 #else
-int toolbars_enable=1;
 #include <SDL_image.h>
 lv* readimage(char*path,int grayscale){
 	SDL_Surface*b=IMG_Load(path);if(b==NULL)return image_empty();lv*i=lmbuff((pair){b->w,b->h});
@@ -3455,6 +3454,7 @@ void text_edit_menu(){
 	menu_separator();
 	if(menu_item("Select All",wid.fv!=NULL,'a')){wid.cursor=(pair){0,RTEXT_END};}
 }
+void resize_window(lv*deck); // forward ref
 void all_menus(){
 	int blocked=running()||msg.overshoot;
 	int canlisten=!blocked&&(ms.type==modal_listen||ms.type==modal_none);
@@ -3467,7 +3467,7 @@ void all_menus(){
 	#endif
 	if(menu_check("Touch Input"    ,1                    ,enable_touch   ,'\0'))enable_touch^=1,set_touch=1;
 	if(menu_check("Script Profiler",1                    ,profiler       ,'\0'))profiler^=1;
-	if(menu_check("Toolbars"       ,!windowed            ,toolbars_enable,'\0'))toolbars_enable^=1;
+	if(menu_check("Toolbars"       ,1                    ,toolbars_enable,'\0'))toolbars_enable^=1,resize_window(deck);
 	if(menu_check("Auto-Save"      ,strlen(document_path),autosave       ,'\0'))autosave^=1;
 	#ifndef __ANDROID__
 		menu_separator();
@@ -3981,6 +3981,22 @@ void save_deck(lv*path){
 	n_write(NULL,lml2(path,deck_write(deck,html)));
 	set_path(path->sv);
 }
+void resize_window(lv*deck){
+	lv*card=ifield(deck,"card");
+	pair size=getpair(ifield(card,"size"));
+	context=draw_buffer(lmbuff(size));
+	dset(env,lmistr("buff"),context.buffer);
+	#define serr(x) {if(x==NULL)printf("SDL error: %s\n",SDL_GetError()),exit(1);}
+	SDL_DisplayMode dis;SDL_GetDesktopDisplayMode(0,&dis);
+	int minscale=noscale?1: (size.x*2<=dis.w&&size.y*2<=dis.h)?2:1;
+	if(win){SDL_SetWindowSize(win,(size.x+(toolbars_enable?4+2*buff_size(TOOLB).x:0))*minscale,size.y*minscale+4),SDL_DestroyTexture(gfx);}
+	else{
+		win=SDL_CreateWindow("Decker",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,size.x*minscale,size.y*minscale,SDL_WINDOW_SHOWN|SDL_WINDOW_ALLOW_HIGHDPI);serr(win);
+		ren=SDL_CreateRenderer(win,-1,SDL_RENDERER_SOFTWARE);serr(ren);
+	}
+	framebuffer_alloc(size,minscale);
+	SDL_SetWindowPosition(win,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED);
+}
 void load_deck(lv*d){
 	dirty=0; wid.active=-1; dr=ddr; con_set(NULL);
 	dset(env,lmistr("deck"),deck=d);
@@ -3991,20 +4007,7 @@ void load_deck(lv*d){
 	FONT_BODY=dget(fonts,lmistr("body"));
 	FONT_MENU=dget(fonts,lmistr("menu"));
 	FONT_MONO=dget(fonts,lmistr("mono"));
-	lv*card=ifield(deck,"card");
-	pair size=getpair(ifield(card,"size"));
-	context=draw_buffer(lmbuff(size));
-	dset(env,lmistr("buff"),context.buffer);
-	#define serr(x) {if(x==NULL)printf("SDL error: %s\n",SDL_GetError()),exit(1);}
-	SDL_DisplayMode dis;SDL_GetDesktopDisplayMode(0,&dis);
-	int minscale=noscale?1: (size.x*2<=dis.w&&size.y*2<=dis.h)?2:1;
-	if(win){SDL_SetWindowSize(win,size.x*minscale,size.y*minscale),SDL_DestroyTexture(gfx);}
-	else{
-		win=SDL_CreateWindow("Decker",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,size.x*minscale,size.y*minscale,SDL_WINDOW_SHOWN|SDL_WINDOW_ALLOW_HIGHDPI);serr(win);
-		ren=SDL_CreateRenderer(win,-1,SDL_RENDERER_SOFTWARE);serr(ren);
-	}
-	framebuffer_alloc(size,minscale);
-	SDL_SetWindowPosition(win,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED);
+	resize_window(deck);
 	if(!gtool){pair s=buff_size(TOOLB);gtool=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,s.x,s.y);}
 	time_t now;time(&now);seed=0xFFFFFFFF&now;
 	validate_modules();

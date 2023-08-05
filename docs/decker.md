@@ -117,10 +117,6 @@ A number of shortcuts are available with any of the drawing tools selected:
 - Holding control or command while clicking will enter Fat Bits mode centered on the position you click, or exit Fat Bits mode.
 - Right-clicking with any tool or holding shift before beginning a stroke will _erase_: this behaves like the pencil tool, but always draws using pattern 0.
 
-In fullscreen mode (see _Decker &#8594; Fullscreen_), if there's room on your monitor, Decker will display toolbars on the left and right edges of the display- use these interchangably with the _Tool_ and _Style_ menus. Or don't!
-
-![](images/wings.gif)
-
 You can drag and drop files directly onto the Decker window, and it will take an appropriate action depending on the type of the file:
 
 - `.html` or `.deck`: open the deck in the [Font/Deck Accessory Mover](#resources).
@@ -135,6 +131,10 @@ The Decker menu allows you to turn on "Touch Input", which modifies several aspe
 - Touch Keyboard: An on-screen keyboard is provided whenever an editable field has focus, as well as in the script editor and some modal dialogs.
 
 Decker automatically enables touch mode the first time it observes a touch event.
+
+The _Decker &#8594; Toolbars_ menu item toggles the visibility of toolbars on the left and right edges of the display or window- use these interchangably with the _Tool_ and _Style_ menus. Or don't!
+
+![](images/wings.gif)
 
 
 Web-Decker and Native-Decker
