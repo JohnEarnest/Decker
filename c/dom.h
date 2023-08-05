@@ -67,13 +67,15 @@ lv* interface_rtext(lv*self,lv*i,lv*x); // forward ref
 lv* interface_pointer(lv*self,lv*i,lv*x); // forward ref
 lv* interface_app(lv*self,lv*i,lv*x); // forward ref
 lv* n_brush(lv*self,lv*z); // forward ref
+#define MATH_PI 3.141592653589793
+#define MATH_E  2.718281828459045
 void constants(lv*env){
 	dset(env,lmistr("sys"    ),lmi(interface_sys,    lmistr("system" ),NULL));
 	dset(env,lmistr("app"    ),lmi(interface_app,    lmistr("app"    ),NULL));
 	dset(env,lmistr("rtext"  ),lmi(interface_rtext,  lmistr("rtext"  ),NULL));
 	dset(env,lmistr("pointer"),lmi(interface_pointer,lmistr("pointer"),NULL));
-	dset(env,lmistr("pi"),lmn(3.141592653589793));
-	dset(env,lmistr("e" ),lmn(2.718281828459045));
+	dset(env,lmistr("pi"),lmn(MATH_PI));
+	dset(env,lmistr("e" ),lmn(MATH_E));
 	lv*colors=lmd();
 	dset(colors,lmistr("white"     ),lmn(32));
 	dset(colors,lmistr("yellow"    ),lmn(33));
@@ -377,6 +379,25 @@ lv* n_image_transform(lv*self,lv*z){
 	else if(!strcmp("dither",z->sv))buffer_dither(self->b);
 	return self;
 }
+void buffer_shear_x(lv*b,lv*t,float shear){
+	pair s=buff_size(b);
+	for(int y=0;y<s.y;y++){int o=(y-(s.y/2))*shear;for(int x=0;x<s.x;x++)t->sv[x+y*s.x]=b->sv[mod(x+o,s.x)+y*s.x];}
+	memcpy(b->sv,t->sv,b->c);
+}
+void buffer_shear_y(lv*b,lv*t,float shear){
+	pair s=buff_size(b);
+	for(int x=0;x<s.x;x++){int o=(x-(s.x/2))*shear;for(int y=0;y<s.y;y++)t->sv[x+y*s.x]=b->sv[x+mod(y+o,s.y)*s.x];}
+	memcpy(b->sv,t->sv,b->c);
+}
+lv* n_image_rotate(lv*self,lv*z){
+	float n=fmod(ln(l_first(z)),2*MATH_PI);
+	if(fabs(n)>MATH_PI/2&&fabs(n)<MATH_PI*3/2.0){buffer_flip_v(self->b),buffer_flip_h(self->b),n+=(n<0?1:-1)*MATH_PI;}
+	lv*tmp=lmbuff(buff_size(self->b));
+	buffer_shear_x(self->b,tmp,-tan(n/2));
+	buffer_shear_y(self->b,tmp, sin(n  ));
+	buffer_shear_x(self->b,tmp,-tan(n/2));
+	return self;
+}
 lv* image_make(lv*buffer);lv* image_read(lv*x); // forward refs
 lv* n_image(lv*self,lv*z){if(lis(l_first(z)))return image_read(l_first(z));return image_make(lmbuff(unpack_pair(z,0)));(void)self;}
 lv* image_empty(){return image_make(lmbuff((pair){0,0}));}
@@ -428,6 +449,7 @@ lv* interface_image(lv*self,lv*i,lv*x){
 	ikey("map"      )return lmnat(n_buffer_map,self);
 	ikey("merge"    )return lmnat(n_image_merge,self);
 	ikey("transform")return lmnat(n_image_transform,self);
+	ikey("rotate"   )return lmnat(n_image_rotate,self);
 	ikey("copy"     )return lmnat(n_image_copy,self);
 	ikey("paste"    )return lmnat(n_image_paste,self);
 	ikey("encoded"  )return image_write(self);

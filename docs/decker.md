@@ -825,6 +825,7 @@ Images are dynamically created interfaces, each representing a mutable rectangul
 | `x[pos]`               | The pattern index of an (x,y) pixel of the image. Reads `0` out of bounds, ignores out of bounds writes. r/w.            |
 | `x.map[x y]`           | Replace every pixel of the image by indexing the dictionary `x`, using `y` as a default if provided.                     |
 | `x.transform[x]`       | Update the image in place according to one of {`"horiz"`,`"vert"`,`"flip"`,`"left"`,`"right"`,`"dither"`}.               |
+| `x.rotate[x]`          | Update the image in place, rotating it counterclockwise around its centerpoint by `x` radians.                           |
 | `x.merge[x...]`        | Consistent with `canvas.merge[]`: Replace every pixel of the image by compositing together images by index.              |
 | `x.copy[pos size a]`   | Consistent with `canvas.copy[]`: grab and return a sub-image at `pos`/`size`, respecting anchor `a`.                     |
 | `x.paste[image pos t]` | Consistent with `canvas.paste[]`: composite in another image at `pos`. If `t` is truthy, treat pattern 0 as transparent. |
@@ -853,6 +854,8 @@ The `transform[x]` function modifies the entire image in place, depending on `x`
 - `"dither"`: dither a 256-gray image to 1-bit color, in patterns 0 and 1, using Bill Atkinson's algorithm.
 
 Any other value will leave the image unchanged.
+
+The `rotate[x]` function uses the [rotation by shearing](https://www.ocf.berkeley.edu/~fricke/projects/israel/paeth/rotation_by_shearing.html) method internally, and is therefore pixel-perfect and area-preserving. Repeated small rotations will accumulate distortion, but applying the same sequence of rotations in reverse will restore the original image.
 
 
 Sound Interface
