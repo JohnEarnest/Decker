@@ -390,7 +390,7 @@ void buffer_shear_y(lv*b,lv*t,float shear){
 	memcpy(b->sv,t->sv,b->c);
 }
 lv* n_image_rotate(lv*self,lv*z){
-	float n=fmod(ln(l_first(z)),2*MATH_PI);
+	float n=-fmod(ln(l_first(z)),2*MATH_PI);
 	if(fabs(n)>MATH_PI/2&&fabs(n)<MATH_PI*3/2.0){buffer_flip_v(self->b),buffer_flip_h(self->b),n+=(n<0?1:-1)*MATH_PI;}
 	lv*tmp=lmbuff(buff_size(self->b));
 	buffer_shear_x(self->b,tmp,-tan(n/2));
