@@ -25,13 +25,8 @@ on view do
   "a multimedia sketchbook",
   "an interactive sketchbook",
   "the everything machine",
-  "it's pretty neat!",
-  "it's pretty good!",
   "a program for your computer",
-  "one of the programs of all time",
-  "not just for chickens",
-  "found the secret chicken card yet?",
-  "hey, is this subtitle changing?"
+  "found the secret chicken card yet?"
  ]
 end
 {end}

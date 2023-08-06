@@ -44,3 +44,8 @@ show[inside[5]]
 outside.const:300
 inside:eval["on one x do const*x end  on two x do one[3+x] end" outside].value
 show[inside[4]]
+
+# if we know what we're doing, we can opt into executing in the caller's scope
+globalish:9998
+t:eval["localish:10+globalish globalish:777" () 1]
+show[t localish globalish]

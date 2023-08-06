@@ -278,13 +278,13 @@ merge=(vals,keys,widen)=>{
 	return {r,ix}
 }
 n_uplevel=([a])=>{let i=2, e=getev(), r=null, name=ls(a); while(e&&i){r=e.v[name];if(r)i--;e=e.p};return r||NONE}
-n_eval=([x,y])=>{
+n_eval=([x,y,extend])=>{
 	y=y?ld(y):lmd();const yy=lmd(y.k.slice(0),y.v.slice(0)), r=lmd(['value','vars','error'].map(lms),[NONE,yy,lms('')])
 	const feval=([r,x])=>{dset(r,lms('value'),x);const b=dget(r,lms('vars')), v=getev().v; Object.keys(v).map(k=>dset(b,lms(k),v[k]));return r}
 	try{
 		const prog=parse(x?ls(x):'')
 		blk_opa(prog,op.BUND,2),blk_lit(prog,lmnat(feval)),blk_op(prog,op.SWAP),blk_op(prog,op.CALL)
-		issue(env_bind(null,yy.k.map(ls),lml(yy.v)),prog)
+		issue(env_bind(extend&&lb(extend)?getev():null,yy.k.map(ls),lml(yy.v)),prog)
 	}catch(e){dset(r,lms('error'),lms(e.x))};return r
 }
 triad={

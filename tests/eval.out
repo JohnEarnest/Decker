@@ -13,3 +13,4 @@
 {"value":on foo do ... end,"vars":{"foo":on foo do ... end},"error":""}
 1500
 2100
+{"value":777,"vars":{"localish":10008},"error":""} 0 777

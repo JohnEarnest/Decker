@@ -934,7 +934,7 @@ lv*n_eval(lv*self,lv*a){
 	lv* prog=parse(ls(l_first(a))->sv);dset(r,lmistr("error"),perr()?lmcstr(par.error):lms(0));
 	if(perr())return r;GEN(k,yy->c)yy->kv[z];GEN(v,yy->c)yy->lv[z];
 	blk_opa(prog,BUND,2),blk_lit(prog,lmnat(n_feval,NULL)),blk_op(prog,SWAP),blk_op(prog,CALL);
-	issue(env_bind(NULL,k,v),prog);return r;
+	issue(env_bind(a->c>2&&lb(a->lv[2])?ev():NULL,k,v),prog);return r;
 }
 void init_interns(){for(int z=0;z<100;z++){lv*t=&interned[z];t->t=0,t->c=1,t->nv=z;}}
 void init(lv*e){state.p=lml(0),state.t=lml(0),state.e=lml(0),state.pcs=idx_new(0);ll_add(state.e,e);}

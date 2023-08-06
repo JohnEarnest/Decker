@@ -98,7 +98,7 @@ Built-in Functions
 | `write[x y]`     | Write a value `y` to a file `x`. Returns `1` on success.(3)                                                                 | Files   |
 | `exit[x]`        | Stop execution with exit code `x`.                                                                                          | System  |
 | `shell[x]`       | Execute string `x` as a shell command and block for its completion.(4)                                                      | System  |
-| `eval[x y]`      | Parse and execute a string `x` as a Lil program, using any variable bindings in dictionary `y`.(5)                          | System  |
+| `eval[x y z]`    | Parse and execute a string `x` as a Lil program, using any variable bindings in dictionary `y`.(5)                          | System  |
 | `import[x]`      | Execute a `.lil` script `x` in an isolated scope and return a dictionary of definitions made within that script.            | System  |
 | `random[x y]`    | Choose `y` random elements from `x`. In Lilt, `sys.seed` is always pre-initialized to a constant.                           | System  |
 | `readcsv[x y d]` | Turn a [RFC-4180](https://datatracker.ietf.org/doc/html/rfc4180) CSV string `x` into a Lil table with column spec `y`.(5)   | Data    |

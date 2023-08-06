@@ -426,7 +426,7 @@ Decker provides a number of useful pre-defined functions:
 | `array[x y]`           | Create a new [Array Interface](#arrayinterface) with size `x` and cast string `y`, or decode an array string `x`.         | Decker     |
 | `image[x]`             | Create a new [Image Interface](#imageinterface) with size `x` (`(width,height)`), or decode an image string.              | Decker     |
 | `sound[x]`             | Create a new [Sound Interface](#soundinterface) with a size or list of samples `x`, or decode a sound string.             | Decker     |
-| `eval[x y]`            | Parse and execute a string `x` as a Lil program, using any variable bindings in dictionary `y`. (5)                       | System     |
+| `eval[x y z]`          | Parse and execute a string `x` as a Lil program, using any variable bindings in dictionary `y`. (5)                       | System     |
 | `random[x y]`          | Choose `y` random elements from `x`. (6)                                                                                  | System     |
 | `readcsv[x y d]`       | Turn a [RFC-4180](https://datatracker.ietf.org/doc/html/rfc4180) CSV string `x` into a Lil table with column spec `y`.(7) | Data       |
 | `writecsv[x y d]`      | Turn a Lil table `x` into a CSV string with column spec `y`.(7)                                                           | Data       |
@@ -455,17 +455,18 @@ If specified, the transition time `z` is the number of frames (at 60 frames/seco
 
 4) If `sleep[]` is provided the string `"play"` as an argument, instead of waiting for some number of frames to pass, it will pause script execution until all sound clips triggered with `play[]` complete.
 
-5) `eval[x y]` returns a dictionary containing:
+5) `eval[x y z]` returns a dictionary containing:
 - `error`: a string giving any error message produced during parsing, or the empty string.
 - `value`: the value of the last expression in the program. On a parse error, `value` will be the number `0`.
 - `vars`: a dictionary containing any variable bindings made while executing the program. (This also includes bindings from argument `y`.)
 
-Code executed within `eval[]` does not have access to any variables from the caller that are not explicitly passed in via the second argument, including global functions and constants, nor can it modify variables of the caller; the code is executed in its own isolated scope. In the following example, we provide our `eval[]`ed code with the `show[]` function and a constant:
+By default, code executed within `eval[]` does not have access to any variables from the caller that are not explicitly passed in via the second argument (`y`), including global functions and constants, nor can it modify variables of the caller; the code is executed in its own isolated scope. In the following example, we provide our `eval[]`ed code with the `show[]` function and a constant:
 ```
 d.show:show
 d.a:2
 eval["show[a+3]" d]
 ```
+If the third argument (`z`) is truthy, `eval[]` will instead execute _within_ the caller's scope, giving it the ability to read (and potentially write) every variable that was in scope at the point where `eval[]` was called. Use this with caution!
 
 6) The behavior of `random[x y]` depends on the type of `x` and whether or not `y` is provided:
 - if `x` is a number, treat it as if it were `range x`.
