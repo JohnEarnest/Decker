@@ -120,8 +120,8 @@ lv* lmistr(char*x){
 	lv*r=&interned[intern_count++];r->t=1,r->c=strlen(x),r->sv=x;
 	if(intern_count>511)printf("warning: intern heap is full!\n");return r;
 }
-int mod(int x,int y){x=y==0?0:x%y;if(x<0)x+=y;return x;}
-long long int lmod(long long int x,long long int y){x=y==0?0:x%y;if(x<0)x+=y;return x;}
+int     mod(int    x,int    y){x=y==0?0:x%y      ;if(x<0)x+=y;return x;}
+double dmod(double x,double y){x=y==0?0:fmod(x,y);if(x<0)x+=y;return x;}
 double rnum_len(char*x,int n,int*len){
 	if(n==0)return 0;int i=0,sign=1;double r=0,p=10;while(isspace(x[i]))i++;
 	if(x[0]=='-')sign=-1,i++;while(i<n&&isdigit(x[i]))r=r*10+(x[i]-'0'),i++;
@@ -268,7 +268,7 @@ dyad(a_add ){return lmn(ln(x)+ln(y));}vd(add)
 dyad(a_sub ){return lmn(ln(x)-ln(y));}vd(sub)
 dyad(a_mul ){return lmn(ln(x)*ln(y));}vd(mul)
 dyad(a_div ){return lmn(ln(y)==0?0:ln(x)/ln(y));}vd(div)
-dyad(a_mod ){return lmn(lmod(ln(y),ln(x)));}vd(mod)
+dyad(a_mod ){return lmn(dmod(ln(y),ln(x)));}vd(mod)
 dyad(a_pow ){return lmn(pow(ln(x),ln(y)));}vd(pow)
 dyad(a_less){return lmn(lin(x)&&lin(y)? ln(x) <ln(y): strcmp(ls(x)->sv,ls(y)->sv)<0);}vd(less)
 dyad(a_more){return lmn(lin(x)&&lin(y)? ln(x) >ln(y): strcmp(ls(x)->sv,ls(y)->sv)>0);}vd(more)
