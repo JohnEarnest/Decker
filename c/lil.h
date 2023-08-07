@@ -14,7 +14,7 @@ typedef struct{int c,size,*iv;}idx;
 typedef struct{lv*p,*t,*e;idx pcs;}pstate;pstate state={0}; // parameters, tasks, envs, index
 typedef struct{int lo,hi,live,size,g,ss;lv**heap;long frees,allocs,depth;pstate st[4];}gc_state;gc_state gc={0};
 typedef struct{char*name;void*func;}primitive;
-int seed=0x12345;lv interned[512]={{0}};int intern_count=100;
+int seed=0x12345;lv interned[512]={{0}};int intern_count=100, do_panic=0;
 #define intern_num {if(x==floor(x)&&x>=0&&x<100)return &interned[(int)x];}
 lv*n_show (lv*self,lv*a); // user-supplied function which displays raw to stdout.
 lv*n_print(lv*self,lv*a); // user-supplied function which formats/displays to stdout.

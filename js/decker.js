@@ -1074,11 +1074,11 @@ ui_list    =(r,              value)=>widget_grid(null,{size:r,font:FONT_BODY,wid
 
 // The Listener
 
-listen_show=(align,bare,x)=>{
+listen_show_image=(x,v)=>{
 	frame=context;while(li.hist.length>=LISTEN_LINES)li.hist.shift()
-	li.hist.push([draw_lil(rsub(LISTEN_SIZE(),rect(18,5)),align,bare,x),x])
-	li.scroll=RTEXT_END
+	li.hist.push([x,v]),li.scroll=RTEXT_END
 }
+listen_show=(align,bare,x)=>listen_show_image(draw_lil(rsub(LISTEN_SIZE(),rect(18,5)),align,bare,x),x)
 n_show=(a)=>{if(a.length<2){listen_show(ALIGN.right,0,a[0])}else{listen_show(ALIGN.right,1,lms(a.map(show).join(' ')))};return a[0]}
 n_print=(a)=>{if(a.length<2){listen_show(ALIGN.right,1,lms(ls(a[0])))}else{listen_show(ALIGN.right,1,a[0]=dyad.format(a[0],lml(a.slice(1))))}return a[0]}
 n_pre_listen=([a])=>{
@@ -1115,6 +1115,12 @@ listener=r=>{
 			if(a&&ev.mu)ms.text=fieldstr(t)
 		})
 	}
+}
+n_panic=z=>{
+	do_panic=1,halt(),states.map(x=>x.t=[]),modal_enter('listen')
+	const s=rect((512-22)-18,16),b=rpair(rect(0,0),s),r=image_make(s),t=frame;frame=draw_frame(r)
+	draw_box(b,0,35),draw_textc(inset(b,2),'PANIC',FONT_MONO,35),frame=t,listen_show_image(r,z)
+	n_show(z),li.vars['_']=z[0]||NONE;return NONE
 }
 
 // Audio
@@ -2073,7 +2079,7 @@ modals=_=>{
 	else if(ms.type=='trans'){
 		const now=new Date().getTime()/1000
 		const sofar=ms.time_start==-1?0:now-ms.time_start;if(ms.time_start==-1)ms.time_start=now
-		if(do_transition(min((sofar*60)/ms.time_end,1.0),frame.image,1)>=1)modal_exit(0)
+		if(do_transition(min((sofar*60)/ms.time_end,1.0),frame.image,1)>=1||do_panic)modal_exit(0)
 	}
 	ms.in_modal=0
 }
@@ -3413,7 +3419,7 @@ loop=stamp=>{
 	if(!prev_stamp)prev_stamp=stamp
 	let delta=(stamp-prev_stamp)+leftover, frame=1000/60, tc=0
 	while(delta>frame){tick(),tc++,delta-=frame;if(tc==5){delta=0;break}};leftover=delta
-	sync(),prev_stamp=stamp,requestAnimationFrame(loop)
+	sync(),prev_stamp=stamp,requestAnimationFrame(loop),do_panic=0
 }
 resize=_=>{
 	const b=q('body'), screen=rect(b.clientWidth,b.clientHeight), fs=min(screen.x/fb.size.x,screen.y/fb.size.y)

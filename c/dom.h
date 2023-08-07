@@ -67,6 +67,7 @@ lv* interface_rtext(lv*self,lv*i,lv*x); // forward ref
 lv* interface_pointer(lv*self,lv*i,lv*x); // forward ref
 lv* interface_app(lv*self,lv*i,lv*x); // forward ref
 lv* n_brush(lv*self,lv*z); // forward ref
+lv* n_panic(lv*self,lv*z); // forward ref
 #define MATH_PI 3.141592653589793
 #define MATH_E  2.718281828459045
 void constants(lv*env){
@@ -99,6 +100,7 @@ lv*n_play(lv*self,lv*z); // forward ref
 void primitives(lv*env,lv*deck){
 	dset(env,lmistr("show"      ),lmnat(n_show      ,NULL));
 	dset(env,lmistr("print"     ),lmnat(n_print     ,NULL));
+	dset(env,lmistr("panic"     ),lmnat(n_panic     ,NULL));
 	dset(env,lmistr("play"      ),lmnat(n_play      ,deck));
 	dset(env,lmistr("go"        ),lmnat(n_go        ,deck));
 	dset(env,lmistr("transition"),lmnat(n_transition,deck));
@@ -714,7 +716,7 @@ void draw_line_custom(rect r,lv*mask,int pattern){
 }
 void draw_line_function(rect r,lv*func,int pattern){
 	lv*a=lml2(lmpair((pair){r.w-r.x,r.h-r.y}),ONE),*p=lmblk(),*e=lmenv(NULL);blk_lit(p,func),blk_lit(p,a),blk_op(p,CALL),pushstate(e);
-	int dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1;while(1){
+	int dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1;while(!do_panic){
 		state.e->c=1,state.t->c=0,state.p->c=0,state.pcs.c=0;issue(e,p);int quota=BRUSH_QUOTA;while(quota&&running())runop(),quota--;lv*v=running()?NONE:arg();
 		if(image_is(v)){
 			lv*mask=v->b;pair ms=buff_size(mask),mc={ms.x/2,ms.y/2};

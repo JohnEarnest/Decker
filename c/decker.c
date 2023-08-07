@@ -1018,10 +1018,13 @@ lv* draw_lil(pair size,int align,int bare,lv*x){
 
 #define LISTEN_W (frame.size.x-22)
 #define LISTEN_H 100
-void listen_show(int align,int bare,lv*x){
+void listen_show_image(lv*x,lv*v){
 	frame=context;while(li.hist->c>=LISTEN_LINES)ll_unshift(li.hist);
-	ll_add(li.hist,lml2(draw_lil((pair){LISTEN_W-18,LISTEN_H-5},align,bare,x),x));
+	ll_add(li.hist,lml2(x,v));
 	li.scroll=RTEXT_END;
+}
+void listen_show(int align,int bare,lv*x){
+	listen_show_image(draw_lil((pair){LISTEN_W-18,LISTEN_H-5},align,bare,x),x);
 }
 lv* n_show(lv*self,lv*a){
 	(void)self;if(a->c<2){listen_show(align_right,0,l_first(a));}
@@ -1069,6 +1072,13 @@ void listener(rect r){
 			if(a&&ev.mu)ms.text=(field_val){rtext_cast(t),0};
 		}
 	}
+}
+lv* n_panic(lv*self,lv*z){
+	do_panic=1,halt();for(int z=gc.ss-1;z>=0;z--){gc.st[z].t->c=0;}
+	modal_enter(modal_listen);
+	pair s={(512-22)-18,16};rect b=rect_pair((pair){0,0},s);lv*r=lmbuff(s);cstate t=frame;frame=draw_buffer(r);
+	draw_box(b,0,35),draw_textc(inset(b,2),"PANIC",FONT_MONO,35),frame=t,listen_show_image(r,z);
+	n_show(self,z),dset(li.vars,lmistr("_"),l_first(z));return NONE;
 }
 
 // Audio Editor
@@ -2189,7 +2199,7 @@ void modals(){
 	else if(ms.type==modal_trans){
 		do_transition((ms.time_curr*1.0)/ms.time_end,1);
 		lv*i=container_image(ms.canvas,1);buffer_paste(rect_pair((pair){0,0},frame.size),frame.clip,i->b,frame.buffer,1);
-		ms.time_curr++;if(ms.time_curr>ms.time_end)modal_exit(0);
+		ms.time_curr++;if(ms.time_curr>ms.time_end||do_panic)modal_exit(0);
 	}
 	ms.in_modal=0;
 }
@@ -3345,6 +3355,7 @@ void sync(){
 		SDL_RenderPresent(ren);
 	}
 	SDL_SetCursor(CURSORS[uicursor]);
+	do_panic=0;
 }
 
 // Runtime

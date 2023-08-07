@@ -392,7 +392,7 @@ end
 
 While the listener is open, the name of every widget is drawn above it, for an easy at-a-glance reference. You can also enable these labels while using the widget tool with _Widgets &#8594; Widget Names_.
 
-The [built-in functions](#built-infunctions) `show[]` and `print[]` can be used to log information to the Listener for later review.
+The [built-in functions](#built-infunctions) `show[]` and `print[]` can be used to log information to the Listener for later review. The `panic[]` function is like `show[]`, but it immediately halts any executing script and opens the Listener.
 
 
 Scripting
@@ -418,7 +418,8 @@ Decker provides a number of useful pre-defined functions:
 
 | Name                   | Description                                                                                                               | Purpose    |
 | :--------------------- | :------------------------------------------------------------------------------------------------------------------------ | :--------- |
-| `show[x...]`           | Print a human-comprehensible representation of the value `x` to _stdout_ followed by a newline, and return `x`.           | Listener   |
+| `show[x...]`           | Print a human-comprehensible representation of the value `x` to the Listener, and return `x`.                             | Listener   |
+| `panic[x...]`          | Print a human-comprehensible representation of the value `x` to the Listener, and immediately halt the executing script.  | Listener   |
 | `print[x...]`          | Display a string `x` in the Listener. (1)                                                                                 | Listener   |
 | `play[x mode]`         | Play a sound. `x` can be either the name of a sound or a sound interface. (2)                                             | Decker     |
 | `go[x y z]`            | Navigate to another card by _name_, _value_, or _index_ `x` with transition `y`, playing for `z` frames (3).              | Decker     |

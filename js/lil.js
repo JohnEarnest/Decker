@@ -1,6 +1,6 @@
 // lil: Learning in Layers
 
-let allocs=0,calldepth=0
+let allocs=0,calldepth=0,do_panic=0
 lmn  =x      =>(allocs++,{t:'num',v:isFinite(x)?+x:0}),   lin  =x=>x&&x.t=='num'
 lms  =x      =>(allocs++,{t:'str',v:''+x }),              lis  =x=>x&&x.t=='str'
 lml  =x      =>(allocs++,{t:'lst',v:x    }),              lil  =x=>x&&x.t=='lst'
@@ -960,7 +960,7 @@ draw_line_custom=(r,mask,pattern)=>{
 }
 draw_line_function=(r,func,pattern)=>{
 	const a=lml([lmpair(rect(r.w-r.x,r.h-r.y)),ONE]),p=lmblk(),e=lmenv();blk_lit(p,func),blk_lit(p,a),blk_op(p,op.CALL),pushstate(e)
-	let dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1;while(1){
+	let dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1;while(!do_panic){
 		state.e=[e],state.t=[],state.pcs=[];issue(e,p);let quota=BRUSH_QUOTA;while(quota&&running())runop(),quota--;const v=running()?NONE:arg()
 		if(image_is(v)){
 			const ms=v.size, mc=rint(rdiv(ms,2))
@@ -2404,6 +2404,7 @@ constants=env=>{
 primitives=(env,deck)=>{
 	env.local('show'      ,lmnat(n_show    ))
 	env.local('print'     ,lmnat(n_print   ))
+	env.local('panic'     ,lmnat(n_panic   ))
 	env.local('play'      ,lmnat(n_play    ))
 	env.local('go'        ,lmnat(([x,t,d])=>n_go([x,t,d],deck)))
 	env.local('transition',lmnat(([f])=>n_transition(f,deck)))
