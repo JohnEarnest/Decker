@@ -1079,8 +1079,8 @@ listen_show_image=(x,v)=>{
 	li.hist.push([x,v]),li.scroll=RTEXT_END
 }
 listen_show=(align,bare,x)=>listen_show_image(draw_lil(rsub(LISTEN_SIZE(),rect(18,5)),align,bare,x),x)
-n_show=(a)=>{if(a.length<2){listen_show(ALIGN.right,0,a[0])}else{listen_show(ALIGN.right,1,lms(a.map(show).join(' ')))};return a[0]}
-n_print=(a)=>{if(a.length<2){listen_show(ALIGN.right,1,lms(ls(a[0])))}else{listen_show(ALIGN.right,1,a[0]=dyad.format(a[0],lml(a.slice(1))))}return a[0]}
+n_show=(a)=>{a[0]=a[0]||NONE;if(a.length<2){listen_show(ALIGN.right,0,a[0])}else{listen_show(ALIGN.right,1,lms(a.map(show).join(' ')))};return a[0]}
+n_print=(a)=>{a[0]=a[0]||NONE;if(a.length<2){listen_show(ALIGN.right,1,lms(ls(a[0])))}else{listen_show(ALIGN.right,1,a[0]=dyad.format(a[0],lml(a.slice(1))))}return a[0]}
 n_pre_listen=([a])=>{
 	const ev=getev();Object.keys(li.vars).map(name=>{if(!ev.v[name])ev.v[name]=li.vars[name]})
 	if(ob.sel.length&&uimode=='object')ev.v.selected=lml(ob.sel.slice(0))
@@ -1119,7 +1119,7 @@ listener=r=>{
 n_panic=z=>{
 	do_panic=1,halt(),states.map(x=>x.t=[]),modal_enter('listen')
 	const s=rect((512-22)-18,16),b=rpair(rect(0,0),s),r=image_make(s),t=frame;frame=draw_frame(r)
-	draw_box(b,0,35),draw_textc(inset(b,2),'PANIC',FONT_MONO,35),frame=t,listen_show_image(r,z)
+	draw_box(b,0,35),draw_textc(inset(b,2),'PANIC',FONT_MONO,35),frame=t,listen_show_image(r,NONE)
 	n_show(z),li.vars['_']=z[0]||NONE;return NONE
 }
 
