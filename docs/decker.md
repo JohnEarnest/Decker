@@ -392,6 +392,8 @@ end
 
 While the listener is open, the name of every widget is drawn above it, for an easy at-a-glance reference. You can also enable these labels while using the widget tool with _Widgets &#8594; Widget Names_.
 
+The [built-in functions](#built-infunctions) `show[]` and `print[]` can be used to log information to the Listener for later review.
+
 
 Scripting
 =========
@@ -416,16 +418,16 @@ Decker provides a number of useful pre-defined functions:
 
 | Name                   | Description                                                                                                               | Purpose    |
 | :--------------------- | :------------------------------------------------------------------------------------------------------------------------ | :--------- |
-| `show[x...]`           | Print a human-comprehensible representation of the value `x` to _stdout_ followed by a newline, and return `x`.           | Console    |
-| `print[x...]`          | Display a string `x` in the Listener. (1)                                                                                 | Console    |
+| `show[x...]`           | Print a human-comprehensible representation of the value `x` to _stdout_ followed by a newline, and return `x`.           | Listener   |
+| `print[x...]`          | Display a string `x` in the Listener. (1)                                                                                 | Listener   |
 | `play[x mode]`         | Play a sound. `x` can be either the name of a sound or a sound interface. (2)                                             | Decker     |
 | `go[x y z]`            | Navigate to another card by _name_, _value_, or _index_ `x` with transition `y`, playing for `z` frames (3).              | Decker     |
 | `transition[x]`        | Install a [transition](#transitions) `x` for use with `go[]`, and return a dictionary of installed transitions.           | Decker     |
 | `brush[x y]`           | Install a [brush](#brushes) `x` for use with `canvas.brush`, and return a dictionary of installed brushes.                | Decker     |
 | `sleep[x]`             | Wait for `x` 60hz frames before proceeding, minimum 1 frame. Allows for performing simple animation. (4)                  | Decker     |
-| `array[x y]`           | Create a new [Array Interface](#arrayinterface) with size `x` and cast string `y`, or decode an array string `x`.         | Decker     |
-| `image[x]`             | Create a new [Image Interface](#imageinterface) with size `x` (`(width,height)`), or decode an image string.              | Decker     |
-| `sound[x]`             | Create a new [Sound Interface](#soundinterface) with a size or list of samples `x`, or decode a sound string.             | Decker     |
+| `array[x y]`           | Create a new [Array Interface](#arrayinterface) with size `x` and cast string `y`, or decode an array string `x`.         | System     |
+| `image[x]`             | Create a new [Image Interface](#imageinterface) with size `x` (`(width,height)`), or decode an image string.              | System     |
+| `sound[x]`             | Create a new [Sound Interface](#soundinterface) with a size or list of samples `x`, or decode a sound string.             | System     |
 | `eval[x y z]`          | Parse and execute a string `x` as a Lil program, using any variable bindings in dictionary `y`. (5)                       | System     |
 | `random[x y]`          | Choose `y` random elements from `x`. (6)                                                                                  | System     |
 | `readcsv[x y d]`       | Turn a [RFC-4180](https://datatracker.ietf.org/doc/html/rfc4180) CSV string `x` into a Lil table with column spec `y`.(7) | Data       |
