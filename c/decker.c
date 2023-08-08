@@ -304,7 +304,7 @@ int framebuffer_flip(pair disp,pair size,int scale){
 	if(scale==2)for(int y=0,i=0,o=0;y<size.y;y++,o+=stride)for(int x=0;x<size.x;x++,i++,o+=2)p[o]=p[o+1]=p[o+stride]=p[o+stride+1]=sgfx[i];
 	SDL_UnlockTexture(gfx);
 	SDL_Rect dst={(disp.x-scale*size.x)/2,(disp.y-scale*size.y)/2,scale*size.x,scale*size.y};
-	if(!windowed)SDL_RenderClear(ren);
+	SDL_RenderClear(ren);
 	SDL_RenderCopy(ren,gfx,NULL,&dst);
 	return 1;
 }
@@ -331,7 +331,7 @@ int framebuffer_flip(pair disp,pair size,int scale){
 	SDL_Rect src={0,0,size.x,size.y};
 	SDL_Rect dst={(disp.x-scale*size.x)/2,(disp.y-scale*size.y)/2,scale*size.x,scale*size.y};
 	SDL_SetRenderDrawColor(ren,0x00,0x00,0x00,0xFF);
-	if(!windowed)SDL_RenderClear(ren);
+	SDL_RenderClear(ren);
 	SDL_RenderCopy(ren,gfx,&src,&dst);
 	return 1;
 }
