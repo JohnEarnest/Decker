@@ -4000,7 +4000,7 @@ void resize_window(lv*deck){
 	#define serr(x) {if(x==NULL)printf("SDL error: %s\n",SDL_GetError()),exit(1);}
 	SDL_DisplayMode dis;SDL_GetDesktopDisplayMode(0,&dis);
 	int minscale=noscale?1: (size.x*2<=dis.w&&size.y*2<=dis.h)?2:1;
-	if(win){SDL_SetWindowSize(win,(size.x+(toolbars_enable?4+2*buff_size(TOOLB).x:0))*minscale,size.y*minscale+4),SDL_DestroyTexture(gfx);}
+	if(win){SDL_SetWindowSize(win,(size.x+(toolbars_enable?4+2*buff_size(TOOLB).x:0))*minscale,size.y*minscale+(toolbars_enable?4:0)),SDL_DestroyTexture(gfx);}
 	else{
 		win=SDL_CreateWindow("Decker",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,size.x*minscale,size.y*minscale,SDL_WINDOW_SHOWN|SDL_WINDOW_ALLOW_HIGHDPI);serr(win);
 		ren=SDL_CreateRenderer(win,-1,SDL_RENDERER_SOFTWARE);serr(ren);
