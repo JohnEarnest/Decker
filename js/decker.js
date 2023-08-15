@@ -1789,11 +1789,9 @@ modals=_=>{
 			if(subtype=='export_image' )save_image()
 			if(subtype=='save_lil'){
 				let x=ms.verb;ret(ONE)
-				let f=image_is(x)?[x]: lid(x)?ll(dget(x,lms('frames'))||lml([])): lil(x)?ll(x): []
-				let d=image_is(x)?[ ]: lid(x)?ll(dget(x,lms('delays'))||lml([])): []
-				let ff=[],fd=[];f.map((v,i)=>{if(image_is(v))ff.push(v),fd.push(i>=d.length?3: clamp(1,0|ln(d[i]),65535))})
-				console.log('save lil',ff,fd)
-
+				let f=image_is(x)?[x]:     lid(x)?ll(dget(x,lms('frames'))||lml([])): lil(x)?ll(x): []
+				let d=image_is(x)?lml([]): lid(x)?   dget(x,lms('delays'))||lml([] ): lml([])
+				let ff=[],fd=[];f.map((v,i)=>{if(image_is(v))ff.push(v),fd.push(lil(d)?(i>=count(d)?3: clamp(1,0|ln(d[i]),65535)):lmn(ln(d)))})
 				if((lil(x)||lid(x)||image_is(x))&&f.length){save_bin(name,writegif(ff,fd))}
 				else if(sound_is(x))                       {save_bin(name,writewav(x))}
 				else if(array_is(x))                       {save_bin(name,writearray(x))}

@@ -405,6 +405,11 @@ if !sys.platform~"web"
 	f:read["temp.gif" "frames"]
 	assert["round-trip animated gif frame delays" (7,5,1) f.delays]
 
+	parts.delays:9
+	write["temp.gif" parts]
+	f:read["temp.gif" "frames"]
+	assert["spread gif frame delay" (9,9,9) f.delays]
+
 	frame_a.size:0,0
 	assert["cannot write out a gif of dimension 0 on either axis." 0 write["temp.gif" frame_a]]
 end
