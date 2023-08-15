@@ -1542,7 +1542,7 @@ void modal_exit(int value){
 		if(ms.type==modal_save&&!value){arg();ret(NONE);ms.type=modal_none;return;}
 		lv*path=modal_save_path(ms.filter==filter_sound?".wav":ms.filter==filter_gif?".gif":"");
 		if(directory_exists(path->sv)&&ms.type!=modal_confirm){modal_save_replace(modal_save_lil,"file",path);return;}
-		lv*value=ms.verb;arg(),ret(!value?NONE:
+		lv*value=arg();ret(!value?NONE:
 			(image_is(value)||lil(value)||lid(value))?n_writegif(NULL,lml2(path,value)):
 			sound_is(value)?n_writewav(NULL,lml2(path,value)):
 			array_is(value)?writebin(path,value):
@@ -2234,8 +2234,8 @@ lv*n_save(lv*self,lv*z){
 	if(sound_is(value))ms.filter=filter_sound,ms.desc="Save a .wav sound file.";
 	if(image_is(value)||lid(value))ms.filter=filter_gif,ms.desc="Save a .gif image file.";
 	if(lil(value)){EACH(z,value)if(image_is(value->lv[z]))ms.filter=filter_gif,ms.desc="Save a .gif image file.";}
-	ms.grid=(grid_val){directory_enumerate(ms.path,ms.filter,0),0,0},ms.verb=value;
-	return NONE;
+	ms.grid=(grid_val){directory_enumerate(ms.path,ms.filter,0),0,0};
+	return value;
 }
 void go_notify(lv*deck,lv*args,int dest){
 	if(args->c&&lis(args->lv[0])){
