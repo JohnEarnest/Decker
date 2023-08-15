@@ -2563,7 +2563,7 @@ lv* n_readgif(lv*self,lv*a){
 }
 char* n_writegif_raw(lv*a,int*len){
 	if(a->c<2)return NULL;lv*i=lml(0),*d=lml(0);
-	lv*si=lil(a->lv[1])?a->lv[1]: lid(a->lv[1])?dget(a->lv[1],lmistr("frames")): l_list(a->lv[1]);
+	lv*si=lil(a->lv[1])?a->lv[1]: lid(a->lv[1])?dgetv(a->lv[1],lmistr("frames")): l_list(a->lv[1]); if(!lil(si))si=l_list(si);
 	lv*sd=lid(a->lv[1])?dget(a->lv[1],lmistr("delays")) :lml(0);
 	EACH(z,si)if(image_is(si->lv[z])&&!is_empty(si->lv[z]))ll_add(i,si->lv[z]),ll_add(d,lil(sd)?lmn(z>=sd->c?3: CLAMP(1,ln(sd->lv[z]),65535)): lmn(ln(sd)));
 	if(i->c<1)return NULL;return writegif(i,d,len);
