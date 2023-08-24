@@ -339,6 +339,7 @@ assert_image["image paste onto itself"
 	 (list  0, 0))
 	self
 ]
+assert["image histogram" ((0,11,22,33,44) dict (4,2,2,2,2)) self.hist]
 
 mi:image["%%IMG0AA4ADQAAA8AH4B/gP/A/8D/4P/gf+B/4D/AH4AAA"].merge[image["%%IMG1AAIAAyYkJCYmJA=="] image["%%IMG0AAYABviIqLiA/A=="]]
 assert["image merge" "%%IMG1AA4ADSYkJiQmJCYkJiQmJCYkJCYkJiQmAQAAACQmJCYmJCYkJgABAAEAASQmJCYkJgEBAAEAAQEBJCYkJCYAAAAAAQAAAAAAJCYmJAEBAQEBAQEBAQEmJCYkAQEBAAEBAQEBAAEkJCYAAAEAAQAAAAEAASYmJCYAAQABAAEAAQABJCYkJgEBAAEAAQEBAAEkJCYkJgAAAQAAAAAAJCYmJCYkJgEBAQEBASQmJCYkJiQmJCYkJiQmJCYk" mi.encoded]
@@ -971,6 +972,7 @@ assert["sound map"        (77,44,55,77,77)    snd[0,5]]
 snd.map[(44,55) dict -37,-120]
 assert["sound map signed" (77,-37,-120,77,77) snd[0,5]]
 
+assert["sound histogram" ("%j" parse "{77:3,-120:1,-37:1}") snd.hist]
 
 #######################################
 #

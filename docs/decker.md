@@ -826,6 +826,7 @@ Images are dynamically created interfaces, each representing a mutable rectangul
 | :--------------------- | :----------------------------------------------------------------------------------------------------------------------- |
 | `typeof x`             | `"image"`                                                                                                                |
 | `x.encoded`            | The content of this image encoded as an opaque string, suitable for decoding with `image[]`.                             |
+| `x.hist`               | A dictionary mapping the distinct patterns in this image to how many times they appear.                                  |
 | `x.size`               | The `size` of the image in pixels. Resizing pads with `0` or truncates, as needed. r/w.                                  |
 | `x[pos]`               | The pattern index of an (x,y) pixel of the image. Reads `0` out of bounds, ignores out of bounds writes. r/w.            |
 | `x.map[x y]`           | Replace every pixel of the image by indexing the dictionary `x`, using `y` as a default if provided.                     |
@@ -834,6 +835,14 @@ Images are dynamically created interfaces, each representing a mutable rectangul
 | `x.merge[x...]`        | Consistent with `canvas.merge[]`: Replace every pixel of the image by compositing together images by index.              |
 | `x.copy[pos size a]`   | Consistent with `canvas.copy[]`: grab and return a sub-image at `pos`/`size`, respecting anchor `a`.                     |
 | `x.paste[image pos t]` | Consistent with `canvas.paste[]`: composite in another image at `pos`. If `t` is truthy, treat pattern 0 as transparent. |
+
+The `image.hist` attribute can be used to efficiently calculate several properties of an image's palette:
+```
+count i.hist                                        # how many patterns appear in this image?
+colors.red in i.hist                                # does this image contain any red pixels?
+(list 0)~keys i.hist                                # is this image entirely blank?
+3 limit extract key orderby value desc from i.hist  # what are the 3 most common patterns in this image?
+```
 
 The `map[]` function is useful for re-paletting an image. For example, if we have an image `i` containing patterns 0 and 1, we could map them to red and green pixels, respectively, as follows:
 ```
@@ -871,6 +880,7 @@ Sounds are dynamically created interfaces, each representing a mutable buffer of
 | :----------- | :--------------------------------------------------------------------------------------------------------- |
 | `typeof x`   | `"sound"`                                                                                                  |
 | `x.encoded`  | The content of this sound encoded as an opaque string, suitable for decoding with `sound[]`.               |
+| `x.hist`     | A dictionary mapping the distinct sample values in this sound to how many times they appear.               |
 | `x.size`     | An integer giving the number of samples in the sound. Resizing pads with `0` or truncates, as needed. r/w. |
 | `x.duration` | A float giving the play time of the sound in seconds.                                                      |
 | `x[y]`       | The value of sample `y`. Reads `0` out of bounds, ignores out of bounds writes. r/w.                       |
@@ -907,6 +917,15 @@ But the simplest way to create such a sound is to pass the list of samples direc
 ```
 s:sound[16*sin (440/8000)*2*pi*range 8000]
 ```
+
+The `sound.hist` attribute can be used to efficiently calculate several properties of its samples:
+```
+(list 0)~keys s.hist  # is a sound entirely silent?
+h:s.hist
+max keys h            # maximum sample value
+min keys h            # minimum sample value
+```
+
 
 Font Interface
 --------------

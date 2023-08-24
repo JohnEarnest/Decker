@@ -1360,6 +1360,10 @@ buffer_map=(buff,x,fill)=>{
 	for(let z=0;z<x.k.length;z++)m[0xFF&ln(x.k[z])]=0xFF&ln(x.v[z])
 	for(let z=0;z<buff.length;z++)buff[z]=m[buff[z]]
 }
+buffer_hist=(buff,sign)=>{
+	const b_extend=u=>(u)|(0-((u)&0x80)),r=lmd(),c=new Float32Array(256);for(let z=0;z<buff.length;z++)c[buff[z]]++
+	for(let z=0;z<256;z++)if(c[z]!=0)dset(r,lmn(sign?b_extend(z):z),lmn(c[z]));return r
+}
 image_make=size=>{
 	const f=(self,i,x)=>{
 		const s=self.size
@@ -1369,6 +1373,7 @@ image_make=size=>{
 			return ib?lmn(self.pix[p.x+p.y*s.x]):NONE
 		}
 		if(ikey(i,'encoded'))return lms(image_write(self))
+		if(ikey(i,'hist'))return buffer_hist(self.pix,0)
 		if(ikey(i,'size'))return x?(image_resize(self,getpair(x)),x): lmpair(self.size)
 		if(ikey(i,'map'))return lmnat(([x,fill])=>(buffer_map(self.pix,x,fill),self))
 		if(ikey(i,'merge'))return lmnat(z=>{
@@ -1434,6 +1439,7 @@ sound_make=data=>{
 			}else{return lml(range(n.y).map(x=>lmn(sign_extend(self.data[x+n.x]))))}
 		}
 		if(ikey(i,'encoded'))return lms(sound_write(self))
+		if(ikey(i,'hist'))return buffer_hist(self.data,1)
 		if(ikey(i,'size')){
 			if(!x)return lmn(self.data.length)
 			const n=clamp(0,ln(x),10*SFX_RATE),o=self.data;self.data=new Uint8Array(n)

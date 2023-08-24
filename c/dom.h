@@ -363,6 +363,11 @@ lv* n_buffer_map(lv*self,lv*z){
 	z=ld(l_first(z));EACH(i,z)m[0xFF&(int)ln(z->kv[i])]=0xFF&(int)ln(z->lv[i]);
 	EACH(z,self->b)self->b->sv[z]=m[0xFF&(int)self->b->sv[z]];return self;
 }
+lv* buffer_hist(lv*x,int sign){
+	#define b_extend(u) ((u)|(0-((u)&0x80)))
+	lv*r=lmd();double c[256]={0.0};EACH(z,x)c[0xFF&(int)(x->sv[z])]++;
+	for(int z=0;z<256;z++)if(c[z]!=0)dset(r,lmn(sign?b_extend(z):z),lmn(c[z]));return r;
+}
 int is_empty(lv*x){pair s=image_size(x);return s.x==0&&s.y==0;}
 int is_blank(lv*x){if(!image_is(x))return 0;EACH(z,x->b)if(x->b->sv[z])return 0;return 1;}
 lv* n_image_merge(lv*self,lv*z){
@@ -455,6 +460,7 @@ lv* interface_image(lv*self,lv*i,lv*x){
 	ikey("copy"     )return lmnat(n_image_copy,self);
 	ikey("paste"    )return lmnat(n_image_paste,self);
 	ikey("encoded"  )return image_write(self);
+	ikey("hist"     )return buffer_hist(self->b,0);
 	return x?x:NONE;
 }
 lv* image_make(lv*buffer){return lmi(interface_image,lmistr("image"),buffer);}
@@ -1030,6 +1036,7 @@ lv* interface_sound(lv*self,lv*i,lv*x){
 	ikey("size"){if(x){sound_resize(self,ln(x));return x;}return lmn(data->c);}
 	ikey("duration")return lmn(data->c/(1.0*SFX_RATE));
 	ikey("encoded")return sound_write(self);
+	ikey("hist")return buffer_hist(self->b,1);
 	ikey("map")return lmnat(n_buffer_map,self);
 	return x?x:NONE;
 }
