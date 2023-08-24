@@ -52,7 +52,7 @@ There are 7 types of value in Lil: numbers, strings, lists, dictionaries, tables
 - _Lists_ are ordered sequences of values which can be indexed by numbers. The empty list is written as `()`, and the unary operator `list` constructs a single-element list from any value. Lists can be joined with the `,` operator.
 - _Dictionaries_ are ordered sequences of pairings between _keys_ and _values_, both of which can be any type. Dictionaries can be made by the binary operator `dict`, the `extract` statement, or a list can be promoted to a dictionary by assigning at non-numeric keys. Dictionaries can be unioned together with the `,` operator. The `keys` operator extracts the keys of a dictionary, and the `range` operator extracts the values of a dictionary.
 - _Tables_ are a rectangular array of values for which every column has a string as its _key_. Tables can be made with the unary operator `table` or with the `insert` statement. The binary operators `,` (append), `join` (natural join), and `cross` (cartesian join) offer a selection of tabular joins.
-- _Functions_ have a name, take arguments, and return a result. They are declared with `on`, and may be freely passed around or stored in variables, but are otherwise totally opaque values.
+- _Functions_ have a name, take arguments, and return a result. They are declared with `on`, and may be freely passed around or stored in variables. `first` of a function gives its name, and `keys` of a function gives a list of its named arguments.
 - _Interfaces_ are opaque dictionary-like values used to represent system resources or Input/Output devices. Accessing or writing to an interface may produce side-effects.
 
 Lil has a soft, spongy, dynamic type system in which values do their best to convert to a more relevant type as the need arises.
@@ -1106,11 +1106,11 @@ The unary aggregation primitives `sum`, `raze`, `min`, and `max` take a list and
 
 `count` gives the number of elements in a value. The `count` of a number is always 1.
 
-`first` and `last` extract the first or last elements of a value.
+`first` and `last` extract the first or last elements of a value. The `first` of a function is the function's name.
 
 `range` of a number produces a list of the integers `[0,x)`. Applied to anything else, it will produce a list of the _values_ of its dictionary equivalent.
 
-`keys` produces a list of the _keys_ of a value's dictionary equivalent.
+`keys` produces a list of the _keys_ of a value's dictionary equivalent. The `keys` of a function are a list of its argument names.
 
 `list` of anything produces a list of length 1 containing that value.
 

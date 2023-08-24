@@ -89,6 +89,8 @@ monads:
 +----+
 | 22 |
 +----+
+"my_func"
+("alpha","beta")
 
 dyads:
 ======

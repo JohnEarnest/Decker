@@ -225,13 +225,13 @@ vm(not,!  ,lb) vm(negate,-  ,ln) vm(floor,floor,ln) vm(cos,cos,ln)
 vm(sin,sin,ln) vm(tan   ,tan,ln) vm(exp  ,exp  ,ln) vm(ln ,log,ln) vm(sqrt,sqrt,ln)
 monad(l_count){return lmn(lin(x)||lis(x)||lil(x)||lid(x)?x->c:lit(x)?x->n:0);}
 monad(l_list ){lv*r=lml(1);r->lv[0]=x;return r;}
-monad(l_first){if(lit(x))return l_first(l_rows(x));lv*l=ll(x);return!l->c?NONE:l->lv[0];}
+monad(l_first){if(lit(x))return l_first(l_rows(x));if(lion(x))return lmcstr(x->sv);lv*l=ll(x);return!l->c?NONE:l->lv[0];}
 monad(l_last ){if(lit(x))return l_last (l_rows(x));lv*l=ll(x);return!l->c?NONE:l->lv[l->c-1];}
 monad(l_typeof){
 	if(linat(x))return lmistr("function");if(lii(x))return x->a;
 	char*n[]={"number","string","list","dict","table","function","INTERNAL"};return lmistr(n[MIN(6,x->t)]);
 }
-monad(l_keys){if(lii(x))return lml(0);x=ld(x);MAP(r,x)x->kv[z];return r;}
+monad(l_keys){if(lii(x))return lml(0);if(lion(x)){MAP(r,x)x->lv[z];return r;};x=ld(x);MAP(r,x)x->kv[z];return r;}
 monad(l_range){if(!lin(x))return ll(x);int n=ln(x);if(n<0)n=0;GEN(r,n)lmn(z);return r;}
 monad(l_rows){x=lt(x);lv*r=lml(x->n);for(int w=0;w<x->n;w++){DMAP(t,x,x->lv[z]->lv[w]);r->lv[w]=t;}return r;}
 monad(l_cols){x=lt(x);DMAP(r,x,x->lv[z]);return r;}
