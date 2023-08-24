@@ -490,7 +490,7 @@ let msg={ // interpreter event messages
 	arg_click:rect(),arg_drag:rect(),lastdrag:rect(),arg_release:rect(),arg_order:null,arg_run:null,arg_link:null,arg_change:null,arg_navigate:null,
 }
 let li={hist:[],vars:{},scroll:0} // listener state
-let ob={sel:[],show_bounds:1,show_names:0,show_cursor:0,show_margins:0,move:0,move_first:0,resize:0,resize_first:0,handle:-1,prev:rect(),orig:rect()} // object editor state
+let ob={sel:[],show_bounds:1,show_names:0,show_cursor:0,show_margins:0,show_guides:1,move:0,move_first:0,resize:0,resize_first:0,handle:-1,prev:rect(),orig:rect()} // object editor state
 let sc={target:null,others:[],next:null, f:null,prev_mode:null,xray:0,status:''} // script editor state
 script_save=x=>{const k=lms('script');mark_dirty();if(sc.target)iwrite(sc.target,k,x);if(sc.others)sc.others.map(o=>iwrite(o,k,x))}
 
@@ -3186,10 +3186,11 @@ all_menus=_=>{
 	}
 	if(uimode=='draw'||uimode=='object'){
 		menu_bar('View',ms.type==null&&!kc.on)
-		if(menu_check('Show Widgets'      ,1,dr.show_widgets))dr.show_widgets^=1
-		if(menu_check('Show Widget Bounds',1,ob.show_bounds ))ob.show_bounds ^=1
-		if(menu_check('Show Widget Names' ,1,ob.show_names  ))ob.show_names  ^=1
-		if(menu_check('Show Cursor Info'  ,1,ob.show_cursor ))ob.show_cursor ^=1
+		if(menu_check('Show Widgets'         ,1,dr.show_widgets))dr.show_widgets^=1
+		if(menu_check('Show Widget Bounds'   ,1,ob.show_bounds ))ob.show_bounds ^=1
+		if(menu_check('Show Widget Names'    ,1,ob.show_names  ))ob.show_names  ^=1
+		if(menu_check('Show Cursor Info'     ,1,ob.show_cursor ))ob.show_cursor ^=1
+		if(menu_check('Show Alignment Guides',1,ob.show_guides ))ob.show_guides ^=1
 		menu_separator()
 		if(menu_check('Show Grid Overlay',1,dr.show_grid))dr.show_grid^=1
 		if(menu_check('Snap to Grid'     ,1,dr.snap     ))dr.snap     ^=1
@@ -3284,6 +3285,20 @@ main_view=_=>{
 				const r=con_to_screen(rect(x,y));draw_rect(rect(r.x,r.y,1,1),44)
 			}
 		}
+	}
+	if(uimode=='object'&&ob.show_guides&&ob.sel.length){
+		const b=ob.sel.map(w=>unpack_widget(w).size).reduce(runion)
+		wids.v.filter(w=>!ob.sel.some(x=>x==w)).map(w=>{
+			const a=unpack_widget(w).size, u=runion(a,b)
+			if(b.y    ==a.y    )draw_hline(u.x,u.x+u.w,u.y    ,13) // top-top
+			if(b.y+b.h==a.y+a.h)draw_hline(u.x,u.x+u.w,u.y+u.h,13) // bottom-bottom
+			if(b.x    ==a.x    )draw_vline(u.x    ,u.y,u.y+u.h,13) // left-left
+			if(b.x+b.w==a.x+a.w)draw_vline(u.x+u.w,u.y,u.y+u.h,13) // right-right
+			if(b.y    ==a.y+a.h)draw_hline(u.x,u.x+u.w,b.y    ,13) // top-bottom
+			if(b.y+b.h==a.y    )draw_hline(u.x,u.x+u.w,a.y    ,13) // bottom-top
+			if(b.x    ==a.x+a.w)draw_vline(b.x,u.y,u.y+u.h    ,13) // left-right
+			if(b.x+b.w==a.x    )draw_vline(a.x,u.y,u.y+u.h    ,13) // right-left
+		})
 	}
 	const eb=ev;if(uimode!='interact')ev=event_state()
 	if(uimode=='interact'||(dr.show_widgets&&!dr.fatbits)){handle_widgets(wids,con_offset())}

@@ -182,11 +182,11 @@ typedef struct {
 } listen_state; listen_state li={0};
 
 typedef struct {
-	lv* sel; int show_bounds, show_names, show_cursor, show_margins;
+	lv* sel; int show_bounds, show_names, show_cursor, show_margins, show_guides;
 	int move, move_first;
 	int resize, resize_first, handle; pair prev;
 	rect orig;
-} obj_state; obj_state ob={NULL,1,0,0,0, 0,0,0,0,-1,{0,0},{0,0,0,0}};
+} obj_state; obj_state ob={NULL,1,0,0,0,1, 0,0,0,0,-1,{0,0},{0,0,0,0}};
 
 typedef struct {
 	lv* target, *others, *next; field_val f;
@@ -3742,10 +3742,11 @@ void all_menus(){
 	}
 	if(uimode==mode_draw||uimode==mode_object){
 		menu_bar("View",ms.type==modal_none&&!kc.on);
-		if(menu_check("Show Widgets"      ,1,dr.show_widgets,'\0'))dr.show_widgets^=1;
-		if(menu_check("Show Widget Bounds",1,ob.show_bounds ,'\0'))ob.show_bounds ^=1;
-		if(menu_check("Show Widget Names" ,1,ob.show_names  ,'\0'))ob.show_names  ^=1;
-		if(menu_check("Show Cursor Info"  ,1,ob.show_cursor ,'\0'))ob.show_cursor ^=1;
+		if(menu_check("Show Widgets"         ,1,dr.show_widgets,'\0'))dr.show_widgets^=1;
+		if(menu_check("Show Widget Bounds"   ,1,ob.show_bounds ,'\0'))ob.show_bounds ^=1;
+		if(menu_check("Show Widget Names"    ,1,ob.show_names  ,'\0'))ob.show_names  ^=1;
+		if(menu_check("Show Cursor Info"     ,1,ob.show_cursor ,'\0'))ob.show_cursor ^=1;
+		if(menu_check("Show Alignment Guides",1,ob.show_guides ,'\0'))ob.show_guides ^=1;
 		menu_separator();
 		if(menu_check("Show Grid Overlay",1,dr.show_grid,0  ))dr.show_grid^=1;
 		if(menu_check("Snap to Grid"     ,1,dr.snap     ,'p'))dr.snap     ^=1;
@@ -3847,6 +3848,21 @@ void main_view(){
 		}
 	}
 	lv*wids=con_wids();
+	if(uimode==mode_object&&ob.show_guides&&ob.sel->c>0){
+		rect b={0};EACH(z,ob.sel){rect s=unpack_widget(ob.sel->lv[z]).size;b=z==0?s:box_union(b,s);}
+		EACH(z,wids){
+			int f=0;EACH(w,ob.sel)if(wids->lv[z]==ob.sel->lv[w]){f=1;break;}if(f)continue;
+			rect a=unpack_widget(wids->lv[z]).size,u=box_union(a,b);
+			if(b.y    ==a.y    )draw_hline(u.x,u.x+u.w,u.y    ,13); // top-top
+			if(b.y+b.h==a.y+a.h)draw_hline(u.x,u.x+u.w,u.y+u.h,13); // bottom-bottom
+			if(b.x    ==a.x    )draw_vline(u.x    ,u.y,u.y+u.h,13); // left-left
+			if(b.x+b.w==a.x+a.w)draw_vline(u.x+u.w,u.y,u.y+u.h,13); // right-right
+			if(b.y    ==a.y+a.h)draw_hline(u.x,u.x+u.w,b.y    ,13); // top-bottom
+			if(b.y+b.h==a.y    )draw_hline(u.x,u.x+u.w,a.y    ,13); // bottom-top
+			if(b.x    ==a.x+a.w)draw_vline(b.x,u.y,u.y+u.h    ,13); // left-right
+			if(b.x+b.w==a.x    )draw_vline(a.x,u.y,u.y+u.h    ,13); // right-left
+		}
+	}
 	event_state eb=ev;if(uimode!=mode_interact)ev=(event_state){0};
 	if(uimode==mode_interact||(dr.show_widgets&&!dr.fatbits)){handle_widgets(wids,con_offset());}
 	else if(dr.show_widgets&&dr.fatbits)EACH(z,wids){draw_boxinv(pal,con_to_screenr(unpack_widget(wids->lv[z]).size));}

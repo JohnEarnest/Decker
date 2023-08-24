@@ -91,6 +91,7 @@ The _View_ menu will be available when the _Widgets_ or drawing tools are chosen
 - _Show Widget Bounds_: Toggle displaying a rectangular "bounding box" for each widget while editing.
 - _Show Widget Names_: Toggle displaying the `name` property of each widget above it while editing.
 - _Show Cursor Info_: Toggle displaying live numerical overlay of mouse position, offset, and selection bounds while editing.
+- _Show Alignment Guides_: Toggle displaying indicators when the edges of a widget are aligned with other widgets on the card.
 - _Show Grid Overlay_: Toggle displaying a configurable "graph paper" overlay while editing.
 - _Snap to Grid_: Toggle making a number of tools discretize to the grid. This impacts the Select, Line, Box, Filled Box, Oval, and Filled Oval tools, as well as moving and resizing one widget at a time with the _Widgets_ tool.
 - _Grid Size..._: Change the width and height of the "cells" in the _Grid Overlay_.
@@ -392,7 +393,7 @@ end
 
 While the listener is open, the name of every widget is drawn above it, for an easy at-a-glance reference. You can also enable these labels while using the widget tool with _Widgets &#8594; Widget Names_.
 
-The [built-in functions](#built-infunctions) `show[]` and `print[]` can be used to log information to the Listener for later review. The `panic[]` function is like `show[]`, but it immediately halts any executing script and opens the Listener.
+The [built-in functions](#built-infunctions) `show[]` and `print[]` can be used to log information to the Listener for later review. The `panic[]` function is like `show[]`, but it immediately halts any executing script and opens the Listener. The first argument to `panic[]`, if any, will be stashed in `_`, just like the result of an expression typed interactively; this mechanism can be used to retrieve any desired context from the `panic[]`ed scope.
 
 
 Scripting
