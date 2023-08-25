@@ -283,8 +283,8 @@ dyad(l_dict){x=ll(x);lv*r=lmd();y=ll(y);EACH(z,x)dset(r,x->lv[z],z>=y->c?NONE:y-
 dyad(l_split){
 	x=ls(x),y=ls(y);if(x->c==0)return ll(y);lv*r=lml(0);int n=0;EACH(z,y){
 		int m=1;EACH(w,x)if(x->sv[w]!=y->sv[z+w]){m=0;break;}if(!m)continue;
-		lv*s=lms(z-n);memcpy(s->sv,y->sv+n,z-n);ll_add(r,s);z+=x->c-1,n=z+1;
-	}if(n<=y->c){lv*s=lms(y->c-n);memcpy(s->sv,y->sv+n,y->c-n);ll_add(r,s);}return r;
+		str s=str_new();str_add(&s,y->sv+n,z-n);ll_add(r,lmstr(s));z+=x->c-1,n=z+1;
+	}if(n<=y->c){str s=str_new();str_add(&s,y->sv+n,y->c-n);ll_add(r,lmstr(s));}return r;
 }
 dyad(l_fuse){
 	str t=str_new();x=ls(x),y=ll(y);EACH(z,y){if(z)str_addl(&t,x);str_addl(&t,ls(y->lv[z]));}
