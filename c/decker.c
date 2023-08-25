@@ -917,11 +917,12 @@ void handle_widgets(lv*x,pair offset){
 		if(contraption_is(w))widget_contraption(w);
 	}
 }
-void draw_wrapped(rect r,rect sr,lv*dst,lv*src,rect clip,int opaque,char*pal){
-	pair ss=buff_size(src),ds=buff_size(dst);sr=box_intersect(sr,rect_pair((pair){0,0},ss)),r=box_intersect(r,clip);if(r.w<=0||r.h<=0||sr.w<=0||sr.h<=0)return;
-	if(!pal){for(int y=0;y<r.h;y++)for(int x=0;x<r.w;x++){int c=src->sv[(sr.x+(x%sr.w))+(sr.y+(y%sr.h))*ss.x];if(opaque||c)dst->sv[(r.x+x)+(r.y+y)*ds.x]=c;}return;}
+void draw_wrapped(rect o,rect sr,lv*dst,lv*src,rect clip,int opaque,char*pal){
+	pair ss=buff_size(src),ds=buff_size(dst);sr=box_intersect(sr,rect_pair((pair){0,0},ss));
+	rect r=box_intersect(o,clip);pair d={r.x-o.x,r.y-o.y};if(r.w<=0||r.h<=0||sr.w<=0||sr.h<=0)return;
+	if(!pal){for(int y=0;y<r.h;y++)for(int x=0;x<r.w;x++){int c=src->sv[(sr.x+((x+d.x)%sr.w))+(sr.y+((y+d.y)%sr.h))*ss.x];if(opaque||c)dst->sv[(r.x+x)+(r.y+y)*ds.x]=c;}return;}
 	for(int y=0;y<r.h;y++)for(int x=0;x<r.w;x++){
-		int dx=r.x+x,dy=r.y+y, c=draw_pattern(pal,src->sv[(sr.x+(x%sr.w))+(sr.y+(y%sr.h))*ss.x],dx,dy), di=(r.x+x)+(r.y+y)*ds.x;
+		int dx=r.x+x,dy=r.y+y, c=draw_pattern(pal,src->sv[(sr.x+((x+d.x)%sr.w))+(sr.y+((y+d.y)%sr.h))*ss.x],dx,dy), di=(r.x+x)+(r.y+y)*ds.x;
 		dst->sv[di]=c^draw_pattern(pal,dst->sv[di],dx,dy);
 	}
 }

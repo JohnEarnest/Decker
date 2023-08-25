@@ -995,15 +995,15 @@ field_keys=(code,shift)=>{
 
 draw_9seg=(r,dst,src,m,clip,opaque,pal)=>{
 	const o=rect(r.x,r.y), s=src.size, ss=s, ds=dst.size; if(s.x<1||s.y<1)return
-	const draw_wrapped=(r,sr)=>{
-		r=rclip(r,clip),sr=rclip(sr,rpair(rect(0,0),ss));if(r.w<=0||r.h<=0||sr.w<=0||sr.h<=0)return
+	const draw_wrapped=(o,sr)=>{
+		const r=rclip(o,clip),d=rsub(r,o);sr=rclip(sr,rpair(rect(0,0),ss));if(r.w<=0||r.h<=0||sr.w<=0||sr.h<=0)return
 		if(!pal){ // solid/opaque
-			for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++){const c=src.pix[(sr.x+(x%sr.w))+(sr.y+(y%sr.h))*ss.x];if(opaque||c)dst.pix[(r.x+x)+(r.y+y)*ds.x]=c}
+			for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++){const c=src.pix[(sr.x+((x+d.x)%sr.w))+(sr.y+((y+d.y)%sr.h))*ss.x];if(opaque||c)dst.pix[(r.x+x)+(r.y+y)*ds.x]=c}
 		}
 		else{ // invert
 			const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
 			for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++){
-				let dx=r.x+x,dy=r.y+y, c=draw_pattern(src.pix[(sr.x+(x%sr.w))+(sr.y+(y%sr.h))*ss.x],dx,dy), di=(r.x+x)+(r.y+y)*ds.x
+				let dx=r.x+x,dy=r.y+y, c=draw_pattern(src.pix[(sr.x+((x+d.x)%sr.w))+(sr.y+((y+d.y)%sr.h))*ss.x],dx,dy), di=(r.x+x)+(r.y+y)*ds.x
 				dst.pix[di]=c^draw_pattern(dst.pix[di],dx,dy)
 			}
 		}
