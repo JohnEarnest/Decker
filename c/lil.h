@@ -14,8 +14,8 @@ typedef struct{int c,size,*iv;}idx;
 typedef struct{lv*p,*t,*e;idx pcs;}pstate;pstate state={0}; // parameters, tasks, envs, index
 typedef struct{int lo,hi,live,size,g,ss;lv**heap;long frees,allocs,depth;pstate st[4];}gc_state;gc_state gc={0};
 typedef struct{char*name;void*func;}primitive;
-int seed=0x12345;lv interned[512]={{0}};int intern_count=100, do_panic=0;
-#define intern_num {if(x==floor(x)&&x>=0&&x<100)return &interned[(int)x];}
+int seed=0x12345;lv interned[1024]={{0}};unsigned int intern_count=383+1, do_panic=0;
+#define intern_num {if(x==floor(x)&&x>=-128&&x<=255)return &interned[((int)x)+128];}
 lv*n_show (lv*self,lv*a); // user-supplied function which displays raw to stdout.
 lv*n_print(lv*self,lv*a); // user-supplied function which formats/displays to stdout.
 lv*debug_show(lv*x);      // version of l_show() which _always_ goes to stdout, for internal use.
@@ -116,9 +116,9 @@ lv* lmstr(str x){lv*r=lmv(1);str_term(&x),r->c=strlen(x.sv);r->sv=x.sv;return r;
 lv* lmcstr(char*x){lv*r=lmv(1);r->c=strlen(x),r->sv=calloc(r->c+1,1),memcpy(r->sv,x,r->c);return r;}
 lv* lmutf8(char*x){str r=str_new();str_addz(&r,x);return lmstr(r);}
 lv* lmistr(char*x){
-	for(int z=0;z<intern_count;z++)if(interned[z].sv==x)return &interned[z];
+	for(unsigned int z=383+1;z<intern_count;z++)if(interned[z].sv==x)return &interned[z];
 	lv*r=&interned[intern_count++];r->t=1,r->c=strlen(x),r->sv=x;
-	if(intern_count>511)printf("warning: intern heap is full!\n");return r;
+	if(intern_count>sizeof(interned))printf("warning: intern heap is full!\n");return r;
 }
 int     mod(int    x,int    y){x=y==0?0:x%y      ;if(x<0)x+=y;return x;}
 double dmod(double x,double y){x=y==0?0:fmod(x,y);if(x<0)x+=y;return x;}
@@ -936,7 +936,7 @@ lv*n_eval(lv*self,lv*a){
 	blk_opa(prog,BUND,2),blk_lit(prog,lmnat(n_feval,NULL)),blk_op(prog,SWAP),blk_op(prog,CALL);
 	issue(env_bind(a->c>2&&lb(a->lv[2])?ev():NULL,k,v),prog);return r;
 }
-void init_interns(){for(int z=0;z<100;z++){lv*t=&interned[z];t->t=0,t->c=1,t->nv=z;}}
+void init_interns(){for(int z=0;z<=383;z++){lv*t=&interned[z];t->t=0,t->c=1,t->nv=z-128;}}
 void init(lv*e){state.p=lml(0),state.t=lml(0),state.e=lml(0),state.pcs=idx_new(0);ll_add(state.e,e);}
 void pushstate(lv*e){
 	if(!state.p)printf("trying to save an uninitialized state!\n");
