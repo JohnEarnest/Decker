@@ -1467,6 +1467,14 @@ c.size:5,7
 c.rect[0,7 5,-2.3]
 assert["rect fill negative rounding" "%%IMG2AAUABwAeAQU=" c.copy[].encoded]
 
+c:deck.card.add["canvas"]
+c.size:3,3
+c.pattern:1
+c.fill[]
+c[1,1]:29
+c.invert[]
+assert["canvas invert animated pattern" "%%IMG0AAMAAwBAAA==" c.copy[].encoded]
+
 #######################################
 #
 #  Deck
