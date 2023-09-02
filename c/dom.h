@@ -64,6 +64,7 @@ lv* n_go(lv*self,lv*z){
 }
 
 lv* interface_rtext(lv*self,lv*i,lv*x); // forward ref
+lv* interface_bits(lv*self,lv*i,lv*x); // forward ref
 lv* interface_pointer(lv*self,lv*i,lv*x); // forward ref
 lv* interface_app(lv*self,lv*i,lv*x); // forward ref
 lv* n_brush(lv*self,lv*z); // forward ref
@@ -74,6 +75,7 @@ void constants(lv*env){
 	dset(env,lmistr("sys"    ),lmi(interface_sys,    lmistr("system" ),NULL));
 	dset(env,lmistr("app"    ),lmi(interface_app,    lmistr("app"    ),NULL));
 	dset(env,lmistr("rtext"  ),lmi(interface_rtext,  lmistr("rtext"  ),NULL));
+	dset(env,lmistr("bits"   ),lmi(interface_bits,   lmistr("bits"   ),NULL));
 	dset(env,lmistr("pointer"),lmi(interface_pointer,lmistr("pointer"),NULL));
 	dset(env,lmistr("pi"),lmn(MATH_PI));
 	dset(env,lmistr("e" ),lmn(MATH_E));
@@ -1194,6 +1196,20 @@ lv* interface_array(lv*self,lv*i,lv*x){
 		ikey("copy"   )return lmnat(n_array_copy,self);
 		ikey("cat"    )return lmnat(n_array_cat,self);
 	}return x?x:NONE;
+}
+
+// Bits interface
+
+#define lbits(x) (0xFFFF&((unsigned int)ln(x)))
+lv* conformb(lv*z,lv*(f(lv*,lv*))){if(z->c<2)z=l_first(z);lv*r=l_first(z);for(int i=1;i<z->c;i++)r=conform(r,z->lv[i],f);return r;}
+lv* a_bits_and(lv*x,lv*y){return lmn(lbits(x)&lbits(y));}lv* n_bits_and(lv*self,lv*z){(void)self;return conformb(z,a_bits_and);}
+lv* a_bits_or (lv*x,lv*y){return lmn(lbits(x)|lbits(y));}lv* n_bits_or (lv*self,lv*z){(void)self;return conformb(z,a_bits_or );}
+lv* a_bits_xor(lv*x,lv*y){return lmn(lbits(x)^lbits(y));}lv* n_bits_xor(lv*self,lv*z){(void)self;return conformb(z,a_bits_xor);}
+lv* interface_bits(lv*self,lv*i,lv*x){
+	ikey("and")return lmnat(n_bits_and,self);
+	ikey("or" )return lmnat(n_bits_or ,self);
+	ikey("xor")return lmnat(n_bits_xor,self);
+	return x?x:NONE;
 }
 
 // Pointer interface

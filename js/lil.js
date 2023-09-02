@@ -925,6 +925,14 @@ interface_app=lmi((self,i,x)=>{
 	}return x?x:NONE
 },'app')
 
+interface_bits=lmi((self,i,x)=>{
+	const lbits=x=>0xFFFF&ln(x), cb=f=>lmnat(a=>(a.length<2?ll(a[0]||NONE):a).reduce(vd(f)))
+	if(ikey(i,'and'))return cb((x,y)=>lmn(lbits(x)&lbits(y)))
+	if(ikey(i,'or' ))return cb((x,y)=>lmn(lbits(x)|lbits(y)))
+	if(ikey(i,'xor'))return cb((x,y)=>lmn(lbits(x)^lbits(y)))
+	return x?x:NONE
+},'bits')
+
 let frame=null
 inclip=p=>rin(frame.clip,p)
 gpix=p=>frame.image.pix[p.x+p.y*frame.image.size.x]
@@ -2398,6 +2406,7 @@ n_transition=(f,deck)=>{const t=deck.transit;if(lion(f))dset(t,lms(f.n),f);retur
 constants=env=>{
 	env.local('sys'    ,interface_system)
 	env.local('app'    ,interface_app)
+	env.local('bits'   ,interface_bits)
 	env.local('rtext'  ,interface_rtext)
 	env.local('pointer',pointer)
 	env.local('pi'   ,lmn(3.141592653589793))

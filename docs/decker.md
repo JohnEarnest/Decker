@@ -550,6 +550,7 @@ Decker also provides pre-defined constants:
 | :-------------- | :--------------------------------------------------------------------- |
 | `sys`           | An instance of the _system_ interface.                                 |
 | `app`           | An instance of the _app_ interface.                                    |
+| `bits`          | An instance of the _bits_ interface.                                   |
 | `rtext`         | An instance of the _rtext_ interface.                                  |
 | `pi`            | The ratio of a circle's circumference to its diameter. Roughly 3.141.  |
 | `e`             | Euler's number; the base of the natural logarithm. Roughly 2.718.      |
@@ -566,7 +567,7 @@ Decker's interfaces break down into several general categories:
 
 | :--------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
 | Datatypes  | [Font](#fontinterface), [Image](#imageinterface), [Sound](#soundinterface), [Array](#arrayinterface)                                       |
-| Utilities  | [System](#systeminterface), [App](#appinterface), [RText](#rtextinterface), [Pointer](#pointerinterface)                                   |
+| Utilities  | [Bits](#bitsinterface), [System](#systeminterface), [App](#appinterface), [RText](#rtextinterface), [Pointer](#pointerinterface)           |
 | Deck Parts | [Deck](#deckinterface), [Card](#cardinterface), [Patterns](#patternsinterface), [Module](#moduleinterface), [KeyStore](#keystoreinterface), [Prototype](#prototypeinterface) |
 | Widgets    | [Button](#buttoninterface), [Field](#fieldinterface), [Slider](#sliderinterface), [Grid](#gridinterface), [Canvas](#canvasinterface), [Contraption](#contraptioninterface) |
 
@@ -611,6 +612,7 @@ The _system_ interface exposes information about the Lil runtime. It is availabl
 - `heap`: the size of Lil's heap, in value slots. This grows automatically as needed and shows a high-water mark.
 - `depth`: the maximum observed stack depth so far, counting by activation records.
 
+
 App Interface
 -------------
 The _app_ interface exposes control over the Decker application itself. It is available as a global constant named `app`.
@@ -626,6 +628,37 @@ The _app_ interface exposes control over the Decker application itself. It is av
 Note that `app.exit[]` doesn't do anything in Web-Decker. Exposing a button for closing Decker is very handy in locked decks, but you may want to hide or disable it when `sys.platform~"web"`.
 
 
+Bits Interface
+--------------
+The _bits_ interface exposes utility routines for efficient bit-wise manipulation of 32-bit integers. It is available as a global constant named `bits`.
+
+| Name                       | Description
+| :------------------------- | :----------------------------------------------------------------------- |
+| `typeof x`                 | `"bits"`                                                                 |
+| `x.or[x...]`               | Calculate the bit-wise OR  of two or more numbers or lists of numbers.   |
+| `x.and[x...]`              | Calculate the bit-wise AND of two or more numbers or lists of numbers.   |
+| `x.xor[x...]`              | Calculate the bit-wise XOR of two or more numbers or lists of numbers.   |
+
+The `bits.and[]`, `bits.or[]` and `bits.xor[]` functions _conform_ scalar and vector arguments like Lil's built in arithmetic operators:
+```
+bits.and[3 (range 8)]    # (0,1,2,3,0,1,2,3)
+         4%(range 8)     # (0,1,2,3,0,1,2,3)
+```
+If these functions are called with more than two arguments, each argument will be successively _reduced_ together. The following are equivalent:
+```
+bits.or[8 4 1]           # 13
+bits.or[bits.or[8 4] 1]  # 13
+```
+If they are called with a _single_ argument, it will likewise be reduced:
+```
+bits.or[(8,4,1)]         # 13
+```
+Note that scalar-vector `bits.xor[]` can be used to perform a bit-wise NOT:
+```
+bits.xor[255 (range 8)]  # (255,254,253,252,251,250,249,248)
+```
+
+
 RText Interface
 ---------------
 Rich text is a series of "runs" of text, each with its own formatting. Runs may contain a hyperlink or even an inline image. The field widget, `alert[]`, and canvas drawing functions understand rich text in addition to plain strings.
@@ -636,7 +669,7 @@ Rich text is represented as a table with columns `text`, `font`, and `arg`. The 
 - if `arg` is a non-zero-length string, the run is a hyperlink. Hyperlinks are clickable if the field is `locked`, and clicking them will produce a `link` event with the contents of the corresponding `arg`.
 - otherwise, the run is ordinary text.
 
-The `rtext` interface contains a number of helper routines for building and manipulating rtext tables. It is available as a global constant named `rtext`.
+The _rtext_ interface contains a number of helper routines for building and manipulating rtext tables. It is available as a global constant named `rtext`.
 
 | Name                         | Description                                                                      |
 | :--------------------------- | :------------------------------------------------------------------------------- |

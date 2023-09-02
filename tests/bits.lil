@@ -1,0 +1,20 @@
+
+# test suite for the bits interface.
+show[bits]
+
+# basic bitwise ops:
+show[bits.and[12 10]]
+show[bits.or [12 10]]
+
+# bitwise ops conform:
+show[bits.xor[15 (range 16)]]
+
+# bitwise ops reduce:
+show[bits.or[32 16 8 4 2 1]]
+
+# bitwise ops reduce a single arg:
+show[bits.or[(32,16,8,4,2,1)]]
+
+# properly handle lengths 0 and 1:
+show[bits.and[5]]
+show[bits.and[]]
