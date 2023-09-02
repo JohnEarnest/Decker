@@ -3347,7 +3347,7 @@ void sync(){
 				(pair){(ev.rawpos .x-dst.x/dpi)/tmscale,(ev.rawpos .y-dst.y/dpi)/tmscale},
 				(pair){(ev.rawdpos.x-dst.x/dpi)/tmscale,(ev.rawdpos.y-dst.y/dpi)/tmscale}
 			);
-			int animate=box_in((rect){dst.x,dst.y,dst.w,dst.h},ev.rawpos)&&dr.show_anim?frame_count:0;
+			int animate=box_in((rect){dst.x,dst.y,dst.w,dst.h},(pair){ev.rawpos.x*dpi,ev.rawpos.y*dpi})&&dr.show_anim?frame_count:0;
 			SDL_LockTexture(gtool,NULL,(void**)&p,&pitch);
 			draw_frame(patterns_pal(ifield(deck,"patterns")),TOOLB,p,pitch,animate,0);
 			SDL_UnlockTexture(gtool);
