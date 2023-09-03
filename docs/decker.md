@@ -865,6 +865,7 @@ Images are dynamically created interfaces, each representing a mutable rectangul
 | `x.map[x y]`           | Replace every pixel of the image by indexing the dictionary `x`, using `y` as a default if provided.                     |
 | `x.transform[x]`       | Update the image in place according to one of {`"horiz"`,`"vert"`,`"flip"`,`"left"`,`"right"`,`"dither"`}.               |
 | `x.rotate[x]`          | Update the image in place, rotating it clockwise around its centerpoint by `x` radians.                                  |
+| `x.translate[pos w]`   | Update the image in place, translating it by `pos` (x,y) pixels. If `w` is truthy, wrap the image at the edges.          |
 | `x.merge[x...]`        | Consistent with `canvas.merge[]`: Replace every pixel of the image by compositing together images by index.              |
 | `x.copy[pos size a]`   | Consistent with `canvas.copy[]`: grab and return a sub-image at `pos`/`size`, respecting anchor `a`.                     |
 | `x.paste[image pos t]` | Consistent with `canvas.paste[]`: composite in another image at `pos`. If `t` is truthy, treat pattern 0 as transparent. |

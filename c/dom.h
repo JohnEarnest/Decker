@@ -407,6 +407,20 @@ lv* n_image_rotate(lv*self,lv*z){
 	buffer_shear_x(self->b,tmp,-tan(n/2));
 	return self;
 }
+void buffer_trans(lv*b,pair o){
+	pair s=buff_size(b);lv*t=lmbuff(s);
+	for(int y=0,z=0;y<s.y;y++)for(int x=0;x<s.x;x++,z++){pair i={x-o.x,y-o.y};t->sv[z]=(i.x<0||i.x>=s.x||i.y<0||i.y>=s.y)?0: b->sv[i.x+i.y*s.x];}
+	memcpy(b->sv,t->sv,b->c);
+}
+void buffer_wrap(lv*b,pair o){
+	pair s=buff_size(b);lv*t=lmbuff(s);
+	for(int y=0,z=0;y<s.y;y++)for(int x=0;x<s.x;x++,z++)t->sv[z]=b->sv[mod(x-o.x,s.x)+mod(y-o.y,s.y)*s.x];
+	memcpy(b->sv,t->sv,b->c);
+}
+lv* n_image_translate(lv*self,lv*z){
+	pair o=getpair(l_first(z));
+	if(o.x==0&&o.y==0){}else if(z->c>=2&&lb(z->lv[1])){buffer_wrap(self->b,o);}else{buffer_trans(self->b,o);}return self;
+}
 lv* image_make(lv*buffer);lv* image_read(lv*x); // forward refs
 lv* n_image(lv*self,lv*z){if(lis(l_first(z)))return image_read(l_first(z));return image_make(lmbuff(unpack_pair(z,0)));(void)self;}
 lv* image_empty(){return image_make(lmbuff((pair){0,0}));}
@@ -459,6 +473,7 @@ lv* interface_image(lv*self,lv*i,lv*x){
 	ikey("merge"    )return lmnat(n_image_merge,self);
 	ikey("transform")return lmnat(n_image_transform,self);
 	ikey("rotate"   )return lmnat(n_image_rotate,self);
+	ikey("translate")return lmnat(n_image_translate,self);
 	ikey("copy"     )return lmnat(n_image_copy,self);
 	ikey("paste"    )return lmnat(n_image_paste,self);
 	ikey("encoded"  )return image_write(self);

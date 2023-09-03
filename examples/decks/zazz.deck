@@ -260,11 +260,7 @@ lup.sw:-1, 1  lup.s : 0, 1  lup.se: 1, 1
 on scroll target offset do
  if "card"~typeof target target:target.image end
  if "string"~typeof offset offset:lup[offset] end
- x:offset[0] y:offset[1]
- if x>0 c:target.copy[] target.paste[c x,0] target.paste[c (x-c.size[0]),0] end
- if x<0 c:target.copy[] target.paste[c x,0] target.paste[c (x+c.size[0]),0] end
- if y>0 c:target.copy[] target.paste[c 0,y] target.paste[c 0,(y-c.size[1])] end
- if y<0 c:target.copy[] target.paste[c 0,y] target.paste[c 0,(y+c.size[1])] end
+ target.paste[target.copy[].translate[offset 1]]
 end
 
 on flipbook target source speed frames do

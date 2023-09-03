@@ -430,6 +430,10 @@ assert["rotate image positive"
 	image[rot].rotate[pi*3.5].encoded
 ]
 
+a:"%%IMG0AAsACQAACAAIABQAEgA/ACCAccAAAA=="
+assert["translate image clamped" "%%IMG0AAsACQAAAAACAAIABQAEgA/ACCAcYA==" image[a].translate[2,1   ].encoded]
+assert["translate image wrapped" "%%IMG0AAsACfggBCCOYAAAAABAAEAAoACQAA==" image[a].translate[-3,4 1].encoded]
+
 #######################################
 #
 #  Rich Text

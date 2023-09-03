@@ -88,40 +88,28 @@ end
 
 {script:home.7}
 on click do
- i:canv.copy[]
- canv.clear[]
- canv.paste[i  1,0]
- canv.paste[i -7,0]
+ canv.paste[canv.copy[].translate[1,0 1]]
  edit[]
 end
 {end}
 
 {script:home.8}
 on click do
- i:canv.copy[]
- canv.clear[]
- canv.paste[i -1,0]
- canv.paste[i  7,0]
+ canv.paste[canv.copy[].translate[-1,0 1]]
  edit[]
 end
 {end}
 
 {script:home.9}
 on click do
- i:canv.copy[]
- canv.clear[]
- canv.paste[i 0, 1]
- canv.paste[i 0,-7]
+ canv.paste[canv.copy[].translate[0,1 1]]
  edit[]
 end
 {end}
 
 {script:home.10}
 on click do
- i:canv.copy[]
- canv.clear[]
- canv.paste[i 0,-1]
- canv.paste[i 0, 7]
+ canv.paste[canv.copy[].translate[0,-1 1]]
  edit[]
 end
 {end}
