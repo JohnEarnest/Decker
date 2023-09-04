@@ -828,7 +828,7 @@ grid_keys=(code,shift)=>{
 	if(code=='PageDown' ){m=1;if(r==-1)r=0;r+=nrd}
 	if(code=='Home'     ){m=1,r=0}
 	if(code=='End'      ){m=1,r=nr-1}
-	if(code=='Backspace'||code=='Delete')grid_deleterow()
+	if(!wid.g.locked&&(code=='Backspace'||code=='Delete'))grid_deleterow()
 	if(!m)return;if(ms.type=='prototype_attrs')ms.text.table=ms.name.table=null
 	wid.gv.row=r=max(0,min(r,nr-1));if(wid.gt){iwrite(wid.gt,lms('row'),lmn(r)),mark_dirty(),msg.target_click=wid.gt,msg.arg_click=rect(0,r)}
 	const os=wid.gv.scroll;if(r-os<0)wid.gv.scroll=r;if(r-os>=nrd)wid.gv.scroll=r-(nrd-1)

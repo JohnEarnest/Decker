@@ -732,7 +732,7 @@ void grid_keys(int code){
 	if(code==SDLK_PAGEDOWN){m=1;if(r==-1)r=0;r+=nrd;}
 	if(code==SDLK_HOME    ){m=1;r=0;}
 	if(code==SDLK_END     ){m=1;r=nr-1;}
-	if(code==SDLK_BACKSPACE||code==SDLK_DELETE)grid_deleterow();
+	if(!wid.g.locked&&(code==SDLK_BACKSPACE||code==SDLK_DELETE))grid_deleterow();
 	if(!m)return;if(ms.type==modal_prototype_attrs)ms.text.table=ms.name.table=NULL;
 	wid.gv->row=r=MAX(0,MIN(r,nr-1));if(wid.gt){iwrite(wid.gt,lmistr("row"),lmn(r)),mark_dirty();msg.target_click=wid.gt,msg.arg_click=(fpair){0,r};}
 	int os=wid.gv->scroll;if(r-os<0)wid.gv->scroll=r;if(r-os>=nrd)wid.gv->scroll=r-(nrd-1);
