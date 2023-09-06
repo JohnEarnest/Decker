@@ -3426,7 +3426,7 @@ mouse=(e,f)=>{
 	ev.rawpos=rect(e.pageX,e.pageY);const c=q('#display').getBoundingClientRect()
 	f(0|((e.pageX-c.x)/zoom),0|((e.pageY-c.y)/zoom),e.button!=0)
 }
-touch=(e,f)=>{const t=e.targetTouches[0]||{}; mouse({pageX:t.clientX, pageY:t.clientY, button:0},f);if(!set_keycaps)enable_touch=1}
+touch=(e,f)=>{const t=e.targetTouches[0]||{}; mouse({pageX:t.clientX, pageY:t.clientY, button:0},f);if(!set_touch)enable_touch=1}
 let prev_stamp=null, leftover=0
 loop=stamp=>{
 	if(!prev_stamp)prev_stamp=stamp
