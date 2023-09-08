@@ -20,15 +20,14 @@ button5:{"type":"button","size":[87,24],"pos":[381,267],"script":"home.4","text"
 
 {script:home.0}
 on step do
- new:board.copy[]
- deltas:(3 cross 3)-1
-
- each pos in new.size[0] cross new.size[1]
-  around:sum each delta in deltas board[pos+delta] end
-  new[pos]:if board[pos] around in 3,4 else around~3 end
+ counts:image[board.size]
+ each delta in (3 cross 3)-1
+  counts.merge["+" board.copy[].translate[delta]]
  end
- 
- board.paste[new]
+ stay:counts.copy[].map[((3,4) dict 1,1) 0].merge["&" board.copy[]]
+ born:counts       .map[(3     dict 1  ) 0]
+ board.paste[born.merge["|" stay]]
+ sleep[5]
 end
 
 on steps x do

@@ -1183,6 +1183,11 @@ after.merge[a.copy[] b.copy[]]
 ```
 ![](images/merge.gif)
 
+If the first argument to `canvas.merge[]` is a single-character string consisting of one of Lil's primitive arithmetic or logical operatiors (`+ - & | < > =`), it will apply that operator between the pixel on the canvas and the corresponding pixel from the second argument image (truncating or repeating it to match) and update the canvas in-place. This permits many interesting types of blending:
+```
+after.merge["+" b.copy[]]
+```
+
 If the `pos` argument to `canvas.text[]` is a list of four coordinates instead of two, it is interpreted as the dimensions `(x,y,width,height)` of a rectangle. In this case, the string `x` will be automatically wrapped (preferring line breaks at whitespace) to fit in this rectangle, with overflow elided with a trailing ellipsis. If provided, the anchor `a` will control the alignment of the text within this rectangle. If `x` is an rtext table and `pos` is _not_ a rectangle, the anchor `a` is ignored, text is drawn top-left aligned, and lines are _not_ automatically wrapped.
 
 If the `pos` argument to `canvas.paste[]` is a list of four coordinates instead of two, it is interpreted as the dimensions `(x,y,width,height)` of a rectangle. In this case, the `image` will be drawn scaled to fit that rectangle, using nearest-neighbor sampling. For example, to draw an image `i` in the top-left corner of the canvas at 2x scale:

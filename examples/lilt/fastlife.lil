@@ -1,0 +1,31 @@
+# a modified version of life.lil which uses collective operations
+# instead of manipulating a pixel at a time:
+
+on randomize do
+	board.clear[]
+	each pos in board.size[0] cross board.size[1]
+		board[pos]:1<random[3]
+	end
+end
+
+on step do
+	counts:image[board.size]
+	each delta in (3 cross 3)-1
+		counts.merge["+" board.copy[].translate[delta]]
+	end
+	stay:counts.copy[].map[((3,4) dict 1,1) 0].merge["&" board.copy[]]
+	born:counts       .map[(   3  dict   1) 0]
+	board.paste[born.merge["|" stay]]
+end
+
+deck:readdeck[]
+board:deck.card.add["canvas"]
+board.size:80,40
+randomize[]
+steps:20
+while steps step[] steps:steps-1 end
+
+each y in range board.size[1]
+	print[each x in range board.size[0] ".O"[board[x,y]] end]
+end
+show[sys.workspace]
