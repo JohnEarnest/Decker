@@ -373,7 +373,7 @@ lv* buffer_hist(lv*x,int sign){
 int is_empty(lv*x){pair s=image_size(x);return s.x==0&&s.y==0;}
 int is_blank(lv*x){if(!image_is(x))return 0;EACH(z,x->b)if(x->b->sv[z])return 0;return 1;}
 void buff_merge_op(lv*target,lv*src,char op){
-	pair ts=buff_size(target),bs=buff_size(src);char*t=target->sv,*b=src->sv;
+	pair ts=buff_size(target),bs=buff_size(src);char*t=target->sv,*b=src->sv;if(bs.x==0||bs.y==0)return;
 	#define op_kernel for(int y=0,i=0;y<ts.y;y++)for(int x=0;x<ts.x;x++,i++)
 	#define op_index  b[(x%bs.x)+(y%bs.y)*bs.x]
 	if(op=='+'){op_kernel t[i]+=op_index                   ;}

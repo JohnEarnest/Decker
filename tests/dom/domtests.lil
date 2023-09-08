@@ -353,6 +353,7 @@ assert["image | merge" "%%IMG1AAgACAABAgMEBQYHAQECAwQFBgcCAgIDBAUGBwMDAwMEBQYHBA
 assert["image = merge" "%%IMG0AAgACIBAIBAIBAIB"                                                                             horiz.copy[].merge["=" vert].encoded]
 assert["image > merge" "%%IMG0AAgACACAwODw+Pz+"                                                                             horiz.copy[].merge[">" vert].encoded]
 assert["image < merge" "%%IMG0AAgACH8/Hw8HAwEA"                                                                             horiz.copy[].merge["<" vert].encoded]
+assert["image op merge with empty image" horiz.encoded horiz.copy[].merge["+" image[0,0]].encoded]
 
 assert_image["read nonexistent gif"
 	list ()
@@ -439,6 +440,7 @@ assert["rotate image positive"
 	"%%IMG2ACgAIgD/AJ0BAgAlAQcAIgEJAB8BCwAeAQsAHQEKAB8BCAAgAQcAIgEHACEBAwABAQQAIAECAAMBBAAlAQQAJQEEACUBBAAlAQIA/wB3"
 	image[rot].rotate[pi*3.5].encoded
 ]
+assert["rotate image empty" image[0,0].encoded image[0,0].rotate[pi].encoded]
 
 a:"%%IMG0AAsACQAACAAIABQAEgA/ACCAccAAAA=="
 assert["translate image clamped" "%%IMG0AAsACQAAAAACAAIABQAEgA/ACCAcYA==" image[a].translate[2,1   ].encoded]
