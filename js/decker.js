@@ -3287,9 +3287,9 @@ main_view=_=>{
 		}
 	}
 	if(uimode=='object'&&ob.show_guides&&ob.sel.length){
-		const b=ob.sel.map(w=>unpack_widget(w).size).reduce(runion)
+		const b=ob.sel.map(w=>con_to_screen(unpack_widget(w).size)).reduce(runion)
 		wids.v.filter(w=>!ob.sel.some(x=>x==w)).map(w=>{
-			const a=unpack_widget(w).size, u=runion(a,b)
+			const a=con_to_screen(unpack_widget(w).size), u=runion(a,b)
 			if(b.y    ==a.y    )draw_hline(u.x,u.x+u.w,u.y    ,13) // top-top
 			if(b.y+b.h==a.y+a.h)draw_hline(u.x,u.x+u.w,u.y+u.h,13) // bottom-bottom
 			if(b.x    ==a.x    )draw_vline(u.x    ,u.y,u.y+u.h,13) // left-left

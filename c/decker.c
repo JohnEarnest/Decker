@@ -3851,10 +3851,10 @@ void main_view(){
 	}
 	lv*wids=con_wids();
 	if(uimode==mode_object&&ob.show_guides&&ob.sel->c>0){
-		rect b={0};EACH(z,ob.sel){rect s=unpack_widget(ob.sel->lv[z]).size;b=z==0?s:box_union(b,s);}
+		rect b={0};EACH(z,ob.sel){rect s=con_to_screenr(unpack_widget(ob.sel->lv[z]).size);b=z==0?s:box_union(b,s);}
 		EACH(z,wids){
 			int f=0;EACH(w,ob.sel)if(wids->lv[z]==ob.sel->lv[w]){f=1;break;}if(f)continue;
-			rect a=unpack_widget(wids->lv[z]).size,u=box_union(a,b);
+			rect a=con_to_screenr(unpack_widget(wids->lv[z]).size),u=box_union(a,b);
 			if(b.y    ==a.y    )draw_hline(u.x,u.x+u.w,u.y    ,13); // top-top
 			if(b.y+b.h==a.y+a.h)draw_hline(u.x,u.x+u.w,u.y+u.h,13); // bottom-bottom
 			if(b.x    ==a.x    )draw_vline(u.x    ,u.y,u.y+u.h,13); // left-left
