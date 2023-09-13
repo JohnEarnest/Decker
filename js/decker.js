@@ -3432,7 +3432,8 @@ loop=stamp=>{
 	if(!prev_stamp)prev_stamp=stamp
 	let delta=(stamp-prev_stamp)+leftover, frame=1000/60, tc=0
 	while(delta>frame){tick(),tc++,delta-=frame;if(tc==5){delta=0;break}};leftover=delta
-	sync(),prev_stamp=stamp,requestAnimationFrame(loop),do_panic=0
+	sync(),prev_stamp=stamp,requestAnimationFrame(loop)
+	if(do_panic)setmode('object');do_panic=0
 }
 resize=_=>{
 	const b=q('body'), screen=rect(b.clientWidth,b.clientHeight), fs=min(screen.x/fb.size.x,screen.y/fb.size.y)

@@ -3356,6 +3356,7 @@ void sync(){
 		SDL_RenderPresent(ren);
 	}
 	SDL_SetCursor(CURSORS[uicursor]);
+	if(do_panic)setmode(mode_object);
 	do_panic=0;
 }
 
