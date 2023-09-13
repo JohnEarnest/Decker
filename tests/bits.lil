@@ -18,3 +18,6 @@ show[bits.or[(32,16,8,4,2,1)]]
 # properly handle lengths 0 and 1:
 show[bits.and[5]]
 show[bits.and[]]
+
+# bounds
+show[bits.or[2^8,16,24,30]]

@@ -1228,7 +1228,7 @@ lv* interface_array(lv*self,lv*i,lv*x){
 
 // Bits interface
 
-#define lbits(x) (0xFFFF&((unsigned int)ln(x)))
+#define lbits(x) (0xFFFFFFFF&((long int)ln(x)))
 lv* conformb(lv*z,lv*(f(lv*,lv*))){if(z->c<2)z=l_first(z);lv*r=l_first(z);for(int i=1;i<z->c;i++)r=conform(r,z->lv[i],f);return r;}
 lv* a_bits_and(lv*x,lv*y){return lmn(lbits(x)&lbits(y));}lv* n_bits_and(lv*self,lv*z){(void)self;return conformb(z,a_bits_and);}
 lv* a_bits_or (lv*x,lv*y){return lmn(lbits(x)|lbits(y));}lv* n_bits_or (lv*self,lv*z){(void)self;return conformb(z,a_bits_or );}
