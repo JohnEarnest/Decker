@@ -927,9 +927,9 @@ interface_app=lmi((self,i,x)=>{
 
 interface_bits=lmi((self,i,x)=>{
 	const lbits=x=>0xFFFFFFFF&ln(x), cb=f=>lmnat(a=>(a.length<2?ll(a[0]||NONE):a).reduce(vd(f)))
-	if(ikey(i,'and'))return cb((x,y)=>lmn(lbits(x)&lbits(y)))
-	if(ikey(i,'or' ))return cb((x,y)=>lmn(lbits(x)|lbits(y)))
-	if(ikey(i,'xor'))return cb((x,y)=>lmn(lbits(x)^lbits(y)))
+	if(ikey(i,'and'))return cb((x,y)=>lmn((lbits(x)&lbits(y))>>>0))
+	if(ikey(i,'or' ))return cb((x,y)=>lmn((lbits(x)|lbits(y))>>>0))
+	if(ikey(i,'xor'))return cb((x,y)=>lmn((lbits(x)^lbits(y))>>>0))
 	return x?x:NONE
 },'bits')
 

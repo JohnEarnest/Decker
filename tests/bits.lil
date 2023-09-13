@@ -20,4 +20,4 @@ show[bits.and[5]]
 show[bits.and[]]
 
 # bounds
-show[bits.or[2^8,16,24,30]]
+show[bits.or[2^8,16,24,30,31]]
