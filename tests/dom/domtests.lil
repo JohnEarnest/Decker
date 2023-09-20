@@ -449,6 +449,7 @@ assert["rotate image empty" image[0,0].encoded image[0,0].rotate[pi].encoded]
 
 a:"%%IMG0AAsACQAACAAIABQAEgA/ACCAccAAAA=="
 assert["translate image clamped" "%%IMG0AAsACQAAAAACAAIABQAEgA/ACCAcYA==" image[a].translate[2,1   ].encoded]
+assert["translate image floored" "%%IMG0AAsACQAAAAACAAIABQAEgA/ACCAcYA==" image[a].translate[2.3,1.2].encoded]
 assert["translate image wrapped" "%%IMG0AAsACfggBCCOYAAAAABAAEAAoACQAA==" image[a].translate[-3,4 1].encoded]
 
 #######################################
