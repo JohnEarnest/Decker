@@ -3505,6 +3505,7 @@ q('body').onkeyup=e=>{
 	}
 	e.preventDefault()
 }
+q('body').onblur=e=>{ev.alt=0,keydown={}}
 let local_clipboard=''
 getclipboard=after=>{
 	const t=document.createElement('textarea');t.style.top='0',t.style.left='0',t.position='fixed',t.onpaste=e=>{e.stopPropagation()}
