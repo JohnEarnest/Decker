@@ -1332,6 +1332,11 @@ array_make=(size,cast,base,buffer)=>{
 	return ri
 }
 
+find_occupied=(image,mask)=>{
+	const s=image.size,d=rcopy(s);for(let z=0;z<image.pix.length;z++){
+		if(image.pix[z]==mask)continue;const x=z%s.x, y=0|(z/s.x);d.x=min(d.x,x), d.y=min(d.y,y), d.w=max(d.w,x), d.h=max(d.h,y)
+	}d.w-=d.x,d.h-=d.y,d.w++,d.h++;return d
+}
 image_copy=(i,r)=>{
 	r=r?rint(r):rect(0,0,i.size.x,i.size.y);const c=image_make(rect(r.w,r.h)), clip=rect(0,0,i.size.x,i.size.y)
 	for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++)c.pix[x+r.w*y]=rin(clip,rect(r.x+x,r.y+y))?i.pix[(r.x+x)+i.size.x*(r.y+y)]:0

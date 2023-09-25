@@ -2271,11 +2271,7 @@ bg_scratch=_=>{
 	bg_scratch_clear()
 }
 bg_edit=_=>{
-	const s=dr.scratch.size, d=rcopy(s)
-	for(let z=0;z<dr.scratch.pix.length;z++){
-		if(dr.scratch.pix[z]==BG_MASK)continue;const x=z%s.x, y=0|(z/s.x)
-		d.x=min(d.x,x), d.y=min(d.y,y), d.w=max(d.w,x), d.h=max(d.h,y)
-	}d.w-=d.x,d.h-=d.y,d.w++,d.h++
+	const d=find_occupied(dr.scratch,BG_MASK)
 	const back=con_image(),after=image_copy(back,d);image_overlay(after,image_copy(dr.scratch,d),BG_MASK,rect(0,0))
 	edit(edit_target({type:'bg_block',pos:d,before:image_copy(back,d),after}))
 }
@@ -2539,6 +2535,10 @@ bg_tighten=_=>{
 	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++)if(get(rect(b,a))){ // regenerate the ANTS outline
 		const n=get(rect(b-1,a))&&get(rect(b,a-1))&&get(rect(b+1,a))&&get(rect(b,a+1));if(!n)set(rect(b,a),ANTS)
 	}
+	const d=find_occupied(dr.mask,0);if(d.w<1||d.h<1||(d.w==r.w&&d.h==r.h))return // trim excess?
+	dr.limbo=image_copy(dr.limbo,d);if(dr.mask)dr.mask=image_copy(dr.mask,d);if(dr.omask)dr.omask=image_copy(dr.omask,d)
+	dr.sel_here .x+=d.x,dr.sel_here .y+=d.y,dr.sel_here .w=d.w,dr.sel_here .h=d.h
+	dr.sel_start.x+=d.x,dr.sel_start.y+=d.y,dr.sel_start.w=d.w,dr.sel_start.h=d.h
 }
 
 // Object Edit Mode

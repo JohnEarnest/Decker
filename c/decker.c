@@ -2454,13 +2454,7 @@ void bg_scratch(){
 	bg_scratch_clear();
 }
 void bg_edit(){
-	pair s=buff_size(dr.scratch);
-	rect d={s.x,s.y,0,0};for(int z=0;z<dr.scratch->c;z++){
-		if(dr.scratch->sv[z]==BG_MASK)continue;
-		int x=z%s.x, y=z/s.x;
-		d.x=MIN(d.x,x), d.y=MIN(d.y,y);
-		d.w=MAX(d.w,x), d.h=MAX(d.h,y);
-	}d.w-=d.x,d.h-=d.y,d.w++,d.h++;
+	rect d=find_occupied(dr.scratch,BG_MASK);
 	lv*back=con_image()->b,*r=lmd();
 	lv*after=buffer_copy(back,d);buffer_overlay(after,buffer_copy(dr.scratch,d),BG_MASK,(pair){0,0});
 	dset(r,lmistr("type"  ),lmn(edit_bg_block));
@@ -2791,6 +2785,10 @@ void bg_tighten(){
 		int n=bg_mask_get((pair){b-1,a})&&bg_mask_get((pair){b,a-1})&&bg_mask_get((pair){b+1,a})&&bg_mask_get((pair){b,a+1});
 		if(!n)bg_mask_set((pair){b,a},ANTS);
 	}
+	rect d=find_occupied(dr.mask,0);if(d.w<1||d.h<1||(d.w==r.w&&d.h==r.h))return; // trim excess?
+	dr.limbo=buffer_copy(dr.limbo,d);if(dr.mask)dr.mask=buffer_copy(dr.mask,d);if(dr.omask)dr.omask=buffer_copy(dr.omask,d);
+	dr.sel_here .x+=d.x,dr.sel_here .y+=d.y,dr.sel_here .w=d.w,dr.sel_here .h=d.h;
+	dr.sel_start.x+=d.x,dr.sel_start.y+=d.y,dr.sel_start.w=d.w,dr.sel_start.h=d.h;
 }
 
 // Object Edit Mode

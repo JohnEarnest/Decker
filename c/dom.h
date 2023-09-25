@@ -340,6 +340,11 @@ lv* data_write(char*type,char f,lv*x){str r=str_new();return str_addz(&r,"%%"),s
 
 lv*lmbuff(pair x){lv*r=lms(x.x*x.y);r->n=x.x;return r;}
 pair buff_size(lv*x){if(x->n==0||x->c==0)return (pair){0,0};return(pair){x->n,x->c/x->n};}
+rect find_occupied(lv*buff,int mask){
+	pair s=buff_size(buff);rect d={s.x,s.y,0,0};for(int z=0;z<buff->c;z++){
+		if(buff->sv[z]==mask)continue;int x=z%s.x, y=z/s.x; d.x=MIN(d.x,x), d.y=MIN(d.y,y), d.w=MAX(d.w,x), d.h=MAX(d.h,y);
+	}d.w-=d.x,d.h-=d.y,d.w++,d.h++;return d;
+}
 lv* buffer_copy(lv*src,rect r){
 	lv*c=lmbuff((pair){r.w,r.h});pair size=buff_size(src);rect clip={0,0,size.x,size.y};
 	for(int y=0;y<r.h;y++)for(int x=0;x<r.w;x++)c->sv[x+r.w*y]=box_in(clip,(pair){r.x+x,r.y+y})?src->sv[(r.x+x)+size.x*(r.y+y)]:0;
