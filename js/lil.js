@@ -1872,6 +1872,10 @@ canvas_read=(x,card)=>{
 				return NONE
 			})
 			if(ikey(i,'text'))return lmnat(([x,pos,a])=>(canvas_pick(self),text(x=lit(x)?rtext_cast(x):lms(ls(x)),pos,a)))
+			if(ikey(i,'textsize'))return lmnat(([x,wid])=>{
+				const l=layout_richtext(self.card.deck,rtext_cast(x||lms('')),ifield(self,'font'),ALIGN.left,wid?ln(wid):RTEXT_END)
+				if(!wid)l.size.x=l.lines.reduce((x,y)=>max(x,y.pos.x+y.pos.w),0);return lmpair(l.size)
+			})
 		}return interface_widget(self,i,x)
 	},'canvas');ri.card=card
 	ri.card=card

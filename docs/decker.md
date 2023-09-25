@@ -684,6 +684,8 @@ The _rtext_ interface contains a number of helper routines for building and mani
 
 Dictionary arguments to `rtext.cat[]` are promoted to tables, and any other arguments which are not already tables will be interpreted as strings and converted to text runs as by `rtext.make[x "" ""]`. Thus, with a single argument, `rtext.cat[]` can be used to _cast_ values to properly formed rtext tables. Sequential rows with matching `font` and (non-image) `arg` values will be coalesced together, and rows with empty `text` spans will be dropped.
 
+To measure the on-screen dimensions of an rtext, see `canvas.textsize[]`.
+
 
 Pointer Interface
 -----------------
@@ -1164,6 +1166,7 @@ The canvas will scale _up_ logical pixels to display them on the card (resulting
 | `x.poly[x...]`          | Draw a filled polygon.                                                                                            |
 | `x.merge[x...]`         | Composite images by index based on the contents of the canvas.                                                    |
 | `x.text[x pos a]`       | Draw a string or rtext `x` at `pos`, from an anchor position `a`.                                                 |
+| `x.textsize[x w]`       | Obtain a `size` for the outer dimensions of a string or rtext `x`, optionally wrapped to width `w`.               |
 | `x.copy[pos size a]`    | Grab an _image_ at `pos`/`size`.                                                                                  |
 | `x.paste[image pos t]`  | Draw an _image_ at `pos`. If `t` is truthy, treat pattern 0 as transparent.                                       |
 | `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                                     |

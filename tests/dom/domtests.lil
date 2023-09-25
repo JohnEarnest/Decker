@@ -1506,6 +1506,14 @@ c[1,1]:29
 c.invert[]
 assert["canvas invert animated pattern" "%%IMG0AAMAAwBAAA==" c.copy[].encoded]
 
+c:deck.card.add["canvas"]
+r:rtext.make["some "],rtext.make["rtext!" "menu"]
+assert["canvas rtext size"              ( 58,13) c.textsize[r]]
+c.font:"mono"
+assert["canvas rtext size w/ font"      ( 63,13) c.textsize[r]]
+assert["canvas plaintext size"          (114,11) c.textsize["Some words to wrap!"]]
+assert["canvas plaintext size w/ width" ( 30,55) c.textsize["Some words to wrap!" 30]]
+
 #######################################
 #
 #  Deck

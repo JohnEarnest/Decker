@@ -1350,6 +1350,11 @@ lv* n_canvas_text(lv*self,lv*z){
 		draw_text(pos,ls(l_first(z))->sv,frame.font,frame.pattern);
 	}return NONE;
 }
+lv* n_canvas_textsize(lv*self,lv*z){
+	lv*t=rtext_cast(l_first(z)),*f=ifield(self,"font");int w=z->c>1?ln(z->lv[1]):RTEXT_END;
+	lv*deck=dget(dget(self->b,lmistr("card"))->b,lmistr("deck"));pair s=layout_richtext(deck,t,f,align_left,w);
+	if(z->c<=1){s.x=0;for(int z=0;z<lines_count;z++){rect p=lines[z].pos;s.x=MAX(s.x,p.x+p.w);}}return lmpair(s);
+}
 void unpack_poly(lv*z){
 	poly_count=0;EACH(i,z){
 		lv*a=z->lv[i];int f=lil(a);if(f)EACH(j,a)if(lin(a->lv[j])){f=0;break;}
@@ -1404,6 +1409,7 @@ lv* interface_canvas(lv*self,lv*i,lv*x){
 		ikey("text"     )return lmnat(n_canvas_text,  self);
 		ikey("copy"     )return lmnat(n_canvas_copy,  self);
 		ikey("paste"    )return lmnat(n_canvas_paste, self);
+		ikey("textsize" )return lmnat(n_canvas_textsize,self);
 	}return interface_widget(self,i,x);
 }
 lv* canvas_read(lv*x,lv*r){
