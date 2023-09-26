@@ -1849,6 +1849,26 @@ assert["copy contraption card: instance" (list "instance") (keys c.widgets)]
 assert["copy contraption card: def"      (list "moveable") (keys target.contraptions)]
 assert["copy contraption card: def wids" (list "clicky"  ) (keys target.contraptions.moveable.widgets)]
 
+deck:readdeck[]
+f1:deck.add["font" 7,7 "alpha"] f1["A"]:deck.fonts.mono.A
+f2:deck.add["font" 8,8 "beta" ] f2["A"]:deck.fonts.mono.B
+f3:deck.add["font" 9,9 "gamma"] f3["A"]:deck.fonts.mono.C
+b:deck.cards.home.add["button"] b.text:"clicky" b.font:f1
+f:deck.cards.home.add["field" ] f.value:(rtext.make["plain"],rtext.make[" bold" "beta"])
+def:deck.add["contraption" "fontie"]
+b2:def.add["button" "also clicky"] b2.font:f3
+s:deck.add["card" "second"]
+m:s.add["contraption" "fontie" "instance"]
+copied:deck.cards.home.copy[b,f]
+target:readdeck[]
+target.cards.home.paste[copied]
+assert["copy widgets: fonts" ("body","menu","mono","alpha","beta") (keys target.fonts)]
+copied:deck.copy[s]
+target.paste[copied]
+assert["copy card: fonts"    ("body","menu","mono","alpha","beta","gamma") (keys target.fonts)]
+assert["copied font integrity" deck.fonts.beta .A.encoded target.fonts.beta .A.encoded]
+assert["copied font integrity" deck.fonts.gamma.A.encoded target.fonts.gamma.A.encoded]
+
 #######################################
 #
 #  Modules

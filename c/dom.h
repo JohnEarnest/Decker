@@ -2025,9 +2025,29 @@ lv* n_con_add(lv*self,lv*z){lv*r=n_card_add(self,z);if(widget_is(r)&&prototype_i
 lv* n_con_remove(lv*self,lv*z){lv*r=n_card_remove(self,z);if(lb(r)&&prototype_is(self))contraption_update(self);return r;}
 lv* con_copy_raw(lv*container,lv*z){lv*r=lml(0);EACH(i,z){lv*w=z->lv[i];if(widget_is(w)&&dget(w->b,lmistr("card"))==container)ll_add(r,widget_write(w));}return r;}
 lv* con_paste_raw(lv*container,lv*payload){lv*r=lml(0);EACH(z,payload){lv*a=ld(payload->lv[z]);ll_add(r,widget_add(container,a));}return r;}
+void find_fonts(lv*deck,lv*target,lv*widgets){
+	lv*defs=ivalue(deck,"fonts"),*fonts=lmd();EACH(z,widgets){
+		lv*wid=widgets->lv[z];if(!widget_is(wid))continue;
+		lv*f=ivalue(wid,"font");if(f)dset(fonts,f,dget(defs,f)); // directly on widgets
+		if(contraption_is(wid)){ // inside contraption instances
+			lv*dwids=ivalue(wid,"widgets");
+			EACH(z,dwids){lv*f=ifield(dwids->lv[z],"font");dset(fonts,dkey(defs,f),f);}
+		}
+		if(field_is(wid)&&matchr(ifield(wid,"style"),lmistr("rich"))){ // inside rtext field values
+			lv*v=ifield(wid,"value"),*f=dget(v,lmistr("font"));
+			EACH(z,f){lv*n=f->lv[z];if(n->c&&!dget(fonts,n))dset(fonts,n,dget(defs,n));}
+		}
+	}
+	fonts=l_drop(lml3(lmistr("mono"),lmistr("menu"),lmistr("body")),fonts);
+	EACH(z,fonts)fonts->lv[z]=font_write(fonts->lv[z]);if(fonts->c)dset(target,lmistr("f"),fonts);
+}
+void merge_fonts(lv*deck,lv*f){
+	if(!f)return;f=ld(f);lv*fonts=ivalue(deck,"fonts");
+	EACH(z,f){lv*k=ls(f->kv[z]),*v=font_read(ls(f->lv[z]));if(font_is(v)&&!dget(fonts,k))dset(fonts,k,v);}
+}
 lv* n_con_copy(lv*card,lv*z){
 	z=l_first(z);if(!lil(z))z=l_list(z);lv*wids=con_copy_raw(card,z),*defs=lmd(),*v=lmd();dset(v,lmistr("w"),wids),dset(v,lmistr("d"),defs);
-	lv*condefs=ifield(ivalue(card,"deck"),"contraptions");EACH(w,wids){
+	lv*deck=ivalue(card,"deck"),*condefs=ifield(deck,"contraptions");find_fonts(deck,v,z);EACH(w,wids){
 		lv*wid=wids->lv[w],*type=dget(wid,lmistr("type")),*def=dget(wid,lmistr("def"));
 		if(!strcmp(type->sv,"contraption")&&dget(defs,def)==NULL)dset(defs,def,prototype_write(dget(condefs,def)));
 	}str r=str_new();str_addz(&r,"%%WGT0");fjson(&r,v);return lmstr(r);
@@ -2046,7 +2066,8 @@ void merge_prototypes(lv*deck,lv*defs,lv*uses){
 lv* n_con_paste(lv*card,lv*z){
 	z=l_first(z);if(!lis(z)||!has_prefix(z->sv,"%%wgt0"))return NONE;
 	int f=1,i=6,n=z->c-i;lv*v=ld(pjson(z->sv,&i,&f,&n)),*defs=dget(v,lmistr("d")),*wids=dget(v,lmistr("w"));wids=wids?ll(wids):lml(0);
-	merge_prototypes(ivalue(card,"deck"),defs?ld(defs):lmd(),wids);return con_paste_raw(card,wids);
+	lv*deck=ivalue(card,"deck");merge_fonts(deck,dget(v,lmistr("f"))),merge_prototypes(deck,defs?ld(defs):lmd(),wids);
+	return con_paste_raw(card,wids);
 }
 lv* interface_card(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
@@ -2215,7 +2236,7 @@ void rename_sound(lv*deck,lv*sound,lv*name){
 lv* n_deck_copy(lv*deck,lv*z){
 	(void)deck;z=l_first(z);if(!card_is(z))return NONE;
 	lv*defs=lmd(),*v=lmd();dset(v,lmistr("c"),card_write(z)),dset(v,lmistr("d"),defs);
-	lv*wids=ifield(z,"widgets");EACH(w,wids){
+	lv*wids=ifield(z,"widgets");find_fonts(deck,v,wids);EACH(w,wids){
 		lv*wid=wids->lv[w];if(!contraption_is(wid))continue;
 		lv*d=ifield(wid,"def"),*n=ifield(d,"name");if(dget(defs,n)==NULL)dset(defs,n,prototype_write(d));
 	}str r=str_new();str_addz(&r,"%%CRD0");fjson(&r,v);return lmstr(r);
@@ -2223,6 +2244,7 @@ lv* n_deck_copy(lv*deck,lv*z){
 lv* deck_paste_named(lv*deck,lv*z,lv*name){
 	z=l_first(z);if(!lis(z)||!has_prefix(z->sv,"%%crd0"))return NONE;
 	int f=1,i=6,n=z->c-i;lv*v=ld(pjson(z->sv,&i,&f,&n)),*payload=dget(v,lmistr("c")),*defs=dget(v,lmistr("d"));payload=payload?ld(payload):lmd();
+	merge_fonts(deck,dget(v,lmistr("f")));
 	lv*wids=dget(payload,lmistr("widgets"));if(wids&&lid(wids)){EACH(z,wids)dset(wids->lv[z],lmistr("name"),wids->kv[z]);}
 	merge_prototypes(deck,defs?ld(defs):lmd(),wids?ll(wids):lml(0));
 	lv*r=card_read(payload,deck);dset(dget(deck->b,lmistr("cards")),name?name:ifield(r,"name"),r);return r;

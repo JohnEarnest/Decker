@@ -710,6 +710,22 @@ transition[on BoxIn      c a b t do  c.rect[c.size/2   c.size*t   "center"]     
 transition[on BoxOut     c a b t do  c.rect[c.size/2   c.size*1-t "center"]     c.merge[b a] end]
 `
 FONTS={
+	body:'%%FNT0CAoBAQAAAAAAAAAAAAABAICAgICAAIAAAAMAoKAAAAAAAAAABQAAUPhQ+FAAAAAFIHCooHAoqHAgAAgAf5KUbhk'+
+	'pRgAABzBIUCBUiJRiAAABAICAAAAAAAAAAAMgQICAgICAQCAAA4BAICAgICBAgAAFAFAg+CBQAAAAAAUAACAg+CAgAAAA'+
+	'AgAAAAAAAABAQIAEAAAAAPAAAAAAAAEAAAAAAAAAgAAABBAQICBAQICAAAAFAHCIiIiIiHAAAAUAIGAgICAgIAAABQBwi'+
+	'AgQIED4AAAFAPgQIHAIiHAAAAUAEDBQkPgQEAAABQD4gPAICIhwAAAFADBAgPCIiHAAAAUA+AgQECAgIAAABQBwiIhwiI'+
+	'hwAAAFAHCIiHgIEGAAAAMAAABAAAAAQAAABAAAACAAAAAgIEAEAAAQIEAgEAAAAAUAAAD4APgAAAAABAAAQCAQIEAAAAA'+
+	'FADBICBAgACAAAAcAOESaqqqcQDgABQAgIFBQ+IiIAAAFAPCIiPCIiPAAAAUAcIiAgICIcAAABQDgkIiIiJDgAAAEAPCA'+
+	'gOCAgPAAAAQA8ICA4ICAgAAABQBwiICYiIhwAAAFAIiIiPiIiIgAAAIAQEBAQEBAQAAABQAICAgIiIhwAAAFAIiQoMCgk'+
+	'IgAAAQAgICAgICA8AAABwCCxqqSgoKCAAAFAMjIqKiYmIgAAAUAcIiIiIiIcAAABQDwiIjwgICAAAAFAHCIiIiIqHAQAA'+
+	'UA8IiI8KCQiAAABQBwiIBwCIhwAAAFAPggICAgICAAAAUAiIiIiIiIcAAABQCIiIhQUCAgAAAHAIKCVFQoKCgAAAUAiIh'+
+	'QIFCIiAAABQCIiFAgICAgAAAEAPAQIECAgPAAAANgQEBAQEBAQGAABICAQEAgIBAQAAADYCAgICAgICBgAAMAQKAAAAAA'+
+	'AAAABgAAAAAAAAD8AAACAIBAAAAAAAAAAAQAAABgEHCQcAAABACAgOCQkJDgAAAEAAAAYJCAkGAAAAQAEBBwkJCQcAAAB'+
+	'AAAAGCQ8IBgAAAEADBA4EBAQEAAAAQAAABwkJCQcBBgBACAgOCQkJCQAAACAEAAwEBAQEAAAAMAIABgICAgICDABACAgJ'+
+	'CgwKCQAAACAMBAQEBAQEAAAAcAAADskpKSkgAABAAAAOCQkJCQAAAEAAAAYJCQkGAAAAQAAADgkJCQ4ICABAAAAHCQkJB'+
+	'wEBAEAAAAsMCAgIAAAAQAAABwgGAQ4AAAAwBAQOBAQEAgAAAEAAAAkJCQkHAAAAUAAACIUFAgIAAABwAAAIJUVCgoAAAF'+
+	'AAAAiFAgUIgAAAQAAACQkJCQcBBgBAAAAPAgQIDwAAADIEBAQIBAQEAgAAGAgICAgICAgIAAA4BAQEAgQEBAgAAFAGiwA'+
+	'AAAAAAAAAUAAAAAAAAAqAAA',
 	menu:'%%FNT0EA0BAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAwADAAMAAwADAAMAAAADAAMAAAAAAAAAAAwAAoACgAKA'+
 	'AAAAAAAAAAAAAAAAAAAAAAAAACBIAEgB/ACQAJAD+AEgASAAAAAAAAAAAAAAABSAAcACoAOAA4ABwADgAOACoAHAAIAAA'+
 	'AAAACW4AkgCUAGQACAAIABMAFIAkgCMAAAAAAAAACAAAeADMAM0AYQDOAMwAzADMAHgAAAAAAAAAAQAAgACAAIAAAAAAA'+
@@ -748,22 +764,6 @@ FONTS={
 	'AAAAPwADAAYADAAYADAAPwAAAAAAAAAAyAAQABAAEAAQACAAEAAQABAAEAAIAAAAAAAAYAAgACAAIAAgACAAIAAgACAAI'+
 	'AAgAAAAAAAA4AAQABAAEAAQAAgAEAAQABAAEAAgAAAAAAABgAAAAAAAGQAmAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAA'+
 	'AAAAAAAAAAADbANsAAAAAAAAA',
-	body:'%%FNT0CAoBAQAAAAAAAAAAAAABAICAgICAAIAAAAMAoKAAAAAAAAAABQAAUPhQ+FAAAAAFIHCooHAoqHAgAAgAf5KUbhk'+
-	'pRgAABzBIUCBUiJRiAAABAICAAAAAAAAAAAMgQICAgICAQCAAA4BAICAgICBAgAAFAFAg+CBQAAAAAAUAACAg+CAgAAAA'+
-	'AgAAAAAAAABAQIAEAAAAAPAAAAAAAAEAAAAAAAAAgAAABBAQICBAQICAAAAFAHCIiIiIiHAAAAUAIGAgICAgIAAABQBwi'+
-	'AgQIED4AAAFAPgQIHAIiHAAAAUAEDBQkPgQEAAABQD4gPAICIhwAAAFADBAgPCIiHAAAAUA+AgQECAgIAAABQBwiIhwiI'+
-	'hwAAAFAHCIiHgIEGAAAAMAAABAAAAAQAAABAAAACAAAAAgIEAEAAAQIEAgEAAAAAUAAAD4APgAAAAABAAAQCAQIEAAAAA'+
-	'FADBICBAgACAAAAcAOESaqqqcQDgABQAgIFBQ+IiIAAAFAPCIiPCIiPAAAAUAcIiAgICIcAAABQDgkIiIiJDgAAAEAPCA'+
-	'gOCAgPAAAAQA8ICA4ICAgAAABQBwiICYiIhwAAAFAIiIiPiIiIgAAAIAQEBAQEBAQAAABQAICAgIiIhwAAAFAIiQoMCgk'+
-	'IgAAAQAgICAgICA8AAABwCCxqqSgoKCAAAFAMjIqKiYmIgAAAUAcIiIiIiIcAAABQDwiIjwgICAAAAFAHCIiIiIqHAQAA'+
-	'UA8IiI8KCQiAAABQBwiIBwCIhwAAAFAPggICAgICAAAAUAiIiIiIiIcAAABQCIiIhQUCAgAAAHAIKCVFQoKCgAAAUAiIh'+
-	'QIFCIiAAABQCIiFAgICAgAAAEAPAQIECAgPAAAANgQEBAQEBAQGAABICAQEAgIBAQAAADYCAgICAgICBgAAMAQKAAAAAA'+
-	'AAAABgAAAAAAAAD8AAACAIBAAAAAAAAAAAQAAABgEHCQcAAABACAgOCQkJDgAAAEAAAAYJCAkGAAAAQAEBBwkJCQcAAAB'+
-	'AAAAGCQ8IBgAAAEADBA4EBAQEAAAAQAAABwkJCQcBBgBACAgOCQkJCQAAACAEAAwEBAQEAAAAMAIABgICAgICDABACAgJ'+
-	'CgwKCQAAACAMBAQEBAQEAAAAcAAADskpKSkgAABAAAAOCQkJCQAAAEAAAAYJCQkGAAAAQAAADgkJCQ4ICABAAAAHCQkJB'+
-	'wEBAEAAAAsMCAgIAAAAQAAABwgGAQ4AAAAwBAQOBAQEAgAAAEAAAAkJCQkHAAAAUAAACIUFAgIAAABwAAAIJUVCgoAAAF'+
-	'AAAAiFAgUIgAAAQAAACQkJCQcBBgBAAAAPAgQIDwAAADIEBAQIBAQEAgAAGAgICAgICAgIAAA4BAQEAgQEBAgAAFAGiwA'+
-	'AAAAAAAAAUAAAAAAAAAqAAA',
 	mono:'%%FNT0CAsBBQAAAAAAAAAAAAAABQAAICAgICAAIAAABQAAUFBQAAAAAAAABQAAUPhQ+FAAAAAABQAgcKigcCiocCAABQA'+
 	'ASKhQIFCokAAABQAAYJCgQKiQaAAABQAgICAAAAAAAAAABQAQICBAQEAgIBAABQAgEBAICAgQECAABQAAIKhwqCAAAAAA'+
 	'BQAAACAg+CAgAAAABQAAAAAAAABgYCBABQAAAAAA+AAAAAAABQAAAAAAAAAwMAAABQgIEBAgIEBAgIAABQAAcIiYqMiIc'+
@@ -2044,9 +2044,26 @@ card_remove=(card,x)=>{
 }
 con_copy_raw=(card,z)=>z.filter(w=>widget_is(w)&&w.card==card).map(widget_write)
 con_paste_raw=(card,payload)=>payload.map(p=>widget_add(card,ld(p)))
+find_fonts=(deck,target,widgets)=>{
+	let fonts=lmd([],[]);widgets.filter(widget_is).map(wid=>{
+		if(wid.font)dset(fonts,lms(wid.font),dget(deck.fonts,lms(wid.font))) // directly on widgets
+		if(contraption_is(wid)){ // inside contraption instances
+			wid.widgets.v.map(w=>ifield(w,'font')).map(f=>dset(fonts,dkey(deck.fonts,f),f))
+		}
+		if(field_is(wid)&&match(ifield(wid,'style'),lms('rich'))){ // inside rtext field values
+			ifield(wid,'value').v.font.filter(n=>count(n)&&!dget(fonts,n)).map(n=>dset(fonts,n,dget(deck.fonts,n)))
+		}
+	})
+	fonts=dyad.drop(lml(['body','menu','mono'].map(lms)),fonts),fonts.v.map((x,i)=>{fonts.v[i]=lms(font_write(x))})
+	if(count(fonts))dset(target,lms('f'),fonts)
+}
+merge_fonts=(deck,f)=>{
+	if(!f)return;f=ld(f)
+	f.v.map((x,i)=>{const k=f.k[i],v=font_read(ls(x));if(font_is(v)&&!dget(deck.fonts,k))dset(deck.fonts,k,v)})
+}
 con_copy=(card,z)=>{
 	z=lil(z)?ll(z):[z];const wids=lml(con_copy_raw(card,z)),defs=lmd(),v=lmd(['w','d'].map(lms),[wids,defs])
-	const condefs=card.deck.contraptions;wids.v.map(wid=>{
+	const condefs=card.deck.contraptions;find_fonts(card.deck,v,z),wids.v.map(wid=>{
 		const type=dget(wid,lms('type')),def=dget(wid,lms('def'))
 		if(ls(type)=='contraption'&&dget(defs,def)==null)dset(defs,def,prototype_write(dget(condefs,def)))
 	});return lms(`%%WGT0${fjson(v)}`)
@@ -2065,7 +2082,7 @@ merge_prototypes=(deck,defs,uses)=>{
 con_paste=(card,z)=>{
 	if(!lis(z)||!z.v.startsWith('%%WGT0'))return NONE
 	const v=ld(pjson(ls(z),6,count(z)-6).value),defs=dget(v,lms('d'));let wids=dget(v,lms('w'));wids=wids?ll(wids):[]
-	merge_prototypes(card.deck,defs?ld(defs):lmd(),wids);return lml(con_paste_raw(card,wids))
+	merge_fonts(card.deck,dget(v,lms('f'))),merge_prototypes(card.deck,defs?ld(defs):lmd(),wids);return lml(con_paste_raw(card,wids))
 }
 card_read=(x,deck,cdata)=>{
 	x=ld(x);const nav_dirs={right:1,left:1,up:1,down:1},ri=lmi((self,i,x)=>{
@@ -2253,7 +2270,7 @@ deck_remove=(deck,t)=>{
 	}return 0
 }
 deck_copy=(deck,z)=>{
-	if(!card_is(z))return NONE;const defs=lmd(),v=lmd(['c','d'].map(lms),[card_write(z),defs])
+	if(!card_is(z))return NONE;const defs=lmd(),v=lmd(['c','d'].map(lms),[card_write(z),defs]);find_fonts(deck,v,z.widgets.v)
 	z.widgets.v.filter(contraption_is).map(wid=>{const d=wid.def,n=ifield(d,'name');if(dget(defs,n)==null)dset(defs,n,prototype_write(d))})
 	return lms(`%%CRD0${fjson(v)}`)
 }
@@ -2261,6 +2278,7 @@ deck_paste=(deck,z,name)=>{
 	if(!lis(z)||!ls(z).startsWith('%%CRD0'))return NONE
 	const v=ld(pjson(ls(z),6,count(z)-6).value);let payload=dget(v,lms('c')),defs=dget(v,lms('d'));payload=payload?ld(payload):lmd()
 	const wids=dget(payload,lms('widgets'));if(wids&&lid(wids))wids.v.map((v,i)=>dset(v,lms('name'),wids.k[i]))
+	merge_fonts(deck,dget(v,lms('f')))
 	merge_prototypes(deck,defs?ld(defs):lmd(),wids?ll(wids):[]);const r=card_read(payload,deck);dset(deck.cards,name||ifield(r,'name'),r);return r
 }
 deck_read=x=>{
