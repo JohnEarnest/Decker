@@ -1,6 +1,6 @@
 // Decker
 
-let zoom=1, deck=null, fb=null, context=null, dirty=0
+let zoom=1, deck=null, fb=null, context=null, dirty=0, smooth=0
 let FONT_BODY=null,FONT_MENU=null,FONT_MONO=null
 
 const ELLIPSIS=String.fromCharCode(95+32)
@@ -424,6 +424,7 @@ tracking=_=>{
 	}
 }
 is_fullscreen=_=>(document.fullscreenElement||document.webkitFullscreenElement)!=null
+toggle_smooth=_=>{smooth=smooth?0:1;resize()}
 toggle_fullscreen=_=>{
 	if(is_fullscreen()){
 		if(document.exitFullscreen)document.exitFullscreen()
@@ -2957,6 +2958,7 @@ all_menus=_=>{
 	if(menu_check('Listener',canlisten,ms.type=='listen','l')){if(ms.type!='listen'){modal_enter('listen')}else{modal_exit(0)}}
 	menu_separator()
 	menu_check('Fullscreen',1,is_fullscreen(),null,toggle_fullscreen)
+	menu_check('Smoothing', 1, smooth, null, toggle_smooth)
 	if(menu_check('Touch Input',1,enable_touch))enable_touch^=1,set_touch=1
 	if(menu_check('Script Profiler',1,profiler))profiler^=1
 	if(menu_check('Toolbars',tzoom>0,toolbars_enable))toolbars_enable^=1,resize()
@@ -3408,8 +3410,13 @@ sync=_=>{
 		id.data[d+1]=0xFF&(cv>> 8)
 		id.data[d+2]=0xFF&(cv    )
 	}
-	const r=q('#render');r.getContext('2d').putImageData(id,0,0)
-	const g=q('#display').getContext('2d');g.imageSmoothingEnabled=zoom!=(0|zoom),g.save(),g.scale(zoom,zoom),g.drawImage(r,0,0),g.restore()
+	const r=q('#render');
+	const rc=r.getContext('2d');
+	const g=q('#display').getContext('2d');
+	let z=zoom;
+	if(smooth){z/=2;const rd=rc.createImageData(r.width,r.height);mmpx(new Uint32Array(id.data.buffer),id.width,id.height,new Uint32Array(rd.data.buffer));rc.putImageData(rd,0,0)}
+	else{rc.putImageData(id,0,0)}
+	g.imageSmoothingEnabled=z!=(0|z),g.save(),g.scale(z,z),g.drawImage(r,0,0),g.restore()
 }
 
 move=(x,y)=>{if(!msg.pending_drag)pointer.prev=pointer.pos;pointer.pos=ev.pos=rect(x,y);if(pointer.held)msg.pending_drag=1}
@@ -3440,12 +3447,12 @@ resize=_=>{
 	zoom=max(1,is_fullscreen()?fs:(0|fs))
 	tzoom=0|min((screen.x-(zoom*fb.size.x))/(2*toolsize.x),screen.y/toolsize.y)
 	const tz=tzoom*toolbars_enable
-	const c =q('#display');c .width=fb.size .x*zoom,c.height =fb.size .y*zoom
-	const tl=q('#ltools' );tl.width=toolsize.x*tz  ,tl.height=toolsize.y*tz
-	const tr=q('#rtools' );tr.width=toolsize.x*tz  ,tr.height=toolsize.y*tz
-	const r =q('#render' );r .width=fb.size .x     ,r .height=fb.size .y
-	const rl=q('#lrender');rl.width=toolsize.x     ,rl.height=toolsize.y
-	const rr=q('#rrender');rr.width=toolsize.x     ,rr.height=toolsize.y
+	const c =q('#display');c .width=fb.size .x*zoom         ,c.height =fb.size .y*zoom
+	const tl=q('#ltools' );tl.width=toolsize.x*tz           ,tl.height=toolsize.y*tz
+	const tr=q('#rtools' );tr.width=toolsize.x*tz           ,tr.height=toolsize.y*tz
+	const r =q('#render' );r .width=fb.size .x*(smooth?2:1) ,r .height=fb.size .y*(smooth?2:1)
+	const rl=q('#lrender');rl.width=toolsize.x              ,rl.height=toolsize.y
+	const rr=q('#rrender');rr.width=toolsize.x              ,rr.height=toolsize.y
 }
 window.onresize=_=>{resize(),sync()}
 q('body').addEventListener('mousedown'  ,e=>mouse(e,down))

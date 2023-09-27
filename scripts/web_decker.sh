@@ -14,6 +14,7 @@ cat js/decker.html >> $DST
 echo -e "<script>\n" >> $DST
 echo -e "VERSION=\"${VERSION}\"\n" >> $DST
 cat js/lil.js >> $DST
+cat js/mmpx.js >> $DST
 cat js/decker.js >> $DST
 echo -e "</script></body>" >> $DST
 
