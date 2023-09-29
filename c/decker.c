@@ -1017,7 +1017,7 @@ lv* draw_lil(pair size,int align,int bare,lv*x){
 
 // The Listener
 
-#define LISTEN_W (frame.size.x-22)
+#define LISTEN_W (context.size.x-22)
 #define LISTEN_H 100
 void listen_show_image(lv*x,lv*v){
 	frame=context;while(li.hist->c>=LISTEN_LINES)ll_unshift(li.hist);
