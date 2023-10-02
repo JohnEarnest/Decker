@@ -1,6 +1,7 @@
 VERSION=$(shell cat VERSION)
 UNAME=$(shell uname)
 SDL=$(shell sdl2-config --cflags --libs)
+EXTRA_FLAGS?=
 
 ifeq ($(UNAME),Darwin)
 	OPEN=open
@@ -36,6 +37,9 @@ ifneq ("$(wildcard /usr/bin/olpc-hwinfo)","")
 	FLAGS:=$(FLAGS) -DLOSPEC
 else
 	SDL:=$(SDL) -lSDL2_image
+endif
+ifneq ("$(EXTRA_FLAGS)","")
+	FLAGS:=$(FLAGS) $(EXTRA_FLAGS)
 endif
 
 resources:
