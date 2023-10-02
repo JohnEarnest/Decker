@@ -772,7 +772,7 @@ void widget_field(lv*target,field x,field_val*value){
 	}
 	if(!x.locked&&!l&&dover(bi)&&(ev.md||ev.mu||ev.drag)){
 		int i=layout_index((pair){ev.pos.x-bi.x,ev.pos.y-bi.y+value->scroll});
-		if(ev.md){wid.cursor.x=wid.cursor.y=i;}else{wid.cursor.y=i;}
+		if(ev.md&&!ev.shift){wid.cursor.x=wid.cursor.y=i;}else{wid.cursor.y=i;}
 		if(ev.dclick){ // double-click to select a word or whitespace span:
 			int a,w=layout_count&&strchr("\n ",layout[MIN(wid.cursor.y,layout_count-1)].c)?1:0;
 			a=wid.cursor.y;while(a>=0&&a<layout_count&&(w^!strchr("\n ",layout[a].c)))a--;wid.cursor.x=a+1;
