@@ -80,6 +80,7 @@ Global Variables
 | `env`           | Dictionary of POSIX Environment variables.                                                            |
 | `sys`           | An Interface which exposes information about the Lilt runtime.                                        |
 | `rtext`         | An Interface with routines for working with rich text.                                                |
+| `bits`          | An Interface with routines for bit-wise manipulation of numbers.                                      |
 | `pi`            | The ratio of a circle's circumference to its diameter. Roughly 3.141.                                 |
 | `e`             | Euler's number; the base of the natural logarithm. Roughly 2.718.                                     |
 | `colors`        | A dictionary of named pattern indices.                                                                |
