@@ -149,7 +149,9 @@ int main(int argc,char**argv){
 		else if(has_suffix(argv[z],".lil")){repl=0;runfile(argv[z],env),z++;}
 	}if(!repl){exit(0);}
 	while(1){
-		char*line=bestlineWithHistory(" ","lilt");lv*prog=parse(line);free(line);
+		char*line=bestlineWithHistory(" ","lilt");
+		if (!line)break;
+		lv*prog=parse(line);free(line);
 		if(perr()){for(int z=0;z<par.c+2;z++)printf(" ");printf("^\n%s\n",par.error);}
 		else{lv*x=run(prog,env);dset(env,lmistr("_"),x);debug_show(x);}
 	}
