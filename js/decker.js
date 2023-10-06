@@ -3360,7 +3360,7 @@ load_deck=d=>{
 	seed=0|(new Date().getTime()/1000),n_play([NONE,lms('loop')])
 }
 tick=_=>{
-	toolbars()
+	pointer.up=ev.mu,pointer.down=ev.md,toolbars()
 	msg.pending_drag=0,msg.pending_halt=0,frame=context,uicursor=0,fb.pix.fill(0)
 	menu_setup(),all_menus(),widget_setup()
 	const ev_stash=ev;kc.heading=null;if(kc.on)ev=event_state()

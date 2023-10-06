@@ -1133,12 +1133,14 @@ draw_text_rich=(r,l,pattern,opaque)=>{
 
 pointer={f:(self,i,x)=>{
 	if(ikey(i,'held' ))return lmn(self.held)
+	if(ikey(i,'down' ))return lmn(self.down)
+	if(ikey(i,'up'   ))return lmn(self.up)
 	if(ikey(i,'pos'  ))return lmpair(self.pos)
 	if(ikey(i,'start'))return lmpair(self.start)
 	if(ikey(i,'prev' ))return lmpair(self.prev)
 	if(ikey(i,'end'  ))return lmpair(self.end)
 	return x?x:NONE
-},t:'int',n:'pointer',held:0,pos:rect(),start:rect(),prev:rect(),end:rect()}
+},t:'int',n:'pointer',held:0,down:0,up:0,pos:rect(),start:rect(),prev:rect(),end:rect()}
 
 keystore_read=x=>{
 	let store=lmd();if(x)x.k.filter((k,i)=>!match(NONE,x.v[i])).map((k,i)=>dset(store,k,x.v[i]))

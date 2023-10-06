@@ -695,6 +695,8 @@ The pointer interface represents the global state of the user's pointing device,
 | :--------- | :---------------------------------------------------------------------- |
 | `typeof x` | `"pointer"`                                                             |
 | `x.held`   | Bool. Is the pointing device held down?                                 |
+| `x.down`   | Bool. Was the pointing device pressed since the last frame?             |
+| `x.up`     | Bool. Was the pointing device released since the last frame?            |
 | `x.pos`    | The `pos` of the pointing device on the current card.                   |
 | `x.prev`   | The value of `x.pos` _before_ the most recent update.                   |
 | `x.start`  | The `pos` where the pointing device was last pressed down.              |

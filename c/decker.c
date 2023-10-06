@@ -3311,6 +3311,7 @@ void sync(){
 			SDL_free(e.drop.file);
 		}
 	}
+	pointer_down=ev.md,pointer_up=ev.mu;
 	SDL_FlushEvent(SDL_USEREVENT);
 	if(toggle_fullscreen){
 		toggle_fullscreen=0;
