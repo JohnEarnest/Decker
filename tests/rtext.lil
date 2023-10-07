@@ -1,0 +1,34 @@
+
+# test suite for the rtext interface
+
+rt1: insert
+	font:"menu" ,""          ,"mono",""
+	arg :""     ,""          ,""    ,""
+	text:"Hello","how about ","some"," salsa?"
+into 0
+rt2: insert
+	text:" never ","mind."
+	arg :""       ,"the_brain_page"
+	font:""       ,""
+into 0
+
+show[rtext.end]
+show[rtext.len[rt1]]
+show[rtext.len[table ()]]
+show[rtext.make["simple"]]
+show[rtext.make["more" "menu" 23]]
+
+show[rtext.get[rt1  6]]
+show[rtext.get[rt1 18]]
+show[rtext.get[rt1 -5]]
+show[rtext.get[rt1 1000]]
+
+show[rtext.cat[insert text:"single" into 0]]  # cast
+show[rtext.cat[rt1 rt2]]                      # catenate
+show[rtext.cat["one" rt2 "another"]]          # catenate w/ strings
+
+show[rtext.string[rt1 4,19]]
+show[rtext.span[rt1 8,12]]                   # onechunk
+show[rtext.span[rt1 4,19]]                   # multichunk
+show[rtext.span[rtext.make[""] 0,0        ]] # empty start
+show[rtext.span[rtext.make[""] 0,rtext.end]] # empty end
