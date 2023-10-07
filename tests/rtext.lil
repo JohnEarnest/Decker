@@ -32,3 +32,20 @@ show[rtext.span[rt1 8,12]]                   # onechunk
 show[rtext.span[rt1 4,19]]                   # multichunk
 show[rtext.span[rtext.make[""] 0,0        ]] # empty start
 show[rtext.span[rtext.make[""] 0,rtext.end]] # empty end
+
+d1:rtext.cat[
+	rtext.make["first|"       "f0"]
+	rtext.make["second|third" "f1"]
+	rtext.make["|fourth"      "f2"]
+]
+d2:rtext.cat[
+	rtext.make["first one\n\nsecond" "f1"]
+	rtext.make[" one"                "f2"]
+	rtext.make["\n\nthird one\n\n"   "f3"]
+]
+show[rtext.split[]]
+show[rtext.split["bogus"]]
+show[rtext.split["" d1]]
+show[first rtext.split["not present" d1]]
+print["--d1--"] each v in rtext.split["|" d1] show[v] end
+print["--d2--"] each v in rtext.split["\n\n" d2] show[v] end

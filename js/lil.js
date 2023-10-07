@@ -1625,6 +1625,12 @@ interface_rtext=lmi((self,i,x)=>{
 	if(ikey(i,'string'))return lmnat(([t,i])=>rtext_string(rtext_cast(t),i?getpair(i):undefined))
 	if(ikey(i,'span'  ))return lmnat(([t,i])=>rtext_span  (rtext_cast(t),i?getpair(i):undefined))
 	if(ikey(i,'cat'   ))return lmnat(x=>{let r=lmt({text:[],font:[],arg:[]});x.map(x=>rtext_appendr(r,rtext_cast(x)));return r})
+	if(ikey(i,'split' ))return lmnat(([x,y])=>{
+		const d=ls(x),v=rtext_cast(y),t=ls(rtext_string(v)),r=lml([]);if(d.length<1||!x||!y)return r
+		let n=0;for(let z=0;z<t.length;z++){
+			let m=1;for(let w=0;w<d.length;w++)if(d[w]!=t[z+w]){m=0;break}if(m){r.v.push(rtext_span(v,rect(n,z))),z+=d.length-1,n=z+1}
+		}if(n<=t.length)r.v.push(rtext_span(v,rect(n,t.length)));return r
+	})
 	return x?x:NONE
 },'rtext')
 button_styles={round:1,rect:1,check:1,invisible:1}

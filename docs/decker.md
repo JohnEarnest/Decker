@@ -680,6 +680,7 @@ The _rtext_ interface contains a number of helper routines for building and mani
 | `rtext.get[table x]`         | The row number of `table` containing character position `x`, or -1.              |
 | `rtext.string[table (x,y)]`  | The text content of `table` between character positions `x` and `y`.             |
 | `rtext.span[table (x,y)]`    | An rtext subtable containing content between character positions `x` and `y`.    |
+| `rtext.split[delim table]`   | Break an rtext into a list of tables at instances of a delimiter string `delim`. |
 | `rtext.cat[x...]`            | Concatenate rtext tables sequentially. Accepts any number of arguments.          |
 
 Dictionary arguments to `rtext.cat[]` are promoted to tables, and any other arguments which are not already tables will be interpreted as strings and converted to text runs as by `rtext.make[x "" ""]`. Thus, with a single argument, `rtext.cat[]` can be used to _cast_ values to properly formed rtext tables. Sequential rows with matching `font` and (non-image) `arg` values will be coalesced together, and rows with empty `text` spans will be dropped.

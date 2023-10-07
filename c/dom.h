@@ -1576,6 +1576,13 @@ lv* rtext_write(lv*x){
 	lv*a=dget(x,lmistr("arg"));if(a){MAP(n,a)image_is(a->lv[z])?image_write(a->lv[z]):a->lv[z];dset(x,lmistr("arg"),n);}
 	return x;
 }
+lv*n_rtext_split(lv*self,lv*z){
+	(void)self;if(z->c<2)return lml(0);lv*d=ls(z->lv[0]),*v=rtext_cast(z->lv[1]),*t=rtext_string(v,(pair){0,RTEXT_END}),*r=lml(0);
+	if(d->c<1)return r;int n=0;EACH(z,t){
+		int m=1;EACH(w,d)if(d->sv[w]!=t->sv[z+w]){m=0;break;}if(!m)continue;
+		ll_add(r,rtext_span(v,(pair){n,z})),z+=d->c-1,n=z+1;
+	}if(n<=t->c)ll_add(r,rtext_span(v,(pair){n,t->c}));return r;
+}
 lv*n_rtext_len   (lv*self,lv*z){(void)self;return lmn(rtext_len(rtext_cast(l_first(z))));}
 lv*n_rtext_get   (lv*self,lv*z){(void)self;return lmn(rtext_get(rtext_cast(l_first(z)),z->c<2?0:ln(z->lv[1])));}
 lv*n_rtext_string(lv*self,lv*z){(void)self;return rtext_string(rtext_cast(l_first(z)),z->c<2?(pair){0,RTEXT_END}:unpack_pair(z,1));}
@@ -1588,6 +1595,7 @@ lv* interface_rtext(lv*self,lv*i,lv*x){
 	ikey("get"   )return lmnat(n_rtext_get   ,self);
 	ikey("string")return lmnat(n_rtext_string,self);
 	ikey("span"  )return lmnat(n_rtext_span  ,self);
+	ikey("split" )return lmnat(n_rtext_split ,self);
 	ikey("cat"   )return lmnat(n_rtext_cat   ,self);
 	return x?x:NONE;
 }
