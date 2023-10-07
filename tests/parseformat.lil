@@ -158,6 +158,9 @@ show["%j"       parse "{\"a\":11,\"b\":22}"      ] # simple dict
 show["%j%n"     parse "{\"a\":23,"               ] # dict w/o end
 show["%j%n"     parse "{\"a\":23,@"              ] # garbage in dict
 show["%j"       parse "{1:5,2:99}"               ] # non-string dict keys
+show["%j"       parse "{'foo':22,'bar':33}"      ] # single-quoted strings
+show["%j"       parse "{'foo':22,'ba\\'r':33}"   ] # escaped single-quote
+show["%j"       parse "'foobaz"                  ] # unterminated single-quote
 # fixed-width
 show["%1s%3j%1s" parse "AtrueB"                  ] # overlong literal
 show["%1s%3j%1s" parse "A12.34e5B"               ] # truncated number

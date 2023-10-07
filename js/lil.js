@@ -105,12 +105,13 @@ fjson=x=>lin(x)?wnum(x.v): lil(x)?`[${x.v.map(fjson).join(',')}]`:
 pjson=(y,h,n)=>{
 	const si=h, hn=_=>m&&y[h]&&(n?h-si<n:1), hnn=x=>m&&h+x<=y.length&&(n?h+x-si<n:1)
 	const jd=_=>{while(hn()&&/[0-9]/.test(y[h]))h++}, jm=x=>hn()&&y[h]==x?(h++,1):0, iw=_=>/[ \n]/.test(y[h]), ws=_=>{while(hn()&&iw())h++}
-	const esc=e=>e=='n'?'\n': /[\\/"]/.test(e)?e: e=='u'&&hnn(4)?String.fromCharCode(parseInt(y.slice(h,h+=4),16)):' '
+	const esc=e=>e=='n'?'\n': /[\\/"']/.test(e)?e: e=='u'&&hnn(4)?String.fromCharCode(parseInt(y.slice(h,h+=4),16)):' '
 	let f=1, m=1, rec=_=>{
 		const t={null:NONE,false:NONE,true:ONE};for(let k in t)if(hnn(k.length)&&y.slice(h,h+k.length)==k)return h+=k.length,t[k]
 		if(jm('[')){const r=lml([]);while(f&&hn()){ws();if(jm(']'))break;r.v.push(rec()),ws(),jm(',')}return r}
 		if(jm('{')){const r=lmd();while(f&&hn()){ws();if(jm('}'))break;const k=rec();ws(),jm(':');if(f)dset(r,k,rec());ws(),jm(',')}return r}
 		if(jm('"')){let r='';while(f&&hn()&&!jm('"'))r+=hnn(2)&&jm('\\')?esc(y[h++]):y[h++];return lms(r)}
+		if(jm("'")){let r='';while(f&&hn()&&!jm("'"))r+=hnn(2)&&jm('\\')?esc(y[h++]):y[h++];return lms(r)}
 		const ns=h;jm('-'),jd(),jm('.'),jd();if(jm('e')||jm('E')){jm('-')||jm('+');jd();}return h<=ns?(f=0,NONE): lmn(+y.slice(ns,h))
 	}, r=rec();return {value:r,index:h}
 }

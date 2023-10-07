@@ -915,10 +915,11 @@ The `%j` pattern can be used to format or parse data as JSON. When formatting JS
 "%j" format list 11,22              # "[11,22]"
 "%j" format table 11,22             # "null"
 ```
-When parsing JSON, the value `true` will become the number `1`, and `false` or `null` will become the number `0`. This JSON parser is highly tolerant and will among other things accept non-string JSON values as dictionary keys, missing `,` and `:` delimiters, and some missing trailing delimiters. [Postel's Law](https://en.wikipedia.org/wiki/Robustness_principle), baby!
+When parsing JSON, the value `true` will become the number `1`, and `false` or `null` will become the number `0`. This JSON parser is highly tolerant and will among other things accept non-string JSON values as dictionary keys, single-quoted strings, missing `,` and `:` delimiters, and some missing trailing delimiters. [Postel's Law](https://en.wikipedia.org/wiki/Robustness_principle), baby!
 ```
 "%j" parse "[true,false,null,1]"   # (1,0,0,1)
 "%j" parse "{11:22,33:44"          # {11:22,33:44}
+"%j" parse "{'foo':22}"            # {"foo":22}
 ```
 
 If any patterns specify names, the result of `parse` will be a dictionary, and `format` will likewise expect a dictionary as its right argument:

@@ -367,7 +367,7 @@ monad(l_amax){x=ll(x);lv*r=l_first(x);for(int z=1;z<x->c;z++)r=l_max  (r,x->lv[z
 monad(l_amin){x=ll(x);lv*r=l_first(x);for(int z=1;z<x->c;z++)r=l_min  (r,x->lv[z]);return r;}
 monad(l_raze){x=ll(x);lv*r=l_first(x);for(int z=1;z<x->c;z++)r=l_comma(r,x->lv[z]);return r;}
 char esc(char e,int*i,char*t,int*n){
-	char h[5]={0};return e=='n'?'\n':strchr("\\\"/",e)?e:
+	char h[5]={0};return e=='n'?'\n':strchr("\\\"/'",e)?e:
 	e=='u'&&*n>=4?(memcpy(h,t+*i,4),(*i)+=4,(*n)-=4,strtol(h,NULL,16)):' ';
 }
 lv* pjson(char*t,int*i,int*f,int*n){
@@ -380,7 +380,8 @@ lv* pjson(char*t,int*i,int*f,int*n){
 	jl("null",NONE);jl("false",NONE);jl("true",ONE);
 	if(jm('[')){lv*r=lml(0);while(jc()){js();if(jm(']'))break;ll_add(r,pjson(t,i,f,n));js();jm(',');}return r;}
 	if(jm('{')){lv*r=lmd( );while(jc()){js();if(jm('}'))break;lv*k=pjson(t,i,f,n);js();jm(':');if(*f)dset(r,k,pjson(t,i,f,n));js();jm(',');}return r;}
-	if(jm('"')){str r=str_new();while(jc()&&!(jm('"'))){str_addc(&r,(jm('\\'))?esc(jn(),i,t,n):jn());}return lmstr(r);}
+	if(jm('"' )){str r=str_new();while(jc()&&!(jm('"' ))){str_addc(&r,(jm('\\'))?esc(jn(),i,t,n):jn());}return lmstr(r);}
+	if(jm('\'')){str r=str_new();while(jc()&&!(jm('\''))){str_addc(&r,(jm('\\'))?esc(jn(),i,t,n):jn());}return lmstr(r);}
 	int ns=*i;jm('-');jd();jm('.');jd();if(jm('e')||jm('E')){jm('-')||jm('+');jd();}if(*i<=ns){*f=0;return NONE;}
 	char tb[NUM];snprintf(tb,MIN(*i-ns+1,NUM),"%s",t+ns);return lmn(atof(tb));
 }
