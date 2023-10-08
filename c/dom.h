@@ -923,6 +923,27 @@ void draw_text_outlined(rect pos,char*text,lv*f){
 	draw_text((rect){pos.x+1,pos.y+1,0,0},text,f,32);
 	draw_text(pos,text,f,1);
 }
+void draw_wrapped(rect o,rect sr,lv*dst,lv*src,rect clip,int opaque,char*pal){
+	pair ss=buff_size(src),ds=buff_size(dst);sr=box_intersect(sr,rect_pair((pair){0,0},ss));
+	rect r=box_intersect(o,clip);pair d={r.x-o.x,r.y-o.y};if(r.w<=0||r.h<=0||sr.w<=0||sr.h<=0)return;
+	if(!pal){for(int y=0;y<r.h;y++)for(int x=0;x<r.w;x++){int c=src->sv[(sr.x+((x+d.x)%sr.w))+(sr.y+((y+d.y)%sr.h))*ss.x];if(opaque||c)dst->sv[(r.x+x)+(r.y+y)*ds.x]=c;}return;}
+	for(int y=0;y<r.h;y++)for(int x=0;x<r.w;x++){
+		int dx=r.x+x,dy=r.y+y, c=draw_pattern(pal,src->sv[(sr.x+((x+d.x)%sr.w))+(sr.y+((y+d.y)%sr.h))*ss.x],dx,dy), di=(r.x+x)+(r.y+y)*ds.x;
+		dst->sv[di]=c^draw_pattern(pal,dst->sv[di],dx,dy);
+	}
+}
+void draw_9seg(rect r,lv*dst,lv*src,rect m,rect clip,int opaque,char*inv){
+	pair o={r.x,r.y}, s=buff_size(src);if(s.x<1||s.y<1)return;
+	draw_wrapped(rect_add((rect){0      ,0      ,m.x          ,m.y          },o),(rect){0      ,0      ,m.x          ,m.y          },dst,src,clip,opaque,inv); // NW
+	draw_wrapped(rect_add((rect){0      ,r.h-m.h,m.x          ,m.h          },o),(rect){0      ,s.y-m.h,m.x          ,m.h          },dst,src,clip,opaque,inv); // SW
+	draw_wrapped(rect_add((rect){r.w-m.w,0      ,m.w          ,m.y          },o),(rect){s.x-m.w,0      ,m.w          ,m.y          },dst,src,clip,opaque,inv); // NE
+	draw_wrapped(rect_add((rect){r.w-m.w,r.h-m.h,m.w          ,m.h          },o),(rect){s.x-m.w,s.y-m.h,m.w          ,m.h          },dst,src,clip,opaque,inv); // SE
+	draw_wrapped(rect_add((rect){0      ,m.y    ,m.x          ,r.h-(m.y+m.h)},o),(rect){0      ,m.y    ,m.x          ,s.y-(m.y+m.h)},dst,src,clip,opaque,inv); // W
+	draw_wrapped(rect_add((rect){m.x    ,0      ,r.w-(m.x+m.w),m.y          },o),(rect){m.x    ,0      ,s.x-(m.x+m.w),m.y          },dst,src,clip,opaque,inv); // N
+	draw_wrapped(rect_add((rect){r.w-m.w,m.y    ,m.w          ,r.h-(m.y+m.h)},o),(rect){s.x-m.w,m.y    ,m.w          ,s.y-(m.y+m.h)},dst,src,clip,opaque,inv); // E
+	draw_wrapped(rect_add((rect){m.x    ,r.h-m.h,r.w-(m.x+m.w),m.h          },o),(rect){m.x    ,s.y-m.h,s.x-(m.x+m.w),m.h          },dst,src,clip,opaque,inv); // S
+	draw_wrapped(rect_add((rect){m.x    ,m.y    ,r.w-(m.x+m.w),r.h-(m.y+m.h)},o),(rect){m.x    ,m.y    ,s.x-(m.x+m.w),s.y-(m.y+m.h)},dst,src,clip,opaque,inv); // C
+}
 
 typedef struct {pair pos;char c;} glyph;
 glyph*glyphs;int glyph_count=0,glyph_size=0;
@@ -1381,6 +1402,15 @@ lv* n_canvas_merge(lv*self,lv*z){
 	for(int y=0;y<frame.size.y;y++)for(int x=0;x<frame.size.x;x++)if(inclip(x,y)){int p=0xFF&PIX(x,y),c=v[p]?b[p][(x%s[p].x)+(y%s[p].y)*s[p].x]:0;PIX(x,y)=c;}
 	return NONE;
 }
+lv* normalize_margin(lv*x,pair s){
+	rect m=getrect(x);
+	return lmrect(rect_max((rect){MIN(m.x,s.x),MIN(m.y,s.y),MIN(m.w,s.x-m.x),MIN(m.h,s.y-m.y)},(rect){0,0,0,0}));
+}
+lv* n_canvas_segment(lv*self,lv*z){
+	pick_canvas(self);if(z->c<1||!image_is(z->lv[0]))return NONE;lv*i=z->lv[0]->b;
+	rect r=getrect(z->c>1?z->lv[1]:NULL),m=getrect(normalize_margin(z->c>2?z->lv[2]:NULL,buff_size(i)));
+	r.w=MAX(r.w,m.x+m.w),r.h=MAX(r.h,m.y+m.h);draw_9seg(r,frame.buffer,i,m,frame.clip,0,NULL);return NONE;
+}
 lv* interface_canvas(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	lv*data=self->b;lv*card=dget(data,lmistr("card")),*deck=dget(card->b,lmistr("deck")),*fonts=dget(deck->b,lmistr("fonts"));
@@ -1416,6 +1446,7 @@ lv* interface_canvas(lv*self,lv*i,lv*x){
 		ikey("text"     )return lmnat(n_canvas_text,  self);
 		ikey("copy"     )return lmnat(n_canvas_copy,  self);
 		ikey("paste"    )return lmnat(n_canvas_paste, self);
+		ikey("segment"  )return lmnat(n_canvas_segment,self);
 		ikey("textsize" )return lmnat(n_canvas_textsize,self);
 	}return interface_widget(self,i,x);
 }
@@ -2161,10 +2192,6 @@ lv* normalize_attributes(lv*x){
 		}
 	}return torect(r),r;
 }
-lv* normalize_margin(lv*x,lv*p){
-	rect m=getrect(x);pair s=getpair(ifield(p,"size"));
-	return lmrect(rect_max((rect){MIN(m.x,s.x),MIN(m.y,s.y),MIN(m.w,s.x-m.x),MIN(m.h,s.y-m.y)},(rect){0,0,0,0}));
-}
 lv* prototype_pos(lv*self){
 	lv*data=self->b,*deck=dget(data,lmistr("deck"));
 	pair cs=getpair(dget(deck->b,lmistr("size"))),ps=getpair(dget(data,lmistr("size")));
@@ -2179,9 +2206,9 @@ lv* interface_prototype(lv*self,lv*i,lv*x){
 			defs->kv[dgeti(defs,o)]=n;dset(data,i,n);return x;
 		}
 		ikey("description"){dset(data,i,ls(x));return x;}
-		ikey("size"       ){dset(data,i,normalize_pair  (x     )),contraption_update(self);return x;}
-		ikey("margin"     ){dset(data,i,normalize_margin(x,self)),contraption_update(self);return x;}
-		ikey("resizable"  ){dset(data,i,lmn(lb(x)))              ,contraption_update(self);return x;}
+		ikey("size"       ){dset(data,i,normalize_pair  (x                             )),contraption_update(self);return x;}
+		ikey("margin"     ){dset(data,i,normalize_margin(x,getpair(ifield(self,"size")))),contraption_update(self);return x;}
+		ikey("resizable"  ){dset(data,i,lmn(lb(x)))                                      ,contraption_update(self);return x;}
 		ikey("image"      ){dset(data,i,image_is(x)?x:image_empty());return x;}
 		ikey("script"     ){dset(data,i,ls(x));return x;}
 		ikey("template"   ){dset(data,i,ls(x));return x;}
@@ -2233,7 +2260,7 @@ lv* prototype_read(lv*x,lv*deck){
 	init_field(ri,"description",x)
 	init_field(ri,"script"     ,x)
 	init_field(ri,"template"   ,x)
-	{lv*k=lmistr("margin"),*v=dget(x,k);dset(r,k,normalize_margin(v?v:NONE,ri));}
+	{lv*k=lmistr("margin"),*v=dget(x,k);dset(r,k,normalize_margin(v?v:NONE,getpair(ifield(ri,"size"))));}
 	return ri;
 }
 

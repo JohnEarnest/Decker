@@ -1171,7 +1171,8 @@ The canvas will scale _up_ logical pixels to display them on the card (resulting
 | `x.text[x pos a]`       | Draw a string or rtext `x` at `pos`, from an anchor position `a`.                                                 |
 | `x.textsize[x w]`       | Obtain a `size` for the outer dimensions of a string or rtext `x`, optionally wrapped to width `w`.               |
 | `x.copy[pos size a]`    | Grab an _image_ at `pos`/`size`.                                                                                  |
-| `x.paste[image pos t]`  | Draw an _image_ at `pos`. If `t` is truthy, treat pattern 0 as transparent.                                       |
+| `x.paste[img pos t]`    | Draw an _image_ at `pos`. If `t` is truthy, treat pattern 0 as transparent.                                       |
+| `x.segment[img rect m]` | Draw an _image_ scaled to fit `rect`, based on margins `m`. Treat pattern 0 as transparent.                       |
 | `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                                     |
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
 
@@ -1201,6 +1202,9 @@ If the `pos` argument to `canvas.paste[]` is a list of four coordinates instead 
 ```
 c.paste[i (0,0),2*i.size]
 ```
+
+The `canvas.segment[img rect m]` function interprets margins (`m`) like the background image of a [Prototype](#prototypeinterface): offsets inward from the left, top, right, and bottom edge of the rectangle, logically dividing it into 9 regions. The four corners retain their original size. The left and right center regions are repeated (or truncated) vertically, the top and bottom center regions are repeated (or truncated) horizontally, and the centermost region is repeated (or truncated) horizontally _and_ vertically.
+
 
 Contraption Interface
 ---------------------
@@ -1292,7 +1296,7 @@ When a widget is removed from its Prototype, the interface becomes inert: it wil
 
 If a prototype is not `resizable`, contraptions will strictly inherit their `size` from the prototype. Otherwise, when the `size` of a contraption is modified, all the internal widgets will reflow based on the configuration of `margin`. The `margin` specifies four offsets inward from the left, top, right, and bottom edge of the prototype's bounding box, respectively. As a contraption is resized, corners of any widget which fall within a margin will retain their distance from the corresponding edge of the bounding box, and any other corners will be repositioned proportionally based on their original positions in the prototype. With appropriate margins, it is possible to achieve a wide variety of useful automatic layouts. Fully-collapsed (0) margins leave reflowing strictly on a proportional basis. The sum of the margins defines the minimum size of a contraption.
 
-In addition to controlling the position and size of widgets, `margin` controls how the background image of contraptions is rendered, by logically dividing it into 9 regions. As a contraption is resized, the four corners retain their original size. The left and right center regions are repeated vertically, the top and bottom center regions are repeated horizontally, and the centermost region is repeated horizontally _and_ vertically.
+In addition to controlling the position and size of widgets, `margin` controls how the background image of contraptions is rendered, by logically dividing it into 9 regions. As a contraption is resized, the four corners retain their original size. The left and right center regions are repeated vertically, the top and bottom center regions are repeated horizontally, and the centermost region is repeated horizontally _and_ vertically. Note that `canvas.segment[]` permits user scripts to efficiently perform the same style of 9-segment image scaling.
 
 The `attributes` table provides information about the attributes of contraption instances based on this Prototype which should be editable by users. It contains a `name` column with (string) attribute names, a `label` column with (string) display names for attributes, and a `type` column indicating the editor that should be provided for that attribute:
 

@@ -917,27 +917,6 @@ void handle_widgets(lv*x,pair offset){
 		if(contraption_is(w))widget_contraption(w);
 	}
 }
-void draw_wrapped(rect o,rect sr,lv*dst,lv*src,rect clip,int opaque,char*pal){
-	pair ss=buff_size(src),ds=buff_size(dst);sr=box_intersect(sr,rect_pair((pair){0,0},ss));
-	rect r=box_intersect(o,clip);pair d={r.x-o.x,r.y-o.y};if(r.w<=0||r.h<=0||sr.w<=0||sr.h<=0)return;
-	if(!pal){for(int y=0;y<r.h;y++)for(int x=0;x<r.w;x++){int c=src->sv[(sr.x+((x+d.x)%sr.w))+(sr.y+((y+d.y)%sr.h))*ss.x];if(opaque||c)dst->sv[(r.x+x)+(r.y+y)*ds.x]=c;}return;}
-	for(int y=0;y<r.h;y++)for(int x=0;x<r.w;x++){
-		int dx=r.x+x,dy=r.y+y, c=draw_pattern(pal,src->sv[(sr.x+((x+d.x)%sr.w))+(sr.y+((y+d.y)%sr.h))*ss.x],dx,dy), di=(r.x+x)+(r.y+y)*ds.x;
-		dst->sv[di]=c^draw_pattern(pal,dst->sv[di],dx,dy);
-	}
-}
-void draw_9seg(rect r,lv*dst,lv*src,rect m,rect clip,int opaque,char*inv){
-	pair o={r.x,r.y}, s=buff_size(src);if(s.x<1||s.y<1)return;
-	draw_wrapped(rect_add((rect){0      ,0      ,m.x          ,m.y          },o),(rect){0      ,0      ,m.x          ,m.y          },dst,src,clip,opaque,inv); // NW
-	draw_wrapped(rect_add((rect){0      ,r.h-m.h,m.x          ,m.h          },o),(rect){0      ,s.y-m.h,m.x          ,m.h          },dst,src,clip,opaque,inv); // SW
-	draw_wrapped(rect_add((rect){r.w-m.w,0      ,m.w          ,m.y          },o),(rect){s.x-m.w,0      ,m.w          ,m.y          },dst,src,clip,opaque,inv); // NE
-	draw_wrapped(rect_add((rect){r.w-m.w,r.h-m.h,m.w          ,m.h          },o),(rect){s.x-m.w,s.y-m.h,m.w          ,m.h          },dst,src,clip,opaque,inv); // SE
-	draw_wrapped(rect_add((rect){0      ,m.y    ,m.x          ,r.h-(m.y+m.h)},o),(rect){0      ,m.y    ,m.x          ,s.y-(m.y+m.h)},dst,src,clip,opaque,inv); // W
-	draw_wrapped(rect_add((rect){m.x    ,0      ,r.w-(m.x+m.w),m.y          },o),(rect){m.x    ,0      ,s.x-(m.x+m.w),m.y          },dst,src,clip,opaque,inv); // N
-	draw_wrapped(rect_add((rect){r.w-m.w,m.y    ,m.w          ,r.h-(m.y+m.h)},o),(rect){s.x-m.w,m.y    ,m.w          ,s.y-(m.y+m.h)},dst,src,clip,opaque,inv); // E
-	draw_wrapped(rect_add((rect){m.x    ,r.h-m.h,r.w-(m.x+m.w),m.h          },o),(rect){m.x    ,s.y-m.h,s.x-(m.x+m.w),m.h          },dst,src,clip,opaque,inv); // S
-	draw_wrapped(rect_add((rect){m.x    ,m.y    ,r.w-(m.x+m.w),r.h-(m.y+m.h)},o),(rect){m.x    ,m.y    ,s.x-(m.x+m.w),s.y-(m.y+m.h)},dst,src,clip,opaque,inv); // C
-}
 void widget_contraption(lv*x){
 	int show=ordinal_enum(ifield(x,"show"),widget_shows);if(show==show_none)return;
 	rect b=rect_pair(getpair(ifield(x,"pos")),getpair(ifield(x,"size")));lv*image=ifield(x,"image");
@@ -3008,7 +2987,7 @@ int prototype_size_editor(){
 			m_margin(HANDLES[1],((pair){0      ,m.y    }),((pair){11,3}), delta.y,y);
 			m_margin(HANDLES[0],((pair){s.x-m.w,0      }),((pair){3,11}),-delta.x,w);if(drag.x&&drag.w)m.w+=delta.x,drag.w=0;
 			m_margin(HANDLES[1],((pair){0      ,s.y-m.h}),((pair){11,3}),-delta.y,h);if(drag.y&&drag.h)m.h+=delta.y,drag.h=0;
-			m=getrect(normalize_margin(lmrect(m),def));
+			m=getrect(normalize_margin(lmrect(m),getpair(ifield(def,"size"))));
 			t_margin(HANDLES[0],((pair){m.x    ,0      }),((pair){3,11}),x);
 			l_margin(HANDLES[1],((pair){0      ,m.y    }),((pair){11,3}),y);
 			t_margin(HANDLES[0],((pair){s.x-m.w,0      }),((pair){3,11}),w);

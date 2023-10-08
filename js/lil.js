@@ -1131,6 +1131,31 @@ draw_text_rich=(r,l,pattern,opaque)=>{
 		else{draw_char(g.pos,g.font,g.char,pattern)}
 	}frame.clip=oc
 }
+draw_9seg=(r,dst,src,m,clip,opaque,pal)=>{
+	const o=rect(r.x,r.y), s=src.size, ss=s, ds=dst.size; if(s.x<1||s.y<1)return
+	const draw_wrapped=(o,sr)=>{
+		const r=rclip(o,clip),d=rsub(r,o);sr=rclip(sr,rpair(rect(0,0),ss));if(r.w<=0||r.h<=0||sr.w<=0||sr.h<=0)return
+		if(!pal){ // solid/opaque
+			for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++){const c=src.pix[(sr.x+((x+d.x)%sr.w))+(sr.y+((y+d.y)%sr.h))*ss.x];if(opaque||c)dst.pix[(r.x+x)+(r.y+y)*ds.x]=c}
+		}
+		else{ // invert
+			const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
+			for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++){
+				let dx=r.x+x,dy=r.y+y, c=draw_pattern(src.pix[(sr.x+((x+d.x)%sr.w))+(sr.y+((y+d.y)%sr.h))*ss.x],dx,dy), di=(r.x+x)+(r.y+y)*ds.x
+				dst.pix[di]=c^draw_pattern(dst.pix[di],dx,dy)
+			}
+		}
+	}
+	draw_wrapped(radd(rect(0      ,0      ,m.x          ,m.y          ),o),rect(0      ,0      ,m.x          ,m.y          )) // NW
+	draw_wrapped(radd(rect(0      ,r.h-m.h,m.x          ,m.h          ),o),rect(0      ,s.y-m.h,m.x          ,m.h          )) // SW
+	draw_wrapped(radd(rect(r.w-m.w,0      ,m.w          ,m.y          ),o),rect(s.x-m.w,0      ,m.w          ,m.y          )) // NE
+	draw_wrapped(radd(rect(r.w-m.w,r.h-m.h,m.w          ,m.h          ),o),rect(s.x-m.w,s.y-m.h,m.w          ,m.h          )) // SE
+	draw_wrapped(radd(rect(0      ,m.y    ,m.x          ,r.h-(m.y+m.h)),o),rect(0      ,m.y    ,m.x          ,s.y-(m.y+m.h))) // W
+	draw_wrapped(radd(rect(m.x    ,0      ,r.w-(m.x+m.w),m.y          ),o),rect(m.x    ,0      ,s.x-(m.x+m.w),m.y          )) // N
+	draw_wrapped(radd(rect(r.w-m.w,m.y    ,m.w          ,r.h-(m.y+m.h)),o),rect(s.x-m.w,m.y    ,m.w          ,s.y-(m.y+m.h))) // E
+	draw_wrapped(radd(rect(m.x    ,r.h-m.h,r.w-(m.x+m.w),m.h          ),o),rect(m.x    ,s.y-m.h,s.x-(m.x+m.w),m.h          )) // S
+	draw_wrapped(radd(rect(m.x    ,m.y    ,r.w-(m.x+m.w),r.h-(m.y+m.h)),o),rect(m.x    ,m.y    ,s.x-(m.x+m.w),s.y-(m.y+m.h))) // C
+}
 
 pointer={f:(self,i,x)=>{
 	if(ikey(i,'held' ))return lmn(self.held)
@@ -1885,6 +1910,10 @@ canvas_read=(x,card)=>{
 				for(let y=0;y<s.y;y++)for(let x=0;x<s.x;x++){const h=rect(x,y);if(inclip(h)){const p=gpix(h),c=v[p]?z[p].pix[(x%sx[p])+(y%sy[p])*sx[p]]:0;pix(h,c)}}
 				return NONE
 			})
+			if(ikey(i,'segment'))return lmnat(([img,x,y])=>{
+				canvas_pick(self);if(!image_is(img))return NONE;const r=rint(getrect(x)),m=normalize_margin(y,img.size)
+				r.w=max(r.w,m.x+m.w),r.h=max(r.h,m.y+m.h),draw_9seg(r,frame.image,img,m,frame.clip,0,null);return NONE
+			})
 			if(ikey(i,'text'))return lmnat(([x,pos,a])=>(canvas_pick(self),text(x=lit(x)?rtext_cast(x):lms(ls(x)),pos,a)))
 			if(ikey(i,'textsize'))return lmnat(([x,wid])=>{
 				const l=layout_richtext(self.card.deck,rtext_cast(x||lms('')),ifield(self,'font'),ALIGN.left,wid?ln(wid):RTEXT_END)
@@ -2158,8 +2187,8 @@ contraption_update=(deck,def)=>{
 		})
 	})
 }
-normalize_margin=(x,p)=>{
-	const m=rint(getrect(x)), s=getpair(ifield(p,'size'))
+normalize_margin=(x,s)=>{
+	const m=rint(getrect(x))
 	return rmax(rect(min(m.x,s.x),min(m.y,s.y),min(m.w,s.x-m.x),min(m.h,s.y-m.y)),rect(0,0,0,0))
 }
 prototype_read=(x,deck)=>{
@@ -2182,7 +2211,7 @@ prototype_read=(x,deck)=>{
 			}
 			if(ikey(i,'description'))return self.description=ls(x),x
 			if(ikey(i,'size'       ))return self.size=rint(getpair(x)),contraption_update(deck,self),x
-			if(ikey(i,'margin'     ))return self.margin=normalize_margin(x,self),contraption_update(deck,self),x
+			if(ikey(i,'margin'     ))return self.margin=normalize_margin(x,getpair(ifield(self,'size'))),contraption_update(deck,self),x
 			if(ikey(i,'resizable'  ))return self.resizable=lb(x),contraption_update(deck,self),x
 			if(ikey(i,'image'      ))return self.image=image_is(x)?x:image_make(rect(0,0)),x
 			if(ikey(i,'script'     ))return self.script=ls(x),x
@@ -2218,7 +2247,7 @@ prototype_read=(x,deck)=>{
 	init_field(ri,'description',x)
 	init_field(ri,'script'     ,x)
 	init_field(ri,'template'   ,x)
-	ri.margin=normalize_margin(dget(x,lms('margin'))||NONE,ri)
+	ri.margin=normalize_margin(dget(x,lms('margin'))||NONE,getpair(ifield(ri,'size')))
 	return ri
 }
 prototype_write=x=>{

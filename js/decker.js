@@ -992,32 +992,6 @@ field_keys=(code,shift)=>{
 	wid.cursor.y=clamp(0,wid.cursor.y,nl.layout.length); if(!m)return
 	wid.cursor_timer=0; if(!shift)wid.cursor.x=wid.cursor.y; field_showcursor()
 }
-
-draw_9seg=(r,dst,src,m,clip,opaque,pal)=>{
-	const o=rect(r.x,r.y), s=src.size, ss=s, ds=dst.size; if(s.x<1||s.y<1)return
-	const draw_wrapped=(o,sr)=>{
-		const r=rclip(o,clip),d=rsub(r,o);sr=rclip(sr,rpair(rect(0,0),ss));if(r.w<=0||r.h<=0||sr.w<=0||sr.h<=0)return
-		if(!pal){ // solid/opaque
-			for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++){const c=src.pix[(sr.x+((x+d.x)%sr.w))+(sr.y+((y+d.y)%sr.h))*ss.x];if(opaque||c)dst.pix[(r.x+x)+(r.y+y)*ds.x]=c}
-		}
-		else{ // invert
-			const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
-			for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++){
-				let dx=r.x+x,dy=r.y+y, c=draw_pattern(src.pix[(sr.x+((x+d.x)%sr.w))+(sr.y+((y+d.y)%sr.h))*ss.x],dx,dy), di=(r.x+x)+(r.y+y)*ds.x
-				dst.pix[di]=c^draw_pattern(dst.pix[di],dx,dy)
-			}
-		}
-	}
-	draw_wrapped(radd(rect(0      ,0      ,m.x          ,m.y          ),o),rect(0      ,0      ,m.x          ,m.y          )) // NW
-	draw_wrapped(radd(rect(0      ,r.h-m.h,m.x          ,m.h          ),o),rect(0      ,s.y-m.h,m.x          ,m.h          )) // SW
-	draw_wrapped(radd(rect(r.w-m.w,0      ,m.w          ,m.y          ),o),rect(s.x-m.w,0      ,m.w          ,m.y          )) // NE
-	draw_wrapped(radd(rect(r.w-m.w,r.h-m.h,m.w          ,m.h          ),o),rect(s.x-m.w,s.y-m.h,m.w          ,m.h          )) // SE
-	draw_wrapped(radd(rect(0      ,m.y    ,m.x          ,r.h-(m.y+m.h)),o),rect(0      ,m.y    ,m.x          ,s.y-(m.y+m.h))) // W
-	draw_wrapped(radd(rect(m.x    ,0      ,r.w-(m.x+m.w),m.y          ),o),rect(m.x    ,0      ,s.x-(m.x+m.w),m.y          )) // N
-	draw_wrapped(radd(rect(r.w-m.w,m.y    ,m.w          ,r.h-(m.y+m.h)),o),rect(s.x-m.w,m.y    ,m.w          ,s.y-(m.y+m.h))) // E
-	draw_wrapped(radd(rect(m.x    ,r.h-m.h,r.w-(m.x+m.w),m.h          ),o),rect(m.x    ,s.y-m.h,s.x-(m.x+m.w),m.h          )) // S
-	draw_wrapped(radd(rect(m.x    ,m.y    ,r.w-(m.x+m.w),r.h-(m.y+m.h)),o),rect(m.x    ,m.y    ,s.x-(m.x+m.w),s.y-(m.y+m.h))) // C
-}
 widget_contraption=x=>{
 	const show=ls(ifield(x,'show'));if(show=='none')return
 	const b=rpair(getpair(ifield(x,'pos')),getpair(ifield(x,'size'))), image=ifield(x,'image')
@@ -2714,7 +2688,7 @@ prototype_size_editor=_=>{
 			m_margin(HANDLES[1],rect(0      ,m.y    ),rect(11,3), delta.y,'y')
 			m_margin(HANDLES[0],rect(s.x-m.w,0      ),rect(3,11),-delta.x,'w');if(drag.x&&drag.w)m.w+=delta.x,drag.w=0
 			m_margin(HANDLES[1],rect(0      ,s.y-m.h),rect(11,3),-delta.y,'h');if(drag.y&&drag.h)m.h+=delta.y,drag.h=0
-			m=normalize_margin(lmrect(m),def)
+			m=normalize_margin(lmrect(m),getpair(ifield(def,'size')))
 			t_margin(HANDLES[0],rect(m.x    ,0      ),rect(3,11),'x')
 			l_margin(HANDLES[1],rect(0      ,m.y    ),rect(11,3),'y')
 			t_margin(HANDLES[0],rect(s.x-m.w,0      ),rect(3,11),'w')

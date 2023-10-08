@@ -1444,6 +1444,14 @@ assert["canvas rtext size w/ font"      ( 63,13) c.textsize[r]]
 assert["canvas plaintext size"          (114,11) c.textsize["Some words to wrap!"]]
 assert["canvas plaintext size w/ width" ( 30,55) c.textsize["Some words to wrap!" 30]]
 
+c:deck.card.add["canvas"]
+i:image["%%IMG1AAcABwABAQEBAQABJyEhISMBASclJCMjAQEnJCUjIwEBKCgoIyMBASgoKCgjAQABAQEBAQE="]
+c.segment[i 1,1,9,9 2,2,3,3]
+assert["canvas segment scale" "%%IMG2AAsACwANAQcAAwEBJwEhBSMBAQEAAgEBJwElASQBJQEkASMCAQEAAgEBJwEkASUBJAElASMCAQEAAgEBJwElASQBJQEkASMCAQEAAgEBJwEkASUBJAElASMCAQEAAgEBKAUjAgEBAAIBASgGIwEBAQADAQgADA==" c.copy[0,0 11,11].encoded]
+c.clear[]
+c.segment[i 1,1,-5,-2.3 2,2,3,3]
+assert["canvas segment minscale" "%%IMG1AAYABgAAAAAAAAAAAQEBAAABJyEjAQABKCMjAQABKCgjAQAAAQEBAQ==" c.copy[0,0 6,6].encoded]
+
 #######################################
 #
 #  Deck
