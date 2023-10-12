@@ -1913,16 +1913,16 @@ modals=_=>{
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='field_props'){
-		const b=draw_modalbox(rect(220,170+60)),f=ob.sel[0], p=unpack_field(f)
+		const b=draw_modalbox(rect(260,200+60)),f=ob.sel[0], p=unpack_field(f)
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Field Properties',FONT_MENU,1)
 		draw_text(rect(b.x,b.y+22,42,20),'Name',FONT_MENU,1)
 		draw_text(rect(b.x,b.y+42,42,60),'Text',FONT_MENU,1)
 		ui_field(rect(b.x+42,b.y+20,b.w-42,18),ms.name)
 		const style=ls(ifield(f,'style'))
-		widget_field(null,{size:rect(b.x+42,b.y+40,b.w-42,58),font:p.font,show:'solid',scrollbar:1,border:1,style,align:p.align,locked:0},ms.text)
+		widget_field(null,{size:rect(b.x+42,b.y+40,b.w-42,88),font:p.font,show:'solid',scrollbar:1,border:1,style,align:p.align,locked:0},ms.text)
 		iwrite(f,lms('name' ),rtext_string(ms.name.table))
 		iwrite(f,lms('value'),ms.text.table),mark_dirty()
-		let border=lb(ifield(f,'border')), scrollbar=lb(ifield(f,"scrollbar")), cb=rect(b.x,b.y+50+60)
+		let border=lb(ifield(f,'border')), scrollbar=lb(ifield(f,"scrollbar")), cb=rect(b.x,b.y+80+60)
 		if(ui_checkbox(rect(cb.x,cb.y,b.w,16),'Border'   ,1,border   )){border   ^=1,iwrite(f,lms('border'   ),lmn(border   )),mark_dirty()}cb.y+=16
 		if(ui_checkbox(rect(cb.x,cb.y,b.w,16),'Scrollbar',1,scrollbar)){scrollbar^=1,iwrite(f,lms('scrollbar'),lmn(scrollbar)),mark_dirty()}cb.y+=16
 		const sb=rect(b.x,cb.y+10);let cp=0
@@ -1979,23 +1979,23 @@ modals=_=>{
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='grid_props'){
-		const b=draw_modalbox(rect(280,140+70)),grid=ob.sel[0]
+		const b=draw_modalbox(rect(280,200+70)),grid=ob.sel[0]
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Grid Properties',FONT_MENU,1)
 		draw_text(rect(b.x,b.y+22,47,20),'Name'  ,FONT_MENU,1)
 		draw_text(rect(b.x,b.y+42,47,20),'Format',FONT_MENU,1)
 		draw_text(rect(b.x,b.y+62,47,20),'Value' ,FONT_MENU,1)
 		ui_field   (rect(b.x+47,b.y+20,b.w-47,18),ms.name)
 		ui_field   (rect(b.x+47,b.y+40,b.w-47,18),ms.text)
-		ui_codeedit(rect(b.x+47,b.y+60,b.w-47,58),1,ms.form0)
+		ui_codeedit(rect(b.x+47,b.y+60,b.w-47,118),1,ms.form0)
 		const etext=rtext_string(ms.form0.table),format=rtext_string(ms.text.table),val=table_decode(etext,format),cn=Object.keys(val.v).length,rn=count(val)
-		draw_text(rect(b.x+47,b.y+60+60,b.w-47,18),`${cn} column${cn==1?'':'s'}, ${rn} row${rn==1?'':'s'}.`,FONT_BODY,1)
+		draw_text(rect(b.x+47,b.y+120+60,b.w-47,18),`${cn} column${cn==1?'':'s'}, ${rn} row${rn==1?'':'s'}.`,FONT_BODY,1)
 		iwrite(grid,lms('name'  ),rtext_string(ms.name.table))
 		iwrite(grid,lms('format'),format),mark_dirty()
-		let headers=lb(ifield(grid,'headers')), scrollbar=lb(ifield(grid,'scrollbar')), lines=lb(ifield(grid,'lines')), cb=rect(b.x,b.y+70+70)
+		let headers=lb(ifield(grid,'headers')), scrollbar=lb(ifield(grid,'scrollbar')), lines=lb(ifield(grid,'lines')), cb=rect(b.x,b.y+130+70)
 		if(ui_checkbox(rint(rect(cb.x,cb.y,b.w/2,16)),'Column Headers',1,headers  )){headers  ^=1,iwrite(grid,lms('headers'  ),lmn(headers  )),mark_dirty()}cb.y+=16
 		if(ui_checkbox(rint(rect(cb.x,cb.y,b.w/2,16)),'Scrollbar'     ,1,scrollbar)){scrollbar^=1,iwrite(grid,lms('scrollbar'),lmn(scrollbar)),mark_dirty()}cb.y+=16
 		if(ui_checkbox(rint(rect(cb.x,cb.y,b.w/2,16)),'Grid Lines'    ,1,lines    )){lines    ^=1,iwrite(grid,lms('lines'    ),lmn(lines    )),mark_dirty()}cb.y+=16
-		const eb=rint(rect(b.x+(b.w/2),b.y+70+70))
+		const eb=rint(rect(b.x+(b.w/2),b.y+130+70))
 		if(ui_radio(rint(rect(eb.x,eb.y,b.w/2,16)),'Edit as JSON',1,ms.edit_json==1)){ms.form0=fieldstr(lms(fjson(monad.cols(val)))),ms.edit_json=1}eb.y+=16
 		if(ui_radio(rint(rect(eb.x,eb.y,b.w/2,16)),'Edit as CSV' ,1,ms.edit_json==0))ms.form0=fieldstr(n_writecsv(count(format)?[val,format]:[val])),ms.edit_json=0
 		const c=rect(b.x,b.y+b.h-20), w=ll(ifield(grid,'widths'))

@@ -1953,16 +1953,16 @@ void modals(){
 		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
 	else if(ms.type==modal_field_props){
-		rect b=draw_modalbox((pair){220,170+60});lv*f=ob.sel->lv[0];field p=unpack_field(f,NULL);
+		rect b=draw_modalbox((pair){260,200+60});lv*f=ob.sel->lv[0];field p=unpack_field(f,NULL);
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Field Properties",FONT_MENU,1);
 		draw_text((rect){b.x,b.y+22,42,20},"Name",FONT_MENU,1);
 		draw_text((rect){b.x,b.y+42,42,60},"Text",FONT_MENU,1);
 		ui_field((rect){b.x+42,b.y+20,b.w-42,18},&ms.name);
 		int style=ordinal_enum(ifield(f,"style"),field_styles);
-		widget_field(NULL,(field){{b.x+42,b.y+40,b.w-42,58},p.font,show_solid,1,1,style,p.align,0},&ms.text);
+		widget_field(NULL,(field){{b.x+42,b.y+40,b.w-42,88},p.font,show_solid,1,1,style,p.align,0},&ms.text);
 		iwrite(f,lmistr("name"),rtext_all(ms.name.table));
 		iwrite(f,lmistr("value"),ms.text.table);mark_dirty();
-		int border=lb(ifield(f,"border")), scrollbar=lb(ifield(f,"scrollbar")); pair cb={b.x,b.y+50+60};
+		int border=lb(ifield(f,"border")), scrollbar=lb(ifield(f,"scrollbar")); pair cb={b.x,b.y+80+60};
 		if(ui_checkbox((rect){cb.x,cb.y,b.w,16},"Border"   ,1,border   )){border   ^=1;iwrite(f,lmistr("border"   ),lmn(border   )),mark_dirty();}cb.y+=16;
 		if(ui_checkbox((rect){cb.x,cb.y,b.w,16},"Scrollbar",1,scrollbar)){scrollbar^=1;iwrite(f,lmistr("scrollbar"),lmn(scrollbar)),mark_dirty();}cb.y+=16;
 		pair sb={b.x,cb.y+10};int cp=0;
@@ -2017,24 +2017,24 @@ void modals(){
 		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
 	else if(ms.type==modal_grid_props){
-		rect b=draw_modalbox((pair){280,140+70});lv*grid=ob.sel->lv[0];
+		rect b=draw_modalbox((pair){280,200+70});lv*grid=ob.sel->lv[0];
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Grid Properties",FONT_MENU,1);
 		draw_text((rect){b.x,b.y+22,47,20},"Name"  ,FONT_MENU,1);
 		draw_text((rect){b.x,b.y+42,47,20},"Format",FONT_MENU,1);
 		draw_text((rect){b.x,b.y+62,47,20},"Value" ,FONT_MENU,1);
 		ui_field   ((rect){b.x+47,b.y+20,b.w-47,18},  &ms.name);
 		ui_field   ((rect){b.x+47,b.y+40,b.w-47,18},  &ms.text);
-		ui_codeedit((rect){b.x+47,b.y+60,b.w-47,58},1,&ms.form0);
+		ui_codeedit((rect){b.x+47,b.y+60,b.w-47,118},1,&ms.form0);
 		lv*etext=rtext_all(ms.form0.table),*format=rtext_all(ms.text.table),*eval=table_decode(etext,format);
 		char desc[4096];snprintf(desc,sizeof(desc),"%d column%s, %d row%s.",eval->c,eval->c==1?"":"s",eval->n,eval->n==1?"":"s");
-		draw_text((rect){b.x+47,b.y+60+60,b.w-47,18},desc,FONT_BODY,1);
+		draw_text((rect){b.x+47,b.y+120+60,b.w-47,18},desc,FONT_BODY,1);
 		iwrite(grid,lmistr("name"  ),rtext_all(ms.name.table));
 		iwrite(grid,lmistr("format"),format);mark_dirty();
-		int headers=lb(ifield(grid,"headers")), scrollbar=lb(ifield(grid,"scrollbar")), lines=lb(ifield(grid,"lines")); pair cb={b.x,b.y+70+70};
+		int headers=lb(ifield(grid,"headers")), scrollbar=lb(ifield(grid,"scrollbar")), lines=lb(ifield(grid,"lines")); pair cb={b.x,b.y+130+70};
 		if(ui_checkbox((rect){cb.x,cb.y,b.w/2,16},"Column Headers",1,headers  )){headers  ^=1;iwrite(grid,lmistr("headers"  ),lmn(headers  )),mark_dirty();}cb.y+=16;
 		if(ui_checkbox((rect){cb.x,cb.y,b.w/2,16},"Scrollbar"     ,1,scrollbar)){scrollbar^=1;iwrite(grid,lmistr("scrollbar"),lmn(scrollbar)),mark_dirty();}cb.y+=16;
 		if(ui_checkbox((rect){cb.x,cb.y,b.w/2,16},"Grid Lines"    ,1,lines    )){lines    ^=1;iwrite(grid,lmistr("lines"    ),lmn(lines    )),mark_dirty();}
-		pair eb={b.x+(b.w/2),b.y+70+70};
+		pair eb={b.x+(b.w/2),b.y+130+70};
 		if(ui_radio((rect){eb.x,eb.y,b.w/2,16},"Edit as JSON",1,ms.edit_json==1)){
 			str r=str_new();fjson(&r,l_cols(eval));ms.form0=(field_val){rtext_cast(lmstr(r)),0};ms.edit_json=1;
 		}eb.y+=16;
