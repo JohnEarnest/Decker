@@ -346,6 +346,10 @@ lv*n_appexit(lv*self,lv*z){
 	#endif
 	return NONE;(void)self;(void)z;
 }
+
+lv* print_array(lv*arr,FILE*out){array a=unpack_array(arr);for(int z=0;z<a.size;z++)fputc(0xFF&(int)array_get_raw(a,z),out);return arr;}
+lv*n_appprint(lv*self,lv*a){(void)self;return a->c==1&&array_is(a->lv[0])?print_array(l_first(a),stdout):n_printf(a,1,stdout);}
+lv*n_appshow(lv*self,lv*a){(void)self;str s=str_new();EACH(z,a){if(z)str_addc(&s,' ');show(&s,a->lv[z],a->c==1);}printf("%s\n",lmstr(s)->sv);return l_first(a);}
 lv*interface_app(lv*self,lv*i,lv*x){
 	if(x&&lis(i)){
 		ikey("fullscreen"){toggle_fullscreen=windowed!=!lb(x);return x;}
@@ -354,6 +358,8 @@ lv*interface_app(lv*self,lv*i,lv*x){
 		ikey("playing"   )return lmn(audio_playing);
 		ikey("save"      )return lmnat(n_appsave,NULL);
 		ikey("exit"      )return lmnat(n_appexit,NULL);
+		ikey("show"      )return lmnat(n_appshow,NULL);
+		ikey("print"     )return lmnat(n_appprint,NULL);
 	}return x?x:NONE;(void)self;
 }
 

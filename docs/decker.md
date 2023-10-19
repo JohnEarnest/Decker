@@ -150,6 +150,7 @@ Web-Decker has generally the same tools and functionality as Native-Decker, but 
 - Opening or importing files uses the browser's native "Open" dialog instead of Decker's UI.
 - Saving or exporting files _cannot_ display a file browser to choose a destination, so Web-Decker provides a simplified dialog which only prompts for a filename. For similar reasons there is no "Autosave" functionality, and `app.save[]` downloads a copy of the deck instead of saving in-place.
 - Web-Decker does nothing if `app.exit[]` is called.
+- Web-Decker sends output from `app.show[]` and `app.print[]` to `console.log()` instead of POSIX _stdout_.
 - Web-Decker always fills the browser window. The toolbars are hidden by default, but can be toggled on (if space is available) from the _Decker_ menu.
 - Web-Decker will always report `sys.platform` as `"web"`, irrespective of the operating system the browser is running on.
 - The Web-Decker implementation of Lil uses the browser's garbage collector, so less information is available in `sys.workspace`.
@@ -624,6 +625,8 @@ The _app_ interface exposes control over the Decker application itself. It is av
 | `x.playing`                | If any audio is currently playing (not counting a background `loop`), `1`. Otherwise, `0`.            |
 | `x.save[]`                 | Save the current deck, in-place if possible. May prompt the user for a save location.                 |
 | `x.exit[]`                 | Immediately close Decker without saving (see `x.save[]`).                                             |
+| `x.show[x...]`             | Print a human-comprehensible representation of the value `x` to _stdout_, and return `x`.             |
+| `x.print[x...]`            | Display a string `x` to _stdout_.                                                                     |
 
 Note that `app.exit[]` doesn't do anything in Web-Decker. Exposing a button for closing Decker is very handy in locked decks, but you may want to hide or disable it when `sys.platform~"web"`.
 

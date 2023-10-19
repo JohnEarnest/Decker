@@ -923,6 +923,16 @@ interface_app=lmi((self,i,x)=>{
 		if(i.v=='playing'   )return lmn(audio_playing)
 		if(i.v=='save'      )return lmnat(_=>((modal_enter&&modal_enter('save_deck'),NONE)))
 		if(i.v=='exit'      )return lmnat(_=>NONE) // does nothing in web-decker
+		if(i.v=='show')return lmnat(z=>{
+			const sp=x=>lis(x)?ls(x): lin(x)?ln(x): show(x)
+			if(lit(z[0])){console.table(rows(z[0]).v.map(r=>r.k.reduce((a,k,i)=>{a[ls(k)]=sp(r.v[i]);return a},{})))}
+			else{console.log(z.map(x=>show(x,z.length==1)).join(' '))}
+			return z[0]||NONE
+		})
+		if(i.v=='print')return lmnat(z=>{
+			const r=ls(z.length>1?dyad.format(z[0],lml(z.slice(1))):z[0]||NONE);console.log(r)
+			return lms(r)
+		})
 	}return x?x:NONE
 },'app')
 
