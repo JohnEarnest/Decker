@@ -390,7 +390,8 @@ PANGRAM='How razorback jumping-frogs can level six piqued gymnasts.'
 
 // State
 
-let uimode='interact', ui_container=null, uicursor=0, enable_touch=0, set_touch=0, profiler=0, toolbar_scroll=0
+let uimode='interact', ui_container=null, uicursor=0, enable_touch=0, set_touch=0, toolbar_scroll=0
+let profiler=0, profiler_ix=0, profiler_hist=new Uint8Array(200)
 mark_dirty=_=>{dirty=1}
 con_set=x=>{
 	if(x!=ui_container)setmode(uimode),msg.next_view=1
@@ -3353,9 +3354,12 @@ tick=_=>{
 	for(let x=0;x<=1;x++)for(let y=0;y<=1;y++)draw_icon(rect(x*(context.size.x-5),y*(context.size.y-5)),CORNERS[x+y*2],1)
 	const used=interpret()
 	if(uimode=='interact'&&profiler){
-		const r=rect(frame.size.x-60,2,50,12)
-		draw_text(inset(r,2),ls(dyad.format(lms('%0.2f%%'),lmn(100*used/FRAME_QUOTA))),FONT_BODY,1)
-		draw_invert(deck.patterns.pal.pix,rect(r.x+1,r.y,ceil((r.w-2)*(used/FRAME_QUOTA)),r.h)),draw_box(r,0,1)
+		const r=rect(frame.size.x-60,2,50,12), pal=deck.patterns.pal.pix
+		draw_text(inset(r,2),ls(dyad.format(lms('%0.2f%%'),lmn(100*used/FRAME_QUOTA))),FONT_BODY,1),draw_box(r,0,1)
+		for(let z=0;z<r.w-2;z++){
+			let v=0;for(let i=0;i<4;i++)v=max(v,profiler_hist[(profiler_ix+(4*z)+i)%profiler_hist.length])
+			draw_invert(pal,rect(r.x+1+z,r.y+r.h-v,1,v-1))
+		}profiler_hist[profiler_ix]=(r.h-2)*used/FRAME_QUOTA,profiler_ix=(profiler_ix+1)%profiler_hist.length
 	}
 	if(msg.pending_loop)sfx_doloop()
 	ev.shortcuts={}

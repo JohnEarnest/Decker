@@ -13,8 +13,10 @@ lv*CHECK,*LOCK,*ANIM,*ZOOM,*CHECKS[4],*CORNERS[4],*RADIOS[4],*ICONS[8],*GESTURES
 lv*FONT_BODY,*FONT_MENU,*FONT_MONO,*TOOLS,*ARROWS,*TOOLB,*PLAYING,*ATTRS;
 enum mini_icons {icon_dir,icon_doc,icon_sound,icon_font,icon_app,icon_lil,icon_pat,icon_chek,icon_none};
 enum cursor_styles {cursor_default,cursor_point,cursor_ibeam,cursor_drag};
-SDL_Cursor*CURSORS[4]; int uicursor=0, enable_touch=0, set_touch=0, profiler=0, should_exit=0;
+SDL_Cursor*CURSORS[4]; int uicursor=0, enable_touch=0, set_touch=0, should_exit=0;
 int set_tracing=0, tracing=0, toolbar_scroll=0, toolbars_enable=0;
+#define PROFILE_HIST_SZ 200
+int profiler=0, profiler_ix=0, profiler_hist[PROFILE_HIST_SZ]={0};
 
 char*TOOL_ICONS=
 	"%%IMG0ABAAwAMABIAEgASABIAEgGTwlKxMqiQKJAIQAggCCAQEBAQEAAAAAAAAAAA//EACgAGAAYABgAFAAz/+H/wAAAAAAA"
@@ -3941,8 +3943,11 @@ void tick(lv*env){
 	double used=interpret();
 	if(uimode==mode_interact&&profiler){
 		rect r={frame.size.x-60,2,50,12};char*pal=patterns_pal(ifield(deck,"patterns"));
-		char t[64];snprintf(t,sizeof(t),"%.02f%%",100*used/FRAME_QUOTA),draw_text(inset(r,2),t,FONT_BODY,1);
-		draw_invert(pal,(rect){r.x+1,r.y,ceil((r.w-2)*(used/FRAME_QUOTA)),r.h}),draw_box(r,0,1);
+		char t[64];snprintf(t,sizeof(t),"%.02f%%",100*used/FRAME_QUOTA),draw_text(inset(r,2),t,FONT_BODY,1);draw_box(r,0,1);
+		for(int z=0;z<r.w-2;z++){
+			int v=0;for(int i=0;i<4;i++)v=MAX(v,profiler_hist[(profiler_ix+(4*z)+i)%PROFILE_HIST_SZ]);
+			draw_invert(pal,(rect){r.x+1+z,r.y+r.h-v,1,v-1});
+		}profiler_hist[profiler_ix]=(r.h-2)*(1.0*used)/FRAME_QUOTA;profiler_ix=(profiler_ix+1)%PROFILE_HIST_SZ;
 	}
 	#define track(v) dset(env,lmistr(#v),v?v:NONE);
 	track(msg.target_click)
