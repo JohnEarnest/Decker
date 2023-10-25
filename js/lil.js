@@ -336,6 +336,10 @@ blk_cat=(x,y)=>{
 		else{for(let i=0;i<oplens[b];i++)blk_addb(x,blk_getb(y,z+i))}z+=oplens[b]
 	}
 }
+blk_loop=(b,names,f)=>{
+	blk_op(b,op.ITER);const head=blk_here(b);blk_lit(b,names);const each=blk_opa(b,op.EACH,0)
+	f(),blk_opa(b,op.NEXT,head),blk_sets(b,each,blk_here(b))
+}
 blk_end=x=>{
 	let z=0;while(z<blk_here(x)){
 		let b=blk_getb(x,z);z+=oplens[b];if(b!=op.CALL)continue
@@ -405,21 +409,17 @@ parse=text=>{
 		else{co=lmblk(),blk_get(co,lms('index'))}if(!match('from'))er(`Expected 'from'.`)
 		expr(b),blk_op1(b,'@tab')
 		blk_lit(b,cw),blk_op(b,op.COL),blk_lit(b,cb),blk_op(b,op.COL),blk_lit(b,co),blk_op(b,op.COL),blk_lit(b,lmn(dir)),blk_opa(b,op.QUERY,func=='@upd')
-		const keys=lml(cols.k.concat([lms('@index')])),name=tempname()
-		blk_op(b,op.ITER);const head=blk_here(b);blk_lit(b,[ls(name)]);const each=blk_opa(b,op.EACH,0);
+		const keys=lml(cols.k.concat([lms('@index')])),name=tempname();blk_loop(b,[ls(name)],_=>{
 			blk_lit(b,keys),blk_get(b,name),cols.v.map(x=>(blk_lit(b,x),blk_op(b,op.COL)))
 			blk_lit(b,index),blk_op(b,op.COL),blk_op(b,op.DROP),blk_opa(b,op.BUND,count(keys)),blk_op2(b,'dict')
-		blk_opa(b,op.NEXT,head),blk_sets(b,each,blk_here(b)),blk_lit(b,keys),blk_op3(b,func)
+		}),blk_lit(b,keys),blk_op3(b,func)
 	}
 	const parseindex=(b,name)=>{
 		const i=[];while(peek().t in{'[':1,'.':1}){
 			if(matchsp('['))i.push(quotesub())
 			if(matchsp('.')){
 				if(peek().t in{'[':1,'.':1}){
-					i.map(v=>(blk_cat(b,v),blk_op(b,op.CALL)))
-					blk_op(b,op.ITER);const head=blk_here(b);blk_lit(b,['x'])
-					const each=blk_opa(b,op.EACH,0);blk_get(b,lms('x')),parseindex(b)
-					blk_opa(b,op.NEXT,head),blk_sets(b,each,blk_here(b));return
+					i.map(v=>(blk_cat(b,v),blk_op(b,op.CALL))),blk_loop(b,['x'],_=>{blk_get(b,lms('x')),parseindex(b)});return
 				}else{i.push(quotedot())}
 			}
 		}
@@ -452,10 +452,7 @@ parse=text=>{
 			blk_lit(b,NONE);const head=blk_here(b);expr(b);const cond=blk_opa(b,op.JUMPF,0)
 			blk_op(b,op.DROP),iblock(b),blk_opa(b,op.JUMP,head),blk_sets(b,cond,blk_here(b));return
 		}
-		if(match('each')){
-			const n=names('in','variable');expr(b),blk_op(b,op.ITER);const head=blk_here(b);blk_lit(b,n)
-			const each=blk_opa(b,op.EACH,0);iblock(b),blk_opa(b,op.NEXT,head),blk_sets(b,each,blk_here(b));return
-		}
+		if(match('each')){const n=names('in','variable');expr(b),blk_loop(b,n,_=>iblock(b));return}
 		if(match('on')){
 			const n=name('function'),a=names('do','argument')
 			blk_lit(b,lmon(n,a,blk_end(block()))),blk_op(b,op.BIND);return
@@ -474,22 +471,15 @@ parse=text=>{
 		}
 		if(matchsp('(')){if(matchsp(')')){blk_lit(b,lml([]));return}expr(b),expect(')');return}
 		const s=peek().v;if(findop(s,monad)>=0&&peek().t in{'symbol':1,'name':1}){
-			next();if(matchsp('@')){
-				expr(b),blk_op(b,op.ITER);const head=blk_here(b);blk_lit(b,['v']);const each=blk_opa(b,op.EACH,0);
-				blk_get(b,lms('v')),blk_op1(b,s),blk_opa(b,op.NEXT,head),blk_sets(b,each,blk_here(b))
-			}else{expr(b),blk_op1(b,s)};return
-		}
-		const n=lms(name('variable'));if(matchsp(':')){expr(b),blk_set(b,n);return}blk_get(b,n),parseindex(b,n)
+			next();if(matchsp('@')){expr(b),blk_loop(b,['v'],_=>{blk_get(b,lms('v')),blk_op1(b,s)})}else{expr(b),blk_op1(b,s)};return
+		}const n=lms(name('variable'));if(matchsp(':')){expr(b),blk_set(b,n);return}blk_get(b,n),parseindex(b,n)
 	}
 	const expr=b=>{
 		term(b);if(peek().t in {'[':1,'.':1}){parseindex(b)}
 		if(matchsp('@')){
 			const temp=tempname(),names=['v','k','i'];blk_set(b,temp),blk_op(b,op.DROP)
-			expr(b),blk_op(b,op.ITER);const head=blk_here(b);blk_lit(b,names);const each=blk_opa(b,op.EACH,0)
-				blk_get(b,temp),names.map(n=>blk_get(b,lms(n))),blk_opa(b,op.BUND,3),blk_op(b,op.CALL)
-			blk_opa(b,op.NEXT,head),blk_sets(b,each,blk_here(b));return
-		}
-		const s=peek().v;if(findop(s,dyad)>=0&&peek().t in {'symbol':1,'name':1}){next(),expr(b),blk_op2(b,s)}
+			expr(b),blk_loop(b,names,_=>{blk_get(b,temp),names.map(n=>blk_get(b,lms(n))),blk_opa(b,op.BUND,3),blk_op(b,op.CALL)});return
+		}const s=peek().v;if(findop(s,dyad)>=0&&peek().t in {'symbol':1,'name':1}){next(),expr(b),blk_op2(b,s)}
 	}
 	const b=lmblk();if(hasnext())expr(b);while(hasnext())blk_op(b,op.DROP),expr(b)
 	if(blk_here(b)==0)blk_lit(b,NONE);return b

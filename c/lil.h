@@ -590,6 +590,10 @@ void blk_cat(lv*x,lv*y){
 		else{for(int i=0;i<oplens[b];i++)blk_addb(x,blk_getb(y,z+i));}z+=oplens[b];
 	}
 }
+void blk_loop(lv*b,lv*names,lv*body){
+	blk_op(b,ITER);int head=blk_here(b);blk_lit(b,names);int each=blk_opa(b,EACH,0);
+	blk_cat(b,body),blk_opa(b,NEXT,head),blk_sets(b,each,blk_here(b));
+}
 lv* blk_end(lv*x){
 	int z=0;while(z<blk_here(x)){
 		int b=blk_getb(x,z);z+=oplens[b];if(b!=CALL)continue;
@@ -721,11 +725,10 @@ void parsequery(lv*b,char*op,int dcol){
 	blk_lit(b,cw),blk_op(b,COL);blk_lit(b,cb),blk_op(b,COL);blk_lit(b,co),blk_op(b,COL);
 	blk_lit(b,lmn(dir));blk_opa(b,QUERY,!strcmp(op,"@upd"));
 	lv*name=tempname(),*names=l_list(name),*keys=l_comma(l_keys(cols),lmistr("@index"));
-	blk_op(b,ITER);int head=blk_here(b);blk_lit(b,names);
-	int each=blk_opa(b,EACH,0);
-		blk_lit(b,keys);blk_get(b,name);EACH(z,cols){blk_lit(b,cols->lv[z]);blk_op(b,COL);}
-		blk_lit(b,index);blk_op(b,COL);blk_op(b,DROP);blk_opa(b,BUND,keys->c),blk_op2(b,"dict");
-	blk_opa(b,NEXT,head),blk_sets(b,each,blk_here(b));blk_lit(b,keys),blk_op3(b,op);
+	lv*l=lmblk();
+	blk_lit(l,keys),blk_get(l,name);EACH(z,cols){blk_lit(l,cols->lv[z]),blk_op(l,COL);}
+	blk_lit(l,index),blk_op(l,COL),blk_op(l,DROP),blk_opa(l,BUND,keys->c),blk_op2(l,"dict");
+	blk_loop(b,names,l),blk_lit(b,keys),blk_op3(b,op);
 }
 lv* quotesub(){int c=0;lv*r=lmblk();while(hasnext()&&!matchsp(']'))expr(r),c++;blk_opa(r,BUND,c);return r;}
 lv* quotedot(){lv*r=lmblk();blk_lit(r,l_list(lmstr(name("member"))));return r;}
@@ -735,9 +738,7 @@ void parseindex(lv*b,lv*name){
 		if(matchsp('.')){
 			if(strchr("[.",peek()->type)){
 				EACH(z,i){blk_cat(b,i->lv[z]),blk_op(b,CALL);}
-				blk_op(b,ITER);int head=blk_here(b);blk_lit(b,l_list(lmistr("x")));
-				int each=blk_opa(b,EACH,0);blk_get(b,lmistr("x"));parseindex(b,NULL);
-				blk_opa(b,NEXT,head);blk_sets(b,each,blk_here(b));return;
+				lv*l=lmblk();blk_get(l,lmistr("x")),parseindex(l,NULL),blk_loop(b,l_list(lmistr("x")),l);return;
 			}else{ll_add(i,quotedot());}
 		}
 	}
@@ -771,11 +772,7 @@ void term(lv*b){
 		blk_lit(b,NONE);int head=blk_here(b);expr(b);int cond=blk_opa(b,JUMPF,0);
 		blk_op(b,DROP);iblock(b);blk_opa(b,JUMP,head);blk_sets(b,cond,blk_here(b));return;
 	}
-	if(match("each")){
-		lv*n=names("in","variable");expr(b);blk_op(b,ITER);int head=blk_here(b);blk_lit(b,n);
-		int each=blk_opa(b,EACH,0);iblock(b);blk_opa(b,NEXT,head),blk_sets(b,each,blk_here(b));
-		return;
-	}
+	if(match("each")){lv*n=names("in","variable");expr(b),blk_loop(b,n,block());return;}
 	if(match("on")){
 		str n=name("function");lv*a=names("do","argument");
 		blk_lit(b,lmon(n,a,blk_end(block())));blk_op(b,BIND);return;
@@ -796,9 +793,8 @@ void term(lv*b){
 	str s=token_str(peek());
 	if(findop(s.sv,monads)>=0&&strchr("mn",peek()->type)){
 		next();if(matchsp('@')){
-			lv*names=l_list(lmistr("v"));
-			expr(b),blk_op(b,ITER);int head=blk_here(b);blk_lit(b,names);int each=blk_opa(b,EACH,0);
-			blk_get(b,names->lv[0]),blk_op1(b,s.sv),blk_opa(b,NEXT,head),blk_sets(b,each,blk_here(b));
+			lv*names=l_list(lmistr("v"));expr(b);
+			lv*l=lmblk();blk_get(l,names->lv[0]),blk_op1(l,s.sv),blk_loop(b,names,l);
 		}else{expr(b),blk_op1(b,s.sv);}free(s.sv);return;
 	}
 	free(s.sv);lv* n=lmstr(name("variable"));
@@ -809,10 +805,9 @@ void expr(lv*b){
 	term(b);if(strchr("[.",peek()->type)){parseindex(b,NULL);}
 	if(matchsp('@')){
 		lv*temp=tempname();blk_set(b,temp),blk_op(b,DROP);
-		lv*names=lml(3);names->lv[0]=lmistr("v"),names->lv[1]=lmistr("k"),names->lv[2]=lmistr("i");
-		expr(b),blk_op(b,ITER);int head=blk_here(b);blk_lit(b,names);int each=blk_opa(b,EACH,0);
-			blk_get(b,temp);EACH(z,names)blk_get(b,names->lv[z]);blk_opa(b,BUND,3);blk_op(b,CALL);
-		blk_opa(b,NEXT,head),blk_sets(b,each,blk_here(b));return;
+		lv*names=lml(3);names->lv[0]=lmistr("v"),names->lv[1]=lmistr("k"),names->lv[2]=lmistr("i");expr(b);
+		lv*l=lmblk();blk_get(l,temp);EACH(z,names)blk_get(l,names->lv[z]);blk_opa(l,BUND,3),blk_op(l,CALL);
+		blk_loop(b,names,l);return;
 	}
 	str s=token_str(peek());if(findop(s.sv,dyads)>=0&&strchr("mn",peek()->type)){next(),expr(b),blk_op2(b,s.sv);}free(s.sv);
 }
