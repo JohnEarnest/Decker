@@ -31,6 +31,7 @@ On OSX, BSD, or Linux, fetch the appropriate SDL2 packages and then build with `
 ```
 brew install sdl2 sdl2_image                                   # OSX/Homebrew
 sudo apt install libsdl2-2.0-0 libsdl2-dev libsdl2-image-dev   # Debian
+nix-shell                                                      # Nix
 
 make lilt            # (optional) command-line tools
 make decker          # build decker itself
