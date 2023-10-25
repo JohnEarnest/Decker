@@ -268,7 +268,7 @@ on flipbook target source speed frames do
  if "card"~typeof source source:source.image end
  if "canvas"~typeof source source:source.copy[] end
  fc:floor source.size/target.size
- fr:(range fc[0]*fc[1]) unless frames
+ fr:(range prod fc) unless frames
  fi:fr[(count fr)%floor sys.ms*speed]
  target.paste[source.copy[target.size*floor(fc[0]%fi),(fi/fc[0]) target.size]]
 end

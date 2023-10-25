@@ -468,7 +468,7 @@ select job:(first job) avg_age:avg[age] by job from people
 # | "Accounting" | 43      |
 # +--------------+---------+
 ```
-The same applies to any functions called in a `where`, `by`, or `orderby` expression. The predefined aggregation functions `sum`, `raze`, `min`, and `max` may come in handy!
+The same applies to any functions called in a `where`, `by`, or `orderby` expression. The predefined aggregation functions `sum`, `prod`, `raze`, `min`, and `max` may come in handy!
 
 ---
 
@@ -1101,7 +1101,7 @@ Appendix 1: Unary Primitives
 ----------------------------
 The unary arithmetic primitives `-` (negation), `!` (logical not), `floor`, `cos`, `sin`, `tan`, `exp` (the exponential function), `ln` (natural log), and `sqrt` (square root) _conform_, and generalize to both lists and numbers.
 
-The unary aggregation primitives `sum`, `raze`, `min`, and `max` take a list and collapse it into a single result as if by combining every element of the list with the binary primitives `+`, `,`, `&` and `|`, respectively.
+The unary aggregation primitives `sum`, `prod`, `raze`, `min`, and `max` take a list and collapse it into a single result as if by combining every element of the list with the binary primitives `+`, `*`, `,`, `&` and `|`, respectively.
 
 `typeof` gives the name of the type of the argument; one of the strings { `"number"`, `"string"`, `"list"`, `"dict"`, `"table"`, `"function"` }, or, in the case of an _interface_, the name of that interface type.
 
@@ -1190,7 +1190,7 @@ The following is a slightly hand-waved EBNF description of Lil's syntax. The pro
 
 ```
 MONAD   := '-'|'!'|'floor'|'cos'|'sin'|'tan'|'exp'|'ln'|'sqrt'|'count'|'first'|'last'|'sum'|'min'|'max'|
-           'raze'|'range'|'keys'|'list'|'rows'|'cols'|'table'|'typeof'|'flip'|'mag'|'unit'|'heading'
+           'raze'|'prod'|'range'|'keys'|'list'|'rows'|'cols'|'table'|'typeof'|'flip'|'mag'|'unit'|'heading'
 DYAD    := '+'|'-'|'*'|'/'|'%'|'^'|'<'|'>'|'='|'&'|'|'|','|'~'|'@'|'split'|'fuse'|'dict'|'take'|'drop'|
            'in'|'join'|'cross'|'parse'|'format'|'unless'|'limit'
 DIGIT   := '0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'

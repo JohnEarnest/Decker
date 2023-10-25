@@ -31,7 +31,7 @@ Primitives
 | Valence | Purpose    |                                                                              |
 | :------ | :--------- | :--------------------------------------------------------------------------- |
 | monad   | arithmetic | `-` `!` `floor` `cos` `sin` `tan` `exp` `ln` `sqrt` `mag` `unit` `heading`   |
-| monad   | reducers   | `count` `first` `last` `sum` `min` `max` `raze`                              |
+| monad   | reducers   | `count` `first` `last` `sum` `prod` `min` `max` `raze`                       |
 | monad   | data       | `range` [0...n) `keys` `list` (enlist) `rows` `cols` `table` `typeof` `flip` |
 | dyad    | arithmetic | `+` `-` `*` `/` `%` (y mod x) `^` (pow) `&` (min) <code>\|</code> (max)      |
 | dyad    | logical    | `<` `>` `=` (conforming equal) `~` (match) `unless` (x if y is `0`)          |

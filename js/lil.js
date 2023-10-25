@@ -136,6 +136,7 @@ monad={
 	mag:    vmnl(x=>lmn(Math.sqrt(ll(x).reduce((x,y)=>x+Math.pow(ln(y),2),0)))),
 	heading:vmnl(x=>{const a=getpair(x);return lmn(Math.atan2(a.y,a.x))}),
 	sum:    x=>ll(x).reduce(dyad['+'],NONE),
+	prod:   x=>ll(x).reduce(dyad['*'],ONE),
 	raze:   x=>ll(x).slice(1).reduce(dyad[','],monad.first(x)),
 	max:    x=>ll(x).slice(1).reduce(dyad['|'],monad.first(x)),
 	min:    x=>ll(x).slice(1).reduce(dyad['&'],monad.first(x)),

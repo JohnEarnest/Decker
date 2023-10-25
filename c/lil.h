@@ -363,6 +363,7 @@ dyad(l_join){
 	}return r;
 }
 monad(l_sum ){x=ll(x);lv*r=NONE      ;for(int z=0;z<x->c;z++)r=l_add  (r,x->lv[z]);return r;}
+monad(l_prod){x=ll(x);lv*r=ONE       ;for(int z=0;z<x->c;z++)r=l_mul  (r,x->lv[z]);return r;}
 monad(l_amax){x=ll(x);lv*r=l_first(x);for(int z=1;z<x->c;z++)r=l_max  (r,x->lv[z]);return r;}
 monad(l_amin){x=ll(x);lv*r=l_first(x);for(int z=1;z<x->c;z++)r=l_min  (r,x->lv[z]);return r;}
 monad(l_raze){x=ll(x);lv*r=l_first(x);for(int z=1;z<x->c;z++)r=l_comma(r,x->lv[z]);return r;}
@@ -539,7 +540,7 @@ lv* l_update(lv*orig,lv*vals,lv*keys){
 primitive monads[]={
 	prim("-",l_negate),prim("!",l_not),prim("floor",l_floor),prim("cos",l_cos),prim("sin",l_sin),
 	prim("tan",l_tan),prim("exp",l_exp),prim("ln",l_ln),prim("sqrt",l_sqrt),
-	prim("sum",l_sum),prim("raze",l_raze),prim("max",l_amax),prim("min",l_amin),
+	prim("sum",l_sum),prim("prod",l_prod),prim("raze",l_raze),prim("max",l_amax),prim("min",l_amin),
 	prim("count",l_count),prim("first",l_first),prim("last",l_last),prim("flip",l_flip),
 	prim("range",l_range),prim("keys",l_keys),prim("list",l_list),prim("rows",l_rows),
 	prim("cols",l_cols),prim("table",l_table),prim("typeof",l_typeof),prim("@tab",l_tab),

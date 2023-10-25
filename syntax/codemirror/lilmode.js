@@ -10,7 +10,7 @@ CodeMirror.defineMode('lil',(config,options)=>{
 	}
 	const VERBS={
 		// monads
-		floor:1,cos:1,sin:1,tan:1,exp:1,ln:1,sqrt:1,unit:1,mag:1,heading:1,sum:1,raze:1,max:1,min:1,count:1,
+		floor:1,cos:1,sin:1,tan:1,exp:1,ln:1,sqrt:1,unit:1,mag:1,heading:1,sum:1,prod:1,raze:1,max:1,min:1,count:1,
 		first:1,last:1,keys:1,range:1,list:1,typeof:1,flip:1,rows:1,cols:1,table:1,
 		// dyads
 		split:1,fuse:1,dict:1,take:1,drop:1,limit:1,in:1,unless:1,join:1,cross:1,parse:1,format:1,
