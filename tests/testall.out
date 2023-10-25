@@ -494,9 +494,9 @@ queries:
 +-------+-------+
 (11,22,33)
 "one"
-{"fb":"three"}
-{"a":"one","b":"three"}
-{"a":"one","":"three"}
+{"fb":("three")}
+{"a":("one"),"b":("three")}
+{"a":("one"),"":("three")}
 ("F","F","?","?","?","M")
 (2,3,1)
 (("A","B","C"),("D","E","F"),("G","H","I"))
@@ -607,7 +607,7 @@ queries:
 | 0 | 5 |
 +---+---+
 ()
-{"n":0,"v":5}
+{"n":(0),"v":(5)}
 {"name":("Alice","Thomas","Sara"),"age":(25,40,34),"job":("Developer","Developer","Developer")}
 {}
 +-------+

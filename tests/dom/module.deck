@@ -8,6 +8,6 @@ size:[512,342]
 {module:trivial}
 description:"a trivial module"
 {script}
-extract a:22 b:33 from 0
+("a","b")dict 22,33
 {end}
 

@@ -279,7 +279,7 @@ show[extract gindex index by sex from gr                                        
 show[select value group by value from "AACBABA"                                       ] # "group" index
 show[select value group by value from "DEFFED"                                        ] # "group" index
 show[extract foo from t                                                               ] # simple column extraction
-show[extract first baz from t                                                         ] # simple scalar extraction
+show[first extract baz from t                                                         ] # simple scalar extraction
 show[extract fb:last baz from t                                                       ] # extract with name
 show[extract a:first baz b:last baz from t                                            ] # extract with names
 show[extract a:first baz last baz from t                                              ] # extract with mixed names/unnamed
@@ -326,7 +326,7 @@ show[select "with space":11 "with space":22 from 0]                             
 show[t:insert "with spaces":("A","A","B","A","A","B","B") ord:13,8,2,1,5,7,3 into 0]     # creating columns (insert)
 show[insert "with \" escapes":1 into 0]                                                  # process normal escape characters
 show[select column["with spaces"] ord by column["with spaces"] orderby ord asc from t]   # reading special-name columns
-show[extract column from t]                                                              # the column magic variable is a table
+show[first extract column from t]                                                        # the column magic variable is a table
 show[extract count column by column["with spaces"] from t]                               # the column magic variable is a *grouped* table in exprs
 
 # fun with queries as loops

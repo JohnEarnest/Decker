@@ -291,10 +291,7 @@ n_eval=([x,y,extend])=>{
 }
 triad={
 	'@sel': (orig,vals,keys)=>{const mv=merge(vals,keys,0);return count(keys)>1?mv.r: dyad.take(mv.ix,dyad.drop(lms('index'),orig))},
-	'@ext': (orig,vals,keys)=>{
-		const r=monad.cols(triad['@sel'](orig,vals,keys));if(r.v.every(x=>lil(x)&&count(x)==1))r.v=r.v.map(monad.first)
-		return count(r)!=1||count(r.k[0])?r: monad.first(r)
-	},
+	'@ext': (orig,vals,keys)=>{const r=monad.cols(triad['@sel'](orig,vals,keys));return count(r)!=1||count(r.k[0])?r: monad.first(r)},
 	'@upd': (orig,vals,keys)=>{
 		orig=dyad.drop(lms('index'),orig);const mv=merge(vals,keys,1),r=mv.r,ix=mv.ix
 		Object.keys(r.v).map(c=>{

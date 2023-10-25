@@ -22,14 +22,14 @@ on mode2 a do
 	each x in a
 		r[x]:1+r[x]
 	end
-	extract first key orderby value desc from r
+	first extract key orderby value desc from r
 end
 show[mode2["ABBCABBA"]]
 show[mode2[1,2,2,3,4,2,1]]
 
 # monolithic query
 on mode3 a do
-	extract first key orderby value desc from
+	first extract key orderby value desc from
 	select key:first value value:count value by value from a
 end
 show[mode3["ABBCABBA"]]

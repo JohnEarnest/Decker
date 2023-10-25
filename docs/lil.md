@@ -26,7 +26,7 @@ on mode a do   # line comment
 	each x in a
 		r[x]:1+r[x]
 	end
-	extract first key orderby value desc from r
+	first extract key orderby value desc from r
 end
 
 mode[1,2,2,3,4,2,1]
@@ -50,7 +50,7 @@ There are 7 types of value in Lil: numbers, strings, lists, dictionaries, tables
 - _Numbers_ are floating-point values, possibly with a sign: `42 37.5 -29999`.
 - _Strings_ are a sequence of characters, written enclosed in double-quotes. The special characters backslash, double-quote, and the newline character (`\n`) are preceded with a backslash escape: `"apple" "foo\nbar"`. The binary `fuse` and `format` operators can both be used for concatenating strings.
 - _Lists_ are ordered sequences of values which can be indexed by numbers. The empty list is written as `()`, and the unary operator `list` constructs a single-element list from any value. Lists can be joined with the `,` operator.
-- _Dictionaries_ are ordered sequences of pairings between _keys_ and _values_, both of which can be any type. Dictionaries can be made by the binary operator `dict`, the `extract` statement, or a list can be promoted to a dictionary by assigning at non-numeric keys. Dictionaries can be unioned together with the `,` operator. The `keys` operator extracts the keys of a dictionary, and the `range` operator extracts the values of a dictionary.
+- _Dictionaries_ are ordered sequences of pairings between _keys_ and _values_, both of which can be any type. Dictionaries can be made by the binary operator `dict`, or a list can be promoted to a dictionary by assigning at non-numeric keys. Dictionaries can be unioned together with the `,` operator. The `keys` operator gets the keys of a dictionary, and the `range` operator gets the values of a dictionary.
 - _Tables_ are a rectangular array of values for which every column has a string as its _key_. Tables can be made with the unary operator `table` or with the `insert` statement. The binary operators `,` (append), `join` (natural join), and `cross` (cartesian join) offer a selection of tabular joins.
 - _Functions_ have a name, take arguments, and return a result. They are declared with `on`, and may be freely passed around or stored in variables. `first` of a function gives its name, and `keys` of a function gives a list of its named arguments.
 - _Interfaces_ are opaque dictionary-like values used to represent system resources or Input/Output devices. Accessing or writing to an interface may produce side-effects.
@@ -530,7 +530,7 @@ extract first value by value from "ABBAAC"             # distinct items in a lis
 If names are specified, all results are collected into a dictionary:
 ```
 extract a:first age b:last age orderby age asc from people 
-# {"a":25,"b":43}
+# {"a":(25),"b":(43)}
 ```
 
 ---
@@ -725,7 +725,7 @@ select where column["with \"escapes"]>0 from denormal
 # | 2             | "C"   |
 # +---------------+-------+
 
-extract column from denormal
+first extract column from denormal
 # +---------------+-------+-------+--------+-------+
 # | with "escapes | count | index | gindex | group |
 # +---------------+-------+-------+--------+-------+
@@ -985,7 +985,7 @@ c:0 each x in haystack if x~needle c:c+1 end end c     # imperative
 
 c:0 each x in haystack c:c+x~needle end c              # imperative, without a conditional
 
-extract count value where value=needle from haystack   # query
+count extract value where value=needle from haystack   # query
 
 count needle take haystack                             # functional (filter)
 
@@ -1002,7 +1002,7 @@ m:x<5                      # compute a "mask" of 0 or 1
 (99*m) + x*!m              # multiply and add to combine masked and unmasked values
 ```
 
-The `@` operator is another powerful tool. Given a data structure on the left and a list of indices on the right it extracts the element at each index. This operation can be used to replicate, filter, or permute the elements of the source:
+The `@` operator is another powerful tool. Given a data structure on the left and a list of indices on the right it picks the element at each index. This operation can be used to replicate, filter, or permute the elements of the source:
 ```
  "ABC" @ 0,0,1,2,1,2,0
 ("A","A","B","C","B","C","A")
@@ -1107,7 +1107,7 @@ The unary aggregation primitives `sum`, `prod`, `raze`, `min`, and `max` take a 
 
 `count` gives the number of elements in a value. The `count` of a number is always 1.
 
-`first` and `last` extract the first or last elements of a value. The `first` of a function is the function's name.
+`first` and `last` pick the first or last elements of a value. The `first` of a function is the function's name.
 
 `range` of a number produces a list of the integers `[0,x)`. Applied to anything else, it will produce a list of the _values_ of its dictionary equivalent.
 

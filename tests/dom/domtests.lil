@@ -500,18 +500,18 @@ assert["card default image size" (512,342) card.image.size]
 
 w1:card.add["button" "thingy"]
 w2:card.add["field" "zoot"]
-assert["card add widgets" (extract thingy:w1 zoot:w2 from 0) card.widgets]
+assert["card add widgets" (("thingy","zoot")dict w1,w2) card.widgets]
 
 r:card.remove[w1]
-assert["card remove a widget" (extract zoot:w2 from 0) card.widgets]
+assert["card remove a widget" (().zoot:w2) card.widgets]
 assert["card removed" 1 r]
 
 w1.index:3
-assert["removed widgets are inert" (extract zoot:w2 from 0) card.widgets]
+assert["removed widgets are inert" (().zoot:w2) card.widgets]
 assert["removed widgets are inert" 0 w1.name]
 
 r:card.remove[card]
-assert["card remove bogus value" (extract zoot:w2 from 0) card.widgets]
+assert["card remove bogus value" (().zoot:w2) card.widgets]
 assert["card remove bogus value fail" r 0]
 
 deck:readdeck[]
@@ -1487,16 +1487,16 @@ assert["deck default attributes and types" dattr deckattrs[deck]]
 
 s1:deck.add[sound[]]
 s2:deck.add[sound[20]]
-assert["deck added sounds" (extract sound1:s1 sound2:s2 from 0) deck.sounds]
+assert["deck added sounds" (("sound1","sound2")dict s1,s2) deck.sounds]
 
 r:deck.remove[s1]
-assert["deck removed sound" (extract sound2:s2 from 0) deck.sounds]
+assert["deck removed sound" (().sound2:s2) deck.sounds]
 assert["deck removed sound success" 1 r]
 
 c1:deck.card
 c2:deck.add["card" "two"]
 c3:deck.add["card" "three"]
-assert["deck added cards" (extract home:c1 two:c2 three:c3 from 0) deck.cards]
+assert["deck added cards" (("home","two","three")dict c1,c2,c3) deck.cards]
 
 deck.card:2
 assert["navigate deck by index" "three" deck.card.name]
@@ -1520,19 +1520,19 @@ deck.card:"Back"
 assert["navigate deck relative- back 3" "home" deck.card.name]
 
 r:deck.remove[c2]
-assert["deck removed card" (extract home:c1 three:c3 from 0) deck.cards]
+assert["deck removed card" (("home","three")dict c1,c3) deck.cards]
 assert["deck removed card success" 1 r]
 c2.index:3
-assert["removed cards are inert" (extract home:c1 three:c3 from 0) deck.cards]
+assert["removed cards are inert" (("home","three")dict c1,c3) deck.cards]
 assert["removed cards are inert" 0 c2.name]
 
 builtins:deck.fonts,()
 f1:deck.add["font"]
 f2:deck.add["font" 13,13 "chancery"]
-assert["deck added font" (builtins,extract font1:f1 chancery:f2 from 0) deck.fonts]
+assert["deck added font" (builtins,("font1","chancery")dict f1,f2) deck.fonts]
 
 r:deck.remove[f1]
-assert["deck removed font" (builtins,extract chancery:f2 from 0) deck.fonts]
+assert["deck removed font" (builtins,().chancery:f2) deck.fonts]
 assert["deck removed font success" 1 r]
 
 r:deck.remove[deck.fonts.menu]
@@ -1821,14 +1821,14 @@ mdef.description: m.description
 mdef.script:      m.script
 mdef.value:       m.value
 mdef.error:       m.error
-assert["module default fields" (extract description:"" script:"" value:() dict () error:"" from 0) mdef]
+assert["module default fields" ("%j" parse "{'description':'','script':'','value':{},'error':''}") mdef]
 
 m.script:"while 1 \"this is bad\" end"
 assert["module script timeout: script" ("while 1 \"this is bad\" end")   m.script]
 assert["module script timeout: value"  (() dict ())                      m.value ]
 assert["module script timeout: error"  ("initialization took too long.") m.error ]
 
-m.script:"extract a:22 b:33 from 0"
+m.script:"(\"a\",\"b\")dict 22,33"
 assert["module trivial script" (("a","b") dict 22,33) m.value]
 
 m.description:"a trivial module"
@@ -1852,7 +1852,7 @@ assert_file["serialize a module with data" "tests/dom/logger2.deck" "temp.deck"]
 
 deck:readdeck[]
 m2:deck.add[m "namedcopy"]
-assert["module copy with name" (extract namedcopy:m2 from 0) (deck.modules)]
+assert["module copy with name" (().namedcopy:m2) (deck.modules)]
 
 #######################################
 #

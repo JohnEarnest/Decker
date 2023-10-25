@@ -525,9 +525,7 @@ lv* l_select(lv*orig,lv*vals,lv*keys){
 	lv*ix=NULL,*r=merge(vals,keys,0,&ix);return keys->c>1?r:l_take(ix,l_drop(lmistr("index"),orig));
 }
 lv* l_extract(lv*orig,lv*vals,lv*keys){
-	lv*r=l_cols(l_select(orig,vals,keys));
-	int c=1;EACH(z,r)if(!lil(r->lv[z])||r->lv[z]->c!=1)c=0;if(c)EACH(z,r)r->lv[z]=l_first(r->lv[z]);
-	return (r->c!=1||r->kv[0]->c)?r: l_first(r);
+	lv*r=l_cols(l_select(orig,vals,keys));return (r->c!=1||r->kv[0]->c)?r: l_first(r);
 }
 lv* l_update(lv*orig,lv*vals,lv*keys){
 	orig=l_drop(lmistr("index"),orig);lv*ix=NULL,*r=merge(vals,keys,1,&ix);EACH(c,r){

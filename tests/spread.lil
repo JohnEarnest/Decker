@@ -2,9 +2,9 @@
 # test double-dot "spread" indexing
 
 # dictionaries
-d1:extract a:"one"   b:"two"  from 0
-d2:extract a:"three" b:"four" from 0
-d3:extract a:"five"  b:"six"  from 0
+d1:("a","b")dict "one","two"
+d2:("a","b")dict "three","four"
+d3:("a","b")dict "five","six"
 ds:(list d1),(list d2),(list d3)
 show[ds..a]              # extract a column
 show[ds..a:"new"]        # amend-each dict
