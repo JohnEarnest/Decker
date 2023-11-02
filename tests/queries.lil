@@ -8,6 +8,11 @@ t1:insert
 into 0
 show[select name id orderby name asc orderby id desc from t1]
 
+# handling singles, empties:
+show[extract first value by value from 11,22,11]
+show[extract first value by value from 11]
+show[extract first value by value from ()]
+
 # tolerate undersized column expression results:
 show[extract id by      ()     from t1]
 show[extract id where   ()     from t1]
