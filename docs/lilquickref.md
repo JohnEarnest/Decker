@@ -50,14 +50,27 @@ Flow
 
 Queries
 -------
-- `select  n:x where a by b orderby c asc from d` reorder, compute, or filter a table
-- `update  n:x where a by b orderby c asc from d` modify rows/columns of a table in place
-- `extract n:x where a by b orderby c asc from d` like select, but yields non-tabular values
-- `insert  n:x into d` append to a table, or `into 0` to make a new table
-- `index`: original row number
-- `gindex`: original index within row's group
-- `group`: index of row's group (by appearance)
-- `column`: the entire current subtable, for referencing denormal columns
+- `select  exprs clauses from y` reorder, compute, or filter a table
+- `update  exprs clauses from y` modify rows/columns of a table in place
+- `extract exprs clauses from y` like select, but yields non-tabular values
+- `insert  exprs into d` append to a table, or `into 0` to make a new table
+
+- `exprs` can be any number of expressions in the forms:
+	- an implicitly named bare expression (`id`, `2*index`)
+	- an explicitly named expression (`ident:id`, `dogyears:7*age`)
+	- a quoted name, for invalid identifiers (`"not a lil id":foo`)
+	- if no expressions are provided, all columns will be returned, like `select *` in SQL
+
+- `clauses` can be any sequence of the following, evaluated right to left:
+	- `by a`: group rows by the unique values of column b
+	- `where a`: filter rows by a boolean column a
+	- `orderby a asc`/`orderby a desc`: sort rows, comparing values of column a as by `<`/`>`
+
+- special columns/values available when computing any column expression:
+	- `index`: magic column of original row numbers
+	- `gindex`: magic column of current row number within group (or all rows if ungrouped)
+	- `group`: magic column of row's group, by appearance (or `0` if ungrouped)
+	- `column`: dictionary of the entire group's columns (or all rows if ungrouped)
 
 Formatting
 ----------

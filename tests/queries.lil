@@ -1,0 +1,86 @@
+
+# even more dedicated query tests
+
+# multiple orderby:
+t1:insert
+ name:"Banana","Durian","Cherry","Apple","Apple","Banana"
+ id:  22      ,11      ,33      ,55     ,44     ,88     
+into 0
+show[select name id orderby name asc orderby id desc from t1]
+
+# tolerate undersized column expression results:
+show[extract id by      ()     from t1]
+show[extract id where   ()     from t1]
+show[extract id orderby () asc from t1]
+show[extract id by      7      from t1]
+show[extract id where   7      from t1]
+show[extract id orderby 7  asc from t1]
+show["evens" extract id where 1,0 from t1]
+show["odds"  extract id where 0,1 from t1]
+
+# misc update scenarios:
+show[update name:"Best %s" format name where gindex=0 orderby id desc by name from t1]
+show[update name:"Best %s" format name where gindex=0 where 1<count gindex orderby id desc by name from t1]
+show[update best:1                     where gindex=0 where 1<count gindex orderby id desc by name from t1]
+
+# the perl weekly challenge 233, part 2: frequency sort
+# (disambiguates identical freqs by sorting by value)
+on f x do
+ extract v orderby c asc orderby v desc from
+  select v:value c:count value by value from x
+end
+show[f[(1,1,2,2,2,3         )]]
+show[f[(2,3,1,3,2           )]]
+show[f[(-1,1,-6,4,5,-6,1,4,1)]]
+
+# examples from the lil reference manual:
+people:insert
+ name:"Alice"    ,"Sam"  ,"Thomas"   ,"Sara"     ,"Walter"
+ age :25         ,28     ,40         ,34         ,43
+ job :"Developer","Sales","Developer","Developer","Accounting"
+into 0
+jobs:insert
+ job   :"Sales","Developer","Accounting","Facilities"
+ salary:85000  ,75000      ,60000       ,50000
+into 0
+guests:insert name:"Alice","Joan","Oscar","Thomas" into 0
+show[select name where ("S%m" parse name) from people]
+show[select name index orderby name asc from people]
+show[select name job by job orderby name asc from people]
+show[select name job orderby (job join name) asc from people]
+show[select employed:(count name) job:(first job) by job from people]
+show[extract v:value i:index orderby value asc  from extract first job by job from people]
+show[extract value           orderby index desc from extract first job by job from people]
+show[extract list index by value from "ABBAAC"]
+show[extract list value by floor index/3 from "ABCDEFGHI"]
+show[extract first value by value from "ABBAAC"]
+show[extract first value by value from "AA"]
+show[extract first value by value from ""]
+show[select a:name b:name_ where name < name_ from guests cross guests]
+denormal:select "with \"escapes":index "count":value from "ABC"
+show[select where column["with \"escapes"]>0 from denormal]
+show[first extract column from denormal]
+
+# group, then regroup
+t2:insert
+	a:"" split "ABABABABABABAB"
+	b:"" split "12341234123412"
+	c:"" split "abcdefghijklmn"
+into 0
+show[select (first b) list group by b from t2]
+show[select where gindex=0 by b from t2]
+show[select where gindex=0 by a where gindex=0 by b from t2]
+
+# multiple where clauses for progressive narrowing
+tested:()
+on track x do tested:tested,count x x end
+show[select where track[b]="1" where track[a]="A" from t2]
+show[tested]
+
+# gindex is effectively "reset" at each clause:
+show[select a b gindex orderby a asc from t2]
+show[select a b gindex where a="A" from t2]
+
+# group with no rows:
+show[select by a from 0 take t2]
+show[select by a where a="Z" from t2]

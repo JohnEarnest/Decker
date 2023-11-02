@@ -138,6 +138,8 @@ show[(-1 drop "ABC")]   # minus after paren
 show[foo:-1 drop "ABC"] # minus after set
 show[2*-1 drop 3,4,5]   # minus after times (etc)
 show[-2 take table 11,22,33,44]
+show[5 take ()]
+show[-3 take ()]
 
 # filter out
 show[(33,44) drop 11,22,44,55                         ]# list drop
@@ -270,8 +272,8 @@ show[select where sex in ("M","F") from gr                                      
 show[select orderby index desc from t                                                 ] # sort into reverse order
 show[select index from t                                                              ] # extract a simple synthetic column
 show[select by sex from gr                                                            ] # group by a simple column
-show[select by sex orderby name asc from gr                                           ] # sort within a group
-show[select first name first sex by sex orderby name asc from gr                      ] # reduce along a group
+show[select orderby name asc by sex from gr                                           ] # sort within a group
+show[select first name first sex orderby name asc by sex from gr                      ] # reduce along a group
 show[select 2*index from t                                                            ] # compute synthetic new columns
 show[select gindex first name by sex from gr                                          ] # rectangular result of grouping + gindex
 show[select  gindex index by sex from gr                                              ] # internal indices: select

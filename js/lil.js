@@ -42,6 +42,7 @@ zip=(x,y,f)=>{const n=count(x),o=count(y)<n?take(n,y.v):y.v;return x.v.map((x,i)
 match=(x,y)=>x==y?1: (x.t!=y.t)||(count(x)!=count(y))?0: (lin(x)||lis(y))?x.v==y.v:
 	         lil(x)?x.v.every((z,i)=>dyad['~'](z,y.v[i]).v): lit(x)?dyad['~'](rows(x),rows(y)).v:
 	         lid(x)?x.v.every((z,i)=>dyad['~'](z,y.v[i]).v&&dyad['~'](x.k[i],y.k[i]).v):0
+
 splicet=(f,x,t)=>{const r={};Object.keys(t.v).map(k=>r[k]=f(x,t.v[k]));return lmt(r)}
 splice=(f,x,y)=>lis(y)?lms(f(x,ll(y)).map(ls).join('')): lid(y)?lmd(f(x,y.k),f(x,y.v)): lit(y)?splicet(f,x,y): lml(f(x,ll(y)))
 ina=(x,y)=>lmn(lis(y)?y.v.indexOf(ls(x))>=0: lil(y)?y.v.some(y=>match(x,y)): lid(y)?dget(y,x)!=undefined: lit(y)?ls(x)in y.v: x==y)
@@ -53,7 +54,7 @@ filter=(i,x,y)=>{
 	if(n&&!i){const r=dyad.take(NONE,y);ix.forEach((_,i)=>{if(nx.indexOf(i)<0)Object.keys(y.v).map(c=>r.v[c].push(y.v[c][i]))});return r}
 	return lmt(Object.keys(y.v).reduce((t,k)=>(i==lb(ina(lms(k),x))&&(t[k]=y.v[k]),t),{}))
 }
-take=(x,y)=>{const n=y.length, s=x<0?mod(x,n):0; return range(abs(x)).map(z=>y[mod(z+s,n)])}
+take=(x,y)=>{const n=y.length, s=x<0?mod(x,n):0; return range(abs(x)).map(z=>y[mod(z+s,n)]||NONE)}
 dkix=(dict,key)=>dict.k.findIndex(x=>match(key,x)), dget=(dict,key)=>dict.v[dkix(dict,key)]
 dvix=(dict,val)=>dict.v.findIndex(x=>match(val,x)), dkey=(dict,val)=>dict.k[dvix(dict,val)]
 dset=(d,k,v)=>{const i=d.k.findIndex(x=>match(x,k));if(i<0){d.k.push(k),d.v.push(v)}else{d.v[i]=v};return d}
@@ -151,7 +152,10 @@ monad={
 	rows:   x=>rows(x),
 	cols:   x=>{const t=lt(x).v;return lmd(Object.keys(t).map(lms),Object.values(t).map(lml))},
 	table:  x=>lid(x)?coltab(x): lil(x)&&x.v.every(lid)?rowtab(x): lil(x)&&x.v.every(lil)?listab(x): lt(x),
-	'@tab': t=>{t=lt(t);const r=lmt({});Object.keys(t.v).map(k=>r.v[k]=t.v[k].slice(0)),r.v.index=range(count(r)).map(lmn);return r},
+	'@tab': t=>{
+		t=lt(t);const r=lmt({});Object.keys(t.v).map(k=>r.v[k]=t.v[k].slice(0))
+		r.v.index=range(count(r)).map(lmn),r.v.gindex=r.v.index.slice(0),r.v.group=r.v.index.map(x=>NONE);return r
+	},
 }
 dyad={
 	'+':  vd((x,y)=>lmn(ln(x)+ln(y))),
@@ -270,10 +274,23 @@ dyad={
 			if(n&&lf)for(let z=0;z<n-vn;z++)r+=pz?'0':' '
 		}return lms(r)
 	},
+	'@where': (col,tab)=>{
+		const w=dyad.take(lmn(count(tab)),lml(ll(col)))
+		const p=lml(range(count(tab)).filter(i=>lb(w.v[i])).map(lmn))
+		const r=dyad.take(p,tab);r.v.gindex=range(count(r)).map(lmn);return r
+	},
+	'@by': (col,tab)=>{
+		const b=dyad.take(lmn(count(tab)),lml(ll(col))), r=monad.rows(tab), u=b.v.reduce((x,y)=>{dset(x,y,y);return x},lmd([],[]))
+		const rows=u.v.map((v,group)=>{
+			const p=lml(range(count(tab)).filter(x=>match(v,b.v[x])).map(lmn))
+			const s=dyad.take(p,tab);s.v.gindex=range(count(s)).map(lmn),s.v.group=range(count(s)).map(_=>lmn(group));return s;
+		});return lml(rows)
+	},
 }
 merge=(vals,keys,widen)=>{
 	const i=lms('@index');let ix=null
 	if(!widen){ix=lml([]);vals.v.map((val,z)=>{dget(val,i).v.map(x=>ix.v.push(x))})}
+	if(widen)vals.v=vals.v.filter(x=>count(dget(x,i)))
 	if(count(vals)==0)vals.v.push(keys.v.reduce((x,y)=>dset(x,y,lml([])),lmd()))
 	let r=monad.raze(lml(vals.v.map(x=>monad.table(widen?x:dyad.drop(i,x)))))
 	if(widen){ix=lml(r.v['@index']),r=dyad.drop(i,r)}
@@ -290,10 +307,30 @@ n_eval=([x,y,extend])=>{
 	}catch(e){dset(r,lms('error'),lms(e.x))};return r
 }
 triad={
-	'@sel': (orig,vals,keys)=>{const mv=merge(vals,keys,0);return count(keys)>1?mv.r: dyad.take(mv.ix,dyad.drop(lms('index'),orig))},
-	'@ext': (orig,vals,keys)=>{const r=monad.cols(triad['@sel'](orig,vals,keys));return count(r)!=1||count(r.k[0])?r: monad.first(r)},
+	'@orderby': (col,tab,order_dir)=>{
+		const lex_list=(x,y,a,ix)=>{
+			if(x.length<ix&&y.length<ix)return 0;const xv=x[ix]||NONE,yv=y[ix]||NONE
+			return lex_less(xv,yv)?a: lex_more(xv,yv)?!a: lex_list(x,y,a,ix+1)
+		}
+		const lex_less=(a,b)=>lil(a)&&lil(b)? lex_list(a.v,b.v,1,0): lb(dyad['<'](a,b))
+		const lex_more=(a,b)=>lil(a)&&lil(b)? lex_list(a.v,b.v,0,0): lb(dyad['>'](a,b))
+		const o=dyad.take(lmn(count(tab)),lml(ll(col)));order_dir=ln(order_dir)
+		const pv=range(count(tab)).sort((a,b)=>{
+			if(lex_less(o.v[a],o.v[b]))return  order_dir
+			if(lex_more(o.v[a],o.v[b]))return -order_dir
+			return a-b // produce a stable sort
+		})
+		const rt=dyad.take(lml(pv.map(lmn)),tab)
+		rt.v.gindex=range(count(tab)).map(lmn);return rt
+	},
+	'@sel': (orig,vals,keys)=>{
+		const mv=merge(vals,keys,0);return count(keys)>1?mv.r: dyad.take(mv.ix,dyad.drop(lml(['index','gindex','group'].map(lms)),orig))
+	},
+	'@ext': (orig,vals,keys)=>{
+		const r=monad.cols(triad['@sel'](orig,vals,keys));return count(r)!=1||count(r.k[0])?r: monad.first(r)
+	},
 	'@upd': (orig,vals,keys)=>{
-		orig=dyad.drop(lms('index'),orig);const mv=merge(vals,keys,1),r=mv.r,ix=mv.ix
+		orig=dyad.drop(lml(['index','gindex','group'].map(lms)),orig);const mv=merge(vals,keys,1),r=mv.r,ix=mv.ix
 		Object.keys(r.v).map(c=>{
 			if(r.v[c]==ix)return;const ci=c in orig.v, col=range(count(orig)).map(z=>ci?orig.v[c][z]:NONE)
 			orig.v[c]=col,ix.v.map((x,row)=>col[0|ln(x)]=r.v[c][row])
@@ -309,8 +346,8 @@ triad={
 
 findop=(n,prims)=>Object.keys(prims).indexOf(n), as_enum=x=>x.split(',').reduce((x,y,i)=>{x[y]=i;return x},{})
 let tnames=0;tempname=_=>lms(`@t${tnames++}`)
-op=as_enum('JUMP,JUMPF,LIT,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,QUERY,IPRE,IPOST')
-oplens=   [ 3   ,3    ,3  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3    ,3   ,3     ]
+op=as_enum('JUMP,JUMPF,LIT,DUP,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,IPRE,IPOST')
+oplens=   [ 3   ,3    ,3  ,1  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3   ,3     ]
 blk_addb=(x,n  )=>x.b.push(0xFF&n)
 blk_here=(x    )=>x.b.length
 blk_setb=(x,i,n)=>x.b[i]=0xFF&n
@@ -395,6 +432,22 @@ parse=text=>{
 	const quotesub=_=>{let c=0,r=lmblk();while(hasnext()&&!matchsp(']'))expr(r),c++;blk_opa(r,op.BUND,c);return r}
 	const quotedot=_=>{const r=lmblk();blk_lit(r,lml([lms(name('member'))]));return r}
 	const iblock=r=>{let c=0;while(hasnext()){if(match('end')){if(!c)blk_lit(r,NONE);return}if(c)blk_op(r,op.DROP);expr(r),c++};er(`Expected 'end' for block.`)}
+	const parseclause=(b,func)=>{
+		const iter_group=(g,f)=>{if(g){const n=tempname();blk_loop(b,[ls(n)],_=>{blk_get(b,n),f()})}else{f()}}
+		if(match('where')){
+			const ex=quote(),grouped=parseclause(b,func)
+			iter_group(grouped,_=>{blk_lit(b,ex),blk_op(b,op.COL),blk_op2(b,'@where')});return grouped
+		}
+		if(match('orderby')){
+			const ex=quote(),dir=match('asc')?-1: match('desc')?1: er(`Expected 'asc' or 'desc'.`), grouped=parseclause(b,func)
+			iter_group(grouped,_=>{blk_lit(b,ex),blk_op(b,op.COL),blk_lit(b,lmn(dir)),blk_op3(b,'@orderby')});return grouped
+		}
+		if(match('by')){
+			const ex=quote(),grouped=parseclause(b,func);if(grouped)blk_op1(b,'raze')
+			blk_lit(b,ex),blk_op(b,op.COL),blk_op2(b,'@by');return 1
+		}
+		if(!match('from'))er(`Expected 'from'.`);expr(b),blk_op1(b,'@tab'),blk_op(b,op.DUP);return 0
+	}
 	const parsequery=(b,func,dcol)=>{
 		const cols=lmd([],[]);while(!matchp('from')&&!matchp('where')&&!matchp('by')&&!matchp('orderby')){
 			let set=peek2().t==':', lit=peek().t=='string', name=lms(lit?(set?peek().v:''):peek().t=='name'?peek().v:'')
@@ -402,15 +455,10 @@ parse=text=>{
 			const x=set&&unique?(next(),next(),name): get&&unique&&dcol?name: lms(dcol?`c${cols.k.length}`: '')
 			cols.k.push(x),cols.v.push(quote())
 		}
-		let cw,cb,co,dir=-1,index=lmblk();blk_get(index,lms('index'))
-		if(match('where'  )){cw=quote()}else{cw=lmblk(),blk_lit(cw,ONE )}
-		if(match('by'     )){cb=quote()}else{cb=lmblk(),blk_lit(cb,NONE)}
-		if(match('orderby')){co=quote();dir=match('asc')?-1: match('desc')?1: er(`Expected 'asc' or 'desc'.`)}
-		else{co=lmblk(),blk_get(co,lms('index'))}if(!match('from'))er(`Expected 'from'.`)
-		expr(b),blk_op1(b,'@tab')
-		blk_lit(b,cw),blk_op(b,op.COL),blk_lit(b,cb),blk_op(b,op.COL),blk_lit(b,co),blk_op(b,op.COL),blk_lit(b,lmn(dir)),blk_opa(b,op.QUERY,func=='@upd')
-		const keys=lml(cols.k.concat([lms('@index')])),name=tempname();blk_loop(b,[ls(name)],_=>{
-			blk_lit(b,keys),blk_get(b,name),cols.v.map(x=>(blk_lit(b,x),blk_op(b,op.COL)))
+		const grouped=parseclause(b,func), index=lmblk();blk_get(index,lms('index'))
+		const keys=lml(cols.k.concat([lms('@index')])),n=tempname();if(!grouped)blk_op1(b,'list')
+		blk_loop(b,[ls(n)],_=>{
+			blk_lit(b,keys),blk_get(b,n),cols.v.map(x=>(blk_lit(b,x),blk_op(b,op.COL)))
 			blk_lit(b,index),blk_op(b,op.COL),blk_op(b,op.DROP),blk_opa(b,op.BUND,count(keys)),blk_op2(b,'dict')
 		}),blk_lit(b,keys),blk_op3(b,func)
 	}
@@ -514,6 +562,7 @@ runop=_=>{
 	const pc=getpc(),o=blk_getb(b,pc),imm=(oplens[o]==3?blk_gets(b,1+pc):0); setpc(pc+oplens[o])
 	switch(o){
 		case op.DROP :arg();break
+		case op.DUP  :{const a=arg();ret(a),ret(a);break}
 		case op.SWAP :{const a=arg(),b=arg();ret(a),ret(b);break}
 		case op.OVER :{const a=arg(),b=arg();ret(b),ret(a),ret(b);break}
 		case op.JUMP :setpc(imm);break
@@ -545,26 +594,6 @@ runop=_=>{
 		case op.COL  :{
 			const ex=arg(),t=arg(),n=Object.keys(t.v),v=lml(Object.values(t.v).map(lml));ret(t)
 			n.push('column'),v.v.push(t),issue(env_bind(getev(),n,v),ex);break
-		}
-		case op.QUERY:{
-			const order_dir=ln(arg()),t=arg(),ct=lmn(count(t))
-			const o=dyad.take(ct,lml(ll(arg()))),b=dyad.take(ct,lml(ll(arg()))),w=dyad.take(ct,lml(ll(arg()))),r=monad.rows(t)
-			const uk=r.v.reduce((x,_,z)=>{if(lb(w.v[z]))dset(x,b.v[z],b.v[z]);return x},lmd([],[]))
-			const rows=uk.v.map((v,group)=>{ // sort groups, select rows
-				const lex_list=(x,y,a,ix)=>{
-					if(x.length<ix&&y.length<ix)return 0;const xv=x[ix]||NONE,yv=y[ix]||NONE
-					return lex_less(xv,yv)?a: lex_more(xv,yv)?!a: lex_list(x,y,a,ix+1)
-				}
-				const lex_less=(a,b)=>lil(a)&&lil(b)? lex_list(a.v,b.v,1,0): lb(dyad['<'](a,b))
-				const lex_more=(a,b)=>lil(a)&&lil(b)? lex_list(a.v,b.v,0,0): lb(dyad['>'](a,b))
-				const gp=range(r.v.length).filter(x=>lb(w.v[x])&&match(v,b.v[x])).sort((a,b)=>{
-					if(lex_less(o.v[a],o.v[b]))return  order_dir
-					if(lex_more(o.v[a],o.v[b]))return -order_dir
-					return a-b // produce a stable sort
-				})
-				return monad.table(lml(gp.map((v,z)=>{const t=r.v[v];dset(t,lms('gindex'),lmn(z)),dset(t,lms('group'),lmn(group));return t})))
-			});if(rows.length==0&&!imm)rows.push(dyad.take(NONE,t))
-			ret(t),ret(lml(rows));break
 		}
 	}while(running()&&getpc()>=blk_here(getblock()))descope()
 }

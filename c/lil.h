@@ -513,27 +513,61 @@ dyad(l_format){
 	}return lmstr(r);
 }
 lv* l_ins(lv*v,lv*n,lv*x){lv*r=torect(l_table(l_dict(n,v)));return lin(x)?r:l_comma(lt(x),r);}
-lv* l_tab(lv*t){t=lt(t);TMAP(r,t,t->lv[z]);torect(r);dset(r,lmistr("index"),l_range(lmn(r->n)));return r;}
+lv* l_tab(lv*t){
+	t=lt(t);TMAP(r,t,t->lv[z]);torect(r);
+	dset(r,lmistr("index" ),l_range(lmn(r->n))),dset(r,lmistr("gindex"),l_range(lmn(r->n))),dset(r,lmistr("group" ),l_take(lmn(r->n),NONE));
+	return r;
+}
 lv* merge(lv*vals,lv*keys,int widen,lv**ix){
 	lv*i=lmistr("@index");
 	if(!widen){*ix=lml(0);EACH(z,vals){lv*x=dget(vals->lv[z],i);EACH(z,x)ll_add(*ix,x->lv[z]);}}
+	if(widen){lv*t=lml(0);EACH(z,vals)if(dget(vals->lv[z],i)->c)ll_add(t,vals->lv[z]);vals=t;}
 	if(vals->c==0){lv*d=lmd();EACH(z,keys)dset(d,keys->lv[z],lml(0));ll_add(vals,d);}
 	GEN(r,vals->c)l_table(widen?vals->lv[z]:l_drop(i,vals->lv[z]));r=l_raze(r);
 	if(widen){*ix=dget(r,i);r=l_drop(i,r);}return r;
 }
-lv* l_select(lv*orig,lv*vals,lv*keys){
-	lv*ix=NULL,*r=merge(vals,keys,0,&ix);return keys->c>1?r:l_take(ix,l_drop(lmistr("index"),orig));
-}
-lv* l_extract(lv*orig,lv*vals,lv*keys){
-	lv*r=l_cols(l_select(orig,vals,keys));return (r->c!=1||r->kv[0]->c)?r: l_first(r);
-}
+lv* disclose(lv*x){lv*t=lml(3);t->lv[0]=lmistr("index"),t->lv[1]=lmistr("gindex"),t->lv[2]=lmistr("group");return l_drop(t,x);}
+lv* l_select(lv*orig,lv*vals,lv*keys){lv*ix=NULL,*r=merge(vals,keys,0,&ix);return keys->c>1?r:l_take(ix,disclose(orig));}
+lv* l_extract(lv*orig,lv*vals,lv*keys){lv*r=l_cols(l_select(orig,vals,keys));return (r->c!=1||r->kv[0]->c)?r: l_first(r);}
 lv* l_update(lv*orig,lv*vals,lv*keys){
-	orig=l_drop(lmistr("index"),orig);lv*ix=NULL,*r=merge(vals,keys,1,&ix);EACH(c,r){
+	orig=disclose(orig);lv*ix=NULL,*r=merge(vals,keys,1,&ix);EACH(c,r){
 		if(r->lv[c]==ix)continue;lv*k=r->kv[c];
 		int ci=dgeti(orig,k);GEN(col,orig->n)ci==-1?NONE:orig->lv[ci]->lv[z];dset(orig,k,col);
 		EACH(row,ix){col->lv[(int)ln(ix->lv[row])]=r->lv[c]->lv[row];}
 	}return orig;
 }
+lv* l_where(lv*col,lv*tab){
+	lv*w=l_take(lmn(tab->n),ll(col)),*p=lml(0);EACH(z,w)if(lb(w->lv[z]))ll_add(p,lmn(z));
+	lv*r=l_take(p,tab);dset(r,lmistr("gindex"),l_range(lmn(r->n)));return r;
+}
+lv* l_by(lv*col,lv*tab){
+	lv*b=l_take(lmn(tab->n),ll(col)),*u=lmd();EACH(z,b)dset(u,b->lv[z],b->lv[z]);
+	lv*r=lml(0);EACH(group,u){
+		lv*p=lml(0);EACH(z,b)if(matchr(b->lv[z],u->lv[group]))ll_add(p,lmn(z));
+		lv*s=l_take(p,tab);dset(s,lmistr("gindex"),l_range(lmn(s->n))),dset(s,lmistr("group"),l_list(lmn(group)));
+		ll_add(r,torect(s));
+	};return r;
+}
+lv*order_vec=NULL;int order_dir=0; // this is gross. qsort() is badly designed, and qsort_r is unportable.
+int lex_less(lv*a,lv*b);int lex_more(lv*a,lv*b);// forward refs
+int lex_list(lv*x,lv*y,int a,int ix){
+	if(x->c<ix&&y->c<ix)return 0;lv*xv=x->c>ix?x->lv[ix]:NONE,*yv=y->c>ix?y->lv[ix]:NONE;
+	return lex_less(xv,yv)?a: lex_more(xv,yv)?!a: lex_list(x,y,a,ix+1);
+}
+int lex_less(lv*a,lv*b){return lil(a)&&lil(b)? lex_list(a,b,1,0): lb(l_less(a,b));}
+int lex_more(lv*a,lv*b){return lil(a)&&lil(b)? lex_list(a,b,0,0): lb(l_more(a,b));}
+int orderby(const void*av,const void*bv){
+	int a=ln(*(lv**)av),b=ln(*(lv**)bv);
+	if(lex_less(order_vec->lv[a],order_vec->lv[b]))return  order_dir;
+	if(lex_more(order_vec->lv[a],order_vec->lv[b]))return -order_dir;
+	return a-b; // produce a stable sort
+}
+lv* l_orderby(lv*col,lv*tab,lv*dir){
+	order_vec=l_take(lmn(tab->n),ll(col)),order_dir=ln(dir);
+	lv*p=l_range(lmn(order_vec->c));qsort(p->lv,p->c,sizeof(lv*),orderby);
+	lv*r=l_take(p,tab);dset(r,lmistr("gindex"),l_range(lmn(r->n)));return r;
+}
+
 #define prim(n,f) {n,(void*)f}
 primitive monads[]={
 	prim("-",l_negate),prim("!",l_not),prim("floor",l_floor),prim("cos",l_cos),prim("sin",l_sin),
@@ -550,18 +584,20 @@ primitive dyads[]={
 	prim("|",l_max),prim("~",l_match),prim("split",l_split),prim("fuse",l_fuse),
 	prim("dict",l_dict),prim("take",l_take),prim("drop",l_drop),prim("in",l_in),
 	prim(",",l_comma),prim("join",l_join),prim("cross",l_cross),prim("parse",l_parse),
-	prim("format",l_format),prim("unless",l_unless),prim("limit",l_limit),prim("",NULL)
+	prim("format",l_format),prim("unless",l_unless),prim("limit",l_limit),
+	prim("@where",l_where),prim("@by",l_by),prim("",NULL)
 };
 primitive triads[]={
-	prim("@sel",l_select),prim("@ext",l_extract),prim("@upd",l_update),prim("@ins",l_ins),prim("",NULL)
+	prim("@sel",l_select),prim("@ext",l_extract),prim("@upd",l_update),prim("@ins",l_ins),
+	prim("@orderby",l_orderby),prim("",NULL)
 };
 
 // Bytecode
 
 int findop(char*n,primitive*p){if(n)for(int z=0;p[z].name[0];z++)if(!strcmp(n,p[z].name))return z;return -1;}
 int tnames=0;lv* tempname(){char t[64];snprintf(t,sizeof(t),"@t%d",tnames++);return lmcstr(t);}
-enum opcodes {JUMP,JUMPF,LIT,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,QUERY,IPRE,IPOST};
-int oplens[]={3   ,3    ,3  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3    ,3   ,3    };
+enum opcodes {JUMP,JUMPF,LIT,DUP,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,IPRE,IPOST};
+int oplens[]={3   ,3    ,3  ,1  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3   ,3    };
 void blk_addb(lv*x,int n){
 	if(x->ns<x->n+1)x->sv=realloc(x->sv,(x->ns*=2)*sizeof(int));x->sv[x->n++]=n;
 	if(x->n>=65536||x->c>=65536)printf("TOO MUCH BYTECODE!\n"),exit(1);
@@ -703,6 +739,27 @@ void iblock(lv*r){
 	}if(!perr())snprintf(par.error,sizeof(par.error),"Expected 'end' for block.");
 }
 lv* block(){lv*r=lmblk();iblock(r);return r;}
+int parseclause(lv*b,int isupdate){
+	if(match("where")){
+		lv*ex=quote();int grouped=parseclause(b,isupdate);
+		if(!grouped)                                {blk_lit(b,ex),blk_op(b,COL),blk_op2(b,"@where");}
+		else{lv*n=tempname(),*l=lmblk();blk_get(l,n),blk_lit(l,ex),blk_op(l,COL),blk_op2(l,"@where");blk_loop(b,l_list(n),l);}
+		return grouped;
+	}
+	if(match("orderby")){
+		lv*ex=quote();int dir=1;if(match("asc"))dir=-1;else if(match("desc"))dir=1;
+		else if(!perr())snprintf(par.error,sizeof(par.error),"Expected 'asc' or 'desc'.");int grouped=parseclause(b,isupdate);
+		if(!grouped)                                {blk_lit(b,ex),blk_op(b,COL),blk_lit(b,lmn(dir)),blk_op3(b,"@orderby");}
+		else{lv*n=tempname(),*l=lmblk();blk_get(l,n),blk_lit(l,ex),blk_op(l,COL),blk_lit(l,lmn(dir)),blk_op3(l,"@orderby");blk_loop(b,l_list(n),l);}
+		return grouped;
+	}
+	if(match("by")){
+		lv*ex=quote();int grouped=parseclause(b,isupdate);if(grouped)blk_op1(b,"raze");
+		blk_lit(b,ex),blk_op(b,COL),blk_op2(b,"@by");return 1;
+	}
+	if(!match("from")&&!perr())snprintf(par.error,sizeof(par.error),"Expected 'from'.");
+	expr(b),blk_op1(b,"@tab"),blk_op(b,DUP);return 0;
+}
 void parsequery(lv*b,char*op,int dcol){
 	lv*cols=lmd();while(!perr()&&!matchp("from")&&!matchp("where")&&!matchp("by")&&!matchp("orderby")){
 		str x=str_new();int set=peek2().type==':', lit=peek()->type=='s';
@@ -713,22 +770,11 @@ void parsequery(lv*b,char*op,int dcol){
 		else if(dcol)             {str_addc(&x,'c'),wnum(&x,cols->c);}
 		ld_add(cols,lmstr(x),quote());
 	}
-	lv*cw,*cb,*co;int dir=-1;lv*index=lmblk();blk_get(index,lmistr("index"));
-	if(match("where"  )){cw=quote();}else{cw=lmblk();blk_lit(cw,ONE);}
-	if(match("by"     )){cb=quote();}else{cb=lmblk();blk_lit(cb,NONE);}
-	if(match("orderby")){
-		co=quote();if(match("asc"))dir=-1;else if(match("desc"))dir=1;
-		else if(!perr())snprintf(par.error,sizeof(par.error),"Expected 'asc' or 'desc'.");
-	}else{co=lmblk();blk_get(co,lmistr("index"));}
-	if(!match("from")&&!perr())snprintf(par.error,sizeof(par.error),"Expected 'from'.");
-	expr(b),blk_op1(b,"@tab");
-	blk_lit(b,cw),blk_op(b,COL);blk_lit(b,cb),blk_op(b,COL);blk_lit(b,co),blk_op(b,COL);
-	blk_lit(b,lmn(dir));blk_opa(b,QUERY,!strcmp(op,"@upd"));
-	lv*name=tempname(),*names=l_list(name),*keys=l_comma(l_keys(cols),lmistr("@index"));
-	lv*l=lmblk();
-	blk_lit(l,keys),blk_get(l,name);EACH(z,cols){blk_lit(l,cols->lv[z]),blk_op(l,COL);}
+	int grouped=parseclause(b,!strcmp(op,"@upd"));lv*index=lmblk();blk_get(index,lmistr("index"));
+	lv*keys=l_comma(l_keys(cols),lmistr("@index")),*n=tempname(),*l=lmblk();if(!grouped)blk_op1(b,"list");
+	blk_lit(l,keys),blk_get(l,n);EACH(z,cols){blk_lit(l,cols->lv[z]),blk_op(l,COL);}
 	blk_lit(l,index),blk_op(l,COL),blk_op(l,DROP),blk_opa(l,BUND,keys->c),blk_op2(l,"dict");
-	blk_loop(b,names,l),blk_lit(b,keys),blk_op3(b,op);
+	blk_loop(b,l_list(n),l),blk_lit(b,keys),blk_op3(b,op);
 }
 lv* quotesub(){int c=0;lv*r=lmblk();while(hasnext()&&!matchsp(']'))expr(r),c++;blk_opa(r,BUND,c);return r;}
 lv* quotedot(){lv*r=lmblk();blk_lit(r,l_list(lmstr(name("member"))));return r;}
@@ -834,20 +880,6 @@ lv* env_bind(lv*e,lv*k,lv*v){lv*r=lmenv(e);EACH(z,k)env_local(r,k->lv[z],z<v->c?
 #define getblock()     ll_peek(state.t)
 #define getpc()        idx_peek(&state.pcs)
 
-lv*order_vec=NULL;int order_dir=0; // this is gross. qsort() is badly designed, and qsort_r is unportable.
-int lex_less(lv*a,lv*b);int lex_more(lv*a,lv*b);// forward refs
-int lex_list(lv*x,lv*y,int a,int ix){
-	if(x->c<ix&&y->c<ix)return 0;lv*xv=x->c>ix?x->lv[ix]:NONE,*yv=y->c>ix?y->lv[ix]:NONE;
-	return lex_less(xv,yv)?a: lex_more(xv,yv)?!a: lex_list(x,y,a,ix+1);
-}
-int lex_less(lv*a,lv*b){return lil(a)&&lil(b)? lex_list(a,b,1,0): lb(l_less(a,b));}
-int lex_more(lv*a,lv*b){return lil(a)&&lil(b)? lex_list(a,b,0,0): lb(l_more(a,b));}
-int orderby(const void*av,const void*bv){
-	int a=*(int*)av,b=*(int*)bv;
-	if(lex_less(order_vec->lv[a],order_vec->lv[b]))return  order_dir;
-	if(lex_more(order_vec->lv[a],order_vec->lv[b]))return -order_dir;
-	return a-b; // produce a stable sort
-}
 void docall(lv*f,lv*a,int tail){
 	if(linat(f)){ret(((lv*(*)(lv*,lv*))f->f)(f->a,a));return;}
 	if(!lion(f)){ret(l_at(f,l_first(a)));return;}
@@ -858,6 +890,7 @@ void runop(){
 	int*pc=getpc(),op=blk_getb(b,*pc),imm=(oplens[op]==3?blk_gets(b,1+*pc):0);(*pc)+=oplens[op];
 	switch(op){
 		case DROP:arg();break;
+		case DUP:{lv*a=arg();ret(a),ret(a);break;}
 		case SWAP:{lv*a=arg(),*b=arg();ret(a),ret(b);break;}
 		case OVER:{lv*a=arg(),*b=arg();ret(b),ret(a),ret(b);break;}
 		case JUMP:*pc=imm;break;
@@ -896,22 +929,6 @@ void runop(){
 			lv*ex=arg(),*t=arg();ret(t);
 			GEN(n,t->c)t->kv[z];GEN(v,t->c)t->lv[z];ll_add(n,lmistr("column")),ll_add(v,t);
 			issue(env_bind(ev(),n,v),ex);break;
-		}
-		case QUERY:{
-			order_dir=ln(arg());lv*t=arg(),*ct=lmn(t->n);
-			lv*o=l_take(ct,ll(arg())),*b=l_take(ct,ll(arg())),*w=l_take(ct,ll(arg()));
-			lv*r=l_rows(t);order_vec=o;idx cn=idx_new(r->c),gr=idx_new(r->c),gp=idx_new(r->c);
-			lv*keys=lml(0);EACH(z,r){ // find groups
-				if(!lb(w->lv[z])){gr.iv[z]=-1;continue;}
-				int f=0;EACH(zz,keys)if(equal(keys->lv[zz],b->lv[z])){f=1,cn.iv[zz]++,gr.iv[z]=zz;break;}
-				if(!f)ll_add(keys,b->lv[z]),cn.iv[keys->c-1]++,gr.iv[z]=keys->c-1;
-			}
-			lv*rows=lml(0);EACH(z,keys){ // sort groups, select rows
-				int i=0;EACH(zz,r)if(gr.iv[zz]==z)gp.iv[i++]=zz;qsort(gp.iv,i,sizeof(int),orderby);
-				GEN(rr,i)r->lv[gp.iv[z]],dset(rr->lv[z],lmistr("gindex"),lmn(z)),dset(rr->lv[z],lmistr("group"),lmn(rows->c));
-				ll_add(rows,l_table(rr));
-			}if(rows->c==0&&!imm){ll_add(rows,l_take(NONE,t));}
-			idx_free(&cn),idx_free(&gr),idx_free(&gp),ret(t),ret(rows);break;
 		}
 	}while(running()&&*getpc()>=blk_here(getblock()))descope;
 }

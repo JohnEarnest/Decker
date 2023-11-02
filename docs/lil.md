@@ -336,16 +336,26 @@ Lil, the Query Language
 -----------------------
 So far, we haven't looked much at tables. While one can operate on tables by indexing them or iterate over their contents with an `each` loop, the real power of tables comes from Lil's query syntax, which resembles a simplified version of SQL. Unlike some of their SQL counterparts, `select`, `extract`, `update`, and `insert` are all pure operations which strictly return a _new_ value as a result.
 
-`select` is used for querying a table, and obtaining a table of results. It is followed by a sequence of column expressions (possibly with names), optionally a `where`, `by`, and/or `orderby` clause, each of which should produce a list of results for each row, the keyword `from`, and then finally an expression giving the source table. In the context of these clauses- and when computing result columns- the columns of the table will be bound as variables.
+A query consists of an operation, a sequence of column expressions (possibly with names), any number of `where`, `by`, and/or `orderby` clauses, the keyword `from`, and then finally an expression giving the source table. If the source is non-tabular, it will be converted into its table equivalent automatically. The operations are:
 
-In a `select`, `extract` or `update`, clauses are carried out in the following order:
+- `select`: query a table and obtain a table of results.
+- `extract`: query a table and obtain a list or dictionary of results.
+- `update`: produce an amended version of a table, preserving its overall structure and order.
 
-- rows are filtered down to only those with a truthy result in the `where` clause. (The implicit `index` column represents their original row numbers.)
-- rows are grouped by the values in the `by` clause, in order of appearance. (The implicit `gindex` column represents each row's original index within its group, and the implicit `group` column represents the index of the group each row belongs to.)
-- each group is sorted according to the values in the `orderby` clause, either ascending (`asc`) or descending (`desc`). Lists are sorted lexicographically, numbers are sorted by value, and anything else is sorted lexicographically by its string equivalent.
-- for each group, result columns are computed.
-- for each group, result columns are _rectangularized_: the group will have as many result rows as the column of maximum `count`.
-- rows are ungrouped: result rows across all groups are concatenated, preserving their grouped order. (This may change the _overall_ order- see `update` if you want to preserve it.)
+If a query has multiple clauses, they're carried out right-to-left, just like Lil expressions. You can think of each clause as taking a table and a column expression, evaluating the expression within the context of the table (binding each table column as a variable), and using the resulting column to transform the input table into a different table. The clauses are:
+
+- `where x`: filter the table to only the rows of `x` which are truthy.
+- `orderby x dir`: sort the rows of the table such that they would put the values of `x` in order; `dir` can either be `asc` (ascending) or `desc` (descending). Lists are sorted lexicographically, numbers are sorted by value, and anything else is sorted lexicographically by its string equivalent.
+- `by x`: group the rows of the table by the dictinct values of `x`, producing 1 or more "subtables". Once the source table has been grouped, all subsequent clauses and result column expressions are applied to the subtables individually. If more than one `by` clause appears in a query, the subtables will be "ungrouped" into a single table before re-grouping.
+
+When column expressions are evaluated, several "magic" columns and variables are automatically defined:
+
+- `index`: integer list; the _original_ row number in the input table for each row in the current table.
+- `gindex`: integer list; the row number for each row in the current group (subtable); this is "reset" after each clause is carried out.
+- `group`: integer list; the group number for each row in the current group (subtable); this is `0` for all rows in an ungrouped query.
+- `column`: dictionary; all of the columns in the current table or subtable, keyed by name.
+
+When "ungrouping" or collecting the final result columns, the table is _rectangularized_: each group will have as many result rows as the column of maximum `count`. Grouping may change the order of rows- see `update` if you want to preserve it.
 
 Given a simple table:
 ```
@@ -455,7 +465,7 @@ select employed:(count name) job:(first job) by job from people
 # +----------+--------------+
 ```
 
-When computing columns, you're working with lists of elements, and taking advantage of the fact that primitives like `<` and `+` automatically "spread" to lists. If you want to call your own functions- say, to average within a grouped column- write them to accept a list like so:
+When computing columns, you're working with lists of elements, and taking advantage of the fact that primitives like `<` and `+` automatically "spread" to lists. When performing comparisons, be sure to use `=` rather than `~`! If you want to call your own functions- say, to average within a grouped column- write them to accept a list like so:
 ```
 on avg x do ((sum x) / count x) end
 
@@ -622,7 +632,7 @@ select a:name b:name_ where name < name_ from guests cross guests
 # | "Oscar" | "Thomas" |
 # +---------+----------+
 ```
-For a row-wise join- concatenating tables with the same columns- you can simply use `,`, which has the same padding/widening behavior as `insert`. You can likewise `take` or `drop` rows or columns from a table. If the left argument to `take` is a list of numbers, it picks out those rows very much like a generalization of `select`:
+For a row-wise join- concatenating tables with the same columns- you can use `,`, which has the same padding/widening behavior as `insert`. You can likewise `take` or `drop` rows or columns from a table. If the left argument to `take` is a list of numbers, it picks out those rows very much like a generalization of `select`:
 ```
 "name" take people
 # +----------+
@@ -751,6 +761,7 @@ It may also be helpful to think in terms of how the shape of output tables relat
 | `join`          | <= x * y    | < x + y         |
 | `cross`         |  = x * y    | = x + y         |
 | `flip`          | x columns   | x rows          |
+
 
 Lil, the Formatting Language
 ----------------------------
@@ -1201,7 +1212,8 @@ NAME    := (ALPHA|'_'|'?') (ALPHA|'_'|'?'|DIGIT)*
 ITER    := (( each' NAME* 'in' ) | 'while') EXPR* 'end'
 ON      := 'on' NAME+ 'do' EXPR* 'end'
 IF      := 'if' EXPR* ('elseif' EXPR*)* ( 'else' EXPR* )? 'end'
-QUERY   := ('select'|'extract'|'update')((NAME|STRING ':')?EXPR)*('where'EXPR)?('by'EXPR)?('orderby'EXPR('asc'|'desc'))?'from' EXPR
+CLAUSE  := ('where' EXPR) | ('by' EXPR) | ('orderby' EXPR ('asc'|'desc'))
+QUERY   := ('select'|'extract'|'update')((NAME|STRING ':')?EXPR)* CLAUSE* 'from' EXPR
 INSERT  := 'insert' (NAME|STRING ':' EXPR) 'into' EXPR
 SEND    := 'send' NAME '[' EXPR* ']'
 INDEX   := ('.' NAME? | '[' EXPR* ']')*
