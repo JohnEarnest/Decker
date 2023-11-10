@@ -76,7 +76,7 @@ void lv_walk(lv*x){
 }
 void lv_free(lv*x){
 	if(!x)return;
-	if(x->lv)free(x->lv);if(x->kv)free(x->kv);if(x->sv)free(x->sv);free(x);gc.frees++,gc.live--;
+	if(x->lv)free(x->lv);if(x->kv)free(x->kv);if(x->sv&&!(x->t==1&&x->b))free(x->sv);free(x);gc.frees++,gc.live--;
 }
 void lv_grow(){
 	gc.heap=realloc(gc.heap,(gc.size*2)*sizeof(lv*));
@@ -120,6 +120,7 @@ lv* lmistr(char*x){
 	lv*r=&interned[intern_count++];r->t=1,r->c=strlen(x),r->sv=x;
 	if(intern_count>sizeof(interned))printf("warning: intern heap is full!\n");return r;
 }
+lv* lmslice(lv*x,int off){lv*r=lmv(1);r->c=MAX(0,x->c-off),r->b=x->b?x->b:x;r->sv=x->sv+MIN(MAX(0,off),x->c);return r;}
 int     mod(int    x,int    y){x=y==0?0:x%y      ;if(x<0)x+=y;return x;}
 double dmod(double x,double y){x=y==0?0:fmod(x,y);if(x<0)x+=y;return x;}
 double rnum_len(char*x,int n,int*len){
@@ -225,8 +226,16 @@ vm(not,!  ,lb) vm(negate,-  ,ln) vm(floor,floor,ln) vm(cos,cos,ln)
 vm(sin,sin,ln) vm(tan   ,tan,ln) vm(exp  ,exp  ,ln) vm(ln ,log,ln) vm(sqrt,sqrt,ln)
 monad(l_count){return lmn(lin(x)||lis(x)||lil(x)||lid(x)?x->c:lit(x)?x->n:0);}
 monad(l_list ){lv*r=lml(1);r->lv[0]=x;return r;}
-monad(l_first){if(lit(x))return l_first(l_rows(x));if(lion(x))return lmcstr(x->sv);lv*l=ll(x);return!l->c?NONE:l->lv[0];}
-monad(l_last ){if(lit(x))return l_last (l_rows(x));lv*l=ll(x);return!l->c?NONE:l->lv[l->c-1];}
+monad(l_first){
+	if(lit(x))return l_first(l_rows(x));if(lion(x))return lmcstr(x->sv);
+	if(lis(x))return l_at(x,NONE);
+	lv*l=ll(x);return!l->c?NONE:l->lv[0];
+}
+monad(l_last ){
+	if(lit(x))return l_last(l_rows(x));
+	if(lis(x))return l_at(x,lmn(x->c-1));
+	lv*l=ll(x);return!l->c?NONE:l->lv[l->c-1];
+}
 monad(l_typeof){
 	if(linat(x))return lmistr("function");if(lii(x))return x->a;
 	char*n[]={"number","string","list","dict","table","function","INTERNAL"};return lmistr(n[MIN(6,x->t)]);
@@ -313,7 +322,9 @@ dyad(l_take){
 	EACH(z,r)r->lv[z]=n?y->lv[mod(z+s,n)]:NONE;return r;
 }
 dyad(l_drop){
-	if(!lin(x))return filter(0,x,y); if(lis(y))return l_fuse(lmistr(""),l_drop(x,ll(y)));
+	if(!lin(x))return filter(0,x,y);
+	if(ln(x)>=0&&lis(y))return lmslice(y,ln(x));
+	if(lis(y))return l_fuse(lmistr(""),l_drop(x,ll(y)));
 	if(lit(y)){TMAP(r,y,l_drop(x,y->lv[z]));return torect(r);}
 	if(lid(y)){
 		lv*t=l_drop(x,l_range(lmn(y->c))),*r=lmd();
