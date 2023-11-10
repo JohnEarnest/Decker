@@ -160,6 +160,7 @@ drop/take:
 ==========
 ((5,5,5),"AB","ABABAB",(3,4),{"apple":11,"cherry":22})
 ((),"DEF","ABC",{"banana":33})
+("xyz","yz","z","","")
 "AB"
 "AB"
 "AB"
