@@ -1064,20 +1064,20 @@ void writexmlstr(str*s,lv*x){
 	#define xc(a,b) if(c==a)str_addz(s,"&" #b ";"),c=0;
 	EACH(z,x){char c=x->sv[z];xc('&',amp)xc('\'',apos)xc('"',quot)xc('>',gt)xc('<',lt)if(c)str_addc(s,c);}
 }
-void writexmlrec(str*s,lv*x,int tab){
-	if(lil(x)){EACH(z,x)writexmlrec(s,x->lv[z],tab);return;}
-	if(!lid(x)){writexmlstr(s,ls(x));if(tab)str_addc(s,'\n');return;}
+void writexmlrec(str*s,lv*x,int tab,int fmt){
+	if(lil(x)){EACH(z,x)writexmlrec(s,x->lv[z],tab,fmt);return;}
+	if(!lid(x)){writexmlstr(s,ls(x));if(tab&&fmt)str_addc(s,'\n');return;}
 	lv*t=ls(dgetv(x,lmistr("tag"))),*a=ld(dgetv(x,lmistr("attr"))),*c=dget(x,lmistr("children"));
 	str_addc(s,'<'),str_addz(s,t->sv);EACH(z,a){
 		str_addc(s,' '),str_addz(s,ls(a->kv[z])->sv);
 		str_addz(s,"=\""),writexmlstr(s,ls(a->lv[z])),str_addc(s,'"');
 	}
-	c=c?ll(c):lml(0);if(!c->c){str_addz(s,"/>\n");return;}str_addz(s,">\n");
-	#define indent(n) for(int z=0;z<n;z++)str_addc(s,' ');
-	EACH(z,c){indent(tab+2);writexmlrec(s,c->lv[z],tab+2);}
-	indent(tab);str_addz(s,"</"),str_addz(s,t->sv);str_addz(s,">\n");
+	c=c?ll(c):lml(0);if(!c->c){str_addz(s,fmt?"/>\n":"/>");return;}str_addz(s,fmt?">\n":">");
+	#define indent(n) for(int z=0;fmt&&z<n;z++)str_addc(s,' ');
+	EACH(z,c){indent(tab+2);writexmlrec(s,c->lv[z],tab+2,fmt);}
+	indent(tab);str_addz(s,"</"),str_addz(s,t->sv);str_addz(s,fmt?">\n":">");
 }
-lv*n_writexml(lv*self,lv*a){(void)self;str r=str_new();writexmlrec(&r,l_first(a),0);return lmstr(r);}
+lv*n_writexml(lv*self,lv*a){(void)self;str r=str_new();writexmlrec(&r,l_first(a),0,a->c>1?lb(a->lv[1]):0);return lmstr(r);}
 lv*readxmltext(char*t,int*i,char stop){
 	str r=str_new();while(t[*i]&&!(stop==' '&&strchr(">/ \n",t[*i]))){
 		#define xs      while(isspace(t[*i]))++*i

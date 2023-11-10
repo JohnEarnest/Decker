@@ -6,28 +6,30 @@ end
 # ----- format -------------
 
 header["lists"]
-print["%s\n" writexml["one","two","three"]]
+print["%s\n" writexml["one","two","three" 1]]
 
 header["string escaping"]
-print["%s\n" writexml["An escaped </tag>."]]
+print["%s\n" writexml["An escaped </tag>." 1]]
 
 header["self-closing tag with attrs"]
 foo.tag:"a"
 foo.attr.href:"http://beyondloom.com"
 foo.attr.target:"_blank"
-print[writexml[foo]]
+print[writexml[foo 1]]
 
 header["child tags"]
 foo.children[0].tag:"baz"
 foo.children[1]:"plain text"
 foo.children[2].tag:"quux"
-print[writexml[foo]]
+print[writexml[foo 1]]
 
 header["nested tags"]
 foo.children[0].children[0].tag:"zami"
 foo.children[0].children[0].attr.boof:99
-print[writexml[foo]]
+print[writexml[foo 1]]
 
+header["no formatting"]
+print[writexml[foo]]
 
 # ----- parse --------------
 

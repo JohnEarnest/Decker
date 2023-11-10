@@ -105,7 +105,7 @@ Built-in Functions
 | `readcsv[x y d]` | Turn a [RFC-4180](https://datatracker.ietf.org/doc/html/rfc4180) CSV string `x` into a Lil table with column spec `y`.(5)   | Data    |
 | `writecsv[x y d]`| Turn a Lil table `x` into a CSV string with column spec `y`.(5)                                                             | Data    |
 | `readxml[x]`     | Turn a useful subset of XML/HTML into a Lil structure.(5)                                                                   | Data    |
-| `writexml[x]`    | Turn a Lil structure `x` into an indented XML string.(5)                                                                    | Data    |
+| `writexml[x fmt]`| Turn a Lil structure `x` into an XML string, formatted with whitespace if `fmt` is truthy.(5)                               | Data    |
 | `readdeck[x]`    | Produce a _deck_ interface from a file at path `x`. If no path is given, produce a new _deck_ from scratch.                 | Decker  |
 | `writedeck[x y]` | Serialize a _deck_ interface `y` to a file at path `x`. Returns `1` on success.(6)                                          | Decker  |
 | `array[x y]`     | Create a new _array_ with size `x` and cast string `y`, or decode an encoded array string `x`.                              | Decker  |

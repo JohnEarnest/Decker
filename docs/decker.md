@@ -436,7 +436,7 @@ Decker provides a number of useful pre-defined functions:
 | `readcsv[x y d]`       | Turn a [RFC-4180](https://datatracker.ietf.org/doc/html/rfc4180) CSV string `x` into a Lil table with column spec `y`.(7) | Data       |
 | `writecsv[x y d]`      | Turn a Lil table `x` into a CSV string with column spec `y`.(7)                                                           | Data       |
 | `readxml[x]`           | Turn a useful subset of XML/HTML into a Lil structure.(8)                                                                 | Data       |
-| `writexml[x]`          | Turn a Lil structure `x` into an indented XML string.(9)                                                                  | Data       |
+| `writexml[x fmt]`      | Turn a Lil structure `x` into an XML string, formatted with whitespace if `fmt` is truthy.(9)                             | Data       |
 | `alert[text type x y]` | Open a modal dialog with the string or rtext `text`, and potentially prompt for input.(10)                                | Modal      |
 | `read[type hint]`      | Open a modal dialog prompting the user to open a document, and return its contents (or `""`).(11)                         | Modal      |
 | `write[x]`             | Open a modal dialog prompting the user to save `x`. Returns `1` if the file was saved successfully, `0` otherwise.(12)    | Modal      |

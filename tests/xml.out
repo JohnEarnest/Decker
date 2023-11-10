@@ -28,6 +28,9 @@ nested tags:
   <quux/>
 </a>
 
+no formatting:
+==============
+<a href="http://beyondloom.com" target="_blank"><baz><zami boof="99"/></baz>plain text<quux/></a>
 simple tags:
 ============
 ({"tag":"foo","attr":{},"children":()},{"tag":"bar","attr":{},"children":()})

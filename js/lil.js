@@ -633,13 +633,14 @@ n_readcsv=([x,y,d])=>{
 		}else{while(match(' '));match(d)}
 	};return r
 }
-n_writexml=([x])=>{
+n_writexml=([x,fmt])=>{
+	fmt=fmt?lb(fmt):0
 	const esc=x=>{const e={'&':'amp',"'":'apos','"':'quot','<':'lt','>':'gt'};return ls(x).replace(/[&'"<>]/g,x=>e[x]?`&${e[x]};`:x)}
 	const rec=(x,tab)=>{
-		if(lil(x))return x.v.map(x=>rec(x,tab)).join(''); if(!lid(x))return esc(x)+(tab?'\n':'')
+		if(lil(x))return x.v.map(x=>rec(x,tab)).join(''); if(!lid(x))return esc(x)+((tab&&fmt)?'\n':'')
 		const t=ls(dget(x,lms('tag'))||lms('')),a=ld(dget(x,lms('attr'))||lmd()),c=ll(dget(x,lms('children'))||lml([]))
-		const r=`<${t}${a.k.map((k,i)=>` ${ls(k)}="${esc(a.v[i])}"`).join('')}${c.length?'':'/'}>\n`
-		return c.length?`${r}${c.map(x=>(' '.repeat(tab+2))+rec(x,tab+2)).join('')}${' '.repeat(tab)}</${t}>\n`:r
+		const r=`<${t}${a.k.map((k,i)=>` ${ls(k)}="${esc(a.v[i])}"`).join('')}${c.length?'':'/'}>${fmt?'\n':''}`
+		return c.length?`${r}${c.map(x=>(' '.repeat(fmt?tab+2:0))+rec(x,tab+2)).join('')}${' '.repeat(fmt?tab:0)}</${t}>${fmt?'\n':''}`:r
 	};return lms(rec(x,0))
 }
 n_readxml=([x])=>{
