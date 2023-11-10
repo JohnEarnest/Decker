@@ -22,11 +22,12 @@ CodeMirror.defineMode('lil',(config,options)=>{
 		token:(stream,state)=>{
 			// lil supports multiline strings, which require some special handling in codemirror:
 			if(state.mode=='str'){
-				if(stream.match(/^(\\["\\n]|[^"])*"/)){state.mode=0;return'string'}
-				stream.match(/^(\\["\\n]|[^"])*/);return 'string'
+				if(stream.match('"')){state.mode=0;return'string'}
+				if(stream.match(/\\[\\n"]/))return'atom' // valid escape sequence
+				if(stream.match('\\'))return'string'     // bogus escape sequence
+				stream.match(/^[^"\\]*/);return'string'
 			}
-			if(stream.match(/^"(\\["\\n]|[^"])*"/))return 'string'
-			if(stream.match(/^"(\\["\\n]|[^"])*/)){state.mode='str';return'string'}
+			if(stream.match('"')){state.mode='str';return'string'}
 			// line comments, keywords/builtins, function definitions:
 			if(stream.match('#')||stream.match(/[\t\n\r ]+\//))return stream.skipToEnd(),'comment'
 			const n=stream.match(/^[a-zA-Z][a-zA-Z0-9_?]*/)
@@ -34,6 +35,8 @@ CodeMirror.defineMode('lil',(config,options)=>{
 			if(n=='on'){state.mode='fname'}
 			if(KEYWORDS[n])return 'keyword'
 			if(VERBS[n])return 'variable-2'
+			// calls/indexing:
+			if(n&&stream.match(/^[ \t]*\[/,false))return 'variable-2'
 			if(!n)stream.next()
 			return null
 		}

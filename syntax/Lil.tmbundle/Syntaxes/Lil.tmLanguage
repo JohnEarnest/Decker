@@ -63,7 +63,7 @@
 			<array>
 				<dict>
 					<key>match</key>
-					<string>\\[n0\\"]</string>
+					<string>\\[n\\"]</string>
 					<key>name</key>
 					<string>constant.character.escape.lil</string>
 				</dict>
