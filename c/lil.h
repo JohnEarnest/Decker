@@ -421,7 +421,7 @@ dyad(l_parse){
 		else if(t=='a'){v=lml(0);while(hn&&(n?1:hc!=fc))ll_add(v,lmn(hc)),h++;}
 		else if(t=='b'){v=strchr("tTyYx1",hc)?ONE:NONE;while(hn&&n?1:hc!=fc)h++;}
 		else if(t=='j'){int f=1,c=n?n:y->c;v=m?pjson(y->sv,&h,&f,&c):NONE;}
-		else if(t=='v'){str r=str_new();m&=!isdigit(hc);while(hn&&ncc[hc-32]=='n')str_addc(&r,hc),h++;v=lmstr(r);}
+		else if(t=='v'){str r=str_new();m&=!isdigit(hc);while(hn&&hc!='\n'&&ncc[hc-32]=='n')str_addc(&r,hc),h++;v=lmstr(r);}
 		else if(t=='q'){
 			str r=str_new();m&=hc=='"';if(m)h++;while(hn&&hc!='"'){
 				if(hc=='\\'){h++;if(m&=!!strchr("\\\"n",hc)){str_addc(&r,hc=='n'?'\n':hc);}}else{str_addc(&r,hc);}h++;

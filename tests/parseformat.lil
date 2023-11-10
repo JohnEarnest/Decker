@@ -40,6 +40,7 @@ show["%q%m"           parse " \"nope\""             ] # %q does not skip leading
 # variable names
 show["%v%m"           parse "aGood_Nam3? suffix"    ] # alphanumeric, ?, _
 show["%v%m"           parse "3name"                 ] # may not start with a digit
+show["%v%n"           parse "debug\n"               ] # edge case: trailing newline
 
 # date-time
 show["%e%n"           parse "2021-01-02T03:04:57Z!" ] # epoch
