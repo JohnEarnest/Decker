@@ -135,8 +135,10 @@ show[(insert a:() b:() into 0),(insert c:() into 0)] # both empty
 header["drop/take"]
 show[(list 3 take list 5),(list 2 take "ABCDEF"),(list 6 take "AB"),(list -2 take range 5),(list 2 take d)]
 show[(list 3 drop list 5),(list 3 drop "ABCDEF"),(list -2 drop "ABCDE"),(list 2 drop d)]
+show[(0 drop "xyz"),(-1 drop "xyz"),(-2 drop "xyz"),(-3 drop "xyz"),(-4 drop "xyz")]
 show[(0 drop "xyz"),( 1 drop "xyz"),( 2 drop "xyz"),( 3 drop "xyz"),( 4 drop "xyz")]
 show[(0 take "xyz"),(-1 take "xyz"),(-2 take "xyz"),(-3 take "xyz"),(-4 take "xyz")]
+show[(0 take "xyz"),( 1 take "xyz"),( 2 take "xyz"),( 3 take "xyz"),( 4 take "xyz")]
 show[-1 drop "ABC"]     # minus after whitespace
 show[(-1 drop "ABC")]   # minus after paren
 show[foo:-1 drop "ABC"] # minus after set
