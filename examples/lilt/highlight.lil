@@ -1,0 +1,105 @@
+#!/usr/bin/env lilt
+
+# convert lil source code into syntax-highlighted html.
+# the colors below correspond to the Sublime Text monokai theme:
+
+style:"
+pre.lil{background:#272822;color:#f8f8f2;padding:.5em;}
+pre.lil .comment {color:#75715e;}
+pre.lil .string  {color:#e6db74;}
+pre.lil .escape  {color:#ae81ff;}
+pre.lil .keyword {color:#f92672;}
+pre.lil .verb    {color:#66d9ef;}
+pre.lil .call    {color:#66d9ef;}
+pre.lil .funcname{color:#a6e22e;}
+"
+
+keywords:"|"split"while|each|send|on|if|elseif|else|end|do|with|local|select|extract|update|insert|into|from|where|by|orderby|asc|desc"
+monads:"|"split"floor|cos|sin|tan|exp|ln|sqrt|unit|mag|heading|sum|prod|raze|max|min|count|first|last|keys|range|list|typeof|flip|rows|cols|table"
+dyads:"|"split"split|fuse|dict|take|drop|limit|in|unless|join|cross|parse|format"
+verbs:monads,dyads
+escapes:"\\n","\\\"","\\\\"
+
+# tokenize the input file into an rtext-compatible table
+# this gives us several useful output options,
+# and also makes it easy to coalesce adjacent runs together:
+
+on chunk type x do
+ insert text:x font:type arg:"" into 0
+end
+
+on highlight text do
+ r:rtext.cat[] i:fn:0
+ while i<count text
+  head:i drop text
+  r:r,if last comm:"#%-r\n%n" parse head # line comments
+   i:i+last comm
+   chunk["comment" "#%s" format first comm]
+  elseif last space:"%.2r\n %n" parse head # whitespace
+   i:i+last space
+   chunk["" first space]
+  elseif "\""~first head # multiline string literals, including backslash escapes
+   i:i+1
+   t:chunk["string" "\""]
+   s:1 while s
+    head:i drop text
+    if "\""~first head
+     s:0 # reached terminal "
+     i:i+1
+     t:t,chunk["string" "\""]
+    elseif (2 take head) in escapes
+     i:i+2
+     t:t,chunk["escape" 2 take head]
+    else
+     str:"%-.2r\"\\" parse head
+     if !count str s:0 end # reached eof while processing a string
+     i:i+count str
+     t:t,chunk["string" str]
+    end
+   end
+  elseif last tok:"%v%n" parse head # identifiers
+   i:i+last tok tok:first tok
+   if     tok~"on"                fn:1 chunk["keyword"  tok]
+   elseif fn                      fn:0 chunk["funcname" tok]
+   elseif tok in keywords              chunk["keyword"  tok]
+   elseif tok in verbs                 chunk["verb"     tok]
+   elseif "%*v%*.2r\n [%m" parse head  chunk["call"     tok]
+   else                                chunk[""         tok]
+   end
+  else # misc special characters/operators
+   i:i+1
+   chunk["" first head]
+  end
+ end
+ rtext.cat[r]
+end
+
+# convert rtext form into xml for output,
+# taking advantage of writexml[] to manage
+# all the hideous entity escaping:
+
+on highlight_to_html text do
+ r.tag:"pre"
+ r.attr.class:"lil"
+ r.children:each row in rows h:highlight[text]
+  s.tag:"span"
+  s.attr.class:row.font
+  s.children:list row.text
+ end
+ writexml[r]
+end
+
+# command line interface:
+
+src:args[2]
+dst:args[3]
+if !src error["usage: ./highlight.lil FILE.lil [OUTPUT.html]"] exit[1] end
+program:read[src]
+if !count program error["unable to read %s!" src] exit[1] end
+result:("<style>%s</style>\n\n" format style),highlight_to_html[program]
+if dst
+ r:write[dst result]
+ if !r error["unable to write to %s!" dst] end
+else
+ print[result]
+end
