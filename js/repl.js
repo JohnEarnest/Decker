@@ -42,6 +42,7 @@ env.local('writexml',lmnat(n_writexml))
 env.local('readxml',lmnat(n_readxml))
 env.local('readdeck',lmnat((([filename])=>deck_read(filename?readTextFile(ls(filename)):''))))
 env.local('writedeck',lmnat(([filename,deck])=>writeTextFile(ls(filename),deck_write(deck,/\.html$/i.test(ls(filename))))))
+env.local('args',lml(process.argv.slice(1).map(lms)))
 constants(env)
 if(process.argv.length>=3){
 	try{run(parse(readTextFile(process.argv[2])))}
