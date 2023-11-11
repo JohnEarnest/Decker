@@ -13,6 +13,14 @@ pre.lil .verb    {color:#66d9ef;}
 pre.lil .call    {color:#66d9ef;}
 pre.lil .funcname{color:#a6e22e;}
 "
+inlines.pre:"background:#272822;color:#f8f8f2;padding:.5em;"
+inlines.comment :"color:#75715e;"
+inlines.string  :"color:#e6db74;"
+inlines.escape  :"color:#ae81ff;"
+inlines.keyword :"color:#f92672;"
+inlines.verb    :"color:#66d9ef;"
+inlines.call    :"color:#66d9ef;"
+inlines.funcname:"color:#a6e22e;"
 
 keywords:"|"split"while|each|send|on|if|elseif|else|end|do|with|local|select|extract|update|insert|into|from|where|by|orderby|asc|desc"
 monads:"|"split"floor|cos|sin|tan|exp|ln|sqrt|unit|mag|heading|sum|prod|raze|max|min|count|first|last|keys|range|list|typeof|flip|rows|cols|table"
@@ -78,25 +86,30 @@ end
 # taking advantage of writexml[] to manage
 # all the hideous entity escaping:
 
-on highlight_to_html text do
+on highlight_to_html text raw do
  r.tag:"pre"
- r.attr.class:"lil"
+ if raw r.attr.style:inlines.pre else r.attr.class:"lil" end
  r.children:each row in rows h:highlight[text]
-  s.tag:"span"
-  s.attr.class:row.font
-  s.children:list row.text
+  if row.font
+   s.tag:"span"
+   if raw s.attr.style:inlines[row.font] else s.attr.class:row.font end
+   s.children:list row.text
+  else
+   list row.text
+  end
  end
  writexml[r]
 end
 
 # command line interface:
-
+inlined:"--inline" in args  args:"--inline" drop args
 src:args[2]
 dst:args[3]
-if !src error["usage: ./highlight.lil FILE.lil [OUTPUT.html]"] exit[1] end
+if !src error["usage: ./highlight.lil FILE.lil [OUTPUT.html] --inline
+  --inline: generate html with inline styles instead of named css classes."] exit[1] end
 program:read[src]
 if !count program error["unable to read %s!" src] exit[1] end
-result:("<style>%s</style>\n\n" format style),highlight_to_html[program]
+result:if !inlined "<style>%s</style>\n\n" format style else () end,highlight_to_html[program inlined]
 if dst
  r:write[dst result]
  if !r error["unable to write to %s!" dst] end
