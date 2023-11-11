@@ -313,7 +313,8 @@ lv*filter(int in,lv*x,lv*y){
 	lv*r=lmt();EACH(z,y)if(in==lb(l_ina(y->kv[z],x)))dset(r,y->kv[z],y->lv[z]);r->n=y->n;return r;
 }
 dyad(l_take){
-	if(!lin(x))return filter(1,x,y);if(lil(y)&&x->nv==y->c)return y;
+	if(!lin(x))return filter(1,x,y);if(lil(y)&&ln(x)==y->c)return y;
+	if(lis(y)&&ln(x)<0&&abs((int)ln(x))<=y->c)return lmslice(y,y->c+ln(x));
 	if(lid(y)){lv*t=l_take(x,l_range(lmn(y->c))),*r=lmd();
 		EACH(z,t){int i=t->lv[z]->nv;dset(r,y->kv[i],y->lv[i]);}return r;}
 	if(lis(y))return l_fuse(lmistr(""),l_take(x,ll(y)));

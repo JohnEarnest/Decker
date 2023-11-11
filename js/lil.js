@@ -172,7 +172,7 @@ dyad={
 	split:(x,y)=>lml(ls(y).split(ls(x)).map(lms)),
 	fuse: (x,y)=>lms(ll(y).map(ls).join(ls(x))),
 	dict: (x,y)=>(y=ll(y),ll(x).reduce((d,x,i)=>dset(d,x,y[i]||NONE),lmd())),
-	take: (x,y)=>lin(x)?splice(take,ln(x),y):filter(1,x,y),
+	take: (x,y)=>lis(y)&&lin(x)&&ln(x)<0&&abs(ln(x))<=count(y)?lms(y.v.slice(count(y)+ln(x))): lin(x)?splice(take,ln(x),y):filter(1,x,y),
 	drop: (x,y)=>lis(y)&&lin(x)&&ln(x)>=0?lms(y.v.slice(ln(x))): lin(x)?splice((x,y)=>x<0?y.slice(0,x):y.slice(x),ln(x),y):filter(0,x,y),
 	limit:(x,y)=>count(y)>ln(x)?dyad.take(lmn(ln(x)),y):y,
 	in:   (x,y)=>lil(x)?lml(x.v.map(x=>dyad.in(x,y))):ina(x,y),
