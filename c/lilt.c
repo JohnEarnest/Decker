@@ -12,7 +12,7 @@
 lv*n_exit(lv*self,lv*a){(void)self;exit(ln(l_first(a)));}
 lv*n_input(lv*self,lv*a){
 	(void)self;char*line=bestline((a->c<2?ls(l_first(a)): l_format(ls(l_first(a)),l_drop(ONE,a)))->sv);
-	lv*r=lmutf8(line);free(line);return r;
+	if(!line)return NONE;lv*r=lmutf8(line);free(line);return r;
 }
 lv*n_dir(lv*self,lv*a){(void)self;lv*r=directory_enumerate(ls(l_first(a))->sv,filter_none,1);r->kv[0]=lmistr("dir");return r;}
 lv*n_path(lv*self,lv*a){
