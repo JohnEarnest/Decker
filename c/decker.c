@@ -1576,7 +1576,7 @@ void modals(){
 			rect c={bb.x,bb.y+(z*slot)-ms.grid.scroll,bb.w,slot}; lv*card=cards->lv[z];
 			if(c.y>bb.y+bb.h||c.y+c.h<bb.y)continue; rect cb=box_intersect(c,bb); // coarse clip
 			rect p={c.x+2,c.y+1,40,28}, t={p.x+p.w+5,p.y,bb.w-(2+p.w+5+5),font_h(FONT_MENU)}, s={t.x,t.y+t.h+2,t.w,font_h(FONT_BODY)};
-			snprintf(temp,sizeof(temp),"%d widgets",ifield(card,"widgets")->c);
+			snprintf(temp,sizeof(temp),"%d widget%s",ifield(card,"widgets")->c,ifield(card,"widgets")->c==1?"":"s");
 			if(ev.md&&dover(cb)){m=1,n_go(deck,l_list(card));curr=card;ms.grid.row=z;}if(ev.dclick&&over(cb))props=1;
 			int col=ev.drag&&ms.grid.row==z?13:1;
 			draw_text_fit(t,ifield(card,"name")->sv,FONT_MENU,col),draw_text_fit(s,temp,FONT_BODY,col);draw_box(p,0,col);

@@ -1449,7 +1449,8 @@ modals=_=>{
 			const p=rect(c.x+2,c.y+1,40,28), t=rect(p.x+p.w+5,p.y,bb.w-(2+p.w+5+5),font_h(FONT_MENU)), s=rect(t.x,t.y+t.h+2,t.w,font_h(FONT_BODY))
 			if(ev.md&&dover(cb)){m=1,n_go([card],deck),curr=card,ms.grid.row=z}if(ev.dclick&&over(cb))props=1
 			const col=ev.drag&&ms.grid.row==z?13:1
-			draw_text_fit(t,ls(ifield(card,'name')),FONT_MENU,col),draw_text_fit(s,`${count(card.widgets)} widgets`,FONT_BODY,col),draw_box(p,0,col)
+			draw_text_fit(t,ls(ifield(card,'name')),FONT_MENU,col)
+			draw_text_fit(s,`${count(card.widgets)} widget${count(card.widgets)==1?'':'s'}`,FONT_BODY,col),draw_box(p,0,col)
 			if(card==curr&&col==1)draw_invert(pal,c);draw_thumbnail(card,p)
 			if((ev.drag||ev.mu)&&ms.grid.row!=-1){
 				{const g=rect(c.x,c.y-3    ,c.w,7);if(over(g)){draw_hline(c.x,c.x+c.w,c.y      ,13),gutter=z  }}
