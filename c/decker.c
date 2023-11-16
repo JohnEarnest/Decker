@@ -991,8 +991,8 @@ lv* draw_lil(pair size,int align,int bare,lv*x){
 	else if(image_is(x)){
 		pair s=image_size(x);char desc[4096];snprintf(desc,sizeof(desc),"(%d x %d)",s.x,s.y);pair ds=font_textsize(FONT_BODY,desc);
 		int mh=MAX(1,MIN(s.y,size.y-font_h(FONT_BODY))), mw=MAX(1,MIN(s.x,w)); float scale=s.x==0&&s.y==0?1:MIN(mw/(s.x*1.0),mh/(s.y*1.0));
-		int iw=scale*s.x, ih=scale*s.y;
-		rect b={xo+(w-MAX(iw,ds.x)),0,iw,ih}; draw_scaled(b,x->b,1),draw_box(b,0,1),draw_text((rect){b.x,b.y+b.h,ds.x,ds.y},desc,FONT_BODY,1);
+		int iw=scale*s.x, ih=scale*s.y; rect b={(xo-2)+(w-MAX(iw,ds.x)),0,iw+2,ih+2};
+		draw_scaled(inset(b,1),x->b,1),draw_box(b,0,1),draw_text((rect){b.x,b.y+b.h,ds.x,ds.y},desc,FONT_BODY,1);
 	}
 	else{
 		char*c=NULL;if(bare){c=ls(x)->sv;}else{str t=str_new();show(&t,x,0);c=lmstr(t)->sv;}

@@ -261,8 +261,8 @@ draw_lil=(size,align,bare,x)=>{
 	}
 	else if(image_is(x)){
 		const s=x.size, desc=`(${s.x} x ${s.y})`, ds=font_textsize(FONT_BODY,desc), mh=max(1,min(s.y,size.y-font_h(FONT_BODY))), mw=max(1,min(s.x,w))
-		const scale=s.x==0&&s.y==0?1:min(mw/(s.x*1.0),mh/(s.y*1.0)), iw=0|(scale*s.x), ih=0|(scale*s.y)
-		const b=rect(xo+(w-max(iw,ds.x)),0,iw,ih); draw_scaled(b,x,1),draw_box(b,0,1),draw_text(rect(b.x,b.y+b.h,ds.x,ds.y),desc,FONT_BODY,1)
+		const scale=s.x==0&&s.y==0?1:min(mw/(s.x*1.0),mh/(s.y*1.0)), iw=0|(scale*s.x), ih=0|(scale*s.y), b=rect((xo-2)+(w-max(iw,ds.x)),0,iw+2,ih+2)
+		draw_scaled(inset(b,1),x,1),draw_box(b,0,1),draw_text(rect(b.x,b.y+b.h,ds.x,ds.y),desc,FONT_BODY,1)
 	}
 	else{const l=layout_plaintext(bare?ls(x): show(x,0),FONT_MONO,align,rect(w,size.y));draw_text_wrap(rect(xo,0,w,size.y),l,1)}
 	for(let y=size.y-1;y>0;y--){let f=0;for(let x=0;x<size.x;x++)if(r.pix[x+(y*size.x)]){f=1;break}if(f){break}else{r.size.y--}}
