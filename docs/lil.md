@@ -987,6 +987,28 @@ Conforming is why Lil has two different equality operators: `=` (equals) conform
 ```
 In many situations, `=` and `~` are equivalent. Prefer `~` when you don't _need_ conforming behavior; it signals your intent more clearly to a reader, since it is easy to tell without context that the result will be a single number.
 
+If two lists do not have the same length, Lil will truncate or repeat the right argument (`y`) to correspond to the length of the left argument (`x`), as if by `(count x) take y`:
+```
+(11,22,33,44)+(100,200)               # (111,222,133,244)
+(11,22,33,44)+(100,200,300,400,500)   # (111,222,333,444)
+(100,200)+(11,22,33,44)               # (111,222)
+```
+This behavior can be useful for finding relative relationships in a list, comparing it to a "shifted" copy of itself:
+```
+v:1,2,2,5,3,6,7,7
+
+(1 drop v)=v                          # (0,1,0,0,0,0,1)    # same as previous?
+(1 drop v)>v                          # (1,0,1,0,1,1,0)    # strictly increasing?
+(1 drop v)-v                          # (1,0,3,-2,3,1,0)   # relative change
+```
+If you're familiar with Q or K, you might recognize this pattern as similar to the applications of the [eachprior](https://code.kx.com/q/ref/maps/#each-prior) adverb.
+
+Another application is applying a "mask" pattern to an entire list:
+```
+(11,22,33,44,55)*(0,1)                # (0,22,0,44,0)      # mask off odd items
+(11,22,33,44,55)*(1,0)                # (11,0,33,0,55)     # mask off even items
+```
+
 Combining conforming operators with reducing operators like `sum` and `raze` offers many elegant and direct solutions to problems. Compare each of these approaches to counting how many times a value `needle` can be found in a list `haystack`:
 ```
 needle:   "apple"
