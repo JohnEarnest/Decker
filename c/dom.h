@@ -13,10 +13,6 @@
 #define ATTR_QUOTA     ( 1*4096)
 #define FRAME_QUOTA    (10*4096)
 #define CLAMP(a,x,b)   ((x)<(a)?(a): (x)>(b)?(b): (x))
-#define ivalue(x,k)    dget(x->b,lmistr(k))
-#define ifield(x,k)    ((lv*(*)(lv*,lv*,lv*))x->f)(x,lmistr(k),NULL)
-#define iindex(x,k,v)  ((lv*(*)(lv*,lv*,lv*))x->f)(x,lmn(k),v)
-#define iwrite(x,k,v)  ((lv*(*)(lv*,lv*,lv*))x->f)(x,k,v)
 #define itype(name)    int name##_is(lv*x){return x&&lii(x)&&!strcmp(x->a->sv,#name);}
 #define init_field(dst,key,src) {lv*k=lmistr(key),*v=dget(src,k);if(v)iwrite(dst,k,v);}
 

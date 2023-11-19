@@ -641,6 +641,10 @@ n_writexml=([x,fmt])=>{
 	fmt=fmt?lb(fmt):0
 	const esc=x=>{const e={'&':'amp',"'":'apos','"':'quot','<':'lt','>':'gt'};return ls(x).replace(/[&'"<>]/g,x=>e[x]?`&${e[x]};`:x)}
 	const rec=(x,tab)=>{
+		if(array_is(x)){
+			const ck=lms('cast'),c=ifield(x,'cast');iwrite(x,ck,lms('char'))
+			const r=iwrite(x,lml([NONE,ifield(x,'size')]));iwrite(x,ck,c);return ls(r)
+		}
 		if(lil(x))return x.v.map(x=>rec(x,tab)).join(''); if(!lid(x))return esc(x)+((tab&&fmt)?'\n':'')
 		const t=ls(dget(x,lms('tag'))||lms('')),a=ld(dget(x,lms('attr'))||lmd()),c=ll(dget(x,lms('children'))||lml([]))
 		const r=`<${t}${a.k.map((k,i)=>` ${ls(k)}="${esc(a.v[i])}"`).join('')}${c.length?'':'/'}>${fmt?'\n':''}`

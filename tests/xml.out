@@ -31,6 +31,9 @@ nested tags:
 no formatting:
 ==============
 <a href="http://beyondloom.com" target="_blank"><baz><zami boof="99"/></baz>plain text<quux/></a>
+smuggling in arrays:
+====================
+string with &amp;lt; text and a literal &lt;.string with &lt; entity and a literal <.
 simple tags:
 ============
 ({"tag":"foo","attr":{},"children":()},{"tag":"bar","attr":{},"children":()})

@@ -985,6 +985,11 @@ lv*run(lv*x,lv*rootenv){
 
 // Standard Library
 
+#define ivalue(x,k)    dget(x->b,lmistr(k))
+#define ifield(x,k)    ((lv*(*)(lv*,lv*,lv*))x->f)(x,lmistr(k),NULL)
+#define iindex(x,k,v)  ((lv*(*)(lv*,lv*,lv*))x->f)(x,lmn(k),v)
+#define iwrite(x,k,v)  ((lv*(*)(lv*,lv*,lv*))x->f)(x,k,v)
+
 void show(str*s,lv*x,int toplevel){
 	if(!x){str_addz(s,"<NULL>");}
 	else if(lin(x)){wnum(s,x->nv);}
@@ -1080,6 +1085,11 @@ void writexmlstr(str*s,lv*x){
 }
 void writexmlrec(str*s,lv*x,int tab,int fmt){
 	if(lil(x)){EACH(z,x)writexmlrec(s,x->lv[z],tab,fmt);return;}
+	if(lii(x)&&!strcmp(x->a->sv,"array")){
+		lv*ck=lmistr("cast"),*c=ifield(x,"cast");iwrite(x,ck,lmistr("char"));
+		lv*off=lml(2);off->lv[0]=NONE,off->lv[1]=ifield(x,"size");
+		str_addl(s,iwrite(x,off,NULL)),iwrite(x,ck,c);
+	}
 	if(!lid(x)){writexmlstr(s,ls(x));if(tab&&fmt)str_addc(s,'\n');return;}
 	lv*t=ls(dgetv(x,lmistr("tag"))),*a=ld(dgetv(x,lmistr("attr"))),*c=dget(x,lmistr("children"));
 	str_addc(s,'<'),str_addz(s,t->sv);EACH(z,a){

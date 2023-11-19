@@ -31,6 +31,9 @@ print[writexml[foo 1]]
 header["no formatting"]
 print[writexml[foo]]
 
+header["smuggling in arrays"]
+print[writexml["string with &lt; text and a literal <.",array[].cat["string with &lt; entity and a literal <."]]]
+
 # ----- parse --------------
 
 header["simple tags"]
