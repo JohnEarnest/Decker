@@ -1,20 +1,5 @@
 title:Decker File Format
 
-<style>
-/* general prose */
-body{margin:1em 5em 5em 3em;}
-h1,h2,figcaption{font-family:Helvetica Neue,Arial,sans-serif;}
-h1{color:#21183c;font-weight:700;}
-h2{color:#21183c;font-weight:300;margin-top:1.5em;}
-pre,code{background-color:Gainsboro;tab-size:2;font-size:large;}
-pre{margin:0 .5em;padding:.5em;border:1px solid #aaa;border-radius:5px;}
-li{margin:1em 0;}
-table{margin:0 .5em;border-collapse:collapse;border:1px solid #aaa;}
-td{padding:5px;}th{padding:10px;border-bottom:1px solid #aaa;background-color:Gainsboro;}
-td,th:not(:first-child){border-left:1px solid #aaa;}
-figure{display:block;text-align:center;}
-</style>
-
 The Decker File Format
 ======================
 Decker is a multimedia platform for creating and sharing interactive documents, with sound, images, hypertext, and scripted behavior. This guide describes the structure of Decker documents in detail, to facilitate the creation of compatible document viewers and editors.
@@ -33,10 +18,10 @@ Rationale
 ---------
 The deck format is designed around several constraints and considerations:
 
-- **Extensibility**: It should be straightforward to add new properties and metadata to widgets, cards, and the deck itself in future revisions of the format. For this reason, we use a text-based format with a key-value associative structure, and provide a `version` field for the document.
-- **Embeddability**: Decks are usually distributed through the web, and to users who have a web browser. By making the document format amenable to embedding inside a valid HTML document's `<script>` tag (with the necessary considerations for escaping special character sequences), it is possible to distribute decks as operating system- and architecture-agnostic "self-executing" documents which can _also_ be read and manipulated without a complete HTML parser.
-- **Exposed Scripts**: Advanced users may want to edit their Lil scripts using their favorite text editor. The document format puts special emphasis on representing scripts with their whitespace intact and a minimum of escaped characters to facilitate this. As a side benefit, the representation given here allows for automatic de-duplication of scripts which appear in many places.
-- **Diff-Friendliness**: Building upon the above, advanced users may want to store and track decks using existing source-control systems. Documents therefore use a line-oriented format compatible with tools like `diff` and attempt, within reason, to reflect localized edits to a deck in localized changes to the file.
+- _Extensibility_: It should be straightforward to add new properties and metadata to widgets, cards, and the deck itself in future revisions of the format. For this reason, we use a text-based format with a key-value associative structure, and provide a `version` field for the document.
+- _Embeddability_: Decks are usually distributed through the web, and to users who have a web browser. By making the document format amenable to embedding inside a valid HTML document's `<script>` tag (with the necessary considerations for escaping special character sequences), it is possible to distribute decks as operating system- and architecture-agnostic "self-executing" documents which can _also_ be read and manipulated without a complete HTML parser.
+- _Exposed Scripts_: Advanced users may want to edit their Lil scripts using their favorite text editor. The document format puts special emphasis on representing scripts with their whitespace intact and a minimum of escaped characters to facilitate this. As a side benefit, the representation given here allows for automatic de-duplication of scripts which appear in many places.
+- _Diff-Friendliness_: Building upon the above, advanced users may want to store and track decks using existing source-control systems. Documents therefore use a line-oriented format compatible with tools like `diff` and attempt, within reason, to reflect localized edits to a deck in localized changes to the file.
 
 Wrapper
 -------
@@ -73,38 +58,31 @@ In the future, the official Decker file format may support additional formats fo
 The data block types used by Decker are as follows:
 
 - `IMG`: an _image record_. Image records are used for card backgrounds, canvas backgrounds, patterns, and image selections copied to the clipboard.  All image formats always begin with 4 bytes giving a pair of 16-bit unsigned big-endian integers indicating the _width_ and _height_ of the image data, respectively, followed by the image data. The supported formats are:
-
 	- `0`: a packed 1-bit image. Each byte represents 8 horizontally adjacent pixels. Bytes are laid out in rows, left-to-right. Images with a width that is not evenly divisible by 8 will be padded with 0 bits. This format is used for most imported images.
-
 	- `1`: an 8-bit image, in which each byte represents the pattern which should be used to draw one pixel. (See: _Pattern Record_.) Bytes are laid out in rows, left-to-right. This format is suitable for images containing animated patterns.
-
 	- `2`: a run-length encoded (RLE) 8-bit image. In each pair of bytes, the first byte indicates a pattern number (See: _Pattern Record_), and the second byte indicates the number of pixels to assign with this pattern, scanning in rows, left-to-right. RLE provides a substantially more compact lossless representation of low-complexity images without requiring a complicated encoder or decoder.
-
 - `FNT` a _font record_. The format is always `0`. Decker fonts define glyphs corresponding to printable ASCII including the space character (32-126; 95 glyphs total), an extra glyph representing an ellipsis (for truncating text on display), as well as some metadata to permit different font sizes and variable-width glyphs. The payload has the following structure:
-
 	- 1 unsigned byte: the maximum width of each glyph in the font, in pixels.
 	- 1 unsigned byte: the height of glyphs, in pixels, including all vertical padding.
 	- 1 unsigned byte: the number of horizontal pixels to advance between characters.
 	- 96 glyph records, each consisting of:
 		- 1 unsigned byte giving the _true_ width of the glyph: how many pixels to advance horizontally after drawing the glyph.
 		- `(width/8)*height` bytes of packed image data, in which each byte represents 8 horizontally adjacent pixels. Glyphs with a width that is not evenly divisible by 8 will be padded with 0 bits. Note the similarity to `IMG0`.
-
 - `SND`: a _sound record_. Sound records are used for audio clips in decks, as well as sound data copied to the clipboard. The format is always `0`. The payload consists of a series of 8-bit signed 8khz PCM monophonic samples.
-
 - `DAT`: a _data record_. Data records are the serialized representation of Lil's _Array Interface_ and can be used for representing arbitrary binary data. The format may be any of the codes described below, which specifies the datatype of values in the array. The payload consists of a series of bytes, which will always be a multiple of the _width_ of the specified format:
 
 | Format | Width | Cast     | Range                     | Description                        |
 | :----- | :---- | :------- | :------------------------ | :--------------------------------- |
-| `DAT0` | 1     | `"u8"`   | [0, 255]                  | unsigned 8-bit int                 |
-| `DAT1` | 1     | `"i8"`   | [-128, 127]               | signed 8-bit int                   |
-| `DAT2` | 2     | `"u16b"` | [0, 65535]                | unsigned 16-bit int, big-endian    |
-| `DAT3` | 2     | `"u16l"` | [0, 65535]                | unsigned 16-bit int, little-endian |
-| `DAT4` | 2     | `"i16b"` | [-32768, 32767]           | signed 16-bit int, big-endian      |
-| `DAT5` | 2     | `"i16l"` | [-32768, 32767]           | signed 16-bit int, little-endian   |
-| `DAT6` | 4     | `"u32b"` | [0, 4294967295]           | unsigned 32-bit int, big-endian    |
-| `DAT7` | 4     | `"u32l"` | [0, 4294967295]           | unsigned 32-bit int, little-endian |
-| `DAT8` | 4     | `"i32b"` | [-2147483648, 2147483647] | signed 32-bit int, big-endian      |
-| `DAT9` | 4     | `"i32l"` | [-2147483648, 2147483647] | signed 32-bit int, little-endian   |
+| `DAT0` | 1     | `"u8"`   | 0...255                   | unsigned 8-bit int                 |
+| `DAT1` | 1     | `"i8"`   | -128...127                | signed 8-bit int                   |
+| `DAT2` | 2     | `"u16b"` | 0...65535                 | unsigned 16-bit int, big-endian    |
+| `DAT3` | 2     | `"u16l"` | 0...65535                 | unsigned 16-bit int, little-endian |
+| `DAT4` | 2     | `"i16b"` | -32768...32767            | signed 16-bit int, big-endian      |
+| `DAT5` | 2     | `"i16l"` | -32768...32767            | signed 16-bit int, little-endian   |
+| `DAT6` | 4     | `"u32b"` | 0...4294967295            | unsigned 32-bit int, big-endian    |
+| `DAT7` | 4     | `"u32l"` | 0...4294967295            | unsigned 32-bit int, little-endian |
+| `DAT8` | 4     | `"i32b"` | -2147483648...2147483647  | signed 32-bit int, big-endian      |
+| `DAT9` | 4     | `"i32l"` | -2147483648...2147483647  | signed 32-bit int, little-endian   |
 | `DAT:` | 1     | `"char"` | n/a                       | ASCII character                    |
 
 Payload
@@ -207,18 +185,14 @@ Some properties are common to all widgets:
 - `font` a string corresponding to the ID of a _Font Record_, used for drawing any text on this widget.
 - `script` a number or string corresponding to a `{script:ID}` chunk, representing event handlers applying to this widget.
 
-
 Each `type` of widget has its own additional optional fields:
 
-- `"button"`:
-	Buttons are the simplest type of interactive widget, responding to cursor-clicks.
+- `"button"`: Buttons are the simplest type of interactive widget, responding to cursor-clicks.
 	- `text`: a string; the button label.
 	- `style`: one of { `"round"` (default), `"rect"`, `"check"`, `"invisible"` }. The `"round"` and `"rect"` styles are normal buttons. The `"check"` style is displayed as a checkbox with a label and an underlying boolean value. An `"invisible"` button cannot be selected by pressing tab and has no appearance except its `"text"` (if any) and inverting its boundary while depressed.
 	- `value`: one of {`0` or `1`}; used for checkbox state.
 	- `shortcut`: a 0- or 1-character string; a keyboard key which can be used as an alternative to clicking this button to activate it. Shortcuts must be a lowercase letter (`a-z`), a digit (`0-9`), or a space character (` `).
-
-- `"field"`:
-	Fields are the basic widget for storing information. They can contain "formatted" text or plain user-entered text, and may have a vertical scrollbar. Locked fields may also be useful for labels, headings, or displaying information computed by a script.
+- `"field"`: Fields are the basic widget for storing information. They can contain "formatted" text or plain user-entered text, and may have a vertical scrollbar. Locked fields may also be useful for labels, headings, or displaying information computed by a script.
 	- `border`: an integer; draw an outline for the field? Default is `1`.
 	- `scrollbar`: an integer; does this field have a scrollbar? Default is `0`. Note that without a visible scrollbar, it is still possible to scroll a field programmatically, or by dragging a selection.
 	- `style`: one of { `"rich"` (default), `"plain"`, `"code"` }. A `"rich"` field permits entry and editing of formatted text. A `"plain"` field is text-only, with a single font. A `"code"` field is likewise text-only, with some changes in behavior making the field more suitable as a code editor: tabbing does not leave the field, shift+`/` toggles Lil block comments, etc.
@@ -228,17 +202,13 @@ Each `type` of widget has its own additional optional fields:
 		- `font`: an array of strings referencing _font records_. An invalid or empty name indicates using the field's `font` property.
 		- `arg`:  an array of strings. Each is either an _image record_ (an inline image), an ordinary string (making this span a hyperlink), or an empty string (ordinary text).
 	- `scroll`: an integer; the scroll offset in rendered pixels.
-
-- `"slider"`:
-	Sliders represent a single number constrained within a specified numeric interval.
+- `"slider"`: Sliders represent a single number constrained within a specified numeric interval.
 	- `style`: one of { `"horiz"` (default), `"vert"`, `"bar"`, `"compact"` }. A `"horiz"` or `"vert"` slider resembles a horizontal or vertical scrollbar, respectively. A `"bar"` has a much simpler appearance, and resembles a horizontal progress bar. A `"compact"` slider moves only in discrete ticks in response to left/right button presses, more like what some UI toolkits call a "spinner".
 	- `interval`: an array of two numbers giving a minimum and maximum value for the slider (inclusive). Default is `[0,100]`.
 	- `step`: the granularity of individual steps on this slider. Default is `1`. The step value must be greater than zero.
 	- `format`: a string which controls how the value will be displayed in the `"bar"` or `"compact"` mode, as by the Lil `format` primitive. Default is `"%f"`.
 	- `value`: a floating-point number. Default is `0`.
-
-- `"canvas"`:
-	Canvases are repositionable, stackable rectangles which can be drawn on- either by a user or through scripting. Canvases are useful for creating cards with animation, procedural drawing, or cards where parts of the background can be shown or hidden selectively.
+- `"canvas"`: Canvases are repositionable, stackable rectangles which can be drawn on- either by a user or through scripting. Canvases are useful for creating cards with animation, procedural drawing, or cards where parts of the background can be shown or hidden selectively.
 	- `border`: an integer; draw an outline for the canvas? Default is `1`.
 	- `draggable`: an integer; allow this canvas to be repositioned in interact mode? Default in `0`.
 	- `image`: an _Image Record_.
@@ -246,9 +216,7 @@ Each `type` of widget has its own additional optional fields:
 	- `pattern`: an integer pattern index used for drawing. Default is `1`.
 	- `clip`: an array of four numbers giving the x, y, width, and height of the clipping rectangle, respectively. Default is the entire canvas.
 	- `scale`: a float scale-up factor used when drawing the canvas. Default is `1.0`. The logical size of a given canvas is the ceiling of its `size` divided by its `scale`.
-
-- `"grid"`:
-	Grids display tabular information. The grid may scroll vertically and the user can select a row or cell by clicking. Grids are less flexible than a set of fields, but make it easier to see a lot of information at once. A single-column grid is also a reasonable stand-in for a dropdown or list selector.
+- `"grid"`: Grids display tabular information. The grid may scroll vertically and the user can select a row or cell by clicking. Grids are less flexible than a set of fields, but make it easier to see a lot of information at once. A single-column grid is also a reasonable stand-in for a dropdown or list selector.
 	- `headers`: an integer; show column headers? Default is 1. Among other things, suppressing headers is useful if you want to use a secondary grid with "summary" columns beneath a grid containing rows of data.
 	- `scrollbar`: an integer; does this grid have a scrollbar? Default is `1`. Note that without a visible scrollbar, it is still possible to scroll a grid programmatically.
 	- `lines`: an integer; does this grid draw grid lines between cells? Default is `1`.
@@ -257,7 +225,6 @@ Each `type` of widget has its own additional optional fields:
 	- `value`: a dictionary keyed by column names. Columns must be arrays, for which each item is recursively composed of _only_ arrays, dictionaries, strings, and numbers. Columns need not necessarily be of uniform types.
 	- `scroll`: an integer; the scroll offset in rows.
 	- `row`: an integer; the selected row index, or -1.
-
 - `"contraption"`:
 	- `def`: a string; the ID of a contraption definition (Prototype).
 	- `widgets`: a dictionary of JSON objects representing the widgets contained in this contraption instance. The properties given here override any properties from the corresponding `widgets` of the contraption's definition. Note that the `pos` of any "inner" widget is relative to the `pos` of the contraption which contains it.

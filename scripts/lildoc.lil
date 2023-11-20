@@ -1,0 +1,323 @@
+###############################################################################
+#
+#  LilDoc
+#
+#  A Lil implementation of a sufficient subset of a markdown processor
+#  to render all of Decker and Lil's documentation,
+#  with a few handy customizations.
+#
+###############################################################################
+
+styles:"
+body{margin:1em 5em 5em 3em;}
+h1,h2,figcaption{font-family:Helvetica Neue,Arial,sans-serif;}
+h1{color:#21183c;font-weight:700;}
+h2{color:#21183c;font-weight:300;margin-top:1.5em;}
+pre,code{background-color:Gainsboro;tab-size:2;font-size:large;}
+pre{margin:0 .5em;padding:.5em;border:1px solid #aaa;border-radius:5px;}
+li{margin:1em 0;}
+table{margin:0 .5em;border-collapse:collapse;border:1px solid #aaa;}
+td{padding:5px;}th{padding:10px;border-bottom:1px solid #aaa;background-color:Gainsboro;}
+td,th:not(:first-child){border-left:1px solid #aaa;}
+figure{display:block;text-align:center;}
+.TOC li{margin:0;}
+
+pre.lil{background:#272822;color:#f8f8f2;padding:.5em;border:1px;}
+pre.lil .comment {color:#75715e;}
+pre.lil .string  {color:#e6db74;}
+pre.lil .escape  {color:#ae81ff;}
+pre.lil .keyword {color:#f92672;}
+pre.lil .verb    {color:#66d9ef;}
+pre.lil .call    {color:#66d9ef;}
+pre.lil .funcname{color:#a6e22e;}
+"
+
+###############################################################################
+#
+#  Lil syntax highlighter:
+#
+###############################################################################
+
+keywords:"|"split"while|each|send|on|if|elseif|else|end|do|with|local|select|extract|update|insert|into|from|where|by|orderby|asc|desc"
+monads:"|"split"floor|cos|sin|tan|exp|ln|sqrt|unit|mag|heading|sum|prod|raze|max|min|count|first|last|keys|range|list|typeof|flip|rows|cols|table"
+dyads:"|"split"split|fuse|dict|take|drop|limit|in|unless|join|cross|parse|format"
+verbs:monads,dyads
+escapes:"\\n","\\\"","\\\\"
+
+# tokenize the input file into an rtext-compatible table
+# this gives us several useful output options,
+# and also makes it easy to coalesce adjacent runs together:
+
+on chunk type x do
+ insert text:x font:type arg:"" into 0
+end
+
+on highlight_lil text do
+ r:rtext.cat[] i:fn:0
+ while i<count text
+  head:i drop text
+  r:r,if last comm:"#%-r\n%n" parse head # line comments
+   i:i+last comm
+   chunk["comment" "#%s" format first comm]
+  elseif last space:"%.2r\n %n" parse head # whitespace
+   i:i+last space
+   chunk["" first space]
+  elseif "\""~first head # multiline string literals, including backslash escapes
+   i:i+1
+   t:chunk["string" "\""]
+   s:1 while s
+    head:i drop text
+    if "\""~first head
+     s:0 # reached terminal "
+     i:i+1
+     t:t,chunk["string" "\""]
+    elseif (2 take head) in escapes
+     i:i+2
+     t:t,chunk["escape" 2 take head]
+    else
+     str:"%-.2r\"\\" parse head
+     if !count str s:0 end # reached eof while processing a string
+     i:i+count str
+     t:t,chunk["string" str]
+    end
+   end
+  elseif last tok:"%v%n" parse head # identifiers
+   i:i+last tok tok:first tok
+   if     tok~"on"                fn:1 chunk["keyword"  tok]
+   elseif fn                      fn:0 chunk["funcname" tok]
+   elseif tok in keywords              chunk["keyword"  tok]
+   elseif tok in verbs                 chunk["verb"     tok]
+   elseif "%*v%*.2r\n [%m" parse head  chunk["call"     tok]
+   else                                chunk[""         tok]
+   end
+  else # misc special characters/operators
+   i:i+1
+   chunk["" first head]
+  end
+ end
+ rtext.cat[r]
+end
+
+on highlight_to_html text raw do
+ r.tag:"pre"
+ if raw r.attr.style:inlines.pre else r.attr.class:"lil" end
+ r.children:each row in rows h:highlight_lil[text]
+  if row.font
+   s.tag:"span"
+   if raw s.attr.style:inlines[row.font] else s.attr.class:row.font end
+   s.children:list row.text
+  else
+   list row.text
+  end
+ end
+ r
+end
+
+###############################################################################
+#
+#  Markdown Engine:
+#
+###############################################################################
+
+on anchor x do
+  "%l" format "" fuse (" ",",") drop x
+end
+
+on tag key children do
+  r.tag:key
+  r.children:children
+end
+
+on imagetag id do
+  r:tag["image" ()]
+  r.attr.src:id
+end
+
+on atag id label do
+  r:tag["a" label]
+  r.attr.href:id
+end
+
+on markdown_inline text do
+  i:0
+  r:()
+  while i<count text
+    head:i drop text
+    r:r,list if last tok:"_%s_%n" parse head
+      tag["em" list
+        if "&" in first tok
+          array[].cat[first tok]
+        else
+          first tok
+        end
+      ]
+    elseif last tok:"`%s`%n" parse head
+      tag["code" list first tok]
+    elseif last tok:"&%s;%n" parse head
+      array[].cat["&%s;" format first tok]
+    elseif last tok:"[%s](%s)%n" parse head
+      atag[tok[1] list tok[0]]
+    elseif last tok:"![%s](%s)%n" parse head
+      if 4<last tok
+        tag["figure"
+          (list imagetag[tok[1]]),
+          (list tag["figcaption" list tok[0]])
+        ]
+      else
+        "!"
+      end
+    else
+      tok:"%-.5r!_`[&%n" parse head
+      first tok
+    end
+    i:i+last tok
+  end
+  r
+end
+
+on markdown_table_row row do
+  i:1
+  r:()
+  tmp:()
+  while i<count row
+    head:i drop row
+    if n:"`%*s`%n" parse head
+      tmp:tmp,n take head
+      i:i+n
+    elseif "|"~first head
+      r:r,list markdown_inline["" fuse tmp]
+      tmp:()
+      i:i+1
+    else
+      tmp:tmp,first head
+      i:i+1
+    end
+  end
+  r
+end
+
+on markdown_table top body do
+  th:tag["thead"
+    list tag["tr"
+      each v in markdown_table_row[top]
+        tag["th" list v]
+      end
+    ]
+  ]
+  tb:tag["tbody"
+    each row in body
+      tag["tr" each c in markdown_table_row[row]
+        tag["td" list c]
+      end]
+    end
+  ]
+  (list th),(list tb)
+end
+
+on markdown text do
+	lines:"\n"split text
+  i:0
+  r:()
+  toc:-1
+  while i<count lines
+    line:lines[i]
+    t:()
+    if "{{TOC}}"~line
+      toc:count r
+      t:tag["ul" ()]
+    elseif "title:"~6 take line
+      t:tag["title" list 6 drop line]
+    elseif "---"~line
+      t:tag["hr" ()]
+    elseif "- "~2 take line
+      on bullets depth do
+        pat:"%s- " format depth take " "
+        local r:()
+        while (!lines[i]~0)&pat~(count pat)take lines[i]
+          b:markdown_inline[(count pat)drop lines[i]]
+          i:i+1
+          rec:bullets[depth+1]
+          r:r,list tag["li" b,if ()~rec () else list rec end]
+        end
+        if count r
+          tag["ul" r]
+        else
+          ()
+        end
+      end
+      t:bullets[0]
+    elseif "|"~first line
+      i:i+2
+      items:()
+      while "|"~first lines[i]
+        items:items,lines[i]
+        i:i+1
+      end
+      t:tag["table" markdown_table[line items]]
+    elseif "```"~3 take line
+      code:()
+      i:i+1
+      while (!lines[i]~0)&!lines[i]~"```"
+        code:code,lines[i]
+        i:i+1
+      end
+      code:"\n" fuse code
+      if "lil"~3 drop line
+        t:highlight_to_html[code 0]
+      else
+        t:tag["pre" list code]
+      end
+    elseif ""~line
+      # paragraph break
+    else
+      s:markdown_inline[line]
+      if "=="~2 take lines[i+1]
+        i:i+1
+        t:tag["h1" s]
+        t.attr.id:anchor[line]
+      elseif "--"~2 take lines[i+1]
+        i:i+1
+        t:tag["h2" s]
+        t.attr.id:anchor[line]
+      else
+        t:tag["p" s]
+      end
+    end
+    if count t
+      r:r,list t
+    end
+    i:i+1
+  end
+  if !toc~-1
+    r[toc].attr.class:"TOC"
+    headers:1 drop extract value where value..tag in ("h1","h2") from r
+    i:0 c:()
+    while i<count headers
+      h:headers[i]
+      cc:()
+      while ((i+1)<count headers)&(!headers[i+1].tag~h.tag)
+        i:i+1
+        cc:cc,list tag["li" list atag[("#%s" format headers[i].attr.id) headers[i].children]]
+      end
+      c:c,list tag["li" list atag[("#%s" format h.attr.id) h.children,if ()~cc () else list tag["ul" cc] end]]
+      i:i+1
+    end
+    r[toc].children:c
+  end
+  writexml[r]
+end
+
+###############################################################################
+#
+#  CLI Processing:
+#
+###############################################################################
+
+src:args[2]
+dst:args[3]
+if (!src)|(!dst) error["usage: ./lildoc.lil INPUT.md OUTPUT.html"] exit[1] end
+file:read[src]
+if !count file error["unable to read %s!" src] exit[1] end
+result:("<style>%s</style>\n" format styles),markdown[file]
+r:write[dst result]
+if !r error["unable to write to %s!" dst] end

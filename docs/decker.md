@@ -1,21 +1,5 @@
 title:Decker: A Multimedia Sketchpad
 
-<style>
-/* general prose */
-body{margin:1em 5em 5em 3em;}
-h1,h2,figcaption{font-family:Helvetica Neue,Arial,sans-serif;}
-h1{color:#21183c;font-weight:700;}
-h2{color:#21183c;font-weight:300;margin-top:1.5em;}
-pre,code{background-color:Gainsboro;tab-size:2;font-size:large;}
-pre{margin:0 .5em;padding:.5em;border:1px solid #aaa;border-radius:5px;}
-li{margin:1em 0;}
-table{margin:0 .5em;border-collapse:collapse;border:1px solid #aaa;}
-td{padding:5px;}th{padding:10px;border-bottom:1px solid #aaa;background-color:Gainsboro;}
-td,th:not(:first-child){border-left:1px solid #aaa;}
-figure{display:block;text-align:center;}
-.TOC li{margin:0;}
-</style>
-
 Decker: A Multimedia Sketchpad
 ==============================
 Decker is a multimedia platform for creating and sharing interactive documents, with sound, images, hypertext, and scripted behavior. It draws strong influence from [HyperCard](https://en.wikipedia.org/wiki/HyperCard), as well as more modern codeless or "low-code" creative tools like [Twine](http://www.twinery.org) and [Bitsy](https://www.bitsy.org). If [Jupyter Notebooks](https://jupyter.org) are a digital lab notebook, think of Decker as a stack of sticky notes for spatially organizing your thoughts and making quick prototypes.
@@ -284,15 +268,15 @@ Additionally, you can use the _Edit &#8594; Query_ dialog to issue Lil queries a
 The query dialog is like a simpler, task-specific version of [the listener](#thelistener): type a Lil query, press shift+return or "Run" to execute it. The variable `me.value` references the data that is currently stored in the selected grid. Clicking "Apply" will store the results of your query in the grid.
 
 You can use queries to filter down results:
-```
+```lil
 select where amount>1 from me.value
 ```
 Compute new columns:
-```
+```lil
 update cost:price*amount from me.value
 ```
 Make new tables from scratch:
-```
+```lil
 insert
 	name:  "Alice","Bob","Charlie"
 	age:   23,25,17
@@ -386,7 +370,7 @@ The expressions you enter will be evaluated as if they were a suffix to the scri
 
 If you are using the widget tool, the variable `selected` will contain a list of widget interfaces that are currently selected, allowing you to use code to manipulate parts of the deck programmatically. Consider, for example, re-titling the buttons in a selection with ascending numerals:
 
-```
+```lil
 each b k i in selected
 	b.text:i
 end
@@ -402,7 +386,7 @@ Scripting
 A small amount of code can go a long way in Decker. Widgets, cards, and the deck itself can be given a _script_. Certain interactions with the deck, like clicking a button or altering a field, will trigger _events_. A script can define functions to respond to events and make something happen, like computing a value to place in a field, navigating to a different card, or drawing a plot on a canvas. Scripts are written in the [Lil](lil.html) programming language. Consult the Lil manual for details.
 
 As a motivating example, consider a card containing a button and a field named `display`. The button has a script like:
-```
+```lil
 on click do
 	display.text: 3*display.text
 end
@@ -466,7 +450,7 @@ If specified, the transition time `z` is the number of frames (at 60 frames/seco
 - `vars`: a dictionary containing any variable bindings made while executing the program. (This also includes bindings from argument `y`.)
 
 By default, code executed within `eval[]` does not have access to any variables from the caller that are not explicitly passed in via the second argument (`y`), including global functions and constants, nor can it modify variables of the caller; the code is executed in its own isolated scope. In the following example, we provide our `eval[]`ed code with the `show[]` function and a constant:
-```
+```lil
 d.show:show
 d.a:2
 eval["show[a+3]" d]
@@ -566,11 +550,10 @@ Interfaces allow Lil programs to interact with deck resources and mutable data. 
 
 Decker's interfaces break down into several general categories:
 
-| :--------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
-| Datatypes  | [Font](#fontinterface), [Image](#imageinterface), [Sound](#soundinterface), [Array](#arrayinterface)                                       |
-| Utilities  | [Bits](#bitsinterface), [System](#systeminterface), [App](#appinterface), [RText](#rtextinterface), [Pointer](#pointerinterface)           |
-| Deck Parts | [Deck](#deckinterface), [Card](#cardinterface), [Patterns](#patternsinterface), [Module](#moduleinterface), [KeyStore](#keystoreinterface), [Prototype](#prototypeinterface) |
-| Widgets    | [Button](#buttoninterface), [Field](#fieldinterface), [Slider](#sliderinterface), [Grid](#gridinterface), [Canvas](#canvasinterface), [Contraption](#contraptioninterface) |
+- _Datatypes_ : [Font](#fontinterface), [Image](#imageinterface), [Sound](#soundinterface), [Array](#arrayinterface)
+- _Utilities_ : [Bits](#bitsinterface), [System](#systeminterface), [App](#appinterface), [RText](#rtextinterface), [Pointer](#pointerinterface)
+- _Deck Parts_ : [Deck](#deckinterface), [Card](#cardinterface), [Patterns](#patternsinterface), [Module](#moduleinterface), [KeyStore](#keystoreinterface), [Prototype](#prototypeinterface)
+- _Widgets_ : [Button](#buttoninterface), [Field](#fieldinterface), [Slider](#sliderinterface), [Grid](#gridinterface), [Canvas](#canvasinterface), [Contraption](#contraptioninterface)
 
 When describing methods and values, this document will use some conventions for brevity:
 - `bool`: a number that is `0` or `1` (Boolean). 
@@ -592,7 +575,7 @@ System Interface
 ----------------
 The _system_ interface exposes information about the Lil runtime. It is available as a global constant named `sys`.
 
-| Name                       | Description
+| Name                       | Description                                                                                           |
 | :------------------------- | :---------------------------------------------------------------------------------------------------- |
 | `typeof x`                 | `"system"`                                                                                            |
 | `x.version`                | Decker's version number as a string in `x.y` format.                                                  |
@@ -618,7 +601,7 @@ App Interface
 -------------
 The _app_ interface exposes control over the Decker application itself. It is available as a global constant named `app`.
 
-| Name                       | Description
+| Name                       | Description                                                                                           |
 | :------------------------- | :---------------------------------------------------------------------------------------------------- |
 | `typeof x`                 | `"app"`                                                                                               |
 | `x.fullscreen`             | Is Decker in fullscreen mode? On write, attempt to switch if possible; may not succeed. (r/w)         |
@@ -635,7 +618,7 @@ Bits Interface
 --------------
 The _bits_ interface exposes utility routines for efficient bit-wise manipulation of 32-bit integers. It is available as a global constant named `bits`.
 
-| Name                       | Description
+| Name                       | Description                                                              |
 | :------------------------- | :----------------------------------------------------------------------- |
 | `typeof x`                 | `"bits"`                                                                 |
 | `x.or[x...]`               | Calculate the bit-wise OR  of two or more numbers or lists of numbers.   |
@@ -643,21 +626,21 @@ The _bits_ interface exposes utility routines for efficient bit-wise manipulatio
 | `x.xor[x...]`              | Calculate the bit-wise XOR of two or more numbers or lists of numbers.   |
 
 The `bits.and[]`, `bits.or[]` and `bits.xor[]` functions _conform_ scalar and vector arguments like Lil's built in arithmetic operators:
-```
+```lil
 bits.and[3 (range 8)]    # (0,1,2,3,0,1,2,3)
          4%(range 8)     # (0,1,2,3,0,1,2,3)
 ```
 If these functions are called with more than two arguments, each argument will be successively _reduced_ together. The following are equivalent:
-```
+```lil
 bits.or[8 4 1]           # 13
 bits.or[bits.or[8 4] 1]  # 13
 ```
 If they are called with a _single_ argument, it will likewise be reduced:
-```
+```lil
 bits.or[(8,4,1)]         # 13
 ```
 Note that scalar-vector `bits.xor[]` can be used to perform a bit-wise NOT:
-```
+```lil
 bits.xor[255 (range 8)]  # (255,254,253,252,251,250,249,248)
 ```
 
@@ -757,7 +740,7 @@ The default patterns and colors are as follows:
 ![](images/palette.png)
 
 The following example overrides one of each type of palette entry:
-```
+```lil
 patterns[12]:image["%%IMG0AAgACH6BpaWBmcN+"]    # a custom pattern from an image
 patterns[28]:35,36,37,38,37,36                  # a sequence of pattern indices
 patterns[38]:"%h" parse "FFDAB9"                # a hex-encoded 24-bit RGB color (peachpuff)
@@ -768,7 +751,7 @@ Array Interface
 ---------------
 Arrays are dynamically created interfaces, each representing a mutable buffer of bytes that can be interpreted as a variety of machine-oriented integer _casts_. The `array[]` built-in function can be used to make a new array from scratch. Arrays are suitable for representing and manipulating binary files or as temporary storage when Lil's immutable collections are ill-suited to the task at hand.
 
-```
+```lil
 a:array[4 "u8"] # make a new unsigned byte array of size 4
 a[0,4]:65       # spread assignment of 65 to 4 bytes, starting at index 0
 a.cast:"char"   # change interpretation of array to characters
@@ -779,16 +762,16 @@ Every array has a _cast_ which controls how it is interpreted: signed or unsigne
 
 | Cast     | Range                     | Description                        |
 | :------- | :------------------------ | :--------------------------------- |
-| `"u8"`   | [0, 255]                  | unsigned 8-bit int                 |
-| `"i8"`   | [-128, 127]               | signed 8-bit int                   |
-| `"u16b"` | [0, 65535]                | unsigned 16-bit int, big-endian    |
-| `"u16l"` | [0, 65535]                | unsigned 16-bit int, little-endian |
-| `"i16b"` | [-32768, 32767]           | signed 16-bit int, big-endian      |
-| `"i16l"` | [-32768, 32767]           | signed 16-bit int, little-endian   |
-| `"u32b"` | [0, 4294967295]           | unsigned 32-bit int, big-endian    |
-| `"u32l"` | [0, 4294967295]           | unsigned 32-bit int, little-endian |
-| `"i32b"` | [-2147483648, 2147483647] | signed 32-bit int, big-endian      |
-| `"i32l"` | [-2147483648, 2147483647] | signed 32-bit int, little-endian   |
+| `"u8"`   | 0...255                   | unsigned 8-bit int                 |
+| `"i8"`   | -128...127                | signed 8-bit int                   |
+| `"u16b"` | 0...65535                 | unsigned 16-bit int, big-endian    |
+| `"u16l"` | 0...65535                 | unsigned 16-bit int, little-endian |
+| `"i16b"` | -32768...32767            | signed 16-bit int, big-endian      |
+| `"i16l"` | -32768...32767            | signed 16-bit int, little-endian   |
+| `"u32b"` | 0...4294967295            | unsigned 32-bit int, big-endian    |
+| `"u32l"` | 0...4294967295            | unsigned 32-bit int, little-endian |
+| `"i32b"` | -2147483648...2147483647  | signed 32-bit int, big-endian      |
+| `"i32l"` | -2147483648...2147483647  | signed 32-bit int, little-endian   |
 | `"char"` | n/a                       | ASCII character                    |
 
 While arrays do not benefit from the full range of operators Lil can bring to bear on lists and numbers, the array interface provides a number of useful methods for reading and writing data, including ways to perform efficient fills and copies.
@@ -825,7 +808,7 @@ If only a shape is provided, `struct[]` will read each _Type Spec_ entry in `sha
 As an additional convenience, `struct[]` will accept a plain `string` or `(string,number)` _Type Spec_ as a shape, for reading or writing a single field at a time. Bitfields may not be read or written individually in this manner.
 
 As an example of using `struct[]`, the following decodes the header of a [GIF89a](https://www.w3.org/Graphics/GIF/spec-gif89a.txt) image file (`src.gif`) and, if present, its global colortable:
-```
+```lil
 bin:read["src.gif" "array"]
 
 gif.magic      :"char",6  # "GIF89a" magic number.
@@ -842,7 +825,7 @@ colors: bin.struct["u8",header.gct.present*3*2^header.gct.size+1]
 ```
 
 The `cat[]` function can be viewed as a convenience wrapper for `struct[]` which makes it easier to concatenate together a series of values. Lists are interpreted as lists of numbers, all numbers are interpreted based on the `cast` of the destination array, strings are always interpreted as a series of `char` bytes, and appended arrays are interpreted based on their own `cast`. By the end of the following examples, `a`, `b`, and `c` contain equivalent data:
-```
+```lil
 blob:array["%%DAT08J+SqQ=="]
 
 a:array[0 "u16l"]
@@ -879,7 +862,7 @@ Images are dynamically created interfaces, each representing a mutable rectangul
 | `x.paste[image pos t]` | Consistent with `canvas.paste[]`: composite in another image at `pos`. If `t` is truthy, treat pattern 0 as transparent. |
 
 The `image.hist` attribute can be used to efficiently calculate several properties of an image's palette:
-```
+```lil
 count i.hist                                        # how many patterns appear in this image?
 colors.red in i.hist                                # does this image contain any red pixels?
 (list 0)~keys i.hist                                # is this image entirely blank?
@@ -887,15 +870,15 @@ colors.red in i.hist                                # does this image contain an
 ```
 
 The `map[]` function is useful for re-paletting an image. For example, if we have an image `i` containing patterns 0 and 1, we could map them to red and green pixels, respectively, as follows:
-```
+```lil
 i.map[(0,1) dict (colors.red,colors.green)]
 ```
 Any other colors will stay the same, unless we provide a second argument with a "default fill":
-```
+```lil
 i.map[(0,1) dict (colors.red,colors.green) colors.blue]
 ```
 Some additional examples:
-```
+```lil
 i.map[(() dict ()) 0]                           # replace all pixels with 0 (clear the image)
 i.map[1,0]                                      # replace black with white, and white with black
 image[i.size+4].map[() colors.red].paste[i 2,2] # add a 2 pixel red border around i
@@ -929,7 +912,7 @@ Sounds are dynamically created interfaces, each representing a mutable buffer of
 | `x.map[x y]` | Replace every sample of the sound by indexing the dictionary `x`, using `y` as a default if provided.      |
 
 The following example creates a new sound and then writes a 1 second long A-4 (440hz) sine wave to it:
-```
+```lil
 s:sound[8000]
 each x in range s.size
 	s[x]:16*sin (440/8000)*2*pi*x
@@ -937,12 +920,12 @@ end
 ```
 
 If a sound is indexed with a pair of numbers `(base,length)`, it will return a list of `length` samples, starting from the index `base`:
-```
+```lil
 s[(10,5)]  # (123,118,114,112,112)
 ```
 
 Conversely, if a sound is _assigned to_ with such a pair as the index, the region of the sound indicated will be _replaced_ by a list of samples given by the assignment value, expanding or shrinking the gap to suit the length of the replacement value.
-```
+```lil
 s[(10,5)]:()                  # delete 5 samples starting at index 10, reducing the size of the sound by 5
 s[(10,5)]:(11,22)             # replace 5 samples starting at index 10 with 2 samples, reducing the size of the sound by 3
 s[(10,5)]:(11,22,33,44,55,66) # replace 5 samples starting at index 10 with 6 samples, increasing the size of the sound by 1
@@ -950,18 +933,18 @@ s[(10,0)]:(11,22)             # insert 2 samples starting at index 10, increasin
 ```
 
 The first example above could be rewritten without a loop as follows, taking advantage of the fact that `*`, `+`, and `sin` can be applied to an entire list at once:
-```
+```lil
 s:sound[]
 s[(0,0)]:16*sin (440/8000)*2*pi*range 8000
 ```
 
 But the simplest way to create such a sound is to pass the list of samples directly to the `sound[]` function instead of a length:
-```
+```lil
 s:sound[16*sin (440/8000)*2*pi*range 8000]
 ```
 
 The `sound.hist` attribute can be used to efficiently calculate several properties of its samples:
-```
+```lil
 (list 0)~keys s.hist  # is a sound entirely silent?
 h:s.hist
 max keys h            # maximum sample value
@@ -1180,13 +1163,13 @@ The canvas will scale _up_ logical pixels to display them on the card (resulting
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
 
 The `canvas.line[]` and `canvas.poly[]` functions can take any number of arguments, which may `(x,y)` points, or lists of `(x,y)` points. For example, either of the following would draw an identical small triangle:
-```
+```lil
 c.poly[(7,-3) (1,6) (10,9)]
 c.poly[(list 7,-3),(list 1,6),(list 10,9)]
 ```
 
 The `canvas.merge[]` function takes any number of images (or one list of images) as arguments and updates every pixel on the canvas (respecting `canvas.clip[]`) by treating the pattern at that pixel as an index into the set of provided images. Pattern indices in the original canvas with no corresponding image are set to 0. If any of the provided images are smaller than the canvas, they are tiled horizontally and vertically as needed. For example, given the four canvases shown below, the mask drawn in `before` using patterns 0 and 1 is used to merge together the images in `a` and `b`:
-```
+```lil
 after.clear[]
 after.paste[before.copy[]]
 after.merge[a.copy[] b.copy[]]
@@ -1194,7 +1177,7 @@ after.merge[a.copy[] b.copy[]]
 ![](images/merge.gif)
 
 If the first argument to `canvas.merge[]` is a single-character string consisting of one of Lil's primitive arithmetic or logical operatiors (`+ - & | < > =`), it will apply that operator between the pixel on the canvas and the corresponding pixel from the second argument image (truncating or repeating it to match) and update the canvas in-place. This permits many interesting types of blending:
-```
+```lil
 after.merge["+" b.copy[]]
 ```
 
@@ -1202,7 +1185,7 @@ If the `pos` argument to `canvas.text[]` is a list of four coordinates instead o
 
 If the `pos` argument to `canvas.paste[]` is a list of four coordinates instead of two, it is interpreted as the dimensions `(x,y,width,height)` of a rectangle. In this case, the `image` will be drawn scaled to fit that rectangle, using nearest-neighbor sampling. For example, to draw an image `i` in the top-left corner of the canvas at 2x scale:
 
-```
+```lil
 c.paste[i (0,0),2*i.size]
 ```
 
@@ -1360,7 +1343,7 @@ Events are as follows:
 If a canvas is not "draggable", events are relative to pointer movement on the canvas: The canvas will fire `click` only if the pointer is depressed within the bounds of the canvas. If a canvas is sent a `click`, it will receive a `release` when the pointer is released, even if the pointer is no longer over that canvas- the `pos` provided may be out of bounds. If a canvas is sent a `click`, it will be sent `drag` events every time the pointer is moved within the bounds of the canvas up until the `release`.
 
 If a canvas _is_ "draggable", tapping on the canvas will fire `click`, moving it will continuously fire `drag`, and releasing it will fire `release`. In all three cases, the provided `pos` will be the _original_ position of the canvas, before the drag operation began. Having this position makes it easy for a draggable canvas to "snap back" to its original position at the end of a drag, or make decisions based on where it came from. Since dragging and dropping often involves checking whether widgets overlap, the following routines may be handy:
-```
+```lil
 on overlaps a b do min(a.pos<b.pos+b.size),b.pos<a.pos+a.size   end    # widget a overlaps widget b
 on inside   a b do min(a.pos>b.pos),(a.pos+a.size)<b.pos+b.size end    # widget a is fully inside widget b
 ```
@@ -1370,7 +1353,7 @@ The `navigate` event will fire when the user presses cursor keys on the keyboard
 The `loop` event handler is fired when the user initially visits a card or when a background audio loop stops. If it returns a _sound interface_ or the name of a sound in the deck, that sound will become the next background loop. In this manner, you can sequence sound clips together to form continuous background sound. The `loop` event handler _must_ complete its work quickly (much like a [transition](#transitions) function) or it and the background loop will be halted.
 
 Decker will supply the following "default" event handlers so that links, navigation, grid interaction, and drawing on canvases will have useful behaviors out of the box. These defaults can be overridden (or wrapped) by definitions in scripts on the deck, card, or relevant widget:
-```
+```lil
 on link x do
 	go[x]
 end
@@ -1407,7 +1390,7 @@ Modules
 Modules offer a way to re-use Lil scripts between decks. If someone else has packaged code as a module, using it in your own decks is as simple as using the [Font/Deck Accessory Mover](#resources) to copy it over. The module will then be available as a deck-level global variable- a dictionary, probably containing functions- that you can call from the Listener or your own scripts.
 
 If you're an advanced user, you might want to make your own modules. Make a new deck, create an empty module from the Listener:
-```
+```lil
 deck.add["module" "logger"]
 ```
 
@@ -1489,7 +1472,7 @@ Now we can add widgets to our prototype, in exactly the same way we'd add them t
 ![](images/protowids.gif)
 
 The `inc` button will need a short script:
-```
+```lil
 on click do
  val.text:val.text+1
 end
@@ -1520,7 +1503,7 @@ Custom Attributes
 So far, we've defined a useful, if simple, contraption with minimal code. We could stop here, but there are a few more details we could add that would make our contraptions behave more like the built-in widget flavors. Hop back into the prototype editor via _File &#8594; Prototypes..._ or by double-clicking on a contraption instance and clicking "Prototype..." in its Properties dialog.
 
 Field widgets have a `.text` and `.value` attribute; we used the former in the script we wrote previously. To expose an attribute like this on our `counter`, we'll add code to our prototype's script. Choose _Prototype &#8594; Script_ from the menu and enter the following:
-```
+```lil
 on get_value do
  val.text+0
 end
@@ -1535,7 +1518,7 @@ Say we have a counter contraption named `count1`. When code outside our contrapt
 Our `get_value` uses `+0` to force the string value of the interior field `val` to a number, and our `set_value` writes a number `x` to the same field. Just like within a card, the widgets of a contraption store the _state_ of the contraption, and any `get_` and `set_` functions we write translate external arguments and requests into manipulations of internal widgets. From the inside, a contraption acts like a little card, and from the outside it appears like a widget.
 
 If you want to expose an immutable attribute, don't define a `set_` corresponding to your `get_`. For example, you might want to expose a utility function that external scripts can call:
-```
+```lil
 on reset do       # a normal function, callable from inside the prototype
  val.text:0
 end
@@ -1562,7 +1545,7 @@ Custom Events
 It is also possible to make your contraptions produce events, just as a button widget produces a `click` event when it is clicked, or a field widget produces a `change` event when its contents is edited.
 
 From the perspective of prototype scripts or the scripts on widgets within a prototype, the global variable `card` is a reference to _the contraption instance_ rather than the card containing the contraption. To send an event to a user script on the contraption instance, we will use `card.event[]`. Modify the script on the `inc` button as follows:
-```
+```lil
 on click do
  val.text:val.text+1
  card.event["change" get_value[]]
@@ -1572,14 +1555,14 @@ end
 Now every time `inc` is clicked, it will send a `change[]` event to the contraption instance. If a user has not defined a handler for this event, it will do nothing harmlessly, just like a button that doesn't define `on click...` in its script.
 
 To help users know that a "change" event is available, we can provide a default "template" script for newly-created contraptions. Edit the template for your prototype via the _Prototype &#8594; Properties..._ menu item:
-```
+```lil
 on change x do
  
 end
 ```
 
 Exit the prototype editor, and modify the script of one of your contraption instances. The script editor should provide your template as a starting point. Try filling it in and then interacting with the contraption to confirm the event fires:
-```
+```lil
 on change x do
  alert["counter is now %i" format x]
 end
@@ -1601,7 +1584,7 @@ Contraptions and prototypes have a few important limitations to keep in mind:
 Animation
 =========
 Let's say we're on a card containing a canvas named `canvas`. The card also has a script which defines a function named `pinwheel[]` for clearing the canvas and drawing a shape on it, with the shape's size and rotation controlled by a parameter `t` (_time_):
-```
+```lil
 on pinwheel t do
   canvas.clear[]
   c:canvas.size/2                   # center of canvas
@@ -1616,7 +1599,7 @@ end
 By calling this function repeatedly and varying the time, it will create a series of different images which produce the illusion of motion, like a flipbook.
 
 Try making a button with a script like the following and clicking it. (Warning: if you are photosensitive, this example might be very uncomfortable to look at; maybe just skip ahead to the next one?)
-```
+```lil
 on click
   frame:0
   while 1
@@ -1631,7 +1614,7 @@ The first thing you'll notice is that once you click the button, it turns inacti
 You'll also notice that the animation looks strange- parts of the pinwheel seem to flicker and appear or disappear randomly. We're actually drawing and erasing the shape _much_ too fast!
 
 Decker allows Lil scripts to run for a certain amount of time each frame, before pausing them briefly to handle redrawing the window and servicing menus. From the script's perspective, it is being paused at arbitrary points inside that `while` loop, so the shape may not be fully-drawn when it's shown to the user. Instead, we should use the `sleep[]` function to tell our script to wait until it's time to draw the next frame- this will look much smoother:
-```
+```lil
 on click
   frame:0
   while 1
@@ -1645,7 +1628,7 @@ end
 This approach to animation can be very convenient and flexible- just write ordinary code with loops and conditionals and insert a few `sleep[]` calls whenever you finish drawing a frame. The disadvantage, though, is that while our animation script is running, everything else in Decker grinds to a halt. The user can't click on buttons, edit fields, or even navigate to another card! Our single escape-hatch is the `pointer` interface, which gives us live-updating information about the mouse (or whatever pointing device is available) even while our script is running.
 
 As a simple example, we could stop our `while` loop when the user clicks the mouse anywhere:
-```
+```lil
 on click
   frame:0
   while !pointer.held
@@ -1657,7 +1640,7 @@ end
 ```
 
 But there's another way: harnessing the `view` event. The `view` event is fired once whenever a user is shown a card, usually as a result of opening a deck or navigating to a card. The `go[]` command will also schedule this behavior, even if we're asking to "navigate" to the card we're already on:
-```
+```lil
 on view do
   pinwheel[sys.frame]
   go[card]
@@ -1669,7 +1652,7 @@ Since each event is an independent script execution, we can't count frames in a 
 The `view` event is fired at most once per frame, so we don't need any explicit `sleep[]` calls, and as long as our script finishes quickly enough, the user will have a chance to interact with widgets and trigger other events between scheduled `view` events. Our animation automatically starts playing when we navigate to the card, and the `view[]` event will stop being triggered if we navigate away to a different card. Note that if a script takes too long, you will see the same behavior as the original `while` loop: the user will be unable to interact with the card until the script is stopped.
 
 The `go[]` is the essential component here, since it _indirectly_ triggers a future `view[]`. If we just called the `view[]` function _directly_,
-```
+```lil
 on view do
   pinwheel[sys.frame]
   view[]                     # bad idea!
@@ -1678,7 +1661,7 @@ end
 it would be equivalent to the first example!
 
 The `go[card]` method of animation is convenient, but it still requires us to write a card-level script. Furthermore, this method cannot be used from within a contraption, as contraption prototype scripts do not have access to the deck or the current card. There's one more option: the `animated` property. Any widget can be flagged as `animated` from the _Widgets_ menu. Animated widgets are automatically sent a `view` event on every frame so long as the card they appear on is visible. If we make our canvas "animated", it will only need the following script:
-```
+```lil
 on view do
  pinwheel[sys.frame]
 end
@@ -1686,7 +1669,7 @@ end
 The `animated` property allows you to make widgets self-updating in an entirely self-contained way: their behavior can be fully contained in their own scripts, allowing them to be copied and pasted between cards or decks without requiring any additional "plumbing".
 
 You can use `animated` anywhere you want a "live updating" widget. Consider, for example, a field that continuously recomputes its value from other widgets:
-```
+```lil
 on view do
  me.text: price.text*(1+taxes.text)
 end
@@ -1707,7 +1690,7 @@ The Lil function you install as a transition will be called several times when a
 On each call, your function should use the resources provided to draw an image on the `canvas`, which will be automatically `clear[]`ed between frames. Transition functions must complete their work quickly: if they exceed a brief quota, they will be halted prematurely, and whatever is on the `canvas` will be used as-is. Transition functions _must_ smoothly handle any number of intervening `tween` values, but are guaranteed to be called with a `tween` of exactly 0 and 1 on the first and last frames, respectively.
 
 Decker supplies the following pre-defined transitions:
-```
+```lil
 transition[on SlideRight c a b t do  c.paste[a c.size*t,0   ] c.paste[b c.size*(t-1),0]      end]
 transition[on SlideLeft  c a b t do  c.paste[a c.size*(-t),0] c.paste[b c.size*(1-t),0]      end]
 transition[on SlideDown  c a b t do  c.paste[a c.size*0,t   ] c.paste[b c.size*0,t-1  ]      end]
@@ -1740,14 +1723,14 @@ Static brushes work like the built-in brushes: as a line is drawn, the mask is c
 - `newLine`: a boolean; `1` for the first call of a new line, otherwise `0`.
 
 An example static brush:
-```
+```lil
 brush["Oval" image["%%IMG0AAwADAHgB/AP8B/wP/B/4H/g/8D/gP8A/gB8AA=="]]
 ```
 
 Remember that you can obtain the encoded strings used by `image[]` by drawing something in Decker and copying it to the clipboard!
 
 An example functional brush, a round brush which gets smaller for faster strokes:
-```
+```lil
 # 11 round brush images ranging from 8px to 1px:
 
 b:image @ "\n" split 1 drop "
@@ -1776,19 +1759,19 @@ Like transition functions, brushes can be defined in any script, at any time, bu
 Playing Sound
 =============
 The `play[]` function is the main way of triggering audio playback in Decker. It can be called with a [Sound Interface](#soundinterface) or the name of a sound in the deck:
-```
+```lil
 play["amen"]
 play[deck.sounds.amen]
 ```
 
 There are two ways to wait for a sound to finish. The `sleep["play"]` function blocks execution until no sounds are playing, which may take many frames:
-```
+```lil
 play["firstClip"]
 sleep["play"]
 play["secondClip"]
 ```
 The `app.playing` property is truthy if sound is playing. You can use this as a "non-blocking" way to wait for sounds to stop:
-```
+```lil
 play["firstClip"]
 while app.playing
 	doSomethingElse[]
@@ -1798,36 +1781,36 @@ play["secondClip"]
 ```
 
 So far, we've looked at "one-shot" sound effects. You can have several such sounds playing at one time. If you provide a second argument to `play[]`, you can instead control the "background loop", a single sound that can be easily repeated:
-```
+```lil
 play["amen" "loop"]
 ```
 
 By default, the background loop will repeat until it is explicitly stopped or replaced with another sound. If you repeatedly "loop-play" the same sound, it will not restart the sound- this is convenient for common applications. If you do wish to reset a looping sound mid-loop, you can stop it and then immediately restart it. To stop the background loop, provide an invalid sound to `play[]`:
-```
+```lil
 play[0 "loop"]
 ```
 
 It is also possible to control the background loop by providing a handler for the card-level `loop` event. This handler is called whenever cards are initially visited (as by `go[]`, for example) as well as each time the background loop completes. The loop handler is passed the previous background loop sound, if any, and the return value will become the new background loop. You can probably see now why the default loop handler is:
-```
+```lil
 on loop prev do
 	prev
 end
 ```
 
 The simplest way to use this event is to give cards a default background loop when you visit them:
-```
+```lil
 on loop do
 	"amen"
 end
 ```
 Or to silence any existing background loop when you visit the card:
-```
+```lil
 on loop do
 	0
 end
 ```
 But you might want to have other side effects, or choose the next background loop sound based on some algorithm:
-```
+```lil
 on loop do
 	iteration_count.value:iteration_count.value+1
 	random["clip1","clip2","clip3"]

@@ -39,10 +39,9 @@ make test            # (optional) regression test suite
 sudo make install    # (optional) install lilt, decker, and lil syntax profiles
 ```
 
-Building the documentation requires [multimarkdown](http://fletcher.github.io/MultiMarkdown-5/installation):
+Building the documentation requires Lilt:
 ```
-brew install multimarkdown
-
+make lilt
 make docs
 ```
 

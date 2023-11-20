@@ -1,20 +1,5 @@
 title:Lilt
 
-<style>
-/* general prose */
-body{margin:1em 5em 5em 3em;}
-h1,h2,figcaption{font-family:Helvetica Neue,Arial,sans-serif;}
-h1{color:#21183c;font-weight:700;}
-h2{color:#21183c;font-weight:300;margin-top:1.5em;}
-pre,code{background-color:Gainsboro;tab-size:2;font-size:large;}
-pre{margin:0 .5em;padding:.5em;border:1px solid #aaa;border-radius:5px;}
-li{margin:1em 0;}
-table{margin:0 .5em;border-collapse:collapse;border:1px solid #aaa;}
-td{padding:5px;}th{padding:10px;border-bottom:1px solid #aaa;background-color:Gainsboro;}
-td,th:not(:first-child){border-left:1px solid #aaa;}
-figure{display:block;text-align:center;}
-</style>
-
 Lilt
 ====
 _Lil Terminal_ is a command-line interface for the Lil programming language, allowing easy experimentation outside of Decker. Lilt also includes bindings for basic CLI and filesystem IO, making it potentially usable for shell scripting and other applications.
@@ -166,7 +151,7 @@ The `readdeck[]` and `writedeck[]` functions allow Lilt to operate on Decker doc
 
 Just as in Decker, you can simulate "injecting" events into widgets, cards, or the deck with the `x.event[name args...]` function they provide, running the appropriate scripts to completion and producing any appropriate side-effects on the deck. For example, clicking on the first widget on the active card:
 
-```
+```lil
 d:readdeck["demo.deck"]
 (first d.card.widgets).event["click"]
 ```

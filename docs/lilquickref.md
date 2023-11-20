@@ -1,18 +1,5 @@
 title:Lil Quick Reference
 
-<style>
-body{margin:1em 5em 5em 3em;font-size:15px;}
-h1,h2,figcaption{font-family:Helvetica Neue,Arial,sans-serif;}
-h1{color:#21183c;font-weight:700;}
-h2{color:#21183c;font-weight:300;}
-pre,code{background-color:Gainsboro;tab-size:2;font-size:large;font-size:15px;}
-pre{margin:0 .5em;padding:.5em;border:1px solid #aaa;border-radius:5px;}
-li{margin:1em 0;}
-table{margin:0 .5em;border-collapse:collapse;border:1px solid #aaa;}
-td{padding:5px;}th{padding:10px;border-bottom:1px solid #aaa;background-color:Gainsboro;}
-td,th:not(:first-child){border-left:1px solid #aaa;}
-</style>
-
 Lil Quick Reference
 ===================
 Types
@@ -32,8 +19,8 @@ Primitives
 | :------ | :--------- | :--------------------------------------------------------------------------- |
 | monad   | arithmetic | `-` `!` `floor` `cos` `sin` `tan` `exp` `ln` `sqrt` `mag` `unit` `heading`   |
 | monad   | reducers   | `count` `first` `last` `sum` `prod` `min` `max` `raze`                       |
-| monad   | data       | `range` [0...n) `keys` `list` (enlist) `rows` `cols` `table` `typeof` `flip` |
-| dyad    | arithmetic | `+` `-` `*` `/` `%` (y mod x) `^` (pow) `&` (min) <code>\|</code> (max)      |
+| monad   | data       | `range` `keys` `list` (enlist) `rows` `cols` `table` `typeof` `flip`         |
+| dyad    | arithmetic | `+` `-` `*` `/` `%` (y mod x) `^` (pow) `&` (min) `|` (max)                  |
 | dyad    | logical    | `<` `>` `=` (conforming equal) `~` (match) `unless` (x if y is `0`)          |
 | dyad    | string     | `fuse` `split` `parse` `format`                                              |
 | dyad    | data       | `,` (concat) `@` (index each right) `dict` `take` `drop` `limit` `in`        |
@@ -74,8 +61,8 @@ Queries
 
 Formatting
 ----------
-A format is `%[name]*-0N.DX`: `*` skip, `0` pad, `N` width.<br/>
-`-` is invert char class (`ro`) or left justify.<br/>
+A format is `%[name]*-0N.DX`: `*` skip, `0` pad, `N` width.
+`-` is invert char class (`ro`) or left justify.
 `.D` is decimal places (`fc`), size of char class (`ro`), or truncate to `D` characters.
 
 | `X`       | Purpose  |                                                                                                |

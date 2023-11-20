@@ -1,26 +1,10 @@
 title:Lil: A Scripting Language
 
-<style>
-/* general prose */
-body{margin:1em 5em 5em 3em;}
-h1,h2,figcaption{font-family:Helvetica Neue,Arial,sans-serif;}
-h1{color:#21183c;font-weight:700;}
-h2{color:#21183c;font-weight:300;margin-top:1.5em;}
-pre,code{background-color:Gainsboro;tab-size:2;font-size:large;}
-pre{margin:0 .5em;padding:.5em;border:1px solid #aaa;border-radius:5px;}
-li{margin:1em 0;}
-table{margin:0 .5em;border-collapse:collapse;border:1px solid #aaa;}
-td{padding:5px;}th{padding:10px;border-bottom:1px solid #aaa;background-color:Gainsboro;}
-td,th:not(:first-child){border-left:1px solid #aaa;}
-figure{display:block;text-align:center;}
-.TOC li{margin:0;}
-</style>
-
 Lil: A Scripting Language
 =========================
 Lil is part of the technology that powers _Decker_, a multimedia creative tool inspired by _HyperCard_. Decker uses Lil for adding custom behavior to decks and the widgets within. Lil is designed to be learned in layers, but it is a richly multi-paradigm language which incorporates ideas from imperative, functional, declarative, and vector-oriented languages.
 
-```
+```lil
 on mode a do   # line comment
 	r:()
 	each x in a
@@ -36,10 +20,7 @@ mode[1,2,2,3,4,2,1]
 
 Lil's implementation needs to be fairly small, as an interpreter is shipped with every standalone Decker document along with the rest of the runtime. At the same time, Lil should be prepared for the everyday needs of Decker users, with primitives to handle common use-cases and a minimum of boilerplate.
 
-The language therefore tries to thread the needle between a design which is simple and a design which is ergonomically pleasant. There is a small number of datatypes, features and primitives, which compose in many useful ways. The query syntax generalizes to manipulation of dictionaries, lists, and strings, and replaces many individual primitive operations in other languages with a single algorithmic framework. Simple things are easy, and complex things are possible.
-
-Table of Contents
------------------
+The language therefore tries to thread the needle between a design which is simple and a design which is ergonomically pleasant. There are a small number of datatypes, features and primitives which compose in many useful ways. The query syntax generalizes to manipulation of dictionaries, lists, and strings, and replaces many individual primitive operations in other languages with a single algorithmic framework. Simple things are easy, and complex things are possible.
 
 {{TOC}}
 
@@ -59,7 +40,7 @@ Lil has a soft, spongy, dynamic type system in which values do their best to con
 
 - When a number is required, strings are parsed, and lists or dictionaries attempt to convert their first _element_. Otherwise, the number 0 is used.
 - When a string is required, numbers are formatted, and lists are recursively converted to strings and joined. Otherwise, the empty string is used.
-- When a list is required, strings are treated as a list of their characters (each a length-1 string), dictionaries are treated as their value list, tables are treated as the list of their rows, each a dictionary, and anything else (number, function, interface) is enclosed in a length-1 list.
+- When a list is required, strings are treated as a list of their characters (each a length-1 string), dictionaries are treated as their value list, tables are treated as the list of their rows (each a dictionary), and anything else (number, function, interface) is enclosed in a length-1 list.
 - When a dictionary is required, strings and lists become dictionaries from their indices to their _elements_, tables become dictionaries of their columns, and otherwise an empty dictionary is used.
 - When a table is required, lists become a single-column "value" table, and dictionaries become two-column "key" and "value" tables. Anything else is interpreted as if it were a list.
 
@@ -72,21 +53,21 @@ When indexing into values, we will uniformly refer to _elements_:
 - An _element_ of a table is one of its rows, as a dictionary.
 - An _element_ of an _empty_ string, list, dictionary, or table is the number 0.
 
-The number zero and the empty string, list, or dictionary are all _falsey_, and any other value (including _any_ table, function, or interface) is _truthy_.
+The number zero (`0`) and the empty string (`""`), list (`()`), or dictionary are all _falsey_, and any other value (including _any_ table, function, or interface) is _truthy_.
 
 
 Lil, the Imperative Language
 ----------------------------
 Lil scripts are a sequence of expressions, including literal values, references or assignments to variables, conditionals (`if`), `each` and `while` loops, and function declarations (`on`).
 
-Variable and function names may contain any alphanumeric characters (as well as `?` and `_`), but must not start with a number. Variable assignments use the symbol `:`, read as "gets" or "becomes":
-```
+Variable and function names may contain any alphanumeric characters (as well as `?` and `_`), but must not start with a digit. Variable assignments use the symbol `:`, read as "gets" or "becomes":
+```lil
 a: 23
 longer_name: "a string"
 ```
 
 If a value has never been explicitly placed in a variable, it contains the number 0. You can access or assign to elements of a list or dictionary by subscripting with brackets:
-```
+```lil
 (11,22,33)[1]
 "String"[2]
 l[4]:2
@@ -94,13 +75,13 @@ d["fruit"]:"apple"
 ```
 
 For convenience, indexing may also be performed with "dot notation", where a name after the dot is treated as a string index. These expressions are equivalent:
-```
+```lil
 d["fruit"]:"cherry"
 d.fruit:"cherry"
 ```
 
 If you index a list with integers within range of its `count` it will act like a list. If you index a list like a dictionary- with keys that are _not_ integers within range of its `count`- it will become a dictionary.
-```
+```lil
 b: 5              # b contains the number 5
 b[0]: 5           # b becomes a length-1 list containing the number 5
 c                 # c contains the number 0
@@ -108,7 +89,7 @@ c.fruit: "yes"    # c now contains a dictionary with the key "fruit" and the val
 ```
 
 When the leftmost part of an assignment expression is an expression- not just a variable name- the value of that expression is _amended_ and a new value with appropriate changes is returned:
-```
+```lil
 (11,22,33)[1]:44  # produces the list (11,44,33)
 "Cat"[1]:"ive"    # produces the string "Civet"
 ().baz:99         # amend the empty list at index "baz" (promoting it to a dictionary) with the value 99,
@@ -117,7 +98,7 @@ When the leftmost part of an assignment expression is an expression- not just a 
 ```
 
 Note the important distinctions between these similar-looking cases:
-```
+```lil
 foo:11,22,33
 
 foo[1]:44     # get the value in "foo", amend it at index 1, and store the amended list in "foo" again.
@@ -130,7 +111,7 @@ foo[1]:44     # get the value in "foo", amend it at index 1, and store the amend
 ```
 
 If you index with a dot followed immediately by another dot or open-bracket it means "each element". Use this for drilling into nested lists or dictionaries:
-```
+```lil
 t:("AB","CD","EFG")
 
 t[1]        # "CD"             # the 1st element of t
@@ -147,15 +128,15 @@ d..key      # {"a":"apple","b":"pear"}
 
 ---
 
-Lil has a number of unary and binary operators- see appendix 1 and 2 for details. Many, like `+` and `*`, should be familiar from mathematics or other programming langugages. The most important thing to remember in Lil is that expressions have uniform operator precedence: expressions are always carried out right-to-left, unless explicitly parenthesized:
-```
+Lil has a number of unary and binary operators- see [appendix 1](#appendix1:unaryprimitives) and [2](#appendix2:binaryprimitives) for details. Many, like `+` and `*`, should be familiar from mathematics or other programming langugages. The most important thing to remember in Lil is that expressions have uniform operator precedence: expressions are always carried out right-to-left, unless explicitly parenthesized:
+```lil
 3*2+5    # 21
 3*(2+5)  # 21
 (3*2)+5  # 11
 ```
 
 You can make decisions with `if`. The keyword `if` is followed by a conditional expression, one or more statements, and finally the keyword `end`. The statements inside the `if ... end` will only be executed if the conditional expression has a truthy value. You can also optionally include an `elseif` keyword (followed by a conditional expression) or just an `else` keyword to divide the body of the `if` into multiple cases.
-```
+```lil
 if 1>2
 	"narp"  # this doesn't happen
 end
@@ -177,10 +158,10 @@ elseif 1<2
 else
 	"narp"    # so this doesn't
 end
-``` 
+```
 
 You can iterate over the elements of a value with an `each` loop. The keyword `each` is followed by zero or more variable names, the keyword `in`, an expression giving the _source_ to iterate over, one or more statements forming the "body" of the loop, and finally the keyword `end`. The _source_ is always treated as a dictionary, and for each iteration of the loop the variable names provided are assigned to the _value_, _key_, and _index_ of the current pairing in that dictionary. For a list, _key_ and _index_ will naturally be identical. Here are a few examples of `each` loops:
-```
+```lil
 each x in 3,5,7
 	x
 end
@@ -196,7 +177,7 @@ end
 ```
 
 You can also repeat a body of code an indefinite number of times with a `while` loop. The keyword `while` is followed by a conditional expression, one or more statements forming the "body" of the loop, and finally the keyword `end`. The conditional expression is evaluated before each iteration of the loop, and the loop stops if this ever results in a falsey value. Here's an example:
-```
+```lil
 a:5
 while a>3
 	print[a]     # prints 5, then 4, then stops.
@@ -205,7 +186,7 @@ end
 ```
 
 To declare a function, use the keyword `on` followed by a name, zero or more argument names, the keyword `do`, one or more statements comprising the "body" of the function, and finally the keyword `end`. To call a function, use its name and a set of bracketed expressions corresponding to the arguments it takes. Extra arguments are ignored, and missing arguments are bound as 0:
-```
+```lil
 on pair x y do
 	x,y
 end
@@ -223,7 +204,7 @@ Lil, the Functional Language
 As we've seen above, thinking about Lil as an everyday garden-variety imperative language is perfectly sufficient for writing scripts. Some characteristics, though, make it well-suited to the _functional_ style of programming, in which we aim to minimize mutation, compose our program from functions which do not have "side-effects", and make use of so-called "higher-order" functions- functions which take functions as arguments.
 
 Values in Lil are truly _values_. They have copy-on-write semantics: an assignment to part of a value creates an entirely new value, leaving any other references to the original value unchanged:
-```
+```lil
 a:1,2,3
 b:a
 b[1]:5
@@ -232,14 +213,14 @@ show[b]  # 1,5,3
 ```
 
 Statements in Lil are always _expressions_. That is, they always return a value and can be composed within larger expressions. Assignments evaluate to the value being assigned. `if` returns the value of the last statement in its taken half. (A missing `else` just means the falsey half evaluates to 0.) `while` likewise evaluates to the last statement on the last iteration of its body:
-```
+```lil
 x:y:z                       # assign both x and y the value of z
 a: if x>5 99 else 33 end    # assign a to either 99 or 33
 c: while b<100 b:b*2 end    # assign c to 128
 ```
 
 The `each` loop collects together the results of _each_ iteration of the loop and returns them. If the input was a dictionary, the output will be a dictionary with the same keys. Otherwise, the output will be a list. Some other languages call this operation _map_:
-```
+```lil
 each x in 3,5,7   # (300,500,700)
 	x*100
 end
@@ -253,7 +234,7 @@ end
 ```
 
 You can pass functions to other functions by name:
-```
+```lil
 on apply func do
 	func["two"]
 end
@@ -264,13 +245,13 @@ apply[twice]    # ("two","two")
 ```
 
 Since `on...end` is an expression, you can also directly substitute it into the call, just as with "anonymous" or "lambda" functions in other languages.
-```
+```lil
 apply[on thrice x do x,x,x end]
 ```
 One advantage of functions always having a bound name is that there's no special combinator plumbing required for anonymous recursion. If the name never matters, consider using the name `_` to signal your intent.
 
 Lil uses _lexical scope_: variables will resolve to the closest nested binding available, and the local variables of a caller to a function will not be visible or modified by the callee (unless the callee's definition is nested in the caller):
-```
+```lil
 global:333
 on quux x do
 	v:99
@@ -285,7 +266,7 @@ quux[zami]
 ```
 
 Furthermore, functions close over variables in their lexical scope, allowing for encapsulated "objects" with their own mutable state:
-```
+```lil
 on counter x do
 	on inc do
 		x:x+1
@@ -302,7 +283,7 @@ print[x  ]        # 0
 Whenever an assignment is carried out, if the variable name in question has been assigned to in any surrounding lexical scope, the assignment will update the _closest_ definition. If the name has never been assigned to before, a new local variable will be created at the current scope. The `on`, `each`, and query (`select`, `update`, `extract`) statements always create new local variables for their arguments, loop variables, or columns, and can thus _shadow_ (take precedence over) outer local variables of the same name. When in doubt, use unique names; it's much less confusing!
 
 It is also possible to _explicitly_ define a local variable by using the keyword `local`, a name, a colon (`:`), and an expression giving the local's initial value:
-```
+```lil
 duplicate:"Alpha"
 on func do
 	local duplicate:"Beta"
@@ -313,7 +294,7 @@ show[duplicate] # "Alpha"
 ```
 
 Finally, if you're mentally wed to the idea of expressing algorithms recursively, you may be pleased to discover that Lil supports _tail-call elimination_. If a recursive function calls itself (or another function) as the final operation in the function, it will not consume extra stack space:
-```
+```lil
 on addrec x y do
 	if x>0
 		1+addrec[x-1 y]  # addition happens after call returns. not tail-recursive!
@@ -358,7 +339,7 @@ When column expressions are evaluated, several "magic" columns and variables are
 When "ungrouping" or collecting the final result columns, the table is _rectangularized_: each group will have as many result rows as the column of maximum `count`. Grouping may change the order of rows- see `update` if you want to preserve it.
 
 Given a simple table:
-```
+```lil
 people.name:"Alice","Sam","Thomas","Sara","Walter"
 people.age:25,28,40,34,43
 people.job:"Developer","Sales","Developer","Developer","Accounting"
@@ -366,7 +347,7 @@ people:table people
 ```
 
 Let's perform some selections:
-```
+```lil
 select from people       # select all columns, like "select *" in SQL
 # +----------+-----+--------------+
 # | name     | age | job          |
@@ -443,7 +424,7 @@ select name job orderby (job join name) asc from people     # sort by multiple c
 ```
 
 All result columns will be repeated to match the `count` of the longest result. Thus, if all the new columns yield a non-listy result, the group is effectively collapsed into a summary row:
-```
+```lil
 select employed:(count name) job by job from people
 # +----------+--------------+
 # | employed | job          |
@@ -466,8 +447,8 @@ select employed:(count name) job:(first job) by job from people
 ```
 
 When computing columns, you're working with lists of elements, and taking advantage of the fact that primitives like `<` and `+` automatically "spread" to lists. When performing comparisons, be sure to use `=` rather than `~`! If you want to call your own functions- say, to average within a grouped column- write them to accept a list like so:
-```
-on avg x do ((sum x) / count x) end
+```lil
+on avg x do (sum x) / count x end
 
 select job:(first job) avg_age:avg[age] by job from people
 # +--------------+---------+
@@ -483,7 +464,7 @@ The same applies to any functions called in a `where`, `by`, or `orderby` expres
 ---
 
 The `update` statement has the same syntax and clauses as `select`, but behaves differently: results are merged with the original table, and the original order of rows is preserved. `orderby` can be used with `update`, but will only impact the inputs to column expressions, not the order of the result rows.
-```
+```lil
 update job:"Engineer" where job="Developer" from people
 # +----------+-----+--------------+
 # | name     | age | job          |
@@ -496,7 +477,7 @@ update job:"Engineer" where job="Developer" from people
 # +----------+-----+--------------+
 ```
 As with `select` you can compute new named columns- values will be filled in with 0 for rows masked off by a `where` clause.
-```
+```lil
 update manager:random[name] where job="Developer" from people
 # +----------+-----+--------------+---------+
 # | name     | age | job          | manager |
@@ -512,13 +493,13 @@ update manager:random[name] where job="Developer" from people
 ---
 
 When mixing queries with other types of code, it may be very useful to execute a query and get back simple lists, strings, or numbers. The `extract` statement is another variation on `select` which unpacks its result directly into a value, instead of a result column in a table:
-```
+```lil
 jobs:extract first job by job from people
 # ("Developer","Sales","Accounting")
 ```
 
 `extract` gives you access to a variety of useful operations for tables, dictionaries, or even lists:
-```
+```lil
 extract value orderby value asc from jobs              # sort a list
 # ("Accounting","Developer","Sales")
 
@@ -538,7 +519,7 @@ extract first value by value from "ABBAAC"             # distinct items in a lis
 # ("A","B","C")
 ```
 If names are specified, all results are collected into a dictionary:
-```
+```lil
 extract a:first age b:last age orderby age asc from people 
 # {"a":(25),"b":(43)}
 ```
@@ -546,7 +527,7 @@ extract a:first age b:last age orderby age asc from people
 ---
 
 The `insert` statement adds new rows to a table. It is followed by a sequence of one or more column names followed by a colon and an expression, the `into` keyword, and an expression evaluating to a table.
-```
+```lil
 insert name:"John" job:"Writer" age:32 into people
 # +----------+-----+--------------+
 # | name     | age | job          |
@@ -560,7 +541,7 @@ insert name:"John" job:"Writer" age:32 into people
 # +----------+-----+--------------+
 ```
 Missing columns will be filled in as 0. If any of the `insert`ed values are lists, the remaining columns will be spread to match:
-```
+```lil
 insert name:("John","Eric") age:32 zodiac:("Taurus","Virgo") into people
 # +----------+-----+--------------+----------+
 # | name     | age | job          | zodiac   |
@@ -575,7 +556,7 @@ insert name:("John","Eric") age:32 zodiac:("Taurus","Virgo") into people
 # +----------+-----+--------------+----------+
 ```
 As a special case, if the value to insert into is a number, treat it as an empty table. This is a convenient way to make a table from scratch:
-```
+```lil
 insert name:("John","Eric") age:32 zodiac:("Taurus","Virgo") into 0
 # +--------+-----+----------+
 # | name   | age | zodiac   |
@@ -588,7 +569,7 @@ insert name:("John","Eric") age:32 zodiac:("Taurus","Virgo") into 0
 ---
 
 Lil also offers two basic joining operations: `join` (natural join), and `cross` (cartesian/cross join):
-```
+```lil
 jobs:insert job:"Sales","Developer","Accounting","Facilities" salary:85000,75000,60000,50000 into 0
 # +--------------+--------+
 # | job          | salary |
@@ -633,7 +614,7 @@ select a:name b:name_ where name < name_ from guests cross guests
 # +---------+----------+
 ```
 For a row-wise join- concatenating tables with the same columns- you can use `,`, which has the same padding/widening behavior as `insert`. You can likewise `take` or `drop` rows or columns from a table. If the left argument to `take` is a list of numbers, it picks out those rows very much like a generalization of `select`:
-```
+```lil
 "name" take people
 # +----------+
 # | name     |
@@ -674,7 +655,7 @@ For a row-wise join- concatenating tables with the same columns- you can use `,`
 # +----------+-----+-------------+
 ```
 The `flip` of a table transposes its data, promoting the first column (or, if it exists, a column named `key`) from the original table to column keys for the result:
-```
+```lil
 expenses: insert kind:"tax","gas","power","food" jan:11,22,33,44 feb:55,66,77,88 into 0
 # +---------+-----+-----+
 # | kind    | jan | feb |
@@ -694,7 +675,7 @@ flip expenses
 # +-------+-----+-----+-------+------+
 ```
 The `key` column makes the `flip` of a table a reversible operation. If you don't need the original keys, you can discard them with `drop`:
-```
+```lil
 "key" drop flip expenses
 # +-----+-----+-------+------+
 # | tax | gas | power | food |
@@ -706,7 +687,7 @@ The `key` column makes the `flip` of a table a reversible operation. If you don'
 
 ---
 In some situations you may wish to construct or query tables containing columns which have names that are reserved keywords (like `count` or `range`) or are not valid Lil identifiers (like `a name with spaces`). To define such a column, enclose the name in double-quotes:
-```
+```lil
 denormal: select "with \"escapes":index "count":value from "ABC"
 # +---------------+-------+
 # | with "escapes | count |
@@ -726,7 +707,7 @@ insert "pet name":"Galena","Pippi","Chester" "pet species":"Chicken","Chicken","
 # +-----------+-------------+
 ```
 To _reference_ these columns in a query, every column expression has the variable `column` bound to the entire table (or subtable, when grouping) within column expressions. As usual, you can access specific columns by indexing this table with a string:
-```
+```lil
 select where column["with \"escapes"]>0 from denormal
 # +---------------+-------+
 # | with "escapes | count |
@@ -766,7 +747,7 @@ It may also be helpful to think in terms of how the shape of output tables relat
 Lil, the Formatting Language
 ----------------------------
 The `parse` and `format` primitives are used for breaking strings apart into Lil values, and formatting Lil values into a customizable string representation, respectively. Both take as their left argument a _format string_ with a concise notation for controlling these processes. In many cases, these format strings are symmetrical: the `parse` of the `format` under the same Format string will be an identity operation, and vice versa:
-```
+```lil
 f: "0x%04h"       # a four-digit zero-padded lowercase hexadecimal number with an '0x' prefix
 f format 123      # "0x007b"
 f parse "0x007b"  # 123
@@ -809,7 +790,7 @@ Pattern types are as follows:
 | `p`  | `()`   | read ISO-8601 date-time as a dictionary of time parts.         | format dict as ISO-8601.                             |
 
 When parsing, each pattern will be matched against input in sequence, consuming some number of input characters and producing output values, and literals will be expected; if at any point a pattern or literal fails to match against input, parsing will cease, and any subsequent patterns in the format string will yield appropriate "null" values. Thus, a given format string will always yield a fixed number of results, no matter the input. In the case where there is _exactly one_ value-yielding pattern in the format string, `parse` output will simply be that value instead of a list.
-```
+```lil
 "%f %s %i" parse "12 apples"                        # (12,"apples",0)
 "%f %ss" parse "12 apples"                          # (12,"apple")
 ("amount","noun") dict "%f %ss" parse "12 apples"   # {"amount":12,"noun":"apple"}
@@ -817,7 +798,7 @@ When parsing, each pattern will be matched against input in sequence, consuming 
 ```
 
 The right argument to `parse` may be list of strings; in this case the output will be a list of _rows_, where each row contains the values from parsing one input string. The `flip` of this would give _columns_ instead. Here's an example of parsing a table of fixed-width records:
-```
+```lil
 form: "%6s%6c%2i"
 data: "apple  $1.00 1\ncherry $0.3515\nbanana $0.75 2"
 
@@ -850,12 +831,12 @@ t: table ("name","price","amt") dict flip r
 ```
 
 When formatting, literals will be included in the output string and each pattern will control conversion of one value from the input list, with a few exceptions as explained below. Missing arguments will be interpreted as appropriate "null" values.
-```
+```lil
 "%i,%a,%i" format 1,(list 65,66,67)  # "1,ABC,0"
 ```
 
 The left argument to `format` may be a list of strings; in this case it is a series of alternating delimiters and format strings, with the last item always being a format string. Each format string is "pushed" one layer deeper into the right argument of `format`, and (if present), the delimiter will be used to `fuse` these intermediate strings, allowing a simple statement to recursively format a complex structure:
-```
+```lil
                     ()  format 11,22                   # (11,22)                # (identity)
                 "%03i"  format 11,22                   # "011"                  # format the first item and discard unused(!)
           (list "%03i") format 11,22                   # ("011","022")          # format each
@@ -864,7 +845,7 @@ The left argument to `format` may be a list of strings; in this case it is a ser
 ("@","<%s>",":","%03i") format (list 11,22),(list 33)  # "<011:022>@<033>"      # fuse (format each (fuse (format each)))
 ```
 Recursive formats will "explode" tables into lists of row-lists:
-```
+```lil
 t: insert alpha:"one","two" beta:11,22 into 0
 #+-------+------+
 #| alpha | beta |
@@ -880,13 +861,13 @@ t: insert alpha:"one","two" beta:11,22 into 0
 If `N` is specified, the `%s`,`%a` and `%b` patterns will read up to `N` characters of input when parsing. Otherwise, the next character in the format string will be interpreted as a delimiter, and input characters will be read until that delimiter is encountered. (Note that if `%s`/`%a`/`%b` is immediately followed by a pattern, the delimiter will be `%`!) If `%s` appears at the end of the format string, it will simply read the remainder of the input string.
 
 The `%p` pattern operates on a dictionary with numeric fields for `year`, `month`, `day`, `hour`, `minute`, `second`:
-```
+```lil
 "%p" parse  "2021-02-03T04:05:58Z"  # {"year":2021,"month":2,"day":3,"hour":4,"minute":5,"second":58}
 "%p" format ().year:1984            # "1984-01-00T00:00:00Z"
 ```
 
 The `%n` pattern can be used for progressive parsing. It also offers a way of finding the first index of a given character in a string:
-```
+```lil
 data: "one,two,three"
 "%s,%n" parse data         # ("one",4)
 "%s,%n" parse 4 drop data  # ("two",4)
@@ -895,7 +876,7 @@ data: "one,two,three"
 ```
 
 The `%m` and `%z` patterns can be used to disambiguate between failing to match and successfully parsing a null-equivalent value. You can also do some kinds of pattern matching:
-```
+```lil
 "%i%m" parse "23"                      # (23,1) # successful parse
 "%i%m" parse "0"                       # (0,1)  # successful parse of 0
 "%i%m" parse "orange"                  # (0,0)  # mismatch, defaulted to 0
@@ -905,7 +886,7 @@ The `%m` and `%z` patterns can be used to disambiguate between failing to match 
 ```
 
 The `%r` pattern is followed by one or more "valid" characters, the count given by `D` (or 1 by default). This pattern matches and collects input if and only if the input characters are within this set of valid characters. The `-` flag inverts this behavior, such that the pattern matches and collects only characters which are _not_ in the valid set. If `N` is specified, exactly N characters must be matched; otherwise `%r` will accept zero or more valid characters. The `%o` pattern is exactly like `%r`, but if `N` is unspecified it will accept zero or _one_ valid characters:
-```
+```lil
 "%.2r01"     parse "01110201"     # "01110"          # grab any leading number of binary digits
 "%*.2r01%z"  parse "010","012"    # (1,0)            # string consists only of binary digits?
 "%r-%i"      parse "----45"       # ("----",45)      # grab any prefix of minus signs
@@ -915,26 +896,26 @@ The `%r` pattern is followed by one or more "valid" characters, the count given 
 ```
 
 The `%q` and `%v` patterns are useful for manipulating Lil source code, parsing/matching and formatting Lil string literals and Lil variable names, respectively:
-```
+```lil
 "%v[%q]%m" parse "func[\"foo\"]"    # ("func","foo",1)
 "%q" format "a string"              # "\"a string\""
 ```
 
 The `%j` pattern can be used to format or parse data as JSON. When formatting JSON, Lil dictionary keys will be cast to strings, and anything other than a number, string, list, or dictionary will become a JSON `null`:
-```
+```lil
 "%j" format (11,22) dict (33,44)    # "{\"11\":33,\"22\":44}"
 "%j" format list 11,22              # "[11,22]"
 "%j" format table 11,22             # "null"
 ```
 When parsing JSON, the value `true` will become the number `1`, and `false` or `null` will become the number `0`. This JSON parser is highly tolerant and will among other things accept non-string JSON values as dictionary keys, single-quoted strings, missing `,` and `:` delimiters, and some missing trailing delimiters. [Postel's Law](https://en.wikipedia.org/wiki/Robustness_principle), baby!
-```
+```lil
 "%j" parse "[true,false,null,1]"   # (1,0,0,1)
 "%j" parse "{11:22,33:44"          # {11:22,33:44}
 "%j" parse "{'foo':22}"            # {"foo":22}
 ```
 
 If any patterns specify names, the result of `parse` will be a dictionary, and `format` will likewise expect a dictionary as its right argument:
-```
+```lil
 "%[one]i %[two]i" parse "34 56"                     # {"one":34,"two":56}
 "%[one]i %[two]i" format ("one","two") dict 34,56   # "34 56"
 ```
@@ -946,13 +927,13 @@ Lil has a number of features influenced by "Vector-oriented" languages like APL,
 The most obvious vector-oriented feature in Lil is _conforming_, in which a number of primitive operators like `+` and `-` can be applied either to single numbers or entire lists. This functionality is essential to how Lil manipulates columns within queries.
 
 Let's start with a unary operator. Applied to a list, `-` "penetrates" to each list element:
-```
+```lil
 -(5)                # -5
 -(10,-35)           # (-10,35)
 ```
 
 With a binary operator, a non-list item will "spread" and be paired with each element in a list. Given two lists, corresponding element from each list are "paired up":
-```
+```lil
 100+10              # 110
 100+(10,20)         # (110,120)
 (100,200)+10        # (110,210)
@@ -960,7 +941,7 @@ With a binary operator, a non-list item will "spread" and be paired with each el
 ```
 
 The same pattern is carried out recursively; you can operate on arbitrarily high-dimensional data this way. Sometimes you may still need an `each` or `flip` to get your operands to line up the way you want:
-```
+```lil
 2*(list 1,2,3),(list 3,4)
 # ((2,4,6),(6,8))
 
@@ -975,7 +956,7 @@ flip(27,19)+flip 2 cross 3
 ```
 
 Conforming is why Lil has two different equality operators: `=` (equals) conforms, and `~` (match) does not. Consider these cases:
-```
+```lil
 22=11,22,33          # (0,1,0)
 22~11,22,33          # 0
 
@@ -988,13 +969,13 @@ Conforming is why Lil has two different equality operators: `=` (equals) conform
 In many situations, `=` and `~` are equivalent. Prefer `~` when you don't _need_ conforming behavior; it signals your intent more clearly to a reader, since it is easy to tell without context that the result will be a single number.
 
 If two lists do not have the same length, Lil will truncate or repeat the right argument (`y`) to correspond to the length of the left argument (`x`), as if by `(count x) take y`:
-```
+```lil
 (11,22,33,44)+(100,200)               # (111,222,133,244)
 (11,22,33,44)+(100,200,300,400,500)   # (111,222,333,444)
 (100,200)+(11,22,33,44)               # (111,222)
 ```
 This behavior can be useful for finding relative relationships in a list, comparing it to a "shifted" copy of itself:
-```
+```lil
 v:1,2,2,5,3,6,7,7
 
 (1 drop v)=v                          # (0,1,0,0,0,0,1)    # same as previous?
@@ -1004,13 +985,13 @@ v:1,2,2,5,3,6,7,7
 If you're familiar with Q or K, you might recognize this pattern as similar to the applications of the [eachprior](https://code.kx.com/q/ref/maps/#each-prior) adverb.
 
 Another application is applying a "mask" pattern to an entire list:
-```
+```lil
 (11,22,33,44,55)*(0,1)                # (0,22,0,44,0)      # mask off odd items
 (11,22,33,44,55)*(1,0)                # (11,0,33,0,55)     # mask off even items
 ```
 
 Combining conforming operators with reducing operators like `sum` and `raze` offers many elegant and direct solutions to problems. Compare each of these approaches to counting how many times a value `needle` can be found in a list `haystack`:
-```
+```lil
 needle:   "apple"
 haystack: ("frog","apple","chicken","toadstool","apple","rice","fish")
 
@@ -1026,7 +1007,7 @@ sum needle=haystack                                    # vector-oriented (spread
 ```
 
 Transforming iterative code into parallel, vector-oriented algorithms makes Lil _much_ faster and more efficient, and may result in simpler and clearer code. Consider the following two approaches for replacing values in an array that are less than 5 with the number "99":
-```
+```lil
 each v in x                # iterative loop
  if v<5 99 else v end
 end
@@ -1036,38 +1017,38 @@ m:x<5                      # compute a "mask" of 0 or 1
 ```
 
 The `@` operator is another powerful tool. Given a data structure on the left and a list of indices on the right it picks the element at each index. This operation can be used to replicate, filter, or permute the elements of the source:
-```
- "ABC" @ 0,0,1,2,1,2,0
-("A","A","B","C","B","C","A")
+```lil
+"ABC" @ 0,0,1,2,1,2,0
+# ("A","A","B","C","B","C","A")
 
- ("AB" dict 11,22) @ "BAAB"
-(22,11,11,22)
+("AB" dict 11,22) @ "BAAB"
+# (22,11,11,22)
 ```
 
 If the left argument is a function, it is applied to each element of the right argument, like a more concise `each` loop:
-```
- on triple x do x,x,x end
+```lil
+on triple x do x,x,x end
 
- each x in 11,22,33 triple[x] end
-((11,11,11),(22,22,22),(33,33,33))
+each x in 11,22,33 triple[x] end
+# ((11,11,11),(22,22,22),(33,33,33))
 
- triple @ 11,22,33
-((11,11,11),(22,22,22),(33,33,33))
+triple @ 11,22,33
+# ((11,11,11),(22,22,22),(33,33,33))
 ```
 
 This also works if the "left argument" is a primitive unary operator, "pushing" the operator onto each element of a list or dictionary:
-```
- first "Cherry","Olive","Orange","Lime"
-"Cherry"
+```lil
+first "Cherry","Olive","Orange","Lime"
+# "Cherry"
 
- first @ "Cherry","Olive","Orange","Lime"
-("C","O","O","L")
+first @ "Cherry","Olive","Orange","Lime"
+# ("C","O","O","L")
 
- count ("Alpha","Beta") dict (list 11,22,33),(list 44,55)
-2
+count ("Alpha","Beta") dict (list 11,22,33),(list 44,55)
+# 2
 
- count @ ("Alpha","Beta") dict (list 11,22,33),(list 44,55)
-{"Alpha":3,"Beta":2}
+count @ ("Alpha","Beta") dict (list 11,22,33),(list 44,55)
+# {"Alpha":3,"Beta":2}
 ```
 
 
@@ -1078,7 +1059,7 @@ Lil contains a number of language features and builtins specifically intended fo
 The `send` statement is followed by the name of a function, and then a set of arguments in brackets, just as if the function were being called. Instead of calling the named function directly, `send` finds the _next closest_ binding (or the most recently _shadowed_ binding, if you like) for the name and calls _that_ function. This is particularly useful for event handlers which need to "bubble" events up to a more general handler, like a card's `link` definition deferring to the deck's `link` definition.
 
 The `send` statement can also be handy to _override_ built-in functions like `go[]` with your own code, so that you have a chance to perform some work before, after, or instead of their default behavior. Defining these overrides in the deck's script will make them apply for events triggered from any card or widget:
-```
+```lil
 on go x do
 	# provide our own novel 'special name':
 	if x~"Random"
@@ -1091,43 +1072,32 @@ end
 ```
 
 An _interface_ appears similar to a dictionary, but indexing or assignment through an interface may have side-effects, and the values in fields may change over time:
-```
-  sys
-<system>
-  "%e" format sys.now
-"2021-11-12T02:00:59Z"
-  "%e" format sys.now
-"2021-11-12T02:01:07Z"
+```lil
+sys                  # <system>
+"%e" format sys.now  # "2021-11-12T02:00:59Z"
+"%e" format sys.now  # "2021-11-12T02:01:07Z"
 
-  time:sys
-<system>
-  time.now
-1636682495
+time:sys             # <system>
+time.now             # 1636682495
 ```
 Interfaces cannot be defined from Lil programs- they are furnished by a host application like Decker. Consult Decker's manual for a description of the interfaces you can use in your scripts. It is also not possible to enumerate the keys of an interface; they may have infinitely many keys, populated on the fly. Thus, the `in` operator will always return `0` when an interface is its right argument, and the `keys` operator will always return `()`.
 
 Interfaces can be compared with `~` and `=` using _reference equality_ and concatenated into lists using `,` like any other datatype:
-```
-  sys~sys
-1
-  sys=(sys,sys,123)
-(1,1,0)
+```lil
+sys~sys              # 1
+sys=(sys,sys,123)    # (1,1,0)
 ```
 
 All interfaces will accept the `"type"` index, which behaves like `typeof`. This is handy if you ever have a list, dictionary, or table containing interfaces:
-```
-  sys.type
-"system"
-  (sys,sys,sys)..type
-("system","system","system")
+```lil
+sys.type             # "system"
+(sys,sys,sys)..type  # ("system","system","system")
 ```
 
 Accessing an invalid index will return `0`, and attempting to write to an invalid (or read-only) index will return the expression to the right, like any other indexed assignment:
-```
-  sys.bogus
-0
-  sys.bogus:123
-123
+```lil
+sys.bogus            # 0
+sys.bogus:123        # 123
 ```
 
 Appendix 1: Unary Primitives
