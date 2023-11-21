@@ -1,0 +1,806 @@
+
+# a series of Lil solutions to selected problems
+# posed on the Perl Weekly Challenge:
+# https://theweeklychallenge.org/
+
+pn:problems:0
+on problem x do
+ problems:problems+1
+ pn:x
+end
+on assert x y do
+ if !x~y
+  print["error in problem %f\ngot:       %j\nexpected:  %j" pn x y]
+  exit[1]
+ end
+end
+
+# utilities:
+
+on rev       x do         extract value orderby index desc from x end   # k: |:
+on sortstr   x do "" fuse extract value orderby value asc  from x end   # k: {x@<x}
+on sumscan   x do a:0 each v in x a:a+v end                       end   # k: +\
+on maxscan   x do a:0 each v in x a:a|v end                       end   # k: |\
+on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':y
+
+# the problems:
+
+problem[242.1]
+# find the (distinct) members of x missing from y.
+on missing x y do extract first value by value where !value in y from x end
+on f x y do (list missing[x y]),list missing[y x] end
+assert[f[(1,2,3)   (2,4,6)  ] "%j"parse"[[1,3],[4,6]]"]
+assert[f[(1,2,3,3) (1,1,2,2)] "%j"parse"[[3],[]]     "]
+
+problem[242.2]
+# given a matrix, reverse each row and invert values.
+on f x do rev @ ! x end
+assert[f["%j" parse "[[1,1,0],[1,0,1],[0,0,0]]"                ] "%j"parse"[[1,0,0],[0,1,0],[1,1,1]                ]"]
+assert[f["%j" parse "[[1,1,0,0],[1,0,0,1],[0,1,1,1],[1,0,1,0]]"] "%j"parse"[[1,1,0,0],[0,1,1,0],[0,0,0,1],[1,0,1,0]]"]
+
+problem[240.1]
+# are y an acronym of the letters x?
+on f x y do x~("","%l")format first@y end
+assert[f["ppp" ("Perl", "Python", "Pascal")] 1]
+assert[f["rp"  ("Perl", "Raku"            )] 0]
+assert[f["oac" ("Oracle", "Awk", "C"      )] 1]
+
+problem[239.1]
+# is the word created by concatenating the array elements is the same?
+on f x y do(""fuse x)~""fuse y end
+assert[f[("ab", "c") ("a", "bc")    ] 1]
+assert[f[("ab", "c") ("ac", "b")    ] 0]
+assert[f[("ab", "cd", "e") ("abcde")] 1]
+
+problem[239.2]
+# how many strings y are formed exclusively from x?
+on f x y do sum each v in y min("" split v)in x end end
+assert[f["ab"  ("ad", "bd", "aaab", "baa", "badab"             )] 2]
+assert[f["abc" ("a", "b", "c", "ab", "ac", "bc", "abc"         )] 7]
+assert[f["cad" ("cc", "acd", "b", "ba", "bac", "bad", "ac", "d")] 4]
+
+problem[238.1]
+# return the running sum of the given array.
+assert[sumscan[(1, 2, 3, 4, 5)] (1, 3, 6, 10, 15)]
+assert[sumscan[(1, 1, 1, 1, 1)] (1, 2, 3, 4, 5  )]
+assert[sumscan[(0, -1, 1, 2  )] (0, -1, 0, 2    )]
+
+problem[238.2]
+# sort the given array in increasing order with respect to the count of steps required
+# to obtain a single-digit number by multiplying its digits recursively for each array element.
+# If any two numbers have the same count of steps, then print the smaller number first.
+on stp x do if x<10 0 else 1+stp[prod""split x] end end
+on f x do extract value orderby (stp@value)join value asc from x end
+assert[f[(15, 99, 1, 34 )] (1, 15, 34, 99 )]
+assert[f[(50, 25, 33, 22)] (22, 33, 50, 25)]
+
+problem[236.1]
+# can you form exact change for all $5 purchases given a stream of bills x?
+on f x do
+ a:b:0 r:1 each v in x
+  if v~10 a:a+1 end
+  if v~5  b:b+1 end
+  c:v-5 while c&r
+   if     c~0
+   elseif a&!c<10 a:a-1 c:c-10
+   elseif b&!c< 5 b:b-1 c:c- 5 
+   else   r:0 end
+  end
+ end
+ r
+end
+assert[f[(5, 5,  5, 10, 20)] 1]
+assert[f[(5, 5, 10, 10, 20)] 0]
+assert[f[(5, 5,  5, 20    )] 1]
+
+problem[233.2]
+# sort the given array in increasing order based on the frequency of the values.
+# if multiple values have the same frequency then sort them in decreasing order.
+on f x do
+ extract v orderby c asc orderby v desc from
+  select v:value c:count value by value from x
+end
+assert[f[(1,1,2,2,2,3         )] (3,1,1,2,2,2         )]
+assert[f[(2,3,1,3,2           )] (1,3,3,2,2           )]
+assert[f[(-1,1,-6,4,5,-6,1,4,1)] (5,-1,4,4,-6,-6,1,1,1)]
+
+problem[230.1]
+# separate the given array into single digits.
+on f x do 0+""split x end
+assert[f[(1, 34, 5, 6  )] (1, 3, 4, 5, 6      )]
+assert[f[(1, 24, 51, 60)] (1, 2, 4, 5, 1, 6, 0)]
+
+problem[230.2]
+# return the count of words that start with the given prefix.
+on f prefix x do sum(list"%s%%m"format prefix)parse x end
+assert[f["at" ("pay", "attention", "practice", "attend")] 2]
+assert[f["ja" ("janet", "julia", "java", "javascript"  )] 3]
+
+problem[220.1]
+# return the list of common characters (sorted alphabetically) found in every word of the given list.
+on f x do
+ extract value orderby value asc where min each y in x c in y end from c:"" split first x
+end
+assert[f[("perl", "rust", "raku" )] (list "r"   )]
+assert[f[("love", "live", "leave")] ("e","l","v")]
+
+problem[219.1]
+# square each number in the list and return the sorted list, increasing order.
+on f x do extract value orderby value asc from x^2 end
+assert[f[(-2, -1, 0, 3, 4)] (0, 1, 4, 9, 16  )]
+assert[f[(5, -4, -1, 3, 6)] (1, 9, 16, 25, 36)]
+
+problem[217.1]
+# find the 3rd smallest element in the sorted matrix.
+on f x do first 2 drop extract value orderby value asc from raze x end
+assert[f["%j" parse "[[3, 1, 2], [5, 2, 4], [0, 1, 3]]"] 1]
+assert[f["%j" parse "[[2, 1], [4, 5]]"                 ] 4]
+assert[f["%j" parse "[[1, 0, 3], [0, 0, 0], [1, 2, 1]]"] 0]
+
+problem[215.1]
+# count words in the list that are not alphabetically sorted.
+on f x do count extract value where !value=sortstr@value from x end
+assert[f[("abc","xyz","tsu")] 1]
+assert[f[("rat","cab","dad")] 3]
+assert[f[("x","y","z"      )] 0]
+
+problem[213.1]
+# sort the all even integers first then all odds in ascending order.
+on f x do extract value orderby (2%value) join value asc from x end
+assert[f[(1,2,3,4,5,6)] (2,4,6,1,3,5)]
+assert[f[(1,2        )] (2,1        )]
+assert[f[(list 1     )] (list 1     )]
+
+problem[206.1]
+# find the shortest time in minutes between any two time points.
+on f x do
+ t:extract value orderby value asc from sum(60,1)*flip "%i:%i" parse x
+ min each v i in t (24*60)%t[(count t)%i+1]-v end
+end
+assert[f[("00:00", "23:55", "20:00"         )]  5]
+assert[f[("01:01", "00:50", "00:57"         )]  4]
+assert[f[("10:10", "09:30", "09:00", "09:55")] 15]
+
+problem[205.2]
+# find the highest value obtained by XORing any two distinct members of the array.
+on f x do max each p in x cross x bits.xor[p] end end
+assert[f[(1,2,3,4,5,6,7)]  7]
+assert[f[(2,4,1,3      )]  7]
+assert[f[(10,5,7,12,8  )] 15]
+
+problem[204.1]
+# is array monotonically increasing OR decreasing?
+on f x do
+ (min!(1 drop x)>x)|
+  min!(1 drop x)<x
+end
+assert[f[(1,2,2,3)] 1]
+assert[f[(1,3,2  )] 0]
+assert[f[(6,5,5,4)] 1]
+
+problem[199.1]
+# count 'good pairs' (i,j) where i<j and x[i]==x[j]
+on f x do
+ r:()
+ each xj j in x
+  each xi i in j take x
+   if xi=xj r:r,list i,j end
+  end
+ end
+ count r
+end
+assert[f[(1,2,3,1,1,3)] 4]
+assert[f[(1,2,3      )] 0]
+assert[f[(1,1,1,1    )] 6]
+
+problem[197.1]
+# move all zeros to the end while maintaining the relative order of non-zero elements.
+on f x do ((z:list 0)drop x),z take x end
+assert[f[(1, 0, 3, 0, 0, 5)] (1, 3, 5, 0, 0, 0)]
+assert[f[(1, 6, 4         )] (1, 6, 4         )]
+assert[f[(0, 1, 0, 2, 0   )] (1, 2, 0, 0, 0   )]
+
+problem[191.1]
+# find out whether the largest item in the list is at least twice as large as each of the other items.
+on f x do (-1,1)[min!(m:max x)<2*(list m)drop x] end
+assert[f[(1,2,3,4)] -1]
+assert[f[(1,2,0,5)]  1]
+assert[f[(2,6,3,1)]  1]
+assert[f[(4,5,2,3)] -1]
+
+problem[189.1]
+# find the smallest character in the given array lexicographically greater than the target character.
+on f target x do target unless first extract value orderby value asc where value>target from x end
+assert[f["b" "emug"] "e"]
+assert[f["a" "dcef"] "c"]
+assert[f["o" "jar" ] "r"]
+assert[f["a" "dcaf"] "c"]
+assert[f["v" "tgal"] "v"]
+
+problem[186.1]
+# intercalate items of a pair of lists.
+on f a b do raze a join b end
+assert[f[(1,2,3) ("a","b","c")] (1,"a",2,"b",3,"c")]
+assert[f[("a","b","c") (1,2,3)] ("a",1,"b",2,"c",3)]
+
+problem[185.1]
+# convert a MAC address from hhhh.hhhh.hhhh to hh:hh:hh:hh:hh:hh
+on f x do "%2h:%2h:%2h:%2h:%2h:%2h"format"%2h%2h.%2h%2h.%2h%2h"parse x end
+assert[f["1ac2.34f0.b1c2"] "1a:c2:34:f0:b1:c2"]
+assert[f["abc1.20f1.345a"] "ab:c1:20:f1:34:5a"]
+
+problem[184.1]
+# given a list of strings, replace the first two chars with a sequence number.
+on f x do each v i in x "%02i%s" format i,2 drop v end end
+assert[f[("ab1234","cd5678","ef1342")] ("001234","015678","021342")]
+assert[f[("pq1122","rs3334"         )] ("001122","013334"         )]
+
+problem[183.1]
+# remove duplicate sublists from a list.
+on f x do keys x dict () end
+assert[f["%j"parse"[[1,2],[3,4],[5,6],[1,2]]"] "%j"parse"[[1,2],[3,4],[5,6]]"]
+assert[f["%j"parse"[[9,1],[3,7],[2,5],[2,5]]"] "%j"parse"[[9,1],[3,7],[2,5]]"]
+
+problem[182.1]
+# find the index of the first biggest number in the list.
+on f x do first extract index orderby value desc from x end
+assert[f[(5, 2, 9, 1, 7, 6)] 2]
+assert[f[(4, 2, 3, 1, 5, 0)] 4]
+
+problem[181.1]
+# order each sentence alphanumerically in a paragraph.
+on f x do
+ "."fuse each s in "."split x
+  " "fuse extract value orderby (list "%l")format value asc from " "split s
+ end
+end
+assert[
+f["All he could think about was how it would all end. There was still a bit of uncertainty in the equation, but the basics were there for anyone to see. No matter how much he tried to see the positive, it wasn't anywhere to be seen. The end was coming and it wasn't going to be pretty."]
+  "about All all could end he how it think was would. a anyone basics bit but equation, for in of see still the the There there to uncertainty was were. anywhere be he how it matter much No positive, see seen the to to tried wasn't. and be coming end going it pretty The to was wasn't."
+]
+
+problem[181.2]
+# find days with a temperature hotter than the previous
+on f x do extract date where 0,temp<1 drop temp orderby date asc from readcsv["date,temp\n",x "si"] end
+assert[
+f["2022-08-01, 20
+2022-08-09, 10
+2022-08-03, 19 
+2022-08-06, 24
+2022-08-05, 22
+2022-08-10, 28
+2022-08-07, 20
+2022-08-04, 18
+2022-08-08, 21
+2022-08-02, 25"]
+ ("2022-08-02","2022-08-05","2022-08-06","2022-08-08","2022-08-10")
+]
+
+problem[180.1]
+# find the index of the first unique character.
+on f x do first extract index where 1~count value by value from x end
+assert[f["Perl Weekly Challenge"] 0]
+assert[f["Long Live Perl"       ] 1]
+
+problem[180.2]
+# find the numbers in a list greater than an integer.
+on f x i do extract value where value>i from x end
+assert[f[(1,4,2,3,5)     3] (4,5    )]
+assert[f[(9,0,6,2,3,8,5) 4] (9,6,8,5)]
+
+problem[179.1]
+# convert an integer into ordinal english words.
+# (range unspecified, so handle 0 to 9999)
+on f x do
+ o:"|"split"||twen|thir|four|fif|six|seven|eigh|nine"
+ s:"|"split"zeroth|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth"
+ i:"|"split"|one|two|three|four|five|six|seven|eight|nine"
+ if     (x>999)&0~1000%x "%s-thousandth"  format i[x/1000]
+ elseif x>999            "%s-thousand %s" format i[x/1000],f[1000%x]
+ elseif (x>99)&0~100%x   "%s-hundredth"   format i[x/100]
+ elseif x>99             "%s-hundred %s"  format i[x/100],f[100%x]
+ elseif x<13 s[x]
+ elseif x<20             "%steenth"       format o[x-10]
+ elseif 0~10%x           "%stieth"        format o[x/10]
+ elseif x>13             "%sty-%s"        format o[x/10],f[10%x]
+ end
+end
+assert[f[11] "eleventh"]
+assert[f[62] "sixty-second"]
+assert[f[99] "ninety-ninth"]
+
+problem[165.1]
+# generate an .svg of dots and lines
+# (which speak and say: what we do is what you wish to do!)
+on svg shapes do
+  b.tag:"svg"
+  b.attr:("xmlns","width","height")dict"http://www.w3.org/2000/svg","100%","100%"
+  v:raze each v in shapes (list 2 take v),(list -2 take v) end
+  b.attr.viewBox:"%i %i %i %i"format(ap:min v),(max v)-ap 
+  b.children:each s in shapes
+    r.tag:"path"
+    r.attr["stroke-width"]:2
+    if 2~count s
+      r.attr.d:"M %f %f a 2 2 0 1 0 1 0 Z"format s
+      r.attr.fill:"orange"
+    else
+      r.attr.d:"M %f %f L %f %f Z"format s
+      r.attr.stroke:"royalblue"
+    end
+  end
+  writexml[b]
+end
+on fit_line x do # calculate a line-of-best-fit via the least-squares method:
+  n:count x
+  sf:sum ff:first f:flip x
+  m:((n*sum prod f)-prod sum x)/(n*sum ff^2)-sf^2
+  b:(1/n)*(sum last f)-m*sf
+  on pt x do x,b+m*x end
+  list pt[min ff],pt[max ff]
+end
+p:"%j" parse "[
+  [333,129],[ 39,189],[140,156],[292,134],[393,52 ],[160,166],[362,122],[ 13,193],
+  [341,104],[320,113],[109,177],[203,152],[343,100],[225,110],[ 23,186],[282,102],
+  [284,98 ],[205,133],[297,114],[292,126],[339,112],[327,79 ],[253,136],[ 61,169],
+  [128,176],[346,72 ],[316,103],[124,162],[ 65,181],[159,137],[212,116],[337, 86],
+  [215,136],[153,137],[390,104],[100,180],[ 76,188],[ 77,181],[ 69,195],[ 92,186],
+  [275,96 ],[250,147],[ 34,174],[213,134],[186,129],[189,154],[361,82 ],[ 363,89],
+]"
+assert[
+  svg[p,fit_line[p]]
+  "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"13 52 380 144\"><path stroke-width=\"2\" d=\"M 333 129 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 39 189 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 140 156 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 292 134 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 393 52 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 160 166 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 362 122 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 13 193 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 341 104 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 320 113 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 109 177 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 203 152 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 343 100 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 225 110 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 23 186 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 282 102 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 284 98 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 205 133 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 297 114 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 292 126 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 339 112 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 327 79 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 253 136 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 61 169 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 128 176 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 346 72 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 316 103 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 124 162 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 65 181 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 159 137 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 212 116 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 337 86 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 215 136 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 153 137 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 390 104 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 100 180 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 76 188 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 77 181 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 69 195 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 92 186 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 275 96 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 250 147 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 34 174 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 213 134 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 186 129 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 189 154 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 361 82 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 363 89 a 2 2 0 1 0 1 0 Z\" fill=\"orange\"/><path stroke-width=\"2\" d=\"M 13 196.232838 L 393 82.249368 Z\" stroke=\"royalblue\"/></svg>"
+]
+
+problem[163.1]
+# sum of bitwise AND of all unique pairs.
+on f x do sum extract bits.and[c0 c1] where c0<c1 from table x cross x end
+assert[f[1,2,3] 3] # (1 & 2) + (2 & 3) + (1 & 3) => 0 + 2 + 1 =>  3
+assert[f[2,3,4] 2] # (2 & 3) + (2 & 4) + (3 & 4) => 2 + 0 + 0 =>  2
+
+problem[162.1]
+# calculate isbn-13 check-digit.
+on f x do 10%10-10%sum(12 take"-"drop x)*1,3 end
+assert[f["978-0-306-40615"] 7]
+assert[f["978-3-16-148410"] 0]
+assert[f["978-1-86197-876"] 9]
+
+problem[160.1]
+# take a number<10, convert to cardinal, count letters, and iterate until you reach "four".
+on f x do
+ d:count@n:"|"split"|one|two|three|four|five|six|seven|eight|nine"
+ r:list x while !d[x]~4 x:d[x] r:r,x end
+ " "fuse each v in r "%s is %s,"format n[v],n[d[v]] end,"four is magic."
+end
+assert[f[5] "five is four, four is magic."                             ]
+assert[f[7] "seven is five, five is four, four is magic."              ]
+assert[f[6] "six is three, three is five, five is four, four is magic."]
+
+problem[145.1]
+# calculate the dot-product of two lists.
+on f x y do sum x*y end
+assert[f[(1,2,3) (4,5,6)] 32]
+
+problem[143.1]
+# evaluate mathematical expressions of numbers, (), and + - * /
+on f x do
+  x:""fuse" "drop x
+  on m t do if last r:("%s%%n"format t)parse x  x:(last r)drop x  first r end end
+  on ex1 do
+   t:if m["("] r:ex2[] m[")"] r else m["%i"] end
+   if     m["*"] t*ex1[]
+   elseif m["/"] t/ex2[]
+   else t end
+  end
+  on ex2 do
+   t:ex1[]
+   if     m["+"] t+ex2[]
+   elseif m["-"] t-ex2[]
+   else t end
+  end
+  ex2[]
+end
+assert[f["10 + 20 - 5"      ] 25]
+assert[f["(10 + 20 - 5) * 2"] 50]
+assert[f["3 * 2 + 5"        ] 11]
+
+problem[139.1]
+# return 1 iff an array is already sorted.
+on f x do min(1 drop x)>x end
+assert[f[(1,2,3,4,5)] 1]
+assert[f[(1,3,2,4,5)] 0]
+
+problem[134.2]
+# generate a multiplcation table and display count of distinct terms.
+# (took some liberties with the display format here)
+on f m n do
+ t:each y in 1+range m y*1+range n end
+ d:extract first value by value from raze t
+ w:floor 2+(1/ln 10)*ln max t
+ c:("","%%%ii")format w
+ "\n"fuse("\n x |%s"format c format first t),
+         (" --+%s"format (sum w)take"-"),
+         (("\n"," %%i |%s"format c)format(1+range m)join t),
+         ("\ndistinct terms: %j" format list d),
+         ("count: %i" format count d)
+end
+assert[f[3 3] "
+ x | 1 2 3
+ --+------
+ 1 | 1 2 3
+ 2 | 2 4 6
+ 3 | 3 6 9
+
+distinct terms: [1,2,3,4,6,9]
+count: 6"
+]
+assert[f[3 5] "
+ x | 1 2 3  4  5
+ --+------------
+ 1 | 1 2 3  4  5
+ 2 | 2 4 6  8 10
+ 3 | 3 6 9 12 15
+
+distinct terms: [1,2,3,4,5,6,8,10,9,12,15]
+count: 11"
+]
+
+problem[131.1]
+# return a list of subarrays of x which contain consecutive integers.
+on f x do extract list value by sumscan[1,!(1 drop value)=value+1] from x end
+assert[f[(1, 2, 3, 6, 7, 8, 9   )] "%j"parse"[[1, 2, 3], [6, 7, 8, 9]]     "]
+assert[f[(11, 12, 14, 17, 18, 19)] "%j"parse"[[11, 12], [14], [17, 18, 19]]"]
+assert[f[(2, 4, 6, 8            )] "%j"parse"[[2], [4], [6], [8]]          "]
+assert[f[(1, 2, 3, 4, 5         )] "%j"parse"[[1, 2, 3, 4, 5]]             "]
+
+problem[130.1]
+# find the single number which appears an odd number of times in x.
+# (this is a classic evil interview question but trivial if you know the trick)
+assert[bits.xor[(2, 5, 4, 4, 5, 5, 2      )] 5]
+assert[bits.xor[(1, 2, 3, 4, 3, 2, 1, 4, 4)] 4]
+
+problem[127.1]
+#are two sets are disjoint?
+on f x y do !count(table x)join table y end
+assert[f[(1, 2, 5, 3, 4) (4, 6, 7, 8, 9)] 0]
+assert[f[(1, 3, 5, 7, 9) (0, 2, 4, 6, 8)] 1]
+
+problem[126.2]
+# compute minesweeper neighbor-counts for mines (x) in a text representation.
+on f x do
+  m:"x"=each r in "\n"split" "drop -1 drop 1 drop x ""split r end
+  i:image[(count first m),count m]
+  each row y in m each v x in row i[x,y]:v end end
+  n:i.copy[].merge["+" i.copy[].translate[-1,0]].merge["+" i.copy[].translate[1,0]]
+  i:n.copy[].merge["+" n.copy[].translate[0,-1]].merge["+" n.copy[].translate[0,1]]
+  "\n%s\n"format"\n"fuse each row y in m
+    " "fuse each v x in row if v "x" else i[x,y] end end
+  end
+end
+assert[f["
+x * * * x * x x x x
+* * * * * * * * * x
+* * * * x * x * x *
+* * * x x * * * * *
+x * * * x * * * * x
+"] "
+x 1 0 1 x 2 x x x x
+1 1 0 2 2 4 3 5 5 x
+0 0 1 3 x 3 x 2 x 2
+1 1 1 x x 4 1 2 2 2
+x 1 1 3 x 2 0 0 1 x
+"]
+
+problem[121.1]
+# invert bit y of byte x.
+on f x y do bits.xor[x 2^y-1] end
+assert[f[12 3]  8]
+assert[f[18 4] 26]
+
+problem[120.1]
+# swap the even and odd bits of a byte.
+on f x do
+ bits.or[
+  bits.and[x 170]/2
+  bits.and[x  85]*2
+ ]
+end
+assert[f[101] 154]
+assert[f[ 18]  33]
+
+problem[120.2]
+# find the (smaller) angle between the hands of an analog clock at a HH:MM time.
+on f x do
+ t:"%[h]i:%[m]i"parse x
+ ha:(30*t.m/60)+360*t.h/12
+ ma:            360*t.m/60
+ min 360%(ma-ha),(ha-ma)
+end
+assert[f["03:10"]  35]
+assert[f["04:00"] 120]
+assert[f["10:10"] 115]
+
+problem[119.1]
+# swap the high and low nybbles of a byte.
+on f x do
+ bits.or[
+  bits.and[x 240]/16
+  bits.and[x  15]*16
+ ]
+end
+assert[f[101] 86]
+assert[f[ 18] 33]
+
+problem[117.1]
+# find the missing row.
+# (this is like the xor trick except with more annoying io requirements.)
+on f x do
+ t:readcsv["n,t\n%s"format x "is"]
+ (sum 1+range 1+count t)-sum t.n
+end
+assert[f[
+"11, Line Eleven
+1, Line one
+9, Line Nine
+13, Line Thirteen
+2, Line two
+6, Line Six
+8, Line Eight
+10, Line Ten
+7, Line Seven
+4, Line Four
+14, Line Fourteen
+3, Line three
+15, Line Fifteen
+5, Line Five"
+] 12]
+
+problem[110.1]
+# filter a file to only "valid" phone numbers of a few specific formats.
+on pn x do 
+ ("%*o +%*02i%*o %*010i%m" parse x)| # +nn  nnnnnnnnnn
+ ("%*o (%*02i)%*o %*10i%m" parse x)| # (nn) nnnnnnnnnn
+ ("%*o %*04i%*o %*10i%m"   parse x)  # nnnn nnnnnnnnnn
+end
+on f x do "\n"fuse extract value where pn[value] from"\n"split x end
+assert[f[
+"0044 1148820341
+ +44 1148820341
+  44-11-4882-0341
+(44) 1148820341
+  00 1148820341"
+]
+"0044 1148820341
+ +44 1148820341
+(44) 1148820341"
+]
+
+problem[110.2]
+# transpose a csv file.
+on f x do "\n"fuse range each v k in cols readcsv[x] ","fuse k,v end end
+assert[f[
+"name,age,sex
+Mohammad,45,m
+Joe,20,m
+Julie,35,f
+Cristina,10,f"
+]
+"name,Mohammad,Joe,Julie,Cristina
+age,45,20,35,10
+sex,m,m,f,f"
+]
+
+problem[106.1]
+# find the maximum difference between two successive elements once the array is sorted.
+on f x do max(1 drop x:extract value orderby value asc from x)-x end
+assert[f[(2, 9, 3, 5   )] 4]
+assert[f[(1, 3, 8, 2, 0)] 5]
+assert[f[(list 5       )] 0]
+
+problem[95.2]
+# implement a stack Object.
+on stack_new do
+ local s:()
+ r.push:on push x do s:s,x x end
+ r.pop :on pop    do t:last s s:-1 drop s t end 
+ r.top :on top    do last s end
+ r.minv:on minv   do min s end
+end
+s:stack_new[]
+s.push[2],s.push[-1],s.push[0]
+assert[
+  (s.pop[],s.top[],s.push[0],s.minv[])
+  (0      ,-1     ,0        ,-1      )
+]
+
+problem[94.1]
+# group a word list into clusters of anagrams.
+on f x do extract list value by sortstr@value from x end
+assert[f[("opt", "bat", "saw", "tab", "pot", "top", "was")] "%j"parse"[['opt','pot','top'],['bat','tab'],['saw','was']]"]
+
+problem[92.1]
+# are two words isomorphic?
+on sig x do extract group by value from x end
+on f x y do sig[x]~sig[y] end
+assert[f["abc" "xyz"] 1]
+assert[f["abb" "xyy"] 1]
+assert[f["sum" "add"] 0]
+
+problem[91.1]
+# see-and-say numbers.
+on f x do
+ 0+"" fuse extract (count value),first value by sumscan[1,!(1 drop value)=value] from ""split x
+end
+assert[f[1122234] 21321314  ]
+assert[f[2333445] 12332415  ]
+assert[f[12345  ] 1112131415]
+
+problem[90.1]
+# show the complementary DNA strand nucleotide sequence.
+on f x do ""fuse("TAGC"dict"ATCG")@x end
+assert[
+  f["GTAAACCCCTTTTCATTTAGACAGATCGACTCCTTATCCATTCTCAGAGATGTGTTGCTGGTCGCCG"]
+    "CATTTGGGGAAAAGTAAATCTGTCTAGCTGAGGAATAGGTAAGAGTCTCTACACAACGACCAGCGGC"
+]
+
+problem[88.1]
+# return an array where r[i] is the product of all elements of x except x[i].
+on f x do each v in x prod(list v)drop x end end
+assert[f[(5, 2, 1, 4, 3)] (24, 60, 120, 30, 40)]
+assert[f[(2, 1, 4, 3   )] (12, 24, 6, 8       )]
+
+problem[87.1]
+# find the longest consecutive sequence in x, or return 0 if no sequence is longest.
+on f x do
+ r:extract value orderby count value asc from
+  extract list value by sumscan[1,!(1 drop value)=value+1] orderby value asc from x
+ if (count r[0])>count r[1] r[0] else 0 end
+end
+assert[f[(100, 4, 50, 3, 2  )] (2, 3, 4  )]
+assert[f[(20, 19, 9, 11, 10 )] (9, 10, 11)]
+assert[f[(20, 30, 10, 40, 50)] 0          ]
+
+problem[83.1]
+# count characters in a sentence minus the first and last word, ignoring whitespace.
+on f x do count""fuse -1 drop 1 drop" "split x end
+assert[f["The Weekly Challenge"                   ] 6]
+assert[f["The purpose of our lives is to be happy"] 23]
+
+problem[79.2]
+# how much water can be trapped between the columns of a histogram?
+on f x do
+ a:maxscan[x]
+ b:rev[maxscan[rev[x]]]
+ sum each v i in x 0|(a[i-1]&b[i+1])-v end
+end
+assert[f[(2, 1, 4, 1, 2, 5)] 6]
+assert[f[(3, 1, 3, 1, 1, 5)] 6]
+
+problem[78.1]
+# identify elements which are greater than all the elements to their right.
+on f x do extract value where value=rev[maxscan[rev[x]]] from x end
+assert[f[(9, 10, 7, 5, 6, 1)] (10, 7, 6, 1)]
+assert[f[(3, 4, 5          )] (list 5     )]
+
+problem[73.1]
+# find the minimum of each y-length sliding window of x.
+on f x y do min@window[y x] end
+assert[f[(1, 5, 0, 2, 9, 3, 7, 6, 4, 8) 3] (0, 0, 0, 2, 3, 3, 4, 4)]
+
+problem[71.1]
+# find elements which are greater than their neighbors.
+# (problem says the script should generate a random array, but that's silly.)
+on f x do extract value where value>(1 drop value,0)|(-1 drop 0,x) from x end
+assert[f[(18, 45, 38, 25, 10, 7, 21, 6, 28, 48)] (45, 21, 48    )]
+assert[f[(47, 11, 32, 8, 1, 9, 39, 14, 36, 23 )] (47, 32, 39, 36)]
+
+problem[62.1]
+# sort and deduplicate email addresses by domain (case-insensitive), then mailbox (case-sensitive).
+# (simplified IO relative to the problem statement.)
+on f x do
+ extract addr where !gindex by box join domain orderby domain join box asc from
+  update addr:x from table "%[box]s@%[domain]l" parse x
+end
+assert[
+  f[("name@example.org","rjt@cpan.org","Name@example.org","rjt@CPAN.org","user@alpha.example.org")]
+  ("user@alpha.example.org","rjt@cpan.org","Name@example.org","name@example.org")
+]
+
+problem[54.2]
+# calculate terms of the collatz sequence starting from x.
+on f x do
+ r:list x
+ while !1~x
+  r:r,x:if 2%x 1+3*x else x/2 end
+ end
+end
+assert[f[23] (23,70,35,106,53,160,80,40,20,10,5,16,8,4,2,1)]
+
+problem[50.1]
+# given a list of intervals [a,b], merge any overlapping intervals.
+on isect x y do if ((x[1])<(y[0])) x else x[0],y[1] end end
+on f x do
+  r:() a:first x
+  each v in 1 drop x
+    t:isect[a v]
+    a:if t~a r:r,list t v else t end
+  end
+  r,list a
+end
+assert[
+  f["%j" parse "[[2,7], [3,9], [10,12], [15,19], [18,22]]"]
+  "%j" parse "[[2, 9], [10, 12], [15, 22]]"
+]
+
+problem[46.1]
+# given a set of strings, extract the most common character for each position.
+on mode x do
+  first extract v orderby c desc from
+    select v:first value c:count value by value from x
+end
+on f x do "" fuse mode @ flip each v in "\n" split x " " drop v end end
+assert[f[
+1 drop "
+H x l 4 !
+c e - l o
+z e 6 l g
+H W l v R
+q 9 m # o"
+]
+"Hello"
+]
+assert[f[
+1 drop "
+P + 2 l ! a t o
+1 e 8 0 R $ 4 u
+5 - r ] + a > /
+P x w l b 3 k \\
+2 e 3 5 R 8 y u
+< ! r ^ ( ) k 0"
+]
+"PerlRaku"
+]
+
+problem[42.1]
+# produce the (decimal) numbers 1-50 in octal.
+on f do
+  v:1+range 50
+  (10*floor v/8)+8%v
+end
+assert[f[] (1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,20,21,22,23,24,25,26,27,30,31,32,33,34,35,36,37,40,41,42,43,44,45,46,47,50,51,52,53,54,55,56,57,60,61,62)]
+
+problem[42.2]
+# are parentheses in a string balanced?
+# (problem says generate random strings, but, again, that's silly.)
+on f x do !max 0>sumscan[("()"dict 1,-1)@x] end
+assert[f["()"   ] 1]
+assert[f["(())" ] 1]
+assert[f[")("   ] 0]
+assert[f["())()"] 0]
+
+problem[40.2]
+# sort the items of x at indices y.
+on f x y do
+  last each v i in extract value orderby value asc from x@y
+    x[y[i]]:v
+  end
+end
+assert[f[(10, 4, 1, 8, 12, 3) (0,2,5)] (1, 4, 3, 8, 12, 10)]
+
+problem[32.1]
+# perform a frequency count of lines in a file and produce a csv summary.
+on f x do
+  ("\n","%s,%i")format select first value count value by value from "\n"split x
+end
+assert[f["apple\nbanana\napple\ncherry\ncherry\napple"] "apple,3\nbanana,1\ncherry,2"]
+
+problem[20.1]
+# split a string into runs of the same character.
+on f x do
+  extract "" fuse value by sumscan[1,!(1 drop value)=value] from x
+end
+assert[f["ABBCDEEF"] "%j"parse"['A','BB','C','D','EE','F']"]
+assert[f["AAAABBAA"] "%j"parse"['AAAA','BB','AA'         ]"]
+
+# conclusion:
+
+print["all integration tests passed."]

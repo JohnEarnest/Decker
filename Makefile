@@ -72,6 +72,7 @@ test: lilt
 	@./scripts/test_interpreter.sh "./c/build/lilt "
 	@./c/build/lilt tests/dom/domtests.lil
 	@./c/build/lilt tests/dom/test_roundtrip.lil
+	@./c/build/lilt tests/puzzles/weeklychallenge.lil
 
 run: lilt
 	@./c/build/lilt
@@ -90,6 +91,7 @@ testjs: js
 	@./scripts/test_interpreter.sh "node js/build/lilt.js"
 	@node js/build/lilt.js tests/dom/domtests.lil
 	@node js/build/lilt.js tests/dom/test_roundtrip.lil
+	@node js/build/lilt.js tests/puzzles/weeklychallenge.lil
 
 web-decker: js
 	@chmod +x ./scripts/web_decker.sh
