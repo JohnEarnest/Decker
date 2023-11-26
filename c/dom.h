@@ -626,7 +626,7 @@ lv* interface_font(lv*self,lv*i,lv*x){
 	if(x){
 		ikey("space"){font_sw(self)=ln(x);return x;}
 		ikey("size" ){
-			lv*r=font_make(getpair(x));iwrite(r,lmistr("space"),ifield(self,"space"));
+			lv*r=font_make(pair_max(getpair(x),(pair){1,1}));iwrite(r,lmistr("space"),ifield(self,"space"));
 			for(int z=0;z<96;z++)iindex(r,z,iindex(self,z,NULL));self->b=r->b;return x;
 		}
 	}else{
@@ -636,7 +636,7 @@ lv* interface_font(lv*self,lv*i,lv*x){
 	}return x?x:NONE;
 }
 lv* font_make(pair s){
-	s=pair_max(s,(pair){0,0});
+	s=pair_max(s,(pair){1,1});
 	lv*r=lmi(interface_font,lmistr("font"),lms(3+96*(1+s.y*(int)ceil(s.x/8.0))));
 	return font_w(r)=s.x,font_h(r)=s.y,font_sw(r)=1,r;
 }

@@ -864,6 +864,11 @@ assert_image["font resize"
 	f.a
 ]
 
+f.size:0
+assert["font minimum size" (1,1) f.size]
+f.size:-.3,2.9
+assert["font bogus size" (1,2) f.size]
+
 #######################################
 #
 #  Sound

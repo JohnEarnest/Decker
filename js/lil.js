@@ -1613,7 +1613,7 @@ font_read=s=>{
 		if(x){
 			if(ikey(i,'space'))return font_sw(self,ln(x)),x
 			if(ikey(i,'size')){
-				const r=font_read(getpair(x));iwrite(r,lms('space'),ifield(self,'space'))
+				const r=font_read(rmax(rint(getpair(x)),rect(1,1)));iwrite(r,lms('space'),ifield(self,'space'))
 				for(let z=0;z<96;z++)iindex(r,z,iindex(self,z));self.pix=r.pix;return x
 			}
 		}else{
@@ -1622,7 +1622,7 @@ font_read=s=>{
 			if(ikey(i,'textsize'))return lmnat(([x])=>lmpair(font_textsize(self,x?ls(x):'')))
 		}return x?x:NONE
 	},'font')
-	if(typeof s=='string')ri.pix=data_read('FNT',s)
+	if(typeof s=='string')ri.pix=data_read('FNT',s); s=rmax(rint(s),rect(1,1))
 	if(!ri.pix){ri.pix=new Uint8Array(3+96*(1+s.y*ceil(s.x/8.0)));font_w(ri,s.x),font_h(ri,s.y),font_sw(ri,1)}
 	return ri
 }
