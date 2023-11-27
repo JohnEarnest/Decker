@@ -948,7 +948,7 @@ The same pattern is carried out recursively; you can operate on arbitrarily high
 2 cross 3
 # ((0,0),(1,0),(0,1),(1,1),(0,2),(1,2))
 
-each x in 2 cross 3 do (27,19)+x end
+each x in 2 cross 3 (27,19)+x end
 # ((27,19),(28,19),(27,20),(28,20),(27,21),(28,21))
 
 flip(27,19)+flip 2 cross 3
