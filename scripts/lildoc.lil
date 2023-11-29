@@ -49,7 +49,7 @@ escapes:"\\n","\\\"","\\\\"
 # and also makes it easy to coalesce adjacent runs together:
 
 on chunk type x do
- insert text:x font:type arg:"" into 0
+ insert text font arg with x type "" end
 end
 
 on highlight_lil text do

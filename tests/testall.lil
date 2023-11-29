@@ -66,8 +66,8 @@ show[flip ("one","two","three")]
 show[flip (list 1,2,3),(list 4,5,6)]
 show[flip 22,(list 33,44),(list 55,66,77,88)]
 show[flip table ()]
-show[flip insert kind:"tax","gas","power","food" jan:11,22,33,44 feb:55,66,77,88 into 0]
-show[flip insert jan:11,22,33,44 feb:55,66,77,88 key:"tax","gas","power","food" into 0]
+show[flip insert kind jan feb with "tax" 11 55 "gas" 22 66 "power" 33 77 "food" 44 88 end]
+show[flip insert jan feb key with 11 55 "tax" 22 66 "gas" 33 77 "power" 44 88 "food" end]
 show[!!(0,1,-23) !!("","0","foo") !!() !!()dict() !!table 1 !!on x do end]
 show[heading 3,5]
 show[mag ((list 9,0),(list 3,4),(list 0,7))]
@@ -127,10 +127,6 @@ show[("Apple","Banana","Peach","Beef")in("Banana","Beef")]
 show[random[() 1]]
 show["untitled" unless 0]
 show["untitled" unless "title"]
-show[(insert a:11 b:22 into 0),(insert c:33 into 0)] # two 1-length tables
-show[(insert a:() b:() into 0),(insert c:33 into 0)] # left empty
-show[(insert a:11 b:22 into 0),(insert c:() into 0)] # right empty
-show[(insert a:() b:() into 0),(insert c:() into 0)] # both empty
 
 header["drop/take"]
 show[(list 3 take list 5),(list 2 take "ABCDEF"),(list 6 take "AB"),(list -2 take range 5),(list 2 take d)]
@@ -148,23 +144,23 @@ show[5 take ()]
 show[-3 take ()]
 
 # filter out
-show[(33,44) drop 11,22,44,55                         ]# list drop
-show[("foo","baz") drop "quux","foo","zami"           ]# list drop
-show["foo" drop "bar","foo","quux"                    ]# str -> list drop
-show["cherry" drop d                                  ]# str -> list dict drop
-show[("b","c") drop insert a:99,88 b:33,44 into 0     ]# list table drop (cols)
-show[(2,0,5) drop insert a:99,88,77 b:33,44,55 into 0 ]# list table drop (rows)
-show["b"       drop insert a:99,88 b:33,44 into 0     ]# str -> list table drop
-show[(list 0,1) drop 3 cross 2                        ]
+show[(33,44) drop 11,22,44,55                          ]# list drop
+show[("foo","baz") drop "quux","foo","zami"            ]# list drop
+show["foo" drop "bar","foo","quux"                     ]# str -> list drop
+show["cherry" drop d                                   ]# str -> list dict drop
+show[("b","c") drop insert a b with 99 33 88 44 end    ]# list table drop (cols)
+show[(2,0,5) drop insert a b with 99 33 88 44 77 55 end]# list table drop (rows)
+show["b"       drop insert a b with 99 33 88 44 end    ]# str -> list table drop
+show[(list 0,1) drop 3 cross 2                         ]
 
 # filter
-show[(33,44) take 11,22,44,55                         ]# list take
-show[("foo","baz") take "quux","foo","zami"           ]# list take
-show["foo" take "bar","foo","quux"                    ]# str -> list take
-show["cherry" take d                                  ]# str -> list dict take
-show[("b","c") take insert a:99,88 b:33,44 into 0     ]# list table take (cols)
-show[(2,0,5) take insert a:99,88,77 b:33,44,55 into 0 ]# list table take (rows)
-show["b"       take insert a:99,88 b:33,44 into 0     ]# str -> list table take
+show[(33,44) take 11,22,44,55                           ]# list take
+show[("foo","baz") take "quux","foo","zami"             ]# list take
+show["foo" take "bar","foo","quux"                      ]# str -> list take
+show["cherry" take d                                    ]# str -> list dict take
+show[("b","c") take insert a b with 99 33 88 44 end     ]# list table take (cols)
+show[(2,0,5) take insert a b with 99 33 88 44 77 55 end ]# list table take (rows)
+show["b"       take insert a b with 99 33 88 44 end     ]# str -> list table take
 show[((list 2,0),(list 0,1),(list 3,3)) take 3 cross 2]
 
 # limit
@@ -301,10 +297,8 @@ show[update age:age+30 where job="Developer" from ppl                           
 show[update job_age:avg[age] by job from ppl                                          ] # compute a new column, preserving existing cols and their order
 show[update rank:1+gindex victor:name=first name by sport orderby score desc from con ] # updating with a sort
 show[update index:2*index from "ABC"                                                  ] # preserve writes to an index column
-show[insert job:"Writer" name:"John" age:32 into ppl                                  ] # insert columns in an arbitrary order
-show[insert name:"John" age:32 job:"Writer" color:"Green" into ppl                    ] # insert a single record, pad novel columns
-show[insert name:("Philip","Angela") age:35 into ppl                                  ] # spread lists, replicate scalars, zero missing columns
-show[insert name:("John","Eric") age:32 zodiac:("Taurus","Virgo") into 0              ] # insert into empty table to take all
+show[insert job name age with "Writer" "John" 32 into ppl                             ] # insert columns in an arbitrary order
+show[insert name age job color with "John" 32 "Writer" "Green" into ppl               ] # insert a single record, pad novel columns
 
 # some important edge cases:
 show[select  name job where job="Plumber" from ppl           ] # select  gives no result rows
@@ -319,11 +313,11 @@ show[update job:"Farmer" where job="Plumber" from ppl        ] # update  changes
 show[select  value where 2       from ("One","Two")          ] # "where"   gives non-boolvec
 show[select  value by    2       from ("One","Two")          ] # "by"      gives non-list
 show[select  value orderby 2 asc from ("One","Two")          ] # "orderby" gives non-list
-x:321 show[select x from (insert a:"x","y" b:1,2 into 0)] # do not shadow visible variables with query internal iterators
+x:321 show[select x from (insert a b with "x" 1 "y" 2 end)   ] # do not shadow visible variables with query internal iterators
 
-e:insert c:""split"ABBBABABABABAAABA" n:(7,7,2,4,4,0,3,4,2,0,9,7,4,6,8,2,3) into 0
+e:select c:""split"ABBBABABABABAAABA" n:7,7,2,4,4,0,3,4,2,0,9,7,4,6,8,2,3 from ()
 show[select c n orderby (c join n) asc from e] # orderby should lexicographically sort tuples
-e:insert n:((list 7,7,2),(list 9,0),(list list 2),(list 3,4),(list 7,7,1),(list 9,2)) into 0
+e:insert n with (7,7,2) (9,0) (list 2) (3,4) (7,7,1) (9,2) end
 show[select index n orderby n asc from e] # tolerate mixed-length tuples
 
 # queries on tables with special names
@@ -331,8 +325,8 @@ show[select "with some spaces" from 0]                                          
 show[select "with \"specials":2*index value from "ABC"]                                  # creating columns (select/update/extract)
 show[select "count":range 5 from 0]                                                      # creating columns that are a reserved word
 show[select "with space":11 "with space":22 from 0]                                      # duplicate columns are disambiguated as usual
-show[t:insert "with spaces":("A","A","B","A","A","B","B") ord:13,8,2,1,5,7,3 into 0]     # creating columns (insert)
-show[insert "with \" escapes":1 into 0]                                                  # process normal escape characters
+show[t:insert "with spaces" ord with "A" 13 "A" 8 "B" 2 "A" 1 "A" 5 "B" 7 "B" 3 end]     # creating columns (insert)
+show[insert "with \" escapes" with 1 end]                                                # process normal escape characters
 show[select column["with spaces"] ord by column["with spaces"] orderby ord asc from t]   # reading special-name columns
 show[first extract column from t]                                                        # the column magic variable is a table
 show[extract count column by column["with spaces"] from t]                               # the column magic variable is a *grouped* table in exprs

@@ -25,9 +25,9 @@ zero:0
 log:table data.log
 
 mod.put:on _ x do
-	log:insert
-		time:count log # would be sys.now, but that's a PITA for testing
-		message:x
+	log:insert time message with
+		count log # would be sys.now, but that's a PITA for testing
+		x
 	into log
 	data.log:cols log
 	log

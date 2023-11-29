@@ -49,7 +49,12 @@ show[on plustwice x y do x+y,y end]
 show[plustwice[3 500]]  # (503,503)
 
 # insert from nothing
-show[t:insert name:"Sara","Eric","Laura","Alice" job:"Programmer","Programmer","IT","Manager" into 0]
+show[t:insert name job with
+ "Sara"  "Programmer"
+ "Eric"  "Programmer"
+ "Laura" "IT"
+ "Alice" "Manager"
+end]
 #+---------+--------------+
 #| name    | job          |
 #+---------+--------------+

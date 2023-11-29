@@ -16,7 +16,7 @@ field1:{"type":"field","size":[289,36],"pos":[54,43],"locked":1,"border":0,"valu
 
 {script:home.0}
 on view do
- b.value:insert brush:keys brush[] into 0
+ b.value:select brush:key from brush[]
 end
 {end}
 

@@ -4,14 +4,14 @@ Lil Quick Reference
 ===================
 Types
 -----
-| `typeof`     | False      | Examples                            |
-| :----------- | :--------- | :---------------------------------- |
-| `"number"`   | `0`        | `42` `37.5` `-29999`                |
-| `"string"`   | `""`       | `"foo\nbar"`                        |
-| `"list"`     | `()`       | `11,22,33` `list 3`                 |
-| `"dict"`     | `()dict()` | `("a","b") dict 11,22`              |
-| `"table"`    | n/a        | `table range 2` `insert a:1 into 0` |
-| `"function"` | n/a        | `on x y do x+y end`                 |
+| `typeof`     | False      | Examples                              |
+| :----------- | :--------- | :------------------------------------ |
+| `"number"`   | `0`        | `42` `37.5` `-29999`                  |
+| `"string"`   | `""`       | `"foo\nbar"`                          |
+| `"list"`     | `()`       | `11,22,33` `list 3`                   |
+| `"dict"`     | `()dict()` | `("a","b") dict 11,22`                |
+| `"table"`    | n/a        | `table range 2` `insert a with 1 end` |
+| `"function"` | n/a        | `on x y do x+y end`                   |
 
 Primitives
 ----------
@@ -40,7 +40,8 @@ Queries
 - `select  exprs clauses from y` reorder, compute, or filter a table
 - `update  exprs clauses from y` modify rows/columns of a table in place
 - `extract exprs clauses from y` like select, but yields non-tabular values
-- `insert  exprs into d` append to a table, or `into 0` to make a new table
+- `insert  c1 c2 with "A" 11 "B" 22 end` create a new table
+- `insert  c1 c2 with "A" 11 "B" 22 into d` append to a table
 
 - `exprs` can be any number of expressions in the forms:
 	- an implicitly named bare expression (`id`, `2*index`)

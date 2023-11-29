@@ -249,10 +249,7 @@ log:{time:[],message:[]}
 log:table data.log
 
 mod.put:on _ x do
-	log:insert
-		time:sys.now
-		message:x
-	into log
+	log:insert time message with sys.now x into log
 	data.log:cols log
 	log
 end

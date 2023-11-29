@@ -277,11 +277,11 @@ update cost:price*amount from me.value
 ```
 Make new tables from scratch:
 ```lil
-insert
-	name:  "Alice","Bob","Charlie"
-	age:   23,25,17
-	hobby: "cryptography","espionage","birdwatching"
-into 0
+insert name age hobby with
+	"Alice"   23 "cryptography"
+	"Bob"     25 "espionage"
+	"Charlie" 17 "birdwatching"
+end
 ```
 Or a whole lot more! See the [Lil scripting language](lil.html) for details. The query script is executed exactly as if it were an event handler triggered on the selected grid widget.
 
@@ -1407,10 +1407,7 @@ log:{time:[],message:[]}
 log:table data.log
 
 mod.put:on _ x do
-	log:insert
-		time:sys.now
-		message:x
-	into log
+	log:insert time message with sys.now x into log
 	data.log: cols log
 	log
 end

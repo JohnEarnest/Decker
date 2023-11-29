@@ -230,7 +230,7 @@ end
 
 {script:CRUD.1}
 on click do
- data.value:insert name:"Emil, Hans","Mustermann, Max","Tisch, Roman" into 0
+ data.value:insert name with "Emil, Hans" "Mustermann, Max" "Tisch, Roman" end
  Tfilter.text:""
  view[]
 end
@@ -244,7 +244,7 @@ end
 
 {script:CRUD.3}
 on click do
- data.value: insert name:fullname[] into data.value
+ data.value:insert name with fullname[] into data.value
  view[]
 end
 {end}

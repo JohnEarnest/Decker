@@ -8,7 +8,10 @@ show[c:writecsv[t "fbss"]]
 show[readcsv[c "fbss"]]
 show[writecsv[table range 5]] # rectangular table(!)
 
-t2:insert foo:"A","B" bar:-2.953,99.8 into 0
+t2:insert foo bar with
+ "A" -2.953
+ "B" 99.8
+end
 show[writecsv[t2 "sc"]]
 
 show[readcsv["foo,bar\nA,-$2.953\nB,$99.8" "sc"]]     # currency casts
@@ -26,7 +29,7 @@ show[readcsv["a,b\n,99\n,"]]                          # ragged last cell, no spe
 show[readcsv["a,b\n,99\n," "si"]]                     # ragged last cell, spec
 
 # custom delimiters
-t3:insert foo:"C|D" bar:789 into t2
+t3:insert foo bar with "C|D" 789 into t2
 show[writecsv[t3 "sc" "|"]]
 show[readcsv["first|second|third\n11|22|33" "fff" "|"]]
 

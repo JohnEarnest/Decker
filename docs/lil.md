@@ -526,9 +526,17 @@ extract a:first age b:last age orderby age asc from people
 
 ---
 
-The `insert` statement adds new rows to a table. It is followed by a sequence of one or more column names followed by a colon and an expression, the `into` keyword, and an expression evaluating to a table.
+The `insert` statement adds new rows to a table. It is followed by a sequence of one or more column names terminated by the `with` keyword, and then a series of expressions supplying the values of each row. The insert statement concludes with `end`, when creating a new table from scratch, or `into` followed by an expression evaluating to a "source" table when appending to an existing table.
+
 ```lil
-insert name:"John" job:"Writer" age:32 into people
+insert name job age with "John" "Writer" 32 end
+# +--------+----------+-----+
+# | name   | job      | age |
+# +--------+----------+-----+
+# | "John" | "Writer" | 32  |
+# +--------+----------+-----+
+
+insert name job age with "John" "Writer" 32 into people
 # +----------+-----+--------------+
 # | name     | age | job          |
 # +----------+-----+--------------+
@@ -540,37 +548,19 @@ insert name:"John" job:"Writer" age:32 into people
 # | "John"   | 32  | "Writer"     |
 # +----------+-----+--------------+
 ```
-Missing columns will be filled in as 0. If any of the `insert`ed values are lists, the remaining columns will be spread to match:
-```lil
-insert name:("John","Eric") age:32 zodiac:("Taurus","Virgo") into people
-# +----------+-----+--------------+----------+
-# | name     | age | job          | zodiac   |
-# +----------+-----+--------------+----------+
-# | "Alice"  | 25  | "Developer"  | 0        |
-# | "Sam"    | 28  | "Sales"      | 0        |
-# | "Thomas" | 40  | "Developer"  | 0        |
-# | "Sara"   | 34  | "Developer"  | 0        |
-# | "Walter" | 43  | "Accounting" | 0        |
-# | "John"   | 32  | 0            | "Taurus" |
-# | "Eric"   | 32  | 0            | "Virgo"  |
-# +----------+-----+--------------+----------+
-```
-As a special case, if the value to insert into is a number, treat it as an empty table. This is a convenient way to make a table from scratch:
-```lil
-insert name:("John","Eric") age:32 zodiac:("Taurus","Virgo") into 0
-# +--------+-----+----------+
-# | name   | age | zodiac   |
-# +--------+-----+----------+
-# | "John" | 32  | "Taurus" |
-# | "Eric" | 32  | "Virgo"  |
-# +--------+-----+----------+
-```
+
+As a special case, if the value to insert into is a number, treat it as an empty table; `insert ... into 0` is equivalent to `insert ... end`.
 
 ---
 
 Lil also offers two basic joining operations: `join` (natural join), and `cross` (cartesian/cross join):
 ```lil
-jobs:insert job:"Sales","Developer","Accounting","Facilities" salary:85000,75000,60000,50000 into 0
+jobs:insert job salary with
+	"Sales"      85000
+	"Developer"  75000
+	"Accounting" 60000
+	"Facilities" 50000
+end
 # +--------------+--------+
 # | job          | salary |
 # +--------------+--------+
@@ -591,7 +581,7 @@ people join jobs
 # | "Walter" | 43  | "Accounting" | 60000  |
 # +----------+-----+--------------+--------+
 
-guests:insert name:"Alice","Joan","Oscar","Thomas" into 0
+guests:insert name with "Alice" "Joan" "Oscar" "Thomas" end
 # +----------+
 # | name     |
 # +----------+
@@ -613,7 +603,7 @@ select a:name b:name_ where name < name_ from guests cross guests
 # | "Oscar" | "Thomas" |
 # +---------+----------+
 ```
-For a row-wise join- concatenating tables with the same columns- you can use `,`, which has the same padding/widening behavior as `insert`. You can likewise `take` or `drop` rows or columns from a table. If the left argument to `take` is a list of numbers, it picks out those rows very much like a generalization of `select`:
+For a row-wise join- concatenating tables with the same columns- you can use `,`. You can likewise `take` or `drop` rows or columns from a table. If the left argument to `take` is a list of numbers, it picks out those rows very much like a generalization of `select`:
 ```lil
 "name" take people
 # +----------+
@@ -656,7 +646,12 @@ For a row-wise join- concatenating tables with the same columns- you can use `,`
 ```
 The `flip` of a table transposes its data, promoting the first column (or, if it exists, a column named `key`) from the original table to column keys for the result:
 ```lil
-expenses: insert kind:"tax","gas","power","food" jan:11,22,33,44 feb:55,66,77,88 into 0
+expenses:insert kind jan feb with
+	"tax"   11 55
+	"gas"   22 66
+	"power" 33 77
+	"food"  44 88
+end
 # +---------+-----+-----+
 # | kind    | jan | feb |
 # +---------+-----+-----+
@@ -697,7 +692,11 @@ denormal: select "with \"escapes":index "count":value from "ABC"
 # | 2             | "C"   |
 # +---------------+-------+
 
-insert "pet name":"Galena","Pippi","Chester" "pet species":"Chicken","Chicken","Toad" into 0
+insert "pet name" "pet species" with
+	"Galena"  "Chicken"
+	"Pippi"   "Chicken"
+	"Chester" "Toad"
+end
 # +-----------+-------------+
 # | pet name  | pet species |
 # +-----------+-------------+
@@ -846,7 +845,7 @@ The left argument to `format` may be a list of strings; in this case it is a ser
 ```
 Recursive formats will "explode" tables into lists of row-lists:
 ```lil
-t: insert alpha:"one","two" beta:11,22 into 0
+t: insert alpha beta with "one" 11 "two" 22 end
 #+-------+------+
 #| alpha | beta |
 #+-------+------+
@@ -1206,7 +1205,7 @@ ON      := 'on' NAME+ 'do' EXPR* 'end'
 IF      := 'if' EXPR* ('elseif' EXPR*)* ( 'else' EXPR* )? 'end'
 CLAUSE  := ('where' EXPR) | ('by' EXPR) | ('orderby' EXPR ('asc'|'desc'))
 QUERY   := ('select'|'extract'|'update')((NAME|STRING ':')?EXPR)* CLAUSE* 'from' EXPR
-INSERT  := 'insert' (NAME|STRING ':' EXPR) 'into' EXPR
+INSERT  := 'insert' (NAME|STRING)* ':' EXPR* (('into' EXPR) | 'end')
 SEND    := 'send' NAME '[' EXPR* ']'
 INDEX   := ('.' NAME? | '[' EXPR* ']')*
 ACCESS  := NAME INDEX ( ':' EXPR )?

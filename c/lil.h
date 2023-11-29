@@ -526,7 +526,11 @@ dyad(l_format){
 		format_type(&r,a,t,n,d,lf,pz,&f,x->sv);if(t!='%'&&!sk)h++;
 	}return lmstr(r);
 }
-lv* l_ins(lv*v,lv*n,lv*x){lv*r=torect(l_table(l_dict(n,v)));return lin(x)?r:l_comma(lt(x),r);}
+lv* l_ins(lv*v,lv*n,lv*x){
+	int rc=ceil((1.0*v->c)/n->c);lv*c=lml(n->c);
+	EACH(z,c){c->lv[z]=lml(rc);for(int r=0;r<rc;r++){int x=(n->c*r)+z;c->lv[z]->lv[r]=x>=v->c?NONE:v->lv[x];}}
+	lv*r=l_table(l_dict(n,c));return lin(x)?r:l_comma(lt(x),r);
+}
 lv* l_tab(lv*t){
 	t=lt(t);TMAP(r,t,t->lv[z]);torect(r);
 	dset(r,lmistr("index" ),l_range(lmn(r->n))),dset(r,lmistr("gindex"),l_range(lmn(r->n))),dset(r,lmistr("group" ),l_take(lmn(r->n),NONE));
@@ -846,8 +850,9 @@ void term(lv*b){
 	if(match("extract")){parsequery(b,"@ext",0);return;}
 	if(match("update" )){parsequery(b,"@upd",1);return;}
 	if(match("insert")){
-		lv*n=lml(0);while(!perr()&&!match("into")){ll_add(n,lmstr(peek()->type=='s'?literal_str(next()):name("column"))),expect(':',0),expr(b);}
-		blk_opa(b,BUND,n->c),blk_lit(b,n),expr(b),blk_op3(b,"@ins");return;
+		lv*n=lml(0);while(!perr()&&!match("with")){ll_add(n,lmstr(peek()->type=='s'?literal_str(next()):name("column")));}
+		int v=0,i=0;while(!perr()){if(match("into")){i=1;break;}if(match("end")){i=0;break;}expr(b),v++;}
+		if(n->c<1)ll_add(n,lmistr("value"));blk_opa(b,BUND,v),blk_lit(b,n);if(i){expr(b);}else{blk_lit(b,NONE);}blk_op3(b,"@ins");return;
 	}
 	if(matchsp('(')){if(matchsp(')')){blk_lit(b,lml(0));return;}expr(b);expect(')',0);return;}
 	str s=token_str(peek());

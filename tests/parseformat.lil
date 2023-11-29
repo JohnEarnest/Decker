@@ -116,23 +116,23 @@ show["%s!" parse "foo!","bar!"]
 show["%*4i-%*2i-%*2iT%*2i:%*2i:%*2iZ%n%m" parse "2003-invalid"]
 
 print["named:"]
-show["%[banana]i %[apple]i"  parse "11 22"                               ] # basic named fields
-show["%[]s"                  parse "fruity"                              ] # empty name
-show["%i %[n]s %i"           parse "111 222 333"                         ] # mixed names/positionals
-show["%[one]i %[two]i"       parse "34 56","78 99"                       ] # tabular parsing
-show["%[unbounded"           parse "11 22"                               ] # missing close bracket
-show["%[unterminated]"       parse "11 22"                               ] # missing typecode
-show["%[name]s:%[name]s"     parse "one:two"                             ] # duplicate key
+show["%[banana]i %[apple]i"  parse "11 22"                                 ] # basic named fields
+show["%[]s"                  parse "fruity"                                ] # empty name
+show["%i %[n]s %i"           parse "111 222 333"                           ] # mixed names/positionals
+show["%[one]i %[two]i"       parse "34 56","78 99"                         ] # tabular parsing
+show["%[unbounded"           parse "11 22"                                 ] # missing close bracket
+show["%[unterminated]"       parse "11 22"                                 ] # missing typecode
+show["%[name]s:%[name]s"     parse "one:two"                               ] # duplicate key
 
-show["%[banana]s %[apple]s"  format ("apple","banana") dict (22,"fruit") ] # basic named fields
-show["%[]s"                  format (list "") dict list 234              ] # empty name
-show["%i %[n]s %i"           format (2,"n",0) dict 333,222,111           ] # mixed names/positionals
-show[      "%[one]j %[two]j" format insert two:111,222 one:333,444 into 0] # tabular formatting 0 (column-wise)
-show[(list "%[one]i,%[two]i")format insert two:111,222 one:333,444 into 0] # tabular formatting 1 (row-wise)
-show[("\n","%[one]i,%[two]i")format insert two:111,222 one:333,444 into 0] # tabular formatting 2 (row-wise with join)
-show["<%[no]s>:%[nope]i"     format () dict ()                           ] # missing keys
-show["%[name]s:%[name]s"     format ().name:"multiplicity"               ] # duplicate keys
-show["%[banana]i %[apple]i"  format "not a dictionary"                   ] # inappropriate argument
+show["%[banana]s %[apple]s"  format ("apple","banana") dict (22,"fruit")   ] # basic named fields
+show["%[]s"                  format (list "") dict list 234                ] # empty name
+show["%i %[n]s %i"           format (2,"n",0) dict 333,222,111             ] # mixed names/positionals
+show[      "%[one]j %[two]j" format insert two one with 111 333 222 444 end] # tabular formatting 0 (column-wise)
+show[(list "%[one]i,%[two]i")format insert two one with 111 333 222 444 end] # tabular formatting 1 (row-wise)
+show[("\n","%[one]i,%[two]i")format insert two one with 111 333 222 444 end] # tabular formatting 2 (row-wise with join)
+show["<%[no]s>:%[nope]i"     format () dict ()                             ] # missing keys
+show["%[name]s:%[name]s"     format ().name:"multiplicity"                 ] # duplicate keys
+show["%[banana]i %[apple]i"  format "not a dictionary"                     ] # inappropriate argument
 
 print["json:"]
 # formatting
@@ -174,5 +174,5 @@ show[(list "%s.mp3")               format ("one","two","three")          ] # for
 show[(":","%03i")                  format 11,22,33                       ] # fuse a formatted column
 show[("(list %s)",",","%2i")       format ((list 1,2,3),(list 4,5,6))    ] # format, fuse, format
 show[(",\n","(list %s)",",","%2i") format ((list 1,2,3),(list 4,5,6))    ] # fuse, format, fuse, format
-show[(list "%u - %i")              format insert a:"u","v" b:11,22 into 0] # explode a table into rows
-show[("\n","%u - %i")              format insert a:"u","v" b:11,22 into 0] # explode a table into rows, fuse
+show[(list "%u - %i")              format insert a b with "u"11 "v"22 end] # explode a table into rows
+show[("\n","%u - %i")              format insert a b with "u"11 "v"22 end] # explode a table into rows, fuse

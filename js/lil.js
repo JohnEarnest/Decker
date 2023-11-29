@@ -341,10 +341,8 @@ triad={
 		});return orig
 	},
 	'@ins': (v,n,x)=>{
-		const torect=t=>{
-			const n=lmn(Object.values(t.v).reduce((x,y)=>max(x,y.length),0))
-			Object.keys(t.v).map(k=>t.v[k]=ll(dyad.take(n,lml(t.v[k]))))
-		}, r=monad.table(dyad.dict(n,v));torect(r);return lin(x)?r:dyad[','](lt(x),r)
+		const nc=count(n), rc=Math.ceil(count(v)/nc), r=monad.table(lmd(n.v,n.v.map((_,z)=>lml(range(rc).map(r=>v.v[nc*r+z]||NONE)))))
+		return lin(x)?r:dyad[','](lt(x),r)
 	},
 }
 
@@ -518,8 +516,10 @@ parse=text=>{
 		if(match('extract')){parsequery(b,'@ext',0);return}
 		if(match('update' )){parsequery(b,'@upd',1);return}
 		if(match('insert')){
-			const n=lml([]);while(!match('into')){n.v.push(lms(peek().t=='string'?next().v:name('column'))),expect(':'),expr(b)}
-			blk_opa(b,op.BUND,count(n)),blk_lit(b,n),expr(b),blk_op3(b,'@ins');return
+			const n=lml([]);while(!match('with')){n.v.push(lms(peek().t=='string'?next().v:name('column')))}
+			let v=0,i=0;while(1){if(match('into')){i=1;break}if(match('end')){i=0;break}expr(b),v++}
+			if(n.v.length<1)n.v.push(lms('value'));blk_opa(b,op.BUND,v),blk_lit(b,n);if(i){expr(b)}else{blk_lit(b,NONE)}
+			blk_op3(b,'@ins');return
 		}
 		if(matchsp('(')){if(matchsp(')')){blk_lit(b,lml([]));return}expr(b),expect(')');return}
 		const s=peek().v;if(findop(s,monad)>=0&&peek().t in{'symbol':1,'name':1}){

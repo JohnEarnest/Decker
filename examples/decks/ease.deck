@@ -25,7 +25,7 @@ field9:{"type":"field","size":[18,14],"pos":[62,164],"locked":1,"border":0,"styl
 
 {script:home.0}
 on view do
- names.value:insert "Function Name":keys ease into 0
+ names.value:select "Function Name":key from ease
  name:first names.rowvalue
  
  usage.value:rtext.cat[
