@@ -698,7 +698,8 @@ interface_system=lmi((self,i,x)=>{
 	return x?x:NONE
 },'system')
 showt=(x,toplevel)=>{
-	if(!toplevel)return `<TABLE...${Object.keys(x.v).length}>`;try{
+	if(!toplevel)return `insert ${Object.keys(x.v).join(' ')} with ${monad.rows(x).v.map(r=>r.v.map(v=>show(v)).join(' ')).join(' ')} end`
+	try{
 	const w=Object.keys(x.v).map(k=>x.v[k].reduce((x,y)=>max(x,show(y).length+2),k.length+2))
 	const s='+'+Object.keys(x.v).map((x,i)=>"-".repeat(w[i])).join('+')+'+'
 	const v=(Object.values(x.v)[0]||[]).map((_,r)=>Object.keys(x.v).map(k=>' '+show(x.v[k][r])).map((f,i)=>f+(' '.repeat(max(0,w[i]-f.length)))))

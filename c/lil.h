@@ -1017,8 +1017,12 @@ void show(str*s,lv*x,int toplevel){
 		str_addz(s," do ... end");
 	}
 	else if(linat(x)){str_addz(s,"on native x do ... end");}
+	else if(lit(x)&&!toplevel){
+		str_addz(s,"insert ");EACH(z,x)str_addl(s,x->kv[z]),str_addc(s,' ');
+		str_addz(s,"with ");for(int r=0;r<x->n;r++)EACH(z,x)show(s,x->lv[z]->lv[r],0),str_addc(s,' ');
+		str_addz(s,"end");return;
+	}
 	else if(lit(x)){
-		if(!toplevel){char t[64];str_add(s,t,snprintf(t,sizeof(t),"<TABLE...%d>",x->c));return;}
 		if(x->c==0){str_addz(s,"++\n||\n++");return;}
 		idx w=idx_new(x->c);lv*cols=lml(x->c);EACH(c,x){
 			lv*col=lml(x->n+1);col->lv[0]=x->kv[c];w.iv[c]=col->lv[0]->c,cols->lv[c]=col;
