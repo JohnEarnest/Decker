@@ -49,3 +49,13 @@ show[rtext.split["" d1]]
 show[first rtext.split["not present" d1]]
 print["--d1--"] each v in rtext.split["|" d1] show[v] end
 print["--d2--"] each v in rtext.split["\n\n" d2] show[v] end
+
+norm:select text font arg from rt1
+show[rt1~rtext.replace[rt1]]                             # bogus args
+show[norm~rtext.replace[rt1 "bogus" "AAAAAAAA"]]         # no matches
+show[rtext.replace[rt1 "salsa" "pineapple"]]             # simple a->b
+show[rtext.replace[rt1 "sa?" "{C}"]]                     # trailing replacement
+show[rtext.replace[rt1 "l" "{L}"]]                       # adjacent replacement
+show[rtext.replace[rt1 ("Hello","about") "?!?"]]         # multiple keys, one value
+show[rtext.replace[rt1 ("Hello","about") ("{A}","{B}")]] # multiple keys, multiple values
+show[rtext.replace[rt1 "about" rtext.make["ABOUT" "menu" "http://about.com"]]] # rtext replacement

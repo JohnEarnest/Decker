@@ -1679,6 +1679,7 @@ rtext_splice=(tab,font,arg,text,cursor,endcursor)=>{
 	endcursor.x=endcursor.y=a+text.length;return r
 }
 rtext_write=x=>{const r=monad.cols(x),arg=dget(r,lms('arg'));if(arg){arg.v=arg.v.map(x=>image_is(x)?lms(image_write(x)):x)};return r}
+rtext_cat=x=>{let r=lmt({text:[],font:[],arg:[]});x.map(x=>rtext_appendr(r,rtext_cast(x)));return r}
 interface_rtext=lmi((self,i,x)=>{
 	if(ikey(i,'end'   ))return lmn(RTEXT_END)
 	if(ikey(i,'make'  ))return lmnat(([t,f,a])=>rtext_make(t,f,a))
@@ -1686,12 +1687,24 @@ interface_rtext=lmi((self,i,x)=>{
 	if(ikey(i,'get'   ))return lmnat(([t,n])=>lmn(rtext_get(rtext_cast(t),n?ln(n):0)))
 	if(ikey(i,'string'))return lmnat(([t,i])=>rtext_string(rtext_cast(t),i?getpair(i):undefined))
 	if(ikey(i,'span'  ))return lmnat(([t,i])=>rtext_span  (rtext_cast(t),i?getpair(i):undefined))
-	if(ikey(i,'cat'   ))return lmnat(x=>{let r=lmt({text:[],font:[],arg:[]});x.map(x=>rtext_appendr(r,rtext_cast(x)));return r})
+	if(ikey(i,'cat'   ))return lmnat(rtext_cat)
 	if(ikey(i,'split' ))return lmnat(([x,y])=>{
 		const d=ls(x),v=rtext_cast(y),t=ls(rtext_string(v)),r=lml([]);if(d.length<1||!x||!y)return r
 		let n=0;for(let z=0;z<t.length;z++){
 			let m=1;for(let w=0;w<d.length;w++)if(d[w]!=t[z+w]){m=0;break}if(m){r.v.push(rtext_span(v,rect(n,z))),z+=d.length-1,n=z+1}
 		}if(n<=t.length)r.v.push(rtext_span(v,rect(n,t.length)));return r
+	})
+	if(ikey(i,'replace'))return lmnat(([tab,k,v])=>{
+		if(!k||!v)return tab||NONE;const t=rtext_cast(tab),r=[],text=ls(rtext_string(t)),c=rect(0,0)
+		if(!lil(k))k=monad.list(k);if(!lil(v))v=monad.list(v)
+		k=dyad.take(lmn(max(count(k),count(v))),dyad.drop(lms(''),k)),k.v=k.v.map(ls)
+		v=dyad.take(lmn(max(count(k),count(v))),v),v.v=v.v.map(rtext_cast)
+		while(c.y<text.length){
+			let any=0;k.v.map((key,ki)=>{
+				const val=v.v[ki];let f=1;for(let i=0;i<key.length;i++)if(text[c.y+i]!=key[i]){f=0;break}
+				if(f){if(c.x!=c.y)r.push(rtext_span(t,c));r.push(r,val),c.x=c.y=(c.y+key.length),any=1}
+			});if(!any)c.y++
+		}if(c.x<text.length)r.push(rtext_span(t,rect(c.x,RTEXT_END)));return rtext_cat(r)
 	})
 	return x?x:NONE
 },'rtext')
