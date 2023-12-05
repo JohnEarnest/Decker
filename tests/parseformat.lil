@@ -162,6 +162,8 @@ show["%j"       parse "{1:5,2:99}"               ] # non-string dict keys
 show["%j"       parse "{'foo':22,'bar':33}"      ] # single-quoted strings
 show["%j"       parse "{'foo':22,'ba\\'r':33}"   ] # escaped single-quote
 show["%j"       parse "'foobaz"                  ] # unterminated single-quote
+show["%j"       parse "{11: 22}"                 ] # whitespace tolerance
+show["%j"       parse "{11:22, 33:44"            ] # whitespace tolerance
 # fixed-width
 show["%1s%3j%1s" parse "AtrueB"                  ] # overlong literal
 show["%1s%3j%1s" parse "A12.34e5B"               ] # truncated number

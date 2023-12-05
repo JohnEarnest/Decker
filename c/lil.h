@@ -394,7 +394,7 @@ lv* pjson(char*t,int*i,int*f,int*n){
 	#define jl(x,y) if((*n)>=(int)strlen(x)&&memcmp(t+*i,x,strlen(x))==0)return(*i)+=strlen(x),(*n)-=strlen(x),y;
 	jl("null",NONE);jl("false",NONE);jl("true",ONE);
 	if(jm('[')){lv*r=lml(0);while(jc()){js();if(jm(']'))break;ll_add(r,pjson(t,i,f,n));js();jm(',');}return r;}
-	if(jm('{')){lv*r=lmd( );while(jc()){js();if(jm('}'))break;lv*k=pjson(t,i,f,n);js();jm(':');if(*f)dset(r,k,pjson(t,i,f,n));js();jm(',');}return r;}
+	if(jm('{')){lv*r=lmd( );while(jc()){js();if(jm('}'))break;lv*k=pjson(t,i,f,n);js();jm(':');js();if(*f)dset(r,k,pjson(t,i,f,n));js();jm(',');}return r;}
 	if(jm('"' )){str r=str_new();while(jc()&&!(jm('"' ))){str_addc(&r,(jm('\\'))?esc(jn(),i,t,n):jn());}return lmstr(r);}
 	if(jm('\'')){str r=str_new();while(jc()&&!(jm('\''))){str_addc(&r,(jm('\\'))?esc(jn(),i,t,n):jn());}return lmstr(r);}
 	int ns=*i;jm('-');jd();jm('.');jd();if(jm('e')||jm('E')){jm('-')||jm('+');jd();}if(*i<=ns){*f=0;return NONE;}
