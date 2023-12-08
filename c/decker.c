@@ -45,11 +45,14 @@ int nosound=0, autosave=0, noscale=0, dirty=0, dirty_timer=0; char document_path
 #define AUTOSAVE_DELAY (10*60)
 lv* deck_get(lv*text){SDL_LockMutex(gil);lv*r=deck_read(text);SDL_UnlockMutex(gil);return r;}
 void mark_dirty(){dirty=1,dirty_timer=AUTOSAVE_DELAY;}
-void set_path(char*path){
-	snprintf(document_path,PATH_MAX,"%s",path);
-	char t[4096];snprintf(t,sizeof(t),"Decker - %s",path);
-	SDL_SetWindowTitle(win,strlen(path)?t:"Decker");
+void set_title(lv*dest){
+	char t[4096], *cardname=!deck?"": lb(ifield(deck,"locked"))?"": dest?ifield(dest,"name")->sv: ifield(ifield(deck,"card"),"name")->sv;
+	if    (!strlen(cardname     )){snprintf(t,sizeof(t),"Decker");}
+	else if(strlen(document_path)){snprintf(t,sizeof(t),"Decker - %s : %s",document_path,cardname);}
+	else                          {snprintf(t,sizeof(t),"Decker : %s",cardname);}
+	SDL_SetWindowTitle(win,t);
 }
+void set_path(char*path){snprintf(document_path,PATH_MAX,"%s",path);set_title(NULL);}
 
 typedef struct {
 	int pending_drag;
@@ -2233,7 +2236,7 @@ void go_notify(lv*deck,lv*args,int dest){
 	}
 	lv*tfun=args->c<2?NULL: lion(args->lv[1])?args->lv[1]: dget(dget(deck->b,lmistr("transit")),args->lv[1]);
 	int moved=dest!=ln(ifield(ifield(deck,"card"),"index"));
-	if(moved)con_set(NULL);
+	if(moved)con_set(NULL),set_title(ifield(deck,"cards")->lv[dest]);
 	if(dest>=0&&tfun!=NULL&&ms.type!=modal_trans){
 		modal_enter(modal_trans);ms.time_curr=0,ms.time_end=args->c<3?30: MAX(1,ln(args->lv[2]));
 		ms.trans=tfun, ms.canvas=free_canvas(deck);
