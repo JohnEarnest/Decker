@@ -1592,7 +1592,7 @@ on pinwheel t do
   a:(0.01*t)+(pi/0.5*16)*range 16   # angle per wedge
   p:flip c+flip r*unit a            # points around a circle
   each x i in p
-    if 2%i canvas.tri[c x p[(count p)%1+i]] end    # draw every other wedge
+    if 2%i canvas.poly[c x p[(count p)%1+i]] end    # draw every other wedge
   end
 end
 ```
