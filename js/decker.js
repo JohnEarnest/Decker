@@ -1651,7 +1651,7 @@ modals=_=>{
 		const rvalue=(g,k)=>g.table.v[k][g.row]
 		let sel=(ms.grid.table&&ms.grid.row>-1)?rvalue(ms.grid,'value'): ms.grid2.row>-1?rvalue(ms.grid2,'value'): null
 		if(ui_button(cb,'>> Copy >>',ms.grid.row>-1)){
-			if(patterns_is(sel)){const dst=ifield(deck,'patterns');for(let z=2;z<=31;z++)iindex(dst,z,iindex(sel,z))}
+			if(patterns_is(sel)){const dst=ifield(deck,'patterns');for(let z=2;z<=47;z++)iindex(dst,z,iindex(sel,z))}
 			else{deck_add(deck,sel,rvalue(ms.grid,'name'))}
 			ms.grid2=gridtab(res_enumerate(deck)),mark_dirty();if(module_is(sel))validate_modules()
 		}cb.y+=25

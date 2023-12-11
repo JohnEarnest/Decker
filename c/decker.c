@@ -1712,7 +1712,7 @@ void modals(){
 		#define rvalue(g,k) dget(ms.g.table,lmistr(k))->lv[ms.g.row]
 		lv*sel=(ms.grid.table&&ms.grid.row>-1)?rvalue(grid,"value"): ms.grid2.row>-1?rvalue(grid2,"value"): NULL;
 		if(ui_button(cb,">> Copy >>",ms.grid.row>-1)){
-			if(patterns_is(sel)){lv*dst=ifield(deck,"patterns");for(int z=2;z<=31;z++)iindex(dst,z,iindex(sel,z,NULL));}
+			if(patterns_is(sel)){lv*dst=ifield(deck,"patterns");for(int z=2;z<=47;z++)iindex(dst,z,iindex(sel,z,NULL));}
 			else{n_deck_add(deck,lml2(sel,rvalue(grid,"name")));}ms.grid2=(grid_val){res_enumerate(deck),0,-1},mark_dirty();
 			if(module_is(sel))validate_modules();
 		}cb.y+=25;
