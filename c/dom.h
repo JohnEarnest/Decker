@@ -1617,12 +1617,14 @@ lv*n_rtext_span  (lv*self,lv*z){(void)self;return rtext_span  (rtext_cast(l_firs
 lv*n_rtext_cat   (lv*self,lv*z){(void)self;lv*r=l_take(NONE,rtext_cast(lmt()));EACH(i,z)rtext_appendr(r,rtext_cast(z->lv[i]));return r;}
 lv*n_rtext_replace(lv*self,lv*z){
 	if(z->c<3)return l_first(z);lv*t=rtext_cast(z->lv[0]),*k=z->lv[1],*v=z->lv[2],*r=lml(0),*text=rtext_string(t,(pair){0,RTEXT_END});
-	if(!lil(k))k=l_list(k);if(!lil(v))v=l_list(v);
+	if(!lil(k))k=l_list(k);if(!lil(v))v=l_list(v);int nocase=z->c>=4&&lb(z->lv[3]);
 	k=l_take(lmn(MAX(k->c,v->c)),l_drop(lmistr(""),k));EACH(z,k)k->lv[z]=ls(k->lv[z]);
 	v=l_take(lmn(MAX(k->c,v->c)),v);EACH(z,v)v->lv[z]=rtext_cast(v->lv[z]);
 	pair c={0,0};while(c.y<text->c){
 		int any=0;EACH(ki,k){
-			lv*key=k->lv[ki],*val=v->lv[ki];int f=1;EACH(i,key)if(text->sv[c.y+i]!=key->sv[i]){f=0;break;}
+			lv*key=k->lv[ki],*val=v->lv[ki];int f=1;
+			if(nocase){EACH(i,key)if(tolower(text->sv[c.y+i])!=tolower(key->sv[i])){f=0;break;}}
+			else      {EACH(i,key)if(        text->sv[c.y+i] !=        key->sv[i] ){f=0;break;}}
 			if(f){if(c.x!=c.y)ll_add(r,rtext_span(t,c));ll_add(r,val);c.x=c.y=(c.y+key->c),any=1;}
 		}if(!any)c.y++;
 	}if(c.x<text->c)ll_add(r,rtext_span(t,(pair){c.x,RTEXT_END}));return n_rtext_cat(self,r);

@@ -59,3 +59,4 @@ show[rtext.replace[rt1 "l" "{L}"]]                       # adjacent replacement
 show[rtext.replace[rt1 ("Hello","about") "?!?"]]         # multiple keys, one value
 show[rtext.replace[rt1 ("Hello","about") ("{A}","{B}")]] # multiple keys, multiple values
 show[rtext.replace[rt1 "about" rtext.make["ABOUT" "menu" "http://about.com"]]] # rtext replacement
+show[rtext.replace["Some some somE none" "some" "Q" 1]]  # case-insensitive

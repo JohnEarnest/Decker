@@ -1694,10 +1694,10 @@ interface_rtext=lmi((self,i,x)=>{
 			let m=1;for(let w=0;w<d.length;w++)if(d[w]!=t[z+w]){m=0;break}if(m){r.v.push(rtext_span(v,rect(n,z))),z+=d.length-1,n=z+1}
 		}if(n<=t.length)r.v.push(rtext_span(v,rect(n,t.length)));return r
 	})
-	if(ikey(i,'replace'))return lmnat(([tab,k,v])=>{
-		if(!k||!v)return tab||NONE;const t=rtext_cast(tab),r=[],text=ls(rtext_string(t)),c=rect(0,0)
+	if(ikey(i,'replace'))return lmnat(([tab,k,v,i])=>{
+		if(!k||!v)return tab||NONE;const t=rtext_cast(tab),r=[],tx=ls(rtext_string(t)),nocase=i&&lb(i),text=nocase?tx.toLowerCase():tx,c=rect(0,0)
 		if(!lil(k))k=monad.list(k);if(!lil(v))v=monad.list(v)
-		k=dyad.take(lmn(max(count(k),count(v))),dyad.drop(lms(''),k)),k.v=k.v.map(ls)
+		k=dyad.take(lmn(max(count(k),count(v))),dyad.drop(lms(''),k)),k.v=k.v.map(nocase?x=>ls(x).toLowerCase():ls)
 		v=dyad.take(lmn(max(count(k),count(v))),v),v.v=v.v.map(rtext_cast)
 		while(c.y<text.length){
 			let any=0;k.v.map((key,ki)=>{
