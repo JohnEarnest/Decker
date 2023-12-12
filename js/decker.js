@@ -54,6 +54,18 @@ save_bin=(n,x)=>{
 	const u=URL.createObjectURL(new Blob([Uint8Array.from(x)])), t=q('#target')
 	t.download=n,t.href=u,t.click(),setTimeout(_=>URL.revokeObjectURL(u),200)
 }
+makelzww=(lw,bw)=>{
+	let w=1+lw,hi=(1<<lw)+1,ov=1<<(lw+1),sc=-1,b=0,nb=0,t={}
+	wb=c=>{b|=c<<nb;nb+=w;while(nb>=8){bw(b&0xff),b>>=8,nb-=8}}
+	ih=()=>{hi++;if(hi==ov){w++,ov<<=1}if(hi==0xfff){let c=1<<lw;wb(c),w=lw+1,hi=c+1,ov=c<<1,t={};return 1}}
+	return {
+		w(b) {
+			let c=sc;if(c==-1){wb(1<<lw),sc=b;return} /* first write sends clear code */
+			let k=(c<<8)|b;if(t[k]!==undefined){sc=t[k]}else{wb(c),sc=b;if(!ih())t[k]=hi}
+		},
+		f() {wb(sc),ih(),wb((1<<lw)+1),nb>0&&bw(b&0xff)}
+	}
+}
 writegif=(frames,delays)=>{
 	const size=frames.reduce((s,f)=>rmax(s,f.size),rect(1,1)), pal=deck.patterns.pal.pix; let frame_index=0, payload=[]
 	const anim_ants       =(x,y)=>(0|((x+y+frame_index)/3))%2?15:0
@@ -73,16 +85,11 @@ writegif=(frames,delays)=>{
 		b(0)                                      // end GCE
 		b(0x2C)                                   // image descriptor
 		s(0),s(0),s(frame.size.x),s(frame.size.y) // dimensions
-		b(0),b(7)                                 // no local colortable,  minimum LZW code size
-		let isize=frame.size.x*frame.size.y, off=0
-		while(off<isize){
-			const bsize=min(64,isize-off)
-			b(1+bsize),b(0x80) // block size, LZW CLEAR
-			for(let z=0;z<bsize;z++){
-				const x=0|((off+z)%frame.size.x), y=0|((off+z)/frame.size.x)
-				b(draw_color_trans(frame.pix[off+z],x,y))
-			}off+=bsize
-		}b(0),frame_index++ // end of frame
+		b(0),b(5)                                 // no local colortable,  minimum LZW code size
+		let bo=payload.length
+		let lw=makelzww(5,b=>{if(bo==payload.length)payload.push(0);payload[bo]++;payload.push(b);if(payload[bo]==255)bo=payload.length});
+		for(let y=0;y<frame.size.y;y++)for(let x=0;x<frame.size.x;x++)lw.w(draw_color_trans(frame.pix[y*frame.size.x+x],x,y))
+		lw.f(),b(0),frame_index++ // end of frame
 	};b(0x3B);return payload
 }
 writewav=sound=>{
