@@ -2635,7 +2635,7 @@ lv* readgif(char*data,int size,int gray,int frames){
 #define add_byte(x)  str_addraw(&r,(x)&0xFF)
 #define add_short(x) str_addraw(&r,(x)&0xFF),str_addraw(&r,((x)>>8)&0xFF) // more like bug-endian, amirite?
 #define add_long(x)  str_addraw(&r,(x)&0xFF),str_addraw(&r,((x)>>8)&0xFF),str_addraw(&r,((x)>>16)&0xFF),str_addraw(&r,((x)>>24)&0xFF)
-#define add_byte_framed(b) {if(bo==r.c)add_byte(0);r.sv[bo]++;add_byte(b);if(r.sv[bo]==255)bo=r.c;}
+#define add_byte_framed(b) {if(bo==r.c)add_byte(0);r.sv[bo]++;add_byte(b);if((0xFF&r.sv[bo])==0xFF)bo=r.c;}
 #define add_bits(c) {b|=(c)<<nb;nb+=w;while(nb>=8){add_byte_framed(b&0xff);b>>=8,nb-=8;}}
 #define inc_hi() {hi++;if(hi==ov){w++;ov<<=1;}if(hi==0xfff){unsigned int c=1<<lw;add_bits(c);w=lw+1;hi=c+1;ov=c<<1;memset(t, 0, sizeof(t));tc=1;}}
 char* writegif(lv*frames,lv*delays,int*len){
@@ -2656,10 +2656,7 @@ char* writegif(lv*frames,lv*delays,int*len){
 		size=image_size(frames->lv[frame]);add_short(0),add_short(0),add_short(size.x),add_short(size.y); // window {x,y,width,height}
 		add_byte(0),add_byte(5); // no local colortable, minimum LZW code size = 5
 		unsigned int count=0; char*data=frames->lv[frame]->b->sv;
-		// inlined LZW encoder, see decker.js makelzww() for a more readable version
-		unsigned int lw=5,w=1+lw,hi=(1<<lw)+1,ov=1<<(lw+1),sc=-1,b=0,nb=0,t[1<<14]={0},tm=(1<<14)-1,tc;
-		int bo=r.c;
-
+		unsigned int lw=5,w=1+lw,hi=(1<<lw)+1,ov=1<<(lw+1),sc=-1,b=0,nb=0,t[1<<14]={0},tm=(1<<14)-1,tc;int bo=r.c;
 		for(int y=0;y<size.y;y++)for(int x=0;x<size.x;x++){
 			int v=draw_color_trans(patterns_pal(patterns),data[y*size.x+x],count,x,y);
 			unsigned int c=sc;if(c==(unsigned)-1){add_bits(1<<lw);sc=v;continue;} // first write sends clear code
