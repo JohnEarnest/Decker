@@ -3949,7 +3949,7 @@ void tick(lv*env){
 			draw_invert(pal,(rect){r.x+1+z,r.y+r.h-v,1,v-1});
 		}profiler_hist[profiler_ix]=(r.h-2)*(1.0*used)/FRAME_QUOTA;profiler_ix=(profiler_ix+1)%PROFILE_HIST_SZ;
 	}
-	if(uimode==mode_object||(uimode==mode_draw&&!dr.fatbits)){
+	if((uimode==mode_object||(uimode==mode_draw&&!dr.fatbits))&&!ev.hidemenu){
 		rect b={menu.x,1,context.size.x-menu.x-2,1+font_h(FONT_MENU)};
 		draw_textr(b,ifield(ifield(deck,"card"),"name")->sv,FONT_BODY,1);
 	}

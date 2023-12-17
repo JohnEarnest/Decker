@@ -3369,7 +3369,7 @@ tick=_=>{
 			draw_invert(pal,rect(r.x+1+z,r.y+r.h-v,1,v-1))
 		}profiler_hist[profiler_ix]=(r.h-2)*used/FRAME_QUOTA,profiler_ix=(profiler_ix+1)%profiler_hist.length
 	}
-	if(uimode=='object'||(uimode=='draw'&&!dr.fatbits)){
+	if((uimode=='object'||(uimode=='draw'&&!dr.fatbits))&&!ev.hidemenu){
 		const b=rect(menu.x,1,context.size.x-menu.x-2,1+font_h(FONT_MENU))
 		draw_textr(b,ls(ifield(ifield(deck,"card"),"name")),FONT_BODY,1)
 	}
