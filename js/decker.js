@@ -2885,7 +2885,7 @@ fire_animate=targets=>{
 fire_view=target=>{
 	const root=lmenv();primitives(root,deck),constants(root)
 	const block=event_invoke(target,'view',lml([NONE]),null,0)
-	ifield(target,'widgets').v.filter(w=>contraption_is(w)&&!dget(viewed,w)).map(w=>{blk_cat(block,event_invoke(w,'view',lml([NONE]),null,1)),dset(viewed,w,ONE)})
+	ifield(target,'widgets').v.filter(w=>contraption_is(w)&&!dget(viewed,w)).map(w=>{blk_cat(block,event_invoke(w.viewproxy,'view',lml([NONE]),null,1)),dset(viewed,w,ONE)})
 	pushstate(root),pending_popstate=1,issue(root,block)
 }
 interpret=_=>{

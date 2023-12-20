@@ -847,12 +847,13 @@ grid_is       =x=>lii(x)&&x.n=='grid'
 slider_is     =x=>lii(x)&&x.n=='slider'
 canvas_is     =x=>lii(x)&&x.n=='canvas'
 contraption_is=x=>lii(x)&&x.n=='contraption'
+proxy_is      =x=>lii(x)&&x.n=='proxy'
 prototype_is  =x=>lii(x)&&x.n=='prototype'
 deck_is       =x=>lii(x)&&x.n=='deck'
 card_is       =x=>lii(x)&&x.n=='card'
 patterns_is   =x=>lii(x)&&x.n=='patterns'
 module_is     =x=>lii(x)&&x.n=='module'
-widget_is     =x=>lii(x)&&x.n in {button:1,field:1,grid:1,slider:1,canvas:1,contraption:1}
+widget_is     =x=>lii(x)&&x.n in {button:1,field:1,grid:1,slider:1,canvas:1,contraption:1,proxy:1}
 ikey  =(x,k)=>lis(x)&&x.v==k
 ivalue=(x,k,d)=>k in x?x[k]:d
 ifield=(x,k)  =>x.f(x,lms(k))
@@ -2036,6 +2037,7 @@ contraption_read=(x,card)=>{
 	let w=dget(x,lms('widgets')),d=def.widgets;if(w){w=ld(w)}else{w=lmd();def.widgets.k.map(k=>dset(w,k,lmd()))}
 	d.k.map((k,i)=>{const a=widget_write(d.v[i]),o=dget(w,k);widget_add(ri,o?dyad[','](a,o):a)})
 	{const k=lms('size'),v=dget(x,k);iwrite(ri,k,v?v:ifield(def,'size'))}
+	{ri.viewproxy=lmi(interface_widget,'proxy'),ri.viewproxy.card=ri}
 	return ri
 }
 contraption_write=x=>{
@@ -2583,7 +2585,7 @@ fire_attr_sync=(target,name,a)=>{
 	pushstate(root),issue(root,b);let q=ATTR_QUOTA;while(running()&&q>0)runop(),q--;const r=running()?NONE:arg();popstate();frame=bf;return in_attr=0,r
 }
 parent_deck=x=>deck_is(x)?x: card_is(x)||prototype_is(x)?x.deck: parent_deck(x.card)
-event_invoke=(target,name,arg,hunk,isolate,noinner,nodiscard)=>{
+event_invoke=(target,name,arg,hunk,isolate,nodiscard)=>{
 	const scopes=lmd([NONE],[parse(DEFAULT_HANDLERS)]); let deck=null
 	const ancestors=target=>{
 		if(deck_is(target)){deck=target;if(isolate)return}
@@ -2608,7 +2610,7 @@ event_invoke=(target,name,arg,hunk,isolate,noinner,nodiscard)=>{
 			t.cards  .v.map((v,i)=>bind(b,t.cards  .k[i],v                ))
 			sname='!deck_scope'
 		}
-		if(card_is(t)||prototype_is(t)||(contraption_is(t)&&!noinner)){
+		if((!isolate&&card_is(t))||prototype_is(t)||(contraption_is(t)&&target!=t)){
 			bind(b,lms('card'),t)
 			t.widgets.v.map((v,i)=>bind(b,t.widgets.k[i],v))
 			sname='!card_scope'
@@ -2618,19 +2620,19 @@ event_invoke=(target,name,arg,hunk,isolate,noinner,nodiscard)=>{
 		else if(core){func(b,sname,core)}
 		blk_get(b,lms(name)),blk_lit(b,arg),blk_op(b,op.CALL);if(!hunk&&!nodiscard)blk_op(b,op.DROP);core=b
 	}
-	const r=lmblk();bind(r,lms('me'),target)
+	const r=lmblk();bind(r,lms('me'),proxy_is(target)?ivalue(target,'card'):target)
 	bind(r,lms('deck'),deck),bind(r,lms('patterns'),deck.patterns)
 	return blk_cat(r,core),r
 }
 fire_async=(target,name,arg,hunk,nest)=>{
 	const root=lmenv();primitives(root,parent_deck(target)),constants(root)
-	if(nest)pushstate(root),pending_popstate=1;issue(root,event_invoke(target,name,arg,hunk,0,0,0))
+	if(nest)pushstate(root),pending_popstate=1;issue(root,event_invoke(target,name,arg,hunk,0,0))
 }
 fire_event_async=(target,name,x)=>fire_async(target,name,lml([x]),null,1)
 fire_hunk_async=(target,hunk)=>fire_async(target,null,lml([]),hunk,1)
 n_event=(self,args)=>{
 	const root=lmenv();primitives(root,parent_deck(self)),constants(root)
-	const b=lmblk();blk_op(b,op.DROP),blk_cat(b,event_invoke(self,ls(args[0]),lml(args.slice(1)),null,0,1,1))
+	const b=lmblk();blk_op(b,op.DROP),blk_cat(b,event_invoke(self,ls(args[0]),lml(args.slice(1)),null,0,1))
 	return issue(root,b),NONE
 }
 readgif=(data,hint)=>{

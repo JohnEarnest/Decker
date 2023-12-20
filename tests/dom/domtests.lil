@@ -1989,6 +1989,33 @@ assert["contraption attribute from event 2" 205 con.prop2]
 def.script:"on get_d1 do (deck,patterns) end"
 assert["contraption prop: access globals" (deck,deck.patterns) con.d1]
 
+deck:readdeck[]
+def:deck.add["contraption" "exposer"]
+f:def.add["field" "w1"]
+b:def.add["button" "w2"]
+b.script:"
+on thing1 do w1 end
+on thing2 do w3 end
+on thing4 do card.event[\"thing3\"] end
+on thing5 do card.event[\"thing6\"] end
+on thing7 do card end"
+def.script:"on get_w do w2 end"
+s:deck.card.add["slider" "w3"]
+e:deck.card.add["contraption" "exposer"]
+e.script:"
+on thing3 do w3 end
+on thing6 do card end"
+assert["prototype member event can access other inner widgets"                                  f         b.event["thing1"]]
+assert["contraption can expose member widgets"                                                  "button"  e.w.type]
+assert["contraption exposed member event can access other inner widgets"                        "field"   e.w.event["thing1"].type]
+assert["contraption exposed member event CANNOT access widgets on the container card"           0         e.w.event["thing2"]]
+assert["contraption instance event handlers CAN access widgets on the container card"           s         e.event["thing3"]]
+assert["contraption instances CAN fire events at the container card"                            s         e.w.event["thing4"]]
+assert["prototype scripts observe 'card' as the prototype"                                      def       b.event["thing7"]]
+assert["contraption scripts observe 'card' as the contraption instance"                         e         e.w.event["thing7"]]
+assert["contraption instance event handlers observe 'card' as the container card via outside"   deck.card e.event["thing6"]]
+assert["contraption instance event handlers observe 'card' as the container card via inside"    deck.card e.w.event["thing5"]]
+
 #######################################
 #
 #  Lilt features

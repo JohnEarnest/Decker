@@ -26,8 +26,8 @@ typedef struct {
 } cstate; cstate frame;
 
 itype(image)itype(sound)itype(font)itype(button)itype(field)itype(slider)itype(grid)itype(canvas)itype(deck)itype(card)itype(patterns)itype(module)itype(array)
-itype(prototype)itype(contraption)
-int widget_is(lv*x){return button_is(x)||field_is(x)||slider_is(x)||grid_is(x)||canvas_is(x)||contraption_is(x);}
+itype(prototype)itype(contraption)itype(proxy)
+int widget_is(lv*x){return button_is(x)||field_is(x)||slider_is(x)||grid_is(x)||canvas_is(x)||contraption_is(x)||proxy_is(x);}
 
 int sleep_frames=0, sleep_play=0;
 lv* n_sleep(lv*self,lv*z){(void)self;z=l_first(z);if(matchr(z,lmistr("play"))){sleep_play=1;}else{sleep_frames=MAX(1,ln(z));}return z;}
@@ -169,7 +169,7 @@ lv* parent_deck(lv*x){
 	if(card_is(x)||prototype_is(x))return ivalue(x,"deck");
 	return parent_deck(ivalue(x,"card"));
 }
-lv* event_invokev(lv*target,lv*name,lv*arg,lv*hunk,int iso,int noinner,int nodiscard){
+lv* event_invokev(lv*target,lv*name,lv*arg,lv*hunk,int iso,int nodiscard){
 	lv*scopes=lmd();dset(scopes,NONE,parse(default_handlers));
 	lv*deck=NULL,*core=NULL;int isolate=iso;ancestors(target,scopes,&deck,&isolate);
 	for(int z=scopes->c-1;z>=0;z--){
@@ -181,7 +181,7 @@ lv* event_invokev(lv*target,lv*name,lv*arg,lv*hunk,int iso,int noinner,int nodis
 			EACH(z,cards  )blk_lit(b,       cards  ->lv[z]         ),blk_loc(b,cards  ->kv[z]),blk_op(b,DROP);
 			sname="!deck_scope";
 		}
-		if(card_is(t)||prototype_is(t)||(contraption_is(t)&&!noinner)){
+		if((!isolate&&card_is(t))||prototype_is(t)||(contraption_is(t)&&target!=t)){
 			blk_lit(b,t),blk_loc(b,lmistr("card")),blk_op(b,DROP);
 			lv*widgets=ivalue(t,"widgets");
 			EACH(z,widgets)blk_lit(b,widgets->lv[z]),blk_loc(b,widgets->kv[z]),blk_op(b,DROP);
@@ -199,12 +199,12 @@ lv* event_invokev(lv*target,lv*name,lv*arg,lv*hunk,int iso,int noinner,int nodis
 		}
 		blk_get(b,name),blk_lit(b,arg),blk_op(b,CALL);if(!hunk&&!nodiscard)blk_op(b,DROP);core=b;
 	}
-	lv*b=lmblk();blk_lit(b,target),blk_loc(b,lmistr("me")),blk_op(b,DROP);
+	lv*b=lmblk();blk_lit(b,proxy_is(target)?ivalue(target,"card"):target),blk_loc(b,lmistr("me")),blk_op(b,DROP);
 	blk_lit(b,deck                   ),blk_loc(b,lmistr("deck"    )),blk_op(b,DROP);
 	blk_lit(b,ifield(deck,"patterns")),blk_loc(b,lmistr("patterns")),blk_op(b,DROP);
 	blk_cat(b,core);return b;
 }
-lv* event_invoke(lv*target,lv*name,lv*arg,lv*hunk,int iso){return event_invokev(target,name,arg,hunk,iso,0,0);}
+lv* event_invoke(lv*target,lv*name,lv*arg,lv*hunk,int iso){return event_invokev(target,name,arg,hunk,iso,0);}
 int pending_popstate=0;
 void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
 	lv*root=lmenv(NULL);primitives(root,parent_deck(target)),constants(root);
@@ -213,7 +213,7 @@ void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
 }
 lv* n_event(lv*self,lv*x){
 	lv*root=lmenv(NULL);primitives(root,parent_deck(self)),constants(root);
-	lv*b=lmblk();blk_op(b,DROP),blk_cat(b,event_invokev(self,ls(l_first(x)),l_drop(ONE,x),NULL,0,1,1));
+	lv*b=lmblk();blk_op(b,DROP),blk_cat(b,event_invokev(self,ls(l_first(x)),l_drop(ONE,x),NULL,0,1));
 	issue(root,b);return NONE;
 }
 void fire_event_async(lv*target,lv*name,lv*arg){fire_async(target,name,l_list(arg),NULL,1);}
@@ -1909,6 +1909,7 @@ lv* contraption_read(lv*x,lv*r){
 		lv*i=widget_read(a,ri);if(lii(i))dset(widgets,ifield(i,"name"),i);
 	}
 	{lv*k=lmistr("size"),*v=dget(x,k);iwrite(ri,k,v?v:ifield(def,"size"));}
+	{lv*p=lmd();dset(p,lmistr("card"),ri);dset(r,lmistr("viewproxy"),lmi(interface_widget,lmistr("proxy"),p));}
 	return ri;
 }
 

@@ -3373,7 +3373,7 @@ void fire_view(lv*target){
 	lv*block=event_invoke(target,name,NONE,NULL,0);
 	lv*wids=ifield(target,"widgets");EACH(z,wids){
 		lv*w=wids->lv[z];if(!contraption_is(w)||dget(viewed,w)!=NULL)continue;
-		blk_cat(block,event_invoke(w,name,NONE,NULL,1)),dset(viewed,w,ONE);
+		blk_cat(block,event_invoke(ivalue(w,"viewproxy"),name,NONE,NULL,1)),dset(viewed,w,ONE);
 	}pushstate(root),pending_popstate=1,issue(root,block);
 }
 int interpret(){
