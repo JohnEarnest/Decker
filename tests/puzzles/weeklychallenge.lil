@@ -25,6 +25,22 @@ on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':
 
 # the problems:
 
+problem[248.1]
+# find the distance of each position in a string x from the closest instance of a character y.
+on f x y do
+ m:!("" split x)=y
+ on fscan x do r:1000000 each v in x r:v*1+r end end
+ fscan[m]&rev[fscan[rev[m]]]
+end
+assert[f["loveleetcode" "e"] (3,2,1,0,1,0,0,1,2,2,1,0)]
+assert[f["aaab"         "b"] (3,2,1,0)]
+
+problem[245.1]
+# sort x by y
+on f x y do extract value orderby y asc from x end
+assert[f[("perl","c","python")    (2,1,3)] ("c","perl","python")]
+assert[f[("c++","haskell","java") (1,3,2)] ("c++","java","haskell")]
+
 problem[242.1]
 # find the (distinct) members of x missing from y.
 on missing x y do extract first value by value where !value in y from x end
