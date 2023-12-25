@@ -2585,20 +2585,23 @@ fire_attr_sync=(target,name,a)=>{
 	pushstate(root),issue(root,b);let q=ATTR_QUOTA;while(running()&&q>0)runop(),q--;const r=running()?NONE:arg();popstate();frame=bf;return in_attr=0,r
 }
 parent_deck=x=>deck_is(x)?x: card_is(x)||prototype_is(x)?x.deck: parent_deck(x.card)
-event_invoke=(target,name,arg,hunk,isolate,nodiscard)=>{
+event_invoke=(target,name,arg,hunk,nodiscard)=>{
 	const scopes=lmd([NONE],[parse(DEFAULT_HANDLERS)]); let deck=null
-	const ancestors=target=>{
-		if(deck_is(target)){deck=target;if(isolate)return}
-		if(contraption_is(target)){ancestors(target.card)}
-		if(card_is(target)||prototype_is(target))ancestors(target.deck)
-		if(widget_is(target)&&!contraption_is(target)){
-			if(prototype_is(target.card)||contraption_is(target.card))isolate=1
-			ancestors(target.card)
-		}
-		const t=isolate&&contraption_is(target)?ifield(target,'def'):target
-		try{dset(scopes,target,parse(ls(ifield(t,'script'))))}
-		catch(e){dset(scopes,target,lmblk());}
-	};ancestors(target)
+	const ancestors_record=(target,src)=>{try{dset(scopes,target,parse(ls(ifield(src,'script'))))}catch(e){dset(scopes,target,lmblk())}}
+	const ancestors_inner=target=>{
+		if(deck_is(target)){deck=target;return}
+		if(contraption_is(target)){deck=target.card.deck}
+		else if(card_is(target)||prototype_is(target)){deck=target.deck}
+		else{ancestors_inner(target.card)}
+		ancestors_record(target,contraption_is(target)?ifield(target,'def'):target)
+	}
+	const ancestors_outer=target=>{
+		if(deck_is(target)){deck=target}
+		else if(widget_is(target)){ancestors_outer(target.card)}
+		else{ancestors_outer(target.deck)}
+		ancestors_record(target,target)
+	}
+	(prototype_is(target)||prototype_is(target.card)||contraption_is(target.card))?ancestors_inner(target):ancestors_outer(target)
 	const bind=(b,n,v)=>{blk_lit(b,v),blk_loc(b,n),blk_op(b,op.DROP)}
 	const func=(b,n,v)=>{blk_lit(b,lmon(n,[],blk_end(v))),blk_op(b,op.BIND),blk_op(b,op.DROP),name=n,arg=lml([])}
 	let core=null
@@ -2610,7 +2613,7 @@ event_invoke=(target,name,arg,hunk,isolate,nodiscard)=>{
 			t.cards  .v.map((v,i)=>bind(b,t.cards  .k[i],v                ))
 			sname='!deck_scope'
 		}
-		if((!isolate&&card_is(t))||prototype_is(t)||(contraption_is(t)&&target!=t)){
+		if(card_is(t)||prototype_is(t)||(contraption_is(t)&&target!=t)){
 			bind(b,lms('card'),t)
 			t.widgets.v.map((v,i)=>bind(b,t.widgets.k[i],v))
 			sname='!card_scope'
@@ -2626,13 +2629,13 @@ event_invoke=(target,name,arg,hunk,isolate,nodiscard)=>{
 }
 fire_async=(target,name,arg,hunk,nest)=>{
 	const root=lmenv();primitives(root,parent_deck(target)),constants(root)
-	if(nest)pushstate(root),pending_popstate=1;issue(root,event_invoke(target,name,arg,hunk,0,0))
+	if(nest)pushstate(root),pending_popstate=1;issue(root,event_invoke(target,name,arg,hunk,0))
 }
 fire_event_async=(target,name,x)=>fire_async(target,name,lml([x]),null,1)
 fire_hunk_async=(target,hunk)=>fire_async(target,null,lml([]),hunk,1)
 n_event=(self,args)=>{
 	const root=lmenv();primitives(root,parent_deck(self)),constants(root)
-	const b=lmblk();blk_op(b,op.DROP),blk_cat(b,event_invoke(self,ls(args[0]),lml(args.slice(1)),null,0,1))
+	const b=lmblk();blk_op(b,op.DROP),blk_cat(b,event_invoke(self,ls(args[0]),lml(args.slice(1)),null,1))
 	return issue(root,b),NONE
 }
 readgif=(data,hint)=>{

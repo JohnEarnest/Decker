@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:11
+card:12
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -419,6 +419,24 @@ on drag pos do
  me.segment[bord.copy[] 10,10,pos-10 m]
 end
 
+{end}
+
+{card:card4}
+script:"card4.0"
+{widgets}
+dispatcher1:{"type":"contraption","size":[100,100],"pos":[289,37],"script":"card4.1","def":"dispatcher","widgets":{"button1":{}}}
+field1:{"type":"field","size":[164,58],"pos":[86,61],"locked":1,"border":0,"value":"clicking the button to the right SHOULD do nothing; it'll fire an alert if events are incorrectly bubbling out of contraptions into their containing cards!"}
+
+{script:card4.0}
+on click do
+ alert["card got a click event from %s!" format me.name]
+end
+{end}
+
+{script:card4.1}
+on click do
+ alert["outer contraption got a click event from %s!" format me.name]
+end
 {end}
 
 {card:card3}
@@ -1082,4 +1100,11 @@ on click pos do
 end
 
 {end}
+
+{contraption:dispatcher}
+size:[100,100]
+margin:[0,0,0,0]
+description:"used to make sure events don't bubble from inside contraptions to their containing card."
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[20,40],"text":"Click Me!"}
 

@@ -3365,15 +3365,15 @@ void fire_animate(lv*targets){
 	lv*name=lmistr("view"),*root=lmenv(NULL);primitives(root,deck),constants(root);
 	lv*block=lmblk();EACH(z,targets){
 		lv*w=targets->kv[z];
-		blk_cat(block,event_invoke(w,name,NONE,NULL,ln(targets->lv[z]))),dset(viewed,w,ONE);
+		blk_cat(block,event_invoke(w,name,NONE,NULL)),dset(viewed,w,ONE);
 	}pushstate(root),pending_popstate=1,issue(root,block);
 }
 void fire_view(lv*target){
 	lv*name=lmistr("view"),*root=lmenv(NULL);primitives(root,deck),constants(root);
-	lv*block=event_invoke(target,name,NONE,NULL,0);
+	lv*block=event_invoke(target,name,NONE,NULL);
 	lv*wids=ifield(target,"widgets");EACH(z,wids){
 		lv*w=wids->lv[z];if(!contraption_is(w)||dget(viewed,w)!=NULL)continue;
-		blk_cat(block,event_invoke(ivalue(w,"viewproxy"),name,NONE,NULL,1)),dset(viewed,w,ONE);
+		blk_cat(block,event_invoke(ivalue(w,"viewproxy"),name,NONE,NULL)),dset(viewed,w,ONE);
 	}pushstate(root),pending_popstate=1,issue(root,block);
 }
 int interpret(){

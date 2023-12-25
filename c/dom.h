@@ -151,27 +151,34 @@ char* default_transitions=""
 "transition[on BoxOut     c a b t do  c.rect[c.size/2   c.size*1-t \"center\"]   c.merge[b a] end]\n"
 ;
 
-void ancestors(lv*target,lv*found,lv**deck,int*isolate){
-	if(deck_is(target)){*deck=target;if(*isolate)return;}
-	if(contraption_is(target)){ancestors(ivalue(target,"card"),found,deck,isolate);}
-	if(card_is(target)||prototype_is(target))ancestors(ivalue(target,"deck"),found,deck,isolate);
-	if(widget_is(target)&&!contraption_is(target)){
-		lv*c=ivalue(target,"card");
-		if(prototype_is(c)||contraption_is(c))*isolate=1;
-		ancestors(c,found,deck,isolate);
-	}
-	lv*t=(*isolate)&&contraption_is(target)?ifield(target,"def"):target;
+void ancestors_inner(lv*target,lv*found,lv**deck){
+	if(deck_is(target)){*deck=target;return;}
+	if(contraption_is(target)){*deck=ivalue(ivalue(target,"card"),"deck");}
+	else if(card_is(target)||prototype_is(target)){*deck=ivalue(target,"deck");}
+	else{ancestors_inner(ivalue(target,"card"),found,deck);}
+	lv*t=contraption_is(target)?ifield(target,"def"):target;
 	lv*s=ifield(t,"script"),*block=parse(s&&s->c?s->sv:"");
 	if(perr()){block=parse("");}dset(found,target,block);
+}
+void ancestors_outer(lv*target,lv*found,lv**deck){
+	if(deck_is(target)){*deck=target;}
+	else{ancestors_outer(ivalue(target,widget_is(target)?"card":"deck"),found,deck);}
+	lv*s=ifield(target,"script"),*block=parse(s&&s->c?s->sv:"");
+	if(perr()){block=parse("");}dset(found,target,block);
+}
+void ancestors(lv*target,lv*found,lv**deck){
+	lv*p=ivalue(target,"card");
+	if(prototype_is(target)||prototype_is(p)||contraption_is(p)){ancestors_inner(target,found,deck);}
+	else{ancestors_outer(target,found,deck);}
 }
 lv* parent_deck(lv*x){
 	if(deck_is(x))return x;
 	if(card_is(x)||prototype_is(x))return ivalue(x,"deck");
 	return parent_deck(ivalue(x,"card"));
 }
-lv* event_invokev(lv*target,lv*name,lv*arg,lv*hunk,int iso,int nodiscard){
+lv* event_invokev(lv*target,lv*name,lv*arg,lv*hunk,int nodiscard){
 	lv*scopes=lmd();dset(scopes,NONE,parse(default_handlers));
-	lv*deck=NULL,*core=NULL;int isolate=iso;ancestors(target,scopes,&deck,&isolate);
+	lv*deck=NULL,*core=NULL;ancestors(target,scopes,&deck);
 	for(int z=scopes->c-1;z>=0;z--){
 		lv*t=scopes->kv[z],*b=lmblk();char*sname="!widget_scope";
 		if(lin(t))sname="!default_handlers";
@@ -181,7 +188,7 @@ lv* event_invokev(lv*target,lv*name,lv*arg,lv*hunk,int iso,int nodiscard){
 			EACH(z,cards  )blk_lit(b,       cards  ->lv[z]         ),blk_loc(b,cards  ->kv[z]),blk_op(b,DROP);
 			sname="!deck_scope";
 		}
-		if((!isolate&&card_is(t))||prototype_is(t)||(contraption_is(t)&&target!=t)){
+		if(card_is(t)||prototype_is(t)||(contraption_is(t)&&target!=t)){
 			blk_lit(b,t),blk_loc(b,lmistr("card")),blk_op(b,DROP);
 			lv*widgets=ivalue(t,"widgets");
 			EACH(z,widgets)blk_lit(b,widgets->lv[z]),blk_loc(b,widgets->kv[z]),blk_op(b,DROP);
@@ -204,16 +211,16 @@ lv* event_invokev(lv*target,lv*name,lv*arg,lv*hunk,int iso,int nodiscard){
 	blk_lit(b,ifield(deck,"patterns")),blk_loc(b,lmistr("patterns")),blk_op(b,DROP);
 	blk_cat(b,core);return b;
 }
-lv* event_invoke(lv*target,lv*name,lv*arg,lv*hunk,int iso){return event_invokev(target,name,arg,hunk,iso,0);}
+lv* event_invoke(lv*target,lv*name,lv*arg,lv*hunk){return event_invokev(target,name,arg,hunk,0);}
 int pending_popstate=0;
 void fire_async(lv*target,lv*name,lv*arg,lv*hunk,int nest){
 	lv*root=lmenv(NULL);primitives(root,parent_deck(target)),constants(root);
-	lv*block=event_invoke(target,name,arg,hunk,0);
+	lv*block=event_invoke(target,name,arg,hunk);
 	if(nest)pushstate(root),pending_popstate=1;issue(root,block);
 }
 lv* n_event(lv*self,lv*x){
 	lv*root=lmenv(NULL);primitives(root,parent_deck(self)),constants(root);
-	lv*b=lmblk();blk_op(b,DROP),blk_cat(b,event_invokev(self,ls(l_first(x)),l_drop(ONE,x),NULL,0,1));
+	lv*b=lmblk();blk_op(b,DROP),blk_cat(b,event_invokev(self,ls(l_first(x)),l_drop(ONE,x),NULL,1));
 	issue(root,b);return NONE;
 }
 void fire_event_async(lv*target,lv*name,lv*arg){fire_async(target,name,l_list(arg),NULL,1);}

@@ -2879,13 +2879,13 @@ find_animated=_=>{
 }
 fire_animate=targets=>{
 	const root=lmenv(),block=lmblk();primitives(root,deck),constants(root)
-	targets.k.map((w,i)=>{blk_cat(block,event_invoke(w,'view',lml([NONE]),null,ln(targets.v[i]))),dset(viewed,w,ONE)})
+	targets.k.map(w=>{blk_cat(block,event_invoke(w,'view',lml([NONE]),null)),dset(viewed,w,ONE)})
 	pushstate(root),pending_popstate=1,issue(root,block)
 }
 fire_view=target=>{
 	const root=lmenv();primitives(root,deck),constants(root)
-	const block=event_invoke(target,'view',lml([NONE]),null,0)
-	ifield(target,'widgets').v.filter(w=>contraption_is(w)&&!dget(viewed,w)).map(w=>{blk_cat(block,event_invoke(w.viewproxy,'view',lml([NONE]),null,1)),dset(viewed,w,ONE)})
+	const block=event_invoke(target,'view',lml([NONE]),null)
+	ifield(target,'widgets').v.filter(w=>contraption_is(w)&&!dget(viewed,w)).map(w=>{blk_cat(block,event_invoke(w.viewproxy,'view',lml([NONE]),null)),dset(viewed,w,ONE)})
 	pushstate(root),pending_popstate=1,issue(root,block)
 }
 interpret=_=>{
