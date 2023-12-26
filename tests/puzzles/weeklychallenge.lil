@@ -35,6 +35,15 @@ end
 assert[f["loveleetcode" "e"] (3,2,1,0,1,0,0,1,2,2,1,0)]
 assert[f["aaab"         "b"] (3,2,1,0)]
 
+problem[247.2]
+# find the bi-gram which occurs most frequently, breaking ties by lexicographic order
+on f x do
+ "" fuse first extract v orderby v asc by c orderby c desc from
+  select v:list first value c:count value by value from -1 drop x join 1 drop x
+end
+assert[f["abcdbca"          ] "bc"]
+assert[f["cdeabeabfcdfabgcd"] "ab"]
+
 problem[245.1]
 # sort x by y
 on f x y do extract value orderby y asc from x end
