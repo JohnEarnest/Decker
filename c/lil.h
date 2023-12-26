@@ -42,7 +42,7 @@ idx  idx_new(int n){int c=MAX(n,16);return(idx){n,c,calloc(c,sizeof(int))};}
 int* idx_peek(idx*x){if(x->c<1)printf("peek empty idx stack!\n");return &x->iv[x->c-1];}
 int  idx_pop (idx*x){if(x->c<1)printf("pop empty idx stack!\n");return x->iv[--(x->c)];}
 void idx_push(idx*x,int n){if(x->size<x->c+1)x->iv=realloc(x->iv,(x->size*=2)*sizeof(int));x->iv[x->c++]=n;}
-str str_new(){return(str){0,32,calloc(32,1)};}
+str str_new(void){return(str){0,32,calloc(32,1)};}
 char cl(char x){return x=='\t'?' ':(x>=32&&x<=126)||x=='\n'?x:'?';}
 void str_provision(str*s,int size){if(s->size<size)s->sv=realloc(s->sv,s->size=size);}
 void str_addraw(str*s,int x){if(s->c+1>=s->size)s->sv=realloc(s->sv,s->size*=2);s->sv[s->c++]=x;}
@@ -78,11 +78,11 @@ void lv_free(lv*x){
 	if(!x)return;
 	if(x->lv)free(x->lv);if(x->kv)free(x->kv);if(x->sv&&!(x->t==1&&x->b))free(x->sv);free(x);gc.frees++,gc.live--;
 }
-void lv_grow(){
+void lv_grow(void){
 	gc.heap=realloc(gc.heap,(gc.size*2)*sizeof(lv*));
 	memset(gc.heap+gc.size,0,gc.size*sizeof(lv*));gc.size*=2;
 }
-void lv_collect(){
+void lv_collect(void){
 	if(gc.live+(gc.size*0.1)<gc.size)return;gc.g++;
 	for(int z=0;z<gc.ss;z++){lv_walk(gc.st[z].e),lv_walk(gc.st[z].p),lv_walk(gc.st[z].t);}
 	lv_walk(state.e),lv_walk(state.p),lv_walk(state.t);
@@ -105,11 +105,11 @@ lv* lmvv(int t,int n){lv*r=lmv(t);r->lv=calloc(r->s=MAX(n,8),sizeof(lv*));r->c=n
 lm(n  ,0)(double x){intern_num;lv*r=lmv(0);r->c=1,r->nv=isfinite(x)?x:0;                 return r;}
 lm(s  ,1)(int n)           {lv*r=lmv(1);r->c=n;r->sv=calloc(n+1,1);                      return r;}
 lm(l  ,2)(int n)           {lv*r=lmvv(2,n);                                              return r;}
-lm(d  ,3)()                {lv*r=lmvv(3,16);r->c=0,r->kv=calloc(16,sizeof(lv*));         return r;}
-lm(t  ,4)()                {lv*r=lmvv(4,16);r->c=0,r->kv=calloc(16,sizeof(lv*));         return r;}
+lm(d  ,3)(void)            {lv*r=lmvv(3,16);r->c=0,r->kv=calloc(16,sizeof(lv*));         return r;}
+lm(t  ,4)(void)            {lv*r=lmvv(4,16);r->c=0,r->kv=calloc(16,sizeof(lv*));         return r;}
 lm(on ,5)(str n,lv*r,lv*b) {r->t=5,r->sv=n.sv,r->b=b;                                    return r;}
 lm(i  ,6)(lv*(*f)(lv*,lv*,lv*),lv*n,lv*s){lv*r=lmv(6);r->f=(void*)f,r->a=n,r->b=s;       return r;}
-lm(blk,7)()                {lv*r=lmvv(7,0);r->sv=calloc(32,sizeof(char)),r->ns=32,r->n=0;return r;}
+lm(blk,7)(void)            {lv*r=lmvv(7,0);r->sv=calloc(32,sizeof(char)),r->ns=32,r->n=0;return r;}
 lm(env,8)(lv*p)            {lv*r=lmd();r->t=8;r->env=p;                                  return r;}
 lm(nat,9)(lv*(*f)(lv*,lv*),lv*c){lv*r=lmv(9);r->f=(void*)f,r->a=c;                       return r;}
 lv* lmstr(str x){lv*r=lmv(1);str_term(&x),r->c=strlen(x.sv);r->sv=x.sv;return r;}
@@ -613,7 +613,7 @@ primitive triads[]={
 // Bytecode
 
 int findop(char*n,primitive*p){if(n)for(int z=0;p[z].name[0];z++)if(!strcmp(n,p[z].name))return z;return -1;}
-int tnames=0;lv* tempname(){char t[64];snprintf(t,sizeof(t),"@t%d",tnames++);return lmcstr(t);}
+int tnames=0;lv* tempname(void){char t[64];snprintf(t,sizeof(t),"@t%d",tnames++);return lmcstr(t);}
 enum opcodes {JUMP,JUMPF,LIT,DUP,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,IPRE,IPOST};
 int oplens[]={3   ,3    ,3  ,1  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3   ,3    };
 void blk_addb(lv*x,int n){
@@ -668,12 +668,12 @@ typedef struct{int i,r,c,tl;char*text;token here,next;char error[1024];}parser;p
 char*tcc=" s\" sss ()ssssdsdddddddddd: sssn@nnnnnnnnnnnnnnnnnnnnnnnnnn[ ]sn nnnnnnnnnnnnnnnnnnnnnnnnnn s s";
 char*ncc= "                nnnnnnnnnn     n nnnnnnnnnnnnnnnnnnnnnnnnnn    n nnnnnnnnnnnnnnnnnnnnnnnnnn    ";
 char*mcc= "     xx x xxxx x          x xxx x                          x  x                             x x";
-char tc(){return (par.i>=par.tl)?' ':par.text[par.i];}
-char ccc(){char x=tc();return x>=32&&x<=126?tcc[x-32]:' ';}
-char ccn(){char x=tc();return x>=32&&x<=126?ncc[x-32]:' ';}
-int  iw(){char x=tc();return x==' '||x=='\t'||x=='\n'||x=='#';}
-int mprev(){if(par.i<1)return 0;char x=par.text[par.i-1];return x>=32&&x<=126?mcc[x-32]=='x':0;}
-char nc(){
+char tc(void){return (par.i>=par.tl)?' ':par.text[par.i];}
+char ccc(void){char x=tc();return x>=32&&x<=126?tcc[x-32]:' ';}
+char ccn(void){char x=tc();return x>=32&&x<=126?ncc[x-32]:' ';}
+int  iw(void){char x=tc();return x==' '||x=='\t'||x=='\n'||x=='#';}
+int mprev(void){if(par.i<1)return 0;char x=par.text[par.i-1];return x>=32&&x<=126?mcc[x-32]=='x':0;}
+char nc(void){
 	if(par.i>=par.tl)return' ';
 	char x=par.text[par.i++];x=='\n'?(par.r++,par.c=0):(par.c++);return x;
 }
@@ -714,13 +714,13 @@ str literal_str(token*t){
 		}else{str_addc(&r,par.text[z]);}
 	}return r;
 }
-token* next(){
+token* next(void){
 	if(par.next.type){par.here=par.next;par.next.type=0;}else{tok(&par.here);}
 	return &par.here;
 }
-token* peek(){if(!par.next.type)tok(&par.next);return &par.next;}
-token peek2(){parser t=par;next();token r=*peek();par=t;return r;}
-int hasnext(){return !perr()&&((par.next.type&&par.next.type!='e')||peek()->type!='e');}
+token* peek(void){if(!par.next.type)tok(&par.next);return &par.next;}
+token peek2(void){parser t=par;next();token r=*peek();par=t;return r;}
+int hasnext(void){return !perr()&&((par.next.type&&par.next.type!='e')||peek()->type!='e');}
 int matchsp(char x){return perr()?0: peek()->type==x?(next(),1):0;}
 int matchp(char*x){
 	if(perr()||peek()->type!='n')return 0;int r=peek()->b-peek()->a;
@@ -750,13 +750,13 @@ str name(char*n){
 }
 lv* names(char*end,char*type){lv*r=lml(0);while(!match(end)&&!perr())ll_add(r,lmstr(name(type)));return r;}
 void expr(lv*b);lv*n_uplevel(lv*self,lv*a); // forward refs
-lv* quote(){lv*r=lmblk();expr(r);blk_end(r);return r;}
+lv* quote(void){lv*r=lmblk();expr(r);blk_end(r);return r;}
 void iblock(lv*r){
 	int c=0;while(hasnext()){
 		if(match("end")){if(!c)blk_lit(r,NONE);return;}if(c)blk_op(r,DROP);expr(r),c++;
 	}if(!perr())snprintf(par.error,sizeof(par.error),"Expected 'end' for block.");
 }
-lv* block(){lv*r=lmblk();iblock(r);return r;}
+lv* block(void){lv*r=lmblk();iblock(r);return r;}
 int parseclause(lv*b,int isupdate){
 	if(match("where")){
 		lv*ex=quote();int grouped=parseclause(b,isupdate);
@@ -794,8 +794,8 @@ void parsequery(lv*b,char*op,int dcol){
 	blk_lit(l,index),blk_op(l,COL),blk_op(l,DROP),blk_opa(l,BUND,keys->c),blk_op2(l,"dict");
 	blk_loop(b,l_list(n),l),blk_lit(b,keys),blk_op3(b,op);
 }
-lv* quotesub(){int c=0;lv*r=lmblk();while(hasnext()&&!matchsp(']'))expr(r),c++;blk_opa(r,BUND,c);return r;}
-lv* quotedot(){lv*r=lmblk();blk_lit(r,l_list(lmstr(name("member"))));return r;}
+lv* quotesub(void){int c=0;lv*r=lmblk();while(hasnext()&&!matchsp(']'))expr(r),c++;blk_opa(r,BUND,c);return r;}
+lv* quotedot(void){lv*r=lmblk();blk_lit(r,l_list(lmstr(name("member"))));return r;}
 void parseindex(lv*b,lv*name){
 	lv*i=lml(0);while(!perr()&&strchr("[.",peek()->type)){
 		if(matchsp('['))ll_add(i,quotesub());
@@ -904,7 +904,7 @@ void docall(lv*f,lv*a,int tail){
 	if(!lion(f)){ret(l_at(f,l_first(a)));return;}
 	if(tail){descope;}issue(env_bind(f->env,f,a),f->b);gc.depth=MAX(gc.depth,state.e->c);
 }
-void runop(){
+void runop(void){
 	lv*b=getblock();if(!liblk(b))ret(ll_pop(state.t));
 	int*pc=getpc(),op=blk_getb(b,*pc),imm=(oplens[op]==3?blk_gets(b,1+*pc):0);(*pc)+=oplens[op];
 	switch(op){
@@ -967,13 +967,13 @@ lv*n_eval(lv*self,lv*a){
 	blk_opa(prog,BUND,2),blk_lit(prog,lmnat(n_feval,NULL)),blk_op(prog,SWAP),blk_op(prog,CALL);
 	issue(env_bind(a->c>2&&lb(a->lv[2])?ev():NULL,k,v),prog);return r;
 }
-void init_interns(){for(int z=0;z<=383;z++){lv*t=&interned[z];t->t=0,t->c=1,t->nv=z-128;}}
+void init_interns(void){for(int z=0;z<=383;z++){lv*t=&interned[z];t->t=0,t->c=1,t->nv=z-128;}}
 void init(lv*e){state.p=lml(0),state.t=lml(0),state.e=lml(0),state.pcs=idx_new(0);ll_add(state.e,e);}
 void pushstate(lv*e){
 	if(!state.p)printf("trying to save an uninitialized state!\n");
 	gc.st[gc.ss++]=state;init(e);
 }
-void popstate(){
+void popstate(void){
 	idx_free(&state.pcs);
 	if(gc.ss){state=gc.st[--gc.ss];}else{printf("state underflow!\n");}
 }
@@ -981,7 +981,7 @@ void runexpr(lv*env,lv*x){issue(env,x);}
 void runfunc(lv*env,lv*f,lv*args){
 	if(f&&lion(f)){lv*b=lmblk();blk_lit(b,f),blk_lit(b,args),blk_op(b,CALL),blk_op(b,DROP);issue(env,b);}
 }
-void halt(){state.e->c=0,state.t->c=0,state.p->c=0,state.pcs.c=0;}
+void halt(void){state.e->c=0,state.t->c=0,state.p->c=0,state.pcs.c=0;}
 lv*run(lv*x,lv*rootenv){
 	init(rootenv),issue(rootenv,x);int c=0;while(running()){runop(),c++;if(c%100==0)lv_collect();}
 	if(state.p->c<1)return NONE;lv*r=arg();
@@ -1151,7 +1151,7 @@ lv*n_readxml(lv*self,lv*a){(void)self;int i=0;return readxmlrec(ls(l_first(a))->
 
 #ifdef _WIN32
 #include <windows.h>
-lv* time_ms(){
+lv* time_ms(void){
 	FILETIME t; GetSystemTimeAsFileTime(&t);
 	ULARGE_INTEGER i; i.LowPart=t.dwLowDateTime, i.HighPart=t.dwHighDateTime;
 	return lmn(i.QuadPart*1e-4);
@@ -1160,7 +1160,7 @@ lv* time_ms(){
 #ifndef __COSMOPOLITAN__
 #include <sys/time.h>
 #endif
-lv* time_ms(){
+lv* time_ms(void){
 	struct timeval now;gettimeofday(&now,NULL);
 	return lmn((((long long)now.tv_sec)*1000)+(now.tv_usec/1000));
 }

@@ -6,7 +6,7 @@ EXTRA_FLAGS?=
 ifeq ($(UNAME),Darwin)
 	OPEN=open
 	COMPILER=clang
-	FLAGS=-Wall -Werror -Wextra -Wpedantic -Os
+	FLAGS=-Wall -Werror -Wextra -Wpedantic -Os -Wstrict-prototypes
 	# -Wno-misleading-indentation silences warnings which are entirely spurious.
 	FLAGS:=$(FLAGS) -Wno-misleading-indentation -Wno-unknown-warning-option
 	# FLAGS:=$(FLAGS) -fsanitize=undefined

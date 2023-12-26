@@ -444,7 +444,7 @@ lv* n_image_translate(lv*self,lv*z){
 }
 lv* image_make(lv*buffer);lv* image_read(lv*x); // forward refs
 lv* n_image(lv*self,lv*z){if(lis(l_first(z)))return image_read(l_first(z));return image_make(lmbuff(unpack_pair(z,0)));(void)self;}
-lv* image_empty(){return image_make(lmbuff((pair){0,0}));}
+lv* image_empty(void){return image_make(lmbuff((pair){0,0}));}
 lv* buffer_clone(lv*x){pair size=buff_size(x);return buffer_copy(x,(rect){0,0,size.x,size.y});}
 lv* image_clone(lv*x){pair size=image_size(x);return image_make(buffer_copy(x->b,(rect){0,0,size.x,size.y}));}
 lv* unpack_image(lv*z,int i){return (i>=z->c||!image_is(z->lv[i]))?image_empty():z->lv[i];}
@@ -824,7 +824,7 @@ void draw_shadow(rect r,int fcol,int bcol,int solid){
 pair*fringe ;int fringe_count=0,fringe_size=0;
 char*visited;int visited_size=0;
 void fringe_push(pair x){grower(fringe,pair);fringe[fringe_count++]=x;}
-pair fringe_pop(){return fringe[--fringe_count];}
+pair fringe_pop(void){return fringe[--fringe_count];}
 void draw_fill(pair r,int pattern,char*src){
 	if(!inclip(r.x,r.y))return;
 	int sz=frame.size.x*frame.size.y;
@@ -891,7 +891,7 @@ void draw_dithered(rect r,lv*buff,int opaque,lv*mask){
 }
 fpair*poly;int poly_count=0,poly_size=0;
 void poly_push(fpair x){grower(poly,fpair);poly[poly_count++]=x;}
-rect poly_bounds(){
+rect poly_bounds(void){
 	rect d={frame.clip.x+frame.clip.w,frame.clip.y+frame.clip.h,frame.clip.x,frame.clip.y};
 	for(int z=0;z<poly_count;z++){fpair p=poly[z];d.x=MIN(d.x,p.x),d.y=MIN(d.y,p.y),d.w=MAX(d.w,p.x),d.h=MAX(d.h,p.y);}
 	d.w-=d.x,d.h-=d.y,d.w++,d.h++;return d;
@@ -2591,7 +2591,7 @@ int readcolor(unsigned char cr,unsigned char cg,unsigned char cb,int grayscale){
 void readcolors(int*i,char*d,int*pal,int packed,int grayscale){
 	int c=1<<((packed&0x07)+1);for(int z=0;z<c;z++)pal[z]=readcolor(d[*i],d[1+(*i)],d[2+(*i)],grayscale),(*i)+=3;
 }
-lv* empty_frames(){lv*r=lmd();dset(r,lmistr("frames"),lml(0)),dset(r,lmistr("delays"),lml(0));return r;}
+lv* empty_frames(void){lv*r=lmd();dset(r,lmistr("frames"),lml(0)),dset(r,lmistr("delays"),lml(0));return r;}
 lv* readgif(char*data,int size,int gray,int frames){
 	if(memcmp(data,"GIF89a",6)&&memcmp(data,"GIF87a",6))return free(data),(frames?empty_frames():image_empty());
 	lv*r_frames=lml(0),*r_delays=lml(0),*r_disposal=lml(0),*r_dict=lmd();dset(r_dict,lmistr("frames"),r_frames),dset(r_dict,lmistr("delays"),r_delays);

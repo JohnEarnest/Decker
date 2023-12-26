@@ -90,7 +90,7 @@ lv*interface_app(lv*self,lv*i,lv*x){
 // Environment
 
 lv*n_import(lv*self,lv*a); // forward ref
-lv* globals(){
+lv* globals(void){
 	lv*env=lmenv(NULL);
 	dset(env,lmistr("show"     ),lmnat(n_show,NULL));
 	dset(env,lmistr("print"    ),lmnat(n_print,NULL));
