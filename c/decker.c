@@ -3868,21 +3868,14 @@ void main_view(void){
 	}
 	if(ob.show_cursor&&ms.type==modal_none&&(uimode==mode_draw||uimode==mode_object)){
 		char t[4096];ev=ev_to_con(ev);
-		if(uimode==mode_draw&&bg_has_sel()){
-			rect r=livesel,l=r;
-			snprintf(t,sizeof(t),"(%3d,%3d,%3d,%3d)",l.x,l.y,l.w,l.h);pair s=font_textsize(FONT_BODY,t);
-			draw_text_outlined(rect_sub(con_to_screenr((rect){r.x,r.y,s.x,s.y}),(pair){0,s.y}),t,FONT_BODY);
+		if(uimode==mode_draw&&bg_has_sel()){rect r=livesel;snprintf(t,sizeof(t),"(%3d,%3d,%3d,%3d)",r.x,r.y,r.w,r.h);}
+		else if(uimode==mode_object&&ev.drag&&is_resizable()){
+			rect w=unpack_widget(ob.sel->lv[0]).size;snprintf(t,sizeof(t),"(%3d,%3d,%3d,%3d)",w.x,w.y,w.w,w.h);
 		}
-		else if(ev.drag){
-			pair a=ev.dpos,b=ev.pos;rect r={b.x,b.y,b.x-a.x,b.y-a.y};
-			snprintf(t,sizeof(t),"(%3d,%3d,%3d,%3d)",r.x,r.y,r.w,r.h);pair s=font_textsize(FONT_BODY,t);
-			draw_text_outlined(rect_sub(con_to_screenr(rect_pair(ev.pos,s)),(pair){0,s.y}),t,FONT_BODY);
-		}
-		else{
-			pair c=ev.pos;
-			snprintf(t,sizeof(t),"(%3d,%3d)",c.x,c.y);pair s=font_textsize(FONT_BODY,t);
-			draw_text_outlined(rect_sub(con_to_screenr(rect_pair(ev.pos,s)),(pair){0,s.y}),t,FONT_BODY);
-		}ev=con_to_ev(ev);
+		else if(ev.drag){pair a=ev.dpos,b=ev.pos;snprintf(t,sizeof(t),"(%3d,%3d,%3d,%3d)",b.x,b.y,b.x-a.x,b.y-a.y);}
+		else{pair c=ev.pos;snprintf(t,sizeof(t),"(%3d,%3d)",c.x,c.y);}
+		pair s=font_textsize(FONT_BODY,t);draw_text_outlined(rect_sub(con_to_screenr(rect_pair(ev.pos,s)),(pair){0,s.y}),t,FONT_BODY);
+		ev=con_to_ev(ev);
 	}
 	if(in_layer()&&ev.exit&&!dr.fatbits&&!card_is(con()))con_set(NULL),ev.exit=0;
 }

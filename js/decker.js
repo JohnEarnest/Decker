@@ -2600,9 +2600,9 @@ object_properties=x=>{
 	if(grid_is       (x))modal_enter('grid_props'  )
 	if(contraption_is(x))modal_enter('contraption_props')
 }
+is_resizable=_=>ob.sel.length==1&&(contraption_is(ob.sel[0])?lb(ifield(ob.sel[0].def,'resizable')):1)
 object_editor=_=>{
 	const wids=con_wids(), pal=deck.patterns.pal.pix
-	const is_resizable=_=>ob.sel.length==1&&(contraption_is(ob.sel[0])?lb(ifield(ob.sel[0].def,'resizable')):1)
 	wids.v.map(wid=>{
 		const w=unpack_widget(wid), sel=ob.sel.some(x=>x==wid);w.size=con_to_screen(w.size)
 		if(sel){draw_box(inset(w.size,-1),0,ANTS)}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1))}
@@ -3300,21 +3300,15 @@ main_view=_=>{
 	}
 	if(ob.show_cursor&&ms.type==null&&uimode in {draw:1,object:1}){
 		ev=ev_to_con(ev);
-		if(uimode=='draw'&&bg_has_sel()){
-			let r=livesel,l=r
-			const t=ls(dyad.format(lms('(%3i,%3i,%3i,%3i)'),lml([l.x,l.y,l.w,l.h].map(lmn)))),s=font_textsize(FONT_BODY,t)
-			draw_text_outlined(rsub(con_to_screen(rect(r.x,r.y,s.x,s.y)),rect(0,s.y)),t,FONT_BODY)
-		}
-		else if(ev.drag){
-			const a=ev.dpos,b=ev.pos,r=rpair(b,rsub(b,a))
-			const t=ls(dyad.format(lms('(%3i,%3i,%3i,%3i)'),lml([r.x,r.y,r.w,r.h].map(lmn)))),s=font_textsize(FONT_BODY,t)
+		const cursor=(x,r)=>{
+			const t=ls(dyad.format(lms(x),lml([r.x,r.y,r.w,r.h].map(lmn)))),s=font_textsize(FONT_BODY,t)
 			draw_text_outlined(rsub(con_to_screen(rpair(ev.pos,s)),rect(0,s.y)),t,FONT_BODY)
 		}
-		else{
-			const c=ev.pos
-			const t=ls(dyad.format(lms('(%3i,%3i)'),lml([c.x,c.y].map(lmn)))),s=font_textsize(FONT_BODY,t)
-			draw_text_outlined(rsub(con_to_screen(rpair(ev.pos,s)),rect(0,s.y)),t,FONT_BODY)
-		}ev=con_to_ev(ev);
+		if(uimode=='draw'&&bg_has_sel())                  {cursor('(%3i,%3i,%3i,%3i)',livesel)}
+		else if(uimode=='object'&&ev.drag&&is_resizable()){cursor('(%3i,%3i,%3i,%3i)',unpack_widget(ob.sel[0]).size)}
+		else if(ev.drag){const a=ev.dpos,b=ev.pos;         cursor('(%3i,%3i,%3i,%3i)',rpair(b,rsub(b,a)))}
+		else                                              {cursor('(%3i,%3i)',ev.pos)}
+		ev=con_to_ev(ev);
 	}
 	if(in_layer()&&ev.exit&&!dr.fatbits&&!card_is(con()))con_set(null),ev.exit=0
 }
