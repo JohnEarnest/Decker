@@ -17,8 +17,8 @@ ISODATE=lms('%04i-%02i-%02iT%02i:%02i:%02iZ%n%m'), PARTS=['year','month','day','
 clchar=x=>{const c=x.charCodeAt(0);return x=='\t'?' ':(c>=32&&c<=126)||(x=='\n')?x:'?'}
 clchars=x=>x.replace(/\r/g,'').replace(/\t/g,' ').replace(/[\u201C\u201D]/g,'"').replace(/[\u2018\u2019]/g,"'").replace(/[^ -~\n]/g,'?')
 wnum=y=>{
-	let w='',d='',s=y<0?(y=-y,'-'):'',i=Math.floor(y);while(i>0){w=(0|i%10)+w,i=i/10}
-	y=Math.round((y-Math.floor(y))*1000000);for(let z=0;z<6;z++){d=(0|y%10)+d,y=y/10}
+	let w='',d='',s=y<0?(y=-y,'-'):'',i=Math.floor(y);y=Math.round((y-Math.floor(y))*1000000);if(y>=1000000)i++
+	while(i>0){w=(0|i%10)+w,i=i/10}for(let z=0;z<6;z++){d=(0|y%10)+d,y=y/10}
 	return s+('0'+w).replace(/^(0+)(?=[^0])/,'')+('.'+d).replace(/(\.?0+)$/,'')
 }
 mod=(x,y)=>x-y*Math.floor(x/y)

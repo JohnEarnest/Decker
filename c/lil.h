@@ -134,8 +134,9 @@ void cswap(char*t,int a,int b){char v=t[a];t[a]=t[b],t[b]=v;}
 void crev(char*t,int n){int i=0,j=n-1;while(i<j)cswap(t,i++,j--);}
 void wnum(str*x,double y){
 	if(y<0)y=-y,str_addc(x,'-');char t[NUM*2]={0};int n=0,s=0;
-	t[n++]='0';double i=floor(y);while(i>0){t[n++]=fmod(i,10)+'0',i=i/10;}crev(t+1,n-1);while(t[s]=='0'&&t[s+1])s++;t[n++]='.';
-	y=round((y-floor(y))*1000000.0);for(int z=0;z<6;z++){t[n+5-z]=fmod(y,10)+'0',y=y/10;}n+=5;while(n>0&&t[n]=='0')n--;if(t[n]=='.')n--;
+	t[n++]='0';double i=floor(y);y=round((y-floor(y))*1000000.0);if(y>=1000000)i++;
+	while(i>0){t[n++]=fmod(i,10)+'0',i=i/10;}crev(t+1,n-1);while(t[s]=='0'&&t[s+1])s++;t[n++]='.';
+	for(int z=0;z<6;z++){t[n+5-z]=fmod(y,10)+'0',y=y/10;}n+=5;while(n>0&&t[n]=='0')n--;if(t[n]=='.')n--;
 	str_add(x,t+s,n-s+1);
 }
 monad(l_rows);monad(l_cols);monad(l_range);monad(l_list);monad(l_first);
