@@ -90,12 +90,14 @@ The _Style_ menu will be available whenever drawing tools are chosen:
 - _Brush..._: Select a brush shape used for most drawing tools.
 - _Color_: Toggle offering Decker's 16-color palette instead of its 28  1-bit drawing patterns.
 - _Transparency_: Toggle treating pattern 0 as transparent when moving selections. Also applies to imported and exported images!
+- _Underpaint_: Toggle making all drawing tools leave pattern 1 alone. This is helpful for adding patterns or color "underneath" solid black lineart.
 - _Tracing Mode_: Toggle drawing the Decker window in a semi-transparent fashion, to allow you to trace images underneath the window.
 
 A number of shortcuts are available with any of the drawing tools selected:
 
 - Pressing `m` toggles the visibility of Decker's main menu.
 - Pressing `t` toggles transparency mode (_Style &#8594; Transparency_).
+- Pressing `u` toggles underpaint mode (_Style &#8594; Underpaint_).
 - Pressing `y` toggles tracing mode (_Style &#8594; Tracing Mode_).
 - If you have imported a color image, you can press `j` or `k` to lighten or darken the image, respectively. This adjustment can only be performed while the box selection remains active.
 - Pressing `9` or `0` will decrement or increment the current brush shape, respectively.

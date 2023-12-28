@@ -97,14 +97,14 @@ int dover(rect r){return box_in(r,ev.dpos);}
 enum tools{tool_select,tool_pencil,tool_lasso,tool_line,tool_fill,tool_poly,tool_rect,tool_fillrect,tool_ellipse,tool_fillellipse};
 typedef struct {
 	int tool, brush, pattern, fill, erasing;
-	int show_widgets, show_anim, trans, trans_mask, color, fatbits; pair offset;
+	int show_widgets, show_anim, trans, trans_mask, under, color, fatbits; pair offset;
 	int show_grid, snap; pair grid_size;
 	rect sel_here, sel_start; lv*limbo; int limbo_dither;
 	lv* scratch, *mask, *omask;
 	int pickfill;
 } draw_state;
-draw_state ddr={tool_pencil,3,1,0,0, 1,1,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0};
-draw_state dr ={tool_pencil,3,1,0,0, 1,1,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0};
+draw_state ddr={tool_pencil,3,1,0,0, 1,1,0,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0};
+draw_state dr ={tool_pencil,3,1,0,0, 1,1,0,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0};
 int bg_pat(void){return dr.trans_mask&&dr.pattern==0?32:dr.pattern;}
 int bg_fill(void){return dr.trans_mask&&dr.fill==0?32:dr.fill;}
 int bg_has_sel(void){return dr.tool==tool_select&&(dr.sel_here.w>0||dr.sel_here.h>0);}
@@ -2435,6 +2435,7 @@ void edit(lv*x){doc_hist->c=doc_hist_cursor;ll_add(doc_hist,x),redo();}
 rect normalize_rect(rect r){if(r.w<0)r.w*=-1,r.x-=r.w;if(r.h<0)r.h*=-1,r.y-=r.h;return r;}
 #define BG_MASK 100
 void bg_scratch_clear(void){pair s=buff_size(dr.scratch);memset(dr.scratch->sv,BG_MASK,s.x*s.y);}
+void bg_scratch_under(void){if(!dr.scratch||!dr.under)return;lv*back=con_image()->b;EACH(z,back)if(back->sv[z]==1)dr.scratch->sv[z]=BG_MASK;}
 void bg_scratch(void){
 	pair c=con_size();if(!dr.scratch)dr.scratch=lmbuff(c);
 	pair s=buff_size(dr.scratch);if(s.x!=c.x||s.y!=c.y)dr.scratch=lmbuff(c);
@@ -2565,7 +2566,7 @@ void bg_tools(void){
 				if(dr.tool==tool_fillellipse)draw_poly(bg_fill());
 				for(int z=0;z<poly_count-1;z++)draw_line(rect_pair(pcast(poly[z]),pcast(poly[z+1])),dr.brush,bg_pat(),deck);
 			}
-			frame=t;if(ev.mu)bg_edit(),clear=1;
+			bg_scratch_under(),frame=t;if(ev.mu)bg_edit(),clear=1;
 		}
 		if(dr.scratch){
 			if(dr.fatbits){draw_fat(con_clip(),dr.scratch,patterns_pal(ifield(deck,"patterns")),frame_count,BG_MASK,FAT,dr.offset);}
@@ -2604,7 +2605,7 @@ void bg_tools(void){
 			poly_push((fpair){ev.dpos.x,ev.dpos.y});
 			bg_scratch();cstate t=frame;frame=draw_buffer(dr.scratch);
 			draw_poly(bg_fill());for(int z=0;z<poly_count-1;z++)draw_line(rect_pair(pcast(poly[z]),pcast(poly[z+1])),dr.brush,bg_pat(),deck);
-			frame=t;bg_edit();bg_scratch_clear();poly_count=0;
+			bg_scratch_under();frame=t;bg_edit();bg_scratch_clear();poly_count=0;
 		}
 	}
 	if(dr.tool==tool_lasso||dr.tool==tool_poly){
@@ -3230,6 +3231,7 @@ void sync(void){
 			if(c==SDLK_LSHIFT||c==SDLK_RSHIFT)ev.shift=0;
 			if(c==SDLK_m&&uimode==mode_draw&&in_layer())ev.hidemenu^=1;
 			if(c==SDLK_t&&uimode==mode_draw&&in_layer())dr.trans^=1;
+			if(c==SDLK_u&&uimode==mode_draw&&in_layer())dr.under^=1;
 			if(c==SDLK_y&&uimode==mode_draw&&in_layer())set_tracing=!tracing;
 			if(c==SDLK_ESCAPE)ev.exit=1;
 			if(!wid.infield&&uimode==mode_interact&&card_is(con())){
@@ -3755,6 +3757,7 @@ void all_menus(void){
 		menu_separator();
 		if(menu_check("Color"       ,1,dr.color,0))dr.color^=1;
 		if(menu_check("Transparency",1,dr.trans,0))dr.trans^=1;
+		if(menu_check("Underpaint"  ,1,dr.under,0))dr.under^=1;
 		#ifndef LOSPEC
 		if(menu_check("Tracing Mode",windowed,tracing,0))set_tracing=!tracing;
 		#endif

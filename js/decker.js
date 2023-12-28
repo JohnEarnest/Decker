@@ -504,7 +504,7 @@ script_save=x=>{const k=lms('script');mark_dirty();if(sc.target)iwrite(sc.target
 
 draw_state=_=>({ // drawing tools state
 	tool:'pencil',brush:3,pattern:1,fill:0,erasing:0, dither_threshold:0,
-	show_widgets:1,show_anim:1,trans:0,trans_mask:0,color:0,fatbits:0,offset:rect(),
+	show_widgets:1,show_anim:1,trans:0,trans_mask:0,under:0,color:0,fatbits:0,offset:rect(),
 	show_grid:0,snap:0,grid_size:rect(16,16), sel_here:rect(),sel_start:rect(),limbo:null,limbo_dither:0,
 	scratch:null,mask:null,omask:null, pickfill:0, poly:[]
 })
@@ -2248,6 +2248,7 @@ image_overlay=(dst,src,mask,offset)=>{
 }
 image_mask=(src,mask)=>{const r=image_copy(src);for(let z=0;z<mask.pix.length;z++)if(!mask.pix[z])r.pix[z]=0;return r}
 bg_scratch_clear=_=>dr.scratch.pix.fill(BG_MASK)
+bg_scratch_under=_=>{if(dr.scratch&&dr.under){const b=con_image();for(let z=0;z<b.pix.length;z++)if(b.pix[z]==1)dr.scratch.pix[z]=BG_MASK}}
 bg_scratch=_=>{
 	const c=con_size();if(!dr.scratch)dr.scratch=image_make(c)
 	const s=dr.scratch.size;if(s.x!=c.x||s.y!=c.y)dr.scratch=image_make(c)
@@ -2352,7 +2353,7 @@ bg_tools=_=>{
 				});poly.push(poly[0])
 				if(dr.tool=='fillellipse')draw_poly(poly,bg_fill());draw_lines(poly,dr.brush,bg_pat(),deck)
 			}
-			frame=t;if(ev.mu)bg_edit(),clear=1
+			bg_scratch_under(),frame=t;if(ev.mu)bg_edit(),clear=1
 		}
 		if(dr.scratch){
 			if(dr.fatbits){draw_fat(con_clip(),dr.scratch,deck.patterns.pal.pix,frame_count,BG_MASK,FAT,dr.offset)}
@@ -2389,7 +2390,8 @@ bg_tools=_=>{
 		else if(ev.drag&&dr.poly.length>0){const l=last(dr.poly);if(ev.pos.x!=l.x||ev.pos.y!=l.y)dr.poly.push(rcopy(ev.pos))}
 		else if(ev.mu){
 			dr.poly.push(rcopy(ev.dpos)),bg_scratch();const t=frame;frame=draw_frame(dr.scratch)
-			draw_poly(dr.poly,bg_fill()),draw_lines(dr.poly,dr.brush,bg_pat(),deck),frame=t,bg_edit(),bg_scratch_clear(),dr.poly=[]
+			draw_poly(dr.poly,bg_fill()),draw_lines(dr.poly,dr.brush,bg_pat(),deck)
+			bg_scratch_under(),frame=t,bg_edit(),bg_scratch_clear(),dr.poly=[]
 		}
 	}
 	if(dr.tool=='lasso'||dr.tool=='poly'){
@@ -3194,6 +3196,7 @@ all_menus=_=>{
 		menu_separator()
 		if(menu_check('Color'       ,1,dr.color))dr.color^=1
 		if(menu_check('Transparency',1,dr.trans))dr.trans^=1
+		if(menu_check('Underpaint'  ,1,dr.under))dr.under^=1
 	}
 	if(uimode=='object'){
 		menu_bar('Widgets',ms.type==null)
@@ -3477,6 +3480,7 @@ q('body').onkeyup=e=>{
 	if(e.key=='Shift'||e.shiftKey)ev.shift=0
 	if(e.key=='m'&&uimode=='draw'&&in_layer())ev.hidemenu^=1
 	if(e.key=='t'&&uimode=='draw'&&in_layer())dr.trans^=1
+	if(e.key=='u'&&uimode=='draw'&&in_layer())dr.under^=1
 	const brush_count=24+count(deck.brushes)
 	if(e.key=='9'&&uimode=='draw'&&ms.type==null)dr.brush=max(            0,dr.brush-1)
 	if(e.key=='0'&&uimode=='draw'&&ms.type==null)dr.brush=min(brush_count-1,dr.brush+1)
