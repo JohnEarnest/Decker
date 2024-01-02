@@ -678,7 +678,7 @@ n_readxml=([x])=>{
 n_random=z=>{
 	const randint=x=>{let y=seed;y^=(y<<13),y^=(y>>>17),(y^=(y<<15));return mod(seed=y,x);} // xorshift32
 	const randelt=x=>lin(x)?lmn(randint(ln(x))): count(x)<1?NONE: l_at(x,lmn(randint(count(x))))
-	let x=z[0]||NONE;if(z.length<2)return randelt(x)
+	let x=z[0]||NONE;if(lid(x))x=monad.range(x);if(z.length<2)return randelt(x)
 	const y=ln(z[1]);if(y>=0){const r=[];for(let z=0;z<y;z++)r.push(randelt(x));return lml(r);}
 	x=lin(x)?monad.range(x).v:ll(x);const p=range(x.length),r=[]
 	for(let i=x.length-1;i>0;i--){const j=randint(i+1),t=p[j];p[j]=p[i],p[i]=t}
