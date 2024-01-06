@@ -1061,11 +1061,12 @@ lv*n_readcsv(lv*self,lv*a){
 		if(t->sv[i++]=='\n')break;css;cm(delim);
 	}while(s&&n<s->c)if(s->sv[n++]!='_')snprintf(b,32,"c%d",n-1),dset(r,lmcstr(b),lml(0));
 	if(!s)s=l_take(lmn(r->c),lmistr("s"));EACH(z,s)if(s->sv[z]!='_')slots++;slots=MIN(slots,r->c);
+	char f[]={'%',0,0};MAP(fmts,s)(f[1]=fchar(s->sv[z]),lmcstr(f));
 	n=0;while(i<=t->c){
 		css;str val=str_new();
 		if(cm('"'))while(i<t->c)if(cm('"')){if(cm('"'))str_addc(&val,'"');else break;}else str_addc(&val,t->sv[i++]);
 		else{while(i<t->c&&!strchr("\n\"",t->sv[i])&&t->sv[i]!=delim)str_addc(&val,t->sv[i++]);}
-		if(n<s->c&&s->sv[n]!='_'){char f[]={'%',fchar(s->sv[n]),0};ll_add(r->lv[slot++],l_parse(lmcstr(f),lmstr(val)));}
+		if(n<s->c&&s->sv[n]!='_'){ll_add(r->lv[slot++],s->sv[n]=='s'?lmstr(val): l_parse(fmts->lv[n],lmstr(val)));}
 		else{free(val.sv);}n++;
 		if(i>=t->c||t->sv[i]=='\n'){
 			while(n<s->c){char u=s->sv[n++];if(u!='_'&&slot<slots)ll_add(r->lv[slot++],strchr("sluvroq",u)?lms(0):NONE);}
