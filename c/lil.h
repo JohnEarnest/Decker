@@ -560,12 +560,12 @@ lv* l_where(lv*col,lv*tab){
 	lv*r=l_take(p,tab);dset(r,lmistr("gindex"),l_range(lmn(r->n)));return r;
 }
 lv* l_by(lv*col,lv*tab){
-	lv*b=l_take(lmn(tab->n),ll(col)),*u=lmd();EACH(z,b)dset(u,b->lv[z],b->lv[z]);
-	lv*r=lml(0);EACH(group,u){
-		lv*p=lml(0);EACH(z,b)if(matchr(b->lv[z],u->lv[group]))ll_add(p,lmn(z));
-		lv*s=l_take(p,tab);dset(s,lmistr("gindex"),l_range(lmn(s->n))),dset(s,lmistr("group"),l_list(lmn(group)));
-		ll_add(r,torect(s));
-	};return r;
+	lv*b=l_take(lmn(tab->n),ll(col)),*u=lmd(),*gi=lmistr("gindex"),*gr=lmistr("group");
+	EACH(row,b){
+		int ki=dgeti(u,b->lv[row]);if(ki==-1){TMAP(nt,tab,lml(0));ki=u->c,dset(u,b->lv[row],nt);}
+		lv*t=u->lv[ki];EACH(col,tab)ll_add(t->lv[col],tab->lv[col]->lv[row]);
+		dget(t,gi)->lv[t->n]=lmn(t->n);dget(t,gr)->lv[t->n]=lmn(ki);t->n++;
+	}return ll(u);
 }
 lv*order_vec=NULL;int order_dir=0; // this is gross. qsort() is badly designed, and qsort_r is unportable.
 int lex_less(lv*a,lv*b);int lex_more(lv*a,lv*b);// forward refs
