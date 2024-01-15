@@ -562,7 +562,7 @@ int widget_button(lv*target,button x,int value){
 	}
 	if(x.style==button_invisible){
 		draw_textc(inset(b,3),x.text,x.font,fcol);
-		if(cl)draw_invert(pal,ar);
+		if(cl&&x.show!=show_transparent)draw_invert(pal,ar);
 	}
 	if(target&&cr)msg.target_click=target;
 	if(!x.locked&&in_widgets())wid.count++;

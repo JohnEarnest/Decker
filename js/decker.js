@@ -658,7 +658,7 @@ widget_button=(target,x,value,func)=>{
 		else{const p=rect(br.x,br.y);draw_icon(p,RADIOS[3],bcol),draw_icon(p,RADIOS[cl||cr?1:0],fcol);if(value)draw_icon(p,RADIOS[2],fcol)}
 		draw_text_fit(to,x.text,font,fcol);ar=to;if(sel)draw_box(rect(to.x-2,to.y-1,to.w+2,to.h+2),0,13);if(cl)draw_invert(pal,ar)
 	}
-	if(x.style=='invisible'){draw_textc(inset(b,3),x.text,font,fcol);if(cl)draw_invert(pal,ar)}
+	if(x.style=='invisible'){draw_textc(inset(b,3),x.text,font,fcol);if(cl&&x.show!='transparent')draw_invert(pal,ar)}
 	if(target&&cr)msg.target_click=target
 	if(!x.locked&&in_widgets())wid.count++
 	return cr

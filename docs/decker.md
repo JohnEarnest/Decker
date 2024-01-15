@@ -301,7 +301,7 @@ All widgets can be "shown" in one of four ways, configurable with the _Widgets_ 
 
 The canvas widget has a special behavior for _Show Invert_: instead of being drawn in black-on-white, the pixels of the canvas will _invert_ the color of anything beneath them as by the Exclusive-OR (XOR) logical operation. Contraptions are similar: their background image is drawn like a canvas, and then any widgets that are part of the contraption are drawn on top, respecting their own internal `show` properties.
 
-(Keep in mind that a "Show None" widget is not the same thing as an "Invisible" button- invisible buttons are shown and interactive, they just don't look like anything!)
+Keep in mind that a "Show None" widget is not the same thing as an "Invisible" button- invisible buttons are shown and interactive, they just don't look like anything! An Invisible button will normally invert its background while depressed, revealing its bounding box, but if it is set to "Show Transparent" it will be truly invisible except for any label text.
 
 If you have an image in the clipboard, you can make a new canvas based on it by using _Edit &#8594; Paste as new Canvas_. This makes it easy to create "paper cutouts" that conceal part of a card and are hidden or revealed by scripts. You can likewise copy the image from a selected canvas to the clipboard to manipulate elsewhere with the drawing tools.
 
