@@ -25,6 +25,24 @@ on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':
 
 # the problems:
 
+problem[250.1]
+# find the minimum index i in x where x=10%i
+# demonstrates a convenient idiom for failing over to a default
+# value when a query doesn't produce any filtered rows.
+on f x do first extract index,-1 where value=10%index from x end
+assert[f[(0, 1, 2                     )]  0]
+assert[f[(4, 3, 2, 1                  )]  2]
+assert[f[(1, 2, 3, 4, 5, 6, 7, 8, 9, 0)] -1]
+
+problem[250.2]
+# find the maximum string value in x, where digit-only strings are their decimal value, and others are their count
+on f x do
+  on sval x do if min(""split x)in"0123456789" 0+x else count x end end
+  max sval @ x
+end
+assert[f[("perl", "2", "000", "python", "r4ku")] 6]
+assert[f[("001", "1", "000", "0001"           )] 1]
+
 problem[248.1]
 # find the distance of each position in a string x from the closest instance of a character y.
 on f x y do
