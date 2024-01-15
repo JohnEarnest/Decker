@@ -611,11 +611,11 @@ void widget_slider(lv*target,slider x){
 	if(x.style==slider_compact){
 		if(x.show==show_transparent){draw_rect((rect){b.x+1,b.y+1,13,b.h-2},bcol),draw_rect((rect){b.x+b.w-14,b.y+1,13,b.h-2},bcol);}
 		draw_boxr(b,fcol,bcol,x.show!=show_transparent),draw_textc((rect){b.x+14,b.y,b.w-28,b.h},t->sv,x.font,fcol);
-		#define comp_btn(xo,dir,ba,li) {\
-			rect bb={b.x+xo,b.y,14,b.h}; int a=!l&&over(bb), o=a&&(ev.mu||ev.drag)&&dover(bb);\
+		#define comp_btn(xo,dir,ba,li,en) {\
+			rect bb={b.x+xo,b.y,14,b.h}; int a=en&&!l&&over(bb), o=a&&(ev.mu||ev.drag)&&dover(bb);\
 			if(o&&ev.md)x.value+=(dir*x.step); if(a)uicursor=cursor_point;\
-			draw_icon((pair){bb.x+1,b.y+(b.h-12)/2},ARROWS->lv[ba+(o?2:0)],fcol);draw_vline(bb.x+li,b.y+1,b.y+b.h-1,sel?13:fcol);}
-		comp_btn(0,-1,4,13);comp_btn(b.w-14,1,5,0);
+			draw_icon((pair){bb.x+1,b.y+(b.h-12)/2},ARROWS->lv[ba+(o?2:0)],en?fcol:13);draw_vline(bb.x+li,b.y+1,b.y+b.h-1,sel?13:fcol);}
+		comp_btn(0,-1,4,13,x.min!=x.value);comp_btn(b.w-14,1,5,0,x.max!=x.value);
 	}
 	if(sel&&ev.dir==dir_up)x.value-=x.step;if(sel&&ev.dir==dir_down)x.value+=x.step;
 	if(in_layer()&&over(frame.clip)&&ev.scroll)x.value+=x.step*ev.scroll; x.value=slider_normalize((fpair){x.min,x.max},x.step,x.value);

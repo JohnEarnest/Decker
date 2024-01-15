@@ -709,11 +709,11 @@ widget_slider=(target,x)=>{
 	if(x.style=='compact'){
 		if(x.show=='transparent')draw_rect(rect(b.x+1,b.y+1,13,b.h-2),bcol),draw_rect(rect(b.x+b.w-14,b.y+1,13,b.h-2),bcol)
 		draw_boxr(b,fcol,bcol,x.show!='transparent'),draw_textc(rect(b.x+14,b.y,b.w-28,b.h),t,font,fcol)
-		const comp_btn=(xo,dir,ba,li)=>{
-			const bb=rect(b.x+xo,b.y,14,b.h), a=!l&&over(bb), o=a&&(ev.mu||ev.drag)&&dover(bb)
+		const comp_btn=(xo,dir,ba,li,en)=>{
+			const bb=rect(b.x+xo,b.y,14,b.h), a=en&&!l&&over(bb), o=a&&(ev.mu||ev.drag)&&dover(bb)
 			if(o&&ev.md)x.value+=(dir*x.step); if(a)uicursor=cursor.point
-			draw_icon(rect(bb.x+1,0|(b.y+(b.h-12)/2)),ARROWS[ba+(o?2:0)],fcol),draw_vline(bb.x+li,b.y+1,b.y+b.h-1,sel?13:fcol)
-		};comp_btn(0,-1,4,13),comp_btn(b.w-14,1,5,0)
+			draw_icon(rect(bb.x+1,0|(b.y+(b.h-12)/2)),ARROWS[ba+(o?2:0)],en?fcol:13),draw_vline(bb.x+li,b.y+1,b.y+b.h-1,sel?13:fcol)
+		};comp_btn(0,-1,4,13,x.value!=x.min),comp_btn(b.w-14,1,5,0,x.value!=x.max)
 	}
 	if(sel&&ev.dir=='up')x.value-=x.step;if(sel&&ev.dir=='down')x.value+=x.step
 	if(in_layer()&&over(frame.clip)&&ev.scroll)x.value+=x.step*ev.scroll; x.value=slider_normalize(target,x.value)
