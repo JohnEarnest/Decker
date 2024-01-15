@@ -153,7 +153,7 @@ module.step:on step do
  elseif o~9   pc:pc+2* !v[x]~v[y]
  elseif o~10  ix:nnn
  elseif o~11  pc:nnn+v[0]
- elseif o~12  v[x]:bits.and[nn rand[256]]
+ elseif o~12  v[x]:bits.and[b random[256]]
  elseif o~13  sprite[v[x] v[y] 16%b]
  elseif o~15  misc[b][x]
  end
