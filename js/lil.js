@@ -1638,7 +1638,7 @@ rtext_make=(t,f,a)=>{
 	return lmt({text:[lms(t)],font:[lms(f)],arg:[image_is(a)?a:lms(a)]})
 }
 rtext_cast=x=>{
-	if(!x)x=lms('');if(lid(x))x=monad.table(x);if(!lit(x))return rtext_make(x)
+	if(!x)x=lms('');if(image_is(x))return rtext_make('','',x);if(lid(x))x=monad.table(x);if(!lit(x))return rtext_make(x)
 	if(x.v.text&&x.v.font&&x.v.arg&&x.v.text.every((t,i)=>lis(t)&&lis(x.v.font[i])&&(image_is(x.v.arg[i])||lis(x.v.arg[i]))))return x
 	let r={text:lml(x.v.text||[lms('')]),font:lml(x.v.font||[lms('')]),arg:lml(x.v.arg||[lms('')])};torect(r)
 	r.text.map((_,z)=>{let i=image_is(r.arg[z]);r.text[z]=i?lms('i'):lms(ls(r.text[z])),r.font[z]=lms(ls(r.font[z])),r.arg[z]=i?r.arg[z]:lms(ls(r.arg[z]))})

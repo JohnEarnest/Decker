@@ -26,6 +26,7 @@ show[rtext.get[rt1 1000]]
 show[rtext.cat[insert text with "single" end]]# cast
 show[rtext.cat[rt1 rt2]]                      # catenate
 show[rtext.cat["one" rt2 "another"]]          # catenate w/ strings
+show[rtext.cat[image[3,4]]]                   # cast to inline image
 
 show[rtext.string[rt1 4,19]]
 show[rtext.span[rt1 8,12]]                   # onechunk

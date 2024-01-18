@@ -1580,7 +1580,9 @@ lv* n_rtext_make(lv*self,lv*z){
 	return torect(r);
 }
 lv* rtext_cast(lv*x){
-	if(!x)x=lmistr("");if(lid(x))x=l_table(x);if(!lit(x))return n_rtext_make(NULL,l_list(ls(x)));
+	if(!x)x=lmistr("");
+	if(image_is(x))return n_rtext_make(NULL,lml3(lmistr(""),lmistr(""),x));
+	if(lid(x))x=l_table(x);if(!lit(x))return n_rtext_make(NULL,l_list(ls(x)));
 	lv*t=lmistr("text"),*f=lmistr("font"),*a=lmistr("arg"),*tv=dget(x,t),*fv=dget(x,f),*av=dget(x,a);
 	if(x->c==3&&tv&&fv&&av){int v=1;EACH(z,tv){if(!lis(tv->lv[z])||!lis(fv->lv[z])||(!lis(av->lv[z])&&!image_is(av->lv[z])))v=0;break;}if(v)return x;}lv*r=lmt();
 	{lv*v=dget(x,t);dset(r,t,v?v:l_list(lmistr("")));}
