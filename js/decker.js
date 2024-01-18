@@ -1754,7 +1754,7 @@ modals=_=>{
 				const anim=deck.patterns.anim
 				const anim_pattern=(pix,x,y,f)=>pix<28||pix>31?pix: anim[pix-28][f%max(1,anim[pix-28].length)]
 				const draw_pattern=(pix,x,y  )=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal[(x%8)+(8*(y%8))+(8*8*pix)]&1
-				if(bg_has_sel()||bg_has_lasso())i=image_copy(i,dr.sel_here),off=rcopy(dr.sel_here)
+				if(bg_has_sel()||bg_has_lasso()){const r=rclip(dr.sel_here,con_clip());i=image_copy(i,r),off=rcopy(r)}
 				for(let z=0;z<4&&dr.show_anim;z++){const c=anim[z].length;if(c)f=lcm(f,c)}
 				for(let z=0;z<f;z++){
 					const frame=image_copy(i)
