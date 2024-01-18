@@ -453,6 +453,13 @@ assert["translate image clamped" "%%IMG0AAsACQAAAAACAAIABQAEgA/ACCAcYA==" image[
 assert["translate image floored" "%%IMG0AAsACQAAAAACAAIABQAEgA/ACCAcYA==" image[a].translate[2.3,1.2].encoded]
 assert["translate image wrapped" "%%IMG0AAsACfggBCCOYAAAAABAAEAAoACQAA==" image[a].translate[-3,4 1].encoded]
 
+b:"%%IMG0AAcACAA4fGx8bGwA"
+assert["scale image up uniform"    "%%IMG0AA4AEAAAAAAPwA/AP/A/8DzwPPA/8D/wPPA88DzwPPAAAAAA"                         image[b].scale[ 2  ].encoded]
+assert["scale image up nonuniform" "%%IMG0AA4AGAAAAAAAAA/AD8APwD/wP/A/8DzwPPA88D/wP/A/8DzwPPA88DzwPPA88AAAAAAAAA==" image[b].scale[ 2,3].encoded]
+assert["scale image down"          "%%IMG0AAQACAAgcFBwUFAA"                                                         image[b].scale[.7,1].encoded]
+assert["scale image negative"      "%%IMG2AAAAAA=="                                                                 image[b].scale[-3,4].encoded]
+assert["scale image none"          "%%IMG2AAAAAA=="                                                                 image[b].scale[    ].encoded]
+
 #######################################
 #
 #  General File IO

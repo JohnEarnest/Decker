@@ -471,6 +471,10 @@ lv* n_image_paste(lv*self,lv*z){
 	if(pos->c<=2){buffer_paste(rect_pair(getpair(pos),image_size(c)),cl,c->b,self->b,solid);}
 	else{buffer_paste_scaled(getrect(pos),cl,c->b,self->b,solid);}return self;
 }
+lv* n_image_scale(lv*self,lv*z){
+	lv*o=image_clone(self);z=l_first(z);fpair n=lin(z)?(fpair){ln(z),ln(z)}: getfpair(z);pair s=image_size(self),r={MAX(0,s.x*n.x),MAX(0,s.y*n.y)};
+	image_resize(self,r);buffer_paste_scaled(rect_pair((pair){0,0},r),rect_pair((pair){0,0},r),o->b,self->b,1);return self;
+}
 lv* image_write(lv*x){
 	x=image_is(x)?x:image_empty();pair s=image_size(x);str t=str_new();char f;int colors=0;for(int z=0;z<s.x*s.y;z++)if(x->b->sv[z]>1)colors=1;
 	str_addraw(&t,(s.x>>8)&0xFF),str_addraw(&t,s.x&0xFF);str_addraw(&t,(s.y>>8)&0xFF),str_addraw(&t,s.y&0xFF);
@@ -495,6 +499,7 @@ lv* interface_image(lv*self,lv*i,lv*x){
 	ikey("transform")return lmnat(n_image_transform,self);
 	ikey("rotate"   )return lmnat(n_image_rotate,self);
 	ikey("translate")return lmnat(n_image_translate,self);
+	ikey("scale"    )return lmnat(n_image_scale,self);
 	ikey("copy"     )return lmnat(n_image_copy,self);
 	ikey("paste"    )return lmnat(n_image_paste,self);
 	ikey("encoded"  )return image_write(self);
