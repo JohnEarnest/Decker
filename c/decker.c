@@ -1495,7 +1495,7 @@ void modal_exit(int value){
 		if(directory_exists(path->sv)&&ms.type!=modal_confirm){modal_save_replace(modal_export_image,"GIF file",path);return;}
 		if(bg_has_sel()){rect s=dr.sel_here;bg_end_selection();dr.sel_here=s;}
 		lv*i=draw_con(con(),1);pair off={0,0};char*pal=patterns_pal(ifield(deck,"patterns"));
-		if(bg_has_sel()||bg_has_lasso()){rect r=box_intersect(dr.sel_here,con_clip());i=image_make(buffer_copy(i->b,r));off=(pair){r.x,r.y};}
+		if(bg_has_sel()||bg_has_lasso()){rect r=box_intersect(dr.sel_here,con_dim());i=image_make(buffer_copy(i->b,r));off=(pair){r.x,r.y};}
 		pair s=image_size(i);int f=1;for(int z=0;z<4&&dr.show_anim;z++){int c=anim_count(pal,z);if(c){f=lcm(f,c);}}
 		int a=0;int bg=dr.trans?0:32;lv*r=lml(f);EACH(z,r){
 			lv*frame=image_make(buffer_copy(i->b,rect_pair((pair){0,0},s)));r->lv[z]=frame;

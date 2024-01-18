@@ -1750,11 +1750,11 @@ modals=_=>{
 			}
 			const save_image=_=>{
 				if(bg_has_sel()){const s=rcopy(dr.sel_here);bg_end_selection(),dr.sel_here=s}
-				let i=draw_con(ifield(deck,'card'),1),off=rect(),f=1,a=0, bg=dr.trans?0:32, frames=[]
+				let i=draw_con(con(),1),off=rect(),f=1,a=0, bg=dr.trans?0:32, frames=[]
 				const anim=deck.patterns.anim
 				const anim_pattern=(pix,x,y,f)=>pix<28||pix>31?pix: anim[pix-28][f%max(1,anim[pix-28].length)]
 				const draw_pattern=(pix,x,y  )=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal[(x%8)+(8*(y%8))+(8*8*pix)]&1
-				if(bg_has_sel()||bg_has_lasso()){const r=rclip(dr.sel_here,con_clip());i=image_copy(i,r),off=rcopy(r)}
+				if(bg_has_sel()||bg_has_lasso()){const r=rclip(dr.sel_here,con_dim());i=image_copy(i,r),off=rcopy(r)}
 				for(let z=0;z<4&&dr.show_anim;z++){const c=anim[z].length;if(c)f=lcm(f,c)}
 				for(let z=0;z<f;z++){
 					const frame=image_copy(i)
