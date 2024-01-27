@@ -25,6 +25,36 @@ on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':
 
 # the problems:
 
+problem[253.1]
+# split all words in a list by a delimiter, excluding empty strings
+on f sep x do
+ extract value where count@value from sep split sep fuse x
+end
+assert[f["." ("one.two.three","four.five","six")] ("one","two","three","four","five","six")]
+assert[f["$" ("$perl$$", "$$raku$"             )] ("perl","raku")                          ]
+
+problem[253.2]
+# in a 0/1 matrix where 1s always appear in contiguous left-aligned spans,
+# grade rows from "weakest" to "strongest",
+# where stronger rows contain more 1s OR have a greater original index.
+# (we can take advantage of both lexicographic ordering and sort stability)
+on f x do
+ extract index orderby value asc from x
+end
+assert[f["%j" parse "[
+ [1, 1, 0, 0, 0],
+ [1, 1, 1, 1, 0],
+ [1, 0, 0, 0, 0],
+ [1, 1, 0, 0, 0],
+ [1, 1, 1, 1, 1]
+]"] (2, 0, 3, 1, 4)]
+assert[f["%j" parse "[
+ [1, 0, 0, 0],
+ [1, 1, 1, 1],
+ [1, 0, 0, 0],
+ [1, 0, 0, 0]
+]"] (0, 2, 3, 1)]
+
 problem[250.1]
 # find the minimum index i in x where x=10%i
 # demonstrates a convenient idiom for failing over to a default
