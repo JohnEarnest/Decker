@@ -25,6 +25,17 @@ on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':
 
 # the problems:
 
+problem[254.2]
+# reverse the vowels in the given string, preserving the order of casing.
+on f x do
+ on zipcase a b do each v i in a ("%l","%u")[v in "AEIOUY"]format b[i] end end
+ "" fuse first cols update value:zipcase[value rev[value]] where value in "aeiouyAEIOUY" from x
+end
+assert[f["Raku" ] "Ruka" ]
+assert[f["Perl" ] "Perl" ]
+assert[f["Julia"] "Jaliu"]
+assert[f["Uiua" ] "Auiu" ]
+
 problem[253.1]
 # split all words in a list by a delimiter, excluding empty strings
 on f sep x do
