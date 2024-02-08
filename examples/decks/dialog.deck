@@ -13,7 +13,7 @@ field1:{"type":"field","size":[132,17],"pos":[322,133],"locked":1,"font":"menu",
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
 field2:{"type":"field","size":[248,55],"pos":[14,142],"locked":1,"show":"transparent","border":0,"value":{"text":["Decker Dialogizer is  a module (\"dd\") which provides customizable, aesthetically pleasant modal dialog boxes for use in Visual Novels and similar interactive content.\n\n","Index:"],"font":["","menu"],"arg":["",""]}}
 index:{"type":"field","size":[243,117],"pos":[16,197],"locked":1,"script":"Index.2","scrollbar":1,"value":{"text":["i","  ","dd.open[], dd.say[], dd.close[]\n","i","  ","dd.ask[]\n","i","  ","dd.open[] configuration\n","i","  ","dd.style[]\n","i","  ","dd.show[]\n","i","  ","custom borders\n","i","  ","rich text\n","i","  ","string interpolation\n","i","  ","commands\n","i","  ","event pumping\n","i","  ","a complete cutscene\n"],"font":["","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono"],"arg":["%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","say","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","ask","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","configuration","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","style","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","show","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","borders","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","richtext","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","interpolation","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","card1","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","eventpumping","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","conclusions"]}}
-version:{"type":"field","size":[42,14],"pos":[16,318],"locked":1,"border":0,"value":"v1.0"}
+version:{"type":"field","size":[42,14],"pos":[16,318],"locked":1,"border":0,"value":"v1.1"}
 
 {script:Index.0}
 on view do
@@ -390,7 +390,7 @@ on resize height do
 end
 
 module.open:on open deck etc do
- if canvas close[] end
+ if canvas & canvas.show~"transparent" close[] end
  host:deck
  canvas:host.card.add["canvas" "dd_overlay"]
  canvas.size:(host.card.size[0]-2*margin),0
