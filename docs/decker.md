@@ -713,7 +713,7 @@ The deck interface represents the global attributes of a Decker document. The op
 | `x.cards`         | A dictionary of _card_ interfaces stored in this deck, keyed by name.                       |
 | `x.card`          | The current _card_. Writing this attribute behaves the same as calling `go[x]`.             |
 | `x.add[x y z]`    | Add a resource to this deck, and return it.                                                 |
-| `x.remove[x]`     | Remove a resource from this deck. Returns 1 on success.                                     |
+| `x.remove[x]`     | Remove a resource, card, or widget from this deck. Returns 1 on success.                    |
 | `x.copy[card]`    | Save a card and its contents as an opaque string starting with `%%CRD0`.                    |
 | `x.paste[text]`   | Append a card and its contents from a `%%CRD0` string to this deck, returning the new card. |
 | `x.event[n x...]` | Issue an event named `n` at this deck with argument(s) `x`.                                 |
@@ -727,7 +727,7 @@ The deck interface represents the global attributes of a Decker document. The op
 - If `x` is `"module"`, insert a new module, using `y` as a name (or an appropriate default name).
 - If `x` is `"contraption"`, insert a new prototype, using `y` as a name (or an appropriate default name).
 
-`deck.remove[x]` will conversely remove existing cards, sounds, modules, prototypes or fonts from the deck. The argument `x` must be an interface value. The built-in fonts may not be removed from a deck. Removing a font will adjust any existing widgets which use it as their `font` attribute with the built-in "body" font. Decks will always have at least one card; attempting to remove the final card will have no effect. When a card is removed from its deck, the interface becomes inert: it will ignore all reads and writes of attributes.
+`deck.remove[x]` will conversely remove existing widgets, cards, sounds, modules, prototypes or fonts from the deck. The argument `x` must be an interface value. The built-in fonts may not be removed from a deck. Removing a font will adjust any existing widgets which use it as their `font` attribute with the built-in "body" font. Decks will always have at least one card; attempting to remove the final card will have no effect. When a card or widget is removed from its deck, the interface becomes inert: it will ignore all reads and writes of attributes.
 
 Patterns Interface
 ------------------

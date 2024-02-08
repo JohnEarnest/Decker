@@ -1613,6 +1613,13 @@ deck:readdeck["tests/dom/bare.deck"]
 assert["read a bare deck" "deck" typeof deck]
 assert["read a bare deck: widget names" ("pusher","outfield","expenses","frame") (keys deck.card.widgets)]
 
+deck:readdeck[]
+b:deck.card.add["button"]
+assert["deck remove widget"            1 deck.remove[b]]
+assert["sanity check widget removed"  () keys deck.card.widgets]
+assert["sanity check widget inert"     0 b.name]
+assert["deck remove inert widget"      0 deck.remove[b]]
+
 #######################################
 #
 #  Names and Indices

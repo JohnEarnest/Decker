@@ -2351,6 +2351,7 @@ void remove_font(lv*w,lv*t){
 }
 lv* n_deck_remove(lv*self,lv*z){
 	lv*data=self->b,*t=l_first(z),*cards=ivalue(self,"cards"),*defs=ivalue(self,"contraptions");
+	if(widget_is(t)&&is_rooted(t))return n_card_remove(ivalue(t,"card"),t);
 	if(module_is(t)){
 		lv*k=lmistr("modules"),*m=dget(data,k);
 		lv*n=dkey(m,t);if(lin(n))return NONE; // this module isn't part of this deck

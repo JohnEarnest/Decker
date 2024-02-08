@@ -2341,6 +2341,7 @@ deck_add=(deck,type,y,z)=>{
 	return NONE
 }
 deck_remove=(deck,t)=>{
+	if(widget_is(t)&&is_rooted(t))return card_remove(t.card,t)
 	if(module_is(t)){const k=dkey(deck.modules,t);if(k)return deck.modules=dyad.drop(k,deck.modules),1}
 	if(sound_is(t)){const k=dkey(deck.sounds,t);if(k)return deck.sounds=dyad.drop(k,deck.sounds),1}
 	if(font_is(t)){
