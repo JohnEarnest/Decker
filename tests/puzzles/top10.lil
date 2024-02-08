@@ -1,8 +1,13 @@
 # codereport top 10
 # see https://github.com/codereport/top10/
 
+px:pn:0
+on problem x name do
+ px:x pn:name
+end
 on assert x y do
  if !x~y
+  print["error in problem %i (%s)" px pn]
   print["got:       %j\nexpected:  %j" x y]
   exit[1]
  end
@@ -15,28 +20,28 @@ on maxs     x do r:0 each v in x r:r|v end               end   # k: |\
 on deltas   x do (first x), (1 drop x)-x                 end   # k: -':
 on differ   x do        1 ,!(1 drop x)=x                 end   # k: !=':
 
-# problem 1: rain water
+problem[1 "rain water"]
 on f1 x do
  sum mag@x-maxs[x]&reverse[maxs[reverse[x]]]
 end
 assert[f1[0,1,0,2,1,0,1,3,2,1,2,1] 6]
 assert[f1[4,2,0,3,2,5            ] 9]
 
-# problem 2: max consecutive ones
+problem[2 "max consecutive ones"]
 on f2 x do
  r:0 max each v in x r:v*v+r end
 end
 assert[f2[1,1,0,1,1,1] 3]
 assert[f2[1,0,1,1,0,1] 2]
 
-# problem 3: longest continuous increasing subsequence
+problem[3 "longest continuous increasing subsequence"]
 on f3 x do
  r:0 1+max each v in(1 drop x)>x  r:v*v+r end
 end
 assert[f3[1,3,5,4,7] 3]
 assert[f3[2,2,2,2,2] 1]
 
-# problem 4: maximum subarray sum
+problem[4 "maximum subarray sum"]
 on f4 x do
  r:0 max each v in x r:v|v+r end
 end
@@ -44,7 +49,7 @@ assert[f4[-2,1,-3,4,-1,2,1,-5,4]  6]
 assert[f4[list 1               ]  1]
 assert[f4[5,4,-1,7,8           ] 23]
 
-# problem 5: sushi for two
+problem[5 "sushi for two"]
 on f5 x do
  t:deltas[such[differ[x]],count x]  2*max(1 drop t)&t
 end
@@ -52,28 +57,28 @@ assert[f5[2,2,2,1,1,2,2    ] 4]
 assert[f5[1,2,1,2,1,2      ] 2]
 assert[f5[2,2,1,1,1,2,2,2,2] 6]
 
-# problem 6: maximum gap
+problem[6 "maximum gap"]
 on f6 x do
  max extract(1 drop value)-value orderby value asc from x
 end
 assert[f6[3,6,9,1] 3]
 assert[f6[list 10] 0]
 
-# problem 7: maximum gap count
+problem[7 "maximum gap count"]
 on f7 x do
  t:extract(1 drop value)-value orderby value asc from x  sum t=max t
 end
 assert[f7[2,5,8,1] 2]
 assert[f7[list 3 ] 0]
 
-# problem 8: three consecutive odds
+problem[8 "three consecutive odds"]
 on f8 x do
  r:0 !3>max each v in 2%x r:v*v+r end
 end
 assert[f8[2,6,4,1             ] 0]
 assert[f8[1,2,34,3,4,5,7,23,12] 1]
 
-# problem 9: skyline
+problem[9 "skyline"]
 on f9 x do
  count maxs[x]dict 0
 end
@@ -81,7 +86,7 @@ assert[f9[5,5,2,10,3,15,10] 3]
 assert[f9[4,3,1           ] 1]
 assert[f9[1,2,3,4,5       ] 5]
 
-# problem 10: ocean view
+problem[10 "ocean view"]
 on f10 x do
  such[reverse[deltas[maxs[reverse[x]]]]]
 end
