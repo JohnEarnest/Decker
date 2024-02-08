@@ -3992,7 +3992,7 @@ void quit(void){
 	ms.verb=lmcstr("Quit");
 }
 void save_deck(lv*path){
-	dirty=0;int html=0;
+	field_change();dirty=0;int html=0;
 	if(has_suffix(path->sv,".html")){html=1;}
 	else if(!has_suffix(path->sv,".deck")){str n=str_new();str_addz(&n,path->sv),str_addz(&n,".deck");path=lmstr(n);}
 	if(!strcmp(ifield(deck,"name")->sv,""))iwrite(deck,lmistr("name"),lmcstr(directory_last(path->sv)));
