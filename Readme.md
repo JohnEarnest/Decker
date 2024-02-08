@@ -8,6 +8,7 @@ You can learn more about Decker on [my website](http://beyondloom.com/decker/), 
 
 There is also a [community forum](https://internet-janitor.itch.io/decker/community) on itch.io.
 
+If you're interested in Lil, Decker's scripting language, you can play with it in your browser at [trylil](http://beyondloom.com/tools/trylil.html).
 
 Building
 --------
