@@ -2620,7 +2620,7 @@ void bg_tools(void){
 		bg_scratch();
 		cstate t=frame;frame=draw_buffer(dr.scratch);
 		lv*bg=container_image(con(),1);
-		draw_fill(ev.pos,ev.rup?bg_fill():bg_pat(),bg->b->sv);
+		draw_fill(ev.pos,ev.rup?0:bg_pat(),bg->b->sv);
 		frame=t;bg_edit();bg_scratch_clear();
 	}
 	if(!bg_has_sel()&&!bg_has_lasso()){

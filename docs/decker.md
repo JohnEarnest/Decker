@@ -60,7 +60,7 @@ All of other tools relate to drawing on the card:
 - _Lasso_: draw an arbitrarily-shaped selection to copy, paste, and reposition images. Like the widgets tool, you can use the cursor keys to move a selection a pixel at a time.
 - _Pencil_: draw freehand, using the selected brush shape and pattern. (See _Style &#8594; Stroke..._ and _Style &#8594; Brush..._).
 - _Line_: draw a straight line using the selected brush shape and pattern. Holding shift will snap to 45 degree angles.
-- _Flood_: fill all pixels of the card background that are adjacent to the starting pixel and contain the same pattern. Right-clicking will use the "Fill" instead of "Stroke" color.
+- _Flood_: fill all pixels of the card background that are adjacent to the starting pixel and contain the same pattern. Right-clicking will use pattern 0 instead of "Stroke" color.
 - _Box_: draw a rectangle using the selected brush shape and pattern. Holding shift will snap to a perfect square.
 - _Filled Box_: like the box tool, but use the fill color (See _Style &#8594; Fill..._) for the interior.
 - _Oval_: draw an oval using the selected brush shape and pattern. Holding shift will snap to a perfect circle.

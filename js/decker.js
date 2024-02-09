@@ -2400,7 +2400,7 @@ bg_tools=_=>{
 	}
 	if(dr.tool=='fill'&&ev.mu){
 		const bg=container_image(con(),1), t=frame;bg_scratch(),frame=draw_frame(dr.scratch)
-		draw_fill(ev.pos,ev.rup?bg_fill():bg_pat(),bg),frame=t,bg_edit(),bg_scratch_clear()
+		draw_fill(ev.pos,ev.rup?0:bg_pat(),bg),frame=t,bg_edit(),bg_scratch_clear()
 	}
 	if(!bg_has_sel()&&!bg_has_lasso()){
 		if(dr.fatbits){
