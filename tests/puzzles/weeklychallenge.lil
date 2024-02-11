@@ -25,6 +25,26 @@ on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':
 
 # the problems:
 
+problem[255.1]
+# find the 'extra' character in y, compared to x
+# (see 130.1, except we have to convert ascii->numbers->ascii)
+on f x y do
+ "%a" format bits.xor[raze "%a" parse x,y]
+end
+assert[f["Perl"   "Preel"  ] "e"]
+assert[f["Weekly" "Weeakly"] "a"]
+assert[f["Box"    "Boxy"   ] "y"]
+
+problem[255.2]
+# find the most frequent word in x, except for y
+# (I'm kinda cheating by only handling . and , as punctuation.)
+on f x y do
+  first extract v orderby c desc from
+        select v:first value c:count value by value from y drop" "split (",",".")drop x
+end
+assert[f["Joe hit a ball, the hit ball flew far after it was hit." "hit"] "ball"]
+assert[f["Perl and Raku belong to the same family. Perl is the most popular language in the weekly challenge." "the"] "Perl"]
+
 problem[254.2]
 # reverse the vowels in the given string, preserving the order of casing.
 on f x do
