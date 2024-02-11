@@ -123,6 +123,7 @@ format_has_names=x=>{
 		let d=0;while(/[0-9]/.test(x[f]))d=d*10+(+x[f++]);if(!x[f])break;const t=x[f++];if(t=='r'||t=='o')while(d&&x[f])d--,f++
 	}return 0
 }
+razetab=x=>{const t=Object.values(x.v);return dyad.dict(lml(t[0]||[]),lml(t[1]||[]))}
 monad={
 	'-':    vm(x=>lmn(-ln(x))),
 	'!':    vm(x=>lb(x)?NONE:ONE),
@@ -138,7 +139,7 @@ monad={
 	heading:vmnl(x=>{const a=getpair(x);return lmn(Math.atan2(a.y,a.x))}),
 	sum:    x=>ll(x).reduce(dyad['+'],NONE),
 	prod:   x=>ll(x).reduce(dyad['*'],ONE),
-	raze:   x=>ll(x).slice(1).reduce(dyad[','],monad.first(x)),
+	raze:   x=>lit(x)?razetab(x) :ll(x).slice(1).reduce(dyad[','],monad.first(x)),
 	max:    x=>ll(x).slice(1).reduce(dyad['|'],monad.first(x)),
 	min:    x=>ll(x).slice(1).reduce(dyad['&'],monad.first(x)),
 	count:  x=>lmn(count(x)),

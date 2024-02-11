@@ -95,6 +95,10 @@ monads:
 +----+
 "my_func"
 ("alpha","beta")
+{"Alpha":11,"Beta":22,"Gamma":33}
+{"Alpha":33,"Beta":22}
+{"Alpha":0,"Beta":0,"Gamma":0}
+{}
 
 dyads:
 ======
