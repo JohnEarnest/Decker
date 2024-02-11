@@ -2611,8 +2611,8 @@ lv* readgif(char*data,int size,int gray,int frames){
 		if(type==0x3B)break; // end
 		if(type==0x21){ // text, gce, comment, app...?
 			if((0xFF&data[i++])==0xF9){
-				i++;int packed=data[i++];delay=readshort(&i,data);
-				int tindex=data[i++];i++;dispose=(packed>>2)&7;
+				i++;int packed=0xFF&data[i++];delay=readshort(&i,data);
+				int tindex=0xFF&data[i++];i++;dispose=(packed>>2)&7;
 				if(packed&1){hastrans=1,trans=tindex;}else{hastrans=0;}
 			}else{while(1){unsigned char s=data[i++];if(!s)break;i+=s;}}
 		}
