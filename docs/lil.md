@@ -1105,7 +1105,7 @@ The unary arithmetic primitives `-` (negation), `!` (logical not), `floor`, `cos
 
 The unary aggregation primitives `sum`, `prod`, `raze`, `min`, and `max` take a list and collapse it into a single result as if by combining every element of the list with the binary primitives `+`, `*`, `,`, `&` and `|`, respectively.
 
-The `raze` of a table `x` will convert it into a dictionary as if by `x[0] dict x[1]`.
+The `raze` of a table `x` will convert it into a dictionary as if by `x[(keys x)[0]] dict x[(keys x)[1]]`.
 
 `typeof` gives the name of the type of the argument; one of the strings { `"number"`, `"string"`, `"list"`, `"dict"`, `"table"`, `"function"` }, or, in the case of an _interface_, the name of that interface type.
 
