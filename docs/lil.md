@@ -1175,6 +1175,17 @@ The `&` and `|` operator calculate the minimum or maximum of their arguments. As
 | string list     | table  | only columns in x of y            | remove columns in x from y                  |
 | number list     | table  | only rows x of y, in order        | remove rows in x from y                     |
 
+Note that if you represent sets as dictionaries, the `take`, `drop` and `,` operators can provide set intersection, disjunction, and union, respectively:
+
+```lil
+x:"AB" dict 0    # {"A":0,"B":0}
+y:"BC" dict 0    # {"B":0,"C":0}
+
+(keys x) take y  # {"B":0}             (intersection)
+(keys x) drop y  # {"C":0}             (disjunction)
+x,y              # {"A":0,"B":0,"C":0} (union)
+```
+
 `x limit y` returns up to `x` items from `y`. Equivalent to `if x<count y x take y else y end`.
 
 `x in y` returns the number 1 or 0 depending upon whether `y` appears in `x`. If `y` is a string, look for the string `x` anywhere in `y`. If `y` is a list, look for `x` as an element of `y`. If `y` is a dictionary, `x` must be a _key_ of that dictionary. If `y` is a table, it must likewise be a _key_ (column name) of that table. In all other cases, `in` returns 0. If `x` is a list, consider each element of x and return a list of 1 or 0.
