@@ -1,0 +1,36 @@
+# conforming between atoms, lists, and dictionaries.
+
+# monadic:
+show[floor (55.3)]
+show[floor (1.1,2.2,-3.3)]
+show[floor ("A","B") dict 11.2,33.9]
+show[unit  "ABCD" dict pi*(0,.5,1,1.5,2)]
+
+# dyadic, the basics:
+show[11+22]
+show[100+(22,33)]
+show[(11,22)+100]
+show[(11,22)+(100,200)]
+
+# jagged lists keep the left arg's length:
+show[(11,22,33)+(100,200)]
+show[(11,22)+(100,200,300)]
+
+# dict-dict takes the union of keys:
+x:("White","Brown","Speckled")dict 10,34,27
+y:("White","Speckled","Brown")dict  5, 3, 8
+z:("Brown","White","Blue"    )dict  9,13,35
+show[x+y] # prefer left order
+show[x+z] # zero-fill unmatched
+
+# atom-dict spreads the atom to every dict element:
+show[x+100]
+show[200+x]
+
+# dict-nondict / nondict-dict likewise spreads:
+d:("alpha","beta")dict (list 11,22),(list 33,44) 
+show[(100,200)*d]
+show[d*(100,200)]
+
+# reducers reflect dict conforming
+show[sum (list x),(list y),(list z)]

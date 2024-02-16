@@ -39,6 +39,10 @@ listab=x=>{
 	x.v.map(row=>{for(let z=0;z<m;z++)t['c'+z].push(z>=count(row)?NONE:row.v[z])});return lmt(t)
 }
 zip=(x,y,f)=>{const n=count(x),o=count(y)<n?take(n,y.v):y.v;return x.v.map((x,i)=>f(x,o[i%n]))}
+dzip=(x,y,f)=>{
+	const r=lmd(x.k.slice(0),x.v.map((z,i)=>f(z,dget(y,x.k[i])||NONE)))
+	y.k.filter(k=>!dget(x,k)).map(k=>dset(r,k,f(NONE,dget(y,k))));return r
+}
 match=(x,y)=>x==y?1: (x.t!=y.t)||(count(x)!=count(y))?0: (lin(x)||lis(y))?x.v==y.v:
 	         lil(x)?x.v.every((z,i)=>dyad['~'](z,y.v[i]).v): lit(x)?dyad['~'](rows(x),rows(y)).v:
 	         lid(x)?x.v.every((z,i)=>dyad['~'](z,y.v[i]).v&&dyad['~'](x.k[i],y.k[i]).v):0
@@ -82,8 +86,10 @@ ls=x=>lin(x)?wnum(x.v): lis(x)?x.v: lil(x)?x.v.map(ls).join(''): ''
 ll=x=>lis(x)?x.v.split('').map(lms): lil(x)||lid(x)?x.v: lit(x)?rows(x).v: [x]
 ld=x=>lid(x)?x:lit(x)?monad.cols(x):lil(x)||lis(x)?lmd(range(count(x)).map(lmn),lis(x)?ll(x):x.v):lmd()
 lt=x=>lit(x)?x: lid(x)||lil(x)?lmt((lid(x)?['key','value']:['value']).reduce((t,k,i)=>(t[k]=x[k[0]],t),{})): lmt({value:ll(x)})
-vm=f=>{const r=x=>lil(x)?lml(x.v.map(r)):f(x);return r}
-vd=f=>{const r=(x,y)=>lil(x)&lil(y)?lml(zip(x,y,r)): lil(x)&!lil(y)? lml(x.v.map(x=>r(x,y))): !lil(x)&lil(y)?lml(y.v.map(y=>r(x,y))): f(x,y);return r}
+vm=f=>{const r=x=>lid(x)?lmd(x.k,x.v.map(r)):lil(x)?lml(x.v.map(r)):f(x);return r}
+vd=f=>{const r=(x,y)=>
+	 lid(x)&lid(y)?dzip(x,y,r)    :lid(x)&!lid(y)?lmd(x.k.slice(0),x.v.map(x=>r(x,y))):!lid(x)&lid(y)?lmd(y.k.slice(0),y.v.map(y=>r(x,y))):
+	 lil(x)&lil(y)?lml(zip(x,y,r)):lil(x)&!lil(y)?lml(x.v.map(x=>r(x,y)))             :!lil(x)&lil(y)?lml(y.v.map(y=>r(x,y))): f(x,y);return r}
 vmnl=f=>{const r=x=>lil(x)?(ll(x).some(x=>!lin(x))?lml(x.v.map(r)):f(x)):f(x);return r}
 tflip=x=>{
 	const c=Object.keys(x.v), kk=c.indexOf('key')>-1?'key':c[0], k=(x.v[kk]||[]).map(ls), cc=c.filter(k=>k!=kk)

@@ -989,6 +989,23 @@ Another application is applying a "mask" pattern to an entire list:
 (11,22,33,44,55)*(1,0)                # (11,0,33,0,55)     # mask off even items
 ```
 
+You can also conform dictionaries. Lil takes the union of keys in the dictionaries and applies the operator between dictionary elements (or `0` if the entry is missing). As when taking the union of dictionaries with `,`, conforming "prefers" the order of keys in the left argument:
+```lil
+x:("White","Brown","Speckled") dict 10,34,27
+y:("Brown","White","Blue"    ) dict  9,13,35
+
+x+y  # {"White":23,"Brown":43,"Speckled":27,"Blue":35}
+y+x  # {"Brown":43,"White":23,"Blue":35,"Speckled":27}
+```
+
+If you use a conforming operator between a dictionary and non-dictionary value, the non-dictionary value will be spread to every element of the dictionary and then conformed recursively as usual. Thus, if _either_ argument is a dictionary, the result will be a dictionary:
+```lil
+d: ("Alpha","Beta") dict (list 5,7),(list 3)
+
+d+100      # {"Alpha":(105,107),"Beta":103}
+(10,20)*d  # {"Alpha":(50,140),"Beta":(30,60)}
+```
+
 Combining conforming operators with reducing operators like `sum` and `raze` offers many elegant and direct solutions to problems. Compare each of these approaches to counting how many times a value `needle` can be found in a list `haystack`:
 ```lil
 needle:   "apple"
@@ -1101,7 +1118,7 @@ sys.bogus:123        # 123
 
 Appendix 1: Unary Primitives
 ----------------------------
-The unary arithmetic primitives `-` (negation), `!` (logical not), `floor`, `cos`, `sin`, `tan`, `exp` (the exponential function), `ln` (natural log), and `sqrt` (square root) _conform_, and generalize to both lists and numbers.
+The unary arithmetic primitives `-` (negation), `!` (logical not), `floor`, `cos`, `sin`, `tan`, `exp` (the exponential function), `ln` (natural log), and `sqrt` (square root) _conform_, and generalize to dictionaries, lists, and numbers.
 
 The unary aggregation primitives `sum`, `prod`, `raze`, `min`, and `max` take a list and collapse it into a single result as if by combining every element of the list with the binary primitives `+`, `*`, `,`, `&` and `|`, respectively.
 
@@ -1136,7 +1153,7 @@ The `raze` of a table `x` will convert it into a dictionary as if by `x[(keys x)
 
 Appendix 2: Binary Primitives
 -----------------------------
-The binary arithmetic and comparison primitives `+`, `-`, `*`, `/`, `%` (modulus), `^` (exponentiation/power), `<`, `>`, `=`, `&` (minimum), and `|` (maximum) _conform_, and generalize to both lists and numbers.
+The binary arithmetic and comparison primitives `+`, `-`, `*`, `/`, `%` (modulus), `^` (exponentiation/power), `<`, `>`, `=`, `&` (minimum), and `|` (maximum) _conform_, and generalize to dictionaries, lists, and numbers.
 
 The modulus operator `%` takes its arguments in the opposite order of common notation- the divisor is the left argument. Thus, `5 % 3,4,5,6,7` is `(3,4,0,1,2)`. In common usage, this order will require fewer parentheses given Lil's right-to-left precedence rule.
 
