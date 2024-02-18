@@ -3949,6 +3949,7 @@ void tick(lv*env){
 		rect b={menu.x,1,context.size.x-menu.x-2,1+font_h(FONT_MENU)};
 		draw_textr(b,ifield(ifield(deck,"card"),"name")->sv,FONT_BODY,1);
 	}
+	if(ui_container&&ivalue(ui_container,"dead"))ui_container=NULL;
 	#define track(v) dset(env,lmistr(#v),v?v:NONE);
 	track(msg.target_click)
 	track(msg.target_drag)

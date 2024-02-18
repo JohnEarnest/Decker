@@ -3371,6 +3371,7 @@ tick=_=>{
 		draw_textr(b,ls(ifield(ifield(deck,"card"),"name")),FONT_BODY,1)
 	}
 	if(msg.pending_loop)sfx_doloop()
+	if(ui_container&&ui_container.dead)ui_container=null
 	ev.shortcuts={}
 	ev.mu=ev.md=ev.click=ev.dclick=ev.tab=ev.action=ev.dir=ev.exit=ev.eval=ev.scroll=ev.rdown=ev.rup=0
 	if(ev.clicktime)ev.clicktime--;if(ev.clicklast)ev.clicklast--
