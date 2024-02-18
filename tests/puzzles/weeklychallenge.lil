@@ -564,7 +564,7 @@ assert[bits.xor[(1, 2, 3, 4, 3, 2, 1, 4, 4)] 4]
 
 problem[127.1]
 #are two sets are disjoint?
-on f x y do !count(table x)join table y end
+on f x y do !count x take y end
 assert[f[(1, 2, 5, 3, 4) (4, 6, 7, 8, 9)] 0]
 assert[f[(1, 3, 5, 7, 9) (0, 2, 4, 6, 8)] 1]
 
