@@ -2729,6 +2729,10 @@ const patorder=[0,1,4,5,8,9,16,17,12,13,18,19,20,21,22,23,24,25,26,27,2,6,3,7,10
 
 toolbars=_=>{
 	if(!toolbars_enable||kc.on)return
+	if(ms.type||uimode=='script'){
+		clr=x=>{const c=q(x);c.getContext('2d').clearRect(0,0,c.width,c.height);}
+		clr('#ltools'),clr('#rtools');return
+	}
 	const toolbar=(element,render,behavior)=>{
 		const c=element.getBoundingClientRect()
 		const pos =rint(rect((ev.rawpos .x-c.x)/tzoom,(ev.rawpos .y-c.y)/tzoom))
@@ -2806,7 +2810,6 @@ toolbars=_=>{
 		if(modebtn(pos,dn,rect(0,tcellh,tcellw*2+1,tcellh+1),'Fill'  ,dr.pickfill==1))dr.pickfill=1
 		if(dr.color){for(let z=0;z<16 ;z++)palbtn(pos,dn,rect(0,(2*tcellh)+z*tcellh,2*tcellw+1,tcellh+1),(z>=2?31:0)+z)}
 		else        {for(let z=0;z<4*8;z++)palbtn(pos,dn,rect((z%2)*tcellw,(2*tcellh)+(0|(z/2))*tcellh+(z>=28?tgap:0),tcellw+1,tcellh+1),patorder[z])}
-		//for(let z=0;z<4*8;z++)palbtn(pos,dn,rect((z%2)*tcellw,(2+(0|(z/2)))*tcellh+(z>=28?tgap:0),tcellw+1,tcellh+1),patorder[z])
 	})
 }
 
