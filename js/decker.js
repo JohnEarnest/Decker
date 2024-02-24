@@ -772,7 +772,8 @@ widget_grid=(target,x,value)=>{
 		if(cols&&x.lines)draw_invert(pal,rect(hs.x-3,b.y+1,1,b.h-2));cx+=cw(cols),cols++
 		for(let y=0;y<nrd;y++){
 			const cell=rect(hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1), v=value.table.v[tk[z]][y+value.scroll]
-			const cf=ls(dyad.format(lms(`%${x.format[z]=='L'?'s':(x.format[z]||'s')}`),v)), ip=rcenter(cell,ICONS[0].size)
+			const fc=x.format[z]=='L'?'s':(x.format[z]||'s')
+			const cf=ls(dyad.format(lms(`%${fc}`),fc=='j'||fc=='a'?monad.list(v):v)), ip=rcenter(cell,ICONS[0].size)
 			const oc=frame.clip; frame.clip=rclip(cell,frame.clip)
 			if     (x.format[z]=='I'){const i=clamp(0,ln(v),8);if(i<8)draw_icon(ip,ICONS[i],fcol)}
 			else if(x.format[z]=='B'){if(lb(v))draw_icon(ip,ICONS[ICON.chek],fcol)}

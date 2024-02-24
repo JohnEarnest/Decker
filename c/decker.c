@@ -673,7 +673,8 @@ int widget_grid(lv*target,grid x,grid_val*value){
 		if(cols&&x.lines)draw_invert(pal,(rect){hs.x-3,b.y+1,1,b.h-2});cx+=cw(cols);cols++;
 		for(int y=0;y<nrd;y++){
 			rect cell={hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1}; lv*v=value->table->lv[z]->lv[y+value->scroll];
-			cf.c=0;format_type_simple(&cf,v,z>=fk?'s':x.format[z]=='L'?'s':x.format[z]);str_term(&cf);
+			char fc=z>=fk?'s':x.format[z]=='L'?'s':x.format[z];
+			cf.c=0;format_type_simple(&cf,fc=='j'||fc=='a'?l_list(v):v,fc);str_term(&cf);
 			rect ib=box_center(cell,image_size(ICONS[0]));pair ip={ib.x,ib.y};
 			rect oc=frame.clip; frame.clip=box_intersect(cell,frame.clip);
 			if     (z<fk&&x.format[z]=='I'){int i=MAX(0,MIN(8,ln(v)));if(i<8)draw_icon(ip,ICONS[i],fcol);}
