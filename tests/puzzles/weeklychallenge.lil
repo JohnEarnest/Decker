@@ -17,13 +17,23 @@ end
 
 # utilities:
 
-on rev       x do         extract value orderby index desc from x end   # k: |:
-on sortstr   x do "" fuse extract value orderby value asc  from x end   # k: {x@<x}
-on sumscan   x do a:0 each v in x a:a+v end                       end   # k: +\
-on maxscan   x do a:0 each v in x a:a|v end                       end   # k: |\
+on rev       x do x @ (-1+count x)-range count x                    end # k: |:
+on sortstr   x do "" fuse extract value orderby value asc  from x   end # k: {x@<x}
+on sumscan   x do a:0 each v in x a:a+v end                         end # k: +\
+on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':y
 
 # the problems:
+
+problem[257.1]
+# how many elements of x are smaller than each element of x?
+on f x do
+ each v in x sum x<v end
+end
+assert[f[(5, 2, 1, 6)] (2, 1, 0, 3)]
+assert[f[(1, 2, 0, 3)] (1, 2, 0, 3)]
+assert[f[(0, 1      )] (0, 1      )]
+assert[f[(9, 4, 9, 2)] (2, 1, 2, 0)]
 
 problem[255.1]
 # find the 'extra' character in y, compared to x

@@ -14,11 +14,11 @@ on assert x y do
 end
 
 # some Q primitives / K compositions
-on reverse  x do extract value orderby index desc from x end   # k: |:
-on such     x do extract index where value from x        end   # k: &:
-on maxs     x do r:0 each v in x r:r|v end               end   # k: |\
-on deltas   x do (first x), (1 drop x)-x                 end   # k: -':
-on differ   x do        1 ,!(1 drop x)=x                 end   # k: !=':
+on reverse  x do x @ (-1+count x)-range count x   end   # k: |:
+on such     x do extract index where value from x end   # k: &:
+on maxs     x do r:0 each v in x r:r|v end        end   # k: |\
+on deltas   x do (first x), (1 drop x)-x          end   # k: -':
+on differ   x do        1 ,!(1 drop x)=x          end   # k: !=':
 
 problem[1 "rain water"]
 on f1 x do
