@@ -617,7 +617,8 @@ n_writecsv=([x,y,d])=>{
 	rows(t).v.forEach(row=>{
 		r+='\n';let n=0, cols=Object.keys(row.v);spec.forEach((x,i)=>{
 			if(x=='_')return;if(n)r+=d;n++
-			const sv=dyad.format(lms('%'+fchar(x)),row.v[cols[i]]).v; r+=(/["\n]/.test(sv)||sv.indexOf(d)>=0?`"${sv.replace(/"/g,'""')}"`:sv)
+			const vv=row.v[cols[i]], fc=fchar(x), sv=dyad.format(lms('%'+fc),fc=='j'||fc=='a'?monad.list(vv):vv).v
+			r+=(/["\n]/.test(sv)||sv.indexOf(d)>=0?`"${sv.replace(/"/g,'""')}"`:sv)
 		})
 	});return lms(r)
 }

@@ -40,3 +40,11 @@ show[writecsv[t4 "ILB"]]
 # allow spaces in column names
 show[t5:readcsv["Multi Word,another\n-1337.5,\"quoted string\""]]
 show[writecsv[t5]]
+
+# handle 'j' columns
+show[writecsv[insert name value with
+ "Alpha" 11,22
+ "Beta"  33,44
+ "Gamma" 55,66
+end "sj"]]
+show[readcsv["name,value\nAlpha,\"[11,22]\"\nBeta,\"[33,44]\"\nGamma,\"[55,66]\"" "sj"]]
