@@ -38,11 +38,6 @@ lv*n_writedeck(lv*self,lv*a){
 	lv*path=ls(l_first(a));int html=0;if(has_suffix(path->sv,".html")){html=1;}
 	lv*v=deck_write(a->c<2?NONE:a->lv[1],html);if(v->c<1)return NONE;return n_write(self,lml2(path,v));
 }
-lv*n_shell(lv*self,lv*a){
-	(void)self;lv*x=ls(l_first(a)),*r=lmd();FILE*child=popen(x->sv,"r");str o=str_new();
-	while(1){int c=fgetc(child);if(feof(child))break;str_addraw(&o,c);}int e=pclose(child);lv*os=lmstr(o);
-	return dset(r,lmistr("out"),lmutf8(os->sv)),dset(r,lmistr("exit"),lmn(WIFEXITED(e)?WEXITSTATUS(e): -1)),r;
-}
 lv*runstring(char*t,lv*env){
 	lv* prog=parse(t);if(perr())return fprintf(stderr,"(%d:%d) %s\n",par.r+1,par.c+1,par.error),NONE;
 	return run(prog,env);

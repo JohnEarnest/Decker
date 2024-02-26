@@ -2874,7 +2874,17 @@ lv*env_enumerate(void){
 		str k=str_new();str_add(&k,env[z],i);dset(r,lmstr(k),lmutf8(env[z]+i+1));
 	}return r;
 }
-lv*n_dir(lv*self,lv*a){(void)self;lv*r=directory_enumerate(ls(l_first(a))->sv,filter_none,1);r->kv[0]=lmistr("dir");return r;}
+lv*n_dir(lv*self,lv*a){
+	(void)self;lv*r=directory_enumerate(ls(l_first(a))->sv,filter_none,1);
+	r->kv[0]=lmistr("dir");return r;
+}
+#ifndef _WIN32
+lv*n_shell(lv*self,lv*a){
+	(void)self;lv*x=ls(l_first(a)),*r=lmd();FILE*child=popen(x->sv,"r");str o=str_new();
+	while(1){int c=fgetc(child);if(feof(child))break;str_addraw(&o,c);}int e=pclose(child);lv*os=lmstr(o);
+	return dset(r,lmistr("out"),lmutf8(os->sv)),dset(r,lmistr("exit"),lmn(WIFEXITED(e)?WEXITSTATUS(e): -1)),r;
+}
+#endif
 lv*n_path(lv*self,lv*a){
 	(void)self;char t[PATH_MAX]={0},t2[PATH_MAX]={0};
 	if     (a->c==1){directory_normalize(t2,ls(a->lv[0])->sv);}
@@ -2899,5 +2909,8 @@ lv* interface_danger(lv*self,lv*i,lv*x){
 	ikey("path"    )return lmnat(n_path     ,self);
 	ikey("write"   )return lmnat(n_writefile,self);
 	ikey("read"    )return lmnat(n_readfile ,self);
+#ifndef _WIN32
+	ikey("shell"   )return lmnat(n_shell    ,self);
+#endif
 	return x?x:NONE;
 }

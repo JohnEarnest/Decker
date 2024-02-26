@@ -1837,17 +1837,30 @@ When enabled, the _danger_ interface is available as a global constant named `da
 | `danger.homepath`        | A string containing the path to the user's home directory. Read-only.                       |
 | `danger.dir[path]`       | List the content of a directory as a table of `dir`, `name`, `type`.                        |
 | `danger.path[x y]`       | Canonical path `x` (joined with `y`, if given).                                             |
+| `danger.shell[x]`*       | Execute string `x` as a shell command and block for its completion.                         |
 | `danger.read[path hint]` | Read a file `path` using `hint` as necessary to control its interpretation.                 |
 | `danger.write[path x]`   | Write a value `x` to a file `path`. Returns `1` on success.                                 |
 
 The `danger.path[]` function can perform a number of useful operations:
 
-- `path["."]` returns the current working directory.
-- `path[x ".."]` returns parent directory of path `x`, if any.
-- `path[x]` canonicalizes a path `x`.
-- `path[x y]` concatenates a path `x` with a name `y`, respecting the filesystem's separator symbol, and canonicalizes the result.
+- `danger.path["."]` returns the current working directory.
+- `danger.path[x ".."]` returns parent directory of path `x`, if any.
+- `danger.path[x]` canonicalizes a path `x`.
+- `danger.path[x y]` concatenates a path `x` with a name `y`, respecting the filesystem's separator symbol, and canonicalizes the result.
 
-Note that on Windows `path[]` will permit the construction of paths that do not actually exist on the filesystem, and is only concerned with structurally canonicalizing them. On MacOS, Linux, BSD, etc, canonicalization is performed as by `realpath()`. Windows paths begin with a drive letter (e.g. `C:\Users\`); `dir[""]` on Windows will enumerate available drives, and thus for consistency `path["C:\\" ".."]` (and likewise for other drives) will return `""`. Your mileage may vary, safety not guaranteed, etc, etc.
+Note that on Windows `danger.path[]` will permit the construction of paths that do not actually exist on the filesystem, and is only concerned with structurally canonicalizing them. On MacOS, Linux, BSD, etc, canonicalization is performed as by `realpath()`. Windows paths begin with a drive letter (e.g. `C:\Users\`); `danger.dir[""]` on Windows will enumerate available drives, and thus for consistency `danger.path["C:\\" ".."]` (and likewise for other drives) will return `""`. Your mileage may vary, safety not guaranteed, etc, etc.
+
+The `danger.shell[]` function returns a dictionary containing:
+- `exit`: the exit code of the process, as a number. If the process halted abnormally (i.e. due to a signal), this will be -1.
+- `out`: _stdout_ of the process, as a string.
+
+Among other things, it is possible to combine `danger.shell[]` with common command-line utilities like `curl` to fetch information over a network:
+```lil
+t:"%j" parse danger.shell["curl https://www.quandl.com/api/v3/datasets/WIKI/AAPL/data.json?rows=10"].out
+table t.dataset_data.column_names dict flip t.dataset_data.data
+```
+
+Note that this function executes subcommands _synchronously_; a long-running shell invocation can lock up Decker! The `danger.shell[]` function is not available on Windows.
 
 
 Startup
