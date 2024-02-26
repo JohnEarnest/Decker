@@ -42,6 +42,9 @@ ifneq ("$(EXTRA_FLAGS)","")
 	FLAGS:=$(FLAGS) $(EXTRA_FLAGS)
 endif
 
+# include potentially unsafe/nonportable scripting APIs
+# FLAGS:=$(FLAGS) -DDANGER_ZONE
+
 resources:
 	@chmod +x ./scripts/resources.sh
 	@./scripts/resources.sh examples/decks/tour.deck

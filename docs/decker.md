@@ -143,6 +143,7 @@ Web-Decker has generally the same tools and functionality as Native-Decker, but 
 - Most web browsers do not allow programs to play audio until the user has interacted with a page, so any `play[]` commands issued before a user has clicked, tapped, or pressed a keyboard key will have no effect.
 - If Web-Decker is accessed via a URL containing a `#` suffix (as in a page anchor), it will attempt to `go[]` to the [URI-decoded](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURI) suffix, making it possible to link to a specific card within a deck.
 - Tracing Mode (_View &#8594; Tracing Mode_) is not available.
+- [The Danger Zone](#thedangerzone) is not available.
 
 In a nutshell, Web-Decker provides an excellent way to share your decks with other people, and a convenient way to play with Decker when you're unable or unwilling to install the native application. If you're making new decks, Native-Decker's saving functionality and keyboard shortcuts may provide a better experience. You can use both however you please- a deck is a deck!
 
@@ -1820,6 +1821,33 @@ on loop do
 end
 ```
 The `loop` event handler _must_ complete quickly; if it exceeds a small quota, it will be halted along with the background loop.
+
+The Danger Zone
+===============
+Normally, Decker has no direct access to the local filesystem; access is exclusively mediated through a user's informed and manual consent within functions like `read[]` and `write[]`.
+
+If you compile Native-Decker from source using the `DANGER_ZONE` flag, you can enable the _danger_ interface, which contains a variety of goodies which could potentially cause harm to the host computer, reveal sensitive information, or expose non-portable, operating-system-specific information and functionality. Don't enter the _danger zone_ unless you know what you're getting into, and be careful using it with scripts you didn't write!
+
+When enabled, the _danger_ interface is available as a global constant named `danger`:
+
+| Name                     | Description                                                                                 |
+| :----------------------- | :------------------------------------------------------------------------------------------ |
+| `typeof danger`          | `"danger"`                                                                                  |
+| `danger.env`             | A dictionary of environment variable keys and their string values. Read-only.               |
+| `danger.homepath`        | A string containing the path to the user's home directory. Read-only.                       |
+| `danger.dir[path]`       | List the content of a directory as a table of `dir`, `name`, `type`.                        |
+| `danger.path[x y]`       | Canonical path `x` (joined with `y`, if given).                                             |
+| `danger.read[path hint]` | Read a file `path` using `hint` as necessary to control its interpretation.                 |
+| `danger.write[path x]`   | Write a value `x` to a file `path`. Returns `1` on success.                                 |
+
+The `danger.path[]` function can perform a number of useful operations:
+
+- `path["."]` returns the current working directory.
+- `path[x ".."]` returns parent directory of path `x`, if any.
+- `path[x]` canonicalizes a path `x`.
+- `path[x y]` concatenates a path `x` with a name `y`, respecting the filesystem's separator symbol, and canonicalizes the result.
+
+Note that on Windows `path[]` will permit the construction of paths that do not actually exist on the filesystem, and is only concerned with structurally canonicalizing them. On MacOS, Linux, BSD, etc, canonicalization is performed as by `realpath()`. Windows paths begin with a drive letter (e.g. `C:\Users\`); `dir[""]` on Windows will enumerate available drives, and thus for consistency `path["C:\\" ".."]` (and likewise for other drives) will return `""`. Your mileage may vary, safety not guaranteed, etc, etc.
 
 
 Startup

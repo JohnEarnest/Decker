@@ -62,6 +62,7 @@ lv* n_go(lv*self,lv*z){
 lv* interface_rtext(lv*self,lv*i,lv*x); // forward ref
 lv* interface_bits(lv*self,lv*i,lv*x); // forward ref
 lv* interface_pointer(lv*self,lv*i,lv*x); // forward ref
+lv* interface_danger(lv*self,lv*i,lv*x); // forward ref
 lv* interface_app(lv*self,lv*i,lv*x); // forward ref
 lv* n_brush(lv*self,lv*z); // forward ref
 lv* n_panic(lv*self,lv*z); // forward ref
@@ -73,6 +74,10 @@ void constants(lv*env){
 	dset(env,lmistr("rtext"  ),lmi(interface_rtext,  lmistr("rtext"  ),NULL));
 	dset(env,lmistr("bits"   ),lmi(interface_bits,   lmistr("bits"   ),NULL));
 	dset(env,lmistr("pointer"),lmi(interface_pointer,lmistr("pointer"),NULL));
+#ifdef DANGER_ZONE
+	// potentially unsafe/nonportable scripting APIs
+	dset(env,lmistr("danger" ),lmi(interface_danger, lmistr("danger" ),NULL));
+#endif
 	dset(env,lmistr("pi"),lmn(MATH_PI));
 	dset(env,lmistr("e" ),lmn(MATH_E));
 	lv*colors=lmd();
@@ -2782,7 +2787,7 @@ void directory_fetch(char*path,int filter){
 	char wildcard[PATH_MAX];
 	if(!strlen(path)){
 		int m=GetLogicalDrives();
-		for(int z=0;z<26;z++)if(m&(1<<z)){snprintf(wildcard,PATH_MAX,"%c:",z+'A');directory_push(1,wildcard,filter);}
+		for(int z=0;z<26;z++)if(m&(1<<z)){snprintf(wildcard,PATH_MAX,"%c:\\",z+'A');directory_push(1,wildcard,filter);}
 		return;
 	}
 	snprintf(wildcard,PATH_MAX,"%s%s*",path,SEPARATOR);
@@ -2794,11 +2799,15 @@ void directory_fetch(char*path,int filter){
 	}while(FindNextFileA(d,&find));FindClose(d);
 }
 #include "shlwapi.h"
-void directory_normalize(char*x,const char*src){PathCanonicalizeA(x,src);}
+void directory_normalize(char*x,const char*src){
+	if(!strlen(src)){snprintf(x,PATH_MAX,"");return;} // retain identity for parent of drives
+	_fullpath(x,src,PATH_MAX);
+}
 void directory_parent(char*x){
-	if(strlen(x)==3){snprintf(x,PATH_MAX,"");return;} // parent of a drive root
+	if(strlen(x)<=3){snprintf(x,PATH_MAX,"");return;} // parent of a drive root
 	char t[PATH_MAX];snprintf(t,PATH_MAX,"%s%s..",x,SEPARATOR);directory_normalize(x,t);
 }
+char** os_env_list(void){return *__p__environ();}
 #else
 #ifndef __COSMOPOLITAN__
 #include <dirent.h>
@@ -2817,6 +2826,7 @@ void directory_fetch(char*path,int filter){
 }
 void directory_normalize(char*x,const char*src){if(realpath(src,x)==NULL){x[0]='\0';}}
 void directory_parent(char*x){char t[PATH_MAX];snprintf(t,PATH_MAX,"%s%s..",x,SEPARATOR);directory_normalize(x,t);}
+char** os_env_list(void){extern char ** environ;return environ;}
 #endif
 
 void directory_home(char*path){
@@ -2855,3 +2865,39 @@ void directory_child(char*x,char*name){char t[PATH_MAX];directory_cat(t,x,name);
 int directory_has_parent(char*x){return strcmp(x,SEPARATOR)!=0&&strlen(x)>0;}
 char* directory_last(char*x){int r=strlen(x);while(r&&x[r-1]!=SEPARATOR[0])r--;return x+r;}
 int directory_exists(char*x){struct stat st;return stat(x,&st)?0:1;}
+
+// Danger : nonportable, potentially hazardous IO
+
+lv*env_enumerate(void){
+	char**env=os_env_list();lv*r=lmd();for(int z=0;env[z];z++){
+		int i=0;while(env[z][i]&&env[z][i]!='=')i++;
+		str k=str_new();str_add(&k,env[z],i);dset(r,lmstr(k),lmutf8(env[z]+i+1));
+	}return r;
+}
+lv*n_dir(lv*self,lv*a){(void)self;lv*r=directory_enumerate(ls(l_first(a))->sv,filter_none,1);r->kv[0]=lmistr("dir");return r;}
+lv*n_path(lv*self,lv*a){
+	(void)self;char t[PATH_MAX]={0},t2[PATH_MAX]={0};
+	if     (a->c==1){directory_normalize(t2,ls(a->lv[0])->sv);}
+	else if(a->c==2&&!strcmp(ls(a->lv[1])->sv,"..")){directory_normalize(t2,ls(a->lv[0])->sv),directory_parent(t2);}
+	else if(a->c==2&&!strcmp(ls(a->lv[0])->sv,""  )){directory_normalize(t2,ls(a->lv[1])->sv);}
+	else if(a->c==2){directory_cat(t,ls(a->lv[0])->sv,ls(a->lv[1])->sv),directory_normalize(t2,t);}
+	return lmutf8(t2);
+}
+lv*n_writefile(lv*self,lv*a){
+	lv*value=a->c>1?a->lv[1]:lms(0);
+	if(array_is(value))return writebin(l_first(a),value);
+	if(sound_is(value))return n_writewav(self,a);
+	if(image_is(value)||lid(value))return n_writegif(self,a);
+	if(lil(value)){EACH(z,value)if(image_is(value->lv[z]))return n_writegif(self,a);}
+	return n_write(self,a);
+}
+lv*n_readfile(lv*self,lv*a);// forward ref
+lv* interface_danger(lv*self,lv*i,lv*x){
+	ikey("homepath"){char t[PATH_MAX];directory_home(t);return lmcstr(t);}
+	ikey("env"     )return env_enumerate();
+	ikey("dir"     )return lmnat(n_dir      ,self);
+	ikey("path"    )return lmnat(n_path     ,self);
+	ikey("write"   )return lmnat(n_writefile,self);
+	ikey("read"    )return lmnat(n_readfile ,self);
+	return x?x:NONE;
+}

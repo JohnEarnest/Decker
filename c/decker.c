@@ -1114,7 +1114,8 @@ lv* contraptions_enumerate(void){
 	EACH(z,defs){ll_add(i,lmn(icon_app)),ll_add(n,defs->kv[z]);}
 	return torect(r);
 }
-lv* readwav(char*name){
+lv*n_readwav(lv*self,lv*a){
+	(void)self;char*name=ls(l_first(a))->sv;
 	Uint8* raw; Uint32 length; SDL_AudioSpec spec; SDL_AudioCVT cvt;
 	if(SDL_LoadWAV(name,&spec,&raw,&length)==NULL)return sound_make(lms(0));
 	if(SDL_BuildAudioCVT(&cvt, spec.format,spec.channels,spec.freq, SFX_FORMAT,SFX_CHANNELS,SFX_RATE)){
@@ -1122,6 +1123,17 @@ lv* readwav(char*name){
 		memcpy(cvt.buf,raw,length),SDL_FreeWAV(raw),SDL_ConvertAudio(&cvt);
 		raw=cvt.buf, length=cvt.len_cvt;
 	}lv*r=lmv(1);r->c=MIN(length,10*SFX_RATE);r->sv=(char*)raw;return sound_make(r);
+}
+lv*n_readfile(lv*self,lv*a){
+	lv*name=ls(l_first(a)),*hint=a->c>1?ls(a->lv[1]):lms(0);
+	if(!strcmp(hint->sv,"array"))return readbin(name);
+	if(has_suffix(name->sv,".png" ))return readimage(name->sv,!strcmp(hint->sv,"gray"));
+	if(has_suffix(name->sv,".bmp" ))return readimage(name->sv,!strcmp(hint->sv,"gray"));
+	if(has_suffix(name->sv,".jpg" ))return readimage(name->sv,!strcmp(hint->sv,"gray"));
+	if(has_suffix(name->sv,".jpeg"))return readimage(name->sv,!strcmp(hint->sv,"gray"));
+	if(has_suffix(name->sv,".gif" ))return n_readgif(self,a);
+	if(has_suffix(name->sv,".wav" ))return n_readwav(self,a);
+	return n_read(self,a);
 }
 
 // Modal Helpers
@@ -1413,7 +1425,7 @@ void modal_exit(int value){
 		field_exit(),sc.f=(field_val){rtext_cast(n_read(NULL,l_list(modal_open_path()))),0};
 	}
 	if(ms.subtype==modal_import_sound){
-		if(value){sound_edit(readwav(modal_open_path()->sv));au.sel=(pair){0,0},au.head=0;}
+		if(value){sound_edit(n_readwav(NULL,l_list(modal_open_path())));au.sel=(pair){0,0},au.head=0;}
 		modal_enter(modal_recording);return;
 	}
 	if(ms.subtype==modal_import_image&&value){import_image(modal_open_path()->sv);}
@@ -1515,16 +1527,7 @@ void modal_exit(int value){
 		if(ms.subtype==modal_save_locked)iwrite(deck,lmistr("locked"),NONE);
 	}
 	if(ms.subtype==modal_open_lil&&value){
-		lv*hint=ms.verb,*name=modal_open_path();lv*type=arg();ret(
-			array_is(type)?readbin(name):
-			has_suffix(name->sv,".gif" )?n_readgif(NULL,lml2(name,hint)):
-			has_suffix(name->sv,".png" )?readimage(name->sv,!strcmp(ls(hint)->sv,"gray")):
-			has_suffix(name->sv,".bmp" )?readimage(name->sv,!strcmp(ls(hint)->sv,"gray")):
-			has_suffix(name->sv,".jpg" )?readimage(name->sv,!strcmp(ls(hint)->sv,"gray")):
-			has_suffix(name->sv,".jpeg")?readimage(name->sv,!strcmp(ls(hint)->sv,"gray")):
-			has_suffix(name->sv,".wav" )?readwav(name->sv):
-			n_read(NULL,l_list(name))
-		);
+		lv*hint=ms.verb,*name=modal_open_path();lv*type=arg();ret(array_is(type)?readbin(name):n_readfile(NULL,lml2(name,hint)));
 	}
 	if(ms.subtype==modal_save_lil){
 		if(ms.type==modal_save&&!value){arg();ret(NONE);ms.type=modal_none;return;}
@@ -3286,7 +3289,7 @@ void sync(void){
 			if(has_suffix(p,".bmp"))import_image(p);
 			if(has_suffix(p,".wav")){
 				au.target=n_deck_add(deck,l_list(lmistr("sound")));mark_dirty();modal_enter(modal_recording);
-				sound_edit(readwav(p));au.sel=(pair){0,0},au.head=0;
+				sound_edit(n_readwav(NULL,l_list(lmutf8(p))));au.sel=(pair){0,0},au.head=0;
 			}
 			if(has_suffix(p,".csv")||has_suffix(p,".psv")){
 				setmode(mode_object);lv*a=lmd();

@@ -46,6 +46,11 @@ make lilt
 make docs
 ```
 
+Decker offers a set of non-portable scripting APIs which are disabled by default. When building from source, you can enable them by defining `DANGER_ZONE`. See the [Decker Reference Manual](http://beyondloom.com/decker/decker.html#thedangerzone) for details:
+```
+FLAGS:=$(FLAGS) -DDANGER_ZONE
+```
+
 As a fun bonus, you can also build Lilt against [Cosmopolitan Libc](https://github.com/jart/cosmopolitan), producing a single binary that will run on most popular operating systems:
 ```
 $ ./apelilt.sh

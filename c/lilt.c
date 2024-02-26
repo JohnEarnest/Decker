@@ -14,13 +14,8 @@ lv*n_input(lv*self,lv*a){
 	(void)self;char*line=bestline((a->c<2?ls(l_first(a)): l_format(ls(l_first(a)),l_drop(ONE,a)))->sv);
 	if(!line)return NONE;lv*r=lmutf8(line);free(line);return r;
 }
-lv*n_dir(lv*self,lv*a){(void)self;lv*r=directory_enumerate(ls(l_first(a))->sv,filter_none,1);r->kv[0]=lmistr("dir");return r;}
-lv*n_path(lv*self,lv*a){
-	(void)self;lv*x=a->c>0?ls(a->lv[0]):lms(0),*y=a->c>1?ls(a->lv[1]):lms(0);str t=str_new();char out[4096];
-	str_add(&t,x->sv,x->c);if(y->c)str_addc(&t,'/');str_add(&t,y->sv,y->c),str_term(&t);
-	char*e=realpath(t.sv,out);free(t.sv);return e!=NULL?lmutf8(out):lmistr("");
-}
 lv*n_readwav(lv*self,lv*a){
+	// this polyfill is limited compared to the version in decker, but avoids SDL dependencies:
 	(void)self;lv*name=ls(l_first(a));int offset=a->c>1?MAX(0,ln(a->lv[1])):0, size=0;
 	struct stat st;if(stat(name->sv,&st)||st.st_size<13)return sound_make(lms(size));
 	char*data=calloc(size=st.st_size,1);FILE*f=fopen(name->sv,"rb");
@@ -37,14 +32,6 @@ lv*n_readfile(lv*self,lv*a){
 	if(has_suffix(name->sv,".gif"))return n_readgif(self,a);
 	if(has_suffix(name->sv,".wav"))return n_readwav(self,a);
 	return n_read(self,a);
-}
-lv*n_writefile(lv*self,lv*a){
-	lv*value=a->c>1?a->lv[1]:lms(0);
-	if(array_is(value))return writebin(l_first(a),value);
-	if(sound_is(value))return n_writewav(self,a);
-	if(image_is(value)||lid(value))return n_writegif(self,a);
-	if(lil(value)){EACH(z,value)if(image_is(value->lv[z]))return n_writegif(self,a);}
-	return n_write(self,a);
 }
 lv*n_readdeck(lv*self,lv*a){return deck_read(lin(l_first(a))?lmistr(""):n_read(self,a));}
 lv*n_writedeck(lv*self,lv*a){
@@ -132,10 +119,7 @@ int main(int argc,char**argv){
 	lv* env=globals();
 	lv* a=lml(argc);for(int z=0;z<argc;z++)a->lv[z]=lmutf8(argv[z]);
 	dset(env,lmistr("args"),a);
-	lv* e=lmd();for(int z=0;environ[z];z++){
-		int i=0;while(environ[z][i]&&environ[z][i]!='=')i++;
-		lv*k=lms(i);memcpy(k->sv,environ[z],i),dset(e,k,lmutf8(environ[z]+i+1));
-	}dset(env,lmistr("env"),e);
+	dset(env,lmistr("env"),env_enumerate());
 	char*home=getenv("LIL_HOME");if(home){
 		struct dirent*find;DIR*dir=opendir(home);if(dir){while((find=readdir(dir))){
 			char path[4096];snprintf(path,sizeof(path),"%s/%s",home,find->d_name);
