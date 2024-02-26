@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # install lilt, decker and lil support resources
 
-DESTDIR=""
-PREFIX="/usr/local"
+DESTDIR=${DESTDIR:=""}
+PREFIX=${PREFIX:="/usr/local"}
 INSTALLDIR="${DESTDIR}${PREFIX}/bin/"
 
 # install binaries
@@ -11,14 +11,16 @@ if [[ ! -f "./c/build/lilt" ]]; then
 fi
 if [ -f "./c/build/lilt" ]; then
 	echo "copying lilt to ${INSTALLDIR}..."
-	sudo cp ./c/build/lilt "${INSTALLDIR}lilt"
+	mkdir -p "${INSTALLDIR}"
+	install -C ./c/build/lilt "${INSTALLDIR}lilt"
 fi
 if [[ ! -f "./c/build/decker" ]]; then
 	echo "skipping decker. no binary found. build first with 'make decker'"
 fi
 if [ -f "./c/build/decker" ]; then
 	echo "copying decker to ${INSTALLDIR}..."
-	sudo cp ./c/build/decker "${INSTALLDIR}decker"
+	mkdir -p "${INSTALLDIR}"
+	install -C ./c/build/decker "${INSTALLDIR}decker"
 fi
 
 # install syntax profiles
