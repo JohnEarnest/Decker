@@ -529,7 +529,8 @@ const menu={heads:[],items:[],x:0,active:-1,stick:-1,lw:-1,sz:rect()}
 no_menu=_=>menu.active==-1&&menu.stick==-1
 in_layer=_=>no_menu()&&(ms.type?ms.in_modal:1)&&((!running()&&!msg.overshoot)||ms.type!=null)
 in_widgets=_=>ms.type!=null?ms.in_modal:1
-menus_off=_=>lb(ifield(deck,'locked'))||(uimode=='draw'&&ev.hidemenu&&ms.type==null)
+menus_off=_=>lb(ifield(deck,'locked'))
+menus_hidden=_=>uimode=='draw'&&ev.hidemenu&&ms.type==null
 menu_head=(name,enabled,t,b)=>({name,enabled,t,b}) // string,bool,rect,rect
 menu_entry=(name,enabled,check,shortcut,t,b)=>({name,enabled,check,shortcut,t,b}) // string,bool,bool,char,rect,rect
 menus_clear=_=>(menu.active=-1,menu.stick=-1)
@@ -561,7 +562,7 @@ menu_check=(name,enabled,check,shortcut,func)=>{
 menu_item=(name,enabled,shortcut,func)=>menu_check(name,enabled,-1,shortcut,func)
 menu_separator=_=>menu_check(0,0,0,0,0)
 menu_finish=_=>{
-	if(menus_off())return
+	if(menus_off()||menus_hidden())return
 	const b=rect(0,0,context.size.x,3+font_h(FONT_MENU)); draw_rect(b,32),draw_hline(0,b.w,b.h,1); const pal=deck.patterns.pal.pix
 	menu.heads.map((x,i)=>{
 		let a=x.enabled&&(over(x.b)||i==menu.stick||i==menu.active);if(ev.drag&&!dover(b))a=0

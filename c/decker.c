@@ -367,7 +367,8 @@ lv*interface_app(lv*self,lv*i,lv*x){
 
 // Menus
 
-int menus_off(void){return lb(ifield(deck,"locked"))||(uimode==mode_draw&&ev.hidemenu&&ms.type==modal_none);}
+int menus_off(void){return lb(ifield(deck,"locked"));}
+int menus_hidden(void){return uimode==mode_draw&&ev.hidemenu&&ms.type==modal_none;}
 void menus_clear(void){menu.active=-1,menu.stick=-1;}
 void menu_setup(void){
 	menu.x=10,menu.head_count=0,menu.sz=(rect){0,0,0,0},menu.active=-1;
@@ -399,7 +400,7 @@ int menu_check(char*name,int enabled,int check,char shortcut){
 int menu_item(char*name,int enabled,char shortcut){return menu_check(name,enabled,-1,shortcut);}
 void menu_separator(void){menu_check(NULL,0,0,'\0');}
 void menu_finish(void){
-	if(menus_off())return;
+	if(menus_off()||menus_hidden())return;
 	rect b={0,0,context.size.x,3+font_h(FONT_MENU)};
 	draw_rect(b,32),draw_hline(0,b.w,b.h,1); char*pal=patterns_pal(ifield(deck,"patterns"));
 	for(int i=0;i<menu.head_count;i++){
