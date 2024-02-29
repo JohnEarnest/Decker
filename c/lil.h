@@ -538,6 +538,28 @@ dyad(l_format){
 		format_type(&r,a,t,n,d,lf,pz,&f,x->sv);if(t!='%'&&!sk)h++;
 	}return lmstr(r);
 }
+lv*like_test(lv*str,lv*pats){
+	EACH(z,pats){
+		lv*p=pats->lv[z];char*m=p->lv[0]->sv,*l=p->lv[1]->sv,*a=p->lv[2]->sv;int sc=p->lv[0]->c;
+		if(!sc&&!str->c){return ONE;}else if(!sc)continue; // an empty pattern matches only the empty string
+		memset(a,0,sc);a[0]=m[0]=='*';for(int ci=0;ci<str->c;ci++){
+			char c=str->sv[ci];for(int si=sc-1;si>=0;si--){ // iterate backwards so we can update alive states in-place
+				int prev=(si>0&&a[si-1])||(si==0&&ci==0)||(si>1&&m[si-1]=='*'&&a[si-2]);
+				a[si]=m[si]=='*'?a[si]||prev: m[si]=='.'?prev: m[si]=='#'?isdigit(c)&&prev: c==l[si]&&prev;
+			}
+		}if(a[sc-1]||(sc>1&&m[sc-1]=='*'&&a[sc-2]))return ONE;
+	}return NONE;
+}
+dyad(l_like){
+	if(!lil(y))y=l_list(y);lv*pats=lml(y->c);EACH(z,pats){
+		lv*p=ls(y->lv[z]),*r=lml(3);r->lv[0]=lms(p->c),r->lv[1]=lms(p->c),r->lv[2]=lms(p->c);pats->lv[z]=r;// {mode,literal,alive?}
+		char*m=r->lv[0]->sv,*l=r->lv[1]->sv;
+		int s=0;EACH(i,p){
+			char c=p->sv[i];m[s]=c=='`'&&i<p->c-1?(l[s]=p->sv[++i],'a'): strchr(".*#",c)?(l[s]='!',c): (l[s]=c,'a');
+			while(p->sv[i]=='*'&&p->sv[i+1]=='*')i++;s++; // collapse sequential *s into one(!)
+		}r->lv[0]->c=s;
+	}if(lil(x)){MAP(r,x)like_test(ls(x->lv[z]),pats);return r;}else{return like_test(ls(x),pats);}
+}
 lv* l_ins(lv*v,lv*n,lv*x){
 	int rc=ceil((1.0*v->c)/n->c);lv*c=lml(n->c);
 	EACH(z,c){c->lv[z]=lml(rc);for(int r=0;r<rc;r++){int x=(n->c*r)+z;c->lv[z]->lv[r]=x>=v->c?NONE:v->lv[x];}}
@@ -614,7 +636,7 @@ primitive dyads[]={
 	prim("|",l_max),prim("~",l_match),prim("split",l_split),prim("fuse",l_fuse),
 	prim("dict",l_dict),prim("take",l_take),prim("drop",l_drop),prim("in",l_in),
 	prim(",",l_comma),prim("join",l_join),prim("cross",l_cross),prim("parse",l_parse),
-	prim("format",l_format),prim("unless",l_unless),prim("limit",l_limit),
+	prim("format",l_format),prim("unless",l_unless),prim("limit",l_limit),prim("like",l_like),
 	prim("@where",l_where),prim("@by",l_by),prim("",NULL)
 };
 primitive triads[]={

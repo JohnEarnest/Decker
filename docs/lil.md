@@ -381,7 +381,7 @@ select firstName:name dogYears:7*age from people     # compute and rename column
 # | "Walter"  | 301      |
 # +-----------+----------+
 
-select name where ("S%m" parse name) from people     # where takes a boolean (0/1) column
+select name where name like "S*" from people     # where takes a boolean (0/1) column
 # +--------+
 # | name   |
 # +--------+
@@ -919,6 +919,62 @@ If any patterns specify names, the result of `parse` will be a dictionary, and `
 "%[one]i %[two]i" format ("one","two") dict 34,56   # "34 56"
 ```
 
+---
+
+The `like` operator offers another way of performing string matching, based on so-called _glob pattern_, which are a simplified subset of regular expressions. A Lil glob pattern is a string which may contain the special characters `.`, `*`, `#` or backticks. In a glob pattern, a dot (`.`) matches any single character, an octothorpe (`#`) matches any single digit (0-9), a star (`*`) matches zero or more of any character, a backtick "escapes" a subsequent special character, treating it like a normal character, and any other character matches exactly itself.
+
+For example, we can use `.` and `#` to describe a "mask" of characters to accept within a broader pattern:
+```lil
+"Apple" like "A..le"                       # 1
+"(555)-867-5309" like "(###)-###-####"     # 1
+```
+
+We can use backtick escapes when we need to match against a special character:
+```lil
+"2*3" like "#`*#"                          # 1
+```
+
+And we can use `*` to perform prefix, infix, or postfix matches for fuzzy searching:
+```lil
+"The Best Orange" like "The*"      # prefix
+"The Best Orange" like "*Best*"    # infix
+"The Best Orange" like "*Orange"   # suffix
+```
+
+If the left argument to `like` is a list of strings, it will produce a list of results indicating whether each string matched the pattern. This allows it to be used conveniently in queries:
+```lil
+t:("widget","plastic dingus","whatsit","extruded plastic dingus","dingus")
+
+t like "*dingus"
+# (0,1,0,1,1)
+
+select where value like "*dingus" from t
+# +---------------------------+
+# | value                     |
+# +---------------------------+
+# | "plastic dingus"          |
+# | "extruded plastic dingus" |
+# | "dingus"                  |
+# +---------------------------+
+```
+
+If the right argument to `like` is a list of patterns, the result will match if _any_ of the provided patterns match:
+```lil
+t:("apple pie","key lime pie","banana cream pie","apple computer")
+
+t like ("apple*","banana*")
+# (1,0,1,1)
+
+select where value like ("apple*","banana*") from t
+# +--------------------+
+# | value              |
+# +--------------------+
+# | "apple pie"        |
+# | "banana cream pie" |
+# | "apple computer"   |
+# +--------------------+
+```
+
 Lil, the Vector Language
 ------------------------
 Lil has a number of features influenced by "Vector-oriented" languages like APL, J, K, and Q. The essence of vector-oriented languages is thinking about manipulating entire data structures _at once_, rather than manipulating their elements serially.
@@ -1171,6 +1227,8 @@ The `&` and `|` operator calculate the minimum or maximum of their arguments. As
 
 `x fuse y` conversely combines the strings in the list `y` with the string `x`, resulting in a string. Combining `split` and `fuse` can allow one to replace instances of one substring with another.
 
+`x like y` returns a truthy result if a string `x` matches a glob pattern `y`. If `y` is a list of patterns, the result will be truthy if any of the patterns match. If `x` is a list, the pattern or patterns will be applied to each string of `x` and return a list of `0` or `1` values.
+
 `x dict y` constructs a dictionary from a list of keys `x` and a list of values `y`.
 
 `x take y` and `x drop y` are very general operators for filtering and reshaping data. Their behaviors depend on the type of the left and right arguments, as summarized in the table below. When `x` is a number, `take` will repeat elements from `y` if it isn't long enough. For non-numeric `x` values, `take` can be thought of as _set intersection_, while `drop` can be thought of as _set difference_.
@@ -1224,7 +1282,7 @@ The following is a slightly hand-waved EBNF description of Lil's syntax. The pro
 MONAD   := '-'|'!'|'floor'|'cos'|'sin'|'tan'|'exp'|'ln'|'sqrt'|'count'|'first'|'last'|'sum'|'min'|'max'|
            'raze'|'prod'|'range'|'keys'|'list'|'rows'|'cols'|'table'|'typeof'|'flip'|'mag'|'unit'|'heading'
 DYAD    := '+'|'-'|'*'|'/'|'%'|'^'|'<'|'>'|'='|'&'|'|'|','|'~'|'@'|'split'|'fuse'|'dict'|'take'|'drop'|
-           'in'|'join'|'cross'|'parse'|'format'|'unless'|'limit'
+           'in'|'join'|'cross'|'parse'|'format'|'unless'|'limit'|'like'
 DIGIT   := '0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'
 NUMBER  := '-'? DIGIT+ '.'? | DIGIT* '.' DIGIT+
 STRING  := '"' (NON_ESC|'\\'|'\"'|'\n')* '"'

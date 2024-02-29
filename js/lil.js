@@ -285,6 +285,25 @@ dyad={
 			if(n&&lf)for(let z=0;z<n-vn;z++)r+=pz?'0':' '
 		}return lms(r)
 	},
+	like: (x,y)=>{
+		if(!lil(y))y=monad.list(y);const pats=y.v.map(pat=>{
+			const r={m:'',l:'',a:[]},ch=ls(pat).split('');for(let i=0;i<ch.length;i++){
+				r.m+=ch[i]=='`'&&i<ch.length-1?(r.l+=ch[++i],'a'): ch[i]in{'.':1,'*':1,'#':1}?(r.l+='!',ch[i]): (r.l+=ch[i],'a')
+				while(ch[i]=='*'&&ch[i+1]=='*')i++
+			}return r
+		})
+		const test=str=>{
+			for(let pi=0;pi<pats.length;pi++){
+				const m=pats[pi].m, l=pats[pi].l, sc=m.length, a=new Uint8Array(sc);a[0]=m[0]=='*'
+				if(!sc&&!str.length){return ONE}else if(!sc)continue;for(let ci=0;ci<str.length;ci++){
+					const c=str[ci];for(let si=sc-1;si>=0;si--){
+						const prev=(si>0&&a[si-1])||(si==0&&ci==0)||(si>1&&m[si-1]=='*'&&a[si-2])
+						a[si]=m[si]=='*'?a[si]||prev: m[si]=='.'?prev: m[si]=='#'?/[0-9]/.test(c)&&prev: c==l[si]&&prev
+					}
+				}if(a[sc-1]||(sc>1&&m[sc-1]=='*'&&a[sc-2]))return ONE
+			}return NONE
+		};return lil(x)?lml(x.v.map(x=>test(ls(x)))): test(ls(x))
+	},
 	'@where': (col,tab)=>{
 		const w=dyad.take(lmn(count(tab)),lml(ll(col)))
 		const p=lml(range(count(tab)).filter(i=>lb(w.v[i])).map(lmn))

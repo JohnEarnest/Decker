@@ -215,8 +215,7 @@ on selname do
 end
 
 on view do
- pattern: "%s%%m" format Tprefix.text
- L.value: select where pattern parse name from data.value
+ L.value: select where name like "*%s*" format Tprefix.text from data.value
  val:     "%s, %s" parse selname[]
  Tname.text:    last val
  Tsurname.text: first val

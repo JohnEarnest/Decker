@@ -22,7 +22,7 @@ Primitives
 | monad   | data       | `range` `keys` `list` (enlist) `rows` `cols` `table` `typeof` `flip`         |
 | dyad    | arithmetic | `+` `-` `*` `/` `%` (y mod x) `^` (pow) `&` (min) `|` (max)                  |
 | dyad    | logical    | `<` `>` `=` (conforming equal) `~` (match) `unless` (x if y is `0`)          |
-| dyad    | string     | `fuse` `split` `parse` `format`                                              |
+| dyad    | string     | `fuse` `split` `parse` `format` `like`                                       |
 | dyad    | data       | `,` (concat) `@` (index each right) `dict` `take` `drop` `limit` `in`        |
 | dyad    | joins      | `join` (natural join/zip) `cross` (cross join/cartesian product)             |
 
@@ -74,3 +74,10 @@ A format is `%[name]*-0N.DX`: `*` skip, `0` pad, `N` width.
 | `bficChH` | Number   | bool, float, int, currency (`-$1.23`), plain currency (`-1.23`), hex lowercase, hex uppercase  |
 | `jep`     | Misc.    | JSON, unix epoch, time-parts {`year`, `month`, `day`, `hour`, `minute`, `second`}              |
 | `qv`      | Lil      | quoted Lil string literal, Lil variable name                                                   |
+
+Glob patterns for `like`:
+
+- `.`: any single character.
+- `#`: any single digit 0-9.
+- `*`: 0 or more of any character.
+- backtick escapes a subsequent special character.

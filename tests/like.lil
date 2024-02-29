@@ -1,0 +1,21 @@
+# tests for the 'like' glob-matching operator
+
+show[("a","")                                         like ""          ] # empty patterns match ONLY empty input strings
+show[("a","")                                         like ()          ] # no patterns never match
+show[""                                               like "a"         ] # empty input strings don't match patterns with literals
+show[("apple","orange")                               like "apple"     ] # plain literals
+show["a`*.b"                                          like "a```*`.b"  ] # escaped literals
+show["ab`"                                            like "ab`"       ] # unterminated escapes act like a literal ` (!)
+show[("apple","axxle","axle","abzle","axxxle")        like "a..le"     ] # single-char wildcards
+show[("(123)-45","(009)-00","(01a)-90","(012)-0z")    like "(###)-##"  ] # digit wildcards
+show[("a*ZbXc","a*ZZbZc","a*ZbZZc","abc")             like "a`*.b.c"   ] # wildcards AND escaped literals
+show[("B123","123","B12")                             like ".123"      ] # leading .
+show[("9123","123","912")                             like "#123"      ] # leading #
+show[("123","A123","AB123","23")                      like "*123"      ] # leading *
+show[("ABCD","ABxCD","ABxxCD","ABxCxD","ABD","ABCDx") like "AB*CD"     ] # middle  *
+show[("ABC","ABCx","ABCxx","AB")                      like "ABC*"      ] # ending  *
+show[""                                               like "*"         ] # empty string matches * (!)
+show[("ab","axxb","axxxxb","a","b")                   like "a***b"     ] # tolerate sequential *s (which are redundant)
+show[("abc","zb")                                     like ("ab","a.c")] # OR together pattern results
+show["abc"                                            like ("ab","a.c")] # (see above)
+show["abc"                                            like ("","abc"  )] # empty patterns short-circuit

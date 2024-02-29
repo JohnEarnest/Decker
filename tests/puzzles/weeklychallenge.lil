@@ -226,7 +226,7 @@ assert[f[(1, 24, 51, 60)] (1, 2, 4, 5, 1, 6, 0)]
 
 problem[230.2]
 # return the count of words that start with the given prefix.
-on f prefix x do sum(list"%s%%m"format prefix)parse x end
+on f prefix x do sum x like "%s*" format prefix end
 assert[f["at" ("pay", "attention", "practice", "attend")] 2]
 assert[f["ja" ("janet", "julia", "java", "javascript"  )] 3]
 
@@ -648,7 +648,7 @@ problem[117.1]
 # find the missing row.
 # (this is like the xor trick except with more annoying io requirements.)
 on f x do
- t:readcsv["n,t\n%s"format x "is"]
+ t:readcsv["n,t\n",x "is"]
  (sum 1+range 1+count t)-sum t.n
 end
 assert[f[
@@ -670,21 +670,18 @@ assert[f[
 
 problem[110.1]
 # filter a file to only "valid" phone numbers of a few specific formats.
-on pn x do 
- ("%*o +%*02i%*o %*010i%m" parse x)| # +nn  nnnnnnnnnn
- ("%*o (%*02i)%*o %*10i%m" parse x)| # (nn) nnnnnnnnnn
- ("%*o %*04i%*o %*10i%m"   parse x)  # nnnn nnnnnnnnnn
+on f x do
+  "\n"fuse extract value where value like ("+## ##########","(##) ##########","#### ##########") from "\n"split x
 end
-on f x do "\n"fuse extract value where pn[value] from"\n"split x end
 assert[f[
 "0044 1148820341
- +44 1148820341
-  44-11-4882-0341
++44 1148820341
+44-11-4882-0341
 (44) 1148820341
-  00 1148820341"
+00 1148820341"
 ]
 "0044 1148820341
- +44 1148820341
++44 1148820341
 (44) 1148820341"
 ]
 
