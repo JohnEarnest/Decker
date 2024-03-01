@@ -921,7 +921,7 @@ If any patterns specify names, the result of `parse` will be a dictionary, and `
 
 ---
 
-The `like` operator offers another way of performing string matching, based on so-called _glob pattern_, which are a simplified subset of regular expressions. A Lil glob pattern is a string which may contain the special characters `.`, `*`, `#` or backticks. In a glob pattern, a dot (`.`) matches any single character, an octothorpe (`#`) matches any single digit (0-9), a star (`*`) matches zero or more of any character, a backtick "escapes" a subsequent special character, treating it like a normal character, and any other character matches exactly itself.
+The `like` operator offers another way of performing string matching, based on so-called _glob patterns_, which are a simplified subset of regular expressions. A Lil glob pattern is a string which may contain the special characters `.`, `*`, `#` or backticks. In a Lil glob pattern, a dot (`.`) matches any single character, an octothorpe (`#`) matches any single digit (0-9), a star (`*`) matches zero or more of any character, a backtick "escapes" a subsequent special character, treating it like a normal character, and any other character matches exactly itself. (You may find that SQL engines you're familiar with offer similar features with their own set of special characters.)
 
 For example, we can use `.` and `#` to describe a "mask" of characters to accept within a broader pattern:
 ```lil
