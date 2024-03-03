@@ -5,6 +5,14 @@ size:[512,342]
 name:"Dialogizer"
 author:"John Earnest"
 
+{sounds}
+scrape:"%%SND0/QABAAD+/gECAgQGAAL/AP/+/wADBAAAAPwAAQP+AAAHAfz/AAX9AAcDAf4D/wABAv7/BgX8+f/9AAMDBwAAAggAAfv5/vkCBgD3A///BAAEAP70AwD6/v8I/fgA/v8A/AD4//f7APoFBQkAB/sGCfUDAADy//YA/AAF+gAADQ4PAwEHB/z9Bfbw9/779vv4BAkD/wj8+gYA8v75APMECg77AAkQCAL8+QEA+Af6A/n+APUFAQDw9fH+Dvb2B/DsCAT9+wPv/gkKC/8J9Aj9Cff9ERUGEfkIDQwNDPvy9QoHC/f/9w8A/AkHBPr3CesODwP4Ef0QBQQIC//84+/49/zn9RUSDwoYDQTsBgT8/Qr8HQz38+r37RD9BQMS/+nz9g8UCgwFHPsPCPADAPU="
+click:"%%SND0AgD/AAD8AwD+AwD/AAD+AAIB/QP/AAABAP4AAP8CAP8AAAQB/gAAAPwBBP0BA/3+AAAAAAAAAAD8CPr7AAD9Av4CAfwBAAAABv0C//7uP9fjOOm3QQzk9B8I6fEm5+8W+PT+/QH49QMB9gIL+PkBB/kCBQAEAwMJAQMAD/0JBgQG+gAE9NHVR7wQUMq+RxOuHDfJDxjx6wz/9gD+8gD4+gH/+Pf8+QIB9/8DAPz4Ef33CAEIAP0O/fgU8/4LBPkN+P0FFvAAEf3+Cf/+AP/++v4DAvwQ9QEH+QMA/wH9/QP8AQAAAvgCDf78Af7/+/sDAfYLBvn/AP3/A/cAC/r3CQj3/wn7/QT8+wQB/fwO/PgKAP0DAPr+APsDB/8ABf4A+AAF/AECBQXzBgj6Av4BAAL+APz+B/wCAPsC/wQH/PoH9AQIAPwFCPr6BgP/AP8CBf0D/QD5"
+clap:"%%SND0AAAAAAAAAQAAAAAAAAXwDhHt4hzyBS4I9dv7MP3f5PURGxQD+wD65w0F8PUCBAcKFAjt5ukKDQsIBfT8+fz/CQ7+9P4GAfv9/QQQA/r4/AAA/AACBQM34tAzEJ9hMrKI3hVQWCbjt80G6gbxFktX65DA+DUYIw7k7vQDAgD9+AsYA/L/BQsS9ev4+wwJ/gP++/4BDAP38v3/Bw4I/fH2AAoKAf77+/n/BgsH/fn89SQK4zZoF5GC+y0kSRXzJRjIqPIeW0jIruIERif90d8TAeoAHRv/7AsB8/T/AQD//gj/BhIF8/Xr9AsQDQYJ+ObtAAoSDwYC9ez0AAYPBQfO4k0uveTkM/oByAs3UBi6ueEiUvWoxS1PDOvsDRf37SvvvwAKDTfz3/gvAfoa8N73AD4Zzs0ACiwi480QEvvSCPYvIQUSwMHlDQthGwPsAO+82wcbLhYvA9XH0PooOx/3z/EA/xAd/entBBgT/Pbj5RoeG+7wB/nj+vwBDxUV59fr9x8fFQ321vf/CxgK/u7f7SEmHxzy1dvqBi8W/vX7DP7z6foRDh4P9eTq/gYcEvf98e36AxoT/e/r+AkRBfz6DwHn5QAUGgv49e3y+P4hIhDl5fADCwT8AwkE+gr99u4DBAoGDgH0AP748gAHDxUM9+v2+QL+DAkCAwv37/cJGQDp7QITEwH99PYABAQIB/v89fj7AAoMDggH++rs+wUUEwXt7PIHERMF/vv28vgDDg/+9vr+ABEVAefp/wUHCAcA+f8A/vwCAAL+/AAMB/zz/gQDBwT2+voFCAoA9fX4AA4TB/by+wAABAH/BAoF//L1AAwM/fP4AAcRCPfv+gQEBgAAAAD9/P4DBAD/AAEBA/v7AAYDAPv6AQUGBAD5/f8AAQQEA/35/f8DCQb/9vX8BwwFAPsAAP0CAv76AQECAv/+/gECAAD/AwMA/v39AgL7+gME"
+talk1:"%%SND03t/f39/g4eDg3+Df9wQRHy47Q0lMTk9PUFBRUVJSUVFRUFFRUVFRUFFQPSsgEAH26+Pf3t3c29va2dnZ2dnZ2djY2NfY6PwGFCMvODxBQ0NERkhKSUlLS0xLSklJSUlISEhGOiIWBvns4tvX1dPS0tHT09TV1NLR0c/O0NDn9AIRIS43PkJERERGRkZHR0hIRkdHR0lKS0tLSjgjGAf47OPb19XS0tLU0tHS09PT0dHQ0NDPz9Di9gAPHy43P0JDRUNFRkdGRkhIR0hISUlISUtKSEcoHA7/7+Te2NXV09HS0tLS0dHR0NHR0M/Pzs3Nzu33BRYkMjg7QEBDQ0REQUNDQ0JDQkNDRURGR0ZEKBwP/e/i2tXQ0c7OzczNzs3My8zKycrJycfHycjk7/0MGScuNDc6Ozs9PT48Pz0+PD08Pj8+P0FBQCQWCPjr4dbQz83My8nJyMfHycjGx8XFw8bFxMbFx9/t+gkYIywyNTg5Ozs6Ozs7Ozs8PTw8PD4+PT8/PjIaDQDx5dvX0s/Ny8zMzc3Mz83Nzs3MzMzNzMzMysvM3/H8DRomMTc8PkBCQ0VFR0hISEhJSUpKSktMTEtLS0xLS0pISUlIQSQZCPvu49vW1NLS0dDQ0NDPzs/P0M7Nzc3Ozc3Ny8zKysvLy8vMzczMzM7Nzc3Nz8/Ozs7Ozc3Ozc3NzMvLy8zMzMzMzc3Oz8/Pz8/Pz9DQ0NDPz8/P0NDR0NHR0dHR0tHR0NDR0dHS0dHR0dHS0tLR0dHR0dHR0NDQz8/Pz8/Pz8/Pz9HQ0NHS0tHS0dLR0tLT09v3ARAfLjg+QkdISkpLTExOTk5NTU9PT05PT0wrIBAB9Ori3tva2tjW1dPU1dfW19fX19fj+gUVJTI7QUdKSUpNTU1OT09OTk5PT09QUFBPNSkbC/7x5+Hd29nY2NbX19bV1tbU1dbV7f0HGCg0P0dLTk9QUVJSU1NSUlNSUVFSUlBQUDAlFwf47OPe29rY19XW19bV1tfW1dXU09TT0/L6CRgnMDk+QUFERkZGRkZHSEdHR0dGRkZISEU/JBgJ++ze2dPQztDP0NDNzczLy8rMyMnIx8fHyM/q9QISHyowNjk6OTs8Ojw/PT4/Pj0/Pz5AP0E/PCQXCPnp3dTOycjFxcbExMXExMTFw8PDwsLAv7/Awt/q+AkWIiwwNDc4Nzk3Nzg5OTo7Oj08PTw8PDw6OiQUB/bo3dHNysjFxMTDwcLBwsHDwsDBwsPCwsPGxMXI4/D9DBwoMTc7Oz9BQEFDQ0FEQ0NCREVFQkNEQ0REREM/JBkJ++/g2tbTzs7Nzc3OzcrMzczMy8vNzc7Oz87Lzs7Oz9Ty/AsbKTU7QEJERkZJS0pLTExOTk1MTU5NTk5PTlBPTk5PTk5PT09PUE9NNygcDP/w6OHd2tfW1NLS0tLR0M/Pzs7MzMzMzc3MzM7Nzc7Ozs7Pz8/Qz8/Qz9DQ0NDQ0dLS09PT09PT09PT1NPT09PT09PT09PS0tLS0tLR0tHQ0dHR0dLS0dHS0tHS0tPT09TT09PT09PT09PT09PT09TU1NTU1dbV1dbW1tbX1tXW1tbW1tbW1tbV1tbW1tU="
+talk2:"%%SND00tPT09PT09PT09TT09PT09PT09PT0tLS0tLS0dLR0NHR0dHS0tHR0tLR0tLT09PU09PT09PT09PT09PT09PU1NTU1NXW1dXW1tbW19bV1tbW1tbW1tbW1dbW1tbV1tXU1NXV1tfX2NnZ2dra2tra2trb3Nz7BBIiMTpESk5PUlNSVFRUU1VWWFdYV1VWVVRWVlRTPC0hEgL27Ojk4uDd3dzb2trZ2dnb2dra2tnb2+L+BxcnNj9GSkxOT09PUVFSUlJTUVFQUU9RUFJTUVBROioeDQD06OLe29jY1tXV1dXU1NbV1NTT09LT2fQADR4rNTs/Q0ZFRUZGSElKSEdHR0ZHRkZHSEdHRUMjGQr77OPa1dHOz83Ky8vKysjKycnKyMjIx8fHx8jm8P4NGyYuMjQ4ODk6PDs6Ozs8Ozs8PDw8PD0/PDo6LRgM/u7i2dLNy8jGxsXDw8TCwcTEwsPExcTBwcPCxMTi7fsLGSQtMjQ1ODo5Ojs6Ozs7PD09PT4+Pj8/QEA+MhsRAPPl3NXSzs3My8vJzMrIysvKycnLzcvMycvLzM7s+QUXIy42Oz0/QkJERERERUVFREdHRkdGRkhISEdHLB8SA/Xo4t3Y1tXT1NPU0tLT1NTT1dXV09TV0tTT1dTo+QUVIy43PUFERERGREZDRkRGRkdHR0dHSElISUlKSUgpHhIA8+ng3dnX1tXU1dTV1dXV0tTU0tXU0tHR0dHQ0M/T8fsJFyYvNzw9P0A/P0BBQUFBQ0NDRkZFRUZHR0dHR0dGRkZFR0lISEkwIRMD9ejg2tfV09PS0tHQ0c/Pz8/Nzc7Ozs7OzczNzM7Nzc/O0M/P0NDPz8/Q0M7Pz87Pz8/Pzs7Nzs7Ozs7Ozc3Mzc7NzczMzMzMzMzNzc3Ozs/Pz8/Pz8/P0NDPz8/Q0NDR0tLS0tLS09PU09TT09PT1NPS0tLS0tLS0tPT09TU1NTU1NTV1dXW1dXW1tfX1tbV1dbW2dk="
+talk3:"%%SND01tbY2NnZ2dnY2tva29vd4P8HFSUyOkJGSExNTk5QUFBRUFFRUVFSU1NSUVFRNCkbCv3z7Ojk4eDf3dzc29va2tra2drb29zuAAoZKDY9QkZISUlJSklKSEhISEhHSUlKS01NTUQqIBAA9Ork3trX19fX1tXU09PT09HS0tXb9wAOHSkxNzs9P0BCQkFBQj9AQEE/PkFAP0BBPyQZDADx5uHc1tXU0dDR0M7My8zMzsvKy8rJyt/u+gkWIiswNDY3Nzk5OTo5Ojk5OTk5Ozk5OTs5HBMG+Org19LOzszLzcrLy8vLzc3Ozs3NysvKytjs9QUUISoxMzY4OTo8PDs8PTs8PDw8Ozs6Ojs9IBMI++3h2tXRz87MysrKycvMzc3NzMzLycrLy9ft+AcYJC80OTw9PkBAP0BAQUFDQ0NDQ0NERENDKBwPAvTr4t3b19bW1tfX19fX2NjW1tbW1NXU09Pb9gAOHiw2PUFCRUdHRkdJSEhKSkpKS01MTU5PT09HLCETA/ju6eTi4N7e29ra2tva2NjX2NjZ2NfV1dfW2e//ChgnMjtBRkhKS0tMTExMTUxNTU1OTk5OTk1NTU1MTExMTUxMSzcmGgv87uXd2dfW1NPS0tLR0dHR0dDQ0NDQ0dHQ0NDPzs7Ozs/Pz8/Q0M/R0dHR0NHR0dLS0dDQ0NDQ0NDP0NDQ0NHPz9DQzs/Pz87Ozs/Pz9DPz9DQ0dDR0dHS0tLS0tPT09PT09PT09PT09TV1dXW1tbW1dXV1dbW1dXV1dXV1dXW1tbX19bW2NjY2NjX19fX2NjY8/4JGSk1PUNHSEtLTU1NTk1NTExOTk9PTk1NSisiEwL16+Pg3dvZ2NnX1tfV1NbW1tXX1tX3/wsfKzc/QUVGSEZGSkhISElJSUpJSkxLS0pKLyMVB/nr5eLd2dfX1NTR0dPS0NHQ0dLQ1fH9ChsoMTc8P0JAQUFCQkREQ0RCQUJBQkJDRUIkGAn76+HZ1dDQz83MzMrIyMnKycnJycfIyMrT6vcFEyApLzQ3OTo7PD09PTw9PT09PT8+Pz8+Pj0fFQf47N7X1M/Ny8vJyMnHx8jIx8nKyMnIx8jIyMvq9AISICsyODs6Ozw/PT8/P0BAPz5AQD4+QEBBQUEkFwz97ODY0s7NzMzLzMvMzczKzMrMy8vLysvJy8rO7fgGFiIuNDo9PT4/Pj8/QEFCQEFCQkFCQkRFREVEQyUbDf7x5uA="
+
 {card:Index}
 image:"%%IMG2AgABVgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AHMBEAD/AO0BGwB7AQYA/wBhAQkADgELAHQBDAD/AFwBCQATAQsAcAEOAP8AWgEKABUBDABtAQ8A/wBYAQoAGQEMAGsBEAD/AFUBCgAcAQwAawEPAP8AUwELAB4BDQBpAQ8A/wBSAQsAIAENAGgBDwD/AFABDAAiAQ0AZwEPAP8ATwEMACQBDQBmAQ8A/wBOAQwAJgENAGUBDwD/AE0BDAAoAQ0AGwEGAEMBDwB5AQUAzQEMACkBDgAWAQwAQQEPAHUBCwDKAQwAKwEOABIBDwBBAQ8AcgEPAMgBDQAsAQ0AEQEQAEEBDwBwAREAxwENAA8BBwAXAQ4ADwERAEEBDwBwAREAxgENAAwBDQAWAQ4ADgERAEEBDwBvARIAxgENAAsBDgAXAQ0ADQESAEEBDwBvARIAxQENAAsBDwAXAQ4ADAESAEEBDwBvARIAxQENAAwBDwAXAQ0ADAESAEEBDwBuARMAxAENAA0BDwAXAQ4ACwESAEEBDwBuARMAxAENAA0BDwAYAQ0ACwESAEEBDwBuARMAwwEOAA0BDwAYAQ4ACgESAEEBDwBuARIAxAENAA4BDwAYAQ4ACgERAEIBDwBuARIAwwEOAA4BDwAZAQ0ACgERAEIBDwBuARIAwwEOAA4BDwAZAQ4ACQERAEIBDwBuAREAxAEOAA4BDwAaAQ0ACQEQAEMBDwBvAQ8AxAEPAA4BDwAaAQ4ACAEOAEUBDwBvAQ0AxgEOAA8BDwAaAQ4ACQEIAEoBDwBwAQcAywEOAA8BDwAaAQ4AWwEPAP8AQgEPAA8BDwAaAQ4AWwEPAP8AQgEPAA8BDwAbAQ4AWgEPAP8AQgEPAA8BDwAbAQ4AWgEPAP8AQgEPAA8BDwAbAQ4AWgEPAP8AQgEPAA8BDwAbAQ4AWgEPAP8AQgEPAA8BDwAcAQ0AWgEPAP8AQgEPAA8BDwAcAQ4AWAEQAP8AQgEPAA8BDwAcAQ4AEAEEAEQBEAAgAQkANwEHABIBBAAPASEARwEFAEgBDwAPAQ8AHAEOAAsBCwA0AQIADAEQABwBDwAxAQsADQEKAAwBJgBAAQoADgEHADIBEAAOAQ8AHAEOAAgBDgAvAQkACgEQABkBEwAuAQ0ACQEOAAoBKQAWAQgAHgENAAoBDwAuARAADgEPABwBDgAGARAAIQEXAAoBEAAVARgAIgEYAAgBDwALASkAEwENABoBDgAIARQAKwEQAA4BDwAcAQ8ABQEQAB4BGgAKARAAFAEaAB4BBwAFAQ8ABwEQACMBEQARARAAGAEPAAYBBQADAQ8AKgEQAA4BDwAcAQ8ABQEQABsBBwAHAQ8ACgEQABIBHQAbAQgABwEOAAcBEAAmAQ4ADwEUABYBDwAFAQUABQEPACoBDwAOAQ8AHAEPAAUBEAAZAQkABwEPAAoBEAARAQ4ABgELABgBCQAHAQ8ABwEQACYBDgAOAQ0AAwEHABQBDwAFAQUABgEPACkBEAANAQ8AHAEPAAUBEAAXAQkACAEQAAoBEAAQAQ0ACgEKABUBCgAIAQ8ABwEQACUBDwANAQ0ABAEIABMBDwADAQYABwEQACgBEAAMARAAHAEPAAUBEAAVAQsACAEQAAoBEAAPAQ0ADAEJABQBCwAIAQ8ABwEQACQBDwANAQ0ABAEKABIBDwADAQUACQEPACgBEAAMARAAHQEOAAUBEAAUAQsACAERAAoBEAAOAQ4ADQEIABMBCwAJAQ8ABwEQACQBDwAMAQ0ABQELABEBDwADAQUACQEQACgBEAALARAAHQEOAAUBEAATAQwACAERAAoBEAANAQ4ADgEJABEBCwAKAQ8ABwEQACMBDwAMAQ0ABgEMABABDwADAQUACQEQACgBEAALARAAHQEOAAUBEAASAQwACQERAAoBEAAMAQ4AEAEIABABDAAKAQ8ABwEQACIBEAAMAQwABwENAA8BDwACAQUACgERACcBEQAKARAAHQEOAAUBEAARAQ0ACAESAAoBEAALAQ8AEQEIAA4BDAAKARAABwEQACIBDwAMAQ0ABQEPAA4BEAACAQUACwEQACgBEQAJARAAHQEOAAUBEAAQAQ0ACQESAAoBEAALAQ4AEgEIAA0BDQAKARAABwEQACEBEAALAQ0ABgEQAA0BEAABAQUADAEPACkBEQAJARAAHQEOAAUBEAAQAQ0ACQESAAoBEAALAQ4AEgEIAA0BDAAKAREABwEQACABEAAMAQ0ABgEQAA0BEAABAQUADAENACwBEQAIARAAHQEOAAUBEAAPAQ0ACgESAAoBEAAKAQ8AEwEHAAwBDQAKAREABwEQAB8BEQALAQ0ABQESAA0BEAABAQUADAEJADABEgAHARAAHAEPAAUBEAAOAQ4ACQETAAoBEAAJAQ8AFAEIAAoBDgAKAREABwEQAB8BEAALAQ4ABQESAA0BFQBHARIABgEQABwBDwAFARAADgEOAAkBEwAKARAACQEPABQBCAAKAQ0ACwERAAcBEAAeARAADAENAAUBEgAOARUASAERAAYBEAAcAQ8ABQEQAA0BDgAKARMACgEQAAkBDwAUAQgACQEOAAsBEQAHARAAHQERAAsBDQAFARMADgEVAEgBDwAIARAAHAEPAAUBEAAMAQ8ACgETAAoBEAAIAQ8AFgEHAAkBDgAKARIABwEQAB0BEAAMAQ0ABAETAA8BFABLAQsACgEQABwBDwAFARAADAEPAAkBBAABAQ8ACgEQAAgBDwAWAQcACAEOAAsBEgAHARAAHAERAAsBDQAEARQADwEUAEsBCAANARAAHAEPAAUBEAAMAQ8ACQEEAAEBDwAKARAABwEQABYBBwAIAQ4ACwESAAcBEAAcARAADAENAAIBFQAQARQAYAEQABwBDwAFARAACwEPAAoBAwACAQ8ACgEQAAcBEAAWAQcABwEPAAoBEwAHARAAGwEQAAwBJAARARMAYQEQABwBDwAFARAACwEPAAoBAwACAQ8ACgEQAAcBEAAWAQcABwEPAAoBEwAHARAAGgERAAwBIwASARMAYQEQABwBDgAGARAACwEPAAoBAwACAQ8ACgEQAAcBDwAXAQcABwEPAAoBEwAHARAAGgEQAA0BDQABARQAEwETAGEBEAAcAQ4ABgEQAAoBDwAKAQQAAgEPAAoBEAAHAQ8AFwEHAAYBDwAKAQQAAQEPAAcBEAAZARAADgENAAMBEAAVARMAYQEQABsBDwAGARAACgEPAAoBAwADAQ8ACgEQAAcBDwAXAQcABgEPAAoBBAABAQ8ABwEQABgBEQAOAQwABgEMABcBEwBhARAAGwEPAAYBEAAKAQ8ACgEDAAMBDwAKARAABgEQABcBBwAGAQ8ACgEEAAEBDwAHARAAGAEQAA8BDAAKAQUAGgESAGIBEAAbAQ4ABwEQAAoBDwAKAQMAAwEPAAoBEAAGARAAFwEHAAYBDwAKAQQAAQEPAAcBEAAXAREADgENACkBEgBiARAAGwEOAAcBEAAJARAACQEEAAMBDwAKARAABgEQABcBBwAFARAACgEDAAIBDwAHARAAFgERAA8BDQApARIAYgEQABoBDwAHARAACQEQAAkBBAADAQ8ACgEQAAYBEAAXAQcABQEQAAkBBAACAQ8ABwEQABYBEAAQAQ0AKQERAGMBEAAaAQ4ACAEQAAkBDwAKAQMABAEPAAoBEAAGARAAFwEHAAUBDwAKAQQAAgEPAAcBEAAVAREAEAEMABQBAwATAREAYwEQABoBDgAIARAACQEPAAoBAwAEAQ8ACgEQAAYBEAAXAQcABQEPAAoBBAACAQ8ABwEQABQBEQARAQwAFAEFABEBEQBjARAAGgEOAAgBEAAJAQ8ACgEDAAQBDwAKARAABgEQABcBBwAFAQ8ACgEEAAIBDwAHARAAFAERABEBDAAUAQcADwERAGMBEAAaAQ4ACAEQAAgBEAAJAQQABAEPAAoBEAAGARAAFwEHAAUBDwAJAQQAAwEPAAcBEAATAREAEgEMABUBCAANARAAZAEQABkBDgAJARAACAEQAAkBBAAEAQ8ACgEQAAYBEAAXAQYABgEPAAkBBAADAQ8ABwEQABMBEQATAQsAFQEJAAwBEABkARAAGQEOAAkBEAAIARAACQEDAAUBDwAKARAABgEQABcBBgAFARAACQEEAAMBDwAHARAAEgERABQBCwAWAQkACwEQAGQBEAAYAQ4ACgEQAAgBEAAIAQQABQEPAAoBEAAGARAAFwEGAAUBEAAJAQQAAwEPAAcBEAARAREAFQELABYBCgAKARAAZAEQABgBDgAKARAACAEQAAgBBAAFAQ8ACgEQAAcBDwAXAQYABQEQAAkBBAADAQ8ABwEQABEBEQAVAQsAFgELAAkBEABkARAAGAEOAAoBEAAHAREACAEEAAUBDwAKARAABwEPABcBBgAFARAACAEEAAQBDwAHARAAEAERABYBCwAVAQ0ACAEPAGUBEAAXAQ4ACwEQAAcBEQAIAQQABQEPAAoBEAAHAQ8AFwEGAAUBEAAIAQQABAEPAAcBEAAQAREAFwEKABUBDQAIAQ8AZQEQABcBDgALARAABwERAAcBBAAGAQ8ACgEQAAcBEAAVAQYABgEQAAgBAwAFAQ8ABwEQAA8BEQAYAQsAEwEPAAcBDwBlARAAFgEOAAwBEAAHAREABwEEAAYBDwAKARAACAEPABUBBgAGARAABwEEAAUBDwAHARAADwEQABkBCwATAQ8ABwEPAGUBEAAWAQ4ADAEQAAcBEQAHAQQABgEPAAoBEAAIAQ8AFQEGAAYBEAAHAQQABQEPAAcBEAAOAREAGgEKABMBDwAHAQ8AZQEQABUBDgANARAABwERAAcBAwAHAQ8ACgEQAAgBDwAVAQYABgEQAAcBBAAFAQ8ABwEQAA0BEgAbAQkAEwEPAAcBDwBlARAAFQEOAA0BEAAHAREABwEDAAcBDwAKARAACQEOABUBBgAGARAABgEFAAUBDwAHARAADQERABwBCQASARAABwEPAGUBEAAUAQ4ADgEQAAgBEAAGAQQABwEQAAkBEAAJAQ8AEwEGAAcBEAAGAQUABQEPAAcBEAAMAREAHgEJABABEAAIAQ8AZQEQABQBDQAPARAACAEQAAYBBAAHARAACQEQAAkBDwATAQYABwEQAAYBBAAGAQ8ABwEQAAwBEQAeAQkAEAEQAAgBDwBlARAAEwEOAA8BEAAIARAABgEEAAcBEAAJARAACgEOABIBBgAJAQ8ABgEEAAYBDwAIAQ8ACwESACABCAAOARAACQEQAGQBEAATAQ0AEAEQAAgBEAAFAQUABwEQAAkBEAAKAQ8AEQEFAAoBDwAFAQUABgEPAAgBEAAKAREAIQEIAA0BEQAJARAAZAEQABIBDQARARAACQEPAAUBBAAIARAACQEQAAsBDgAQAQYACgEPAAUBBQAGAQ8ACAEQAAkBEgAiAQcADAESAAkBEABkAREAEAENABMBDwAJAQ8ABQEEAAgBEAAJAREACgEPAA8BBgAKAQ8ABQEEAAcBDwAIARAACQETACMBBgAJARMACgEQAGUBEAAPAQ0AFAEPAAoBDgAFAQMACgEPAAkBEQALAQ8ADQEGAAwBDgAEAQUABwEPAAgBEAAJARMAJAEGAAcBFAAKARAAZQENABIBDAAVARAACQEOAAQBBAAKARAACAERAAwBDwALAQYADgENAAQBBQAHAQ8ACQEPAAgBFAAmAR4ADAEPAGUBCgAUAQ0AFQEQAAoBDQAEAQQACgEQAAkBEQAMAQ8ACQEGAA8BDQAEAQQACAEPAAkBEAAHARYAJQEcAA0BDwBnAQQAFwENABYBEQAJAQ4AAgEEAAsBEAAJAREADQEPAAcBBgARAQ0AAgEEAAkBDwAJARAABwEqABMBGQAOARAAWwEEACEBDQAXARAACwENAAIBBAALARAACQERAA4BEAADAQYAFAEMAAEBBQAJAQ8ACQEQAAgBKwATARYADwEQAFgBCAAfAQwAGgEPAAwBEQAMARAACQEQABEBFgAWARAACgEPAAkBDwAJASsAFQETABABDwBXAQoAHgEMABsBDAARAQ4ADgEMAAwBDQAWAREAGwENAAsBDwAJAQwADgElABsBEAASAQsAWwEKABwBDAAcAQcAFwELABABBwASAQgAHAEMACABCAAOAQ8ACgEHABUBHgAiAQsAFAEHAGABCQAbAQwAPgEFAJEBEADtAQkAGQELANYBEADuAQkAFwELANcBDwDwAQkAFAELANkBDwDxAQoAEQEKANsBDwDyAQwADAEKAN0BDwDzAQ4ABQELAOABDwD1ARkA4wEPAPcBEwDmAQ8A+gEOAOkBDwD/APIBDwD/APIBDgD/APMBDgD/APMBDgD/APIBDgD/APMBDQD/APQBDQD/APMBDQD/APQBDQD/APMBDQD/APQBDAD/APUBCwD/APUBCwD/APYBCgD/APYBCQD/AOUBBQANAQkA/wDmAQYACwEJAP8A6AEIAAcBBwD/AOwBCQADAQcA/wDwAQ4A/wD1AQkA/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wBR"
 script:"Index.0"
@@ -12,8 +20,8 @@ script:"Index.0"
 field1:{"type":"field","size":[132,17],"pos":[322,133],"locked":1,"font":"menu","show":"invert","border":0,"align":"center","value":"Dialogs for Decker"}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
 field2:{"type":"field","size":[248,55],"pos":[14,142],"locked":1,"show":"transparent","border":0,"value":{"text":["Decker Dialogizer is  a module (\"dd\") which provides customizable, aesthetically pleasant modal dialog boxes for use in Visual Novels and similar interactive content.\n\n","Index:"],"font":["","menu"],"arg":["",""]}}
-index:{"type":"field","size":[243,117],"pos":[16,197],"locked":1,"script":"Index.2","scrollbar":1,"value":{"text":["i","  ","dd.open[], dd.say[], dd.close[]\n","i","  ","dd.ask[]\n","i","  ","dd.open[] configuration\n","i","  ","dd.style[]\n","i","  ","dd.show[]\n","i","  ","custom borders\n","i","  ","rich text\n","i","  ","string interpolation\n","i","  ","commands\n","i","  ","event pumping\n","i","  ","a complete cutscene\n"],"font":["","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono"],"arg":["%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","say","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","ask","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","configuration","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","style","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","show","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","borders","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","richtext","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","interpolation","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","card1","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","eventpumping","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","conclusions"]}}
-version:{"type":"field","size":[42,14],"pos":[16,318],"locked":1,"border":0,"value":"v1.1"}
+index:{"type":"field","size":[243,117],"pos":[16,197],"locked":1,"script":"Index.2","scrollbar":1,"value":{"text":["i","  ","dd.open[], dd.say[], dd.close[]\n","i","  ","dd.ask[]\n","i","  ","dd.open[] configuration\n","i","  ","dd.style[]\n","i","  ","dd.show[]\n","i","  ","custom borders\n","i","  ","text speed\n","i","  ","sound effects\n","i","  ","rich text\n","i","  ","string interpolation\n","i","  ","commands\n","i","  ","event pumping\n","i","  ","a complete cutscene\n"],"font":["","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono"],"arg":["%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","say","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","ask","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","configuration","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","style","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","show","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","borders","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","textspeed","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","soundeffects","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","richtext","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","interpolation","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","card1","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","eventpumping","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","conclusions"]}}
+version:{"type":"field","size":[42,14],"pos":[16,318],"locked":1,"border":0,"value":"v1.2"}
 
 {script:Index.0}
 on view do
@@ -123,6 +131,28 @@ button4:{"type":"button","size":[60,20],"pos":[267,118],"script":"say.0","text":
 windoid:{"type":"canvas","size":[36,24],"pos":[22,253],"locked":1,"border":0,"image":"%%IMG2ACQAGAAlASIAAgEBIB8BAgACAQEgAQEBIAEBByABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQECAAIBASADAQEgBQEBIBUBAgACAQEgAQEBIAEBASAFAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBAgACAQEgAwEBIAUBASAVAQIAAgEBIAEBASABAQEgBQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQIAAgEBIAMBASAFAQEgFQECAAIBASABAQEgAQEHIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQIAAgEBIB8BAgACASIAAgEBIB8BAgACAQEgHwECAAIBASAfAQIAAgEBIB8BAgACAQEgHwECAAIBASAfAQIAAgEBIB8BAgACAQEgHwECAAIBASAfAQIAAgEiAAIBIgAl","scale":1}
 button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
 
+{card:textspeed}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,28],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"text speed"}
+ex1:{"type":"field","size":[244,164],"pos":[10,56],"style":"code","value":"\ndd.open[deck o]\n\ndd.style[().speed:1]\ndd.say[chickens.text]\n\ndd.style[().speed:3]\ndd.say[chickens.text]\n\ndd.style[().speed:7]\ndd.say[chickens.text]\n\ndd.close[]"}
+field2:{"type":"field","size":[236,238],"pos":[266,56],"locked":1,"border":0,"value":"Normally, dd.say[] will display all the text in each dialog box instantly. If the\"speed\" property is set, dialogizer will animate the text appearing word-by-word.\n\nA non-zero \"speed\" indicates the number of frames (60ths of a second) which will elapse between each word appearing, breaking words on whitespace.\n\nIf a user clicks while text is animating, the animation will immediately finish."}
+button4:{"type":"button","size":[60,20],"pos":[267,200],"script":"say.0","text":"Try It!"}
+button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+chickens:{"type":"field","size":[244,59],"pos":[10,235],"locked":1,"value":"The chicken (Gallus gallus domesticus) is a large and round short-winged bird, domesticated from the red junglefowl of Southeast Asia around 8,000 years ago. Most chickens are raised for food, providing meat and eggs; others are kept as pets or for cockfighting."}
+field3:{"type":"field","size":[92,14],"pos":[160,294],"locked":1,"border":0,"style":"plain","align":"right","value":"(source: wikipedia)"}
+
+{card:soundeffects}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,28],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"sound effects"}
+ex1:{"type":"field","size":[244,204],"pos":[10,56],"style":"code","value":"o.osound:\"scrape\"\no.nsound:\"click\"\no.asound:\"clap\"\ndd.open[deck o]\n\ndd.say[\"Line 1\"]\ndd.say[\"Line 2\"]\ndd.ask[\"Question\" (\"A\",\"B\",\"C\")]\ndd.say[\"Line 3\"]\n\no.tsound:(\"talk1\",\"talk2\",\"talk3\")\no.speed:3\ndd.style[o]\ndd.say[textspeed.widgets.chickens.text]\n\ndd.close[]"}
+field2:{"type":"field","size":[236,238],"pos":[266,56],"locked":1,"border":0,"value":"There are several properties available which indicate that dialogizer should play sounds at various times:\n\n- \"osound\": dd.open[] is called.\n- \"nsound\": user advanced to the next dd.say[] dialog.\n- \"asound\": user made a choice in a dd.ask[] dialog.\n- \"tsound\": played each word while text animates.\n\nSounds may be specified by name (a string) or by value (a sound interface). If you set either property to a list, an element will be chosen randomly each time a sound needs to be played."}
+button4:{"type":"button","size":[60,20],"pos":[267,240],"script":"say.0","text":"Try It!"}
+button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+
 {card:richtext}
 {widgets}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
@@ -229,7 +259,7 @@ button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text
 on click do
  stage.event["command" "reset"]
  go[stage "BoxIn"]
- dd.open[deck]
+ dd.open[deck o]
  dd.say[source.value]
  dd.close[]
  go["Back" "BoxOut"]
@@ -262,11 +292,15 @@ on command x do
   pippi.show:"none"
 
  elseif x~"light"
+  o.nsound:"clap"
+  o.speed:2
   o.fcolor:colors.black
   o.bcolor:colors.white
   dd.style[o]
  
  elseif x~"dark"
+  o.nsound:"click"
+  o.speed:2
   o.fcolor:colors.white
   o.bcolor:colors.black
   dd.style[o]
@@ -354,15 +388,24 @@ local align:"left"
 local fcolor:32
 local bcolor:1
 local next:arrow
+local speed:0
 local names:() dict ()
 local border:0
 local pad:()
+local osound:"" # open box
+local nsound:"" # advance to next box
+local asound:"" # make a choice
+local tsound:"" # talk
 
 on ifmt x do x format names end
 on fmt x do update text:ifmt @ text from rtext.cat[x] end
 on tween a b t do a+(b-a)*0|1&t end
 on rin x pos size do min(x>pos),(x<pos+size) end
 on tick do host.card.event["animate"] sleep[] end
+
+on sfx x do
+ play[if "list"~typeof x random[x] else x end]
+end
 
 on draw_border do
  canvas.clear[]
@@ -398,6 +441,7 @@ module.open:on open deck etc do
  canvas.show:"transparent"
  canvas.border:0
  style[etc]
+ sfx[osound]
 end
 
 module.style:on style etc do
@@ -408,6 +452,11 @@ module.style:on style etc do
  align :if "align"  in etc etc.align  else "left"   end
  names :if "names"  in etc etc.names  else ()dict() end
  next  :if "next"   in etc etc.next   else arrow    end
+ speed :if "speed"  in etc etc.speed  else 0        end
+ osound:if "osound" in etc etc.osound else ""       end
+ nsound:if "nsound" in etc etc.nsound else ""       end
+ asound:if "asound" in etc etc.asound else ""       end
+ tsound:if "tsound" in etc etc.tsound else ""       end
  border:etc.border.image.copy[]
  pad:"ltrb" dict 4 take if !0~etc.border.margin etc.border.margin else padding end
 end
@@ -417,7 +466,7 @@ module.show:on show x do
 end
 
 module.close:on close do
- if canvas resize[0] end
+ if canvas & canvas.show~"transparent" resize[0] end
  host.card.remove[canvas]
  host:canvas:0
 end
@@ -425,7 +474,7 @@ end
 module.say:on say text do
  text:fmt @ rtext.split["\n\n" text]
  canvas.font:tfont
- each seg in text
+ each seg i in text
   t:rtext.string[seg]
   if t[0]~"!"
    host.card.event["command" (1 drop t)]
@@ -433,7 +482,25 @@ module.say:on say text do
    dim:canvas.textsize[seg canvas.size[0]-(pad.l+pad.r)]
    resize[dim[1]+(pad.t+pad.b)+next.size[1]]
    canvas.pattern:fcolor
-   canvas.text[seg pad.l,pad.t,dim ("top_%s" format align)]
+   if speed
+    splits: extract index,1+count t where value in (" ","\n") from "" split t
+    si:0 db:0 while si<count splits
+     sfx[tsound]
+     each in range speed
+      if pointer.down si:-1+count splits db:1 end
+      tick[]
+     end
+     draw_border[]
+     canvas.pattern:fcolor
+     canvas.text[rtext.span[seg 0,splits[si]] pad.l,pad.t,dim ("top_%s" format align)]
+     si:si+1
+    end
+    if db
+     while pointer.held|pointer.down tick[] end
+    end
+   else
+    canvas.text[seg pad.l,pad.t,dim ("top_%s" format align)]
+   end
    a:next.copy[].map[1 dict fcolor]
    p:canvas.size-(pad.r,pad.b)+next.size
    on wait do
@@ -446,6 +513,7 @@ module.say:on say text do
     tick[]
    end
    while !pointer.held|pointer.down wait[] end
+   sfx[nsound]
    while  pointer.held|pointer.up   wait[] end
   end
  end
@@ -476,7 +544,7 @@ module.ask:on ask text choices do
    if (pointer.held|pointer.down|pointer.up)&rin[pointer.pos-canvas.pos rpos rsize]
     canvas.rect[rpos+2 rsize-4]
     canvas.pattern:bcolor
-    if pointer.up r:i end
+    if pointer.up r:i sfx[asound] end
    end
    canvas.font:bfont
    canvas.text[choice (rpos+padding),(rsize-2*padding) "center"]
