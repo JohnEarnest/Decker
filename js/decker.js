@@ -638,7 +638,7 @@ widget_button=(target,x,value,func)=>{
 	let sh=0,shh=0;if(!l&&uimode=='interact'&&!wid.fv&&!ev.shift&&x.show!='none'&&x.shortcut){if(keyup[x.shortcut]){shh=1}else if(keydown[x.shortcut]){sh=1}}
 	const a=!l&&dover(b)&&over(b), cs=sel&&!func&&ev.action, cl=cs||sh||((ev.md||ev.drag)&&a), cr=cs||shh|(ev.mu&&a)
 	if(func&&a){ev.callback=func,ev.callback_rect=rcopy(b)}
-	if(!l&&over(b)&&!ev.drag)uicursor=cursor.point
+	if(!l&&over(b)&&!ev.drag&&x.show!='none')uicursor=cursor.point
 	if(x.show=='none')return cr; let ar=inset(b,2)
 	if(x.style=='round'){
 		draw_boxr(b,fcol,bcol,x.show!='transparent')
