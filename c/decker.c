@@ -663,15 +663,16 @@ int widget_grid(lv*target,grid x,grid_val*value){
 	char*pal=patterns_pal(ifield(deck,"patterns"));
 	if(x.lines)draw_rect(bh,fcol);if(nc<=0)draw_textc(inset(bb,1),"(no data)",hfnt,fcol);
 	if(!cf.sv)cf=str_new();
-	for(int z=0,cols=0,cx=0;z<nc&&cx+cw(cols)<=bb.w;z++){
+	for(int z=0,cols=0,cx=0;z<nc&&cx+cw(cols)<=bb.w;z++,cols++){
 		rect hs=(rect){bh.x+4+cx,bh.y+1,cw(cols)-5,bh.h-2};
+		if(hs.w<=0)continue; // suppressed column
 		if(x.headers){
 			draw_textc(hs,value->table->kv[z]->sv,hfnt,x.lines?bcol:fcol);
 			int oa=target&&in_layer()&&over(hs)&&((ev.drag||ev.mu)?dover(hs):1)&&!wid.col_drag;
 			if(oa&&(ev.md||ev.drag))draw_invert(pal,hs); if(oa&&!ev.drag)uicursor=cursor_point;
 			if(oa&&ev.mu){msg.target_order=target,msg.arg_order=value->table->kv[z];}
 		}
-		if(cols&&x.lines)draw_invert(pal,(rect){hs.x-3,b.y+1,1,b.h-2});cx+=cw(cols);cols++;
+		if(cols&&x.lines)draw_invert(pal,(rect){hs.x-3,b.y+1,1,b.h-2});cx+=cw(cols);
 		for(int y=0;y<nrd;y++){
 			rect cell={hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1}; lv*v=value->table->lv[z]->lv[y+value->scroll];
 			cf.c=0;format_type_simple(&cf,v,z>=fk?'s':x.format[z]=='L'?'s':x.format[z]);str_term(&cf);

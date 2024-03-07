@@ -762,15 +762,16 @@ widget_grid=(target,x,value)=>{
 	draw_box(x.lines?b:rect(b.x,bb.y,b.w,b.h-(bb.y-b.y)),0,sel?13:fcol)
 	const cw=n=>0|(n>=x.widths.length?((bb.w-hwt)/(nc-x.widths.length)):x.widths[n])
 	if(x.lines)draw_rect(bh,fcol);if(nc<=0)draw_textc(inset(bb,1),'(no data)',hfnt,fcol)
-	for(let z=0,cols=0,cx=0;z<nc&&cx+cw(cols)<=bb.w;z++){
+	for(let z=0,cols=0,cx=0;z<nc&&cx+cw(cols)<=bb.w;z++,cols++){
 		const hs=rect(bh.x+4+cx,bh.y+1,cw(cols)-5,bh.h-2)
+		if(hs.w<=0)continue; // suppressed column
 		if(headers){
 			draw_textc(hs,tk[z],hfnt,x.lines?bcol:fcol)
 			const oa=target&&in_layer()&&over(hs)&&((ev.drag||ev.mu)?dover(hs):1)&&!wid.col_drag
 			if(oa&&(ev.md||ev.drag))draw_invert(pal,hs); if(oa&&!ev.drag)uicursor=cursor.point
 			if(oa&&ev.mu)msg.target_order=target,msg.arg_order=lms(tk[z])
 		}
-		if(cols&&x.lines)draw_invert(pal,rect(hs.x-3,b.y+1,1,b.h-2));cx+=cw(cols),cols++
+		if(cols&&x.lines)draw_invert(pal,rect(hs.x-3,b.y+1,1,b.h-2));cx+=cw(cols)
 		for(let y=0;y<nrd;y++){
 			const cell=rect(hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1), v=value.table.v[tk[z]][y+value.scroll]
 			const fc=x.format[z]=='L'?'s':(x.format[z]||'s')
