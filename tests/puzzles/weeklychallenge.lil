@@ -25,6 +25,19 @@ on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':
 
 # the problems:
 
+problem[259.2]
+# parse a dictionary-literal-like line format
+on f x do
+ r.name:first h:"{%%%*r %v%*r %n" parse x
+ i:last h while last t:"%v=%j%*r %n" parse i drop x  i:i+t[2]  r.fields[t[0]]:t[1] end r
+end
+assert[f["{%  id   field1=\"value1\"    field2=\"value2\"  field3=42 %}"]
+  "%j" parse "{'name':'id','fields':{'field1':'value1','field2':'value2','field3':42}}"
+]
+assert[f["{%  youtube title=\"Title \\\"quoted\\\" done\" %}"]
+  "%j" parse "{'name':'youtube','fields':{'title':'Title \"quoted\" done'}}"
+]
+
 problem[257.1]
 # how many elements of x are smaller than each element of x?
 on f x do
