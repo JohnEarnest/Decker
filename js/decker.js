@@ -762,24 +762,32 @@ widget_grid=(target,x,value)=>{
 	draw_box(x.lines?b:rect(b.x,bb.y,b.w,b.h-(bb.y-b.y)),0,sel?13:fcol)
 	const cw=n=>0|(n>=x.widths.length?((bb.w-hwt)/(nc-x.widths.length)):x.widths[n])
 	if(x.lines)draw_rect(bh,fcol);if(nc<=0)draw_textc(inset(bb,1),'(no data)',hfnt,fcol)
+	const rowb=n=>rect(bb.x,bb.y+rh*n,bb.w,rh)
+	const rowh=n=>inset(rect(bb.x+1,bb.y+rh*n+2,bb.w-2,rh-3),x.lines?0:-1)
+	let clicked=0,rsel=0,hrow=-1;for(let y=0;y<nrd;y++){
+		const ra=in_layer()&&over(bb)&&over(rowb(y))
+		if(ra&&(ev.md||ev.drag))draw_rect(rowh(y),fcol),rsel=1,hrow=y+value.scroll
+		if(ra&&ev.mu)clicked=1,value.row=y+value.scroll; if(ra&&!ev.drag)uicursor=cursor.point
+	}
+	const rr=value.row-value.scroll;if(!rsel&&rr>=0&&rr<nrd)draw_rect(rowh(rr),fcol),hrow=value.row
 	for(let z=0,cols=0,cx=0;z<nc&&cx+cw(cols)<=bb.w;z++,cols++){
 		const hs=rect(bh.x+4+cx,bh.y+1,cw(cols)-5,bh.h-2)
 		if(hs.w<=0)continue; // suppressed column
 		if(headers){
-			draw_textc(hs,tk[z],hfnt,x.lines?bcol:fcol)
 			const oa=target&&in_layer()&&over(hs)&&((ev.drag||ev.mu)?dover(hs):1)&&!wid.col_drag
-			if(oa&&(ev.md||ev.drag))draw_invert(pal,hs); if(oa&&!ev.drag)uicursor=cursor.point
+			const dp=oa&&(ev.md||ev.drag);if(dp)draw_rect(hs,x.lines?bcol:fcol)
+			draw_textc(hs,tk[z],hfnt,x.lines^dp?bcol:fcol); if(oa&&!ev.drag)uicursor=cursor.point
 			if(oa&&ev.mu)msg.target_order=target,msg.arg_order=lms(tk[z])
 		}
 		if(cols&&x.lines)draw_invert(pal,rect(hs.x-3,b.y+1,1,b.h-2));cx+=cw(cols)
 		for(let y=0;y<nrd;y++){
 			const cell=rect(hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1), v=value.table.v[tk[z]][y+value.scroll]
-			const fc=x.format[z]=='L'?'s':(x.format[z]||'s')
+			const fc=x.format[z]=='L'?'s':(x.format[z]||'s'), ccol=y+value.scroll==hrow?bcol:fcol
 			const cf=ls(dyad.format(lms(`%${fc}`),fc=='j'||fc=='a'?monad.list(v):v)), ip=rcenter(cell,ICONS[0].size)
 			const oc=frame.clip; frame.clip=rclip(cell,frame.clip)
-			if     (x.format[z]=='I'){const i=clamp(0,ln(v),8);if(i<8)draw_icon(ip,ICONS[i],fcol)}
-			else if(x.format[z]=='B'){if(lb(v))draw_icon(ip,ICONS[ICON.chek],fcol)}
-			else{('fcCihH'.indexOf(x.format[z])>=0?draw_textr:draw_text_fit)(rect(hs.x+1,bb.y+rh*y,hs.w-2,rh),cf,fnt,fcol)} // right-align numeric
+			if     (x.format[z]=='I'){const i=clamp(0,ln(v),8);if(i<8)draw_icon(ip,ICONS[i],ccol)}
+			else if(x.format[z]=='B'){if(lb(v))draw_icon(ip,ICONS[ICON.chek],ccol)}
+			else{('fcCihH'.indexOf(x.format[z])>=0?draw_textr:draw_text_fit)(rect(hs.x+1,bb.y+rh*y,hs.w-2,rh),cf,fnt,ccol)} // right-align numeric
 			frame.clip=oc
 			if(sel&&ev.dclick&&!x.locked&&over(cell)){
 				const f=x.format[z]||'s', tc=rect(z,y+value.scroll)
@@ -789,6 +797,7 @@ widget_grid=(target,x,value)=>{
 			}
 		}
 	}
+	if(x.lines)for(let y=1;y<nrd;y++)draw_hline(bb.x,bb.x+bb.w,bb.y+rh*y,fcol)
 	if(!x.locked&&in_layer()&&target)for(let z=0,cx=bh.x;z<nc;cx+=cw(z),z++){
 		const h=rect(cx+cw(z)-1,bh.y,5,bh.h);if(h.x+h.w>b.x+b.w)break
 		if(over(h))draw_vline(h.x+2,h.y,h.y+h.h,13)
@@ -798,13 +807,6 @@ widget_grid=(target,x,value)=>{
 			iwrite(target,lms('widths'),lml(range(max(x.widths.length,i+1)).map(z=>lmn(i==z?s:cw(z))))),mark_dirty()
 		}
 	}
-	const rowb=n=>rect(bb.x,bb.y+rh*n,bb.w,rh)
-	const rowh=n=>inset(rect(bb.x+1,bb.y+rh*n+2,bb.w-2,rh-3),x.lines?0:-1)
-	let clicked=0,rsel=0;for(let y=0;y<nrd;y++){
-		if(y&&x.lines)draw_hline(bb.x,bb.x+bb.w,bb.y+rh*y,fcol); const ra=in_layer()&&over(bb)&&over(rowb(y))
-		if(ra&&(ev.md||ev.drag))draw_invert(pal,rowh(y)),rsel=1; if(ra&&ev.mu)clicked=1,value.row=y+value.scroll; if(ra&&!ev.drag)uicursor=cursor.point
-	}
-	const rr=value.row-value.scroll;if(!rsel&&rr>=0&&rr<nrd)draw_invert(pal,rowh(rr))
 	if(target&&os!=value.scroll)iwrite(target,lms('scroll'),lmn(value.scroll)),mark_dirty()
 	if(target&&or!=value.row)iwrite(target,lms('row'),lmn(value.row)),mark_dirty()
 	if(target&&clicked)msg.target_click=target,msg.arg_click=rect(0,value.row)

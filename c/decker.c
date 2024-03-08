@@ -663,26 +663,36 @@ int widget_grid(lv*target,grid x,grid_val*value){
 	char*pal=patterns_pal(ifield(deck,"patterns"));
 	if(x.lines)draw_rect(bh,fcol);if(nc<=0)draw_textc(inset(bb,1),"(no data)",hfnt,fcol);
 	if(!cf.sv)cf=str_new();
+	#define rowb(n) (rect){bb.x,bb.y+rh*n,bb.w,rh}
+	#define rowh(n) inset((rect){bb.x+1,bb.y+rh*n+2,bb.w-2,rh-3},x.lines?0:-1)
+	int clicked=0,rsel=0,hrow=-1;for(int y=0;y<nrd;y++){
+		int ra=in_layer()&&over(bb)&&over(rowb(y));
+		if(ra&&(ev.md||ev.drag))draw_rect(rowh(y),fcol),rsel=1,hrow=y+value->scroll;
+		if(ra&&ev.mu)clicked=1,value->row=y+value->scroll; if(ra&&!ev.drag)uicursor=cursor_point;
+	}int rr=value->row-value->scroll;
+	if(!rsel&&rr>=0&&rr<nrd)draw_rect(rowh(rr),fcol),hrow=value->row;
 	for(int z=0,cols=0,cx=0;z<nc&&cx+cw(cols)<=bb.w;z++,cols++){
 		rect hs=(rect){bh.x+4+cx,bh.y+1,cw(cols)-5,bh.h-2};
 		if(hs.w<=0)continue; // suppressed column
 		if(x.headers){
-			draw_textc(hs,value->table->kv[z]->sv,hfnt,x.lines?bcol:fcol);
 			int oa=target&&in_layer()&&over(hs)&&((ev.drag||ev.mu)?dover(hs):1)&&!wid.col_drag;
-			if(oa&&(ev.md||ev.drag))draw_invert(pal,hs); if(oa&&!ev.drag)uicursor=cursor_point;
+			int dp=oa&&(ev.md||ev.drag);if(dp)draw_rect(hs,x.lines?bcol:fcol);
+			draw_textc(hs,value->table->kv[z]->sv,hfnt,x.lines^dp?bcol:fcol);
+			if(oa&&!ev.drag)uicursor=cursor_point;
 			if(oa&&ev.mu){msg.target_order=target,msg.arg_order=value->table->kv[z];}
 		}
 		if(cols&&x.lines)draw_invert(pal,(rect){hs.x-3,b.y+1,1,b.h-2});cx+=cw(cols);
 		for(int y=0;y<nrd;y++){
+			int ccol=y+value->scroll==hrow?bcol:fcol;
 			rect cell={hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1}; lv*v=value->table->lv[z]->lv[y+value->scroll];
 			cf.c=0;format_type_simple(&cf,v,z>=fk?'s':x.format[z]=='L'?'s':x.format[z]);str_term(&cf);
 			rect ib=box_center(cell,image_size(ICONS[0]));pair ip={ib.x,ib.y};
 			rect oc=frame.clip; frame.clip=box_intersect(cell,frame.clip);
-			if     (z<fk&&x.format[z]=='I'){int i=MAX(0,MIN(8,ln(v)));if(i<8)draw_icon(ip,ICONS[i],fcol);}
-			else if(z<fk&&x.format[z]=='B'){if(lb(v))draw_icon(ip,ICONS[icon_chek],fcol);}
+			if     (z<fk&&x.format[z]=='I'){int i=MAX(0,MIN(8,ln(v)));if(i<8)draw_icon(ip,ICONS[i],ccol);}
+			else if(z<fk&&x.format[z]=='B'){if(lb(v))draw_icon(ip,ICONS[icon_chek],ccol);}
 			else{
 				rect r={hs.x+1,bb.y+rh*y,hs.w-2,rh}; // right-align numeric columns:
-				if(z<fk&&strchr("fcCihH",x.format[z])){draw_textr(r,cf.sv,fnt,fcol);}else{draw_text_fit(r,cf.sv,fnt,fcol);}
+				if(z<fk&&strchr("fcCihH",x.format[z])){draw_textr(r,cf.sv,fnt,ccol);}else{draw_text_fit(r,cf.sv,fnt,ccol);}
 			}
 			frame.clip=oc;
 			if(sel&&ev.dclick&&!x.locked&&over(cell)){
@@ -693,6 +703,7 @@ int widget_grid(lv*target,grid x,grid_val*value){
 			}
 		}
 	}
+	if(x.lines)for(int y=1;y<nrd;y++)draw_hline(bb.x,bb.x+bb.w,bb.y+rh*y,fcol);
 	if(!x.locked&&in_layer()&&target)for(int z=0,cx=bh.x;z<nc;cx+=cw(z),z++){
 		rect h={cx+cw(z)-1,bh.y,5,bh.h};if(h.x+h.w>b.x+b.w)break;
 		if(over(h))draw_vline(h.x+2,h.y,h.y+h.h,13);
@@ -702,12 +713,6 @@ int widget_grid(lv*target,grid x,grid_val*value){
 			GEN(r,MAX(x.widths[0],i+1))lmn(i==z?s:cw(z));iwrite(target,lmistr("widths"),r),mark_dirty();
 		}
 	}
-	#define rowb(n) (rect){bb.x,bb.y+rh*n,bb.w,rh}
-	#define rowh(n) inset((rect){bb.x+1,bb.y+rh*n+2,bb.w-2,rh-3},x.lines?0:-1)
-	int clicked=0,rsel=0;for(int y=0;y<nrd;y++){
-		if(y&&x.lines)draw_hline(bb.x,bb.x+bb.w,bb.y+rh*y,fcol); int ra=in_layer()&&over(bb)&&over(rowb(y));
-		if(ra&&(ev.md||ev.drag))draw_invert(pal,rowh(y)),rsel=1; if(ra&&ev.mu)clicked=1,value->row=y+value->scroll; if(ra&&!ev.drag)uicursor=cursor_point;
-	}int rr=value->row-value->scroll;if(!rsel&&rr>=0&&rr<nrd)draw_invert(pal,rowh(rr));
 	if(target&&os!=value->scroll)iwrite(target,lmistr("scroll"),lmn(value->scroll)),mark_dirty();
 	if(target&&or!=value->row)iwrite(target,lmistr("row"),lmn(value->row)),mark_dirty();
 	if(target&&clicked)msg.target_click=target,msg.arg_click=(fpair){0,value->row};
