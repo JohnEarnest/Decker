@@ -2829,7 +2829,7 @@ setscript=x=>{
 	               canvas_is(sc.target)?(p=1,lms('on click pos do\n \nend\n\non drag pos do\n \nend\n\non release pos do\n \nend')):v
 	if(p&&widget_is(sc.target)&&!contraption_is(sc.target)&&lb(ifield(sc.target,'animated'))){v=lms(ls(v)+'\n\non view do\n \nend')}
 	if(!count(v)&&contraption_is(sc.target)){const t=sc.target.def.template;if(t&&t.length)p=1,v=lms(t)}
-	sc.status=p?'No existing script; populated a template.':'',sc.f=fieldstr(v)
+	sc.status=p?'No existing script; populated a template.':'',sc.f=fieldstr(v),wid.active=0
 }
 finish_script=_=>{if(sc.next){setscript(sc.next),sc.next=null}else{setmode(sc.prev_mode)}}
 close_script=next=>{

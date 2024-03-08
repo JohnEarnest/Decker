@@ -463,7 +463,7 @@ void setscript(lv*x){
 	if(p&&widget_is(sc.target)&&!contraption_is(sc.target)&&lb(ifield(sc.target,"animated"))){v=l_fuse(lmistr(""),lml2(v,lmistr("\n\non view do\n \nend")));}
 	if(!v->c&&contraption_is(sc.target)){lv*t=ifield(ifield(sc.target,"def"),"template");if(t->c)p=1,v=t;}
 	if(p)snprintf(sc.status,sizeof(sc.status),"No existing script; populated a template.");
-	sc.f=(field_val){rtext_cast(v),0};
+	sc.f=(field_val){rtext_cast(v),0};wid.active=0;
 }
 void finish_script(void){if(sc.next){setscript(sc.next),sc.next=NULL;}else{setmode(sc.prev_mode);}}
 void widget_setup(void){
