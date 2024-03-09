@@ -377,7 +377,7 @@ void menu_setup(void){
 void menu_bar(char*name,int enabled){
 	if(menus_off())enabled=0;
 	rect t=rect_pair((pair){menu.x,2},font_textsize(FONT_MENU,name)), b={t.x-5,0,t.w+10,t.h+3}; int i=menu.head_count;
-	menu.heads[menu.head_count++]=(menu_head){name,enabled,t,b}; menu.x=b.x+b.w+5;
+	menu.heads[menu.head_count++]=(menu_head){name,enabled,t,b}; menu.x=b.x+b.w+5; if(menus_hidden())return;
 	if(ev.click&&enabled&&over(b)){ev.mu=0;if(menu.stick==-1)menu.stick=i;}
 	if(menu.stick!=-1&&enabled&&over(b))menu.stick=i,menu.lw=0;
 	if(menu.stick==-1){
