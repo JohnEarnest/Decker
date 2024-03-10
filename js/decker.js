@@ -540,7 +540,7 @@ menu_setup=_=>(menu.x=10,menu.heads=[],menu.sz=rect(),menu.active=-1)
 menu_bar=(name,enabled)=>{
 	if(menus_off())enabled=0
 	const t=rpair(rect(menu.x,2),font_textsize(FONT_MENU,name)), b=rect(t.x-5,0,t.w+10,t.h+3), i=menu.heads.length
-	menu.heads.push(menu_head(name,enabled,t,b)), menu.x=b.x+b.w+5
+	menu.heads.push(menu_head(name,enabled,t,b)), menu.x=b.x+b.w+5; if(menus_hidden())return
 	if(ev.click&&enabled&&over(b)){ev.mu=0;if(menu.stick==-1)menu.stick=i}
 	if(menu.stick!=-1&&enabled&&over(b))menu.stick=i,menu.lw=0
 	if(menu.stick==-1){
