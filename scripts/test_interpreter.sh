@@ -8,7 +8,7 @@ echo "running tests against ${INTERPRETER}..."
 positive_test() {
 	rm -rf temp.out
 	rm -rf temp.err
-	$INTERPRETER "$1" temp.ch8 >> temp.out 2>> temp.err
+	$INTERPRETER "$1" >> temp.out 2>> temp.err
 	ec=$?
 	if [ -s temp.err ]; then
 		echo "errors running test ${1}:"
