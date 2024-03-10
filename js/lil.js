@@ -1868,9 +1868,13 @@ grid_read=(x,card)=>{
 			if(ikey(i,'value'    ))return self.value=lt(x),x
 			if(ikey(i,'scroll'   ))return self.scroll=max(0,ln(x)),x
 			if(ikey(i,'row'      ))return self.row=max(-1,ln(x)),x
+			if(ikey(i,'col'      ))return (!lin(x)?iwrite(self,lms('colname'),x): self.col=max(-1,ln(x))),x
+			if(ikey(i,'colname'  ))return iwrite(self,lms('col'),lmn(Object.keys(ifield(self,'value').v).indexOf(ls(x)))),x
+			if(ikey(i,'cell'     ))return iwrite(self,lms('col'),l_at(x,NONE)),iwrite(self,lms('row'),l_at(x,ONE)),x
 			if(ikey(i,'scrollbar'))return self.scrollbar=lb(x),x
 			if(ikey(i,'headers'  ))return self.headers=lb(x),x
 			if(ikey(i,'lines'    ))return self.lines=lb(x),x
+			if(ikey(i,'bycell'   ))return self.bycell=lb(x),x
 			if(ikey(i,'widths'   ))return self.widths=ints(ll(x),255),x
 			if(ikey(i,'format'   ))return self.format=ls(x),x
 		}else{
@@ -1879,20 +1883,27 @@ grid_read=(x,card)=>{
 			if(ikey(i,'scrollbar'))return lmn(ivalue(self,ls(i),1))
 			if(ikey(i,'headers'  ))return lmn(ivalue(self,ls(i),1))
 			if(ikey(i,'lines'    ))return lmn(ivalue(self,ls(i),1))
+			if(ikey(i,'bycell'   ))return lmn(ivalue(self,ls(i),0))
 			if(ikey(i,'widths'   ))return lml((ivalue(self,ls(i),[])).map(lmn))
 			if(ikey(i,'format'   ))return lms(ivalue(self,ls(i),''))
 			if(ikey(i,'size'     ))return lmpair(ivalue(self,ls(i),rect(100,50)))
+			if(ikey(i,'cell'     ))return lml([ifield(self,'col'),ifield(self,'row')])
 			if(ikey(i,'row'      )){const r=value_inherit(self,ls(i))||lmn(-1);return lmn(clamp(-1,ln(r),count(ifield(self,'value'))-1))}
-			if(ikey(i,'rowvalue' )){const r=ln(ifield(self,'row')),v=ifield(self,'value');return r<0||r>=count(v)?lmd():l_at(v,lmn(r))}
+			if(ikey(i,'col'      )){const c=value_inherit(self,ls(i))||lmn(-1);return lmn(clamp(-1,ln(c),count(monad.keys(ifield(self,'value')))-1))}
+			if(ikey(i,'colname'  )){const c=ln(ifield(self,'col'));k=Object.keys(ifield(self,'value').v);return c<0||c>=k.length?NONE: lms(k[c])}
+			if(ikey(i,'rowvalue' )){const r=ln(ifield(self,'row')),                         v=ifield(self,'value');return r<0||     r>=count(v)?lmd():l_at(v,lmn(r))}
+			if(ikey(i,'cellvalue')){const r=ln(ifield(self,'row')),c=ln(ifield(self,'col')),v=ifield(self,'value');return r<0||c<0||r>=count(v)||c>=Object.keys(v.v).length?NONE: Object.values(v.v)[c][r]}
 		}return interface_widget(self,i,x)
 	},'grid');ri.card=card
 	init_field(ri,'scrollbar',x)
 	init_field(ri,'headers'  ,x)
 	init_field(ri,'lines'    ,x)
+	init_field(ri,'bycell'   ,x)
 	init_field(ri,'widths'   ,x)
 	init_field(ri,'format'   ,x)
 	init_field(ri,'scroll'   ,x)
 	init_field(ri,'row'      ,x)
+	init_field(ri,'col'      ,x)
 	{const k=lms('value'),v=dget(x,k);if(v)iwrite(ri,k,monad.table(v))}
 	return ri
 }
@@ -1901,11 +1912,13 @@ grid_write=x=>{
 	if(x.scrollbar!=undefined)dset(r,lms('scrollbar'),lmn(x.scrollbar))
 	if(x.headers!=undefined)dset(r,lms('headers'),lmn(x.headers))
 	if(x.lines!=undefined)dset(r,lms('lines'),lmn(x.lines))
+	if(x.bycell!=undefined)dset(r,lms('bycell'),lmn(x.bycell))
 	if(x.widths)dset(r,lms('widths'),lml(x.widths.map(lmn)))
 	if(x.format)dset(r,lms('format'),lms(x.format))
 	if(x.value)dset(r,lms('value'),monad.cols(x.value))
 	if(x.scroll)dset(r,lms('scroll'),lmn(x.scroll))
 	if(x.row!=undefined&&x.row!=-1)dset(r,lms('row'),lmn(x.row))
+	if(x.col!=undefined&&x.col!=-1)dset(r,lms('col'),lmn(x.col))
 	return r
 }
 canvas_clip=(canvas,z)=>{
@@ -2257,7 +2270,7 @@ contraption_update=(deck,def)=>{
 			if(button_is(w))p=dyad.take(lms('value'),p)
 			if(slider_is(w))p=dyad.take(lms('value'),p)
 			if(field_is (w))p=dyad.take(lml(['value','scroll'].map(lms)),p)
-			if(grid_is  (w))p=dyad.take(lml(['value','scroll','row'].map(lms)),p)
+			if(grid_is  (w))p=dyad.take(lml(['value','scroll','row','col'].map(lms)),p)
 			if(canvas_is(w))p=dyad.take(lms('image'),p)
 			dset(r,ifield(w,'name'),p)
 		});return r

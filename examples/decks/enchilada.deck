@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:4
+card:3
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -55,6 +55,20 @@ three:{"type":"grid","size":[120,70],"pos":[20,150],"locked":1,"scrollbar":1,"he
 four:{"type":"grid","size":[100,70],"pos":[37,246],"show":"invert","scrollbar":0,"headers":1,"format":"scf","value":{"fruit":[],"price":[],"amount":[]}}
 icons:{"type":"grid","size":[130,138],"pos":[165,135],"scrollbar":0,"headers":1,"lines":0,"widths":[25,42],"format":"Iss","value":{"icon":[0,1,2,3,4,5,6,7,8],"number":[0,1,2,3,4,5,6,7,8],"name":["Directory","Document","Sound","Font","Application","Lil","Pattern","Check","(No Icon)"]}}
 checklist:{"type":"grid","size":[119,91],"pos":[324,133],"headers":0,"lines":1,"widths":[20],"format":"BL","value":{"chosen":[0,1,1,0,1],"name":["First","Second","Third","Fourth","Fifth"]},"row":3}
+
+{card:bycell}
+{widgets}
+one:{"type":"grid","size":[120,90],"pos":[20,30],"scrollbar":1,"headers":0,"bycell":1,"format":"scf","value":{"fruit":["apple","cherry","banana"],"price":[1,0.35,0.75],"amount":[1,15,2]},"row":2,"col":2}
+two:{"type":"grid","size":[160,70],"pos":[189,43],"scrollbar":1,"headers":1,"bycell":1,"format":"scf","value":{"fruit":["apple","banana","cherry","durian","elderberry","fungus","galena","hoho","ice","jar","k"],"price":[1,0.75,0.35,2.99,0.92,0.23,6.25,1.99,0.25,1.5,1337],"amount":[1,2,15,5,1,395,1,3,1,5,420]},"row":1,"col":2}
+icons:{"type":"grid","size":[130,138],"pos":[155,186],"scrollbar":0,"headers":1,"lines":0,"bycell":1,"widths":[25,42],"format":"Iss","value":{"icon":[0,1,2,3,4,5,6,7,8],"number":[0,1,2,3,4,5,6,7,8],"name":["Directory","Document","Sound","Font","Application","Lil","Pattern","Check","(No Icon)"]},"row":8,"col":2}
+checklist:{"type":"grid","size":[119,91],"pos":[299,233],"headers":0,"lines":1,"bycell":1,"widths":[20],"format":"BL","value":{"chosen":[0,1,1,0,1],"name":["First","Second","Third","Fourth","Fifth"]},"row":0,"col":1}
+field1:{"type":"field","size":[100,20],"pos":[368,49],"animated":1,"script":"bycell.0","value":"[2,1,\"amount\"]"}
+
+{script:bycell.0}
+on view do
+ me.text:"%j" format list two.cell,two.colname
+end
+{end}
 
 {card:fields}
 {widgets}

@@ -18,7 +18,7 @@ lcm=(x,y)=>{const r=gcd(x,y);return 0|((x*y)/(r?r:1))}
 copy_object=x=>Object.keys(x).reduce((r,k)=>((r[k]=x[k]),r),{})
 plain_or_rich=x=>lit(x)?rtext_cast(x):lms(x?ls(x):'')
 fieldstr=x=>({table:rtext_cast(x),scroll:0})
-gridtab=(x,r)=>({table:x,scroll:0,row:r==undefined?-1:r})
+gridtab=(x,r)=>({table:x,scroll:0,row:r==undefined?-1:r,col:-1})
 open_url=x=>{window.open(x,'_blank')}
 open_file=(filter,f)=>{const s=q('#source');s.value='',s.accept=filter,s.onchange=_=>{if(s.files.length)f(s.files[0])},s.click()}
 open_text=(filter,f)=>open_file(filter,file=>{const r=new FileReader();r.onload=_=>{f(clchars(r.result))},r.readAsText(file)})
@@ -331,6 +331,7 @@ unpack_grid=x=>({
 	headers  :lb(ifield(x,'headers'  )),
 	scrollbar:lb(ifield(x,'scrollbar')),
 	lines    :lb(ifield(x,'lines'    )),
+	bycell   :lb(ifield(x,'bycell'   )),
 	show     :ls(ifield(x,'show'     )),
 	locked   :lb(ifield(x,'locked'   )),
 })
@@ -338,6 +339,7 @@ unpack_grid_value=x=>({
 	table :   ifield(x,'value' ) ,
 	scroll:ln(ifield(x,'scroll')),
 	row   :ln(ifield(x,'row'   )),
+	col   :ln(ifield(x,'col'   )),
 })
 
 let cursor={default:'default',point:'pointer',ibeam:'text',drag:'grabbing'}
@@ -749,7 +751,7 @@ grid_exit=_=>{
 }
 widget_grid=(target,x,value)=>{
 	if(x.show=='none')return 0; const hfnt=FONT_BODY, hsize=x.headers?font_h(hfnt)+5:0, showscroll=x.size.h<=(50+hsize)||x.size.w<16?0:x.scrollbar
-	const fnt=x.font?x.font:FONT_MONO, os=value.scroll, or=value.row, files=x.headers==2, headers=files||x.size.h<=hsize?0:x.headers
+	const fnt=x.font?x.font:FONT_MONO, os=value.scroll, or=value.row, oc=value.col, files=x.headers==2, headers=files||x.size.h<=hsize?0:x.headers
 	const tk=Object.keys(value.table.v), nr=count(value.table), nc=tk.length, rh=font_h(fnt)+(x.lines?5:3)
 	const fcol=!in_layer()?13:x.show=='invert'?32:1, bcol=x.show=='invert'?1:32, b=x.size, pal=deck.patterns.pal.pix
 	let sel=in_layer()&&x.show!='none'&&wid.active==wid.count
@@ -761,15 +763,22 @@ widget_grid=(target,x,value)=>{
 	const bb=sbar.size; value.scroll=sbar.scroll, hwt=x.widths.reduce((x,y)=>x+y,0)
 	draw_box(x.lines?b:rect(b.x,bb.y,b.w,b.h-(bb.y-b.y)),0,sel?13:fcol)
 	const cw=n=>0|(n>=x.widths.length?((bb.w-hwt)/(nc-x.widths.length)):x.widths[n])
+	const grid_cell=pos=>{let cx=0;for(let z=0;z<min(nc,pos.x);z++)cx+=cw(z);return rclip(bb,rect(bb.x+cx,bb.y+rh*pos.y+1,cw(pos.x),rh-1))}
+	const grid_hcell=pos=>{const r=inset(grid_cell(pos),x.lines?1:0);if(pos.x&&x.lines)r.x+=1,r.w-=1;return r}
 	if(x.lines)draw_rect(bh,fcol);if(nc<=0)draw_textc(inset(bb,1),'(no data)',hfnt,fcol)
 	const rowb=n=>rect(bb.x,bb.y+rh*n,bb.w,rh)
 	const rowh=n=>inset(rect(bb.x+1,bb.y+rh*n+2,bb.w-2,rh-3),x.lines?0:-1)
-	let clicked=0,rsel=0,hrow=-1;for(let y=0;y<nrd;y++){
-		const ra=in_layer()&&over(bb)&&over(rowb(y))
-		if(ra&&(ev.md||ev.drag))draw_rect(rowh(y),fcol),rsel=1,hrow=y+value.scroll
-		if(ra&&ev.mu)clicked=1,value.row=y+value.scroll; if(ra&&!ev.drag)uicursor=cursor.point
+	let clicked=0,rsel=0,hrow=-1,hcol=-1;for(let y=0;y<nrd;y++){
+		const ra=in_layer()&&over(bb)&&over(rowb(y));let cbox=rect()
+		if(ra&&x.bycell){for(let z=0;z<nc;z++){const cell=rect(z,y);if(over(grid_cell(cell)))hcol=z,cbox=grid_hcell(cell)}}
+		if(ra&&(ev.md||ev.drag)){rsel=1,hrow=y+value.scroll,draw_rect(x.bycell?cbox:rowh(y),fcol)}
+		if(ra&&ev.mu)clicked=1,value.row=y+value.scroll,value.col=hcol
+		if(ra&&!ev.drag)uicursor=cursor.point
+	}const rr=value.row-value.scroll;
+	if(!rsel&&rr>=0&&rr<nrd&&(x.bycell?value.col>=0&&value.col<nc:1)){
+		hrow=value.row,hcol=value.col
+		draw_rect(x.bycell&&value.col>=0?grid_hcell(rect(value.col,rr)): rowh(rr),fcol)
 	}
-	const rr=value.row-value.scroll;if(!rsel&&rr>=0&&rr<nrd)draw_rect(rowh(rr),fcol),hrow=value.row
 	for(let z=0,cols=0,cx=0;z<nc&&cx+cw(cols)<=bb.w;z++,cols++){
 		const hs=rect(bh.x+4+cx,bh.y+1,cw(cols)-5,bh.h-2)
 		if(hs.w<=0)continue; // suppressed column
@@ -782,14 +791,14 @@ widget_grid=(target,x,value)=>{
 		if(cols&&x.lines)draw_invert(pal,rect(hs.x-3,b.y+1,1,b.h-2));cx+=cw(cols)
 		for(let y=0;y<nrd;y++){
 			const cell=rect(hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1), v=value.table.v[tk[z]][y+value.scroll]
-			const fc=x.format[z]=='L'?'s':(x.format[z]||'s'), ccol=y+value.scroll==hrow?bcol:fcol
+			const fc=x.format[z]=='L'?'s':(x.format[z]||'s'), ccol=y+value.scroll==hrow&&(x.bycell?cols==hcol :1)?bcol:fcol
 			const cf=ls(dyad.format(lms(`%${fc}`),fc=='j'||fc=='a'?monad.list(v):v)), ip=rcenter(cell,ICONS[0].size)
 			const oc=frame.clip; frame.clip=rclip(cell,frame.clip)
 			if     (x.format[z]=='I'){const i=clamp(0,ln(v),8);if(i<8)draw_icon(ip,ICONS[i],ccol)}
 			else if(x.format[z]=='B'){if(lb(v))draw_icon(ip,ICONS[ICON.chek],ccol)}
 			else{('fcCihH'.indexOf(x.format[z])>=0?draw_textr:draw_text_fit)(rect(hs.x+1,bb.y+rh*y,hs.w-2,rh),cf,fnt,ccol)} // right-align numeric
 			frame.clip=oc
-			if(sel&&ev.dclick&&!x.locked&&over(cell)){
+			if(!x.locked&&sel&& ((ev.dclick&&over(cell)) || (ev.action&&x.bycell&&z==value.col&&y+value.scroll==value.row))){
 				const f=x.format[z]||'s', tc=rect(z,y+value.scroll)
 				if     (f=='I'||f=='L'){} // no editing allowed
 				else if(f=='B'||f=='b'){grid_edit_cell(tc,lmn(!lb(v)))} // toggle
@@ -809,6 +818,7 @@ widget_grid=(target,x,value)=>{
 	}
 	if(target&&os!=value.scroll)iwrite(target,lms('scroll'),lmn(value.scroll)),mark_dirty()
 	if(target&&or!=value.row)iwrite(target,lms('row'),lmn(value.row)),mark_dirty()
+	if(target&&oc!=value.col)iwrite(target,lms('col'),lmn(value.col)),mark_dirty()
 	if(target&&clicked)msg.target_click=target,msg.arg_click=rect(0,value.row)
 	if(in_widgets())wid.count++
 	return files?((clicked&&ev.dclick)||(sel&&ev.action)): clicked
@@ -831,19 +841,27 @@ grid_insertrow=_=>{
 grid_edit_cell=(cell,v)=>{
 	const r={};Object.keys(wid.gv.table.v).map((k,i)=>{r[k]=wid.gv.table.v[k].slice(0);if(i==cell.x)r[k][cell.y]=v})
 	grid_edit(lmt(r))
+	wid.gv.col=cell.x,iwrite(wid.gt,lms('col'),lmn(cell.x))
+	wid.gv.row=cell.y,iwrite(wid.gt,lms('row'),lmn(cell.y))
 }
 grid_keys=(code,shift)=>{
-	const fnt=wid.g.font?wid.g.font:FONT_MONO, hfnt=FONT_BODY;let m=0, nr=count(wid.gv.table), r=wid.gv.row
+	const fnt=wid.g.font?wid.g.font:FONT_MONO, hfnt=FONT_BODY, nr=count(wid.gv.table), nc=Object.keys(wid.gv.table.v).length
+	let m=0, r=wid.gv.row, c=wid.gv.col
 	const rh=font_h(fnt)+5, bh=wid.g.headers?font_h(hfnt)+5:0, nrd=min(nr,0|((wid.g.size.h-bh+1)/rh))
-	if(code=='ArrowUp'  ){m=1;if(r==-1){r=0}else{r-=1}}
-	if(code=='ArrowDown'){m=1;if(r==-1){r=0}else{r+=1}}
-	if(code=='PageUp'   ){m=1;if(r==-1)r=0;r-=nrd}
-	if(code=='PageDown' ){m=1;if(r==-1)r=0;r+=nrd}
-	if(code=='Home'     ){m=1,r=0}
-	if(code=='End'      ){m=1,r=nr-1}
+	if(code=='ArrowUp'   ){m=1;if(r==-1){r=0}else{r-=1}}
+	if(code=='ArrowDown' ){m=1;if(r==-1){r=0}else{r+=1}}
+	if(code=='ArrowLeft' ){m=1;if(c==-1){c=0}else{c-=1}}
+	if(code=='ArrowRight'){m=1;if(c==-1){c=0}else{c+=1}}
+	if(code=='PageUp'    ){m=1;if(r==-1)r=0;r-=nrd}
+	if(code=='PageDown'  ){m=1;if(r==-1)r=0;r+=nrd}
+	if(code=='Home'      ){m=1,r=0}
+	if(code=='End'       ){m=1,r=nr-1}
 	if(!wid.g.locked&&(code=='Backspace'||code=='Delete'))grid_deleterow()
 	if(!m)return;if(ms.type=='prototype_attrs')ms.text.table=ms.name.table=null
-	wid.gv.row=r=max(0,min(r,nr-1));if(wid.gt){iwrite(wid.gt,lms('row'),lmn(r)),mark_dirty(),msg.target_click=wid.gt,msg.arg_click=rect(0,r)}
+	wid.gv.row=r=max(0,min(r,nr-1)),wid.gv.col=c=max(0,min(c,nc-1));if(wid.gt){
+		iwrite(wid.gt,lms('row'),lmn(r)),iwrite(wid.gt,lms('col'),lmn(c)),mark_dirty()
+		msg.target_click=wid.gt,msg.arg_click=rect(0,r)
+	}
 	const os=wid.gv.scroll;if(r-os<0)wid.gv.scroll=r;if(r-os>=nrd)wid.gv.scroll=r-(nrd-1)
 	if(wid.gt&&os!=wid.gv.scroll)iwrite(wid.gt,lms('scroll'),lmn(wid.gv.scroll)),mark_dirty()
 }
@@ -1056,8 +1074,8 @@ ui_dfield  =(r,enable,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'sol
 ui_textedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:1,border  ,style:'plain',align:ALIGN.left,locked:0},value)
 ui_codeedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_MONO,show:'transparent',scrollbar:1,border  ,style:'code' ,align:ALIGN.left,locked:running()},value)
 ui_richedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:1,border  ,style:'rich' ,align:ALIGN.left,locked:0},value)
-ui_table   =(r,widths,format,value)=>widget_grid(null,{size:r,font:FONT_BODY,widths   ,format   ,headers:2,scrollbar:1,lines:0,show:'solid',locked:1},value)
-ui_list    =(r,              value)=>widget_grid(null,{size:r,font:FONT_BODY,widths:[],format:'',headers:0,scrollbar:1,lines:0,show:'solid',locked:1},value)
+ui_table   =(r,widths,format,value)=>widget_grid(null,{size:r,font:FONT_BODY,widths   ,format   ,headers:2,scrollbar:1,lines:0,bycell:0,show:'solid',locked:1},value)
+ui_list    =(r,              value)=>widget_grid(null,{size:r,font:FONT_BODY,widths:[],format:'',headers:0,scrollbar:1,lines:0,bycell:0,show:'solid',locked:1},value)
 
 // The Listener
 
@@ -1711,7 +1729,7 @@ modals=_=>{
 			listen_show(ALIGN.right,1,lms('applied table query:')),listen_show(ALIGN.left,1,rtext_string(ms.text.table))
 		}c.x-=65
 		if(ui_button(rect(c.x,c.y,60,20),'Close',1)||ev.exit)modal_exit(0)
-		if(ms.grid.table){widget_grid(null,{size:gsize,font:FONT_MONO,widths:[],format:'',headers:1,scrollbar:1,lines:1,show:'solid',locked:1},ms.grid)}
+		if(ms.grid.table){widget_grid(null,{size:gsize,font:FONT_MONO,widths:[],format:'',headers:1,scrollbar:1,lines:1,bycell:0,show:'solid',locked:1},ms.grid)}
 		else{draw_box(gsize,0,1),draw_textc(gsize,'Working...',FONT_BODY,1)}
 	}
 	else if(ms.type=='url'){
@@ -1993,7 +2011,7 @@ modals=_=>{
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='grid_props'){
-		const b=draw_modalbox(rect(280,200+70)),grid=ob.sel[0]
+		const b=draw_modalbox(rect(280,216+70)),grid=ob.sel[0]
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Grid Properties',FONT_MENU,1)
 		draw_text(rect(b.x,b.y+22,47,20),'Name'  ,FONT_MENU,1)
 		draw_text(rect(b.x,b.y+42,47,20),'Format',FONT_MENU,1)
@@ -2005,10 +2023,12 @@ modals=_=>{
 		draw_text(rect(b.x+47,b.y+120+60,b.w-47,18),`${cn} column${cn==1?'':'s'}, ${rn} row${rn==1?'':'s'}.`,FONT_BODY,1)
 		iwrite(grid,lms('name'  ),rtext_string(ms.name.table))
 		iwrite(grid,lms('format'),format),mark_dirty()
-		let headers=lb(ifield(grid,'headers')), scrollbar=lb(ifield(grid,'scrollbar')), lines=lb(ifield(grid,'lines')), cb=rect(b.x,b.y+130+70)
+		let headers=lb(ifield(grid,'headers')), scrollbar=lb(ifield(grid,'scrollbar')), lines=lb(ifield(grid,'lines')), bycell=lb(ifield(grid,'bycell'))
+		let cb=rect(b.x,b.y+130+70)
 		if(ui_checkbox(rint(rect(cb.x,cb.y,b.w/2,16)),'Column Headers',1,headers  )){headers  ^=1,iwrite(grid,lms('headers'  ),lmn(headers  )),mark_dirty()}cb.y+=16
 		if(ui_checkbox(rint(rect(cb.x,cb.y,b.w/2,16)),'Scrollbar'     ,1,scrollbar)){scrollbar^=1,iwrite(grid,lms('scrollbar'),lmn(scrollbar)),mark_dirty()}cb.y+=16
 		if(ui_checkbox(rint(rect(cb.x,cb.y,b.w/2,16)),'Grid Lines'    ,1,lines    )){lines    ^=1,iwrite(grid,lms('lines'    ),lmn(lines    )),mark_dirty()}cb.y+=16
+		if(ui_checkbox(rint(rect(cb.x,cb.y,b.w/2,16)),'Select by Cell',1,bycell   )){bycell   ^=1,iwrite(grid,lms('bycell'   ),lmn(bycell   )),mark_dirty()}cb.y+=16
 		const eb=rint(rect(b.x+(b.w/2),b.y+130+70))
 		if(ui_radio(rint(rect(eb.x,eb.y,b.w/2,16)),'Edit as JSON',1,ms.edit_json==1)){ms.form0=fieldstr(lms(fjson(monad.cols(val)))),ms.edit_json=1}eb.y+=16
 		if(ui_radio(rint(rect(eb.x,eb.y,b.w/2,16)),'Edit as CSV' ,1,ms.edit_json==0))ms.form0=fieldstr(n_writecsv(count(format)?[val,format]:[val])),ms.edit_json=0
@@ -3494,7 +3514,7 @@ q('body').onkeyup=e=>{
 	if(e.key=='9'&&uimode=='draw'&&ms.type==null)dr.brush=max(            0,dr.brush-1)
 	if(e.key=='0'&&uimode=='draw'&&ms.type==null)dr.brush=min(brush_count-1,dr.brush+1)
 	if(e.key=='Escape')ev.exit=1
-	if(!wid.infield&&uimode=='interact'&&card_is(con())){
+	if(!wid.infield&&!wid.ingrid&&uimode=='interact'&&card_is(con())){
 		if(e.key=='ArrowUp'   )msg.target_navigate=ifield(deck,'card'),msg.arg_navigate=lms('up'   )
 		if(e.key=='ArrowDown' )msg.target_navigate=ifield(deck,'card'),msg.arg_navigate=lms('down' )
 		if(e.key=='ArrowLeft' )msg.target_navigate=ifield(deck,'card'),msg.arg_navigate=lms('left' )

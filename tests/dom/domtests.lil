@@ -747,6 +747,7 @@ dattr.row:       -1
 dattr.headers:   1
 dattr.scrollbar: 1
 dattr.lines:     1
+dattr.bycell:    0
 dattr.widths:    ()
 dattr.format:    ""
 on gridattrs x do
@@ -757,6 +758,7 @@ on gridattrs x do
 	r.headers:   x.headers
 	r.scrollbar: x.scrollbar
 	r.lines:     x.lines
+	r.bycell:    x.bycell
 	r.widths:    x.widths
 	r.format:    x.format
 end
@@ -768,6 +770,7 @@ dattr.row:       g.row:     1
 dattr.headers:   g.headers: 0
 dattr.scrollbar: g.scrollbar: 0
 dattr.lines:     g.lines:   0
+dattr.bycell:    g.bycell:  1
 dattr.widths:    g.widths:  11,22,33
 dattr.format:    g.format:  "issj"
 assert["grid mutable attributes" dattr gridattrs[g]]
@@ -778,6 +781,7 @@ dattr.row:-1          g.row: -9
 dattr.headers:0       g.headers:()
 dattr.scrollbar:1     g.scrollbar:23
 dattr.lines:1         g.lines:999
+dattr.bycell:1        g.bycell:9999
 dattr.widths:0,0,0    g.widths:"ABC"
 dattr.format:"123"    g.format:123
 assert["grid attribute sanitizing" dattr gridattrs[g]]
@@ -790,6 +794,21 @@ g.row:1
 assert["grid rowvalue" (("a","b")dict 22,55) g.rowvalue]
 g.row:-999
 assert["grid empty rowvalue" (()dict()) g.rowvalue]
+
+assert["grid default colindex" -1 g.col]
+g.col:1
+assert["grid write colindex" ("b",1) g.colname,g.col]
+g.colname:"zorch"
+assert["grid write invalid colname" (0,-1) g.colname,g.col]
+g.colname:"a"
+assert["grid write valid colname" ("a",0) g.colname,g.col]
+g.row:2
+assert["grid read cell" (0,2) g.cell]
+assert["grid cellvalue" 33 g.cellvalue]
+g.cell:("b",1)
+assert["grid write cellvalue" (1,1) g.cell]
+g.colname:"bogus"
+assert["grid cellvalue when no column set" 0 g.cellvalue]
 
 g.row:1
 g.value:insert a with end

@@ -250,6 +250,7 @@ int has_suffix(char*x,char*sx){int a=strlen(x),b=strlen(sx);if(b>a)return 0;for(
 int read2(char*src,int off){int a=0xFF&src[off],b=0xFF&src[off+1];return (a<<8)|b;}
 lv* lml2(lv*x,lv*y){lv*r=lml(2);r->lv[0]=x,r->lv[1]=y;return r;}
 lv* lml3(lv*x,lv*y,lv*z){lv*r=lml(3);r->lv[0]=x,r->lv[1]=y,r->lv[2]=z;return r;}
+lv* lml4(lv*x,lv*y,lv*z,lv*w){lv*r=lml(4);r->lv[0]=x,r->lv[1]=y,r->lv[2]=z,r->lv[3]=w;return r;}
 lv* lmpair(pair x){return lml2(lmn(x.x),lmn(x.y));}
 lv* lmfpair(fpair x){return lml2(lmn(x.x),lmn(x.y));}
 lv* lmrect(rect x){lv*r=lml(4);r->lv[0]=lmn(x.x),r->lv[1]=lmn(x.y),r->lv[2]=lmn(x.w),r->lv[3]=lmn(x.h);return r;}
@@ -1797,10 +1798,10 @@ lv* slider_write(lv*x){
 
 // Grid interface
 
-typedef struct {rect size;lv*font;int widths[256];char*format;int headers,scrollbar,lines,show,locked;} grid;
-typedef struct {lv*table;int scroll,row;} grid_val;
+typedef struct {rect size;lv*font;int widths[256];char*format;int headers,scrollbar,lines,bycell,show,locked;} grid;
+typedef struct {lv*table;int scroll,row,col;} grid_val;
 grid unpack_grid(lv*x,grid_val*value){
-	value->table=ifield(x,"value"),value->scroll=ln(ifield(x,"scroll")),value->row=ln(ifield(x,"row"));
+	value->table=ifield(x,"value"),value->scroll=ln(ifield(x,"scroll")),value->row=ln(ifield(x,"row")),value->col=ln(ifield(x,"col"));
 	grid r={
 		rect_pair(getpair(ifield(x,"pos")),getpair(ifield(x,"size"))),
 		ifield(x,"font"),
@@ -1809,6 +1810,7 @@ grid unpack_grid(lv*x,grid_val*value){
 		lb(ifield(x,"headers")),
 		lb(ifield(x,"scrollbar")),
 		lb(ifield(x,"lines")),
+		lb(ifield(x,"bycell")),
 		ordinal_enum(ifield(x,"show"),widget_shows),
 		lb(ifield(x,"locked")),
 	};
@@ -1822,9 +1824,13 @@ lv* interface_grid(lv*self,lv*i,lv*x){
 		ikey("value"    ){dset(data,i,lt(x));return x;}
 		ikey("scroll"   ){int n=MAX(0,ln(x));dset(data,i,lmn(n));return x;}
 		ikey("row"      ){int n=MAX(-1,ln(x));dset(data,i,lmn(n));return x;}
+		ikey("col"      ){if(!lin(x))return iwrite(self,lmistr("colname"),x);int n=MAX(-1,ln(x));dset(data,i,lmn(n));return x;}
+		ikey("colname"  ){iwrite(self,lmistr("col"),lmn(dgeti(ifield(self,"value"),x)));return x;}
+		ikey("cell"     ){iwrite(self,lmistr("col"),l_at(x,lmn(0))),iwrite(self,lmistr("row"),l_at(x,lmn(1)));return x;}
 		ikey("scrollbar"){dset(data,i,lmn(lb(x)));return x;}
 		ikey("headers"  ){dset(data,i,lmn(lb(x)));return x;}
 		ikey("lines"    ){dset(data,i,lmn(lb(x)));return x;}
+		ikey("bycell"   ){dset(data,i,lmn(lb(x)));return x;}
 		ikey("widths"   ){dset(data,i,normalize_ints(x,255));return x;}
 		ikey("format"   ){dset(data,i,ls(x));return x;}
 	}else{
@@ -1833,14 +1839,16 @@ lv* interface_grid(lv*self,lv*i,lv*x){
 		ikey("scrollbar"){lv*r=dget(data,i);return r?r:ONE;}
 		ikey("headers"  ){lv*r=dget(data,i);return r?r:ONE;}
 		ikey("lines"    ){lv*r=dget(data,i);return r?r:ONE;}
+		ikey("bycell"   ){lv*r=dget(data,i);return r?r:NONE;}
 		ikey("widths"   ){lv*r=dget(data,i);return r?r:lml(0);}
 		ikey("format"   ){lv*r=dget(data,i);return r?r:lmistr("");}
 		ikey("size"     ){lv*r=dget(data,i);return r?r:lmpair((pair){100,50});}
-		ikey("row"      ){
-			lv*r=value_inherit(self,i),*v=ifield(self,"value");
-			if(!r)return lmn(-1); int n=ln(r); return lmn(CLAMP(-1,n,v->n-1));
-		}
-		ikey("rowvalue" ){int r=ln(ifield(self,"row"));lv*v=ifield(self,"value");return r<0||r>=v->n?lmd():l_at(v,lmn(r));}
+		ikey("cell"     ){return lml2(ifield(self,"col"),ifield(self,"row"));}
+		ikey("row"      ){lv*r=value_inherit(self,i),*v=ifield(self,"value");if(!r)return lmn(-1); int n=ln(r); return lmn(CLAMP(-1,n,v->n-1));}
+		ikey("col"      ){lv*c=value_inherit(self,i),*v=ifield(self,"value");if(!c)return lmn(-1); int n=ln(c); return lmn(CLAMP(-1,n,v->c-1));}
+		ikey("colname"  ){int c=ln(ifield(self,"col"));lv*v=ifield(self,"value");return c<0||c>=v->c?NONE: v->kv[c];}
+		ikey("rowvalue" ){int r=ln(ifield(self,"row"))                         ;lv*v=ifield(self,"value");return r<0||     r>=v->n         ?lmd():l_at(v,lmn(r));}
+		ikey("cellvalue"){int r=ln(ifield(self,"row")),c=ln(ifield(self,"col"));lv*v=ifield(self,"value");return r<0||c<0||r>=v->n||c>=v->c?NONE:v->lv[c]->lv[r];}
 	}return interface_widget(self,i,x);
 }
 lv* grid_read(lv*x,lv*r){
@@ -1848,10 +1856,12 @@ lv* grid_read(lv*x,lv*r){
 	init_field(r,"scrollbar",x);
 	init_field(r,"headers"  ,x);
 	init_field(r,"lines"    ,x);
+	init_field(r,"bycell"   ,x);
 	init_field(r,"widths"   ,x);
 	init_field(r,"format"   ,x);
 	init_field(r,"scroll"   ,x);
 	init_field(r,"row"      ,x);
+	init_field(r,"col"      ,x);
 	{lv*k=lmistr("value"),*v=dget(x,k);if(v)iwrite(r,k,l_table(v));}
 	return r;
 }
@@ -1860,11 +1870,13 @@ lv* grid_write(lv*x){
 	{lv*k=lmistr("scrollbar"),*v=dget(data,k);if(v)dset(r,k,v);}
 	{lv*k=lmistr("headers"  ),*v=dget(data,k);if(v)dset(r,k,v);}
 	{lv*k=lmistr("lines"    ),*v=dget(data,k);if(v)dset(r,k,v);}
+	{lv*k=lmistr("bycell"   ),*v=dget(data,k);if(v)dset(r,k,v);}
 	{lv*k=lmistr("widths"   ),*v=dget(data,k);if(v&&v->c)dset(r,k,v);}
 	{lv*k=lmistr("format"   ),*v=dget(data,k);if(v&&v->c)dset(r,k,v);}
 	{lv*k=lmistr("value"    ),*v=dget(data,k);if(v)dset(r,k,l_cols(v));}
 	{lv*k=lmistr("scroll"   ),*v=dget(data,k);if(v&&ln(v)!=0)dset(r,k,v);}
 	{lv*k=lmistr("row"      ),*v=dget(data,k);if(v&&ln(v)!=-1)dset(r,k,v);}
+	{lv*k=lmistr("col"      ),*v=dget(data,k);if(v&&ln(v)!=-1)dset(r,k,v);}
 	return r;
 }
 
@@ -2195,7 +2207,7 @@ lv* contraption_strip(lv*x){
 		if(button_is(w))p=l_take(lmistr("value"),p);
 		if(slider_is(w))p=l_take(lmistr("value"),p);
 		if(field_is (w))p=l_take(lml2(lmistr("value"),lmistr("scroll")),p);
-		if(grid_is  (w))p=l_take(lml3(lmistr("value"),lmistr("scroll"),lmistr("row")),p);
+		if(grid_is  (w))p=l_take(lml4(lmistr("value"),lmistr("scroll"),lmistr("row"),lmistr("col")),p);
 		if(canvas_is(w))p=l_take(lmistr("image"),p);
 		dset(r,ifield(w,"name"),p);
 	}return r;

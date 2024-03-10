@@ -262,6 +262,8 @@ The grid properties dialog displays the contents of the grid's table encoded as 
 
 In interact mode, you can select a particular row by clicking on it. If the grid is unlocked, you can additionally sort columns by clicking a header or edit a specific cell's value by double-clicking it. The user's input will be parsed based on the column's format type, if any. Double-clicking a boolean column (formatted as `b` or `B`) will directly toggle the value. Double-clicking a column formatted as `L` or `I` will have no effect. If the grid has headers and more than one column is displayed, you can drag the space between column headings to resize the columns. By default, every column is given equal horizontal space. You can restore default spacing by clicking "Reset Widths" in the grid properties dialog.
 
+If a grid is set to "Select by Cell", clicking within the grid will highlight a specific cell, instead of an entire row. In this mode, the left and right arrow keys may be used to move between columns, and pressing space or return will edit the selected cell just like a double-click.
+
 The _File_ menu offers options for importing or exporting [Comma Separated Value](https://en.wikipedia.org/wiki/Comma-separated_values) (CSV) data, respecting the grid's format string, when a grid is selected.
 
 Additionally, you can use the _Edit &#8594; Query_ dialog to issue Lil queries against the contents of the grid, preview results, and update the grid if desired:
@@ -1116,13 +1118,20 @@ The grid widget represents an interactive spreadsheet-style view of a table.
 | `x.headers`             | Bool. Display table header row? r/w.                                                                  |
 | `x.scrollbar`           | Bool. Draw a scrollbar for this widget? r/w.                                                          |
 | `x.lines`               | Bool. Draw grid lines for this widget? r/w.                                                           |
+| `x.bycell`              | Bool. Allow selection by cell, rather than only by row? r/w.                                          |
 | `x.widths`              | A list of up to 255 widths of table columns, in pixels. r/w.                                          |
 | `x.scroll`              | Int. The first row of the table to display. r/w.                                                      |
 | `x.row`                 | Int. The index of the selected row of the table, or -1 for no selection. r/w.                         |
+| `x.col`                 | Int. The index of the selected column of the table, or -1 for no selection. r/w.                      |
+| `x.colname`             | String. The name of the selected column of the table, or `0` for no selection. r/w.                   |
+| `x.cell`                | Access `(x.col,x.row)` as a pair. r/w.                                                                |
 | `x.rowvalue`            | Dict. The selected row of the table, or an empty dictionary for no selection.                         |
+| `x.cellvalue`           | Anything. The selected cell value of the table, or `0` for no selection.                              |
 | `x.format`              | String. A column spec for formatting columns of the table. See `writecsv[]`. r/w.                     |
 | `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
+
+Note that both `grid.col` and `grid.cell` accept writes with the column specified _either_ by name or by index. An invalid column name or `-1` will clear the column selection.
 
 Canvas Interface
 ----------------
@@ -1301,7 +1310,7 @@ The `attributes` table provides information about the attributes of contraption 
 | `"code"`       | A Lil string          | Large field in "code" editing mode. |
 | `"rich"`       | An rtext table        | Large field in "rich" editing mode. |
 
-Modifying the attributes of a Prototype will automatically update Contraption instances in the current deck. Modifying the attributes of widgets contained in this Prototype will require explicitly calling `prototype.update[]`. In either case, when a definition is updated, the `name`, `pos`, `show`, `locked`, `animated`, `font`, and `script` attributes of Contraptions will be preserved, as well the `value`, `scroll`, `row` and `image` attributes of the widgets they contain (as applicable) if they have been modified from their original values in the prototype, but everything else will be regenerated from the definition. The _state_ of contraptions is kept, and the _behavior and appearance_ is changed.
+Modifying the attributes of a Prototype will automatically update Contraption instances in the current deck. Modifying the attributes of widgets contained in this Prototype will require explicitly calling `prototype.update[]`. In either case, when a definition is updated, the `name`, `pos`, `show`, `locked`, `animated`, `font`, and `script` attributes of Contraptions will be preserved, as well the `value`, `scroll`, `row`, `col`, and `image` attributes of the widgets they contain (as applicable) if they have been modified from their original values in the prototype, but everything else will be regenerated from the definition. The _state_ of contraptions is kept, and the _behavior and appearance_ is changed.
 
 
 Events
