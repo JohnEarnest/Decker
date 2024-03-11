@@ -650,7 +650,7 @@ rect grid_cell(grid x,grid_val*value,rect bb,pair pos){
 	int hwt=0;for(int z=0;z<x.widths[0];z++)hwt+=x.widths[1+z];
 	#define cw(n) (n>=x.widths[0]?((bb.w-hwt)/(nc-x.widths[0])):x.widths[1+n])
 	int nc=value->table->c, rh=font_h(fnt)+(x.lines?5:3),cx=0; for(int z=0;z<MIN(nc,pos.x);z++)cx+=cw(z);
-	return box_intersect((rect){bb.x+cx,bb.y+rh*pos.y+1,cw(pos.x),rh-1},bb);
+	return box_intersect((rect){bb.x+cx,bb.y+rh*pos.y+1,pos.x==nc-1?bb.w-cx:cw(pos.x),rh-1},bb);
 }
 rect grid_hcell(grid x,int column,rect cell){
 	cell=inset(cell,x.lines?1:0);if(column&&x.lines)cell.x+=1,cell.w-=1;return cell;

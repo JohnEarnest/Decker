@@ -763,7 +763,7 @@ widget_grid=(target,x,value)=>{
 	const bb=sbar.size; value.scroll=sbar.scroll, hwt=x.widths.reduce((x,y)=>x+y,0)
 	draw_box(x.lines?b:rect(b.x,bb.y,b.w,b.h-(bb.y-b.y)),0,sel?13:fcol)
 	const cw=n=>0|(n>=x.widths.length?((bb.w-hwt)/(nc-x.widths.length)):x.widths[n])
-	const grid_cell=pos=>{let cx=0;for(let z=0;z<min(nc,pos.x);z++)cx+=cw(z);return rclip(bb,rect(bb.x+cx,bb.y+rh*pos.y+1,cw(pos.x),rh-1))}
+	const grid_cell=pos=>{let cx=0;for(let z=0;z<min(nc,pos.x);z++)cx+=cw(z);return rclip(bb,rect(bb.x+cx,bb.y+rh*pos.y+1,pos.x==nc-1?bb.w-cx:cw(pos.x),rh-1))}
 	const grid_hcell=pos=>{const r=inset(grid_cell(pos),x.lines?1:0);if(pos.x&&x.lines)r.x+=1,r.w-=1;return r}
 	if(x.lines)draw_rect(bh,fcol);if(nc<=0)draw_textc(inset(bb,1),'(no data)',hfnt,fcol)
 	const rowb=n=>rect(bb.x,bb.y+rh*n,bb.w,rh)
