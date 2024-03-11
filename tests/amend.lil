@@ -50,3 +50,58 @@ print["\ninterface via function:"]
 show[getsys[].seed]        # accessing an interface member via a function call
 show[getsys[].seed:12345]  # amending an interface member via a function call
 show[sys.seed getsys]      # make sure the write happened and we didn't blow away the function
+
+# amending tables gets moderately complicated!
+print["\namending tables:"]
+t:insert fruit price amount with
+	"apple"      1.00  1
+	"cherry"     0.35 15
+	"banana"     0.75  2
+	"durian"     2.99  5
+	"elderberry" 0.92  1
+end
+
+# these two specific alternatives are equivalent, following naturally from indexing:
+a:t
+a.fruit[2]:"golfball"       # amend single cell by column, row
+show[a]
+b:t
+b[2].fruit:"dagger"         # amend single cell by row, column
+show[b]
+
+# column-wise stuff:
+# the common-sense rule is we ONLY modify the contents of the indicated column.
+c:t
+c.amount:99,88,77,66,55     # amend entire column with a list: replace old column
+show[c]
+d:t
+d.zoot:11,22,33,44,55       # amend in novel column: creates a new column!
+show[d]
+d:t
+d.zoot:11,22,33             # amend in short column: extends with 0s
+show[d]
+d:t
+d.zoot:11,22,33,44,55,66,77 # amend in long column: truncate to current rowcount
+show[d]
+d:t
+d.zoot:123                  # spread non-lists when amending columns
+d.zami:"foof"               # (see above)
+show[d]
+
+# row-wise stuff:
+# as above, the common-sense rule is we ONLY modify the contents of the indicated row.
+# unlike amending elements of a list, we don't handle any in-between or off-the-end row indices to insert rows.
+e:t
+val:("amount","fruit")dict(12.3,"rat")
+e[1]:val                    # amend row with a dictionary (which may not contain all keys, leaving missing entries unchanged)
+show[e]
+e:t
+e[-1].fruit:"orange"        # amending row at an invalid index is ignored
+e[ 5].fruit:"kumquat"       # (see above)
+show[e~t]
+e:t
+e[3].bologna:99999          # amending row at invalid column names is likewise ignored
+show[e~t]
+e:t
+e[3]:"five"                 # spread non-dicts when amending rows (this will *rarely* make sense to do!!!)
+show[e]

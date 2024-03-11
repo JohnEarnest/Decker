@@ -184,6 +184,14 @@ int dgeti(lv*d,lv*k){EACH(z,d)if(matchr(d->kv[z],k))return z;return -1;}
 lv* dkey(lv*d,lv*v){EACH(z,d)if(matchr(d->lv[z],v))return d->kv[z];return NONE;}
 lv* amend(lv*x,lv*i,lv*y){
 	if(lii(x))return ((lv*(*)(lv*,lv*,lv*))x->f)(x,i,y);
+	if(lit(x)&&lin(i)){
+		lv*rn=lmn(x->n), *r=l_take(rn,x);int ri=ln(i);if(!lid(y)){lv*t=lmd();EACH(z,x)dset(t,x->kv[z],y);y=t;}
+		if(ri>=0&&ri<x->n)EACH(k,y){int ki=dgeti(r,ls(y->kv[k]));if(ki!=-1)r->lv[ki]=amend(r->lv[ki],lmn(ri),y->lv[k]);}return r;
+	}
+	if(lit(x)&&lis(i)){
+		lv*rn=lmn(x->n), *r=l_take(rn,x), *c=lil(y)?l_take(lmn(MIN(y->c,x->n)),ll(y)): l_take(rn,l_list(y));
+		while(c->c<x->n)ll_add(c,NONE);dset(r,ls(i),c);return r;
+	}
 	if(!lis(x)&&!lil(x)&&!lid(x))return amend(lml(0),i,y);
 	if((lil(x)||lis(x))&&(!lin(i)||(i->nv<0||i->nv>x->c)))return amend(ld(x),i,y);
 	if(lil(x)){int n=ln(i);MAP(r,x)z==n?y:x->lv[z];if(n==x->c)ll_add(r,y);return r;}

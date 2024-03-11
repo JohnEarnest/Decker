@@ -65,6 +65,15 @@ dset=(d,k,v)=>{const i=d.k.findIndex(x=>match(x,k));if(i<0){d.k.push(k),d.v.push
 union=(x,y)=>{const r=lmd(x.k.slice(0),x.v.slice(0));y.k.forEach(k=>dset(r,k,dget(y,k)));return r}
 amend=(x,i,y)=>{
 	if(lii(x))return x.f(x,i,y)
+	const clonetab=x=>{const r={};Object.keys(x.v).map((k,i)=>{r[k]=x.v[k].slice(0)});return r}
+	if(lit(x)&&lin(i)){
+		const r=clonetab(x), rn=count(x), cols=ll(monad.keys(x)), ri=0|ln(i); y=lid(y)?y: lmd(cols, new Array(cols.length).fill(y))
+		if(ri>=0&&ri<rn)y.k.map((k,i)=>{k=ls(k);if(k in r)r[k][ri]=y.v[i]});return lmt(r)
+	}
+	if(lit(x)&&lis(i)){
+		const r=clonetab(x), rn=count(x), c=lil(y)?ll(y).slice(0,rn): new Array(rn).fill(y)
+		while(c.length<rn)c.push(NONE);r[ls(i)]=c;return lmt(r)
+	}
 	if(!lis(x)&&!lil(x)&&!lid(x))return amend(lml([]),i,y)
 	if((lil(x)||lis(x))&&(!lin(i)||(ln(i)<0||ln(i)>count(x))))return amend(ld(x),i,y)
 	if(lil(x)){const r=lml(x.v.slice(0));r.v[ln(i)|0]=y;return r}
