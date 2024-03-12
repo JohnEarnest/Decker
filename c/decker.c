@@ -241,6 +241,7 @@ typedef struct {
 	int from_listener, from_action, from_keycaps;
 	int act_go, act_card, act_gomode, act_trans, act_transno, act_sound;
 	int time_curr, time_end; lv*carda, *cardb, *trans, *canvas;
+	rect pending_grid_cell;
 } modal_state; modal_state ms={0};
 typedef struct {modal_state ms;widget_state wid;} modal_context;
 modal_context ms_stack[8]={0};int ms_index=0;
@@ -716,7 +717,11 @@ int widget_grid(lv*target,grid x,grid_val*value){
 				char f=z<fk?x.format[z]:'s';pair tc=(pair){z,y+value->scroll};
 				if     (f=='I'||f=='L'){} // no editing allowed
 				else if(f=='B'||f=='b'){grid_edit_cell(tc,lmn(!lb(v)));} // toggle
-				else{wid.pending_grid_edit=1,ms.cell=tc;ms.text=(field_val){rtext_cast(lmcstr(cf.sv)),0};}
+				else{
+					wid.pending_grid_edit=1,ms.pending_grid_cell=grid_cell(x,value,bb,(pair){tc.x,tc.y-value->scroll});
+					ms.pending_grid_cell.y-=1,ms.pending_grid_cell.w+=1,ms.pending_grid_cell.h+=2;
+					ms.cell=tc;ms.text=(field_val){rtext_cast(lmcstr(cf.sv)),0};
+				}
 			}
 		}
 	}
@@ -911,6 +916,7 @@ void field_input(char*text){
 	field_edit(rtext_font(wid.fv->table,wid.cursor.y),lmistr(""),t.sv,wid.cursor);free(t.sv);
 }
 void field_keys(int code,int shift){
+	if(code==SDLK_RETURN&&ms.type==modal_gridcell){modal_exit(1);ev.action=0;return;}
 	rect b=wid.f.size, bi=inset(b,2);if(wid.f.scrollbar)bi.w-=image_size(ARROWS->lv[0]).x+3;
 	lv*fnt=wid.f.font?wid.f.font: wid.f.style==field_code?FONT_MONO: FONT_BODY; layout_richtext(deck,wid.fv->table,fnt,wid.f.align,bi.w);
 	int m=0, s=wid.cursor.x!=wid.cursor.y;
@@ -1814,12 +1820,11 @@ void modals(void){
 		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_pop(0);
 	}
 	else if(ms.type==modal_gridcell){
-		rect b=draw_modalbox((pair){170,70});
-		draw_textc((rect){b.x,b.y,b.w,20},kc.heading="Enter a new value for\nthe selected cell:",FONT_BODY,1);
-		ui_field((rect){b.x,b.y+20+5,b.w,20},&ms.text);
-		pair c={b.x+b.w-(b.w-(2*60+5))/2-60,b.y+b.h-20};
-		if(ui_button((rect){c.x,c.y,60,20},"OK",1))modal_exit(1);c.x-=65;
-		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_exit(0);
+		rect c=ms.pending_grid_cell;
+		draw_rect(inset(c,-2),32),draw_box(inset(c,-2),0,1);
+		ui_field(c,&ms.text);
+		if(ev.click&&!over(c))modal_exit(1);
+		if(ev.exit)modal_exit(0);
 	}
 	else if(ms.type==modal_open){
 		rect b=draw_modalbox((pair){300,frame.size.y-16-30});
@@ -3249,11 +3254,11 @@ void sync(void){
 			else if(ms.type==modal_recording&&!wid.infield&&au.mode==record_stopped){
 				if(c==SDLK_BACKSPACE||c==SDLK_DELETE)sound_delete();
 			}
+			if(c==SDLK_RETURN)ev.action=1;
 			if     (wid.ingrid )grid_keys(c);
 			else if(wid.infield)field_keys(c,m&(KMOD_LSHIFT|KMOD_RSHIFT));
 			if(uimode==mode_script)sc.status[0]='\0';
 			if(c==SDLK_SPACE&&!wid.infield)ev.action=1;
-			if(c==SDLK_RETURN)ev.action=1;
 			if(c==SDLK_TAB   )ev.tab=1;
 			if(c==SDLK_l&&ms.type==modal_none&&!wid.ingrid&&!wid.infield&&ev.shift)ev.shortcuts['l']=1;
 			if(c==SDLK_j&&ms.type==modal_none&&!cmd&&dr.limbo_dither&&dither_threshold>-2.0)dither_threshold-=.1;

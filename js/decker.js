@@ -481,7 +481,7 @@ modal_state=_=>({ // modal state
 	filter:0, grid:null,grid2:null, text:null,name:null,form0:null,form1:null,form2:null,
 	desc:'',path:'',filter:'', message:null,verb:null, cell:rect(),
 	from_listener:0,from_action:0,from_keycaps:0, act_go:0,act_card:0,act_gomode:0,act_trans:0,act_transo:0,act_sound:0,
-	time_curr:0,time_end:0,time_start:0, carda:null,cardb:null,trans:null,canvas:null,
+	time_curr:0,time_end:0,time_start:0, carda:null,cardb:null,trans:null,canvas:null,pending_grid_cell:rect(),
 })
 modal_state_clone=x=>{const r=Object.assign({},x);r.cell=rcopy(r.cell);return r}
 let ms=modal_state(), ms_stack=[]
@@ -802,7 +802,11 @@ widget_grid=(target,x,value)=>{
 				const f=x.format[z]||'s', tc=rect(z,y+value.scroll)
 				if     (f=='I'||f=='L'){} // no editing allowed
 				else if(f=='B'||f=='b'){grid_edit_cell(tc,lmn(!lb(v)))} // toggle
-				else{wid.pending_grid_edit=1,ms.cell=tc,ms.text=fieldstr(lms(cf))}
+				else{
+					wid.pending_grid_edit=1,ms.pending_grid_cell=grid_cell(rect(tc.x,tc.y-value.scroll))
+					ms.pending_grid_cell.y-=1,ms.pending_grid_cell.w+=1,ms.pending_grid_cell.h+=2
+					ms.cell=tc,ms.text=fieldstr(lms(cf))
+				}
 			}
 		}
 	}
@@ -994,6 +998,7 @@ field_input=text=>{
 	field_edit(rtext_font(wid.fv.table,wid.cursor.y),lms(''),clchars(text),wid.cursor)
 }
 field_keys=(code,shift)=>{
+	if(code=='Enter'&&ms.type=='gridcell'){modal_exit(1),ev.action=0;return}
 	const b=wid.f.size, bi=inset(b,2);if(wid.f.scrollbar)bi.w-=ARROWS[0].size.x+3
 	const fnt=wid.f.font?wid.f.font: wid.f.style=='code'?FONT_MONO: FONT_BODY, layout=layout_richtext(deck,wid.fv.table,fnt,wid.f.align,bi.w)
 	let m=0, s=wid.cursor.x!=wid.cursor.y
@@ -1748,12 +1753,11 @@ modals=_=>{
 		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_pop(0)
 	}
 	else if(ms.type=='gridcell'){
-		const b=draw_modalbox(rect(170,70))
-		draw_textc(rect(b.x,b.y,b.w,20),kc.heading='Enter a new value for\nthe selected cell:',FONT_BODY,1)
-		ui_field(rect(b.x,b.y+20+5,b.w,20),ms.text)
-		const c=rect(b.x+b.w-(b.w-(2*60+5))/2-60,b.y+b.h-20)
-		if(ui_button(rect(c.x,c.y,60,20),'OK',1))modal_exit(1);c.x-=65
-		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_exit(0)
+		const c=ms.pending_grid_cell
+		draw_rect(inset(c,-2),32),draw_box(inset(c,-2),0,1)
+		ui_field(c,ms.text)
+		if(ev.click&&!over(c))modal_exit(1)
+		if(ev.exit)modal_exit(0)
 	}
 	else if(ms.type=='save'){
 		const l=layout_plaintext(ms.desc,FONT_BODY,ALIGN.center,rect(250,100))
@@ -3489,11 +3493,11 @@ q('body').onkeydown=e=>{
 		if(e.key=='Backspace'||e.key=='Delete')ob_destroy()
 	}
 	else if(ms.type=='recording'&&!wid.infield&&au.mode=='stopped'){if(e.key=='Backspace'||e.key=='Delete')sound_delete()}
+	if(e.key=='Enter')ev.action=1
 	if     (wid.ingrid )grid_keys (e.key,e.shiftKey)
 	else if(wid.infield)field_keys(e.key,e.shiftKey)
 	if(uimode=='script')sc.status=''
 	if(e.key==' '&&!wid.infield)ev.action=1
-	if(e.key=='Enter')ev.action=1
 	if(e.key=='Tab')ev.tab=1
 	if(e.key=='L'&&ms.type==null&&!wid.ingrid&&!wid.infield)ev.shortcuts['l']=1
 	if(e.key=='f'&&ms.type==null&&!wid.ingrid&&!wid.infield)toggle_fullscreen
