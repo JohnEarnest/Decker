@@ -25,6 +25,16 @@ on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':
 
 # the problems:
 
+problem[260.1]
+# are the number of occurrences for each digit in an array distinct?
+on f x do
+ t:extract count value by value from x
+ t~keys t dict 0
+end
+assert[f[(1,2,2,1,1,3           )] 1]
+assert[f[(1,2,3                 )] 0]
+assert[f[(-2,0,1,-2,1,1,0,1,-2,9)] 1]
+
 problem[259.2]
 # parse a dictionary-literal-like line format
 on f x do
