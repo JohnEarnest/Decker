@@ -62,6 +62,7 @@ typedef struct {
 	lv* target_order;    lv*  arg_order;
 	lv* target_run;      lv*  arg_run;
 	lv* target_link;     lv*  arg_link;
+	lv* target_ccell;    lv*  arg_ccell;
 	lv* target_change;   lv*  arg_change;
 	lv* target_navigate; lv*  arg_navigate;
 } message_state; message_state msg={0};
@@ -752,10 +753,9 @@ void grid_insertrow(void){
 	}grid_edit(torect(r));
 }
 void grid_edit_cell(pair cell,lv*v){
-	lv*x=wid.gv->table,*r=lmt();EACH(i,x){GEN(c,x->n)(z==cell.y&&i==cell.x)?v: x->lv[i]->lv[z];dset(r,x->kv[i],c);}
-	grid_edit(torect(r));
 	wid.gv->col=cell.x,iwrite(wid.gt,lmistr("col"),lmn(cell.x));
 	wid.gv->row=cell.y,iwrite(wid.gt,lmistr("row"),lmn(cell.y));
+	msg.target_ccell=wid.gt,msg.arg_ccell=ls(v);
 }
 void grid_keys(int code){
 	lv*fnt=wid.g.font?wid.g.font:FONT_MONO, *hfnt=FONT_BODY;
@@ -1472,8 +1472,7 @@ void modal_exit(int value){
 		return;
 	}
 	if(ms.type==modal_gridcell&&value){
-		char f[]={'%',grid_format()->sv[ms.cell.x],0};lv*v=l_parse(lmcstr(f),ls(rtext_all(ms.text.table)));
-		grid_edit_cell(ms.cell,v);
+		grid_edit_cell(ms.cell,ls(rtext_all(ms.text.table)));
 	}
 	if(ms.type==modal_card_props){
 		lv*card=ifield(deck,"card");
@@ -3436,13 +3435,14 @@ int interpret(void){
 			lv*arg=grid_is(msg.target_click)?lmn(msg.arg_click.y): canvas_is(msg.target_click)?lmfpair(msg.arg_click): NONE;
 			fire_event_async(msg.target_click,lmistr("click"),arg);msg.target_click=NULL;
 		}
-		else if(msg.target_drag    ){fire_event_async(msg.target_drag    ,lmistr("drag"    ),lmfpair(msg.arg_drag   ));msg.target_drag    =NULL;}
-		else if(msg.target_release ){fire_event_async(msg.target_release ,lmistr("release" ),lmfpair(msg.arg_release));msg.target_release =NULL;}
-		else if(msg.target_run     ){fire_event_async(msg.target_run     ,lmistr("run"     ),msg.arg_run             );msg.target_run     =NULL;}
-		else if(msg.target_link    ){fire_event_async(msg.target_link    ,lmistr("link"    ),msg.arg_link            );msg.target_link    =NULL;}
-		else if(msg.target_order   ){fire_event_async(msg.target_order   ,lmistr("order"   ),msg.arg_order           );msg.target_order   =NULL;}
-		else if(msg.target_change  ){fire_event_async(msg.target_change  ,lmistr("change"  ),msg.arg_change          );msg.target_change  =NULL;}
-		else if(msg.target_navigate){fire_event_async(msg.target_navigate,lmistr("navigate"),msg.arg_navigate        );msg.target_navigate=NULL;}
+		else if(msg.target_drag    ){fire_event_async(msg.target_drag    ,lmistr("drag"      ),lmfpair(msg.arg_drag   ));msg.target_drag    =NULL;}
+		else if(msg.target_release ){fire_event_async(msg.target_release ,lmistr("release"   ),lmfpair(msg.arg_release));msg.target_release =NULL;}
+		else if(msg.target_run     ){fire_event_async(msg.target_run     ,lmistr("run"       ),msg.arg_run             );msg.target_run     =NULL;}
+		else if(msg.target_link    ){fire_event_async(msg.target_link    ,lmistr("link"      ),msg.arg_link            );msg.target_link    =NULL;}
+		else if(msg.target_order   ){fire_event_async(msg.target_order   ,lmistr("order"     ),msg.arg_order           );msg.target_order   =NULL;}
+		else if(msg.target_ccell   ){fire_event_async(msg.target_ccell   ,lmistr("changecell"),msg.arg_ccell           );msg.target_ccell   =NULL;}
+		else if(msg.target_change  ){fire_event_async(msg.target_change  ,lmistr("change"    ),msg.arg_change          );msg.target_change  =NULL;}
+		else if(msg.target_navigate){fire_event_async(msg.target_navigate,lmistr("navigate"  ),msg.arg_navigate        );msg.target_navigate=NULL;}
 		else if(a->c               ){fire_animate(a);}
 		if(!running())break; // not running, and no remaining events to process, so we're done for this frame
 	}
@@ -3993,11 +3993,13 @@ void tick(lv*env){
 	track(msg.target_release)
 	track(msg.target_run)
 	track(msg.target_link)
+	track(msg.target_ccell)
 	track(msg.target_order)
 	track(msg.target_change)
 	track(msg.target_navigate)
 	track(msg.arg_run)
 	track(msg.arg_link)
+	track(msg.arg_ccell)
 	track(msg.arg_order)
 	track(msg.arg_change)
 	track(msg.arg_navigate)

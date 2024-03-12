@@ -1337,24 +1337,27 @@ For widgets within a contraption, `card` will be the contraption. While editing/
 
 Events are as follows:
 
-| Target      | Name       | Argument                                     | When                                                           |
-| :---------- | :--------- | :------------------------------------------- | :------------------------------------------------------------- |
-| button      | `click`    | None.                                        | The user clicks the button or activates its _shortcut_.        |
-| grid        | `click`    | Row number.                                  | The user selects a row in the grid.                            |
-| grid        | `order`    | Column name as a string.                     | The user clicks a header cell on the grid.                     |
-| grid        | `change`   | `grid.value` (table).                        | The user alters the data in the the grid.                      |
-| canvas      | `click`    | `pos` on the canvas.                         | The user depresses their pointing device on a canvas.          |
-| canvas      | `drag`     | `pos` on the canvas.                         | The user moves their pointing device while held on a canvas.   |
-| canvas      | `release`  | `pos` on the canvas.                         | The user releases their pointing device on a canvas.           |
-| field       | `link`     | Link contents (string).                      | The user clicks a link in rich text.                           |
-| field       | `run`      | Selection or `field.text` (string).          | The user presses shift+return with the field active.           |
-| field       | `change`   | `field.text` (string).                       | The user alters the field, debounced to 1 second.              |
-| slider      | `change`   | `slider.value` (number).                     | The user alters the slider, debounced to 1 frame.              |
-| card        | `navigate` | One of {`"up"`,`"down"`,`"left"`,`"right"`}. | The user performs a navigation input.                          |
-| card        | `view`     | None.                                        | The card is navigated to, or the user enters interaction mode. |
-| contraption | `view`     | None.                                        | The surrounding card is sent a `view` event (see above).       |
-| widget      | `view`     | None.                                        | The surrounding card is active, repeatedly at 60hz.            |
-| card        | `loop`     | Previous _sound interface_ or `0`.           | The card is navigated to, or the background loop completes.    |
+| Target      | Name         | Argument                                     | When                                                           |
+| :---------- | :----------- | :------------------------------------------- | :------------------------------------------------------------- |
+| button      | `click`      | None.                                        | The user clicks the button or activates its _shortcut_.        |
+| grid        | `click`      | Row number.                                  | The user selects a row in the grid.                            |
+| grid        | `order`      | Column name as a string.                     | The user clicks a header cell on the grid.                     |
+| grid        | `change`     | `grid.value` (table).                        | The user alters the data in the the grid.                      |
+| grid        | `changecell` | Replacement value (string).                  | The user edits a cell in the grid.                             |
+| canvas      | `click`      | `pos` on the canvas.                         | The user depresses their pointing device on a canvas.          |
+| canvas      | `drag`       | `pos` on the canvas.                         | The user moves their pointing device while held on a canvas.   |
+| canvas      | `release`    | `pos` on the canvas.                         | The user releases their pointing device on a canvas.           |
+| field       | `link`       | Link contents (string).                      | The user clicks a link in rich text.                           |
+| field       | `run`        | Selection or `field.text` (string).          | The user presses shift+return with the field active.           |
+| field       | `change`     | `field.text` (string).                       | The user alters the field, debounced to 1 second.              |
+| slider      | `change`     | `slider.value` (number).                     | The user alters the slider, debounced to 1 frame.              |
+| card        | `navigate`   | One of {`"up"`,`"down"`,`"left"`,`"right"`}. | The user performs a navigation input.                          |
+| card        | `view`       | None.                                        | The card is navigated to, or the user enters interaction mode. |
+| contraption | `view`       | None.                                        | The surrounding card is sent a `view` event (see above).       |
+| widget      | `view`       | None.                                        | The surrounding card is active, repeatedly at 60hz.            |
+| card        | `loop`       | Previous _sound interface_ or `0`.           | The card is navigated to, or the background loop completes.    |
+
+Editing a cell in a grid produces a `changecell` event, which provides an opportunity to parse/validate input, produce side-effects, or cancel applying the change entirely. The `row`, `col`, and `colname` attributes of the target grid (`me`) can be referenced to identify the cell being altered.
 
 If a canvas is not "draggable", events are relative to pointer movement on the canvas: The canvas will fire `click` only if the pointer is depressed within the bounds of the canvas. If a canvas is sent a `click`, it will receive a `release` when the pointer is released, even if the pointer is no longer over that canvas- the `pos` provided may be out of bounds. If a canvas is sent a `click`, it will be sent `drag` events every time the pointer is moved within the bounds of the canvas up until the `release`.
 
@@ -1389,6 +1392,12 @@ on order col do
 	if !me.locked
 		me.value:select orderby me.value[col] asc from me.value
 	end
+end
+
+on changecell x do
+	v:("%%%l" format "s" unless me.format[me.col]) parse x
+	me.value:((me.value)[me.colname][me.row]:v)
+	me.event["change" me.value]
 end
 
 on loop prev do

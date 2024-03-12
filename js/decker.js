@@ -496,8 +496,8 @@ keycaps_enter=_=>{if(!enable_touch||kc.on)return;kc.shift=0,kc.lock=0,kc.on=1,ev
 
 let msg={ // interpreter event messages
 	pending_drag:0,pending_halt:0,pending_view:0,pending_loop:0,next_view:0,overshoot:0,
-	target_click:null,target_drag:null,target_release:null,target_order:null,target_run:null,target_link:null,target_change:null,target_navigate:null,
-	arg_click:rect(),arg_drag:rect(),lastdrag:rect(),arg_release:rect(),arg_order:null,arg_run:null,arg_link:null,arg_change:null,arg_navigate:null,
+	target_click:null,target_drag:null,target_release:null,target_order:null,target_run:null,target_link:null,target_ccell:null,target_change:null,target_navigate:null,
+	arg_click:rect(),arg_drag:rect(),lastdrag:rect(),arg_release:rect(),arg_order:null,arg_run:null,arg_link:null,arg_ccell:null,arg_change:null,arg_navigate:null,
 }
 let li={hist:[],vars:{},scroll:0} // listener state
 let ob={sel:[],show_bounds:1,show_names:0,show_cursor:0,show_margins:0,show_guides:1,move:0,move_first:0,resize:0,resize_first:0,handle:-1,prev:rect(),orig:rect()} // object editor state
@@ -839,10 +839,9 @@ grid_insertrow=_=>{
 	grid_edit(lmt(r))
 }
 grid_edit_cell=(cell,v)=>{
-	const r={};Object.keys(wid.gv.table.v).map((k,i)=>{r[k]=wid.gv.table.v[k].slice(0);if(i==cell.x)r[k][cell.y]=v})
-	grid_edit(lmt(r))
 	wid.gv.col=cell.x,iwrite(wid.gt,lms('col'),lmn(cell.x))
 	wid.gv.row=cell.y,iwrite(wid.gt,lms('row'),lmn(cell.y))
+	msg.target_ccell=wid.gt,msg.arg_ccell=lms(ls(v))
 }
 grid_keys=(code,shift)=>{
 	const fnt=wid.g.font?wid.g.font:FONT_MONO, hfnt=FONT_BODY, nr=count(wid.gv.table), nc=Object.keys(wid.gv.table.v).length
@@ -1412,7 +1411,7 @@ modal_enter=type=>{
 }
 modal_exit=value=>{
 	wid=ms.old_wid
-	if(ms.type=='gridcell'&&value)grid_edit_cell(ms.cell,dyad.parse(lms(`%${ls(grid_format())[ms.cell.x]||'s'}`),rtext_string(ms.text.table)))
+	if(ms.type=='gridcell'&&value)grid_edit_cell(ms.cell,rtext_string(ms.text.table))
 	if(ms.type=='card_props'){iwrite(ifield(deck,'card'),lms('name'),rtext_string(ms.name.table)),mark_dirty()}
 	if(ms.type=='grid_props'){
 		const t=table_decode(rtext_string(ms.form0.table),rtext_string(ms.text.table))
@@ -2937,13 +2936,14 @@ interpret=_=>{
 			const arg=grid_is(msg.target_click)?lmn(msg.arg_click.y): canvas_is(msg.target_click)?lmpair(msg.arg_click): NONE
 			fire_event_async(msg.target_click,'click',arg),msg.target_click=null
 		}
-		else if(msg.target_drag    ){fire_event_async(msg.target_drag    ,'drag'    ,lmpair(msg.arg_drag   )),msg.target_drag    =null}
-		else if(msg.target_release ){fire_event_async(msg.target_release ,'release' ,lmpair(msg.arg_release)),msg.target_release =null}
-		else if(msg.target_run     ){fire_event_async(msg.target_run     ,'run'     ,msg.arg_run            ),msg.target_run     =null}
-		else if(msg.target_link    ){fire_event_async(msg.target_link    ,'link'    ,msg.arg_link           ),msg.target_link    =null}
-		else if(msg.target_order   ){fire_event_async(msg.target_order   ,'order'   ,msg.arg_order          ),msg.target_order   =null}
-		else if(msg.target_change  ){fire_event_async(msg.target_change  ,'change'  ,msg.arg_change         ),msg.target_change  =null}
-		else if(msg.target_navigate){fire_event_async(msg.target_navigate,'navigate',msg.arg_navigate       ),msg.target_navigate=null}
+		else if(msg.target_drag    ){fire_event_async(msg.target_drag    ,'drag'      ,lmpair(msg.arg_drag   )),msg.target_drag    =null}
+		else if(msg.target_release ){fire_event_async(msg.target_release ,'release'   ,lmpair(msg.arg_release)),msg.target_release =null}
+		else if(msg.target_run     ){fire_event_async(msg.target_run     ,'run'       ,msg.arg_run            ),msg.target_run     =null}
+		else if(msg.target_link    ){fire_event_async(msg.target_link    ,'link'      ,msg.arg_link           ),msg.target_link    =null}
+		else if(msg.target_order   ){fire_event_async(msg.target_order   ,'order'     ,msg.arg_order          ),msg.target_order   =null}
+		else if(msg.target_ccell   ){fire_event_async(msg.target_ccell   ,'changecell',msg.arg_ccell          ),msg.target_ccell   =null}
+		else if(msg.target_change  ){fire_event_async(msg.target_change  ,'change'    ,msg.arg_change         ),msg.target_change  =null}
+		else if(msg.target_navigate){fire_event_async(msg.target_navigate,'navigate'  ,msg.arg_navigate       ),msg.target_navigate=null}
 		else if(count(a)           ){fire_animate(a)}
 		if(!running())break // not running, and no remaining events to process, so we're done for this frame
 	}if(msg.next_view&&ms.type!='listen')msg.pending_view=1,msg.next_view=0 // no more than one view[] event per frame!

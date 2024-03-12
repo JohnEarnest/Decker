@@ -139,9 +139,15 @@ char* default_handlers=""
 "		me.value:select orderby me.value[x] asc from me.value "
 "	end "
 "end\n"
+"on changecell x do "
+"	v:(\"%%%l\" format \"s\" unless me.format[me.col]) parse x "
+"	me.value:((me.value)[me.colname][me.row]:v) "
+"	me.event[\"change\" me.value] "
+"end\n"
 "on loop x do"
 "	x "
-"end\n";
+"end\n"
+;
 
 char* default_transitions=""
 "transition[on SlideRight c a b t do  c.paste[a c.size*t,0   ] c.paste[b c.size*(t-1),0]      end]\n"
