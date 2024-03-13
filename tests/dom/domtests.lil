@@ -818,6 +818,17 @@ g.value:insert a with 11 22 33 end
 g.row:15
 assert["grid row clamped max" 2 g.row]
 
+g.value:insert a b with 11 22 33 44 end
+g.row:1
+g.col:0
+g.rowvalue:("b","a")dict 99,88
+assert["grid write rowvalue" insert a b with 11 22 88 99 end g.value]
+g.cellvalue:101
+assert["grid write cellvalue" insert a b with 11 22 101 99 end g.value]
+g.row:-1
+g.cellvalue:99999
+assert["grid write cellvalue with invalid row index" insert a b with 11 22 101 99 end g.value]
+
 #######################################
 #
 #  Font

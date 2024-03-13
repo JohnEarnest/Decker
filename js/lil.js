@@ -759,8 +759,7 @@ on link x do go[x] end
 on drag x do if !me.locked|me.draggable me.line[(pointer.prev-me.offset)/me.scale x] end end
 on order x do if !me.locked me.value:select orderby me.value[x] asc from me.value end end
 on changecell x do
-	v:("%%%l" format "s" unless me.format[me.col]) parse x
-	me.value:((me.value)[me.colname][me.row]:v)
+	me.cellvalue:("%%%l" format "s" unless me.format[me.col]) parse x
 	me.event["change" me.value]
 end
 on navigate x do if x~"right" go["Next"] end if x~"left" go["Prev"] end end
@@ -1891,6 +1890,8 @@ grid_read=(x,card)=>{
 			if(ikey(i,'bycell'   ))return self.bycell=lb(x),x
 			if(ikey(i,'widths'   ))return self.widths=ints(ll(x),255),x
 			if(ikey(i,'format'   ))return self.format=ls(x),x
+			if(ikey(i,'rowvalue' ))return iwrite(self,lms('value'   ),amend(ifield(self,'value'   ),ifield(self,'row'    ),x)),x
+			if(ikey(i,'cellvalue'))return iwrite(self,lms('rowvalue'),amend(ifield(self,'rowvalue'),ifield(self,'colname'),x)),x
 		}else{
 			if(ikey(i,'value'    ))return value_inherit(self,ls(i))||lmt({})
 			if(ikey(i,'scroll'   ))return value_inherit(self,ls(i))||NONE

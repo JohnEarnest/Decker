@@ -1125,8 +1125,8 @@ The grid widget represents an interactive spreadsheet-style view of a table.
 | `x.col`                 | Int. The index of the selected column of the table, or -1 for no selection. r/w.                      |
 | `x.colname`             | String. The name of the selected column of the table, or `0` for no selection. r/w.                   |
 | `x.cell`                | Access `(x.col,x.row)` as a pair. r/w.                                                                |
-| `x.rowvalue`            | Dict. The selected row of the table, or an empty dictionary for no selection.                         |
-| `x.cellvalue`           | Anything. The selected cell value of the table, or `0` for no selection.                              |
+| `x.rowvalue`            | Dict. The selected row of the table, or an empty dictionary for no selection. r/w.                    |
+| `x.cellvalue`           | Anything. The selected cell value of the table, or `0` for no selection. r/w.                         |
 | `x.format`              | String. A column spec for formatting columns of the table. See `writecsv[]`. r/w.                     |
 | `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
@@ -1395,8 +1395,7 @@ on order col do
 end
 
 on changecell x do
-	v:("%%%l" format "s" unless me.format[me.col]) parse x
-	me.value:((me.value)[me.colname][me.row]:v)
+	me.cellvalue:("%%%l" format "s" unless me.format[me.col]) parse x
 	me.event["change" me.value]
 end
 

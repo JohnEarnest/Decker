@@ -140,8 +140,7 @@ char* default_handlers=""
 "	end "
 "end\n"
 "on changecell x do "
-"	v:(\"%%%l\" format \"s\" unless me.format[me.col]) parse x "
-"	me.value:((me.value)[me.colname][me.row]:v) "
+"	me.cellvalue:(\"%%%l\" format \"s\" unless me.format[me.col]) parse x "
 "	me.event[\"change\" me.value] "
 "end\n"
 "on loop x do"
@@ -1839,6 +1838,8 @@ lv* interface_grid(lv*self,lv*i,lv*x){
 		ikey("bycell"   ){dset(data,i,lmn(lb(x)));return x;}
 		ikey("widths"   ){dset(data,i,normalize_ints(x,255));return x;}
 		ikey("format"   ){dset(data,i,ls(x));return x;}
+		ikey("rowvalue" ){iwrite(self,lmistr("value"   ),amend(ifield(self,"value"   ),ifield(self,"row"    ),x));return x;}
+		ikey("cellvalue"){iwrite(self,lmistr("rowvalue"),amend(ifield(self,"rowvalue"),ifield(self,"colname"),x));return x;}
 	}else{
 		ikey("value"    ){lv*r=value_inherit(self,i);return r?r:lmt();}
 		ikey("scroll"   ){lv*r=value_inherit(self,i);return r?r:NONE;}
