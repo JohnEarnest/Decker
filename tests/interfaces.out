@@ -6,6 +6,7 @@
 "B"
 11
 ("D","A","E","B","C")
+"list" "dict"
 {"sys":<system>}
 99
 {"sys":<system>}
