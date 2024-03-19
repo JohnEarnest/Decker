@@ -110,3 +110,4 @@ docs:
 	@./c/build/lilt scripts/lildoc.lil docs/decker.md      docs/decker.html
 	@./c/build/lilt scripts/lildoc.lil docs/format.md      docs/format.html
 	@./c/build/lilt scripts/lildoc.lil docs/lilquickref.md docs/lilquickref.html
+	@./c/build/lilt scripts/lildoc.lil docs/learn.md       docs/learn.html
