@@ -1647,7 +1647,7 @@ font_read=s=>{
 		if(lin(i)||(lis(i)&&count(i)==1)){ // read/write glyphs
 			let ix=lin(i)?ln(i): ls(i).charCodeAt(0)-32, c=String.fromCharCode(ix+32)
 			if(x){
-				if(!image_is(x))return x;font_gw(self,c,min(x.size.x,font_w(self)));const s=rect(font_gw(self,c),font_h(self))
+				if(!image_is(x)||ix<0||ix>95)return x;font_gw(self,c,min(x.size.x,font_w(self)));const s=rect(font_gw(self,c),font_h(self))
 				for(let a=s.y-1;a>=0;a--)for(let b=s.x-1;b>=0;b--)font_spix(self,c,b,a, b>=(x.size.x||a>=x.size.y)?0:x.pix[b+a*x.size.x]?1:0)
 				return x
 			}

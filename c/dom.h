@@ -637,7 +637,7 @@ lv* interface_font(lv*self,lv*i,lv*x){
 	if(lin(i)||(lis(i)&&i->c==1)){ // read/write glyphs
 		int ix=lin(i)?ln(i): i->sv[0]-32;char c=ix+32;
 		if(x){
-			if(!image_is(x))return x;pair s=image_size(x);
+			if(!image_is(x)||ix<0||ix>95)return x;pair s=image_size(x);
 			font_each(self,c){int col=(b>=s.x||a>=s.y)?0: x->b->sv[b+a*s.x]?1:0; font_spix(self,c,b,a,col);}
 			font_gw(self,c)=MIN(s.x,font_w(self));return x;
 		}

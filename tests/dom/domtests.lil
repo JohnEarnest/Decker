@@ -907,6 +907,10 @@ assert["font minimum size" (1,1) f.size]
 f.size:-.3,2.9
 assert["font bogus size" (1,2) f.size]
 
+# oob accesses:
+f[96]:image[]
+f[-1]:image[]
+
 #######################################
 #
 #  Sound
