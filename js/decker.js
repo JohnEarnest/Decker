@@ -3447,19 +3447,26 @@ mouse=(e,f)=>{
 	f(0|((e.pageX-c.x)/zoom),0|((e.pageY-c.y)/zoom),e.button!=0)
 }
 touch=(e,f)=>{const t=e.targetTouches[0]||{}; mouse({pageX:t.clientX, pageY:t.clientY, button:0},f);if(!set_touch)enable_touch=1}
-let prev_stamp=null, leftover=0
-next_frame=fn=>{
+let prev_stamp=null, leftover=0, scheduled_frame
+document.onvisibilitychange=()=>{
+	if(document.hidden && scheduled_frame) {
+		cancelAnimationFrame(scheduled_frame)
+		schedule_frame()
+	}
+}
+schedule_frame=_=>{
 	// when a tab is in the background, requestAnimationFrame gets seriously throttled
 	// if a script in a deck like jankytunes is playing sound that messes it up
 	// so we should use setTimeout instead, which isn't throttled if audio is playing
-	if(document.hidden) setTimeout(() => fn(performance.now()), 1000/60)
-	else requestAnimationFrame(fn)
+	if(document.hidden) setTimeout(() => loop(performance.now()), 1000/60)
+	else scheduled_frame = requestAnimationFrame(loop)
 }
 loop=stamp=>{
+	scheduled_frame=null
 	if(!prev_stamp)prev_stamp=stamp
 	let delta=(stamp-prev_stamp)+leftover, frame=1000/60, tc=0
 	while(delta>frame){tick(),tc++,delta-=frame;if(tc==5){delta=0;break}};leftover=delta
-	sync(),prev_stamp=stamp,next_frame(loop)
+	sync(),prev_stamp=stamp,schedule_frame()
 	if(do_panic)setmode('object');do_panic=0
 }
 resize=_=>{
@@ -3633,4 +3640,4 @@ q('body').ondrop=e=>{
 
 pushstate(lmenv()),load_deck(deck_read(q('script[language="decker"]').innerText))
 const tag=decodeURI(document.URL.split('#')[1]||'');if(tag.length)iwrite(deck,lms('card'),lms(tag))
-resize(),next_frame(loop)
+resize(),schedule_frame()
