@@ -2125,7 +2125,7 @@ free_canvas=deck=>{ // make a drawing surface that isn't attached to the parent 
 	container_image(r,1);return r
 }
 go_notify=(deck,x,t,url,delay)=>{
-	if(url&&/(http|https|ftp|gopher|gemini):\/\//.test(url))modal_enter('url'),ms.text=fieldstr(lms(url))
+	if(url&&/^(http|https|ftp|gopher|gemini):\/\//.test(url))modal_enter('url'),ms.text=fieldstr(lms(url))
 	const moved=x!=ln(ifield(ifield(deck,'card'),'index'))
 	if(moved)con_set(null)
 	const tfun=t==null?null: lion(t)?t: dget(deck.transit,t)
