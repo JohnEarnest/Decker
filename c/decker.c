@@ -927,8 +927,8 @@ void field_keys(int code,int shift){
 	if(code==SDLK_DOWN     ){m=1;if(l>=0)wid.cursor.y=layout_index((pair){c.x-1,lines[l].pos.y+lines[l].pos.h+1   });}
 	if(code==SDLK_PAGEUP   ){m=1;if(l>=0)wid.cursor.y=layout_index((pair){c.x-1,lines[l].pos.y               -bi.h});}
 	if(code==SDLK_PAGEDOWN ){m=1;if(l>=0)wid.cursor.y=layout_index((pair){c.x-1,lines[l].pos.y+lines[l].pos.h+bi.h});}
-	if(code==SDLK_HOME     ){m=1,wid.cursor.y=0;}
-	if(code==SDLK_END      ){m=1,wid.cursor.y=layout_count;}
+	if(code==SDLK_HOME     ){m=1;if(ev.alt){wid.cursor.y=0           ;}else if(l>=0)wid.cursor.y=lines[l].range.x;}
+	if(code==SDLK_END      ){m=1;if(ev.alt){wid.cursor.y=layout_count;}else if(l>=0)wid.cursor.y=lines[l].range.y+(l==lines_count-1?1:0);}
 	if(code==SDLK_BACKSPACE){field_edit(lmistr(""),lmistr(""),"",s?wid.cursor:(pair){wid.cursor.y-1,wid.cursor.y});}
 	if(code==SDLK_DELETE   ){field_edit(lmistr(""),lmistr(""),"",s?wid.cursor:(pair){wid.cursor.y,wid.cursor.y+1});}
 	if(code==SDLK_RETURN){

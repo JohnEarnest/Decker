@@ -1009,8 +1009,8 @@ field_keys=(code,shift)=>{
 	if(code=='ArrowDown'   ){m=1;if(l>=0)wid.cursor.y=layout_index(layout,rect(c.x-1,layout.lines[l].pos.y+layout.lines[l].pos.h+1   ))}
 	if(code=='PageUp'      ){m=1;if(l>=0)wid.cursor.y=layout_index(layout,rect(c.x-1,layout.lines[l].pos.y                      -bi.h))}
 	if(code=='PageDown'    ){m=1;if(l>=0)wid.cursor.y=layout_index(layout,rect(c.x-1,layout.lines[l].pos.y+layout.lines[l].pos.h+bi.h))}
-	if(code=='Home'        ){m=1,wid.cursor.y=0}
-	if(code=='End'         ){m=1,wid.cursor.y=layout.layout.length;}
+	if(code=='Home'        ){m=1;if(ev.alt){wid.cursor.y=0                   }else if(l>=0)wid.cursor.y=layout.lines[l].range.x;}
+	if(code=='End'         ){m=1;if(ev.alt){wid.cursor.y=layout.layout.length}else if(l>=0)wid.cursor.y=layout.lines[l].range.y+(l==layout.lines.length-1?1:0);}
 	if(code=='Backspace'   ){field_edit(lms(''),lms(''),'',s?wid.cursor:rect(wid.cursor.y-1,wid.cursor.y))}
 	if(code=='Delete'      ){field_edit(lms(''),lms(''),'',s?wid.cursor:rect(wid.cursor.y,wid.cursor.y+1))}
 	if(code=='Enter'       ){
