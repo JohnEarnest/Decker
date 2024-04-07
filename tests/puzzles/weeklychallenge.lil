@@ -59,6 +59,18 @@ assert[f[(-3, 1, 2, -1, 3, -2, 4)] 4]
 assert[f[(-1, -2, -3, 1         )] 3]
 assert[f[(1,2                   )] 2]
 
+problem[262.2]
+# count pairs of indices to x where x[i]==x[j], i<j, and k divides i*j
+on f k x do
+  sum each xi i in x
+    sum each xj j in x
+      (xi~xj)&(i<j)&!k%i*j
+    end
+  end
+end
+assert[f[2 (3,1,2,2,2,1,3)] 4]
+assert[f[1 (1,2,3)        ] 0]
+
 problem[261.1]
 # compute the absolute difference between element and digit sum of x
 on f x do mag(sum x)-sum""split""fuse x end
