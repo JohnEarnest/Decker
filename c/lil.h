@@ -159,14 +159,6 @@ lv* lt(lv*x){
 		r->n=x->c; lv*v=lml(x->c);EACH(z,x)v->lv[z]=x->lv[z];dset(r,lmistr("value"),v);
 	}else{x=ll(x);dset(r,lmistr("value"),x);r->n=x->c;}return r;
 }
-int equal(lv*x,lv*y){
-	if(lin(x))return ln(x)==ln(y);
-	if(lis(x)){y=ls(y);if(x->c==y->c){EACH(z,x)if(x->sv[z]!=y->sv[z])return 0;return 1;}}
-	if(lil(x)&&lil(y)) if(x->c==y->c){EACH(z,x)if(!equal(x->lv[z],y->lv[z]))return 0;return 1;}
-	if(lid(x)&&lid(y)&&x->c==y->c){
-		EACH(z,x)if(!equal(x->lv[z],y->lv[z])||!equal(x->kv[z],y->kv[z]))return 0;return 1;
-	}return x==y;
-}
 int matchr(lv*x,lv*y){
 	if(x==y)return 1;if(x->t!=y->t||x->n!=y->n||x->c!=y->c)return 0;
 	if(lin(x))return x->nv==y->nv; if(lis(x))return !strcmp(x->sv,y->sv);
@@ -318,7 +310,7 @@ dyad(l_fuse){
 	return lmstr(t);
 }
 dyad(l_ina){
-	if(lil(y))EACH(z,y)if(equal(y->lv[z],x))return ONE;
+	if(lil(y))EACH(z,y)if(matchr(y->lv[z],x))return ONE;
 	return lis(y)?(strstr(y->sv,ls(x)->sv)?ONE:NONE): (lid(y)||lit(y))&&dget(y,x)?ONE: NONE;
 }
 dyad(l_in){if(lil(x)){MAP(r,x)l_in(x->lv[z],y);return r;}return l_ina(x,y);}
@@ -388,7 +380,7 @@ dyad(l_join){
 		if(i>=0){ll_add(ik,y->kv[z]);}else{ll_add(dk,lmn(z)),dset(r,y->kv[z],lml(0));}
 	}
 	for(int ai=0;ai<x->n;ai++)for(int bi=0;bi<y->n;bi++){
-		int m=1;EACH(z,ik){if(!equal(dget(x,ik->lv[z])->lv[ai],dget(y,ik->lv[z])->lv[bi])){m=0;break;}}
+		int m=1;EACH(z,ik){if(!matchr(dget(x,ik->lv[z])->lv[ai],dget(y,ik->lv[z])->lv[bi])){m=0;break;}}
 		if(!m)continue;
 		EACH(z,x )ll_add(r->lv[z     ],x->lv[z                   ]->lv[ai]);
 		EACH(z,dk)ll_add(r->lv[x->c+z],y->lv[(int)(dk->lv[z]->nv)]->lv[bi]);r->n++;
@@ -947,7 +939,7 @@ void docall(lv*f,lv*a,int tail){
 	if(tail){descope;}issue(env_bind(f->env,f,a),f->b);gc.depth=MAX(gc.depth,state.e->c);
 }
 void runop(void){
-	lv*b=getblock();if(!liblk(b))ret(ll_pop(state.t));
+	lv*b=getblock();
 	int*pc=getpc(),op=blk_getb(b,*pc),imm=(oplens[op]==3?blk_gets(b,1+*pc):0);(*pc)+=oplens[op];
 	switch(op){
 		case DROP:arg();break;
