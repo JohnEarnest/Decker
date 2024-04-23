@@ -900,11 +900,12 @@ The `%q` and `%v` patterns are useful for manipulating Lil source code, parsing/
 "%q" format "a string"              # "\"a string\""
 ```
 
-The `%j` pattern can be used to format or parse data as JSON. When formatting JSON, Lil dictionary keys will be cast to strings, and anything other than a number, string, list, or dictionary will become a JSON `null`:
+The `%j` pattern can be used to format or parse data as JSON. When formatting JSON, Lil dictionary keys will be cast to strings, tables will be cast to their rows (as by `rows`), and anything other than a number, string, list, or dictionary will become a JSON `null`:
 ```lil
 "%j" format (11,22) dict (33,44)    # "{\"11\":33,\"22\":44}"
 "%j" format list 11,22              # "[11,22]"
-"%j" format table 11,22             # "null"
+"%j" format table 11,22             # "[{\"value\":11},{\"value\":22}]"
+"%j" format on x do 2+x end         # "null"
 ```
 When parsing JSON, the value `true` will become the number `1`, and `false` or `null` will become the number `0`. This JSON parser is highly tolerant and will among other things accept non-string JSON values as dictionary keys, single-quoted strings, missing `,` and `:` delimiters, and some missing trailing delimiters. [Postel's Law](https://en.wikipedia.org/wiki/Robustness_principle), baby!
 ```lil

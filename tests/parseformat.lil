@@ -142,6 +142,7 @@ show["%j" format "string\n with\"/escapes\\!"    ]
 show["%j" format "</script < /script < / script" ]
 show["%j" format ().foo:999                      ]
 show["%j" format table 11,22,33                  ]
+show["%j" format on x do 2+x end                 ]
 # parsing
 show["%j %j %j" parse "true null false"          ] # simple literals
 show["%j%n"     parse "[true,false,true]"        ] # simple list

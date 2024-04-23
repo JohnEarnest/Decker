@@ -116,7 +116,7 @@ fstr=x=>{
 		return e?'\\/':({'\n':'\\n','\\':'\\\\','"':'\\"'})[x]||x
 	}).join('')
 }
-fjson=x=>lin(x)?wnum(x.v): lil(x)?`[${x.v.map(fjson).join(',')}]`:
+fjson=x=>lin(x)?wnum(x.v): lit(x)?fjson(rows(x)): lil(x)?`[${x.v.map(fjson).join(',')}]`:
          lis(x)?`"${fstr(x.v)}"`:lid(x)?`{${x.k.map((k,i)=>`${fjson(lms(ls(k)))}:${fjson(x.v[i])}`).join(',')}}`:'null'
 pjson=(y,h,n)=>{
 	const si=h, hn=_=>m&&y[h]&&(n?h-si<n:1), hnn=x=>m&&h+x<=y.length&&(n?h+x-si<n:1)

@@ -481,6 +481,7 @@ dyad(l_parse){
 }
 void fjson(str*s,lv*x){
 	if(lin(x)){wnum(s,x->nv);}
+	else if(lit(x)){fjson(s,l_rows(x));}
 	#define wrap(a,b,c) str_addc(s,a);EACH(z,x)c;str_addc(s,b);
 	else if(lil(x)){wrap('[',']',{if(z)str_addc(s,',');fjson(s,x->lv[z]);})}
 	else if(lid(x)){wrap('{','}',{if(z)str_addc(s,',');fjson(s,ls(x->kv[z]));str_addc(s,':');fjson(s,x->lv[z]);})}

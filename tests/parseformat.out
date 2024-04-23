@@ -113,6 +113,7 @@ json:
 "\"string\\n with\\\"/escapes\\\\!\""
 "\"<\\/script < \\/script < \\/ script\""
 "{\"foo\":999}"
+"[{\"value\":11},{\"value\":22},{\"value\":33}]"
 "null"
 (1,0,0)
 ((1,0,1),17)
