@@ -1723,7 +1723,21 @@ rtext_splice=(tab,font,arg,text,cursor,endcursor)=>{
 	rtext_appendr(r,rtext_span(tab,rect(b,RTEXT_END)))
 	endcursor.x=endcursor.y=a+text.length;return r
 }
+rtext_splicer=(tab,insert,cursor,endcursor)=>{
+	const a=min(cursor.x,cursor.y),b=max(cursor.x,cursor.y),r=rtext_cast()
+	rtext_appendr(r,rtext_span(tab,rect(0,a)))
+	rtext_appendr(r,insert)
+	rtext_appendr(r,rtext_span(tab,rect(b,RTEXT_END)))
+	endcursor.x=endcursor.y=a+rtext_len(insert);return r
+}
 rtext_write=x=>{const r=monad.cols(x),arg=dget(r,lms('arg'));if(arg){arg.v=arg.v.map(x=>image_is(x)?lms(image_write(x)):x)};return r}
+rtext_read=x=>{
+	if(lis(x))return x;x=ld(x)
+	const a=dget(x,lms('arg'));if(a){dset(x,lms('arg'),lml(ll(a).map(a=>ls(a).startsWith('%%IMG')?image_read(ls(a)):lms(ls(a)))))}
+	return rtext_cast(x)
+}
+rtext_encode=x=>`%%RTX0${fjson(rtext_write(x))}`
+rtext_decode=x=>rtext_read(pjson(x,6,x.length-6).value)
 rtext_cat=x=>{let r=lmt({text:[],font:[],arg:[]});x.map(x=>rtext_appendr(r,rtext_cast(x)));return r}
 interface_rtext=lmi((self,i,x)=>{
 	if(ikey(i,'end'   ))return lmn(RTEXT_END)
@@ -1813,11 +1827,6 @@ field_read=(x,card)=>{
 			if(ikey(i,'font'     ))return dget(self.card.deck.fonts,lms(self.font||(self.style=='code'?'mono':'body')))
 		}return interface_widget(self,i,x)
 	},'field');ri.card=card
-	const rtext_read=x=>{
-		if(lis(x))return x;x=ld(x)
-		const a=dget(x,lms('arg'));if(a){dset(x,lms('arg'),lml(ll(a).map(a=>ls(a).startsWith('%%IMG')?image_read(ls(a)):lms(ls(a)))))}
-		return rtext_cast(x)
-	}
 	{const k=lms('value'),v=dget(x,k);if(v)iwrite(ri,k,rtext_read(v))}
 	init_field(ri,'border'   ,x)
 	init_field(ri,'scrollbar',x)

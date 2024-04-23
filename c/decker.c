@@ -872,6 +872,12 @@ void field_edit(lv*font,lv*arg,char*text,pair pos){
 	o->lv[2]=rtext_splice(wid.fv->table,font,arg,text,pos,&c),o->lv[3]=lmpair(c         ); // after
 	field_redo();
 }
+void field_editr(lv*rtext,pair pos){
+	wid.hist->c=wid.hist_cursor; lv*o=lml(4);ll_add(wid.hist,o); pair c={0,0};
+	o->lv[0]=wid.fv->table                                   ,o->lv[1]=lmpair(wid.cursor); // before
+	o->lv[2]=rtext_splicer(wid.fv->table,rtext,       pos,&c),o->lv[3]=lmpair(c         ); // after
+	field_redo();
+}
 pair field_position(int cursor){
 	if(layout_count<1)return (pair){1,1};cursor=MAX(0,MIN(cursor,layout_count+1));
 	int e=cursor>=layout_count?1:0, i=cursor-e, l=layout[i].line, c=i-lines[l].range.x;
@@ -3491,8 +3497,12 @@ void text_edit_menu(void){
 		lv*s=rtext_span(wid.fv->table,wid.cursor),*i=rtext_is_image(s);
 		set_clip((i?image_write(i):rtext_all(s)));
 	}
+	if(rich&&menu_item("Copy Rich Text",selection,'r'))set_clip(rtext_encode(rtext_span(wid.fv->table,wid.cursor)));
 	if(has_clip("%%IMG")&&rich&&menu_item("Paste Inline Image",wid.fv!=NULL,'v')){field_edit(lmistr(""),image_read(get_clip()),"i",wid.cursor);}
-	else if(menu_item("Paste",wid.fv!=NULL&&strlen(clip_stash),'v')){field_input(get_clip()->sv);}
+	else if(has_clip("%%RTX")&&rich&&menu_item("Paste Rich Text",wid.fv!=NULL,'v')){field_editr(rtext_decode(get_clip()),wid.cursor);}
+	else if((!has_clip("%%RTX")||!rich)&&menu_item("Paste",wid.fv!=NULL&&strlen(clip_stash),'v')){
+		field_input(has_clip("%%RTX")?rtext_all(rtext_decode(get_clip()))->sv:get_clip()->sv);
+	}
 	if(menu_item("Clear",wid.fv!=NULL,0)){wid.cursor=(pair){0,RTEXT_END};field_keys(SDLK_DELETE,0);}
 	menu_separator();
 	if(menu_item("Select All",wid.fv!=NULL,'a')){wid.cursor=(pair){0,RTEXT_END};}

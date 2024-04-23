@@ -959,10 +959,11 @@ field_undo=_=>{const x=wid.hist[--(wid.hist_cursor)];field_apply(x[0],x[1])}
 field_redo=_=>{const x=wid.hist[(wid.hist_cursor)++];field_apply(x[2],x[3])}
 field_edit=(font,arg,text,pos)=>{
 	const c=rect(), spliced=rtext_splice(wid.fv.table,font,arg,text,pos,c); wid.hist=wid.hist.slice(0,wid.hist_cursor)
-	wid.hist.push([
-		wid.fv.table,rect(wid.cursor.x,wid.cursor.y), // before
-		spliced     ,c                              , // after
-	]),field_redo()
+	wid.hist.push([wid.fv.table,rect(wid.cursor.x,wid.cursor.y), spliced,c]),field_redo()
+}
+field_editr=(rtext,pos)=>{
+	const c=rect(), spliced=rtext_splicer(wid.fv.table,rtext,pos,c); wid.hist=wid.hist.slice(0,wid.hist_cursor)
+	wid.hist.push([wid.fv.table,rect(wid.cursor.x,wid.cursor.y), spliced,c]),field_redo()
 }
 field_sel_lines=_=>{
 	let a=min(wid.cursor.x,wid.cursor.y),b=max(wid.cursor.x,wid.cursor.y),l=field_showcursor()
@@ -2956,11 +2957,13 @@ interpret=_=>{
 
 text_edit_menu=_=>{
 	const selection=wid.fv!=null&&wid.cursor.x!=wid.cursor.y
+	const rich=wid.fv!=null&&wid.f.style=='rich'
 	if(menu_item('Undo',wid.hist_cursor>0              ,'z'))field_undo()
 	if(menu_item('Redo',wid.hist_cursor<wid.hist.length,'Z'))field_redo()
 	menu_separator()
 	if(menu_item('Cut',selection,'x',menucut)){}
 	if(menu_item('Copy',selection,'c',menucopy)){}
+	if(rich&&menu_item('Copy Rich Text',selection,0,menucopyrich)){}
 	if(menu_item('Paste',wid.fv!=null,'v',menupaste)){}
 	if(menu_item('Clear',wid.fv!=null))wid.cursor=rect(0,RTEXT_END),field_keys('Delete',0)
 	menu_separator()
@@ -3584,6 +3587,13 @@ dopaste=x=>{
 		const c=deck_paste(deck,lms(x));con_set(null)
 		const card=ifield(deck,'card'), n=ln(ifield(card,'index'));iwrite(c,lms('index'),lmn(n+1)),n_go([c],deck)
 	}
+	else if(/^%%RTX0/.test(x)){
+		if(wid.fv){
+			const t=rtext_decode(x)
+			if(wid.f.style=='rich'){field_editr(t,wid.cursor)}
+			else{field_input(ls(rtext_string(t)))}
+		}
+	}
 	else if(wid.gv&&!wid.g.locked&&ms.type==null){grid_edit(n_readcsv([lms(x),lms(wid.g.format)]))}
 	else if(wid.fv){field_input(x)}
 }
@@ -3594,6 +3604,7 @@ pasteascanvas=_=>getclipboard(t=>{ob_create([lmd([lms('type'),lms('locked'),lms(
 pasteintocanvas=_=>getclipboard(t=>{const i=image_read(t),c=ob.sel[0];iwrite(c,lms('size'),ifield(i,'size')),c.image=i})
 menucut=_=>{const r=docut();if(r)setclipboard(r)}
 menucopy=_=>{const r=docopy();if(r)setclipboard(r)}
+menucopyrich=_=>{setclipboard(rtext_encode(rtext_span(wid.fv.table,wid.cursor)))}
 menupaste=_=>getclipboard(t=>{if(t.length)dopaste(t)})
 document.oncut=e=>{const r=docut();if(r)e.clipboardData.setData('text/plain',r),local_clipboard=r;e.preventDefault()}
 document.oncopy=e=>{const r=docopy();if(r)e.clipboardData.setData('text/plain',r),local_clipboard=r;e.preventDefault()}

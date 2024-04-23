@@ -1618,6 +1618,13 @@ lv* rtext_splice(lv*table,lv*font,lv*arg,char*text,pair cursor,pair*endcursor){
 	rtext_appendr(r,rtext_span(table,(pair){b,RTEXT_END}));
 	endcursor->x=endcursor->y=a+t->c; return r;
 }
+lv* rtext_splicer(lv*table,lv*insert,pair cursor,pair*endcursor){
+	int a=MIN(cursor.x,cursor.y),b=MAX(cursor.x,cursor.y); lv*r=rtext_cast(NULL);
+	rtext_appendr(r,rtext_span(table,(pair){0,a}));
+	rtext_appendr(r,insert);
+	rtext_appendr(r,rtext_span(table,(pair){b,RTEXT_END}));
+	endcursor->x=endcursor->y=a+rtext_len(insert); return r;
+}
 lv* rtext_read(lv*x){
 	if(lis(x))return x; x=ld(x);
 	lv*a=dget(x,lmistr("arg"));if(a){MAP(n,a)has_prefix(ls(a->lv[z])->sv,"%%img")?image_read(ls(a->lv[z])):ls(a->lv[z]);dset(x,lmistr("arg"),n);}
@@ -1628,6 +1635,8 @@ lv* rtext_write(lv*x){
 	lv*a=dget(x,lmistr("arg"));if(a){MAP(n,a)image_is(a->lv[z])?image_write(a->lv[z]):a->lv[z];dset(x,lmistr("arg"),n);}
 	return x;
 }
+lv* rtext_encode(lv*x){str r=str_new();str_addz(&r,"%%RTX0");fjson(&r,rtext_write(x));return lmstr(r);}
+lv* rtext_decode(lv*x){int f=1,i=6,n=x->c-i;lv*v=rtext_read(pjson(x->sv,&i,&f,&n));return v;}
 lv*n_rtext_split(lv*self,lv*z){
 	(void)self;if(z->c<2)return lml(0);lv*d=ls(z->lv[0]),*v=rtext_cast(z->lv[1]),*t=rtext_string(v,(pair){0,RTEXT_END}),*r=lml(0);
 	if(d->c<1)return r;int n=0;EACH(z,t){
