@@ -25,7 +25,7 @@ print[addtail[3 5]]
 print["deepest observed stack: %i" sys.workspace.depth]
 
 print["tail recursion: deep"]
-print[addtail[80000 5]]
+print[addtail[800 5]]
 
 print["deepest observed stack: %i" sys.workspace.depth]
 

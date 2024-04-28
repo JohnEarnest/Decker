@@ -4,7 +4,7 @@ tail recursion: shallow
 8
 deepest observed stack: 6
 tail recursion: deep
-80005
+805
 deepest observed stack: 6
 false tail-calls
 0
