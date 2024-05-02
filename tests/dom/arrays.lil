@@ -1,0 +1,163 @@
+#######################################
+#
+#  Array Interface Integration Suite
+#
+#######################################
+
+on assert_file text want got do
+	s:shell["cmp -s %s %s" format want,got] # exit code { 0:matched, 1:differed, 2:error }
+	if s.exit
+		print["test failed: %s" text]
+		print["binary file '%s' does not match '%s'" format got,want]
+		exit[1]
+	end
+	shell["rm %s" format got]
+end
+on assert_base text want got disp do
+	#print["%s..." text]
+	if !want~got
+		print["test failed: %s" text]
+		print["expected:"] disp[want]
+		print["got:"]      disp[got]
+		exit[1]
+	end
+end
+on assert text want got do
+	assert_base[text want got show]
+end
+
+#######################################
+#
+#  Tests
+#
+#######################################
+
+a:array[4 "i16l"]
+assert["array from scratch" "array" (typeof a)]
+assert["array cast" "i16l" a.cast]
+assert["array size" 4      a.size]
+a[3]:99
+assert["array scalar r/w" 99 a[3]]
+a[1,3]:333
+assert["array scalar spread" (0,333,333,333) a[0,4]]
+a[0,4]:11,22,33,44,55
+assert["array vector r/w" (11,22,33,44) a[0,4]]
+assert["array left OOB"   0 a[-1]]
+
+assert["array encode" "%%DAT5CwAWACEALAA=" a.encoded]
+dec:array["%%DAT5CwAWACEALAA="]
+assert["array decode" ("i16l",list 11,22,33,44) dec.cast,list dec[0,4]]
+
+s:a.slice[1,2]
+assert["array slice read" ("i16l",2,0,33) (s.cast,s.size,s.here,s[1])]
+s[0]:77
+assert["array slice writethru" 77 a[1]]
+s[2]:88
+assert["array slice oob write" 44 a[3]]
+
+c:a.copy[1,5]
+assert["array copy read" ("i16l",5,0,list 77,33,44,0) (c.cast,c.size,c.here,list c[0,4])]
+c[0]:103
+assert["array copy no writethru" 77 a[1]]
+
+a[0]:"ABCDEFG"
+assert["array char write" (65,77) a[0,2]]
+a[0,4]:"ABCDEFG"
+assert["array string write" (65,66,67,68) a[0,4]]
+a.cast:"i8"
+assert["array splayed chars" (65,0,66,0) a[0,4]]
+a.cast:"char"
+a[0,4]:"ABCDEFG"
+assert["array string read" "ABCD" a[0,4]]
+a.cast:"i8"
+a[0,4]:(0,10,65,13)
+a.cast:"char"
+assert["array read denormal chars" "?\nA" a[0,4]]
+a.cast:"u8"
+a[0,4]:(226,128,156,65)
+a.cast:"char"
+assert["array read utf-surrogate" "\"A" a[0,4]]
+
+a:array[2 "i16l"]
+a[0,2]:"AB"
+a.size:5
+assert["array resize bigger" (65,66,0,0,0) a[0,a.size]]
+a.size:1
+assert["array resize smaller" (list 65) a[0,a.size]]
+b:a.slice[0,2] b.size:5
+assert["array slices can't resize" (1,2) (a.size,b.size)]
+
+a:array[4 "i32b"] # need capacity for the biggest-size cast!
+on limits cast nums do
+	a.cast:cast
+	o:0,count nums
+	a[o]:nums
+	assert[("array %s r/w limits" format cast) nums a[o]]
+end
+limits["u8"               0,1,255       ]
+limits["i8"          -128,0,1,127       ]
+limits["u16b"             0,1,65535     ]
+limits["u16l"             0,1,65535     ]
+limits["i16b"      -32768,0,1,32767     ]
+limits["i16l"      -32768,0,1,32767     ]
+limits["u32b"             0,1,4294967295]
+limits["u32l"             0,1,4294967295]
+limits["i32b" -2147483648,0,1,2147483647]
+limits["i32l" -2147483648,0,1,2147483647]
+
+bin:read["tests/dom/a.gif" "array"]
+assert["read array from file" (86,"array") (bin.size,typeof bin)]
+write["temp.gif" bin]
+assert_file["write file from array" "tests/dom/a.gif" "temp.gif"]
+
+gif.magic      :"char",6  # "GIF89a" magic number.
+gif.size       :"u16l",2  # (width,height) in pixels.
+gif.gct.present:1         # flag: is there a global colortable?
+gif.gct.res    :3         # color resolution (almost always 7; 8-bits per channel).
+gif.gct.sorted :1         # flag: are the colors sorted by importance? (almost always zero).
+gif.gct.size   :3         # number of entries in the global colortable.
+gif.background :"u8"      # index of the background color.
+gif.aspect     :"u8"      # pixel aspect ratio (almost always zero).
+
+rgif.magic      :"GIF89a"
+rgif.size       :8,9
+rgif.gct.present:1
+rgif.gct.res    :7
+rgif.gct.sorted :0
+rgif.gct.size   :0
+rgif.background :1
+rgif.aspect     :0
+
+assert["array read struct" rgif bin.struct[gif]]
+cpy:array[0]
+cpy.struct[gif rgif]
+assert["array write struct" bin.slice[0,13].encoded cpy.encoded]
+cpy.struct["u8",6 (11,22,33,44,55,66)]
+assert["array write here"   19 cpy.here]
+assert["array write field"  (11,22,33,44,55,66) cpy[13,6]]
+cpy.here:0
+assert["array read field"   "GIF89a" cpy.struct["char",6]]
+
+blob:array["%%DAT08J+SqQ=="]
+a:array[0 "u16l"]
+a.cat["TEXT"]
+a.cat[345,9000]
+a.cat[blob]
+b:array[0 "u16l"].cat["TEXT"].cat[345,9000].cat[blob]
+c:array[0 "u16l"].cat["TEXT" 345,9000 blob]
+assert["array cat"          "%%DAT3VEVYVFkBKCPwn5Kp" a.encoded]
+assert["array cat, chained" "%%DAT3VEVYVFkBKCPwn5Kp" b.encoded]
+assert["array cat, multi"   "%%DAT3VEVYVFkBKCPwn5Kp" c.encoded]
+assert["array cat payload"  "%%DAT38J+SqQ=="         c.slice[4].encoded]
+
+#######################################
+#
+#  Wrap Up
+#
+#######################################
+
+if 0~assert
+	print["internal error; environment corruption!"]
+else
+	print["all array tests passed."]
+end

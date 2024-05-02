@@ -73,6 +73,8 @@ uninstall:
 test: lilt
 	@chmod +x ./scripts/test_interpreter.sh
 	@./scripts/test_interpreter.sh "./c/build/lilt "
+	@./c/build/lilt tests/dom/arrays.lil
+	@./c/build/lilt tests/dom/images.lil
 	@./c/build/lilt tests/dom/domtests.lil
 	@./c/build/lilt tests/dom/test_roundtrip.lil
 	@./c/build/lilt tests/puzzles/weeklychallenge.lil
@@ -92,6 +94,8 @@ js: jsres
 testjs: js
 	@chmod +x ./scripts/test_interpreter.sh
 	@./scripts/test_interpreter.sh "node js/build/lilt.js"
+	@node js/build/lilt.js tests/dom/arrays.lil
+	@node js/build/lilt.js tests/dom/images.lil
 	@node js/build/lilt.js tests/dom/domtests.lil
 	@node js/build/lilt.js tests/dom/test_roundtrip.lil
 	@node js/build/lilt.js tests/puzzles/weeklychallenge.lil
