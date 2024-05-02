@@ -25,6 +25,51 @@ on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':
 
 # the problems:
 
+problem[267.1]
+# find the sign of product of all integers in x
+on f x do t:prod x  t/mag t end
+assert[f[(-1, -2, -3, -4, 3, 2, 1)]  1]
+assert[f[(1, 2, 0, -2, -1        )]  0]
+assert[f[(-1, -1, 1, -1, 2       )] -1]
+
+problem[267.2]
+# calculate the lines/last-line-width of a string wrapped
+# at 100 units wide given a list of character widths.
+on f str wids do
+  local y:1 local x:0
+  each w in ("abcdefghijklmnopqrstuvwxyz"dict wids)@str
+   if 100<x+w y:y+1 x:w else x:x+w end
+  end
+  y,x
+end
+assert[f[
+  "abcdefghijklmnopqrstuvwxyz"
+  (10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10)
+] (3,60)]
+assert[f[
+  "bbbcccdddaaa"
+  (4,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10)
+] (2,4)]
+
+problem[266.1]
+# find any words that appear exactly once among two sentences
+on f x y do
+ extract value where 1=count index by value from " "split x," ",y
+end
+assert[f["Mango is sweet" "Mango is sour"   ] ("sweet","sour")]
+assert[f["Mango Mango"    "Orange"          ] (list "Orange" )]
+assert[f["Mango is Mango" "Orange is Orange"] ()              ]
+
+problem[266.2]
+# is a square matrix non-zero only along the main diagonals?
+on f x do
+  n:count x  # loosely, {(!!x)~t||t:(!n)=/:|!n:#x}
+  each v in range n (v=range n)|v=(n-1)-range n end~!!x
+end
+assert[f["%j" parse "[[1,0,0,2],[0,3,4,0],[0,5,6,0],[7,0,0,1]]"] 1]
+assert[f["%j" parse "[[1,2,3],[4,5,6],[7,8,9]]"                ] 0]
+assert[f["%j" parse "[[1,0,2],[0,3,0],[4,0,5]]"                ] 1]
+
 problem[263.1]
 # find indices of sorted elements of x equal to k
 # demonstrates a "glottal stop" in chained queries
