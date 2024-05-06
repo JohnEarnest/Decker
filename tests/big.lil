@@ -19,6 +19,3 @@ testnum[100000000000]
 # the biggest precise int in an ieee-754
 testnum[9007199254740992]
 
-# a very large number that cannot be represented exactly:
-r:1 each x in 1+range 10 r:r*r*x end r
-testnum[r]

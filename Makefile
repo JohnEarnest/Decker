@@ -100,6 +100,13 @@ testjs: js
 	@node js/build/lilt.js tests/dom/test_roundtrip.lil
 	@node js/build/lilt.js tests/puzzles/weeklychallenge.lil
 
+testawk:
+	@chmod +x ./scripts/test_interpreter.sh
+	@./scripts/test_interpreter.sh "awk -f tools/awk/lila.awk"
+	@awk -f tools/awk/lila.awk tests/dom/arrays.lil
+	@awk -f tools/awk/lila.awk tests/dom/images.lil
+	@awk -f tools/awk/lila.awk tests/puzzles/weeklychallenge.lil
+
 web-decker: js
 	@chmod +x ./scripts/web_decker.sh
 	@./scripts/web_decker.sh examples/decks/tour.deck js/build/decker.html $(VERSION)

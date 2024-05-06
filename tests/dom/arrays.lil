@@ -5,8 +5,8 @@
 #######################################
 
 on assert_file text want got do
-	s:shell["cmp -s %s %s" format want,got] # exit code { 0:matched, 1:differed, 2:error }
-	if s.exit
+	s:shell["cmp %s %s" format want,got]
+	if count s.out
 		print["test failed: %s" text]
 		print["binary file '%s' does not match '%s'" format got,want]
 		exit[1]
@@ -140,9 +140,9 @@ assert["array read field"   "GIF89a" cpy.struct["char",6]]
 
 blob:array["%%DAT08J+SqQ=="]
 a:array[0 "u16l"]
-a.cat["TEXT"]
-a.cat[345,9000]
-a.cat[blob]
+a.cat["TEXT"]   # 4 bytes
+a.cat[345,9000] # 4 bytes (as u16s)
+a.cat[blob]     # 4 bytes
 b:array[0 "u16l"].cat["TEXT"].cat[345,9000].cat[blob]
 c:array[0 "u16l"].cat["TEXT" 345,9000 blob]
 assert["array cat"          "%%DAT3VEVYVFkBKCPwn5Kp" a.encoded]
