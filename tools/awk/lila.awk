@@ -95,8 +95,7 @@ function bitwise_or(x,y,   v,r){v=1;r=0;while(x>0||y>0){if((x%2)==1||(y%2)==1)r+
 function bitwise_xor(x,y,  v,r){v=1;r=0;while(x>0||y>0){if((x%2)   !=(y%2)   )r+=v;x=int(x/2);y=int(y/2);v*=2};return r}
 # many awk builtins interpret strings as regular expressions,
 # so we have to escape special chars to use them as literals:
-function regex_esc(x){return ((x~/[.^$*+?(){}\\|[]/)?"\\":"")x}  # . ^ $ * + ? ( ) [ { } \ |
-function regex_esc_str(x,  r){r="";for(z=1;z<=length(x);z++)r=r regex_esc(substr(x,z,1));return r}
+function regex_esc(x){gsub(/[.^$*+?(){}\\|[]/,"\\\\&",x);return x}  # . ^ $ * + ? ( ) [ { } \ |
 
 ###########################################################
 #
