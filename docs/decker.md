@@ -1395,7 +1395,8 @@ on order col do
 end
 
 on changecell x do
-	me.cellvalue:("%%%l" format "s" unless me.format[me.col]) parse x
+	f:me.format[me.col] f:if count f f else "s" end
+	me.cellvalue:("%%%l" format f) parse x
 	me.event["change" me.value]
 end
 
