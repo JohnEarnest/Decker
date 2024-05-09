@@ -33,10 +33,10 @@ deltas.up   : 0,-1
 deltas.down : 0, 1
 
 on resetLevel do
- card.remove@findActors[]
+ card.remove[findActors[]]
  l:deck.cards["level_%i" format level.value]
  card.image.paste[l.image.copy[]]
- card.paste[l.copy[range l.widgets]]
+ card.paste[l.copy[l.widgets]]
  hist.value:0 take hist.value
  undo.locked:1
 end

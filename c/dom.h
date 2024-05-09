@@ -2115,7 +2115,9 @@ lv* n_card_add(lv*self,lv*z){
 	return NONE;
 }
 lv* n_card_remove(lv*self,lv*z){
-	z=l_first(z);if(!widget_is(z)||lin(dkey(ivalue(self,"widgets"),z)))return NONE;
+	z=l_first(z);
+	if(lil(z)||lid(z)){int r=1;EACH(i,z)r&=lb(n_card_remove(self,z->lv[i]));return r?ONE:NONE;}
+	if(!widget_is(z)||lin(dkey(ivalue(self,"widgets"),z)))return NONE;
 	lv*name=ifield(z,"name"),*widgets=ivalue(self,"widgets"),*target=dget(widgets,name);
 	dset(self->b,lmistr("widgets"),l_drop(name,widgets));
 	dset(target->b,lmistr("dead"),ONE);return ONE;
@@ -2146,7 +2148,8 @@ void merge_fonts(lv*deck,lv*f){
 	EACH(z,f){lv*k=ls(f->kv[z]),*v=font_read(ls(f->lv[z]));if(font_is(v)&&!dget(fonts,k))dset(fonts,k,v);}
 }
 lv* n_con_copy(lv*card,lv*z){
-	z=l_first(z);if(!lil(z))z=l_list(z);lv*wids=con_copy_raw(card,z),*defs=lmd(),*v=lmd();dset(v,lmistr("w"),wids),dset(v,lmistr("d"),defs);
+	z=l_first(z);z=lil(z)?z: lid(z)?ll(z): l_list(z);
+	lv*wids=con_copy_raw(card,z),*defs=lmd(),*v=lmd();dset(v,lmistr("w"),wids),dset(v,lmistr("d"),defs);
 	lv*deck=ivalue(card,"deck"),*condefs=ifield(deck,"contraptions");find_fonts(deck,v,z);EACH(w,wids){
 		lv*wid=wids->lv[w],*type=dget(wid,lmistr("type")),*def=dget(wid,lmistr("def"));
 		if(!strcmp(type->sv,"contraption")&&dget(defs,def)==NULL)dset(defs,def,prototype_write(dget(condefs,def)));

@@ -997,8 +997,8 @@ The card interface gives access to the contents of a given card.
 | `x.widgets`       | A dictionary of widget interfaces on this card, keyed by name.                                    |
 | `x.index`         | The ordinal position of this card in the deck, counting from 0. r/w.                              |
 | `x.add[x y z]`    | Add a widget to this card, and return it.                                                         |
-| `x.remove[x]`     | Remove a widget `x` from this card. Returns 1 on success.                                         |
-| `x.copy[list]`    | Save a list of widgets on this card as an opaque string starting with `%%WGT0`.                   |
+| `x.remove[x]`     | Remove a widget `x` (or list/dict of widgets) from this card. Returns 1 on success.               |
+| `x.copy[list]`    | Save a widget (or list/dict of widgets) on this card as an opaque string starting with `%%WGT0`.  |
 | `x.paste[text]`   | Append the widgets within a `%%WGT0` string to this card, returning a list of the new widgets.    |
 | `x.event[n x...]` | Issue an event named `n` at this card with argument(s) `x`.                                       |
 

@@ -2197,6 +2197,7 @@ card_add=(card,type,name,n2)=>{
 	return NONE
 }
 card_remove=(card,x)=>{
+	if(lil(x)||lid(x))return x.v.reduce((x,y)=>x&card_remove(card,y),1)
 	if(!widget_is(x)||!dkey(card.widgets,x))return 0
 	const name=ifield(x,'name');dget(card.widgets,name).dead=true,card.widgets=dyad.drop(name,card.widgets);return 1
 }
@@ -2220,7 +2221,8 @@ merge_fonts=(deck,f)=>{
 	f.v.map((x,i)=>{const k=f.k[i],v=font_read(ls(x));if(font_is(v)&&!dget(deck.fonts,k))dset(deck.fonts,k,v)})
 }
 con_copy=(card,z)=>{
-	z=lil(z)?ll(z):[z];const wids=lml(con_copy_raw(card,z)),defs=lmd(),v=lmd(['w','d'].map(lms),[wids,defs])
+	z=lil(z)||lid(z)?ll(z):[z];
+	const wids=lml(con_copy_raw(card,z)),defs=lmd(),v=lmd(['w','d'].map(lms),[wids,defs])
 	const condefs=card.deck.contraptions;find_fonts(card.deck,v,z),wids.v.map(wid=>{
 		const type=dget(wid,lms('type')),def=dget(wid,lms('def'))
 		if(ls(type)=='contraption'&&dget(defs,def)==null)dset(defs,def,prototype_write(dget(condefs,def)))
