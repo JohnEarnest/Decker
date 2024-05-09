@@ -2716,7 +2716,7 @@ prototype_size_editor=_=>{
 		// resize handle
 		let sh=rpair(radd(con_to_screen(s),rect(1,1)),rect(8,8));if(over(sh))r=1;
 		if((ev.drag||ev.mu)&&dover(sh)&&(delta.x!=0||delta.y!=0)){
-			s=rmax(rect(1,1),radd(s,delta)),sh=rpair(radd(con_to_screen(s),rect(1,1)),rect(8,8))
+			s=snap(rmax(rect(1,1),radd(s,delta))),sh=rpair(radd(con_to_screen(s),rect(1,1)),rect(8,8))
 			draw_box(con_to_screen(rpair(rect(0,0),s)),0,ANTS),r=1;if(ev.mu)resize=1
 		}
 		draw_rect(sh,32),draw_box(sh,0,1);if(over(sh))uicursor=cursor.drag

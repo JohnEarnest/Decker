@@ -3029,7 +3029,7 @@ int prototype_size_editor(void){
 		char l[4096]={0};rect sh=rect_pair(pair_add(con_to_screen(s),(pair){1,1}),(pair){8,8});
 		if(over(sh))r=1;
 		if((ev.drag||ev.mu)&&dover(sh)&&(delta.x!=0||delta.y!=0)){
-			s=pair_max((pair){1,1},pair_add(s,delta)),sh=rect_pair(pair_add(con_to_screen(s),(pair){1,1}),(pair){8,8});
+			s=snap(pair_max((pair){1,1},pair_add(s,delta))),sh=rect_pair(pair_add(con_to_screen(s),(pair){1,1}),(pair){8,8});
 			draw_box(con_to_screenr(rect_pair((pair){0,0},s)),0,ANTS),r=1;if(ev.mu)resize=1;
 		}
 		draw_rect(sh,32),draw_box(sh,0,1);if(over(sh))uicursor=cursor_drag;
