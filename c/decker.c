@@ -2963,7 +2963,10 @@ void object_editor(void){
 		if(ev.dir==dir_right)ob_move((pair){ 1*(ev.shift?dr.grid_size.x:1), 0},1),nudge=1;
 		if(ev.dir==dir_up   )ob_move((pair){ 0,-1*(ev.shift?dr.grid_size.y:1)},1),nudge=1;
 		if(ev.dir==dir_down )ob_move((pair){ 0, 1*(ev.shift?dr.grid_size.y:1)},1),nudge=1;
-		if(nudge&&ev.shift&&ob.sel->c==1)ob_move(snap_delta(getpair(ifield(ob.sel->lv[0],"pos"))),1);
+		if(nudge&&ev.shift){
+			pair p={RTEXT_END,RTEXT_END};EACH(z,ob.sel){p=pair_min(p,getpair(ifield(ob.sel->lv[z],"pos")));}
+			if(ob.sel->c)ob_move(snap_delta(p),1);
+		}
 	}
 	int ish=is_resizable()?in_handle(unpack_widget(ob.sel->lv[0]).size):-1;
 	int isw=0;EACH(w,wids){rect wid=unpack_widget(wids->lv[w]).size;EACH(z,ob.sel)if(ob.sel->lv[z]==wids->lv[w]&&over(wid))isw=1;}
@@ -2985,7 +2988,8 @@ void object_editor(void){
 	else if(isw    &&ev.md){ob.move  =1,ob.move_first  =1,ob.prev=ev.pos;}
 	else if(ob.resize&&(!ev.drag||!ob.sel->c)){ob.resize=0,ob.resize_first=0;}
 	else if(ob.move&&(!ev.drag||!ob.sel->c)){
-		if(ob.sel->c==1)ob_move(snap_delta(getpair(ifield(ob.sel->lv[0],"pos"))),!ob.move_first);
+		pair p={RTEXT_END,RTEXT_END};EACH(z,ob.sel){p=pair_min(p,getpair(ifield(ob.sel->lv[z],"pos")));}
+		if(ob.sel->c)ob_move(snap_delta(p),!ob.move_first);
 		ob.move=0,ob.move_first=0;
 	}
 	else if(ob.resize){

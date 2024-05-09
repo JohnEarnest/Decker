@@ -2651,7 +2651,10 @@ object_editor=_=>{
 		if(ev.dir=='right')ob_move(rect( 1*(ev.shift?dr.grid_size.x:1), 0),1),nudge=1
 		if(ev.dir=='up'   )ob_move(rect( 0,-1*(ev.shift?dr.grid_size.y:1)),1),nudge=1
 		if(ev.dir=='down' )ob_move(rect( 0, 1*(ev.shift?dr.grid_size.y:1)),1),nudge=1
-		if(nudge&&ev.shift&&ob.sel.length==1)ob_move(snap_delta(getpair(ifield(ob.sel[0],'pos'))),1)
+		if(nudge&&ev.shift&&ob.sel.length){
+			const p=ob.sel.reduce((p,w)=>rmin(p,getpair(ifield(w,'pos'))),rect(RTEXT_END,RTEXT_END))
+			ob_move(snap_delta(p),1)
+		}
 	}
 	const ish=is_resizable()?in_handle(unpack_widget(ob.sel[0]).size):-1
 	const isw=wids.v.some(w=>over(unpack_widget(w).size)&&ob.sel.some(x=>x==w))
@@ -2673,7 +2676,10 @@ object_editor=_=>{
 	else if(isw    &&ev.md){ob.move  =1,ob.move_first  =1,ob.prev=rcopy(ev.pos)}
 	else if(ob.resize&&(!ev.drag||!ob.sel.length)){ob.resize=0,ob.resize_first=0}
 	else if(ob.move&&(!ev.drag||!ob.sel.length)){
-		if(ob.sel.length==1)ob_move(snap_delta(getpair(ifield(ob.sel[0],'pos'))),!ob.move_first)
+		if(ob.sel.length){
+			const p=ob.sel.reduce((p,w)=>rmin(p,getpair(ifield(w,'pos'))),rect(RTEXT_END,RTEXT_END))
+			ob_move(snap_delta(p),!ob.move_first)
+		}
 		ob.move=0,ob.move_first=0
 	}
 	else if(ob.resize){
