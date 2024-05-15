@@ -2951,6 +2951,10 @@ void object_editor(void){
 		if(sel){draw_box(inset(w.size,-1),0,ANTS);}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1));}
 		if(sel&&is_resizable()){draw_handles(w.size);}
 		if(ob.show_bounds){
+			if(lb(ifield(wid,"volatile"))){
+				draw_line((rect){w.size.x,w.size.y,w.size.x+w.size.w,w.size.y+w.size.h},0,1,deck);
+				draw_line((rect){w.size.x+w.size.w,w.size.y,w.size.x,w.size.y+w.size.h},0,1,deck);
+			}
 			rect badge={w.size.x+w.size.w-10,w.size.y,10,10};
 			if(w.locked                  )draw_rect(badge,1),draw_icon((pair){badge.x+1,badge.y+1},LOCK,32),badge.y+=10;
 			if(lb(ifield(wid,"animated")))draw_rect(badge,1),draw_icon((pair){badge.x+1,badge.y+1},ANIM,32);
@@ -3588,6 +3592,8 @@ void all_menus(void){
 			if(menu_item("Export Image..."   ,1,'\0'))modal_enter(modal_export_image);
 		}
 		menu_separator();
+		if(menu_item("Purge Volatiles",1,'\0')){n_deck_purge(deck,NONE);msg.next_view=1;}
+		menu_separator();
 		if(menu_item("Cards..."     ,1,'C' ))modal_enter(modal_cards);
 		if(menu_item("Sounds..."    ,1,'S' ))modal_enter(modal_sounds);
 		if(menu_item("Prototypes...",1,'T' ))modal_enter(modal_contraptions);
@@ -3827,13 +3833,15 @@ void all_menus(void){
 		if(menu_item("New Grid..."       ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("grid"  ));ob_create(l_list(p));}
 		if(card_is(con())&&menu_item("New Contraption...",1,'\0'))modal_enter(modal_pick_contraption);
 		menu_separator();
-		int al=1,aa=1,as=1,at=1,ai=1,an=1;EACH(z,ob.sel){
+		int al=1,aa=1,av=1,as=1,at=1,ai=1,an=1;EACH(z,ob.sel){
 			widget w=unpack_widget(ob.sel->lv[z]);al&=w.locked;
 			as&=w.show==show_solid, at&=w.show==show_transparent, ai&=w.show==show_invert, an&=w.show==show_none;
 			aa&=lb(ifield(ob.sel->lv[z],"animated"));
+			av&=lb(ifield(ob.sel->lv[z],"volatile"));
 		}
 		if(menu_check("Locked"          ,ob.sel->c,ob.sel->c&&al,'\0'))ob_edit_prop("locked"  ,lmn(!al));
 		if(menu_check("Animated"        ,ob.sel->c,ob.sel->c&&aa,'\0'))ob_edit_prop("animated",lmn(!aa));
+		if(menu_check("Volatile"        ,ob.sel->c,ob.sel->c&&av,'\0'))ob_edit_prop("volatile",lmn(!av));
 		menu_separator();
 		if(menu_check("Show Solid"      ,ob.sel->c,ob.sel->c&&as,'\0'))ob_edit_prop("show",lmistr("solid"));
 		if(menu_check("Show Transparent",ob.sel->c,ob.sel->c&&at,'\0'))ob_edit_prop("show",lmistr("transparent"));

@@ -182,6 +182,7 @@ Some properties are common to all widgets:
 	- `"none"`: Do not draw this widget at all. Such a widget will not produce any events.
 - `locked` an integer; if nonzero, this widget is non-editable. For `button`, this means it cannot be clicked. A locked `field` may not be edited, and a locked `canvas` may not be drawn upon by user mouse events. The default is `0`.
 - `animated` an integer; if nonzero, this widget will be sent a `view[]` event on each frame (60hz). The default is `0`.
+- `volatile` an integer; if nonzero, this widget does not serialize its _value state_: the `value` attribute of buttons, fields, sliders or grids, the `scroll` attribute of fields or grids, the `row` and `col` attribute of grids, and the image content of a canvas. The default is `0`.
 - `font` a string corresponding to the ID of a _Font Record_, used for drawing any text on this widget.
 - `script` a number or string corresponding to a `{script:ID}` chunk, representing event handlers applying to this widget.
 
@@ -379,3 +380,6 @@ Changelog
 
 1.41:
 - Introduced the `grid.bycell` and `grid.col` fields.
+
+1.43:
+- Introduced the `volatile` property for all widgets.

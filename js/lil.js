@@ -2079,7 +2079,7 @@ contraption_read=(x,card)=>{
 			iwrite(dwid,lms('pos'),lmpair(a)),iwrite(dwid,lms('size'),lmpair(rsub(b,a)))
 		})
 	}
-	const masks={name:1,index:1,image:1,script:1,locked:1,animated:1,pos:1,show:1,font:1,toggle:1,event:1,offset:1}
+	const masks={name:1,index:1,image:1,script:1,locked:1,animated:1,volatile:1,pos:1,show:1,font:1,toggle:1,event:1,offset:1}
 	const ri=lmi((self,i,x)=>{
 		if(!is_rooted(self))return NONE
 		if(x){
@@ -2127,6 +2127,7 @@ interface_widget=(self,i,x)=>{
 		if(ikey(i,'script'  ))return self.script=ls(x),x
 		if(ikey(i,'locked'  ))return self.locked=lb(x),x
 		if(ikey(i,'animated'))return self.animated=lb(x),x
+		if(ikey(i,'volatile'))return self.volatile=lb(x),x
 		if(ikey(i,'size'    ))return self.size=rint(rclamp(rect(),getpair(x),rect(4096,4096))),x
 		if(ikey(i,'pos'     ))return self.pos=rint(getpair(x)),x
 		if(ikey(i,'show'    ))return self.show=normalize_enum(widget_shows,ls(x)),x
@@ -2136,6 +2137,7 @@ interface_widget=(self,i,x)=>{
 		if(ikey(i,'script'  ))return lms(ivalue(self,ls(i),''))
 		if(ikey(i,'locked'  ))return lmn(ivalue(self,ls(i),0))
 		if(ikey(i,'animated'))return lmn(ivalue(self,ls(i),0))
+		if(ikey(i,'volatile'))return lmn(ivalue(self,ls(i),0))
 		if(ikey(i,'pos'     ))return lmpair(ivalue(self,ls(i),rect()))
 		if(ikey(i,'show'    ))return lms(ivalue(self,ls(i),'solid'))
 		if(ikey(i,'font'    ))return dget(self.card.deck.fonts,lms(ivalue(self,ls(i),button_is(self)?'menu':'body')))
@@ -2161,12 +2163,13 @@ widget_read=(x,card)=>{
 	init_field(ri,'font'    ,x)
 	init_field(ri,'locked'  ,x)
 	init_field(ri,'animated',x)
+	init_field(ri,'volatile',x)
 	init_field(ri,'pos'     ,x)
 	init_field(ri,'show'    ,x)
 	return ri
 }
 widget_write=x=>{
-	const r=lmd()
+	const r=lmd();widget_purge(x)
 	dset(r,lms('name'),lms(x.name))
 	dset(r,lms('type'),lms(x.n))
 	dset(r,lms('size'),ifield(x,'size'))
@@ -2175,6 +2178,7 @@ widget_write=x=>{
 	if(x.pos     )dset(r,lms('pos'     ),lmpair(x.pos))
 	if(x.locked  )dset(r,lms('locked'  ),lmn(x.locked))
 	if(x.animated)dset(r,lms('animated'),lmn(x.animated))
+	if(x.volatile)dset(r,lms('volatile'),lmn(x.volatile))
 	if(x.script  )dset(r,lms('script'  ),lms(x.script))
 	if(x.font&&x.font!=(button_is(x)?"menu":"body"))dset(r,lms('font'),lms(x.font))
 	if(x.show&&x.show!='solid')dset(r,lms('show'),lms(x.show))
@@ -2443,6 +2447,16 @@ deck_paste=(deck,z,name)=>{
 	merge_fonts(deck,dget(v,lms('f')))
 	merge_prototypes(deck,defs?ld(defs):lmd(),wids?ll(wids):[]);const r=card_read(payload,deck);dset(deck.cards,name||ifield(r,'name'),r);return r
 }
+widget_purge=x=>{
+	if(!x.volatile)return
+	if(button_is(x))iwrite(x,lms('value'),NONE)
+	if(slider_is(x))iwrite(x,lms('value'),NONE)
+	if(field_is (x))iwrite(x,lms('value'),lms('')),iwrite(x,lms('scroll'),NONE)
+	if(grid_is  (x))iwrite(x,lms('value'),lmt()  ),iwrite(x,lms('scroll'),NONE)
+	if(canvas_is(x)){const t=frame;canvas_pick(x),draw_rect(frame.clip,0);frame=t}
+	if(contraption_is(x))x.widgets.v.map(w=>widget_purge(w))
+}
+deck_purge=x=>{x.cards.v.map(c=>c.widgets.v.map(w=>widget_purge(w)))}
 deck_read=x=>{
 	const deck={},scripts={},cards={},modules={},defs={}, fonts=lmd(),sounds=lmd(); let i=0,m=0,md=0,lc=0
 	Object.keys(FONTS).map(k=>dset(fonts,lms(k),font_read(FONTS[k])))
@@ -2503,6 +2517,7 @@ deck_read=x=>{
 			if(ikey(i,'event'   ))return lmnat(args=>n_event(self,args))
 			if(ikey(i,'copy'    ))return lmnat(([x])=>deck_copy(self,x))
 			if(ikey(i,'paste'   ))return lmnat(([x])=>deck_paste(self,x))
+			if(ikey(i,'purge'   ))return lmnat(()=>{deck_purge(self);return NONE})
 		}return x?x:NONE
 	},'deck')
 	ri.fonts       =fonts

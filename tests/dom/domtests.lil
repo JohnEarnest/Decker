@@ -443,6 +443,7 @@ dattr.font:    deck.fonts.menu
 dattr.script:  ""
 dattr.locked:  0
 dattr.animated:0
+dattr.volatile:0
 dattr.size:    60,20
 dattr.pos:     0,0
 dattr.show:    "solid"
@@ -457,6 +458,7 @@ on buttonattrs x do
 	r.script:  x.script
 	r.locked:  x.locked
 	r.animated:x.animated
+	r.volatile:x.volatile
 	r.size:    x.size
 	r.pos:     x.pos
 	r.show:    x.show
@@ -472,6 +474,7 @@ dattr.font:     b.font:     deck.fonts.menu
 dattr.script:   b.script:   "2+3"
 dattr.locked:   b.locked:   1
 dattr.animated: b.animated: 1
+dattr.volatile: b.volatile: 1
 dattr.size:     b.size:     32,48
 dattr.pos:      b.pos:      12,34
 dattr.show:     b.show:     "invert"
@@ -486,6 +489,7 @@ dattr.font:deck.fonts.body  b.font: "zoop"
 dattr.script:"0"            b.script: 0
 dattr.locked:1              b.locked: 99
 dattr.animated:1            b.animated: 37
+dattr.volatile:1            b.volatile: 9999
 dattr.size:0,19             b.size: -12,19
 dattr.pos:-99,0             b.pos:-99,"A"
 dattr.show:"solid"          b.show:"frizzle"
@@ -1598,6 +1602,20 @@ assert["add card to deck: cardlist" ("home","card1") (keys deck.cards)]
 assert["add card to deck: wids"     (list "clickme") (keys c2.widgets)]
 c3:deck.add[c1 "named"]
 assert["add card to deck with name" ("home","card1","named") (keys deck.cards)]
+
+deck:readdeck[]
+f1:deck.card.add["field" "preserved"]
+f2:deck.card.add["field" "ephemeral"]
+f2.volatile:1
+f1.text:"This text is preserved."
+f2.text:"This text is discarded."
+deck.purge[]
+assert["manually purge volatiles" ("This text is preserved.","") (f1,f2)..text]
+f1.text:"This text round-trips."
+f2.text:"This text does not round-trip."
+writedeck["temp.deck" deck]
+deck:readdeck["temp.deck"]
+assert["volatiles do not round-trip" ("This text round-trips.","") (f1,f2)..text]
 
 #######################################
 #

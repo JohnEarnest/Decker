@@ -719,6 +719,7 @@ The deck interface represents the global attributes of a Decker document. The op
 | `x.remove[x]`     | Remove a resource, card, or widget from this deck. Returns 1 on success.                    |
 | `x.copy[card]`    | Save a card and its contents as an opaque string starting with `%%CRD0`.                    |
 | `x.paste[text]`   | Append a card and its contents from a `%%CRD0` string to this deck, returning the new card. |
+| `x.purge[]`       | Reset the value-state of `volatile` widgets to their defaults.                              |
 | `x.event[n x...]` | Issue an event named `n` at this deck with argument(s) `x`.                                 |
 
 `deck.add[x y z]` can add new cards, sounds, modules, prototypes and fonts to the deck:
@@ -1017,6 +1018,7 @@ The button widget is a clickable button, possibly with a stateful checkbox.
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
 | `x.locked`              | Bool. If true, the user cannot modify the value of this checkbox. r/w.                                |
 | `x.animated`            | Bool. If true, this widget will be sent `view[]` events at 60hz while on the current card. r/w.       |
+| `x.volatile`            | Bool. If true, this widget does not serialize its value-state when the deck is saved. r/w.            |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
@@ -1052,6 +1054,7 @@ The field widget displays and possibly allows the editing of text.
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
 | `x.locked`              | Bool. If true, the user cannot edit the text of this field. r/w.                                      |
 | `x.animated`            | Bool. If true, this widget will be sent `view[]` events at 60hz while on the current card. r/w.       |
+| `x.volatile`            | Bool. If true, this widget does not serialize its value-state when the deck is saved. r/w.            |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
@@ -1083,6 +1086,7 @@ The slider widget represents a single number, constrained within a configurable 
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
 | `x.locked`              | Bool. If true, the user cannot change the value of this slider. r/w.                                  |
 | `x.animated`            | Bool. If true, this widget will be sent `view[]` events at 60hz while on the current card. r/w.       |
+| `x.volatile`            | Bool. If true, this widget does not serialize its value-state when the deck is saved. r/w.            |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
@@ -1108,6 +1112,7 @@ The grid widget represents an interactive spreadsheet-style view of a table.
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
 | `x.locked`              | Bool. If true, the user cannot select a row of the grid. r/w.                                         |
 | `x.animated`            | Bool. If true, this widget will be sent `view[]` events at 60hz while on the current card. r/w.       |
+| `x.volatile`            | Bool. If true, this widget does not serialize its value-state when the deck is saved. r/w.            |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
@@ -1149,6 +1154,7 @@ The canvas will scale _up_ logical pixels to display them on the card (resulting
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                                 |
 | `x.locked`              | Bool. If false, the user can draw on this canvas in the current brush and pattern. r/w.                           |
 | `x.animated`            | Bool. If true, this widget will be sent `view[]` events at 60hz while on the current card. r/w.                   |
+| `x.volatile`            | Bool. If true, this widget does not serialize its value-state when the deck is saved. r/w.            |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                                          |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                                   |
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.                          |
@@ -1220,6 +1226,7 @@ Contraptions are custom widgets, defined in a [Prototype](#prototypeinterface). 
 | `x.image`               | An _image_ interface representing the contraption's background, inherited from its Prototype.         |
 | `x.locked`              | Bool. Behavior of this property is entirely up to the Prototype. r/w.                                 |
 | `x.animated`            | Bool. If true, this widget will be sent `view[]` events at 60hz while on the current card. r/w.       |
+| `x.volatile`            | Bool. Behavior of this property is entirely up to the Prototype. r/w.                                 |
 | `x.pos`                 | The `pos` of this widget relative to its container. r/w.                                              |
 | `x.offset`              | The `pos` of this widget in screen coordinates.                                                       |
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
@@ -1310,7 +1317,7 @@ The `attributes` table provides information about the attributes of contraption 
 | `"code"`       | A Lil string          | Large field in "code" editing mode. |
 | `"rich"`       | An rtext table        | Large field in "rich" editing mode. |
 
-Modifying the attributes of a Prototype will automatically update Contraption instances in the current deck. Modifying the attributes of widgets contained in this Prototype will require explicitly calling `prototype.update[]`. In either case, when a definition is updated, the `name`, `pos`, `show`, `locked`, `animated`, `font`, and `script` attributes of Contraptions will be preserved, as well the `value`, `scroll`, `row`, `col`, and `image` attributes of the widgets they contain (as applicable) if they have been modified from their original values in the prototype, but everything else will be regenerated from the definition. The _state_ of contraptions is kept, and the _behavior and appearance_ is changed.
+Modifying the attributes of a Prototype will automatically update Contraption instances in the current deck. Modifying the attributes of widgets contained in this Prototype will require explicitly calling `prototype.update[]`. In either case, when a definition is updated, the `name`, `pos`, `show`, `locked`, `animated`, `volatile`, `font`, and `script` attributes of Contraptions will be preserved, as well the `value`, `scroll`, `row`, `col`, and image content of the widgets they contain (as applicable) if they have been modified from their original values in the prototype, but everything else will be regenerated from the definition. The _state_ of contraptions is kept, and the _behavior and appearance_ is changed.
 
 
 Events
@@ -1603,6 +1610,17 @@ Contraptions and prototypes have a few important limitations to keep in mind:
 - Custom attributes cannot be invoked recursively or directly call other custom attributes. If this is attempted, they halt and return `0`. For example, a script inside a prototype should use `get_value[]` instead of `card.value` to access the `value` attribute.
 
 
+Volatility
+==========
+Widgets store the persistent state of a deck. All information with a lifetime longer than an event handler script is represented somewhere in a widget, a card, or the deck itself. Some widgets, however, contain _derived state_ that is not essential; for example, the numbers in a total display computed from the contents of a grid, or the image on an animated canvas which is redrawn on every frame.
+
+Any widget may be marked as "volatile", manually through the _Widgets &#8594; Volatile_ menu item or programmatically via the `.volatile` attribute. When a deck is saved and reloaded, volatile "value-state" of widgets- the `value`, `scroll`, `row`, `col` and image content- is discarded, including widgets contained within contraptions. Note that much like `.locked`, the `.volatile` attribute of a contraption instance _itself_ doesn't do anything; it's up to the prototype's scripts to forward this property appropriately to inner widgets that may be somehow "inherit" this property.
+
+Within a work session, the value-state of any volatile widgets may also be "purged", manually through the _File &#8594; Purge Volatiles_ menu item or programmatically via the `deck.purge[]` method. When volatiles are purged manually, the current card will automatically be sent a `view[]` event to allow the card to regenerate volatile state as it sees fit.
+
+Careful use of volatility can significantly reduce the size of saved decks and provide a useful mechanism for "resetting" games and similar applications between test runs. It can, however, also introduce subtle bugs if used improperly- say, if a script relies upon reading a volatile widget's state as a "source of truth" when it may have been purged and not re-calculated. If a widget represents a "cache" of an expensive operation, it may not be desirable to make it volatile, even if that data _could_ be regenerated. If you aren't _certain_ a widget's contents is ephemeral, avoid applying this feature.
+
+
 Animation
 =========
 Let's say we're on a card containing a canvas named `canvas`. The card also has a script which defines a function named `pinwheel[]` for clearing the canvas and drawing a shape on it, with the shape's size and rotation controlled by a parameter `t` (_time_):
@@ -1697,6 +1715,8 @@ on view do
 end
 ```
 This approach "pulls" values from other fields, whereas you might otherwise "push" values from fields when they're edited, using their `change` event. As always, build your applications in the way that makes the most sense to you!
+
+Widgets whose values are continuously updated from elsewhere and therefore do not contain meaningfully persistent data are good candidates for being marked as [volatile](#volatility).
 
 
 Transitions

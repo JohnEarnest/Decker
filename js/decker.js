@@ -2639,6 +2639,10 @@ object_editor=_=>{
 		if(sel){draw_box(inset(w.size,-1),0,ANTS)}else if(ob.show_bounds){draw_boxinv(pal,inset(w.size,-1))}
 		if(sel&&is_resizable())draw_handles(w.size)
 		if(ob.show_bounds){
+			if(lb(ifield(wid,'volatile'))){
+				draw_line(rect(w.size.x,w.size.y,w.size.x+w.size.w,w.size.y+w.size.h),0,1,deck)
+				draw_line(rect(w.size.x+w.size.w,w.size.y,w.size.x,w.size.y+w.size.h),0,1,deck)
+			}
 			const badge=rect(w.size.x+w.size.w-10,w.size.y,10,10)
 			if(w.locked                  )draw_rect(badge,1),draw_icon(rect(badge.x+1,badge.y+1),LOCK,32),badge.y+=10
 			if(lb(ifield(wid,"animated")))draw_rect(badge,1),draw_icon(rect(badge.x+1,badge.y+1),ANIM,32)
@@ -3039,6 +3043,8 @@ all_menus=_=>{
 			if(menu_item("Export Image...",1))modal_enter('export_image')
 		}
 		menu_separator()
+		if(menu_item('Purge Volatiles',1)){deck_purge(deck),msg.next_view=1}
+		menu_separator()
 		if(menu_item('Cards...'     ,1,'C'))modal_enter('cards')
 		if(menu_item('Sounds...'    ,1,'S'))modal_enter('sounds')
 		if(menu_item('Prototypes...',1,'T'))modal_enter('contraptions')
@@ -3248,11 +3254,13 @@ all_menus=_=>{
 		if(menu_item('New Grid...'       ,1))ob_create([lmd([lms('type')],[lms('grid'  )])])
 		if(card_is(con())&&menu_item('New Contraption...',1))modal_enter('pick_contraption')
 		menu_separator()
-		let al=1,aa=1,as=1,at=1,ai=1,an=1
+		let al=1,aa=1,av=1,as=1,at=1,ai=1,an=1
 		ob.sel.map(unpack_widget).map(w=>{al&=w.locked, as&=w.show=='solid', at&=w.show=='transparent', ai&=w.show=='invert', an&=w.show=='none'})
 		ob.sel.map(w=>aa&=lb(ifield(w,'animated')))
+		ob.sel.map(w=>av&=lb(ifield(w,'volatile')))
 		if(menu_check('Locked'          ,ob.sel.length,ob.sel.length&&al))ob_edit_prop('locked'  ,lmn(!al))
 		if(menu_check('Animated'        ,ob.sel.length,ob.sel.length&&aa))ob_edit_prop('animated',lmn(!aa))
+		if(menu_check('Volatile'        ,ob.sel.length,ob.sel.length&&av))ob_edit_prop('volatile',lmn(!av))
 		menu_separator()
 		if(menu_check('Show Solid'      ,ob.sel.length,ob.sel.length&&as))ob_edit_prop('show',lms('solid'      ))
 		if(menu_check('Show Transparent',ob.sel.length,ob.sel.length&&at))ob_edit_prop('show',lms('transparent'))
