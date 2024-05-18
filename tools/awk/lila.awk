@@ -2041,8 +2041,8 @@ function parse_send(b){
 }
 function parse_atmonad(b,n,  l){expr(b);l=lmblk();blk_get(l,"v");blk_op1(l,n);blk_loop(b,l_list(lms("v")),l)}
 function parse_atdyad(b,  temp,nm,l,z){
-	temp=tempname();l=lmblk();nm=lml3(lms("v"),lms("k"),lms("i"))
-	blk_get(l,temp);blk_get(l,"v");blk_get(l,"k");blk_get(l,"i");blk_opa(l,"BUND",3);blk_op(l,"CALL")
+	temp=tempname();l=lmblk();nm=l_list(lms("v"))
+	blk_get(l,temp);blk_get(l,"v");blk_opa(l,"BUND",1);blk_op(l,"CALL")
 	blk_set(b,temp);blk_op(b,"DROP");expr(b);blk_loop(b,nm,l)
 }
 function term(b,  n,t){

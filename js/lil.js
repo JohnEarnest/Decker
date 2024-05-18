@@ -564,8 +564,8 @@ parse=text=>{
 	const expr=b=>{
 		term(b);if(peek().t in {'[':1,'.':1}){parseindex(b)}
 		if(matchsp('@')){
-			const temp=tempname(),names=['v','k','i'];blk_set(b,temp),blk_op(b,op.DROP)
-			expr(b),blk_loop(b,names,_=>{blk_get(b,temp),names.map(n=>blk_get(b,lms(n))),blk_opa(b,op.BUND,3),blk_op(b,op.CALL)});return
+			const temp=tempname(),names=['v'];blk_set(b,temp),blk_op(b,op.DROP)
+			expr(b),blk_loop(b,names,_=>{blk_get(b,temp),names.map(n=>blk_get(b,lms(n))),blk_opa(b,op.BUND,1),blk_op(b,op.CALL)});return
 		}const s=peek().v;if(findop(s,dyad)>=0&&peek().t in {'symbol':1,'name':1}){next(),expr(b),blk_op2(b,s)}
 	}
 	const b=lmblk();if(hasnext())expr(b);while(hasnext())blk_op(b,op.DROP),expr(b)

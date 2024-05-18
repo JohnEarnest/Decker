@@ -905,8 +905,8 @@ void expr(lv*b){
 	term(b);if(strchr("[.",peek()->type)){parseindex(b,NULL);}
 	if(matchsp('@')){
 		lv*temp=tempname();blk_set(b,temp),blk_op(b,DROP);
-		lv*names=lml(3);names->lv[0]=lmistr("v"),names->lv[1]=lmistr("k"),names->lv[2]=lmistr("i");expr(b);
-		lv*l=lmblk();blk_get(l,temp);EACH(z,names)blk_get(l,names->lv[z]);blk_opa(l,BUND,3),blk_op(l,CALL);
+		lv*names=l_list(lmistr("v"));expr(b);
+		lv*l=lmblk();blk_get(l,temp);blk_get(l,l_first(names));blk_opa(l,BUND,1);blk_op(l,CALL);
 		blk_loop(b,names,l);return;
 	}
 	str s=token_str(peek());if(findop(s.sv,dyads)>=0&&strchr("mn",peek()->type)){next(),expr(b),blk_op2(b,s.sv);}free(s.sv);

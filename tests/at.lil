@@ -7,7 +7,7 @@ show[(11,22,33,44) @ 0,1,0,2,0]
 # and dictionary extraction
 show[(11,22,33,44) @ ("a","b") dict 2,0]
 
-# in general, `x @ y` is equivalent to `each v k i in y (x[v k i]) end`
+# in general, `x @ y` is equivalent to `each v in y x[v] end`
 on step x y z do
 	(x,y,z)
 end
