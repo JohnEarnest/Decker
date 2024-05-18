@@ -2062,6 +2062,7 @@ lv* interface_module(lv*self,lv*i,lv*x){
 	lv*data=self->b,*deck=ivalue(self,"deck"),*modules=ivalue(deck,"modules");
 	if(x){
 		ikey("description"){dset(data,i,ls(x));return x;}
+		ikey("version"    ){dset(data,i,lmn(ln(x)));return x;}
 		ikey("name"){
 			lv*name=ivalue(self,"name");
 			if(ls(x)->c==0){return x;}lv*n=ukey(modules,ls(x),ls(x)->sv,dget(data,i));
@@ -2081,6 +2082,7 @@ lv* interface_module(lv*self,lv*i,lv*x){
 		ikey("script"     ){lv*r=dget(data,i);return r?r:lmistr("");}
 		ikey("value"      ){lv*r=dget(data,i);return r?r:lmd();}
 		ikey("description"){lv*r=dget(data,i);return r?r:lmistr("");}
+		ikey("version"    ){lv*r=dget(data,i);return r?r:NONE;}
 		ikey("error"      ){lv*r=dget(data,i);return r?r:lmistr("");}
 	}return x?x:NONE;
 }
@@ -2090,6 +2092,7 @@ lv* module_read(lv*x,lv*deck){
 	{lv*k=lmistr("name");dset(r,k,ukey(modules,dget(x,k),"module",NULL));}
 	lv*ri=lmi(interface_module,lmistr("module"),r);
 	init_field(ri,"description",x);
+	init_field(ri,"version",x);
 	init_field(ri,"script",x);
 	return ri;
 }
@@ -2099,6 +2102,7 @@ lv* module_write(lv*x){
 	{lv*k=lmistr("data"       ),*v=dget(data,k);dset(r,k,v->b);}
 	{lv*k=lmistr("script"     ),*v=dget(data,k);dset(r,k,v);}
 	{lv*k=lmistr("description"),*v=dget(data,k);if(v&&v->c)dset(r,k,v);}
+	{lv*k=lmistr("version"    ),*v=dget(data,k);if(v&&ln(v))dset(r,k,v);}
 	return r;
 }
 
@@ -2161,10 +2165,18 @@ lv* n_con_copy(lv*card,lv*z){
 		if(!strcmp(type->sv,"contraption")&&dget(defs,def)==NULL)dset(defs,def,prototype_write(dget(condefs,def)));
 	}str r=str_new();str_addz(&r,"%%WGT0");fjson(&r,v);return lmstr(r);
 }
+lv* n_deck_add(lv*self,lv*z);lv* deck_read(lv*x); // forward refs
 void merge_prototypes(lv*deck,lv*defs,lv*uses){
 	lv*condefs=ifield(deck,"contraptions");EACH(d,defs){
-		lv*def=ld(defs->lv[d]),*name=dget(def,lmistr("name")),*desc=dget(def,lmistr("description"));if(!lis(name))continue;if(!desc)desc=lmistr("");
-		int f=0;EACH(c,condefs){lv*con=condefs->lv[c];if(matchr(name,ifield(con,"name"))&&matchr(desc,ifield(con,"description"))){f=1;break;}}if(f)continue;
+		lv*def=ld(defs->lv[d]),*name=dget(def,lmistr("name")),*desc=dget(def,lmistr("description"));
+		lv*ver=dget(def,lmistr("version"));float version=ver?ln(ver):0.0;
+		if(!lis(name))continue;if(!desc)desc=lmistr("");
+		int f=0;EACH(c,condefs){
+			lv*con=condefs->lv[c];if(matchr(name,ifield(con,"name"))&&matchr(desc,ifield(con,"description"))){
+				if(ln(ifield(con,"version"))<version)n_deck_add(deck,prototype_read(def,deck_read(lmistr(""))));
+				f=1;break;
+			}
+		}if(f)continue;
 		lv*p=prototype_read(def,deck),*nn=ifield(p,"name");dset(condefs,nn,p);
 		EACH(w,uses){
 			lv*wid=ld(uses->lv[w]),*type=dget(wid,lmistr("type")),*def=dget(wid,lmistr("def"));
@@ -2274,6 +2286,7 @@ lv* interface_prototype(lv*self,lv*i,lv*x){
 			defs->kv[dgeti(defs,o)]=n;dset(data,i,n);return x;
 		}
 		ikey("description"){dset(data,i,ls(x));return x;}
+		ikey("version"    ){dset(data,i,lmn(ln(x)));return x;}
 		ikey("size"       ){dset(data,i,normalize_pair  (x                             )),contraption_update(self);return x;}
 		ikey("margin"     ){dset(data,i,normalize_margin(x,getpair(ifield(self,"size")))),contraption_update(self);return x;}
 		ikey("resizable"  ){dset(data,i,lmn(lb(x)))                                      ,contraption_update(self);return x;}
@@ -2284,6 +2297,7 @@ lv* interface_prototype(lv*self,lv*i,lv*x){
 	}else{
 		ikey("name"       )return dget(data,i);
 		ikey("description"){lv*r=dget(data,i);return r?r:lmistr("");}
+		ikey("version"    ){lv*r=dget(data,i);return r?r:NONE;      }
 		ikey("script"     ){lv*r=dget(data,i);return r?r:lmistr("");}
 		ikey("template"   ){lv*r=dget(data,i);return r?r:lmistr("");}
 		ikey("size"       )return dget(data,i);
@@ -2306,6 +2320,7 @@ lv* prototype_write(lv*prototype){
 	{lv*k=lmistr("resizable"  ),*v=dget(data,k);if(lb(v))dset(r,k,v);}
 	{lv*k=lmistr("margin"     ),*v=dget(data,k);dset(r,k,v);}
 	{lv*k=lmistr("description"),*v=dget(data,k);if(v&&lis(v)&&v->c)dset(r,k,v);}
+	{lv*k=lmistr("version"    ),*v=dget(data,k);if(v&&lin(v)&&ln(v))dset(r,k,v);}
 	{lv*k=lmistr("script"     ),*v=dget(data,k);if(v&&lis(v)&&v->c)dset(r,k,v);}
 	{lv*k=lmistr("template"   ),*v=dget(data,k);if(v&&lis(v)&&v->c)dset(r,k,v);}
 	{lv*k=lmistr("image"      ),*v=dget(data,k);if(v&&!is_blank(v))dset(r,k,image_write(v));}
@@ -2326,6 +2341,7 @@ lv* prototype_read(lv*x,lv*deck){
 	lv*w=dget(x,lmistr("widgets"));if(lid(w)){EACH(z,w)dset(w->lv[z],lmistr("name"),ls(w->kv[z]));}w=w?ll(w):lml(0);
 	EACH(z,w){lv*n=dget(w->lv[z],lmistr("name"));if(n){lv*i=widget_read(w->lv[z],ri);if(lii(i))dset(widgets,ifield(i,"name"),i);}}
 	init_field(ri,"description",x)
+	init_field(ri,"version"    ,x)
 	init_field(ri,"script"     ,x)
 	init_field(ri,"template"   ,x)
 	{lv*k=lmistr("margin"),*v=dget(x,k);dset(r,k,normalize_margin(v?v:NONE,getpair(ifield(ri,"size"))));}
@@ -2355,6 +2371,7 @@ lv* deck_paste_named(lv*deck,lv*z,lv*name){
 	lv*r=card_read(payload,deck);dset(dget(deck->b,lmistr("cards")),name?name:ifield(r,"name"),r);return r;
 }
 lv* n_deck_paste(lv*deck,lv*z){return deck_paste_named(deck,z,NULL);}
+lv* n_deck_remove(lv*self,lv*z); // forward ref
 lv* n_deck_add(lv*self,lv*z){
 	lv*sounds=ivalue(self,"sounds"),*fonts=ivalue(self,"fonts"),*modules=ivalue(self,"modules"),*cards=ivalue(self,"cards"),*t=l_first(z);
 	lv*defs=ivalue(self,"contraptions");
@@ -2362,12 +2379,23 @@ lv* n_deck_add(lv*self,lv*z){
 	if(font_is(t)){lv*r=font_make((pair){font_w(t),font_h(t)});memcpy(r->b->sv,t->b->sv,r->b->c);return uset(fonts,unpack_str(z,1),"font",r);}
 	if(sound_is(t)){lv*b=lms(t->b->c);memcpy(b->sv,t->b->sv,b->c);return uset(sounds,unpack_name(z,1),"sound",sound_make(b));}
 	if(module_is(t)){
-		lv*a=module_write(t);if(z->c>1)dset(a,lmistr("name"),unpack_str(z,1));
-		lv*r=module_read(a,self);dset(modules,ifield(r,"name"),r);return r;
+		if(z->c<2&&dget(modules,ifield(t,"name"))){ // replace
+			n_deck_remove(self,dget(modules,ifield(t,"name")));modules=ivalue(self,"modules");
+			lv*r=module_read(module_write(t),self);dset(modules,ifield(r,"name"),r);return r;
+		}else{ // insert
+			lv*a=module_write(t);if(z->c>1)dset(a,lmistr("name"),unpack_str(z,1));
+			lv*r=module_read(a,self);dset(modules,ifield(r,"name"),r);return r;
+		}
 	}
 	if(prototype_is(t)){
-		lv*a=prototype_write(t);if(z->c>1)dset(a,lmistr("name"),unpack_str(z,1));
-		lv*r=prototype_read(a,self);dset(defs,ifield(r,"name"),r);return r;
+		if(z->c<2&&dget(defs,ifield(t,"name"))){ // replace
+			lv*name=ifield(t,"name"),*r=dget(defs,name);
+			r->b=prototype_read(prototype_write(t),self)->b;dset(r->b,lmistr("name"),name);
+			contraption_update(r);return r;
+		}else{ // insert
+			lv*a=prototype_write(t);if(z->c>1)dset(a,lmistr("name"),unpack_str(z,1));
+			lv*r=prototype_read(a,self);dset(defs,ifield(r,"name"),r);return r;
+		}
 	}
 	if(lis(t)&&!strcmp("sound" ,t->sv))return uset(sounds,unpack_name(z,2),"sound",sound_make(lms(MAX(0,z->c>1?ln(z->lv[1]):0))));
 	if(lis(t)&&!strcmp("font"  ,t->sv))return uset(fonts,unpack_name(z,2),"font",font_make(unpack_pair(z,1)));

@@ -43,6 +43,7 @@ end
 
 {module:ovals}
 description:"Oval-shaped brushes"
+version:1.0
 {script}
 brush["OvalSml"  image["%%IMG0AAYABhg8fPjwYA=="]]
 brush["OvalMed"  image["%%IMG0AAgACA4/f3/+/vxw"]]
@@ -52,6 +53,7 @@ brush["OvalHuge" image["%%IMG0ABIAEgAHgAAfwAB/wAH/wAP/wAf/gA//gB//AB//AD/+AD/+AH
 
 {module:sumis}
 description:"Velocity-sensitive sumi-style brushes"
+version:1.0
 {script}
 # 16 round brush images ranging from 1px to 13px:
 b:image@"\n"split 1 drop "
@@ -78,6 +80,7 @@ brush[on SumiLrg delta do b[   15&.8*mag delta]end]
 
 {module:stipplers}
 description:"Stippling brushes"
+version:1.0
 {script}
 # a rough dotted line:
 pix:image["%%IMG0AAEAAYA="] # a single pixel

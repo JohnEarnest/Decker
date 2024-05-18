@@ -389,6 +389,7 @@ image:"%%IMG0AgABVr/7/9v//v//3/9///9v///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 {module:pt}
 description:"Display and animate sprites for visual novels."
+version:1.0
 {script}
 
 local FRONT:999999  # foremost (reasonable) widget index
@@ -753,6 +754,7 @@ end
 
 {module:dd}
 description:"Display sequential, styled modal dialogs for visual novels."
+version:1.2
 {script}
 # state/constants:
 local host:0

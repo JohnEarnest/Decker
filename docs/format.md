@@ -237,6 +237,7 @@ The `{module:ID}` Chunk
 Module chunks always have an ID, which serves as the `name` of the module. They also may have additional optional properties:
 
 - `description`: a string giving a human-readable description of the purpose of the module.
+- `version`: a number used to distinguish subsequent revisions of a module. The default is `0`.
 
 Modules may contain a `{data}` chunk containing a dictionary of names associated with JSON values, in the same structure as `{widgets}` or `{fonts}`.
 
@@ -246,6 +247,7 @@ An example of a complete `{module:ID}` chunk:
 ```
 {module:logger}
 description:"a utility module for logging"
+version:1.0
 {data}
 log:{time:[],message:[]}
 {script}
@@ -269,6 +271,7 @@ Contraption chunks always have an ID, which serves as the `name` of the Prototyp
 
 - `size`: an array of 2 integers providing the width and height of instances of the Prototype, respectively, in pixels.
 - `description`: a string giving a human-readable description of the purpose of the Prototype.
+- `version`: a number used to distinguish subsequent revisions of a Prototype. The default is `0`.
 - `image`: an _Image Record_ used as the background of instances of the Prototype.
 - `script`: a number or string corresponding to a `{script:ID}` chunk, analogous to the script of a card from the perspective of contained widgets.
 - `template`: a string containing a Lil script that will be used as the default script for newly-created instances of this Prototype.
@@ -383,3 +386,4 @@ Changelog
 
 1.43:
 - Introduced the `volatile` property for all widgets.
+- Introduced the `version` property for the `{module:ID}` and `{contraption:ID}` sections.

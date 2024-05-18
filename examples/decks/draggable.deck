@@ -209,6 +209,7 @@ end
 
 {module:rect}
 description:"Utilities for working with rectangles"
+version:1.0
 {script}
 module.make     :on make      a b do ("pos","size") dict (list a),(list b)                   end
 module.overlaps :on overlaps  a b do min(a.pos<b.pos+b.size),b.pos<a.pos+a.size              end

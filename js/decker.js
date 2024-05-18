@@ -1365,6 +1365,7 @@ modal_enter=type=>{
 		ms.name =fieldstr(ifield(c,'name'))
 		ms.form0=fieldstr(ifield(c,'description'))
 		ms.form1=fieldstr(ifield(c,'template'))
+		ms.form2=fieldstr(ifield(c,'version'))
 	}
 	if(type=='prototype_attrs'){
 		const a=ifield(con(),'attributes')
@@ -1617,15 +1618,18 @@ modals=_=>{
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='prototype_props'){
-		const b=draw_modalbox(rect(220,220)),def=con(), lw=67
+		const b=draw_modalbox(rect(220,230)),def=con(), lw=67
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Prototype Properties',FONT_MENU,1)
 		draw_text(rect(b.x,b.y+ 22,lw,20),'Name',FONT_MENU,1)
-		draw_text(rect(b.x,b.y+ 42,lw,20),'Description',FONT_MENU,1)
-		draw_text(rect(b.x,b.y+102,lw,20),'Template\nScript',FONT_MENU,1)
+		draw_text(rect(b.x,b.y+ 42,lw,20),'Version',FONT_MENU,1)
+		draw_text(rect(b.x,b.y+ 62,lw,20),'Description',FONT_MENU,1)
+		draw_text(rect(b.x,b.y+122,lw,20),'Template\nScript',FONT_MENU,1)
 		ui_field   (rect(b.x+lw,b.y+20 ,b.w-lw,18),ms.name)
-		ui_textedit(rect(b.x+lw,b.y+40 ,b.w-lw,58),1,ms.form0)
-		ui_codeedit(rect(b.x+lw,b.y+100,b.w-lw,78),1,ms.form1)
+		ui_field   (rect(b.x+lw,b.y+40 ,b.w-lw,18),ms.form2)
+		ui_textedit(rect(b.x+lw,b.y+60 ,b.w-lw,58),1,ms.form0)
+		ui_codeedit(rect(b.x+lw,b.y+120,b.w-lw,78),1,ms.form1)
 		iwrite(def,lms('name'       ),rtext_string(ms.name .table))
+		iwrite(def,lms('version'    ),rtext_string(ms.form2.table))
 		iwrite(def,lms('description'),rtext_string(ms.form0.table))
 		iwrite(def,lms('template'   ),rtext_string(ms.form1.table)),mark_dirty()
 		const c=rect(b.x,b.y+b.h-20)
@@ -1671,7 +1675,7 @@ modals=_=>{
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit){iwrite(def,lms('attributes'),ms.grid.table),mark_dirty(),modal_exit(1)}
 	}
 	else if(ms.type=='resources'){
-		const b=draw_modalbox(rect(280,190))
+		const b=draw_modalbox(rect(320,190))
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Font/Deck Accessory Mover',FONT_MENU,1)
 		const lgrid=rect(b.x            ,b.y+15 ,100    ,b.h-(15+15+5+20))
 		const rgrid=rect(b.x+b.w-lgrid.w,lgrid.y,lgrid.w,lgrid.h         )
@@ -1685,8 +1689,17 @@ modals=_=>{
 		const cb=rect(lgrid.x+lgrid.w+5,lgrid.y+5,b.w-(lgrid.w+5+5+rgrid.w),20)
 		const rvalue=(g,k)=>g.table.v[k][g.row]
 		let sel=(ms.grid.table&&ms.grid.row>-1)?rvalue(ms.grid,'value'): ms.grid2.row>-1?rvalue(ms.grid2,'value'): null
-		if(ui_button(cb,'>> Copy >>',ms.grid.row>-1)){
+		let copy_message='>> Copy >>',can_copy=1
+		if(ms.grid.row>-1&&sel&&(module_is(sel)||prototype_is(sel))){
+			const name=ifield(sel,'name');let sver=ln(ifield(sel,'version')),dver=sver;can_copy=0
+			if(module_is   (sel)){const v=dget(deck.modules     ,name);if(v){dver=ln(ifield(v,'version'))}else{can_copy=1}}
+			if(prototype_is(sel)){const v=dget(deck.contraptions,name);if(v){dver=ln(ifield(v,'version'))}else{can_copy=1}}
+			if(sver>dver)can_copy=1,copy_message='>> Upgrade >>'
+			if(sver<dver)can_copy=1,copy_message='>> Downgrade >>'
+		}
+		if(ui_button(cb,copy_message,can_copy&&ms.grid.row>-1)){
 			if(patterns_is(sel)){const dst=ifield(deck,'patterns');for(let z=2;z<=47;z++)iindex(dst,z,iindex(sel,z))}
+			else if(module_is(sel)||prototype_is(sel)){deck_add(deck,sel)}
 			else{deck_add(deck,sel,rvalue(ms.grid,'name'))}
 			ms.grid2=gridtab(res_enumerate(deck)),mark_dirty();if(module_is(sel))validate_modules()
 		}cb.y+=25
@@ -1697,7 +1710,10 @@ modals=_=>{
 		}cb.y+=25
 		const pre=rect(cb.x,cb.y,cb.w,b.h-(cb.y-b.y))
 		if(sel&&font_is(sel)){const l=layout_plaintext(PANGRAM,sel,ALIGN.center,rect(pre.w,pre.h));draw_text_wrap(pre,l,1)}
-		if(sel&&(module_is(sel)||prototype_is(sel))){const l=layout_plaintext(ls(ifield(sel,'description')),FONT_BODY,ALIGN.center,rect(pre.w,pre.h));draw_text_wrap(pre,l,1)}
+		if(sel&&(module_is(sel)||prototype_is(sel))){
+			draw_textc(rect(pre.x,pre.y+pre.h-18,pre.w,18),ls(dyad.format(lms('version %f'),ifield(sel,'version'))),FONT_BODY,1);pre.h-=20
+			const l=layout_plaintext(ls(ifield(sel,'description')),FONT_BODY,ALIGN.center,rect(pre.w,pre.h));draw_text_wrap(pre,l,1)
+		}
 		if(sel&&sound_is(sel)){if(ui_button(cb,'Play',1))n_play([sel])}
 		if(sel&&patterns_is(sel)){
 			const c=frame.clip,pal=sel.pal.pix;frame.clip=pre;

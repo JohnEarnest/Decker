@@ -1373,6 +1373,7 @@ void modal_enter(int type){
 		ms.name =(field_val){rtext_cast(ifield(c,"name")),0};
 		ms.form0=(field_val){rtext_cast(ifield(c,"description")),0};
 		ms.form1=(field_val){rtext_cast(ifield(c,"template")),0};
+		ms.form2=(field_val){rtext_cast(ifield(c,"version")),0};
 	}
 	if(type==modal_prototype_attrs){
 		lv*a=ifield(con(),"attributes");
@@ -1743,7 +1744,7 @@ void modals(void){
 		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_pop(0);
 	}
 	else if(ms.type==modal_resources){
-		rect b=draw_modalbox((pair){280,190});
+		rect b=draw_modalbox((pair){320,190});
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Font/Deck Accessory Mover",FONT_MENU,1);
 		rect lgrid={b.x            ,b.y+15 ,100    ,b.h-(15+15+5+20)};
 		rect rgrid={b.x+b.w-lgrid.w,lgrid.y,lgrid.w,lgrid.h         };
@@ -1757,9 +1758,20 @@ void modals(void){
 		rect cb={lgrid.x+lgrid.w+5,lgrid.y+5,b.w-(lgrid.w+5+5+rgrid.w),20};
 		#define rvalue(g,k) dget(ms.g.table,lmistr(k))->lv[ms.g.row]
 		lv*sel=(ms.grid.table&&ms.grid.row>-1)?rvalue(grid,"value"): ms.grid2.row>-1?rvalue(grid2,"value"): NULL;
-		if(ui_button(cb,">> Copy >>",ms.grid.row>-1)){
+		char*copy_message=">> Copy >>";int can_copy=1;
+		if(ms.grid.row>-1&&sel&&(module_is(sel)||prototype_is(sel))){
+			lv*name=ifield(sel,"name");
+			float sver=ln(ifield(sel,"version")),dver=sver;can_copy=0;
+			if(module_is   (sel)){lv*v=dget(ifield(deck,"modules"     ),name);if(v){dver=ln(ifield(v,"version"));}else{can_copy=1;}}
+			if(prototype_is(sel)){lv*v=dget(ifield(deck,"contraptions"),name);if(v){dver=ln(ifield(v,"version"));}else{can_copy=1;}}
+			if(sver>dver)can_copy=1,copy_message=">> Upgrade >>";
+			if(sver<dver)can_copy=1,copy_message=">> Downgrade >>";
+		}
+		if(ui_button(cb,copy_message,can_copy&&ms.grid.row>-1)){
 			if(patterns_is(sel)){lv*dst=ifield(deck,"patterns");for(int z=2;z<=47;z++)iindex(dst,z,iindex(sel,z,NULL));}
-			else{n_deck_add(deck,lml2(sel,rvalue(grid,"name")));}ms.grid2=(grid_val){res_enumerate(deck),0,-1,-1},mark_dirty();
+			else if(module_is(sel)||prototype_is(sel)){n_deck_add(deck,l_list(sel));}
+			else{n_deck_add(deck,lml2(sel,rvalue(grid,"name")));}
+			ms.grid2=(grid_val){res_enumerate(deck),0,-1,-1},mark_dirty();
 			if(module_is(sel))validate_modules();
 		}cb.y+=25;
 		if(ui_button(cb,"Remove",ms.grid2.row>-1)){
@@ -1768,7 +1780,10 @@ void modals(void){
 		}cb.y+=25;
 		rect pre={cb.x,cb.y,cb.w,b.h-(cb.y-b.y)};
 		if(sel&&font_is(sel)){layout_plaintext(pangram,sel,align_center,(pair){pre.w,pre.h}),draw_text_wrap(pre,1);}
-		if(sel&&(module_is(sel)||prototype_is(sel))){layout_plaintext(ifield(sel,"description")->sv,FONT_BODY,align_center,(pair){pre.w,pre.h}),draw_text_wrap(pre,1);}
+		if(sel&&(module_is(sel)||prototype_is(sel))){
+			draw_textc((rect){pre.x,pre.y+pre.h-18,pre.w,18},l_format(lmistr("version %f"),ifield(sel,"version"))->sv,FONT_BODY,1);pre.h-=20;
+			layout_plaintext(ifield(sel,"description")->sv,FONT_BODY,align_center,(pair){pre.w,pre.h}),draw_text_wrap(pre,1);
+		}
 		if(sel&&sound_is(sel)){if(ui_button(cb,"Play",1))n_play(deck,l_list(sel));}
 		if(sel&&patterns_is(sel)){
 			rect c=frame.clip;frame.clip=pre;char*pal=patterns_pal(sel);for(int z=0;z<32;z++)for(int y=0;y<16;y++)for(int x=0;x<16;x++){
@@ -2115,15 +2130,18 @@ void modals(void){
 		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
 	else if(ms.type==modal_prototype_props){
-		rect b=draw_modalbox((pair){220,220});lv*def=con();int lw=67;
+		rect b=draw_modalbox((pair){220,230});lv*def=con();int lw=67;
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Prototype Properties",FONT_MENU,1);
 		draw_text((rect){b.x,b.y+ 22,lw,20},"Name",FONT_MENU,1);
-		draw_text((rect){b.x,b.y+ 42,lw,20},"Description",FONT_MENU,1);
-		draw_text((rect){b.x,b.y+102,lw,20},"Template\nScript",FONT_MENU,1);
+		draw_text((rect){b.x,b.y+ 42,lw,20},"Version",FONT_MENU,1);
+		draw_text((rect){b.x,b.y+ 62,lw,20},"Description",FONT_MENU,1);
+		draw_text((rect){b.x,b.y+122,lw,20},"Template\nScript",FONT_MENU,1);
 		ui_field   ((rect){b.x+lw,b.y+20 ,b.w-lw,18},&ms.name);
-		ui_textedit((rect){b.x+lw,b.y+40 ,b.w-lw,58},1,&ms.form0);
-		ui_codeedit((rect){b.x+lw,b.y+100,b.w-lw,78},1,&ms.form1);
+		ui_field   ((rect){b.x+lw,b.y+40 ,b.w-lw,18},&ms.form2);
+		ui_textedit((rect){b.x+lw,b.y+60 ,b.w-lw,58},1,&ms.form0);
+		ui_codeedit((rect){b.x+lw,b.y+120,b.w-lw,78},1,&ms.form1);
 		iwrite(def,lmistr("name"       ),rtext_all(ms.name .table));
+		iwrite(def,lmistr("version"    ),rtext_all(ms.form2.table));
 		iwrite(def,lmistr("description"),rtext_all(ms.form0.table));
 		iwrite(def,lmistr("template"   ),rtext_all(ms.form1.table));mark_dirty();
 		pair c={b.x,b.y+b.h-20};

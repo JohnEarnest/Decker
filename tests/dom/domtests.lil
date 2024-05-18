@@ -1825,6 +1825,24 @@ deck:readdeck[]
 m2:deck.add[m "namedcopy"]
 assert["module copy with name" (().namedcopy:m2) (deck.modules)]
 
+d1:readdeck[]
+m1:d1.add["module" "testy"]
+m1.version:1.1
+m1.script:"m.foof:on foof x do 2*x end"
+d2:readdeck[]
+m2:d2.add["module" "testy"]
+m2.version:1.2
+m2.script:"m.foof:on foof x do 1+3*x end"
+d3:readdeck[]
+d3.add[m1]
+assert["transplant module" (1.1,20) (d3.modules.testy.version,d3.modules.testy.value.foof[10])]
+d3.add[m2]
+assert["upgrade module in-place" (list "testy") (keys d3.modules)]
+assert["upgrade module"    (1.2,31) (d3.modules.testy.version,d3.modules.testy.value.foof[10])]
+d3.add[m1]
+assert["downgrade module in-place" (list "testy") (keys d3.modules)]
+assert["downgrade module"  (1.1,20) (d3.modules.testy.version,d3.modules.testy.value.foof[10])]
+
 #######################################
 #
 #  Contraptions
@@ -1975,6 +1993,64 @@ assert["prototype scripts observe 'card' as the prototype"                      
 assert["contraption scripts observe 'card' as the contraption instance"                         e         e.w.event["thing7"]]
 assert["contraption instance event handlers observe 'card' as the container card via outside"   deck.card e.event["thing6"]]
 assert["contraption instance event handlers observe 'card' as the container card via inside"    deck.card e.w.event["thing5"]]
+
+d1:readdeck[]
+p1:d1.add["contraption" "port"]
+p1.version:1.3
+p1.add["field" "v"]
+p1.script:"
+on get_val do v.text end
+on set_val x do v.text:x end
+on get_foof do
+ on foof x do 2*x end
+end
+"
+d2:readdeck[]
+p2:d2.add["contraption" "port"]
+p2.version:1.5
+p2.add["field" "v"]
+p2.script:"
+on get_val do v.text end
+on set_val x do v.text:x end
+on get_foof do
+ on foof x do 1+3*x end
+end
+"
+d3:readdeck[]
+d3.add[p1]
+fa:d3.card.add["contraption" "port" "alice"]
+fb:d3.card.add["contraption" "port" "betty"]
+fc:d3.card.add["field" "cindy"]
+fa.val:"Alice's Value"
+fb.val:"Betty's Value"
+fc.text:"Cindy Is Not a Contraption"
+assert["transplanted prototype attrs" (("alice","betty","cindy")dict "Alice's Value","Betty's Value",0) (d3.card.widgets..val)]
+assert["transplanted prototype funcs" (10) (fa.foof[5])]
+d3.add[p2]
+assert["upgraded prototype"   (1.5,"port") (d3.contraptions.port.version,keys d3.contraptions)]
+assert["upgraded prototype attrs"     (("alice","betty","cindy")dict "Alice's Value","Betty's Value",0) (d3.card.widgets..val)]
+assert["upgraded prototype funcs"     (16) (fa.foof[5])]
+d3.add[p1]
+assert["downgraded prototype" (1.3,"port") (d3.contraptions.port.version,keys d3.contraptions)]
+assert["downgraded prototype attrs"   (("alice","betty","cindy")dict "Alice's Value","Betty's Value",0) (d3.card.widgets..val)]
+assert["downgraded prototype funcs"   (10) (fa.foof[5])]
+d4:readdeck[]
+copied:d3.card.copy[fa,fb]
+d4.card.paste[copied]
+assert["install prototype via paste" 1.3 d4.contraptions.port.version]
+d3.add[p2]
+copied:d3.card.copy[fb]
+d4.card.paste[copied]
+assert["upgrade prototype via paste" 1.5 d4.contraptions.port.version]
+d3.add[p1]
+copied:d3.card.copy[fa]
+d4.card.paste[copied]
+assert["prototypes do NOT downgrade via paste" 1.5 d4.contraptions.port.version]
+assert["prototype paste update in-place" (list "port") (keys d4.contraptions)]
+assert["prototype paste final arrangement"
+	(("alice","betty","port1","port2") dict ("Alice's Value","Betty's Value","Betty's Value","Alice's Value"))
+	d4.card.widgets..val
+]
 
 #######################################
 #

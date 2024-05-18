@@ -1263,6 +1263,7 @@ module_read=(x,deck)=>{
 	const ri=lmi((self,i,x)=>{
 		if(x){
 			if(ikey(i,'description'))return self.description=ls(x),x
+			if(ikey(i,'version'))return self.version=ln(x),x
 			if(ikey(i,'name')){
 				if(ls(x)=='')return x
 				self.name=ls(ukey(self.deck.modules,lms(ls(x)),ls(x),lms(self.name)))
@@ -1281,6 +1282,7 @@ module_read=(x,deck)=>{
 			if(ikey(i,'name'       ))return lms(self.name)
 			if(ikey(i,'data'       ))return self.data
 			if(ikey(i,'description'))return lms(self.description||'')
+			if(ikey(i,'version'    ))return lmn(self.version||0.0)
 			if(ikey(i,'script'     ))return lms(self.script||'')
 			if(ikey(i,'error'      ))return lms(self.error||'')
 			if(ikey(i,'value'      ))return self.value
@@ -1292,6 +1294,7 @@ module_read=(x,deck)=>{
 	ri.data=keystore_read(dget(x,lms('data')))
 	ri.value=lmd()
 	init_field(ri,'description',x)
+	init_field(ri,'version',x)
 	init_field(ri,'script',x)
 	return ri
 }
@@ -1301,6 +1304,7 @@ module_write=x=>{
 	dset(r,lms('data'  ),x.data.data)
 	dset(r,lms('script'),ifield(x,'script'))
 	if(x.description)dset(r,lms('description'),ifield(x,'description'))
+	if(x.version)dset(r,lms('version'),ifield(x,'version'))
 	return r
 }
 
@@ -2236,7 +2240,12 @@ con_copy=(card,z)=>{
 merge_prototypes=(deck,defs,uses)=>{
 	const condefs=deck.contraptions;defs.v.map(def=>{
 		const name=dget(def,lms('name'));let desc=dget(def,lms('description'));if(!lis(name))return;if(!desc)desc=lms('')
-		if(condefs.v.some(con=>match(name,ifield(con,'name'))&&match(desc,ifield(con,'description'))))return
+		const ver=dget(def,lms('version')),version=ver?ln(ver):0.0
+		if(condefs.v.some(con=>{
+			const r=match(name,ifield(con,'name'))&&match(desc,ifield(con,'description'))
+			if(r&&ln(ifield(con,'version'))<version)deck_add(deck,prototype_read(def,deck_read('')))
+			return r
+		}))return
 		const p=prototype_read(def,deck),nn=ifield(p,'name');dset(condefs,nn,p)
 		uses.map(wid=>{
 			const type=dget(wid,lms('type')),def=dget(wid,lms('def'))
@@ -2337,6 +2346,7 @@ prototype_read=(x,deck)=>{
 				defs.k[dvix(defs,self)]=n,self.name=ls(n);return x
 			}
 			if(ikey(i,'description'))return self.description=ls(x),x
+			if(ikey(i,'version'    ))return self.version=ln(x),x
 			if(ikey(i,'size'       ))return self.size=rint(getpair(x)),contraption_update(deck,self),x
 			if(ikey(i,'margin'     ))return self.margin=normalize_margin(x,getpair(ifield(self,'size'))),contraption_update(deck,self),x
 			if(ikey(i,'resizable'  ))return self.resizable=lb(x),contraption_update(deck,self),x
@@ -2347,6 +2357,7 @@ prototype_read=(x,deck)=>{
 		}else{
 			if(ikey(i,'name'       ))return lms(self.name)
 			if(ikey(i,'description'))return lms(self.description||'')
+			if(ikey(i,'version'    ))return lmn(self.version||0.0)
 			if(ikey(i,'script'     ))return lms(self.script||'')
 			if(ikey(i,'template'   ))return lms(self.template||'')
 			if(ikey(i,'size'       ))return lmpair(self.size)
@@ -2372,6 +2383,7 @@ prototype_read=(x,deck)=>{
 	let w=dget(x,lms('widgets'));if(lid(w)){w.v.map((v,i)=>dset(v,lms('name'),w.k[i]))}
 	(w?ll(w):[]).map(w=>{const n=dget(w,lms('name'));if(n){const i=widget_read(w,ri);if(lii(i))dset(ri.widgets,ifield(i,'name'),i)}})
 	init_field(ri,'description',x)
+	init_field(ri,'version'    ,x)
 	init_field(ri,'script'     ,x)
 	init_field(ri,'template'   ,x)
 	ri.margin=normalize_margin(dget(x,lms('margin'))||NONE,getpair(ifield(ri,'size')))
@@ -2384,6 +2396,7 @@ prototype_write=x=>{
 	if(x.resizable)dset(r,lms('resizable'),ONE)
 	dset(r,lms('margin'),ifield(x,'margin'))
 	if(x.description&&x.description.length)dset(r,lms('description'),lms(x.description))
+	if(x.version    &&x.version!=0.0      )dset(r,lms('version'    ),lmn(x.version    ))
 	if(x.script     &&x.script.length     )dset(r,lms('script'     ),lms(x.script     ))
 	if(x.template   &&x.template.length   )dset(r,lms('template'   ),lms(x.template   ))
 	if(nice(x.image)                      )dset(r,lms('image'      ),lms(image_write(x.image)))
@@ -2403,11 +2416,29 @@ deck_add=(deck,type,y,z)=>{
 	if(ikey(type,'font'))return uset(deck.fonts,unpack_name(z),'font',font_read(getpair(y)))
 	if(sound_is(type))return uset(deck.sounds,unpack_name(y),'sound',sound_read(sound_write(type)))
 	if(ikey(type,'sound'))return uset(deck.sounds,unpack_name(z),'sound',sound_read(y?ln(y):0))
-	if(module_is(type)){const a=module_write(type);if(y)dset(a,lms('name'),lms(ls(y)));const r=module_read(a,deck);return dset(deck.modules,ifield(r,'name'),r),r}
+	if(module_is(type)){
+		if((!y)&&dget(deck.modules,ifield(type,'name'))){
+			deck_remove(deck,dget(deck.modules,ifield(type,'name')))
+			const r=module_read(module_write(type),deck);
+			return dset(deck.modules,ifield(r,'name'),r),r
+		}else{
+			const a=module_write(type);if(y)dset(a,lms('name'),lms(ls(y)));
+			const r=module_read(a,deck);return dset(deck.modules,ifield(r,'name'),r),r
+		}
+	}
 	if(ikey(type,'module')){const a=lmd();if(y)dset(a,lms('name'),lms(ls(y)));const r=module_read(a,deck);return dset(deck.modules,ifield(r,'name'),r),r}
 	if(card_is(type))return deck_paste(deck,deck_copy(deck,type),y?lms(ls(y)):null)
 	if(ikey(type,'card')){const a=lmd();if(y)dset(a,lms('name'),lms(ls(y)));const r=card_read(a,deck);return dset(deck.cards,ifield(r,'name'),r),r}
-	if(prototype_is(type)){const a=prototype_write(type);if(y)dset(a,lms('name'),lms(ls(y)));const r=prototype_read(a,deck);return dset(deck.contraptions,ifield(r,'name'),r),r}
+	if(prototype_is(type)){
+		if((!y)&&dget(deck.contraptions,ifield(type,'name'))){
+			const name=ifield(type,'name'),r=dget(deck.contraptions,name)
+			for(var k in r)delete r[k];Object.assign(r,prototype_read(prototype_write(type),deck));r.name=ls(name)
+			contraption_update(deck,r);return r
+		}else{
+			const a=prototype_write(type);if(y)dset(a,lms('name'),lms(ls(y)));
+			const r=prototype_read(a,deck);return dset(deck.contraptions,ifield(r,'name'),r),r
+		}
+	}
 	if(ikey(type),'contraption'){const a=lmd();if(y)dset(a,lms('name'),lms(ls(y)));const r=prototype_read(a,deck);return dset(deck.contraptions,ifield(r,'name'),r),r}
 	return NONE
 }

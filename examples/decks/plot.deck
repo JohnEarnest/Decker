@@ -110,6 +110,7 @@ field3:{"type":"field","size":[148,15],"pos":[59,304],"locked":1,"border":0,"sty
 
 {module:plot}
 description:"draw graphs and plots to canvases"
+version:1.0
 {script}
 plot_margin: 10
 

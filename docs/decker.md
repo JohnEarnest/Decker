@@ -724,7 +724,8 @@ The deck interface represents the global attributes of a Decker document. The op
 
 `deck.add[x y z]` can add new cards, sounds, modules, prototypes and fonts to the deck:
 
-- If `x` is a card, sound, module, prototype or font interface, insert an exact copy of it using `y` as a name (or an appropriate default name).
+- If `x` is a card, sound, or font interface, insert an exact copy of it using `y` as a name (or an appropriate default name).
+- If `x` is a module or prototype and `y` is specified or no module/prototype of the same name exists in the deck, insert a copy of `x` as shown above. Otherwise, replace the existing module or prototype with `x`. The `version` of `x` is irrelevant; the same method may be used to "upgrade" or "downgrade" either resource.
 - If `x` is `"card"`, insert a new blank card at the end of the deck, using `y` as a name (or an appropriate default name).
 - If `x` is `"sound"`, insert a new sound, using an int `y` as a length (if present), and `z` as a name (or an appropriate default name).
 - If `x` is `"font"`, insert a new font, using an int pair `y` as a size (if present), and `z` as a name (or an appropriate default name).
@@ -1007,6 +1008,9 @@ The card interface gives access to the contents of a given card.
 
 When a widget is removed from its card, the interface becomes inert: it will ignore all reads and writes of attributes.
 
+If `card.paste[]` is called with a string that contains a prototype definition with a newer `version` attribute than an existing prototype in the deck, the pasted definition will replace the existing one, upgrading all live contraption instances. If you wish to "downgrade" a prototype, see `deck.add[]`.
+
+
 Button Interface
 ----------------
 The button widget is a clickable button, possibly with a stateful checkbox.
@@ -1250,6 +1254,7 @@ Modules are chunks of reusable Lil code. See the [modules](#modules) section for
 | `x.name`                | String. The name of this module. r/w.                                                                   |
 | `x.data`                | A _keystore_ interface containing supplemental storage for this module. (See below.)                    |
 | `x.description`         | String. A human-readable description of the purpose of this module. r/w.                                |
+| `x.version`             | Number. The revision number of this module. Higher numbers are considered "newer". r/w.                 |
 | `x.script`              | String. The Lil source code of the module's script. r/w.                                                |
 | `x.value`               | Dictionary. The contents of the module as returned by the final expression in the `script`.             |
 | `x.error`               | String. If there was a problem initializing this module, a description of the problem. Otherwise, `""`. |
@@ -1287,6 +1292,7 @@ Prototypes are definitions from which [Contraptions](#contraptioninterface) are 
 | `typeof x`              | `"prototype"`                                                                                          |
 | `x.name`                | String. The name of the Prototype. r/w.                                                                |
 | `x.description`         | String. A human-readable description of the purpose of this Prototype. r/w.                            |
+| `x.version`             | Number. The revision number of this prototype. Higher numbers are considered "newer". r/w.             |
 | `x.script`              | String. The Lil source code of the Prototype's script, or `""`. r/w.                                   |
 | `x.template`            | String. The Lil source code that can be used as a default for newly-created Prototype instances. r/w.  |
 | `x.size`                | The `size` of this Prototype in pixels. r/w.                                                           |
@@ -1525,7 +1531,8 @@ Now let's make a few contraptions from our prototype! You can use the _Prototype
 
 ![](images/protoinstances.gif)
 
-You can copy and paste contraptions like any other widget. In fact, if you copy a contraption to the clipboard, you can paste it into another deck and it will bring along the prototype definition!
+You can copy and paste contraptions like any other widget. In fact, if you copy a contraption to the clipboard, you can paste it into another deck and it will bring along the prototype definition! If the `version` of the prototype in a pasted clipboard snippet is newer than a prototype that already exists in the deck, the new definition will replace the old one.
+
 
 Custom Attributes
 -----------------
