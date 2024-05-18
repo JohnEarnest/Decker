@@ -208,6 +208,10 @@ select index value orderby value asc from "BACB"
 extract name orderby name asc from people
 # -> ("Alice","Sam","Sara","Thomas","Walter")
 
+# if you don't specify a column expression, extracts the first column:
+extract orderby name asc from people
+# (same as above)
+
 # more table and collection operators:
 a join b    # natural join (by column name).
 a cross b   # cross join / cartesian product.

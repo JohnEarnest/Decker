@@ -416,7 +416,7 @@ on get_state_name name do
 end
 
 on puppet_names do
- extract value where target.widgets @ get_state_name @ value from keys target.widgets
+ extract where target.widgets @ get_state_name @ value from keys target.widgets
 end
 
 on init_puppet name do
@@ -704,7 +704,7 @@ on exec_command text do
  if "lil"~3 limit text
   eval_snippet[3 drop text]
  else
-  f:extract value where count@value from " " split text
+  f:extract where count@value from " " split text
   (commands[first f])[1 drop f]
  end
 end

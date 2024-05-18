@@ -366,7 +366,8 @@ triad={
 		const mv=merge(vals,keys,0);return count(keys)>1?mv.r: dyad.take(mv.ix,dyad.drop(lml(['index','gindex','group'].map(lms)),orig))
 	},
 	'@ext': (orig,vals,keys)=>{
-		const r=monad.cols(triad['@sel'](orig,vals,keys));return count(r)!=1||count(r.k[0])?r: monad.first(r)
+		const r=monad.cols(triad['@sel'](orig,vals,keys))
+		return count(keys)==1?(count(r)?monad.first(r):lml([])): count(r)!=1||count(r.k[0])?r: monad.first(r)
 	},
 	'@upd': (orig,vals,keys)=>{
 		orig=dyad.drop(lml(['index','gindex','group'].map(lms)),orig);const mv=merge(vals,keys,1),r=mv.r,ix=mv.ix

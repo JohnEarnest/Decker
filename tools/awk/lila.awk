@@ -872,7 +872,10 @@ function sort_by(order_dir,order_vec,  r,z,i,j,perm){
 
 function triads(name,x,y,z,  r,rc,i,j,col,ci,t){
 	if(name=="@sel")return l_select(x,y,z)
-	if(name=="@ext"){r=l_cols(l_select(x,y,z));return count(r)!=1||count(dic_getk(r,0))?r:l_first(r)}
+	if(name=="@ext"){
+		r=l_cols(l_select(x,y,z));
+		return count(z)==1?(count(r)?l_first(r):lml()): count(r)!=1||count(dic_getk(r,0))?r:l_first(r)
+	}
 	if(name=="@upd"){
 		x=disclose(x);merge_ix=-1;r=merge(y,z,1)
 		for(i=0;i<count(r);i++){

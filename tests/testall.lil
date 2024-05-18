@@ -310,8 +310,8 @@ show[select  name job where job="Plumber" from ppl           ] # select  gives n
 show[select  n:count name v:2+3 where job="Plumber" from ppl ] # must eval column expressions, even with no result rows
 show[extract job where job="Plumber" from ppl                ] # extract gives no result rows
 show[extract n:count name v:2+3 where job="Plumber" from ppl ] # must eval column expressions, even with no result rows
-show[extract where job="Developer" from ppl                  ] # no columns specified for extract, get all cols as a dict
-show[extract from table ()                                   ] # extract of no rows or columns
+show[extract where job="Developer" from ppl                  ] # no columns specified for extract, get first col
+show[extract from table ()                                   ] # extract of no rows or columns; get ()
 show[select  from ()                                         ] # a list behaves like a table with the column "value"
 show[extract from ()                                         ] # a list behaves like a table with the column "value"
 show[update job:"Farmer" where job="Plumber" from ppl        ] # update  changes no rows

@@ -523,6 +523,12 @@ If names are specified, all results are collected into a dictionary:
 extract a:first age b:last age orderby age asc from people 
 # {"a":(25),"b":(43)}
 ```
+If no columns are specified, the result will be the first column of the table:
+```lil
+extract orderby value asc from "BEDAC"
+# ("A","B","C","D","E")
+```
+
 
 ---
 

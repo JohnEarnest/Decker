@@ -89,7 +89,7 @@ i:0 brush[on Dotted do i:i+1 if 2%i pix end end]
 # 4x4 stipples: very soft
 # explicitly crack a 4x4 circle into masks of each individual set pixel:
 mask:image["%%IMG0AAQABGDw8GA="]
-ss:each p in extract value where mask @ value from 4 cross 4
+ss:each p in extract where mask @ value from 4 cross 4
  i:image[4,4] i[p]:1 i
 end
 brush[on SoftSml do random[ss] end]
@@ -97,7 +97,7 @@ brush[on SoftSml do random[ss] end]
 # 8x8 stipples: very soft
 # explicitly crack an 8x8 circle into masks of each individual set pixel:
 mask:image["%%IMG0AAgACDx+/////348"]
-sm:each p in extract value where mask @ value from 8 cross 8
+sm:each p in extract where mask @ value from 8 cross 8
  i:image[8,8] i[p]:1 i
 end
 brush[on SoftMed do random[sm] end]

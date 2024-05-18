@@ -581,7 +581,10 @@ lv* merge(lv*vals,lv*keys,int widen,lv**ix){
 }
 lv* disclose(lv*x){lv*t=lml(3);t->lv[0]=lmistr("index"),t->lv[1]=lmistr("gindex"),t->lv[2]=lmistr("group");return l_drop(t,x);}
 lv* l_select(lv*orig,lv*vals,lv*keys){lv*ix=NULL,*r=merge(vals,keys,0,&ix);return keys->c>1?r:l_take(ix,disclose(orig));}
-lv* l_extract(lv*orig,lv*vals,lv*keys){lv*r=l_cols(l_select(orig,vals,keys));return (r->c!=1||r->kv[0]->c)?r: l_first(r);}
+lv* l_extract(lv*orig,lv*vals,lv*keys){
+	lv*r=l_cols(l_select(orig,vals,keys));
+	return keys->c==1?(r->c?l_first(r):lml(0)): (r->c!=1||r->kv[0]->c)?r: l_first(r);
+}
 lv* l_update(lv*orig,lv*vals,lv*keys){
 	orig=disclose(orig);lv*ix=NULL,*r=merge(vals,keys,1,&ix);EACH(c,r){
 		if(r->lv[c]==ix)continue;lv*k=r->kv[c];

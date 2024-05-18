@@ -18,7 +18,7 @@ end
 # utilities:
 
 on rev       x do x @ (-1+count x)-range count x                    end # k: |:
-on sortstr   x do "" fuse extract value orderby value asc  from x   end # k: {x@<x}
+on sortstr   x do "" fuse extract orderby value asc from x          end # k: {x@<x}
 on sumscan   x do a:0 each v in x a:a+v end                         end # k: +\
 on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':y
@@ -45,7 +45,7 @@ problem[268.2]
 # sort x ascending, with each pair descending.
 # like many weird sorting problems, this one really showcases generalized clause order!
 on f x do
-  extract value orderby value desc by floor gindex/2 orderby value asc from x
+  extract orderby value desc by floor gindex/2 orderby value asc from x
 end
 assert[f[(2,5,3,4        )] (3,2,5,4        )]
 assert[f[(9,4,1,3,6,4,6,1)] (1,1,4,3,6,4,9,6)]
@@ -80,7 +80,7 @@ assert[f[
 problem[266.1]
 # find any words that appear exactly once among two sentences
 on f x y do
- extract value where 1=count index by value from " "split x," ",y
+ extract where 1=count index by value from " "split x," ",y
 end
 assert[f["Mango is sweet" "Mango is sour"   ] ("sweet","sour")]
 assert[f["Mango Mango"    "Orange"          ] (list "Orange" )]
@@ -204,7 +204,7 @@ problem[255.2]
 # find the most frequent word in x, except for y
 # (I'm kinda cheating by only handling . and , as punctuation.)
 on f x y do
-  first extract v orderby c desc from
+  first extract orderby c desc from
         select v:first value c:count value by value from y drop" "split (",",".")drop x
 end
 assert[f["Joe hit a ball, the hit ball flew far after it was hit." "hit"] "ball"]
@@ -224,7 +224,7 @@ assert[f["Uiua" ] "Auiu" ]
 problem[253.1]
 # split all words in a list by a delimiter, excluding empty strings
 on f sep x do
- extract value where count@value from sep split sep fuse x
+ extract where count@value from sep split sep fuse x
 end
 assert[f["." ("one.two.three","four.five","six")] ("one","two","three","four","five","six")]
 assert[f["$" ("$perl$$", "$$raku$"             )] ("perl","raku")                          ]
@@ -282,7 +282,7 @@ assert[f["aaab"         "b"] (3,2,1,0)]
 problem[247.2]
 # find the bi-gram which occurs most frequently, breaking ties by lexicographic order
 on f x do
- first extract v orderby v asc by c orderby c desc from
+ first extract orderby v asc by c orderby c desc from
        select v:first value c:count value by value from window[2 x]
 end
 assert[f["abcdbca"          ] "bc"]
@@ -290,7 +290,7 @@ assert[f["cdeabeabfcdfabgcd"] "ab"]
 
 problem[245.1]
 # sort x by y
-on f x y do extract value orderby y asc from x end
+on f x y do extract orderby y asc from x end
 assert[f[("perl","c","python")    (2,1,3)] ("c","perl","python")]
 assert[f[("c++","haskell","java") (1,3,2)] ("c++","java","haskell")]
 
@@ -339,7 +339,7 @@ problem[238.2]
 # to obtain a single-digit number by multiplying its digits recursively for each array element.
 # If any two numbers have the same count of steps, then print the smaller number first.
 on stp x do if x<10 0 else 1+stp[prod""split x] end end
-on f x do extract value orderby (stp@value)join value asc from x end
+on f x do extract orderby (stp@value)join value asc from x end
 assert[f[(15, 99, 1, 34 )] (1, 15, 34, 99 )]
 assert[f[(50, 25, 33, 22)] (22, 33, 50, 25)]
 
@@ -366,7 +366,7 @@ problem[233.2]
 # sort the given array in increasing order based on the frequency of the values.
 # if multiple values have the same frequency then sort them in decreasing order.
 on f x do
- extract v orderby c asc orderby v desc from
+ extract orderby c asc orderby v desc from
   select v:value c:count value by value from x
 end
 assert[f[(1,1,2,2,2,3         )] (3,1,1,2,2,2         )]
@@ -388,34 +388,34 @@ assert[f["ja" ("janet", "julia", "java", "javascript"  )] 3]
 problem[220.1]
 # return the list of common characters (sorted alphabetically) found in every word of the given list.
 on f x do
- extract value orderby value asc where min each y in x c in y end from c:"" split first x
+ extract orderby value asc where min each y in x c in y end from c:"" split first x
 end
 assert[f[("perl", "rust", "raku" )] (list "r"   )]
 assert[f[("love", "live", "leave")] ("e","l","v")]
 
 problem[219.1]
 # square each number in the list and return the sorted list, increasing order.
-on f x do extract value orderby value asc from x^2 end
+on f x do extract orderby value asc from x^2 end
 assert[f[(-2, -1, 0, 3, 4)] (0, 1, 4, 9, 16  )]
 assert[f[(5, -4, -1, 3, 6)] (1, 9, 16, 25, 36)]
 
 problem[217.1]
 # find the 3rd smallest element in the sorted matrix.
-on f x do first 2 drop extract value orderby value asc from raze x end
+on f x do first 2 drop extract orderby value asc from raze x end
 assert[f["%j" parse "[[3, 1, 2], [5, 2, 4], [0, 1, 3]]"] 1]
 assert[f["%j" parse "[[2, 1], [4, 5]]"                 ] 4]
 assert[f["%j" parse "[[1, 0, 3], [0, 0, 0], [1, 2, 1]]"] 0]
 
 problem[215.1]
 # count words in the list that are not alphabetically sorted.
-on f x do count extract value where !value=sortstr@value from x end
+on f x do count extract where !value=sortstr@value from x end
 assert[f[("abc","xyz","tsu")] 1]
 assert[f[("rat","cab","dad")] 3]
 assert[f[("x","y","z"      )] 0]
 
 problem[213.1]
 # sort the all even integers first then all odds in ascending order.
-on f x do extract value orderby (2%value) join value asc from x end
+on f x do extract orderby (2%value) join value asc from x end
 assert[f[(1,2,3,4,5,6)] (2,4,6,1,3,5)]
 assert[f[(1,2        )] (2,1        )]
 assert[f[(list 1     )] (list 1     )]
@@ -423,7 +423,7 @@ assert[f[(list 1     )] (list 1     )]
 problem[206.1]
 # find the shortest time in minutes between any two time points.
 on f x do
- t:extract value orderby value asc from sum(60,1)*flip "%i:%i" parse x
+ t:extract orderby value asc from sum(60,1)*flip "%i:%i" parse x
  min each v i in t (24*60)%t[(count t)%i+1]-v end
 end
 assert[f[("00:00", "23:55", "20:00"         )]  5]
@@ -479,7 +479,7 @@ assert[f[(4,5,2,3)] -1]
 
 problem[189.1]
 # find the smallest character in the given array lexicographically greater than the target character.
-on f target x do target unless first extract value orderby value asc where value>target from x end
+on f target x do target unless first extract orderby value asc where value>target from x end
 assert[f["b" "emug"] "e"]
 assert[f["a" "dcef"] "c"]
 assert[f["o" "jar" ] "r"]
@@ -520,7 +520,7 @@ problem[181.1]
 # order each sentence alphanumerically in a paragraph.
 on f x do
  "."fuse each s in "."split x
-  " "fuse extract value orderby (list "%l")format value asc from " "split s
+  " "fuse extract orderby (list "%l")format value asc from " "split s
  end
 end
 assert[
@@ -530,7 +530,7 @@ f["All he could think about was how it would all end. There was still a bit of u
 
 problem[181.2]
 # find days with a temperature hotter than the previous
-on f x do extract date where temp>(first temp),temp orderby date asc from readcsv["date,temp\n",x "si"] end
+on f x do extract where temp>(first temp),temp orderby date asc from readcsv["date,temp\n",x "si"] end
 assert[
 f["2022-08-01, 20
 2022-08-09, 10
@@ -553,7 +553,7 @@ assert[f["Long Live Perl"       ] 1]
 
 problem[180.2]
 # find the numbers in a list greater than an integer.
-on f x i do extract value where value>i from x end
+on f x i do extract where value>i from x end
 assert[f[(1,4,2,3,5)     3] (4,5    )]
 assert[f[(9,0,6,2,3,8,5) 4] (9,6,8,5)]
 
@@ -826,7 +826,7 @@ assert[f[
 problem[110.1]
 # filter a file to only "valid" phone numbers of a few specific formats.
 on f x do
-  "\n"fuse extract value where value like ("+## ##########","(##) ##########","#### ##########") from "\n"split x
+  "\n"fuse extract where value like ("+## ##########","(##) ##########","#### ##########") from "\n"split x
 end
 assert[f[
 "0044 1148820341
@@ -857,7 +857,7 @@ sex,m,m,f,f"
 
 problem[106.1]
 # find the maximum difference between two successive elements once the array is sorted.
-on f x do max(1 drop x:extract value orderby value asc from x)-x end
+on f x do max(1 drop x:extract orderby value asc from x)-x end
 assert[f[(2, 9, 3, 5   )] 4]
 assert[f[(1, 3, 8, 2, 0)] 5]
 assert[f[(list 5       )] 0]
@@ -917,7 +917,7 @@ assert[f[(2, 1, 4, 3   )] (12, 24, 6, 8       )]
 problem[87.1]
 # find the longest consecutive sequence in x, or return 0 if no sequence is longest.
 on f x do
- r:extract value orderby count value asc from
+ r:extract orderby count value asc from
   extract list value by sumscan[1,!(1 drop value)=value+1] orderby value asc from x
  if (count r[0])>count r[1] r[0] else 0 end
 end
@@ -941,7 +941,7 @@ assert[f[(3, 1, 3, 1, 1, 5)] 6]
 
 problem[78.1]
 # identify elements which are greater than all the elements to their right.
-on f x do extract value where value=rev[maxscan[rev[x]]] from x end
+on f x do extract where value=rev[maxscan[rev[x]]] from x end
 assert[f[(9, 10, 7, 5, 6, 1)] (10, 7, 6, 1)]
 assert[f[(3, 4, 5          )] (list 5     )]
 
@@ -953,7 +953,7 @@ assert[f[(1, 5, 0, 2, 9, 3, 7, 6, 4, 8) 3] (0, 0, 0, 2, 3, 3, 4, 4)]
 problem[71.1]
 # find elements which are greater than their neighbors.
 # (problem says the script should generate a random array, but that's silly.)
-on f x do extract value where value>(1 drop value,0)|(-1 drop 0,x) from x end
+on f x do extract where value>(1 drop value,0)|(-1 drop 0,x) from x end
 assert[f[(18, 45, 38, 25, 10, 7, 21, 6, 28, 48)] (45, 21, 48    )]
 assert[f[(47, 11, 32, 8, 1, 9, 39, 14, 36, 23 )] (47, 32, 39, 36)]
 
@@ -998,7 +998,7 @@ assert[
 problem[46.1]
 # given a set of strings, extract the most common character for each position.
 on mode x do
-  first extract v orderby c desc from
+  first extract orderby c desc from
     select v:first value c:count value by value from x
 end
 on f x do "" fuse mode @ flip each v in "\n" split x " " drop v end end
@@ -1044,7 +1044,7 @@ assert[f["())()"] 0]
 problem[40.2]
 # sort the items of x at indices y.
 on f x y do
-  last each v i in extract value orderby value asc from x@y
+  last each v i in extract orderby value asc from x@y
     x[y[i]]:v
   end
 end

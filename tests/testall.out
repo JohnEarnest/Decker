@@ -585,12 +585,12 @@ queries:
 +---+---+
 ()
 {"n":(0),"v":(5)}
-{"name":("Alice","Thomas","Sara"),"age":(25,40,34),"job":("Developer","Developer","Developer")}
-{}
+("Alice","Thomas","Sara")
+()
 +-------+
 | value |
 +-------+
-{"value":()}
+()
 +----------+-----+--------------+
 | name     | age | job          |
 +----------+-----+--------------+
