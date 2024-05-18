@@ -196,7 +196,7 @@ end
 
 {module:zazz}
 description:"easy animation effects for your decks"
-version:1.0
+version:1
 {script}
 
 on inbox targets box do

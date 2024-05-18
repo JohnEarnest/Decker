@@ -2623,6 +2623,7 @@ lv* deck_write(lv*x,int html){
 		lv*module=m->lv[z],*data=module_write(module);
 		str_addz(&r,"\n{module:"),esc_write(&r,1,dget(data,lmistr("name"))),str_addz(&r,"}\n");
 		write_line("description",v,v)
+		write_line("version"    ,v,v)
 		lv*mdata=dget(data,lmistr("data"));write_dict("{data}\n",mdata,)
 		str_addz(&r,"{script}\n"),esc_write(&r,0,ifield(module,"script")),str_addz(&r,"\n{end}\n");
 	}
@@ -2633,6 +2634,7 @@ lv* deck_write(lv*x,int html){
 		write_line("resizable"  ,v&&lb(v),v                              )
 		write_line("margin"     ,1       ,v                              )
 		write_line("description",v       ,v                              )
+		write_line("version"    ,v       ,v                              )
 		write_line("image"      ,v       ,v                              )
 		write_line("script"     ,v&&v->c ,script_ref(scripts,base,&sci,v))
 		write_line("template"   ,v&&v->c ,v                              )

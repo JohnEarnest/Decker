@@ -20,7 +20,7 @@ end
 
 {module:highlight}
 description:"convert lil source code into syntax-highlighted html"
-version:1.0
+version:1
 {script}
 inlines.pre:"background:#272822;color:#f8f8f2;padding:.5em;"
 inlines.comment :"color:#75715e;"

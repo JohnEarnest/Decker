@@ -389,7 +389,7 @@ image:"%%IMG0AgABVr/7/9v//v//3/9///9v///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 {module:pt}
 description:"Display and animate sprites for visual novels."
-version:1.0
+version:1
 {script}
 
 local FRONT:999999  # foremost (reasonable) widget index

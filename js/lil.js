@@ -2617,6 +2617,7 @@ deck_write=(x,html)=>{
 		const data=module_write(m)
 		r+=`\n{module:${esc_write(1,ls(dget(data,lms('name'))))}}\n`
 		write_key(data,'description',x=>x,x=>x)
+		write_key(data,'version'    ,x=>x,x=>x)
 		write_dict('{data}\n',dget(data,lms('data')),x=>x)
 		r+=`{script}\n${esc_write(0,ls(ifield(m,'script')))}\n{end}\n`
 	})
@@ -2627,6 +2628,7 @@ deck_write=(x,html)=>{
 		write_key(data,'resizable'  ,x=>x&&lb(x),x=>x)
 		write_key(data,'margin'     ,x=>1       ,x=>x)
 		write_key(data,'description',x=>x       ,x=>x)
+		write_key(data,'version'    ,x=>x       ,x=>x)
 		write_key(data,'image'      ,x=>x       ,x=>x)
 		write_key(data,'script'     ,x=>count(x),x=>script_ref(base,x))
 		write_key(data,'template'   ,x=>count(x),x=>x)

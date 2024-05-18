@@ -56,7 +56,7 @@ end
 
 {module:ease}
 description:"a collection of easing functions"
-version:1.0
+version:1
 {script}
 on tween f do
  # for ease of use (har har), wrap all the basic
