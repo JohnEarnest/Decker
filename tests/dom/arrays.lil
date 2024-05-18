@@ -150,6 +150,13 @@ assert["array cat, chained" "%%DAT3VEVYVFkBKCPwn5Kp" b.encoded]
 assert["array cat, multi"   "%%DAT3VEVYVFkBKCPwn5Kp" c.encoded]
 assert["array cat payload"  "%%DAT38J+SqQ=="         c.slice[4].encoded]
 
+mem:array[16 "u8"]
+ds:mem.slice[8,2 "i32l"]
+ds[0]:123
+assert["array slice offset" (123,123,0,0,0,2) (ds[0],mem[8,4],ds.size)]
+dc:mem.copy[8,2 "i32l"]
+assert["array copy offset"  (123,2) (ds[0],ds.size)]
+
 #######################################
 #
 #  Wrap Up

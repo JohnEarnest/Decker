@@ -1387,13 +1387,13 @@ function array_set(arr,offset,len,v,  z){
 function n_array_slice(arr,args,  i,offset,len,cast,step,r){
 	i=l_first(args);offset=int(ln(lil(i)?l_first(i):i));len=lil(i)?int(max(0,ln(l_last(i)))):-1
 	cast=count(args)<2?array_cast(arr): lvs(ls(lst_get(args,1)));if(!cast_size[cast])cast="u8"
-	step=cast_size[cast];offset*=step;if(len<0)len=int((array_size(arr)-offset)/step)
+	step=cast_size[cast];offset*=cast_size[array_cast(arr)];if(len<0)len=int((array_size(arr)-offset)/step)
 	r=array_make(cast,len);heap_aux[r]=arr;heap_v[r]=offset;return r
 }
 function n_array_copy(arr,args,  i,offset,len,cast,step,r,z){
 	i=l_first(args);offset=int(ln(lil(i)?l_first(i):i));len=lil(i)?int(max(0,ln(l_last(i)))):-1
 	cast=count(args)<2?array_cast(arr): lvs(ls(lst_get(args,1)));if(!cast_size[cast])cast="u8"
-	step=cast_size[cast];offset*=step;if(len<0)len=int((array_size(arr)-offset)/step)
+	step=cast_size[cast];offset*=cast_size[array_cast(arr)];if(len<0)len=int((array_size(arr)-offset)/step)
 	r=array_make(cast,0);for(z=0;z<len*step;z++)array_append_byte(r,array_get_byte(arr,offset+z));return r
 }
 

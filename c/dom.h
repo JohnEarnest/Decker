@@ -1186,11 +1186,11 @@ void array_set(array a,int index,int len,lv*v){
 	else{double vv=ln(v);for(int z=0;z<len;z++)array_set_raw(a,index+z,vv);} // spread a number up to len
 }
 lv* n_array_slice(lv*self,lv*a){
-	array src=unpack_array(self);lv*o=l_first(a);array_offset(o);int cast=a->c>1?ordinal_enum(a->lv[1],casts):src.cast, step=cast_size[cast];offset*=step;
+	array src=unpack_array(self);lv*o=l_first(a);array_offset(o);int cast=a->c>1?ordinal_enum(a->lv[1],casts):src.cast, step=cast_size[cast];offset*=cast_size[src.cast];
 	if(len<0)len=(src.size-offset)/step;lv*r=array_make(len,cast,offset,src.data);dset(r->b,lmistr("slice"),ONE);return r;
 }
 lv* n_array_copy(lv*self,lv*a){
-	array src=unpack_array(self);lv*o=l_first(a);array_offset(o);int cast=a->c>1?ordinal_enum(a->lv[1],casts):src.cast, step=cast_size[cast];offset*=step;
+	array src=unpack_array(self);lv*o=l_first(a);array_offset(o);int cast=a->c>1?ordinal_enum(a->lv[1],casts):src.cast, step=cast_size[cast];offset*=cast_size[src.cast];
 	if(len<0)len=(src.size-offset)/step;lv*r=array_make(len,cast,0,NULL);array dst=unpack_array(r);
 	src.base+=offset;for(int z=0;z<len;z++)array_set_raw(dst,z,array_get_raw(src,z));return r;
 }
