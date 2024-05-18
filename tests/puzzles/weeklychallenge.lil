@@ -25,6 +25,14 @@ on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':
 
 # the problems:
 
+problem[269.1]
+# are there at least two numbers in x whose bitwise OR has a trailing 0 digit in binary?
+# (this is, of course, simply asking if there are at least two even numbers!)
+on f x do 1<sum 0=2%x end
+assert[f[(1,2,3,4,5)] 1]
+assert[f[(2,3,8,16 )] 1]
+assert[f[(1,2,5,7,9)] 0]
+
 problem[268.1]
 # ignoring order, what number could be added to x to get y?
 on f x y do (min y)-(min x) end
