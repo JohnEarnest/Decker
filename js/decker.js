@@ -3433,7 +3433,7 @@ tick=_=>{
 	}
 	if((uimode=='object'||(uimode=='draw'&&!dr.fatbits))&&!ev.hidemenu){
 		const b=rect(menu.x,1,context.size.x-menu.x-2,1+font_h(FONT_MENU))
-		draw_textr(b,ls(ifield(ifield(deck,"card"),"name")),FONT_BODY,1)
+		draw_textr(b,ls(ifield(con(),"name")),FONT_BODY,1)
 	}
 	if(msg.pending_loop)sfx_doloop()
 	if(ui_container&&ui_container.dead)ui_container=null
