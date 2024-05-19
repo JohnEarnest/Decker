@@ -1675,19 +1675,27 @@ void modals(void){
 		if(ui_button((rect){c.x,c.y,60,20},"Delete",s!=NULL)){n_deck_remove(deck,l_list(s));mark_dirty();ms.grid=(grid_val){sounds_enumerate(),0,-1,-1};}
 	}
 	else if(ms.type==modal_contraptions){
-		rect b=draw_modalbox((pair){250,170});
+		rect b=draw_modalbox((pair){250,230});
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Contraption Prototypes",FONT_MENU,1);
-		rect gsize={b.x,b.y+15,b.w,b.h-20-50-25};
+		rect gsize={b.x,b.y+15,b.w,b.h-20-50-25-25};
 		int choose=ui_table(gsize,1,16,0,"Is",&ms.grid);
 		rect psize={b.x,gsize.y+gsize.h+5,b.w,50};draw_box(psize,0,1);psize=inset(psize,2);
 		if(ms.grid.row>=0){
 			char*desc=ifield(ifield(deck,"contraptions")->lv[ms.grid.row],"description")->sv;
 			layout_plaintext(desc,FONT_BODY,align_left,(pair){psize.w,psize.h});draw_text_wrap(psize,1);
 		}
-		pair c={b.x+b.w-60,b.y+b.h-20};
-		if(ui_button((rect){c.x,c.y,60,20},"OK",1)||ev.exit){modal_exit(0);};c.x=b.x;
-		if(ui_button((rect){c.x,c.y,60,20},"New...",1)){modal_exit(1);con_set(n_deck_add(deck,l_list(lmistr("contraption"))));mark_dirty();}c.x+=65;
-		if(ui_button((rect){c.x,c.y,60,20},"Edit...",ms.grid.row>=0)||choose){modal_exit(2);con_set(ifield(deck,"contraptions")->lv[ms.grid.row]);}
+		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"OK",1)||ev.exit){modal_exit(0);}
+		if(ui_button((rect){b.x,b.y+b.h-45,60,20},"New...",1)){modal_exit(1);con_set(n_deck_add(deck,l_list(lmistr("contraption"))));mark_dirty();}
+		if(ui_button((rect){b.x,b.y+b.h-20,60,20},"Edit...",ms.grid.row>=0)||choose){modal_exit(2);con_set(ifield(deck,"contraptions")->lv[ms.grid.row]);}
+		if(ui_button((rect){b.x+65,b.y+b.h-45,60,20},"Clone",ms.grid.row>=0)||choose){
+			lv*s=ifield(deck,"contraptions")->lv[ms.grid.row];
+			n_deck_add(deck,lml2(s,l_format(lmistr("%s_clone"),ifield(s,"name"))));
+			ms.grid=(grid_val){contraptions_enumerate(),0,-1,-1};
+		}
+		if(ui_button((rect){b.x+65,b.y+b.h-20,60,20},"Delete",ms.grid.row>=0||choose)){
+			n_deck_remove(deck,l_list(ifield(deck,"contraptions")->lv[ms.grid.row]));
+			ms.grid=(grid_val){contraptions_enumerate(),0,-1,-1};
+		}
 	}
 	else if(ms.type==modal_recording){
 		rect b=draw_modalbox((pair){frame.size.x-50,130}); int samples=MAX(1,ln(ifield(au.target,"size")));
@@ -2233,7 +2241,7 @@ void modals(void){
 		if(ui_button((rect){c.x,c.y,60,20},"Next",1)||ev.dir==dir_right){n_go(deck,l_list(lmistr("Next")));}
 	}
 	else if(ms.type==modal_pick_contraption){
-		rect b=draw_modalbox((pair){250,170});
+		rect b=draw_modalbox((pair){250,230});
 		draw_textc((rect){b.x,b.y-5,b.w,20},"New Contraption",FONT_MENU,1);
 		rect gsize={b.x,b.y+15,b.w,b.h-20-50-25};
 		int choose=ui_table(gsize,1,16,0,"Is",&ms.grid);

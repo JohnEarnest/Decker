@@ -1583,9 +1583,9 @@ modals=_=>{
 		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_pop(0)
 	}
 	else if(ms.type=='contraptions'||ms.type=='pick_contraption'){
-		const b=draw_modalbox(rect(250,170))
+		const b=draw_modalbox(rect(250,230))
 		draw_textc(rect(b.x,b.y-5,b.w,20),ms.type=='contraptions'?'Contraption Prototypes':'New Contraption',FONT_MENU,1)
-		const gsize=rect(b.x,b.y+15,b.w,b.h-20-50-25)
+		const gsize=rect(b.x,b.y+15,b.w,b.h-20-50-25-(ms.type=='contraptions'?25:0))
 		const choose=ui_table(gsize,[16],'Is',ms.grid)
 		let psize=rect(b.x,gsize.y+gsize.h+5,b.w,50);draw_box(psize,0,1),psize=inset(psize,2)
 		if(ms.grid.row>=0){
@@ -1594,9 +1594,18 @@ modals=_=>{
 		}
 		const c=rect(b.x+b.w-60,b.y+b.h-20)
 		if(ms.type=='contraptions'){
-			if(ui_button(rect(c.x,c.y,60,20),'OK',1)||ev.exit){modal_exit(0)};c.x=b.x
-			if(ui_button(rect(c.x,c.y,60,20),'New...',1)){modal_exit(1),con_set(deck_add(deck,lms('contraption'))),mark_dirty()}c.x+=65
-			if(ui_button(rect(c.x,c.y,60,20),'Edit...',ms.grid.row>=0)||choose){modal_exit(2),con_set(deck.contraptions.v[ms.grid.row])}
+			if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'OK',1)||ev.exit){modal_exit(0)}
+			if(ui_button(rect(b.x,b.y+b.h-45,60,20),'New...',1)){modal_exit(1),con_set(deck_add(deck,lms('contraption'))),mark_dirty()}
+			if(ui_button(rect(b.x,b.y+b.h-20,60,20),'Edit...',ms.grid.row>=0)||choose){modal_exit(2),con_set(deck.contraptions.v[ms.grid.row])}
+			if(ui_button(rect(b.x+65,b.y+b.h-45,60,20),'Clone',ms.grid.row>=0)||choose){
+				const s=ifield(deck,'contraptions').v[ms.grid.row]
+				deck_add(deck,s,lms(ls(ifield(s,'name'))+'_clone'))
+				ms.grid=gridtab(contraptions_enumerate())
+			}
+			if(ui_button(rect(b.x+65,b.y+b.h-20,60,20),'Delete',ms.grid.row>=0||choose)){
+				deck_remove(deck,ifield(deck,'contraptions').v[ms.grid.row])
+				ms.grid=gridtab(contraptions_enumerate())
+			}
 		}
 		if(ms.type=='pick_contraption'){
 			if(ui_button(rect(c.x,c.y,60,20),'Create',ms.grid.row>=0)||choose){
