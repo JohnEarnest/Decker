@@ -1362,7 +1362,7 @@ Events are as follows:
 | canvas      | `release`    | `pos` on the canvas.                         | The user releases their pointing device on a canvas.           |
 | field       | `link`       | Link contents (string).                      | The user clicks a link in rich text.                           |
 | field       | `run`        | Selection or `field.text` (string).          | The user presses shift+return with the field active.           |
-| field       | `change`     | `field.text` (string).                       | The user alters the field, debounced to 1 second.              |
+| field       | `change`     | `field.text` (string).                       | The user alters the field, debounced to 1/4 second.            |
 | slider      | `change`     | `slider.value` (number).                     | The user alters the slider, debounced to 1 frame.              |
 | card        | `navigate`   | One of {`"up"`,`"down"`,`"left"`,`"right"`}. | The user performs a navigation input.                          |
 | card        | `view`       | None.                                        | The card is navigated to, or the user enters interaction mode. |

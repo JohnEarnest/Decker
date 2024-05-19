@@ -68,7 +68,7 @@ typedef struct {
 } message_state; message_state msg={0};
 
 #define FIELD_CURSOR_DUTY  20
-#define FIELD_CHANGE_DELAY 60
+#define FIELD_CHANGE_DELAY 15
 typedef struct {
 	int active, count;
 	int scrolls,thumbid,thumbo;
