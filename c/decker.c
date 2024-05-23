@@ -4090,7 +4090,7 @@ void save_deck(lv*path){
 	else if(!has_suffix(path->sv,".deck")){str n=str_new();str_addz(&n,path->sv),str_addz(&n,".deck");path=lmstr(n);}
 	if(!strcmp(ifield(deck,"name")->sv,""))iwrite(deck,lmistr("name"),lmcstr(directory_last(path->sv)));
 	n_write(NULL,lml2(path,deck_write(deck,html)));
-	set_path(path->sv);
+	set_path(path->sv);msg.next_view=1;
 }
 void resize_window(lv*deck){
 	lv*card=ifield(deck,"card");
