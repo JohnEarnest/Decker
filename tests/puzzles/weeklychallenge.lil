@@ -25,6 +25,13 @@ on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':
 
 # the problems:
 
+problem[270.1]
+# how many 1s in a matrix have no 1s in the same row or column?
+on f x do (sum 1=sum x)&(sum 1=sum@x) end
+assert[f["%j" parse "[[1,0,0],[0,0,1],[1,0,0]]"] 1]
+assert[f["%j" parse "[[1,0,1],[0,0,0],[0,1,0]]"] 1]
+assert[f["%j" parse "[[1,0,0],[0,1,0],[0,0,1]]"] 3]
+
 problem[269.1]
 # are there at least two numbers in x whose bitwise OR has a trailing 0 digit in binary?
 # (this is, of course, simply asking if there are at least two even numbers!)
