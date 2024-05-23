@@ -222,7 +222,7 @@ field2:{"type":"field","size":[236,204],"pos":[266,56],"locked":1,"border":0,"va
 button3:{"type":"button","size":[60,20],"pos":[266,176],"script":"say.0","text":"Try It!"}
 source:{"type":"field","size":[115,74],"pos":[10,226],"value":{"text":["","Pippi:"," Check out that animated swirly thing! I think I'm getting dizzy..."],"font":["","menu",""],"arg":["","",""]}}
 field5:{"type":"field","size":[100,14],"pos":[17,210],"locked":1,"border":0,"style":"plain","align":"center","value":"source:"}
-target:{"type":"canvas","size":[112,74],"pos":[142,226],"locked":1,"image":"%%IMG2AHAASgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8AgA==","scale":1}
+target:{"type":"canvas","size":[112,74],"pos":[142,226],"locked":1,"volatile":1,"scale":1}
 field3:{"type":"field","size":[100,14],"pos":[149,210],"locked":1,"border":0,"style":"plain","align":"center","value":"target:"}
 button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
 

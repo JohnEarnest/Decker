@@ -112,7 +112,7 @@ five:{"type":"button","size":[60,20],"pos":[20,155],"script":"modals.4","text":"
 button1:{"type":"button","size":[60,20],"pos":[20,105],"script":"modals.5","text":"Choose"}
 rich:{"type":"field","size":[200,100],"pos":[292,217],"show":"invert","align":"center","value":{"text":["","Rich Text Alert Example","\nAlerts can contain rich text, ","too","?\nthis is so amazing I'm ","losing my mind!"],"font":["","menu","","","","mono"],"arg":["","","","anything","",""]}}
 button2:{"type":"button","size":[86,23],"pos":[285,138],"script":"modals.6","text":"Read Image"}
-preview:{"type":"canvas","size":[100,100],"pos":[280,31],"image":"%%IMG2AGQAZAD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wA3","scale":1}
+preview:{"type":"canvas","size":[100,100],"pos":[280,31],"scale":1}
 button3:{"type":"button","size":[86,23],"pos":[285,168],"script":"modals.7","text":"Write Image"}
 button4:{"type":"button","size":[100,38],"pos":[385,138],"script":"modals.8","text":"Read Image\n(Dithered)"}
 

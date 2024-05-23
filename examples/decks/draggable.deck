@@ -43,7 +43,7 @@ field1:{"type":"field","size":[204,19],"pos":[148,28],"locked":1,"font":"menu","
 field2:{"type":"field","size":[316,47],"pos":[101,292],"locked":1,"border":0,"style":"plain","align":"center","value":"Normally, an unlocked canvas widget can be scribbled upon.\nIf the \"draggable\" attribute of a canvas is 1, the user can click-and-drag to reposition it while in interact mode.\nTry it!"}
 field3:{"type":"field","size":[99,18],"pos":[94,212],"locked":1,"border":0,"style":"plain","align":"center","value":"Non-draggable"}
 field4:{"type":"field","size":[99,18],"pos":[312,214],"locked":1,"border":0,"style":"plain","align":"center","value":"Draggable"}
-canvas1:{"type":"canvas","size":[100,100],"pos":[93,100],"image":"%%IMG2AGQAZAD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wA3"}
+canvas1:{"type":"canvas","size":[100,100],"pos":[93,100]}
 canvas2:{"type":"canvas","size":[100,100],"pos":[314,103],"draggable":1,"scale":1}
 
 {script:The Basics.0}

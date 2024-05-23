@@ -2061,7 +2061,7 @@ canvas_read=(x,card)=>{
 canvas_write=x=>{
 	const r=lmd([lms('type')],[lms('canvas')])
 	if(x.border!=undefined)dset(r,lms('border'),lmn(x.border))
-	if(x.image    )dset(r,lms('image'    ),lms(image_write(x.image)))
+	if(x.image&&!is_blank(x.image))dset(r,lms('image'),lms(image_write(x.image)))
 	if(x.draggable)dset(r,lms('draggable'),lmn(x.draggable))
 	if(x.brush    )dset(r,lms('brush'    ),lmn(x.brush))
 	if(x.pattern!=undefined&&x.pattern!=1)dset(r,lms('pattern'),lmn(x.pattern))

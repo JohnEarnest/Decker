@@ -205,7 +205,7 @@ description:"A self-tweening sprite."
 script:"mover.0"
 attributes:{"name":["img"],"label":["Image"],"type":["string"]}
 {widgets}
-c:{"type":"canvas","size":[32,32],"pos":[0,0],"locked":1,"animated":1,"volatile":1,"show":"transparent","border":0,"image":"%%IMG2ACAAIAD/AP8A/wD/AAQ=","scale":1}
+c:{"type":"canvas","size":[32,32],"pos":[0,0],"locked":1,"animated":1,"volatile":1,"show":"transparent","border":0,"scale":1}
 s:{"type":"field","size":[100,22],"pos":[71,-36],"show":"none","style":"plain","value":"{}"}
 i:{"type":"field","size":[100,20],"pos":[64,0],"show":"none","style":"plain"}
 

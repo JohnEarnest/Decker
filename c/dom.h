@@ -1486,7 +1486,7 @@ lv* canvas_read(lv*x,lv*r){
 lv* canvas_write(lv*x){
 	lv*data=x->b,*r=lmd();dset(r,lmistr("type"),lmistr("canvas"));pair lsize=getpair(ifield(x,"lsize"));
 	{lv*k=lmistr("border"   ),*v=dget(data,k);if(v)dset(r,k,v);}
-	{lv*k=lmistr("image"    ),*v=dget(data,k);if(v)dset(r,k,image_write(v));}
+	{lv*k=lmistr("image"    ),*v=dget(data,k);if(v&&!is_blank(v))dset(r,k,image_write(v));}
 	{lv*k=lmistr("draggable"),*v=dget(data,k);if(v&&ln(v)!=0)dset(r,k,v);}
 	{lv*k=lmistr("brush"    ),*v=dget(data,k);if(v&&ln(v)!=0)dset(r,k,v);}
 	{lv*k=lmistr("pattern"  ),*v=dget(data,k);if(v&&ln(v)!=1)dset(r,k,v);}

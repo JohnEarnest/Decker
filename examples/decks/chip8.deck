@@ -8,7 +8,7 @@ name:"chip8.deck"
 script:"home.0"
 {widgets}
 display:{"type":"canvas","size":[256,128],"pos":[238,25],"locked":1,"border":1,"scale":4}
-keypad:{"type":"canvas","size":[160,160],"pos":[291,166],"locked":1,"border":1,"image":"%%IMG2AKAAoAD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AGQ=","scale":1}
+keypad:{"type":"canvas","size":[160,160],"pos":[291,166],"locked":1,"border":1,"scale":1}
 rom:{"type":"field","size":[193,63],"pos":[23,159],"scrollbar":1,"style":"plain"}
 button1:{"type":"button","size":[98,20],"pos":[23,129],"script":"home.1","text":"Load .CH8 ROM"}
 button2:{"type":"button","size":[86,20],"pos":[130,129],"locked":1,"script":"home.2","text":"Run"}
