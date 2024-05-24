@@ -1328,7 +1328,7 @@ Modifying the attributes of a Prototype will automatically update Contraption in
 
 Events
 ======
-When processing an event, Decker first executes scripts (if present) for all of the _ancestors_ of the event _target_. The deck is always first. If the target is a widget, its script is executed after the card which contains it. If any scripts are malformed and do not parse correctly (as could be verified with `sys.eval[]`), they will be ignored. Each successive script runs in a nested environment chained to the previous, such that `send` may be used to access any definitions made in ancestor scripts which are shadowed by the current script.
+When processing an event, Decker first executes scripts (if present) for all of the _ancestors_ of the event _target_. The deck is always first. If the target is a widget, its script is executed after the card which contains it. If any scripts are malformed and do not parse correctly (as could be verified with `eval[]`), they will be ignored. Each successive script runs in a nested environment chained to the previous, such that `send` may be used to access any definitions made in ancestor scripts which are shadowed by the current script.
 
 When the deck script executes, the following constants will be defined:
 

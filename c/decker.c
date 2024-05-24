@@ -2334,9 +2334,9 @@ void validate_modules(void){
 void script_editor(rect r){
 	int mh=3+font_h(FONT_MENU);
 	lv*overw=NULL;if(sc.xray){
-		lv*wids=con_wids();EACH(z,wids){
+		lv*wids=con_wids();int ow=0;EACHR(z,wids){
 			lv*wid=wids->lv[z];rect size=con_to_screenr(unpack_widget(wid).size);
-			int o=ev.alt&&over(size), col=o?(overw=wid,13):44;
+			int o=ev.alt&&over(size)&&!ow, col=o?(overw=wid,13):44;ow|=o;
 			draw_textc(size,ifield(wid,"name")->sv,FONT_BODY,o?-1:col),draw_box(size,0,col);
 			if(ifield(wid,"script")->c)draw_icon((pair){size.x-1,size.y},ICONS[icon_lil],o?1:col);
 			if(ev.alt&&ev.mu&&over(size)&&dover(size)){close_script(wid);ev.md=ev.mu=0;break;}

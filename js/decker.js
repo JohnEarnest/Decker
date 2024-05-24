@@ -2909,8 +2909,8 @@ script_editor=r=>{
 	}
 	const mh=3+font_h(FONT_MENU)
 	let overw=null;if(sc.xray){
-		const wids=con_wids();for(let z=0;z<wids.v.length;z++){
-			const wid=wids.v[z],size=con_to_screen(unpack_widget(wid).size), o=ev.alt&&over(size), col=o?(overw=wid,13):44
+		const wids=con_wids();let ow=0;for(let z=wids.v.length-1;z>=0;z--){
+			const wid=wids.v[z],size=con_to_screen(unpack_widget(wid).size), o=ev.alt&&over(size)&&!ow, col=o?(overw=wid,13):44; ow|=o
 			draw_textc(size,ls(ifield(wid,'name')),FONT_BODY,o?-1:col),draw_box(size,0,col)
 			if(count(ifield(wid,'script')))draw_icon(rect(size.x-1,size.y),ICONS[ICON.lil],o?1:col)
 			if(ev.alt&&ev.mu&&over(size)&&dover(size)){close_script(wid),ev.md=ev.mu=0;break}
