@@ -1502,10 +1502,14 @@ image_merge_op=(target,src,op)=>{
 image_make=size=>{
 	const f=(self,i,x)=>{
 		const s=self.size
-		if(i&&lil(i)){ // read/write pixels
+		if(i&&lil(i)){ // read/write single pixels
 			const p=getpair(i),ib=p.x>=0&&p.y>=0&&p.x<s.x&&p.y<s.y
 			if(x){if(ib)self.pix[p.x+p.y*s.x]=ln(x);return x}
 			return ib?lmn(self.pix[p.x+p.y*s.x]):NONE
+		}
+		if(ikey(i,'pixels')){ // read/write all pixels
+			if(x){ll(monad.raze(lml(ll(x)))).forEach((v,i)=>self.pix[i]=ln(v));return x}
+			const r=[];for(let y=0;y<s.y;y++){const t=[];for(let x=0;x<s.x;x++)t.push(lmn(self.pix[x+y*s.x]));r.push(lml(t))}return lml(r)
 		}
 		if(ikey(i,'encoded'))return lms(image_write(self))
 		if(ikey(i,'hist'))return buffer_hist(self.pix,0)

@@ -3,10 +3,9 @@
 # directly within a decker script.
 
 on randomize do
-	board.clear[]
-	each pos in board.size[0] cross board.size[1]
-		board[pos]:1<random[3]
-	end
+	r:image[board.size]
+	r.pixels:random[(0,0,1) prod r.size]
+	board.paste[r]
 end
 
 on step do

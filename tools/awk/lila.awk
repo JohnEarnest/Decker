@@ -406,7 +406,7 @@ function l_table(x,  r,z,m,t,row,col,k,ok){
 	}
 	return lt(x)
 }
-function l_raze(x,y,  r){
+function l_raze(x, r){
 	if(lit(x))return l_dict(count(x)>0?tab_getv(x,0):lml(), count(x)>1?tab_getv(x,1):lml())
 	x=ll(x);r=l_first(x);for(z=1;z<count(x);z++)r=l_cat(r,lst_get(x,z));return r
 }
@@ -1227,7 +1227,8 @@ function interfaces(self,i,x,  r){
 	}
 	else if(li_name(self)=="image"){
 		if(i&&lil(i)){return x!=-1?n_image_set_px(self,i,x):n_image_get_px(self,i)}
-		if(lvs(i)=="size"){return x!=-1?n_image_resize(self,x):lml2(lmn(image_w(self)),lmn(image_h(self)))}
+		if(lvs(i)=="pixels"){return x!=-1?n_image_set_pixels(self,x):n_image_get_pixels(self)}
+		if(lvs(i)=="size"  ){return x!=-1?n_image_resize(self,x):lml2(lmn(image_w(self)),lmn(image_h(self)))}
 		if(lvs(i)=="map"      )return lmnat("map"      ,"image_map"      ,self)
 		if(lvs(i)=="merge"    )return lmnat("merge"    ,"image_merge"    ,self)
 		if(lvs(i)=="transform")return lmnat("transform","image_transform",self)
@@ -1711,6 +1712,15 @@ function n_image_get_px(img,i){
 	w=image_w(img);h=image_h(img)
 	t=ll(i);px=count(t)>=1?ln(lst_get(t,0)):0;py=count(t)>=2?ln(lst_get(t,1)):0
 	return (px>=0&&py>=0&&px<w&&py<h)?lmn(image_get_px(img,px,py)): NONE
+}
+function n_image_get_pixels(img,  r,t,x,y){
+	r=lml()
+	for(y=0;y<image_h(img);y++){t=lml();lst_add(r,t);for(x=0;x<image_w(img);x++)lst_add(t,lmn(image_get(img,x+y*image_w(img))))}
+	return r
+}
+function n_image_set_pixels(img,x,  t,c,r,z){
+	t=l_raze(ll(x));c=image_w(img)*image_h(img)
+	r="";for(z=0;z<c;z++){r=r b2h[z<count(t)?ln(lst_get(t,z)): image_get(img,z)]};heap_v[img]=r;return x
 }
 function n_image_resize(img,x,  w,h,t,sx,sy,r,a,b){
 	t=ll(x);sx=count(t)>=1?max(0,ln(lst_get(t,0))):0;sy=count(t)>=2?max(0,ln(lst_get(t,1))):0

@@ -500,10 +500,14 @@ lv* image_write(lv*x){
 }
 lv* interface_image(lv*self,lv*i,lv*x){
 	pair s=image_size(self);
-	if(i&&lil(i)){ // read/write pixels
+	if(i&&lil(i)){ // read/write single pixels
 		pair p=getpair(i);int ib=p.x>=0&&p.y>=0&&p.x<s.x&&p.y<s.y;
 		if(x){if(ib)self->b->sv[p.x+p.y*s.x]=0xFF&(int)ln(x);return x;}
 		return ib?lmn(0xFF&(self->b->sv[p.x+p.y*s.x])):NONE;
+	}
+	ikey("pixels"){ // read/write all pixels
+		if(x){lv*t=l_raze(ll(x));EACH(z,t){if(z>=self->b->c)break;self->b->sv[z]=0xFF&(int)ln(t->lv[z]);}return x;}
+		lv*r=lml(s.y);for(int y=0;y<s.y;y++){GEN(t,s.x)lmn(0xFF&(self->b->sv[z+y*s.x]));r->lv[y]=t;}return r;
 	}
 	ikey("size"     ){if(x){image_resize(self,getpair(x));return x;}return lmpair(s);}
 	ikey("map"      )return lmnat(n_buffer_map,self);

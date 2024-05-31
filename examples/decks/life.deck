@@ -53,10 +53,9 @@ end
 
 {script:home.3}
 on click do
- board.clear[]
- each pos in board.lsize[0] cross board.lsize[1]
-  board[pos]:1<random[3]
- end
+ b:image[board.lsize]
+ b.pixels:random[(0,0,1) prod board.lsize]
+ board.paste[b]
 end
 {end}
 

@@ -19,10 +19,7 @@ on image_format i do
 	print["(%s)" format (",\n ","(list %s)",",",f) format i]
 end
 on image_matrix i do
-	s:i.size
-	r:each y in range s[1]
-		each x in range s[0] i[x,y] end
-	end
+	r:if "image"~typeof i i.pixels else () end
 	if 0~count r list r else r end
 end
 on assert_file text want got do
@@ -335,6 +332,22 @@ assert["scale image up nonuniform" "%%IMG0AA4AGAAAAAAAAA/AD8APwD/wP/A/8DzwPPA88D
 assert["scale image down"          "%%IMG0AAQACAAgcFBwUFAA"                                                         image[b].scale[.7,1].encoded]
 assert["scale image negative"      "%%IMG2AAAAAA=="                                                                 image[b].scale[-3,4].encoded]
 assert["scale image none"          "%%IMG2AAAAAA=="                                                                 image[b].scale[    ].encoded]
+
+i:image[4,3]
+i.pixels:range 16
+assert_image["image write flat pixels"
+	((list 0, 1, 2, 3),
+	 (list 4, 5, 6, 7),
+	 (list 8, 9,10,11))
+	i
+]
+i.pixels:(list 10,11,12,13),(list 14,15,16,17)
+assert_image["image write pixel matrix"
+	((list 10,11,12,13),
+	 (list 14,15,16,17),
+	 (list  8, 9,10,11))
+	i
+]
 
 #######################################
 #

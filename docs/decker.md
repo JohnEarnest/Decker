@@ -861,6 +861,7 @@ Images are dynamically created interfaces, each representing a mutable rectangul
 | `typeof x`             | `"image"`                                                                                                                |
 | `x.encoded`            | The content of this image encoded as an opaque string, suitable for decoding with `image[]`.                             |
 | `x.hist`               | A dictionary mapping the distinct patterns in this image to how many times they appear.                                  |
+| `x.pixels`             | A list of lists of pattern indices of every pixel of the image. r/w.                                                     |
 | `x.size`               | The `size` of the image in pixels. Resizing pads with `0` or truncates, as needed. r/w.                                  |
 | `x[pos]`               | The pattern index of an (x,y) pixel of the image. Reads `0` out of bounds, ignores out of bounds writes. r/w.            |
 | `x.map[x y]`           | Replace every pixel of the image by indexing the dictionary `x`, using `y` as a default if provided.                     |
@@ -879,6 +880,8 @@ colors.red in i.hist                                # does this image contain an
 (list 0)~keys i.hist                                # is this image entirely blank?
 3 limit extract key orderby value desc from i.hist  # what are the 3 most common patterns in this image?
 ```
+
+The `image.pixels` attribute is for bulk reads or writes of pixels. Reading will always produce a matrix (list-of-lists) of pattern indices. Writing will accept either a flat list of pixels, automatically wrapped to the dimensions of the image, or a matrix of pixels, which behaves as if the matrix were razed into a flat list. In either case, it is the caller's responsibility to ensure that the source data matches the dimensions of the image.
 
 The `map[]` function is useful for re-paletting an image. For example, if we have an image `i` containing patterns 0 and 1, we could map them to red and green pixels, respectively, as follows:
 ```lil
