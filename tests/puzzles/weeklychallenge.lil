@@ -25,6 +25,24 @@ on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':
 
 # the problems:
 
+problem[271.1]
+# find the row number (1-indexed) of a matrix containing maximum ones
+on f x do 1+first extract index orderby sum@value desc from x end
+assert[f["%j" parse "[[0,1],[1,0]]"      ] 1]
+assert[f["%j" parse "[[0,0,0],[1,0,1]]"  ] 2]
+assert[f["%j" parse "[[0,0],[1,1],[0,0]]"] 2]
+
+problem[271.2]
+# sort the integers in x in ascending order by the number of 1 bits in their binary representation,
+# breaking ties by their value.
+on f x do
+  masks:2^range 32
+  on onebits x do sum!!bits.and[x masks] end
+  extract orderby onebits@value asc orderby value asc from x
+end
+assert[f[(0,1,2,3,4,5,6,7,8  )] (0,1,2,4,8,3,5,6,7  )]
+assert[f[(1024,512,256,128,64)] (64,128,256,512,1024)]
+
 problem[270.1]
 # how many 1s in a matrix have no 1s in the same row or column?
 on f x do (sum 1=sum x)&(sum 1=sum@x) end
