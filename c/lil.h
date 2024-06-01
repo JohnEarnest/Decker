@@ -412,8 +412,11 @@ lv* pjson(char*t,int*i,int*f,int*n){
 	int ns=*i;jm('-');jd();jm('.');jd();if(jm('e')||jm('E')){jm('-')||jm('+');jd();}if(*i<=ns){*f=0;return NONE;}
 	char tb[NUM];snprintf(tb,MIN(*i-ns+1,NUM),"%s",t+ns);return lmn(atof(tb));
 }
+int cumulative_month_days[12]={0,31,59,90,120,151,181,212,243,273,304,334};
+int leap_year(int year){return year%400==0?1: year%100==0?0: year%4==0?1: 0;}
 time_t parts_to_epoch(struct tm *p){
 	return p->tm_sec+p->tm_min*60+p->tm_hour*3600+
+	       (cumulative_month_days[p->tm_mon]+(p->tm_mon>=1&&leap_year(p->tm_year+1900)))*86400+
 	       (p->tm_mday-1)*86400+(p->tm_year-70)*31536000+((p->tm_year-69)/4)*86400-((p->tm_year-1)/100)*86400+((p->tm_year+299)/400)*86400;
 }
 int format_has_names(lv*x){

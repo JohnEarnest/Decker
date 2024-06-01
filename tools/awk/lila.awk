@@ -591,7 +591,11 @@ function json_parse(  r,mc,k,e,ns){
 	if(json_m("e")||json_m("E")){json_m("-")||json_m("+");json_d()}
 	if(json_i<=ns){json_f=0;return NONE};return lmn(substr(json_t,ns,min(json_i-ns,512)))
 }
-BEGIN{ISODATE=lms("%[year]04i-%[month]02i-%[day]02iT%[hour]02i:%[minute]02i:%[second]02iZ%n%m")}
+BEGIN{
+	ISODATE=lms("%[year]04i-%[month]02i-%[day]02iT%[hour]02i:%[minute]02i:%[second]02iZ%n%m")
+	split("0,31,59,90,120,151,181,212,243,273,304,334",cumulative_month_days,",")
+}
+function leap_year(year){return year%400==0?1: year%100==0?0: year%4==0?1: 0}
 function l_parse(x,y,  r,z,f,h,m,pi,named,nk,hn,si,sk,lf,n,d,t,v,s,p,mc,yr,k){
 	if(lil(y)){r=lml();for(z=0;z<count(y);z++)lst_add(r,l_parse(x,lst_get(y,z)));return r}
 	x=lvs(ls(x));y=lvs(ls(y));f=1;h=1;m=1;pi=0;named=format_has_names(x);r=named?lmd():lml()
@@ -668,7 +672,9 @@ function l_parse(x,y,  r,z,f,h,m,pi,named,nk,hn,si,sk,lf,n,d,t,v,s,p,mc,yr,k){
 			}else{p=lmd()}
 			if(t=="e"){
 				yr=ln(dget(p,lms("year")))
+				mo=ln(dget(p,lms("month")))
 				z =ln(dget(p,lms("second")))+(60*ln(dget(p,lms("minute"))))+(3600*ln(dget(p,lms("hour"))))+86400*(ln(dget(p,lms("day")))-1)
+				z+=(cumulative_month_days[mo+1]+leap_year(yr+1900))*86400
 				z+=((yr-70)*31536000)+(int((yr-69)/4)*86400)-(int((yr-1)/100)*86400)+(int((yr+299)/400)*86400)
 				v=lmn((!m)?0:z)
 			}

@@ -89,6 +89,8 @@ show["%a"             format 65                     ] # widen scalar to ascii li
 show["%q"             format "a\n\"b"               ] # quoted
 show["%v"             format "fooBar"               ] # variable
 show["%e"             format 1609556697             ] # epoch
+show["%e" format "%e" parse  "2024-08-07T12:34:56Z" ] # epoch (leap year)
+show["%e" format "%e" parse  "2025-08-07T12:34:56Z" ] # epoch (non-leap year)
 show["%p" format "%p" parse  "2021-02-03T04:05:58Z" ] # parts
 
 d.year:1984 d.month:5 d.day:25
