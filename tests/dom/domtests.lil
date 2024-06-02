@@ -1849,8 +1849,8 @@ assert["downgrade module"  (1.1,20) (d3.modules.testy.version,d3.modules.testy.v
 deck:readdeck[]
 
 def:deck.add["contraption" "spinner"]
-defaults:def @ "type","description","script","size"
-assert["prototype default attributes" ("prototype","","",(list 100,100)) defaults]
+defaults:def @ "type","description","script","size","font","show"
+assert["prototype default attributes" ("prototype","","",(list 100,100),deck.fonts.body,"solid") defaults]
 assert["deck contraptions"        "dict"                  (typeof deck.contraptions)]
 assert["deck contraption content" ("prototype","spinner") (typeof deck.contraptions.spinner),(keys deck.contraptions)]
 

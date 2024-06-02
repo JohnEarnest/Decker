@@ -2365,6 +2365,8 @@ prototype_read=(x,deck)=>{
 			if(ikey(i,'version'    ))return lmn(self.version||0.0)
 			if(ikey(i,'script'     ))return lms(self.script||'')
 			if(ikey(i,'template'   ))return lms(self.template||'')
+			if(ikey(i,'font'       ))return monad.first(self.deck.fonts)
+			if(ikey(i,'show'       ))return lms('solid')
 			if(ikey(i,'size'       ))return lmpair(self.size)
 			if(ikey(i,'margin'     ))return lmrect(self.margin)
 			if(ikey(i,'resizable'  ))return lmn(self.resizable)

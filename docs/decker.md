@@ -1300,6 +1300,8 @@ Prototypes are definitions from which [Contraptions](#contraptioninterface) are 
 | `x.template`            | String. The Lil source code that can be used as a default for newly-created Prototype instances. r/w.  |
 | `x.size`                | The `size` of this Prototype in pixels. r/w.                                                           |
 | `x.image`               | An _image_ interface representing the Prototype's background. r/w.                                     |
+| `x.show`                | The string `"solid"`.                                                                                  |
+| `x.font`                | The default font `body`.                                                                               |
 | `x.resizable`           | Bool. Can instances of this Prototype be resized? r/w.                                                 |
 | `x.margin`              | A list of 4 integers. See below for details. r/w.                                                      |
 | `x.widgets`             | A dictionary of widget interfaces in this Prototype, keyed by name.                                    |

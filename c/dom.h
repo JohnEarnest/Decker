@@ -2304,6 +2304,8 @@ lv* interface_prototype(lv*self,lv*i,lv*x){
 		ikey("version"    ){lv*r=dget(data,i);return r?r:NONE;      }
 		ikey("script"     ){lv*r=dget(data,i);return r?r:lmistr("");}
 		ikey("template"   ){lv*r=dget(data,i);return r?r:lmistr("");}
+		ikey("font"       )return l_first(ifield(ivalue(self,"deck"),"fonts"));
+		ikey("show"       )return lmistr("solid");
 		ikey("size"       )return dget(data,i);
 		ikey("margin"     )return dget(data,i);
 		ikey("resizable"  )return dget(data,i);
