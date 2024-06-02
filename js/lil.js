@@ -1805,7 +1805,7 @@ button_write=x=>{
 	const r=lmd([lms('type')],[lms('button')])
 	if(x.text)dset(r,lms('text' ),lms(x.text))
 	if(x.style&&x.style!='round')dset(r,lms('style'),lms(x.style))
-	if(x.value!=undefined)dset(r,lms('value'),lmn(x.value))
+	if(x.value!=undefined&&!x.volatile)dset(r,lms('value'),lmn(x.value))
 	if(x.shortcut)dset(r,lms('shortcut'),lms(x.shortcut))
 	return r
 }
@@ -1851,8 +1851,8 @@ field_write=x=>{
 	if(x.scrollbar!=undefined)dset(r,lms('scrollbar'),lmn(x.scrollbar))
 	if(x.style&&x.style!='rich')dset(r,lms('style'),lms(x.style))
 	if(x.align&&x.align!='left')dset(r,lms('align'),lms(x.align))
-	if(x.scroll)dset(r,lms('scroll'),lmn(x.scroll))
-	if(x.value){if(rtext_is_plain(x.value)){const v=rtext_string(x.value);if(ls(v))dset(r,lms('value'),v)}else{dset(r,lms('value'),rtext_write(x.value))}}
+	if(x.scroll&&!x.volatile)dset(r,lms('scroll'),lmn(x.scroll))
+	if(x.value&&!x.volatile){if(rtext_is_plain(x.value)){const v=rtext_string(x.value);if(ls(v))dset(r,lms('value'),v)}else{dset(r,lms('value'),rtext_write(x.value))}}
 	return r
 }
 slider_styles={horiz:1,vert:1,bar:1,compact:1}
@@ -1886,7 +1886,7 @@ slider_read=(x,card)=>{
 slider_write=x=>{
 	const r=lmd([lms('type')],[lms('slider')])
 	if(x.interval)dset(r,lms('interval'),lmpair(x.interval))
-	if(x.value!=undefined&&x.value!=0)dset(r,lms('value'),lmn(x.value))
+	if(x.value!=undefined&&x.value!=0&&!x.volatile)dset(r,lms('value'),lmn(x.value))
 	if(x.step!=undefined&&x.step!=1)dset(r,lms('step'),lmn(x.step))
 	if(x.format&&x.format!='%f')dset(r,lms('format'),lms(x.format))
 	if(x.style&&x.style!='horiz')dset(r,lms('style'),lms(x.style))
@@ -1949,10 +1949,10 @@ grid_write=x=>{
 	if(x.bycell!=undefined)dset(r,lms('bycell'),lmn(x.bycell))
 	if(x.widths)dset(r,lms('widths'),lml(x.widths.map(lmn)))
 	if(x.format)dset(r,lms('format'),lms(x.format))
-	if(x.value)dset(r,lms('value'),monad.cols(x.value))
-	if(x.scroll)dset(r,lms('scroll'),lmn(x.scroll))
-	if(x.row!=undefined&&x.row!=-1)dset(r,lms('row'),lmn(x.row))
-	if(x.col!=undefined&&x.col!=-1)dset(r,lms('col'),lmn(x.col))
+	if(x.value &&!x.volatile)dset(r,lms('value'),monad.cols(x.value))
+	if(x.scroll&&!x.volatile)dset(r,lms('scroll'),lmn(x.scroll))
+	if(x.row!=undefined&&x.row!=-1&&!x.volatile)dset(r,lms('row'),lmn(x.row))
+	if(x.col!=undefined&&x.col!=-1&&!x.volatile)dset(r,lms('col'),lmn(x.col))
 	return r
 }
 canvas_clip=(canvas,z)=>{
@@ -2065,7 +2065,7 @@ canvas_read=(x,card)=>{
 canvas_write=x=>{
 	const r=lmd([lms('type')],[lms('canvas')])
 	if(x.border!=undefined)dset(r,lms('border'),lmn(x.border))
-	if(x.image&&!is_blank(x.image))dset(r,lms('image'),lms(image_write(x.image)))
+	if(x.image&&!is_blank(x.image)&&!x.volatile)dset(r,lms('image'),lms(image_write(x.image)))
 	if(x.draggable)dset(r,lms('draggable'),lmn(x.draggable))
 	if(x.brush    )dset(r,lms('brush'    ),lmn(x.brush))
 	if(x.pattern!=undefined&&x.pattern!=1)dset(r,lms('pattern'),lmn(x.pattern))
@@ -2178,7 +2178,7 @@ widget_read=(x,card)=>{
 	return ri
 }
 widget_write=x=>{
-	const r=lmd();widget_purge(x)
+	const r=lmd()
 	dset(r,lms('name'),lms(x.name))
 	dset(r,lms('type'),lms(x.n))
 	dset(r,lms('size'),ifield(x,'size'))

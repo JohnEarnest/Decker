@@ -1612,7 +1612,7 @@ f1.text:"This text round-trips."
 f2.text:"This text does not round-trip."
 writedeck["temp.deck" deck]
 deck:readdeck["temp.deck"]
-assert["volatiles do not round-trip" ("This text round-trips.","") (f1,f2)..text]
+assert["volatiles do not round-trip" ("This text round-trips.","") (range deck.card.widgets)..text]
 
 #######################################
 #

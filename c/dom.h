@@ -1490,7 +1490,7 @@ lv* canvas_read(lv*x,lv*r){
 lv* canvas_write(lv*x){
 	lv*data=x->b,*r=lmd();dset(r,lmistr("type"),lmistr("canvas"));pair lsize=getpair(ifield(x,"lsize"));
 	{lv*k=lmistr("border"   ),*v=dget(data,k);if(v)dset(r,k,v);}
-	{lv*k=lmistr("image"    ),*v=dget(data,k);if(v&&!is_blank(v))dset(r,k,image_write(v));}
+	{lv*k=lmistr("image"    ),*v=dget(data,k);if(v&&!is_blank(v)&&!lb(ifield(x,"volatile")))dset(r,k,image_write(v));}
 	{lv*k=lmistr("draggable"),*v=dget(data,k);if(v&&ln(v)!=0)dset(r,k,v);}
 	{lv*k=lmistr("brush"    ),*v=dget(data,k);if(v&&ln(v)!=0)dset(r,k,v);}
 	{lv*k=lmistr("pattern"  ),*v=dget(data,k);if(v&&ln(v)!=1)dset(r,k,v);}
@@ -1543,7 +1543,7 @@ lv* button_write(lv*x){
 	lv*data=x->b,*r=lmd();dset(r,lmistr("type"),lmistr("button"));
 	{lv*k=lmistr("text" ),*v=dget(data,k);if(v&&v->c)dset(r,k,v);}
 	{lv*k=lmistr("style"),*v=dget(data,k);if(v&&strcmp(button_styles[0],v->sv))dset(r,k,v);}
-	{lv*k=lmistr("value"),*v=dget(data,k);if(v)dset(r,k,v);}
+	{lv*k=lmistr("value"),*v=dget(data,k);if(v&&!lb(ifield(x,"volatile")))dset(r,k,v);}
 	{lv*k=lmistr("shortcut"),*v=dget(data,k);if(v&&v->c)dset(r,k,v);}
 	return r;
 }
@@ -1744,13 +1744,13 @@ lv* field_read(lv*x,lv*r){
 	return r;
 }
 lv* field_write(lv*x){
-	lv*data=x->b,*r=lmd();dset(r,lmistr("type"),lmistr("field"));
+	lv*data=x->b,*r=lmd();dset(r,lmistr("type"),lmistr("field"));int vol=lb(ifield(x,"volatile"));
 	{lv*k=lmistr("border"   ),*v=dget(data,k);if(v)dset(r,k,v);}
 	{lv*k=lmistr("scrollbar"),*v=dget(data,k);if(v)dset(r,k,v);}
 	{lv*k=lmistr("style"    ),*v=dget(data,k);if(v&&strcmp(field_styles[0],v->sv))dset(r,k,v);}
 	{lv*k=lmistr("align"    ),*v=dget(data,k);if(v&&strcmp(field_aligns[0],v->sv))dset(r,k,v);}
-	{lv*k=lmistr("scroll"   ),*v=dget(data,k);if(v&&ln(v)!=0)dset(r,k,v);}
-	{lv*k=lmistr("value"    ),*v=dget(data,k);if(v){if(rtext_is_plain(v)){v=rtext_all(v);if(v->c)dset(r,k,v);}else{dset(r,k,rtext_write(v));}}}
+	{lv*k=lmistr("scroll"   ),*v=dget(data,k);if(v&&ln(v)!=0&&!vol)dset(r,k,v);}
+	{lv*k=lmistr("value"    ),*v=dget(data,k);if(v&&!vol){if(rtext_is_plain(v)){v=rtext_all(v);if(v->c)dset(r,k,v);}else{dset(r,k,rtext_write(v));}}}
 	return r;
 }
 
@@ -1808,7 +1808,7 @@ lv* slider_read(lv*x,lv*r){
 lv* slider_write(lv*x){
 	lv*data=x->b,*r=lmd();dset(r,lmistr("type"),lmistr("slider"));
 	{lv*k=lmistr("interval"),*v=dget(data,k);if(v)dset(r,k,v);}
-	{lv*k=lmistr("value"   ),*v=dget(data,k);if(v&&ln(v)!=0)dset(r,k,v);}
+	{lv*k=lmistr("value"   ),*v=dget(data,k);if(v&&ln(v)!=0&&!lb(ifield(x,"volatile")))dset(r,k,v);}
 	{lv*k=lmistr("step"    ),*v=dget(data,k);if(v&&ln(v)!=1)dset(r,k,v);}
 	{lv*k=lmistr("format"  ),*v=dget(data,k);if(v&&strcmp("%f",v->sv))dset(r,k,v);}
 	{lv*k=lmistr("style"   ),*v=dget(data,k);if(v&&strcmp(slider_styles[0],v->sv))dset(r,k,v);}
@@ -1887,17 +1887,17 @@ lv* grid_read(lv*x,lv*r){
 	return r;
 }
 lv* grid_write(lv*x){
-	lv*data=x->b,*r=lmd();dset(r,lmistr("type"),lmistr("grid"));
+	lv*data=x->b,*r=lmd();dset(r,lmistr("type"),lmistr("grid"));int vol=lb(ifield(x,"volatile"));
 	{lv*k=lmistr("scrollbar"),*v=dget(data,k);if(v)dset(r,k,v);}
 	{lv*k=lmistr("headers"  ),*v=dget(data,k);if(v)dset(r,k,v);}
 	{lv*k=lmistr("lines"    ),*v=dget(data,k);if(v)dset(r,k,v);}
 	{lv*k=lmistr("bycell"   ),*v=dget(data,k);if(v)dset(r,k,v);}
 	{lv*k=lmistr("widths"   ),*v=dget(data,k);if(v&&v->c)dset(r,k,v);}
 	{lv*k=lmistr("format"   ),*v=dget(data,k);if(v&&v->c)dset(r,k,v);}
-	{lv*k=lmistr("value"    ),*v=dget(data,k);if(v)dset(r,k,l_cols(v));}
-	{lv*k=lmistr("scroll"   ),*v=dget(data,k);if(v&&ln(v)!=0)dset(r,k,v);}
-	{lv*k=lmistr("row"      ),*v=dget(data,k);if(v&&ln(v)!=-1)dset(r,k,v);}
-	{lv*k=lmistr("col"      ),*v=dget(data,k);if(v&&ln(v)!=-1)dset(r,k,v);}
+	{lv*k=lmistr("value"    ),*v=dget(data,k);if(v&&!vol)dset(r,k,l_cols(v));}
+	{lv*k=lmistr("scroll"   ),*v=dget(data,k);if(v&&ln(v)!= 0&&!vol)dset(r,k,v);}
+	{lv*k=lmistr("row"      ),*v=dget(data,k);if(v&&ln(v)!=-1&&!vol)dset(r,k,v);}
+	{lv*k=lmistr("col"      ),*v=dget(data,k);if(v&&ln(v)!=-1&&!vol)dset(r,k,v);}
 	return r;
 }
 
@@ -2031,7 +2031,7 @@ lv* widget_read(lv*x,lv*card){
 }
 void widget_purge(lv*x); // forward ref
 lv* widget_write(lv*x){
-	lv*data=x->b,*r=lmd();widget_purge(x);
+	lv*data=x->b,*r=lmd();
 	{lv*k=lmistr("name"    ),*v=dget(data,k);dset(r,k,v);}
 	{lv*k=lmistr("type"    ),*v=dget(data,k);dset(r,k,v);}
 	{lv*k=lmistr("size"    );dset(r,k,ifield(x,"size"));}
