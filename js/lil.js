@@ -384,8 +384,8 @@ triad={
 
 findop=(n,prims)=>Object.keys(prims).indexOf(n), as_enum=x=>x.split(',').reduce((x,y,i)=>{x[y]=i;return x},{})
 let tnames=0;tempname=_=>lms(`@t${tnames++}`)
-op=as_enum('JUMP,JUMPF,LIT,DUP,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,IPRE,IPOST')
-oplens=   [ 3   ,3    ,3  ,1  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3   ,3     ]
+op=as_enum('JUMP,JUMPF,LIT,DUP,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,IPRE,IPOST,FIDX')
+oplens=   [ 3   ,3    ,3  ,1  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3   ,3    ,3    ]
 blk_addb=(x,n  )=>x.b.push(0xFF&n)
 blk_here=(x    )=>x.b.length
 blk_setb=(x,i,n)=>x.b[i]=0xFF&n
@@ -407,7 +407,7 @@ blk_getimm=(x,i)=>x.locals[i]
 blk_cat=(x,y)=>{
 	let z=0,base=blk_here(x);while(z<blk_here(y)){
 		const b=blk_getb(y,z);if(b==op.LIT||b==op.GET||b==op.SET||b==op.LOC||b==op.AMEND){blk_imm(x,b,blk_getimm(y,blk_gets(y,z+1)))}
-		else if(b==op.JUMP||b==op.JUMPF||b==op.EACH||b==op.NEXT){blk_opa(x,b,blk_gets(y,z+1)+base)}
+		else if(b==op.JUMP||b==op.JUMPF||b==op.EACH||b==op.NEXT||b==op.FIDX){blk_opa(x,b,blk_gets(y,z+1)+base)}
 		else{for(let i=0;i<oplens[b];i++)blk_addb(x,blk_getb(y,z+i))}z+=oplens[b]
 	}
 }
@@ -565,8 +565,9 @@ parse=text=>{
 	const expr=b=>{
 		term(b);if(peek().t in {'[':1,'.':1}){parseindex(b)}
 		if(matchsp('@')){
-			const temp=tempname(),names=['v'];blk_set(b,temp),blk_op(b,op.DROP)
-			expr(b),blk_loop(b,names,_=>{blk_get(b,temp),names.map(n=>blk_get(b,lms(n))),blk_opa(b,op.BUND,1),blk_op(b,op.CALL)});return
+			const temp=tempname(),names=['v'];blk_set(b,temp),expr(b);const fidx=blk_opa(b,op.FIDX,0)
+			blk_loop(b,names,_=>{blk_get(b,temp),names.map(n=>blk_get(b,lms(n))),blk_opa(b,op.BUND,1),blk_op(b,op.CALL)})
+			blk_sets(b,fidx,blk_here(b));return
 		}const s=peek().v;if(findop(s,dyad)>=0&&peek().t in {'symbol':1,'name':1}){next(),expr(b),blk_op2(b,s)}
 	}
 	const b=lmblk();if(hasnext())expr(b);while(hasnext())blk_op(b,op.DROP),expr(b)
@@ -625,6 +626,7 @@ runop=_=>{
 		case op.TAIL :{const a=arg(),f=arg();docall(f,a,o==op.TAIL);break}
 		case op.BIND :{const f=arg(),r=lmon(f.n,f.a,f.b);r.c=getev(),env_local(getev(),lms(f.n),r),ret(r);break}
 		case op.ITER :{const x=arg();ret(lil(x)?x:ld(x));ret(lid(x)?lmd():lml([]));break}
+		case op.FIDX :{const x=arg(),f=arg();if((lid(f)||lil(f)||lis(f))&&lil(x)){ret(lml(x.v.map(x=>l_at(f,x))));setpc(imm)}else{ret(x)};break}
 		case op.EACH :{
 			const n=arg(),r=arg(),s=arg();if(count(r)==count(s)){setpc(imm),ret(r);break}
 			const z=count(r), v=lml([s.v[z],lid(s)?s.k[z]:lmn(z),lmn(z)]);

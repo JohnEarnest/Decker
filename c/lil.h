@@ -655,8 +655,8 @@ primitive triads[]={
 
 int findop(char*n,primitive*p){if(n)for(int z=0;p[z].name[0];z++)if(!strcmp(n,p[z].name))return z;return -1;}
 int tnames=0;lv* tempname(void){char t[64];snprintf(t,sizeof(t),"@t%d",tnames++);return lmcstr(t);}
-enum opcodes {JUMP,JUMPF,LIT,DUP,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,IPRE,IPOST};
-int oplens[]={3   ,3    ,3  ,1  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3   ,3    };
+enum opcodes {JUMP,JUMPF,LIT,DUP,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,IPRE,IPOST,FIDX};
+int oplens[]={3   ,3    ,3  ,1  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3   ,3    ,3   };
 void blk_addb(lv*x,int n){
 	if(x->ns<x->n+1)x->sv=realloc(x->sv,(x->ns*=2)*sizeof(int));x->sv[x->n++]=n;
 	if(x->n>=65536||x->c>=65536)printf("TOO MUCH BYTECODE!\n"),exit(1);
@@ -681,7 +681,7 @@ lv*  blk_getimm(lv*x,int i){return x->lv[i];}
 void blk_cat(lv*x,lv*y){
 	int z=0,base=blk_here(x);while(z<blk_here(y)){
 		int b=blk_getb(y,z);if(b==LIT||b==GET||b==SET||b==LOC||b==AMEND){blk_imm(x,b,blk_getimm(y,blk_gets(y,z+1)));}
-		else if(b==JUMP||b==JUMPF||b==EACH||b==NEXT){blk_opa(x,b,blk_gets(y,z+1)+base);}
+		else if(b==JUMP||b==JUMPF||b==EACH||b==NEXT||b==FIDX){blk_opa(x,b,blk_gets(y,z+1)+base);}
 		else{for(int i=0;i<oplens[b];i++)blk_addb(x,blk_getb(y,z+i));}z+=oplens[b];
 	}
 }
@@ -910,10 +910,12 @@ void term(lv*b){
 void expr(lv*b){
 	term(b);if(strchr("[.",peek()->type)){parseindex(b,NULL);}
 	if(matchsp('@')){
-		lv*temp=tempname();blk_set(b,temp),blk_op(b,DROP);
-		lv*names=l_list(lmistr("v"));expr(b);
+		lv*temp=tempname();blk_set(b,temp);
+		lv*names=l_list(lmistr("v"));expr(b);int fidx=blk_opa(b,FIDX,0);
+
+
 		lv*l=lmblk();blk_get(l,temp);blk_get(l,l_first(names));blk_opa(l,BUND,1);blk_op(l,CALL);
-		blk_loop(b,names,l);return;
+		blk_loop(b,names,l);blk_sets(b,fidx,blk_here(b));return;
 	}
 	str s=token_str(peek());if(findop(s.sv,dyads)>=0&&strchr("mn",peek()->type)){next(),expr(b),blk_op2(b,s.sv);}free(s.sv);
 }
@@ -976,6 +978,7 @@ void runop(void){
 			lv*r=lmon(n,a,f->b);r->env=ev(),env_local(ev(),lmcstr(r->sv),r),ret(r);break;
 		}
 		case ITER:{lv*x=arg();ret(lil(x)?x:ld(x));ret(lid(x)?lmd():lml(0));break;}
+		case FIDX:{lv*x=arg(),*f=arg();if((lid(f)||lil(f)||lis(f))&&lil(x)){MAP(r,x)l_at(f,x->lv[z]);ret(r);*pc=imm;}else{ret(x);}break;}
 		case EACH:{
 			lv*n=arg(),*r=arg(),*s=arg();if(r->c==s->c){*pc=imm,ret(r);break;}
 			int z=r->c;lv*v=lml(3);v->lv[0]=s->lv[z],v->lv[1]=lid(s)?s->kv[z]:lmn(z),v->lv[2]=lmn(z);

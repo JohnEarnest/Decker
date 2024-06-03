@@ -198,12 +198,10 @@ on image_flatten img deck do
 end
 on image_inline img pos do
  if 1<max keys img.hist
-  # note: the @ forces the Lil interpreter to process every byte in sequence,
-  # which is dramatically slower than the vectorized approach for grayscale:
   pix:"" fuse colors @ 0|15& -32+ raze img.copy[].map[(0,1) dict (32,47)].pixels
   cs:"RGB"
  else
-  pix:"" fuse (list "%02H") format 255 * ! raze img.pixels
+  pix:"" fuse ("FF","00") @ raze img.pixels
   cs:"G"
  end
  "q %i 0 0 %i %i %i cm BI /W %i /H %i /CS /%s /BPC 8 /F /AHx ID\n%s>\nEI Q\n" format img.size,pos,img.size,cs,pix
