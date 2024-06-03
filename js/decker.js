@@ -1823,7 +1823,7 @@ modals=_=>{
 			if(subtype=='export_table' )field_exit(),save_text(name,ls(n_writecsv([grid.table,format])))
 			if(subtype=='export_image' )save_image()
 			if(subtype=='save_lil'){
-				let x=ms.verb;ret(ONE)
+				let x=ms.verb;arg();ret(ONE)
 				let f=image_is(x)?[x]:     lid(x)?ll(dget(x,lms('frames'))||lml([])): lil(x)?ll(x): []
 				let d=image_is(x)?lml([]): lid(x)?   dget(x,lms('delays'))||lml([] ): lml([])
 				let ff=[],fd=[];f.map((v,i)=>{if(image_is(v))ff.push(v),fd.push(0|clamp(1,!lil(d)?ln(d): i>=count(d)?3: ln(d.v[i]),65535))})
