@@ -354,6 +354,8 @@ lv*n_appexit(lv*self,lv*z){
 lv* print_array(lv*arr,FILE*out){array a=unpack_array(arr);for(int z=0;z<a.size;z++)fputc(0xFF&(int)array_get_raw(a,z),out);return arr;}
 lv*n_appprint(lv*self,lv*a){(void)self;return a->c==1&&array_is(a->lv[0])?print_array(l_first(a),stdout):n_printf(a,1,stdout);}
 lv*n_appshow(lv*self,lv*a){(void)self;str s=str_new();EACH(z,a){if(z)str_addc(&s,' ');show(&s,a->lv[z],a->c==1);}printf("%s\n",lmstr(s)->sv);return l_first(a);}
+lv* draw_widget(lv*w);lv* draw_con(lv*card,int active); // forward refs
+lv*n_apprender(lv*self,lv*a){(void)self;a=l_first(a);return widget_is(a)?draw_widget(a): card_is(a)?draw_con(a,1): image_empty();}
 lv*interface_app(lv*self,lv*i,lv*x){
 	if(x&&lis(i)){
 		ikey("fullscreen"){toggle_fullscreen=windowed!=!lb(x);return x;}
@@ -364,6 +366,7 @@ lv*interface_app(lv*self,lv*i,lv*x){
 		ikey("exit"      )return lmnat(n_appexit,NULL);
 		ikey("show"      )return lmnat(n_appshow,NULL);
 		ikey("print"     )return lmnat(n_appprint,NULL);
+		ikey("render"    )return lmnat(n_apprender,NULL);
 	}return x?x:NONE;(void)self;
 }
 
@@ -1204,19 +1207,19 @@ void draw_thumbnail(lv*card,rect r){
 }
 lv* draw_widget(lv*w){
 	if(canvas_is(w))return n_canvas_copy(w,lml(0));
-	pair rsize=getpair(ifield(w,"size"));lv*buff=lmbuff(rsize),*r=image_make(buff);
-	cstate t=frame;frame=draw_buffer(buff);event_state eb=ev;ev=(event_state){0};menus_clear(); // !!!
+	pair rsize=getpair(ifield(w,"size"));lv*buff=lmbuff(rsize),*r=image_make(buff);int im=ms.in_modal,it=ms.type;ms.in_modal=1;
+	cstate t=frame;frame=draw_buffer(buff);event_state eb=ev;ev=(event_state){0};ms.type=modal_about;menus_clear(); // !!!
 	if     (button_is     (w)){                button p=unpack_button(w)  ;p.size.x=0,p.size.y=0;widget_button(w,p,lb(ifield(w,"value")));}
 	else if(slider_is     (w)){                slider p=unpack_slider(w)  ;p.size.x=0,p.size.y=0;widget_slider(w,p);}
 	else if(grid_is       (w)){grid_val  v={0};grid   p=unpack_grid (w,&v);p.size.x=0,p.size.y=0;widget_grid (w,p,&v);}
 	else if(field_is      (w)){field_val v={0};field  p=unpack_field(w,&v);p.size.x=0,p.size.y=0;widget_field(w,p,&v);}
 	else if(contraption_is(w)){pair o=getpair(ifield(w,"pos"));iwrite(w,lmistr("pos"),lmpair((pair){0,0}));widget_contraption(w);iwrite(w,lmistr("pos"),lmpair(o));}
-	return ev=eb,frame=t,r;
+	return ev=eb,frame=t,ms.in_modal=im,ms.type=it,r;
 }
 lv* draw_con(lv*card,int active){
-	int im=ms.in_modal;ms.in_modal=active;
+	int im=ms.in_modal,it=ms.type;ms.in_modal=active;
 	pair rsize=getpair(ifield(card,"size"));lv*buff=lmbuff(rsize),*r=image_make(buff);
-	cstate t=frame;frame=draw_buffer(buff);event_state eb=ev;ev=(event_state){0};
+	cstate t=frame;frame=draw_buffer(buff);event_state eb=ev;ev=(event_state){0};if(active){ms.type=modal_about,menus_clear();}
 	lv*back=ifield(card,"image");pair bsize=image_size(back);
 	if(bsize.x!=0&&bsize.y!=0)buffer_paste(rect_pair((pair){0,0},bsize),frame.clip,back->b,frame.buffer,1);
 	lv*wids=ivalue(card,"widgets");if(uimode!=mode_draw||dr.show_widgets)EACH(z,wids){
@@ -1227,7 +1230,7 @@ lv* draw_con(lv*card,int active){
 		else if(grid_is       (w)){grid_val  v={0};grid  p=unpack_grid (w,&v);widget_grid (w,p,&v);}
 		else if(field_is      (w)){field_val v={0};field p=unpack_field(w,&v);widget_field(w,p,&v);}
 		else if(contraption_is(w)){widget_contraption(w);}
-	}return ev=eb,frame=t,ms.in_modal=im,r;
+	}return ev=eb,frame=t,ms.in_modal=im,ms.type=it,r;
 }
 rect modal_rtext(pair extra){
 	pair size={200,100};

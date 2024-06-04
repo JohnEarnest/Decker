@@ -214,16 +214,17 @@ draw_dithered=(r,image,opaque,mask,threshold)=>{
 }
 draw_widget=w=>{
 	if(canvas_is(w))return container_image(w,1)
+	const im=ms.in_modal,it=ms.type;ms.in_modal=1,ms.type='about'
 	const rsize=getpair(ifield(w,'size')),r=image_make(rsize),t=frame,te=copy_object(ev);frame=draw_frame(r),ev=event_state(),menus_clear() // !!!
 	if     (button_is     (w)){const p=unpack_button(w);p.size.x=0,p.size.y=0;widget_button(w,p,lb(ifield(w,'value')))}
 	else if(slider_is     (w)){const p=unpack_slider(w);p.size.x=0,p.size.y=0;widget_slider(w,p)}
 	else if(grid_is       (w)){const p=unpack_grid  (w);p.size.x=0,p.size.y=0;widget_grid  (w,p,unpack_grid_value(w))}
 	else if(field_is      (w)){const p=unpack_field (w);p.size.x=0,p.size.y=0;widget_field (w,p,unpack_field_value(w))}
 	else if(contraption_is(w)){const o=w.pos;w.pos=rect(0,0);widget_contraption(w);w.pos=o}
-	return ev=te,frame=t,r
+	return ev=te,frame=t,ms.in_modal=im,ms.type=it,r
 }
 draw_con=(card,active)=>{
-	const im=ms.in_modal;ms.in_modal=active
+	const im=ms.in_modal,it=ms.type;ms.in_modal=active;if(active){ms.type='about',menus_clear()}
 	const rsize=getpair(ifield(card,'size')),r=image_make(rsize),t=frame,te=copy_object(ev);frame=draw_frame(r),ev=event_state()
 	const back=ifield(card,'image'), bsize=back.size, wids=card.widgets
 	if(bsize.x!=0&&bsize.y!=0)image_paste(rpair(rect(),bsize),frame.clip,back,frame.image,1)
@@ -234,7 +235,7 @@ draw_con=(card,active)=>{
 		if(grid_is       (w))widget_grid  (w,unpack_grid  (w),unpack_grid_value(w))
 		if(field_is      (w))widget_field (w,unpack_field (w),unpack_field_value(w))
 		if(contraption_is(w))widget_contraption(w)
-	});return ev=te,frame=t,ms.in_modal=im,r
+	});return ev=te,frame=t,ms.in_modal=im,ms.type=it,r
 }
 draw_thumbnail=(card,r)=>{
 	const back=ifield(card,'image');r=inset(r,1),draw_rect(r,0);if(back.size.x>0||back.size.y>0)draw_scaled(r,back,1)

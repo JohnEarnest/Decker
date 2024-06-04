@@ -1005,6 +1005,9 @@ interface_app=lmi((self,i,x)=>{
 			const r=ls(z.length>1?dyad.format(z[0],lml(z.slice(1))):z[0]||NONE);console.log(r)
 			return lms(r)
 		})
+		if(i.v=='render')return draw_con==undefined?NONE:lmnat(([a])=>{
+			return widget_is(a)?draw_widget(a): card_is(a)?draw_con(a,1): image_make(rect())
+		})
 	}return x?x:NONE
 },'app')
 
