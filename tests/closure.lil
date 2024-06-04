@@ -105,3 +105,12 @@ on func do
 end
 func[]
 show[duplicate] # "Alpha"
+
+# variadic function declarations:
+on func ...x do
+ show["variadic" x]
+end
+func[]
+func[11]
+func[22 "B"]
+show[keys func]

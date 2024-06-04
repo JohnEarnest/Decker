@@ -540,7 +540,8 @@ parse=text=>{
 		}
 		if(match('each')){const n=names('in','variable');expr(b),blk_loop(b,n,_=>iblock(b));return}
 		if(match('on')){
-			const n=name('function'),a=names('do','argument')
+			const n=name('function'),v=matchsp('.')&&matchsp('.')&&matchsp('.');let a=names('do','argument')
+			if(v&&a.length!=1)return er(`Variadic functions must take exactly one named argument.`);if(v)a=['...'+a[0]]
 			blk_lit(b,lmon(n,a,blk_end(block()))),blk_op(b,op.BIND);return
 		}
 		if(match('send')){
@@ -596,7 +597,9 @@ arg      =_=>state.p.pop()
 docall=(f,a,tail)=>{
 	if(linat(f)){ret(f.f(ll(a)));return}
 	if(!lion(f)){ret(l_at(f,monad.first(a)));return}
-	if(tail){descope()}issue(env_bind(f.c,f.a,a),f.b),calldepth=max(calldepth,state.e.length)
+	if(tail){descope()}
+	issue(f.a.length==1&&f.a[0][0]=='.'?env_bind(f.c,[f.a[0].slice(3)],monad.list(a)): env_bind(f.c,f.a,a),f.b)
+	calldepth=max(calldepth,state.e.length)
 }
 runop=_=>{
 	const b=getblock();if(!liblk(b))ret(state.t.pop())

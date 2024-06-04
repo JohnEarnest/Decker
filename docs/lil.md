@@ -199,6 +199,14 @@ pair[3,5]    # careful: ',' joins items into lists- it is not an argument separa
 pair 3 5     # wrong: this is three separate statements, not a function call!
 ```
 
+If you want to define a function that takes a variable number of arguments- a so-called _variadic_ or _ambivalent_ function- declare the function with a single named argument prefaced with `...`. When the function is called, this argument will contain a list of every argument provided to the function:
+```
+on several ...x do 1-x end
+several[11 22 33]
+# (-10,-21,-32)
+```
+
+
 Lil, the Functional Language
 ----------------------------
 As we've seen above, thinking about Lil as an everyday garden-variety imperative language is perfectly sufficient for writing scripts. Some characteristics, though, make it well-suited to the _functional_ style of programming, in which we aim to minimize mutation, compose our program from functions which do not have "side-effects", and make use of so-called "higher-order" functions- functions which take functions as arguments.
@@ -1296,7 +1304,7 @@ STRING  := '"' (NON_ESC|'\\'|'\"'|'\n')* '"'
 LITERAL := NUMBER | STRING | '(' ')'
 NAME    := (ALPHA|'_'|'?') (ALPHA|'_'|'?'|DIGIT)*
 ITER    := (( each' NAME* 'in' ) | 'while') EXPR* 'end'
-ON      := 'on' NAME+ 'do' EXPR* 'end'
+ON      := 'on' ( '...' NAME |  NAME+ ) 'do' EXPR* 'end'
 IF      := 'if' EXPR* ('elseif' EXPR*)* ( 'else' EXPR* )? 'end'
 CLAUSE  := ('where' EXPR) | ('by' EXPR) | ('orderby' EXPR ('asc'|'desc'))
 QUERY   := ('select'|'extract'|'update')((NAME|STRING ':')?EXPR)* CLAUSE* 'from' EXPR

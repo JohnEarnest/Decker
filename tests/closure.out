@@ -18,3 +18,7 @@ It is I, the outer boop: 25
 "Beta"
 "Chained"
 "Alpha"
+"variadic" ()
+"variadic" (11)
+"variadic" (22,"B")
+("...x")

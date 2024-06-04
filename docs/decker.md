@@ -409,9 +409,9 @@ Decker provides a number of useful pre-defined functions:
 
 | Name                   | Description                                                                                                               | Purpose    |
 | :--------------------- | :------------------------------------------------------------------------------------------------------------------------ | :--------- |
-| `show[x...]`           | Print a human-comprehensible representation of the value `x` to the Listener, and return `x`.                             | Listener   |
-| `panic[x...]`          | Print a human-comprehensible representation of the value `x` to the Listener, and immediately halt the executing script.  | Listener   |
-| `print[x...]`          | Display a string `x` in the Listener. (1)                                                                                 | Listener   |
+| `show[...x]`           | Print a human-comprehensible representation of the value `x` to the Listener, and return `x`.                             | Listener   |
+| `panic[...x]`          | Print a human-comprehensible representation of the value `x` to the Listener, and immediately halt the executing script.  | Listener   |
+| `print[...x]`          | Display a string `x` in the Listener. (1)                                                                                 | Listener   |
 | `play[x mode]`         | Play a sound. `x` can be either the name of a sound or a sound interface. (2)                                             | Decker     |
 | `go[x y z]`            | Navigate to another card by _name_, _value_, or _index_ `x` with transition `y`, playing for `z` frames (3).              | Decker     |
 | `transition[x]`        | Install a [transition](#transitions) `x` for use with `go[]`, and return a dictionary of installed transitions.           | Decker     |
@@ -614,8 +614,8 @@ The _app_ interface exposes control over the Decker application itself. It is av
 | `x.render[x]`              | Draw the visual appearance of card or widget `x` as an Image interface.                               |
 | `x.save[]`                 | Save the current deck, in-place if possible. May prompt the user for a save location.                 |
 | `x.exit[]`                 | Immediately close Decker without saving (see `x.save[]`).                                             |
-| `x.show[x...]`             | Print a human-comprehensible representation of the value `x` to _stdout_, and return `x`.             |
-| `x.print[x...]`            | Display a string `x` to _stdout_.                                                                     |
+| `x.show[...x]`             | Print a human-comprehensible representation of the value `x` to _stdout_, and return `x`.             |
+| `x.print[...x]`            | Display a string `x` to _stdout_.                                                                     |
 
 Note that `app.exit[]` doesn't do anything in Web-Decker. Exposing a button for closing Decker is very handy in locked decks, but you may want to hide or disable it when `sys.platform~"web"`.
 
@@ -627,9 +627,9 @@ The _bits_ interface exposes utility routines for efficient bit-wise manipulatio
 | Name                       | Description                                                              |
 | :------------------------- | :----------------------------------------------------------------------- |
 | `typeof x`                 | `"bits"`                                                                 |
-| `x.or[x...]`               | Calculate the bit-wise OR  of two or more numbers or lists of numbers.   |
-| `x.and[x...]`              | Calculate the bit-wise AND of two or more numbers or lists of numbers.   |
-| `x.xor[x...]`              | Calculate the bit-wise XOR of two or more numbers or lists of numbers.   |
+| `x.or[...x]`               | Calculate the bit-wise OR  of two or more numbers or lists of numbers.   |
+| `x.and[...x]`              | Calculate the bit-wise AND of two or more numbers or lists of numbers.   |
+| `x.xor[...x]`              | Calculate the bit-wise XOR of two or more numbers or lists of numbers.   |
 
 The `bits.and[]`, `bits.or[]` and `bits.xor[]` functions _conform_ scalar and vector arguments like Lil's built in arithmetic operators:
 ```lil
@@ -674,7 +674,7 @@ The _rtext_ interface contains a number of helper routines for building and mani
 | `rtext.span[table (x,y)]`    | An rtext subtable containing content between character positions `x` and `y`.    |
 | `rtext.split[delim table]`   | Break an rtext into a list of tables at instances of a delimiter string `delim`. |
 | `rtext.replace[table x y i]` | Replace every instance in `table` of `x` with `y`. If `i`, ignore case.          |
-| `rtext.cat[x...]`            | Concatenate rtext tables sequentially. Accepts any number of arguments.          |
+| `rtext.cat[...x]`            | Concatenate rtext tables sequentially. Accepts any number of arguments.          |
 
 Dictionary arguments to `rtext.cat[]` are promoted to tables, Image interfaces are turned into inline image spans, and any other arguments which are not already tables will be interpreted as strings and converted to text runs as by `rtext.make[x "" ""]`. Thus, with a single argument, `rtext.cat[]` can be used to _cast_ values to properly formed rtext tables. Sequential rows with matching `font` and (non-image) `arg` values will be coalesced together, and rows with empty `text` spans will be dropped.
 
@@ -721,7 +721,7 @@ The deck interface represents the global attributes of a Decker document. The op
 | `x.copy[card]`    | Save a card and its contents as an opaque string starting with `%%CRD0`.                    |
 | `x.paste[text]`   | Append a card and its contents from a `%%CRD0` string to this deck, returning the new card. |
 | `x.purge[]`       | Reset the value-state of `volatile` widgets to their defaults.                              |
-| `x.event[n x...]` | Issue an event named `n` at this deck with argument(s) `x`.                                 |
+| `x.event[n ...x]` | Issue an event named `n` at this deck with argument(s) `x`.                                 |
 
 `deck.add[x y z]` can add new cards, sounds, modules, prototypes and fonts to the deck:
 
@@ -799,7 +799,7 @@ While arrays do not benefit from the full range of operators Lil can bring to be
 | `x.slice[offset cast]` | Create a lightweight view of a subset of this array, potentially with a different cast.                                  |
 | `x.copy [offset cast]` | Create a new, distinct array by copying a subset of this array, potentially with a different cast.                       |
 | `x.struct[shape x]`    | Read or write structured values starting at `here` and post-incrementing `here` based on `shape`.                        |
-| `x.cat[x...]`          | Append one or more numbers, strings, lists, or arrays to this array, starting at and post-incrementing `here`.           |
+| `x.cat[...x]`          | Append one or more numbers, strings, lists, or arrays to this array, starting at and post-incrementing `here`.           |
 
 Several parts of the array interface take an `offset` argument. An `offset` may be either a single number (an index from the beginning of the array), or a pair of numbers (an index from the beginning of the array and a length). A single index refers to reading or writing a single value, whereas an index and length refer to reading or writing multiple values. For reads, multiple numbers will be read as a list, and any number of `char`s will be read as a Lil string. For writes, any sort of listy value (list, string, or _array_) will be truncated or padded with 0 to fit the specified length, and a single number will be replicated to fill the specified length.
 
@@ -870,7 +870,7 @@ Images are dynamically created interfaces, each representing a mutable rectangul
 | `x.rotate[x]`          | Update the image in place, rotating it clockwise around its centerpoint by `x` radians.                                  |
 | `x.translate[pos w]`   | Update the image in place, translating it by `pos` (x,y) pixels. If `w` is truthy, wrap the image at the edges.          |
 | `x.scale[n]`           | Update the image in place, nearest-neighbor scaling it by `n`, which can be a single number or `(x,y)` pair.             |
-| `x.merge[x...]`        | Consistent with `canvas.merge[]`: Replace every pixel of the image by compositing together images by index.              |
+| `x.merge[...x]`        | Consistent with `canvas.merge[]`: Replace every pixel of the image by compositing together images by index.              |
 | `x.copy[pos size a]`   | Consistent with `canvas.copy[]`: grab and return a sub-image at `pos`/`size`, respecting anchor `a`.                     |
 | `x.paste[image pos t]` | Consistent with `canvas.paste[]`: composite in another image at `pos`. If `t` is truthy, treat pattern 0 as transparent. |
 
@@ -1006,7 +1006,7 @@ The card interface gives access to the contents of a given card.
 | `x.remove[x]`     | Remove a widget `x` (or list/dict of widgets) from this card. Returns 1 on success.               |
 | `x.copy[list]`    | Save a widget (or list/dict of widgets) on this card as an opaque string starting with `%%WGT0`.  |
 | `x.paste[text]`   | Append the widgets within a `%%WGT0` string to this card, returning a list of the new widgets.    |
-| `x.event[n x...]` | Issue an event named `n` at this card with argument(s) `x`.                                       |
+| `x.event[n ...x]` | Issue an event named `n` at this card with argument(s) `x`.                                       |
 
 `card.add[x y]` can add a new widget to the card. If `x` is a string {`"button"`, `"field"`, `"slider"`, `"canvas"`, or `"grid"`}, insert a new widget of the appropriate type using `y` as a name (or an appropriate default name). If `x` is the string `"contraption"`, insert a new instance of the prototype with name `y` using `z` as a name (or an appropriate default name). If `x` is a widget interface, insert a copy of it, again using `y` as a name or an appropriate default.
 
@@ -1037,7 +1037,7 @@ The button widget is a clickable button, possibly with a stateful checkbox.
 | `x.value`               | Bool. Is this checkbox checked? r/w.                                                                  |
 | `x.shortcut`            | String. A keyboard key which can be used as an alternative to pressing this button. r/w.              |
 | `x.style`               | The style of button; one of {`"round"`, `"rect"`, `"check"`, `"invisible"`}. r/w.                     |
-| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
+| `x.event[n ...x]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`.                  |
 
 The `toggle[]` function alters the `x.show` property of widgets:
@@ -1076,7 +1076,7 @@ The field widget displays and possibly allows the editing of text.
 | `x.scrollbar`           | Bool. Draw a scrollbar for this widget? r/w.                                                          |
 | `x.style`               | The style of field; one of {`"rich"`, `"plain"`, `"code"`}. r/w.                                      |
 | `x.align`               | The text alignment of the field; one of {`"left"`, `"center"`, `"right"`}. r/w.                       |
-| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
+| `x.event[n ...x]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
 
 If a field has a `style` other than `rich`, any rtext written to the `value` attribute will be coalesced into a single run of ordinary text with the default font.
@@ -1106,7 +1106,7 @@ The slider widget represents a single number, constrained within a configurable 
 | `x.interval`            | A list of numbers giving a minimum and maximum for the value, inclusive. r/w.                         |
 | `x.format`              | A `format` string controlling how the value is shown in `"bar"` or `"compact"` styles. r/w.           |
 | `x.style`               | The style of slider; one of {`"horiz"`, `"vert"`, `"bar"`, `"compact"`}. r/w.                         |
-| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
+| `x.event[n ...x]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
 
 Grid Interface
@@ -1141,7 +1141,7 @@ The grid widget represents an interactive spreadsheet-style view of a table.
 | `x.rowvalue`            | Dict. The selected row of the table, or an empty dictionary for no selection. r/w.                    |
 | `x.cellvalue`           | Anything. The selected cell value of the table, or `0` for no selection. r/w.                         |
 | `x.format`              | String. A column spec for formatting columns of the table. See `writecsv[]`. r/w.                     |
-| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
+| `x.event[n ...x]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
 
 Note that both `grid.col` and `grid.cell` accept writes with the column specified _either_ by name or by index. An invalid column name or `-1` will clear the column selection.
@@ -1181,15 +1181,15 @@ The canvas will scale _up_ logical pixels to display them on the card (resulting
 | `x.invert[pos size a]`  | Invert the white and non-white pixels within the rectangle given by `pos`/`size`.                                 |
 | `x.box[pos size a]`     | Draw a a rectangular outline given by `pos`/`size` with the current pattern and brush.                            |
 | `x.fill[pos]`           | Flood-fill using the drawing pattern starting from `pos`.                                                         |
-| `x.line[x...]`          | Draw a line connecting two or more points. If only a single point is given, draw a single instance of the brush.  |
-| `x.poly[x...]`          | Draw a filled polygon.                                                                                            |
-| `x.merge[x...]`         | Composite images by index based on the contents of the canvas.                                                    |
+| `x.line[...x]`          | Draw a line connecting two or more points. If only a single point is given, draw a single instance of the brush.  |
+| `x.poly[...x]`          | Draw a filled polygon.                                                                                            |
+| `x.merge[...x]`         | Composite images by index based on the contents of the canvas.                                                    |
 | `x.text[x pos a]`       | Draw a string or rtext `x` at `pos`, from an anchor position `a`.                                                 |
 | `x.textsize[x w]`       | Obtain a `size` for the outer dimensions of a string or rtext `x`, optionally wrapped to width `w`.               |
 | `x.copy[pos size a]`    | Grab an _image_ at `pos`/`size`.                                                                                  |
 | `x.paste[img pos t]`    | Draw an _image_ at `pos`. If `t` is truthy, treat pattern 0 as transparent.                                       |
 | `x.segment[img rect m]` | Draw an _image_ scaled to fit `rect`, based on margins `m`. Treat pattern 0 as transparent.                       |
-| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                                     |
+| `x.event[n ...x]`       | Issue an event named `n` at this widget with argument(s) `x`.                                                     |
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
 
 The `canvas.line[]` and `canvas.poly[]` functions can take any number of arguments, which may `(x,y)` points, or lists of `(x,y)` points. For example, either of the following would draw an identical small triangle:
@@ -1242,7 +1242,7 @@ Contraptions are custom widgets, defined in a [Prototype](#prototypeinterface). 
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
 | `x.def`                 | The Prototype of this contraption.                                                                    |
-| `x.event[n x...]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
+| `x.event[n ...x]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
 
 Contraption interfaces may expose additional attributes. Reads or writes to properties aside from those listed above (such as `.zami`) will invoke the `script` of the Prototype corresponding to this Contraption, calling either a function `get_zami` on a read, or `set_zami` (with a value) on a write. Inside an attribute handler both `me` and `card` are bound to the target Contraption instance, for consistency with event handlers.
@@ -1426,7 +1426,7 @@ end
 
 While a script is executing (or performing a `sleep[]`), no additional events can be fired until it completes. The `pointer` interface will, however, continue to update to reflect the current state of the pointing device.
 
-Widgets, Cards, and the Deck itself all expose a function called `event[name args...]`, which can be used to issue synthetic events at that target. The `name` may be the name of an existing event or any function in that target's script. When calling an event handler via `event[]` it will have all of the normal "magic" constants available as when called by Decker itself.
+Widgets, Cards, and the Deck itself all expose a function called `event[name ...args]`, which can be used to issue synthetic events at that target. The `name` may be the name of an existing event or any function in that target's script. When calling an event handler via `event[]` it will have all of the normal "magic" constants available as when called by Decker itself.
 
 
 Modules

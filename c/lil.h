@@ -879,7 +879,9 @@ void term(lv*b){
 	}
 	if(match("each")){lv*n=names("in","variable");expr(b),blk_loop(b,n,block());return;}
 	if(match("on")){
-		str n=name("function");lv*a=names("do","argument");
+		str n=name("function");int var=matchsp('.')&&matchsp('.')&&matchsp('.');lv*a=names("do","argument");
+		if(!perr()&&var&&a->c!=1){snprintf(par.error,sizeof(par.error),"Variadic functions must take exactly one named argument.");return;}
+		if(var&&a->c==1)a=l_list(l_format(lmistr("...%s"),l_first(a)));
 		blk_lit(b,lmon(n,a,blk_end(block())));blk_op(b,BIND);return;
 	}
 	if(match("send")){
@@ -945,7 +947,9 @@ lv* env_bind(lv*e,lv*k,lv*v){lv*r=lmenv(e);EACH(z,k)env_local(r,k->lv[z],z<v->c?
 void docall(lv*f,lv*a,int tail){
 	if(linat(f)){ret(((lv*(*)(lv*,lv*))f->f)(f->a,a));return;}
 	if(!lion(f)){ret(l_at(f,l_first(a)));return;}
-	if(tail){descope;}issue(env_bind(f->env,f,a),f->b);gc.depth=MAX(gc.depth,state.e->c);
+	if(tail){descope;}
+	issue(f->c==1&&f->lv[0]->sv[0]=='.'?env_bind(f->env,l_list(lmcstr(f->lv[0]->sv+3)),l_list(a)) :env_bind(f->env,f,a),f->b);
+	gc.depth=MAX(gc.depth,state.e->c);
 }
 void runop(void){
 	lv*b=getblock();

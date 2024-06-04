@@ -2064,13 +2064,18 @@ function parse_atdyad(b,  temp,nm,l,z){
 	blk_get(l,temp);blk_get(l,"v");blk_opa(l,"BUND",1);blk_op(l,"CALL")
 	blk_set(b,temp);blk_op(b,"DROP");expr(b);blk_loop(b,nm,l)
 }
-function term(b,  n,t){
+function term(b,  n,t,v){
 	if(peek_type()=="d"){blk_lit(b,lmn(token_val(next_token())));return}
 	if(peek_type()=="s"){blk_lit(b,lms(token_val(next_token())));return}
 	if(tmatch("if")){parse_if(b);return}
 	if(tmatch("while")){parse_while(b);return}
 	if(tmatch("each")){t=names("in","variable");expr(b);blk_loop(b,t,block());return}
-	if(tmatch("on")){n=name("function");t=names("do","argument");blk_lit(b,lmon(n,t,blk_end(block())));blk_op(b,"BIND");return}
+	if(tmatch("on")){
+		n=name("function");v=tmatchsp(".")&&tmatchsp(".")&&tmatchsp(".");t=names("do","argument");
+		if(!perr&&v&&count(t)!=1){perr="Variadic functions must take exactly one named argument.";return;}
+		if(v&&count(t)==1)t=l_list(lms("..." lvs(l_first(t))))
+		blk_lit(b,lmon(n,t,blk_end(block())));blk_op(b,"BIND");return
+	}
 	if(tmatch("send"   )){parse_send(b);return}
 	if(tmatch("local"  )){n=name("variable");expect(":");expr(b);blk_loc(b,n);return}
 	if(tmatch("select" )){parsequery(b,"@sel",1);return}
@@ -2199,11 +2204,12 @@ function ret(x){state_p[state_pc++]=x}
 function arg(){return state_p[--state_pc]}
 
 BEGIN{call_depth=0}
-function docall(f,a,tail){
+function docall(f,a,tail,  la,d){
 	if(linat(f)){ret(natives(lnat_inner(f),lnat_self(f),a));return}
 	if(!lion(f)){ret(l_at(f,l_first(a)));return}
 	if(tail)descope()
-	issue(env_bind(lon_closure(f),l_dict(lon_args(f),a)),lon_body(f))
+	la=lon_args(f);d=(count(la)==1&&lvs(l_first(la))~/^\./) ?l_dict(l_list(lms(substr(lvs(l_first(la)),4))),l_list(a)): l_dict(la,a)
+	issue(env_bind(lon_closure(f),d),lon_body(f))
 	call_depth=max(call_depth,state_ec)
 }
 function run_block(prog,  steps,pc,op,imm,a,b,c,r,n,ni,z){

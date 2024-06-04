@@ -75,9 +75,9 @@ Built-in Functions
 | Name             | Description                                                                                                                 | Purpose |
 | :--------------- | :-------------------------------------------------------------------------------------------------------------------------- | :------ |
 | `input[x]`       | Read a line from _stdin_ as a string, optionally displaying `x` as if with `print[]`, without the newline. Gets `0` on EOF. | Console |
-| `show[x...]`     | Print a human-comprehensible representation of the value `x` to _stdout_ followed by a newline, and return `x`.             | Console |
-| `print[x...]`    | Print a string `x` to _stdout_ followed by a newline. If more args are provided, `format` all but the first using `x`.(0)   | Console |
-| `error[x...]`    | Print a string `x` to _stderr_ followed by a newline. If more args are provided, `format` all but the first using `x`.(0)   | Console |
+| `show[...x]`     | Print a human-comprehensible representation of the value `x` to _stdout_ followed by a newline, and return `x`.             | Console |
+| `print[...x]`    | Print a string `x` to _stdout_ followed by a newline. If more args are provided, `format` all but the first using `x`.(0)   | Console |
+| `error[...x]`    | Print a string `x` to _stderr_ followed by a newline. If more args are provided, `format` all but the first using `x`.(0)   | Console |
 | `dir[x]`         | List the content of a directory as a table.(1)                                                                              | Files   |
 | `path[x y]`      | Canonical path `x` (joined with `y`, if given) via [realpath()](https://www.man7.org/linux/man-pages/man3/realpath.3.html). | Files   |
 | `read[x hint]`   | Read a file `x` using `hint` as necessary to control its interpretation.(2)                                                 | Files   |
@@ -149,7 +149,7 @@ Working With Decks
 ------------------
 The `readdeck[]` and `writedeck[]` functions allow Lilt to operate on Decker documents. Lilt can load, create, and manipulate multiple decks simultaneously, providing options for automated testing, data import/export, accessibility, and interacting with other technology from outside the Decker ecosystem.
 
-Just as in Decker, you can simulate "injecting" events into widgets, cards, or the deck with the `x.event[name args...]` function they provide, running the appropriate scripts to completion and producing any appropriate side-effects on the deck. For example, clicking on the first widget on the active card:
+Just as in Decker, you can simulate "injecting" events into widgets, cards, or the deck with the `x.event[name ...args]` function they provide, running the appropriate scripts to completion and producing any appropriate side-effects on the deck. For example, clicking on the first widget on the active card:
 
 ```lil
 d:readdeck["demo.deck"]

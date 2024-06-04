@@ -112,6 +112,12 @@ on twice f x do
 end
 twice[on double x do x*2 end  10] # -> 40
 
+# functions can be given a variadic argument with "..."
+on vary ...x do
+ show[x]
+end
+f[11 22 33]          # -> (11,22,33)
+
 # variables have lexical scope:
 on outer x do        # function argument defines local x.
  on inner x do       # function argument shadows outer x.
