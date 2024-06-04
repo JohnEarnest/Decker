@@ -25,6 +25,22 @@ on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':
 
 # the problems:
 
+problem[272.1]
+# replace every period ("."") in an IP address with "[.]"
+on f x do "[.]" fuse "." split x end
+assert[f["1.1.1.1"    ] "1[.]1[.]1[.]1"    ]
+assert[f["255.101.1.0"] "255[.]101[.]1[.]0"]
+
+problem[272.2]
+# calculate the sum of the absolute difference between the ASCII values of adjacent characters in x.
+on f x do
+  t:"%a" parse x
+  sum mag@(1 drop t)-t
+end
+assert[f["hello"] 13]
+assert[f["perl" ] 30]
+assert[f["raku" ] 37]
+
 problem[271.1]
 # find the row number (1-indexed) of a matrix containing maximum ones
 on f x do 1+first extract index orderby sum@value desc from x end
