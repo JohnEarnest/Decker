@@ -428,7 +428,7 @@ Decker provides a number of useful pre-defined functions:
 | `writexml[x fmt]`      | Turn a Lil structure `x` into an XML string, formatted with whitespace if `fmt` is truthy.(9)                             | Data       |
 | `alert[text type x y]` | Open a modal dialog with the string or rtext `text`, and potentially prompt for input.(10)                                | Modal      |
 | `read[type hint]`      | Open a modal dialog prompting the user to open a document, and return its contents (or `""`).(11)                         | Modal      |
-| `write[x]`             | Open a modal dialog prompting the user to save `x`. Returns `1` if the file was saved successfully, `0` otherwise.(12)    | Modal      |
+| `write[x hint]`        | Open a modal dialog prompting the user to save `x`. Returns `1` if the file was saved successfully, `0` otherwise.(12)    | Modal      |
 
 1) if `print[]` is provided more than one argument, the first argument will be interpreted as a _format string_, and each remaining argument will be treated as an element of a list of right arguments to `format`. The resulting string will then be printed on its own line. For example, `print["%s, %i" "first" 2]` is equivalent to `print["%s, %i" format ("first",2)]`.
 
@@ -523,8 +523,8 @@ The `"frames"` or `"gray_frames"` hints will cause `read[]` of a GIF to return a
 
 If an image contains transparent pixels, they will be read as pattern 0.
 
-12) `write[]` recognizes several types of Lil value and will serialize each appropriately:
-- _array interfaces_ are written as binary files.
+12) `write[x hint]` recognizes several types of Lil value and will serialize each appropriately:
+- _array interfaces_ are written as binary files. If `hint` is provided, use it as the file extension (for example `".png"`).
 - _sound interfaces_ are written as a .WAV audio file, and a `.wav` extension will be appended to any filename without it.
 - _image interfaces_ are written as GIF89a images, and a `.gif` extension will be appended to any filename without it.
 - A list of _image interfaces_ is written as an animated gif.

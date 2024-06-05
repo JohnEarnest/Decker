@@ -236,7 +236,7 @@ typedef struct {
 	int type, subtype, filter, in_modal, edit_json;
 	widget_state old_wid;
 	grid_val grid,grid2;field_val text,name,form0,form1,form2;
-	char*desc;char path[PATH_MAX];
+	char*desc;char path[PATH_MAX],path_suffix[PATH_MAX];
 	lv*message,*verb;pair cell;
 	int from_listener, from_action, from_keycaps;
 	int act_go, act_card, act_gomode, act_trans, act_transno, act_sound;
@@ -1578,7 +1578,7 @@ void modal_exit(int value){
 	}
 	if(ms.subtype==modal_save_lil){
 		if(ms.type==modal_save&&!value){arg();ret(NONE);ms.type=modal_none;return;}
-		lv*path=modal_save_path(ms.filter==filter_sound?".wav":ms.filter==filter_gif?".gif":"");
+		lv*path=modal_save_path(ms.filter==filter_sound?".wav":ms.filter==filter_gif?".gif": ms.path_suffix);
 		if(directory_exists(path->sv)&&ms.type!=modal_confirm){modal_save_replace(modal_save_lil,"file",path);return;}
 		lv*value=arg();ret(!value?NONE:
 			(image_is(value)||lil(value)||lid(value))?n_writegif(NULL,lml2(path,value)):
@@ -2293,8 +2293,8 @@ lv*n_open(lv*self,lv*z){
 	return r;
 }
 lv*n_save(lv*self,lv*z){
-	(void)self;modal_enter(modal_save_lil);lv*value=l_first(z);
-	if(array_is(value))ms.desc="Save a binary file.";
+	(void)self;modal_enter(modal_save_lil);lv*value=l_first(z);ms.path_suffix[0]=0;
+	if(array_is(value)){ms.desc="Save a binary file.";if(z->c>1)snprintf(ms.path_suffix,sizeof(ms.path_suffix),"%s",ls(z->lv[1])->sv);}
 	if(sound_is(value))ms.filter=filter_sound,ms.desc="Save a .wav sound file.";
 	if(image_is(value)||lid(value))ms.filter=filter_gif,ms.desc="Save a .gif image file.";
 	if(lil(value)){EACH(z,value)if(image_is(value->lv[z]))ms.filter=filter_gif,ms.desc="Save a .gif image file.";}

@@ -480,7 +480,7 @@ let wid=wid_state()
 modal_state=_=>({ // modal state
 	type:null,subtype:null,in_modal:0,edit_json:0,old_wid:null,
 	filter:0, grid:null,grid2:null, text:null,name:null,form0:null,form1:null,form2:null,
-	desc:'',path:'',filter:'', message:null,verb:null, cell:rect(),
+	desc:'',path:'',path_suffix:'',filter:'', message:null,verb:null, cell:rect(),
 	from_listener:0,from_action:0,from_keycaps:0, act_go:0,act_card:0,act_gomode:0,act_trans:0,act_transo:0,act_sound:0,
 	time_curr:0,time_end:0,time_start:0, carda:null,cardb:null,trans:null,canvas:null,pending_grid_cell:rect(),
 })
@@ -2128,9 +2128,9 @@ n_open=([type,hint])=>{
 	if(image_is(r)&&hint&&(ls(hint)=='frames'||ls(hint)=='gray_frames'))r=readgif([],ls(hint))
 	ms.verb=t=='array'?lms(t): hint?ls(hint):'';return r
 }
-n_save=([x])=>{
-	modal_enter('save_lil');x=x||NONE
-	if(array_is(x)                                      )ms.desc='Save a binary file.'    ,ms.text=fieldstr(lms('untitled.bin'))
+n_save=([x,s])=>{
+	modal_enter('save_lil');x=x||NONE;ms.path_suffix=array_is(x)&&s?ls(s):''
+	if(array_is(x)                                      )ms.desc='Save a binary file.'    ,ms.text=fieldstr(lms('untitled'+ms.path_suffix))
 	if(sound_is(x)                                      )ms.desc='Save a .wav sound file.',ms.text=fieldstr(lms('sound.wav'))
 	if(image_is(x)||lid(x)||(lil(x)&&x.v.some(image_is)))ms.desc='Save a .gif image file.',ms.text=fieldstr(lms('image.gif'))
 	ms.verb=x;return NONE
