@@ -51,8 +51,8 @@ button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"pdf.build[]"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
-field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"The pdf.build[] function takes a table of page descriptions and produces an array interface representing the complete PDF document, which can then be saved with the write[] built-in function. Remember to save with a \".pdf\" extension!\n\nThe page description table consists of two columns:\n\n- size: pairs of (width,height) dimensions of pages, measured in display units.\n- code: a string or array containing a sequence of drawing commands for the page.\n\nA full description of PDF vector drawing commands is beyond the scope of this document, but the \"pdf\" module provides a number of helper functions for preparing these code sequences, as we will see later. Of particular note in this example is that the default drawing coordinate system has its origin in the bottom-left corner of each page, rather than the top-left corner used by Decker's canvas APIs."}
-ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"box:\"\n1 0 0 RG % set (red,green,blue) color\n2 w      % set line width\n 2  2 m  % move to (x,y)\n10  2 l  % line to (x,y)\n10 10 l\n 2 10 l\ns        % stroke line\n\"\n\npages:insert size code with\n 12,12 box\nend\n\nwrite[pdf.build[pages]]\n"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"The pdf.build[] function takes a table (or tables) of page descriptions and produces an array interface representing the complete PDF document, which can then be saved with the write[] built-in function. Remember to save with a \".pdf\" extension!\n\nThe page description table consists of two columns:\n\n- size: pairs of (width,height) dimensions of pages, measured in display units.\n- code: a string or array containing a sequence of drawing commands for the page.\n\nA full description of PDF vector drawing commands is beyond the scope of this document, but the \"pdf\" module provides a number of helper functions for preparing these code sequences, as we will see later. Of particular note in this example is that the default drawing coordinate system has its origin in the bottom-left corner of each page, rather than the top-left corner used by Decker's canvas APIs."}
+ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"box:\"\n1 0 0 RG % set (red,green,blue) color\n2 w      % set line width\n 2  2 m  % move to (x,y)\n10  2 l  % line to (x,y)\n10 10 l\n 2 10 l\ns        % stroke line\n\"\n\npages:insert size code with\n 12,12 box\nend\n\nwrite[pdf.build[pages] \".pdf\"]"}
 button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"build.0","text":"Try It!"}
 
 {script:build.0}
@@ -61,56 +61,56 @@ on click do
 end
 {end}
 
-{card:layout_center}
+{card:page_center}
 {widgets}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
-title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"pdf.layout_center[]"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"pdf.page_center[]"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
-field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"The pdf module provides a number of \"layout\" functions which assemble page descriptions and return a single-row table, which can be concatenated together and provided to pdf.build[].\n\npdf.layout_center[img margin]\n\n- img: an Image interface.\n- margin: number of units to pad the image.\n\nImages passed to layout functions must be \"flat\", consisting only of the patterns 0/1 and (if color is used) the solid colors 32-47. See the pdf.image_flatten[] function for help flattening images with 1-bit patterns or animated patterns."}
-ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"img:image[\"%%IMG0AA8AD+AOgAKB8gIQBAgIaBZoJggwKBLIEYgQCI/ygALgDg==\"]\n\nwrite[pdf.build[\n pdf.layout_center[img 10]\n]]\n"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["The pdf module provides a number of \"page\" functions which assemble page descriptions and return a single-row table, which can be concatenated together and provided to pdf.build[].\n\n","pdf.page_center[img margin]\n","\n- img: an Image interface.\n- margin: number of units to pad the image.\n\nImages passed to layout functions must be \"flat\", consisting only of the patterns 0/1 and (if color is used) the solid colors 32-47. See the ","pdf.flatten[]"," function for help flattening images with 1-bit patterns or animated patterns."],"font":["","mono","","",""],"arg":["","","","flatten",""]}}
+ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"img:image[\"%%IMG0AA8AD+AOgAKB8gIQBAgIaBZoJggwKBLIEYgQCI/ygALgDg==\"]\n\nr:pdf.build[pdf.page_center[img 10]]\nwrite[r \".pdf\"]"}
 button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"build.0","text":"Try It!"}
 
-{card:layout_vertical}
+{card:page_vertical}
 image:"%%IMG2AgABVgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8AdwExAP8A0AEBABcNAQAXAQEA/wDQAQEAFw0BABcBAQD/ANABAQAXDQEAFwEBAP8A0AEBAAoBDQ0BAQ0ACgEBAP8A0AEBAAoBAQAMDQEADAEBAAoBAQD/ANABAQAKAQEADA0BAAwBAQAKAQEA/wDQAQEACgEBAAwNAQAMAQEACgEBAP8A0AEBAAoBAQAMDQEADAEBAAoBAQD/ANABAQAKAQEADA0BAAwBAQAKAQEAKwFLAP8AWgEBAAoBAQAMDQEADAEBAAoBAQArAQEASQEBAP8AWgEBAAoBAQAMDQEADAEBAAoBAQArAQEASQEBAP8AWgEBAAoBAQAMDQEADAEBAAoBAQArAQEASQEBAP8AWgEBAAoBAQAMDQEADAEBAAoBAQArAQEASQEBAP8AWgEBAAoBAQAMDQEADAEBAAoBAQArAQEAGwEVABkBAQD/AFoBAQAKAQEADA0BAAwBAQAKAQEAKwEBABsBAQATAQEAGQEBAP8AWgEBAAoBAQAMDQEADAEBAAoBAQArAQEAGwEBABMBAQAZAQEA/wBaAQEACgEBAAwNAQAMAQEACgEBACsBAQAbAQEAEwEBABkBAQD/AFoBAQAKAQEADA0BAAwBAQAKAQEAKwEBABsBAQATAQEAGQEBAP8AWgEBAAoBAQAMDQEADAEBAAoBAQArAQEAGwEBABMBAQAZAQEA/wBaAQEACgEBAAwNAQAMAQEACgEBACsBAQADARUAAwEBABMBAQADARMAAwEBAP8AWgEBAAoBAQAMDQEADAEBAAoBAQArAQEAAwEBABMBAQADAQEAEwEBAAMBAQARAQEAAwEBAP8AWgEBAAoBDQ0BAQ0ACgEBACsBAQADAQEAEwEBAAMBAQATAQEAAwEBABEBAQADAQEA/wBaAQEAFw0BABcBAQArAQEAAwEBABMBAQADAQEAEwEBAAMBAQARAQEAAwEBAP8AWgEBABcNAQAXAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAXDQEAFwEBACsBAQADAQEAEwEBAAMBAQATAQEAAwEBABEBAQADAQEA/wBaAQEABAETDQEBEwAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBDUkBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEAQEAEg0BABIBAQAEAQEAKwEBAAMBAQATAQEAAwEBABMBAQADAQEAEQEBAAMBAQD/AFoBAQAEARMNAQETAAQBAQArAQEAAwEVAAMBAQATAQEAAwETAAMBAQD/AFoBAQAXDQEAFwEBACsBAQAbAQEAEwEBABkBAQD/AFoBAQAXDQEAFwEBACsBAQAbAQEAEwEBABkBAQD/AFoBAQAXDQEAFwEBACsBAQAbAQEAEwEBABkBAQD/AFoBAQAKAQ0NAQENAAoBAQArAQEAGwEBABMBAQAZAQEA/wBaAQEACgEBAAwNAQAMAQEACgEBACsBAQAbAQEAEwEBABkBAQD/AFoBAQAKAQEADA0BAAwBAQAKAQEAKwEBABsBFQAZAQEA/wBaAQEACgEBAAwNAQAMAQEACgEBACsBAQBJAQEA/wBaAQEACgEBAAwNAQAMAQEACgEBACsBAQBJAQEA/wBaAQEACgEBAAwNAQAMAQEACgEBACsBAQBJAQEA/wBaAQEACgEBAAwNAQAMAQEACgEBACsBAQBJAQEA/wBaAQEACgEBAAwNAQAMAQEACgEBACsBSwD/AFoBAQAKAQEADA0BAAwBAQAKAQEA/wDQAQEACgEBAAwNAQAMAQEACgEBAP8A0AEBAAoBAQAMDQEADAEBAAoBAQD/ANABAQAKAQEADA0BAAwBAQAKAQEA/wDQAQEACgEBAAwNAQAMAQEACgEBAP8A0AEBAAoBAQAMDQEADAEBAAoBAQD/ANABAQAKAQEADA0BAAwBAQAKAQEA/wDQAQEACgEBAAwNAQAMAQEACgEBAP8A0AEBAAoBAQAMDQEADAEBAAoBAQD/ANABAQAKAQEADA0BAAwBAQAKAQEA/wDQAQEACgEBAAwNAQAMAQEACgEBAP8A0AEBAAoBAQAMDQEADAEBAAoBAQD/ANABAQAKAQ0NAQENAAoBAQD/ANABAQAXDQEAFwEBAP8A0AEBABcNAQAXAQEA/wDQAQEAFw0BABcBAQD/ANABMQD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AHE="
 {widgets}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
-title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"pdf.layout_vertical[], pdf.layout_horizontal[]"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"pdf.page_vertical[], pdf.page_horizontal[]"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
-field1:{"type":"field","size":[248,105],"pos":[254,48],"locked":1,"border":0,"value":"The \"vertical\" layout stacks a list of images vertically on a page, each horizontally centered. The \"horizontal\" layout likewise stacks images horizontally, each vertically centered:\n\npdf.layout_vertical[images margin]\npdf.layout_horizontal[images margin]\n\n- images: a list of Image interfaces.\n- margin: number of units to pad the image.\n"}
-ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"img:image[\"%%IMG0AA8AD+AOgAKB8gIQBAgIaBZoJggwKBLIEYgQCI/ygALgDg==\"]\n\nwide:image[\"%%IMG0ABQAD+AAcIAAEIH/kAIAgAQAQAgDQBYDQCYAQDARQBIeQBHgQBAAQI//kIAAEOAAcA==\"]\n\ntall:image[\"%%IMG0AA8AFOAOgAKB8gIQBAgIaBZoJgggCCAIJCgkKCSoNKgSSBGIEAiP8oAC4A4=\"]\n\nwrite[pdf.build[\n pdf.layout_vertical  [img,wide 10],\n pdf.layout_horizontal[img,tall 10]\n]]"}
+field1:{"type":"field","size":[248,116],"pos":[254,48],"locked":1,"border":0,"value":{"text":["The \"vertical\" layout stacks a list of images vertically on a page, each horizontally centered. The \"horizontal\" layout likewise stacks images horizontally, each vertically centered:\n","\npdf.page_vertical[images margin]\npdf.page_horizontal[images margin]","\n\n- images: a list of Image interfaces.\n- margin: number of units to pad the image.\n"],"font":["","mono",""],"arg":["","",""]}}
+ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"img:image[\"%%IMG0AA8AD+AOgAKB8gIQBAgIaBZoJggwKBLIEYgQCI/ygALgDg==\"]\n\nwide:image[\"%%IMG0ABQAD+AAcIAAEIH/kAIAgAQAQAgDQBYDQCYAQDARQBIeQBHgQBAAQI//kIAAEOAAcA==\"]\n\ntall:image[\"%%IMG0AA8AFOAOgAKB8gIQBAgIaBZoJgggCCAIJCgkKCSoNKgSSBGIEAiP8oAC4A4=\"]\n\nr:pdf.build[\n pdf.page_vertical  [img,wide 10]\n pdf.page_horizontal[img,tall 10]\n]\n\nwrite[r \".pdf\"]"}
 button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"build.0","text":"Try It!"}
 
-{card:grid}
+{card:page_grid}
 image:"%%IMG2AgABVgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AH4BiAD/AHkBAQCGAQEA/wB5AQEAhgEBAP8AeQEBAIYBAQD/AHkBAQCGAQEA/wB5AQEAhgEBAP8AeQEBAAUBJgAFASYABQEmAAUBAQD/AHkBAQAFAQEAJAEBAAUBAQAkAQEABQEBACQBAQAFAQEA/wB5AQEABQEBACQBAQAFAQEAJAEBAAUBAQAkAQEABQEBAP8AeQEBAAUBAQAkAQEABQEBACQBAQAFAQEAJAEBAAUBAQD/AHkBAQAFAQEAJAEBAAUBAQAkAQEABQEBACQBAQAFAQEA/wB5AQEABQEBACQBAQAFAQEAJAEBAAUBAQAkAQEABQEBAP8AeQEBAAUBAQAkAQEABQEBACQBAQAFAQEAJAEBAAUBAQD/AHkBAQAFAQEAJAEBAAUBAQAkAQEABQEBACQBAQAFAQEA/wB5AQEABQEBACQBAQAFAQEAJAEBAAUBAQAkAQEABQEBAP8AeQEBAAUBAQAkAQEABQEBACQBAQAFAQEAJAEBAAUBAQD/AHkBAQAFAQEAJAEBAAUBAQAkAQEABQEBACQBAQAFAQEA/wB5AQEABQEBACQBAQAFAQEAJAEBAAUBAQAkAQEABQEBAP8AeQEBAAUBAQAkAQEABQEBACQBAQAFAQEAJAEBAAUBAQD/AHkBAQAFAQEAJAEBAAUBAQAkAQEABQEBACQBAQAFAQEA/wB5AQEABQEBACQBAQAFAQEAJAEBAAUBAQAkAQEABQEBAP8AeQEBAAUBAQAkAQEABQEBACQBAQAFAQEAJAEBAAUBAQD/AHkBAQAFAQEAJAEBAAUBAQAkAQEABQEBACQBAQAFAQEA/wB5AQEABQEBACQBAQAFAQEAJAEBAAUBAQAkAQEABQEBAP8AeQEBAAUBAQAkAQEABQEBACQBAQAFAQEAJAEBAAUBAQD/AHkBAQAFAQEAJAEBAAUBAQAkAQEABQEBACQBAQAFAQEA/wB5AQEABQEBACQBAQAFAQEAJAEBAAUBAQAkAQEABQEBAP8AeQEBAAUBAQAkAQEABQEBACQBAQAFAQEAJAEBAAUBAQD/AHkBAQAFAQEAJAEBAAUBAQAkAQEABQEBACQBAQAFAQEA/wB5AQEABQEBACQBAQAFAQEAJAEBAAUBAQAkAQEABQEBAP8AeQEBAAUBJgAFASYABQEmAAUBAQD/AHkBAQCGAQEA/wB5AQEAhgEBAP8AeQEBAIYBAQD/AHkBAQCGAQEA/wB5AQEAhgEBAP8AeQEBAAUBJgAFASYABQEmAAUBAQD/AHkBAQAFAQEAJAEBAAUBAQAkAQEABQEBACQBAQAFAQEA/wB5AQEABQEBACQBAQAFAQEAJAEBAAUBAQAkAQEABQEBAP8AeQEBAAUBAQAkAQEABQEBACQBAQAFAQEAJAEBAAUBAQD/AHkBAQAFAQEAJAEBAAUBAQAkAQEABQEBACQBAQAFAQEA/wB5AQEABQEBACQBAQAFAQEAJAEBAAUBAQAkAQEABQEBAP8AeQEBAAUBAQAkAQEABQEBACQBAQAFAQEAJAEBAAUBAQD/AHkBAQAFAQEAJAEBAAUBAQAkAQEABQEBACQBAQAFAQEA/wB5AQEABQEBACQBAQAFAQEAJAEBAAUBAQAkAQEABQEBAP8AeQEBAAUBAQAkAQEABQEBACQBAQAFAQEAJAEBAAUBAQD/AHkBAQAFAQEAJAEBAAUBAQAkAQEABQEBACQBAQAFAQEA/wB5AQEABQEBACQBAQAFAQEAJAEBAAUBAQAkAQEABQEBAP8AeQEBAAUBAQAkAQEABQEBACQBAQAFAQEAJAEBAAUBAQD/AHkBAQAFAQEAJAEBAAUBAQAkAQEABQEBACQBAQAFAQEA/wB5AQEABQEBACQBAQAFAQEAJAEBAAUBAQAkAQEABQEBAP8AeQEBAAUBAQAkAQEABQEBACQBAQAFAQEAJAEBAAUBAQD/AHkBAQAFAQEAJAEBAAUBAQAkAQEABQEBACQBAQAFAQEA/wB5AQEABQEBACQBAQAFAQEAJAEBAAUBAQAkAQEABQEBABoBAQD/AF4BAQAFAQEAJAEBAAUBAQAkAQEABQEBACQBAQAFAQEA/wB5AQEABQEBACQBAQAFAQEAJAEBAAUBAQAkAQEABQEBAP8AeQEBAAUBAQAkAQEABQEBACQBAQAFAQEAJAEBAAUBAQD/AHkBAQAFAQEAJAEBAAUBAQAkAQEABQEBACQBAQAFAQEA/wB5AQEABQEBACQBAQAFAQEAJAEBAAUBAQAkAQEABQEBAP8AeQEBAAUBAQAkAQEABQEBACQBAQAFAQEAJAEBAAUBAQD/AHkBAQAFASYABQEmAAUBJgAFAQEA/wB5AQEAhgEBAP8AeQEBAIYBAQD/AHkBAQCGAQEA/wB5AQEAhgEBAP8AeQEBAIYBAQD/AHkBiAD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wAj"
 {widgets}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
-title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"pdf.layout_grid[]"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"pdf.page_grid[]"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
-field1:{"type":"field","size":[248,105],"pos":[254,48],"locked":1,"border":0,"value":"The \"grid\" layout stacks a list of images in a uniform grid based on the maximum size of the provided images, with a specified number of columns.\n\npdf.layout_grid[images margin width]\n\n- images: a list of Image interfaces.\n- margin: number of units to pad the image.\n- width: number of grid columns."}
-ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"img:image[\"%%IMG0AA8AD+AOgAKB8gIQBAgIaBZoJggwKBLIEYgQCI/ygALgDg==\"]\n\nwide:image[\"%%IMG0ABQAD+AAcIAAEIH/kAIAgAQAQAgDQBYDQCYAQDARQBIeQBHgQBAAQI//kIAAEOAAcA==\"]\n\ntall:image[\"%%IMG0AA8AFOAOgAKB8gIQBAgIaBZoJgggCCAIJCgkKCSoNKgSSBGIEAiP8oAC4A4=\"]\n\nimages:img,wide,img,tall,img\n\nwrite[pdf.build[\n pdf.layout_grid[images 10 3]\n]]"}
+field1:{"type":"field","size":[248,105],"pos":[254,48],"locked":1,"border":0,"value":{"text":["The \"grid\" layout stacks a list of images in a uniform grid based on the maximum size of the provided images, with a specified number of columns.\n\n","pdf.page_grid[images margin width]","\n\n- images: a list of Image interfaces.\n- margin: number of units to pad the image.\n- width: number of grid columns."],"font":["","mono",""],"arg":["","",""]}}
+ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"img:image[\"%%IMG0AA8AD+AOgAKB8gIQBAgIaBZoJggwKBLIEYgQCI/ygALgDg==\"]\n\nwide:image[\"%%IMG0ABQAD+AAcIAAEIH/kAIAgAQAQAgDQBYDQCYAQDARQBIeQBHgQBAAQI//kIAAEOAAcA==\"]\n\ntall:image[\"%%IMG0AA8AFOAOgAKB8gIQBAgIaBZoJgggCCAIJCgkKCSoNKgSSBGIEAiP8oAC4A4=\"]\n\nimages:img,wide,img,tall,img\nr:pdf.build[\n pdf.page_grid[images 10 3]\n]\n\nwrite[r \".pdf\"]"}
 button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"build.0","text":"Try It!"}
 
-{card:image_inline}
+{card:rasterize}
 {widgets}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
-title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"pdf.image_inline[], pdf.set_palette[]"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"pdf.rasterize[], pdf.palette[]"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
-field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"The layout functions we've seen previously automatically handle converting Images into PDF drawing instructions. If you want to define your own custom layouts, you can use pdf.image_inline[] to convert an image into a string of drawing instructions.\n\npdf.image_inline[img pos]\n\n- img: an Image interface.\n- pos: (x,y) drawing coordinates of the bottom-left corner of the image.\n\nBy default, pdf.image_inline[] converts images with Decker's default palette. If you have customized the palette, first call pdf.set_palette[] with the deck's Patterns interface."}
-ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"img:image[\"%%IMG2ACAAEQEDABoBBAAPAQUACgECAA4BASgEAQEACgEBAA4BASgGAQEAEQEFAAEBASgEAQIoAQEBAAIBBQAJAQEjBAECKAEBAigCAQIoAQEBAAEBAScEAQEACAEBIwYBASgBAQIoBQECJwYBAQAGAQEjBAECIwEBASgGAQEoAQEBJwQBAicBAQEABQEBIwEBAiMCAQIjAQEBKAIBASgBAQIoAQEBJwEBAicCAQInAQEBAAQBASMCAQIjBQEBKAMBAigBAQEnAgECJwUBAQAEAQIjBgEBIwEBASgGAQInBgEBJwEBAQAFAQEjAgEBIwEBAiMCAQknAgEBJwEBAicCAQEABQEBIwMBAiMDAQEABwEBJwMBAicDAQEABQEBIwgBAQAHAQEnCAEBAAIBAQADAQgACQEIAAIBAgAeAQQAGgED\"]\n\npdf.set_palette[deck.patterns]\n\nwrite[pdf.build[\n pdf.layout_raw[\n  48,32 pdf.image_inline[img 3,5]\n ]\n]]\n"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["The layout functions we've seen previously automatically handle converting Images into PDF drawing instructions. If you want to define your own custom layouts, you can use pdf.rasterize[] to convert an image into a string of drawing instructions.\n\n","pdf.rasterize[img pos]","\n\n- img: an Image interface.\n- pos: (x,y) drawing coordinates of the bottom-left corner of the image.\n\nBy default, pdf.rasterize[] converts images with Decker's default palette. If you have customized the palette, first call pdf.palette[] with the deck's Patterns interface."],"font":["","mono",""],"arg":["","",""]}}
+ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"img:image[\"%%IMG2ACAAEQEDABoBBAAPAQUACgECAA4BASgEAQEACgEBAA4BASgGAQEAEQEFAAEBASgEAQIoAQEBAAIBBQAJAQEjBAECKAEBAigCAQIoAQEBAAEBAScEAQEACAEBIwYBASgBAQIoBQECJwYBAQAGAQEjBAECIwEBASgGAQEoAQEBJwQBAicBAQEABQEBIwEBAiMCAQIjAQEBKAIBASgBAQIoAQEBJwEBAicCAQInAQEBAAQBASMCAQIjBQEBKAMBAigBAQEnAgECJwUBAQAEAQIjBgEBIwEBASgGAQInBgEBJwEBAQAFAQEjAgEBIwEBAiMCAQknAgEBJwEBAicCAQEABQEBIwMBAiMDAQEABwEBJwMBAicDAQEABQEBIwgBAQAHAQEnCAEBAAIBAQADAQgACQEIAAIBAgAeAQQAGgED\"]\n\npdf.palette[deck.patterns]\nr:pdf.build[\n pdf.page_raw[\n  48,32 pdf.rasterize[img 3,5]\n ]\n]\nwrite[r \".pdf\"]"}
 button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"build.0","text":"Try It!"}
 
-{card:image_flatten}
+{card:flatten}
 {widgets}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"pdf.image_flatten[]"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
-field1:{"type":"field","size":[248,121],"pos":[254,48],"locked":1,"border":0,"value":"As noted previously, Images passed to layout functions must be \"flat\", consisting only of the patterns 0/1 and (if color is used) the solid colors 32-47. The pdf.image_flatten[] function can convert images that contain 1-bit or animated patterns into this format:\n\npdf.image_flatten[img deck]\n\n- img: an Image interface.\n- deck: a Deck interface."}
-ex1:{"type":"field","size":[232,143],"pos":[10,48],"border":1,"style":"code","value":"i:pdf.image_flatten[\n patterned.copy[]\n deck\n]\n\nwrite[\n pdf.build[pdf.layout_center[i]]\n]\n"}
+field1:{"type":"field","size":[248,121],"pos":[254,48],"locked":1,"border":0,"value":{"text":["As noted previously, Images passed to layout functions must be \"flat\", consisting only of the patterns 0/1 and (if color is used) the solid colors 32-47. The pdf.flatten[] function can convert images that contain 1-bit or animated patterns into this format:\n","\npdf.flatten[img deck]","\n\n- img: an Image interface.\n- deck: a Deck interface."],"font":["","mono",""],"arg":["","",""]}}
+ex1:{"type":"field","size":[232,143],"pos":[10,48],"border":1,"style":"code","value":"i:pdf.flatten[patterned.copy[] deck]\nr:pdf.build[pdf.page_center[i]]\nwrite[r \".pdf\"]"}
 button4:{"type":"button","size":[60,20],"pos":[253,171],"script":"build.0","text":"Try It!"}
 patterned:{"type":"canvas","size":[91,82],"pos":[83,211],"locked":1,"image":"%%IMG2AFsAUgD/AP8APAEGAFEBCwBOAQ8ASgEIHQYBBABIAQUdCwEFABoBCgAhAQQdDwEFABMBEQAeAQMdEgEHAAoBGAAcAQMdFQEGAAYBDicKAQQAGgEDHRgBBQADAQsnEAEDABkBAx0cAQMAAQEGJxcBAwAXAQMdHQEHJxoBBAAVAQMdHwEEJx0BBAATAQMdIQEEJx0BBAASAQMdIgEDJx4BAwARAQMdJAEDJx4BAwAQAQMdJQEDJx4BAwAPAQMdJQEDJx8BAwAOAQMdJQEDJyABAwANAQMdJgEDJx8BAwANAQMdJgEDJyABAwAMAQMdJgEDJyABAwAMAQMdJgEDJyABAwAMAQMdJgEDJyABAwAMAQMdJgEDJyEBAwALAQMdJgEDJyEBAwALAQMdJgEDJyEBAwAMAQMdJQEDJyEBAwAMAQMdJQEDJyEBAwAMAQMdJQEDJyEBAwAMAQMdJQEDJyEBAwANAQMdIwEDJyIBAwANAQMdIwEDJyIBAwANAQMdIwEDJyIBAwAOAQMdIQEDJyMBAwAPAQMdHwEEJyIBAwARAQMdHQEEJyIBAwATAQMdHAEHJx4BAwAVAQQdGQEJJxwBAwAXAQUdAwEBHQIBAR0PAQMNAwEFJxoBAwAZAQwdDAEEDQcBAycXAQUAGwEZDQkBBScPAQkAHgEWDQsBBicKAQoAIgEDDQEBDg0OARcAJAEDDSABDwApAQMNIgEKACwBAw0nAQMALgEDDScBAwAuAQMNJwEEAC0BAw0oAQMALQEDDSgBAwAtAQMNKAEDAC4BAw0mAQMALwEDDSYBAwAvAQMNJQEDADEBAw0kAQMAMQEDDSQBAwAyAQMNIwEDADIBAw0iAQMANAEDDSABAwA2AQMNHgEEADYBAw0dAQQAOAEEDRoBBAA6AQUNFgEFADwBBQ0TAQYAPwEGDQ4BBgBDAQcNCQEGAEYBEwBLAQ4AUAEJAP8A/wCp","scale":1}
 field2:{"type":"field","size":[100,14],"pos":[78,198],"locked":1,"show":"transparent","border":0,"value":"patterned"}
@@ -120,16 +120,16 @@ field2:{"type":"field","size":[100,14],"pos":[78,198],"locked":1,"show":"transpa
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"integration"}
 button3:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Index","style":"rect"}
-field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"Using everything we've discussed, here's an example script that turns the current deck into a printable PDF of thumbnail images, using a custom transition function to capture the appearance of each card.\n\n(This takes a little while; be patient.)"}
-ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"images:each card in range deck.cards\n pdf.image_flatten[\n  app.render[card] deck\n ]\nend\n\npairs:extract list value\n by floor index/2 from images\n\nwrite[pdf.build[\n raze each p in pairs\n  pdf.layout_vertical[p 10]\n end\n]]"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"Using everything we've discussed, here's an example script that turns the current deck into a printable PDF of thumbnail images.\n\n(This takes a little while; be patient.)"}
+ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"images:each card in range deck.cards\n pdf.flatten[app.render[card] deck]\nend\n\npairs:extract list value\n by floor index/2 from images\n\nr:pdf.build[\n raze each p in pairs\n  pdf.page_vertical[p 10]\n end\n]\n\nwrite[r \".pdf\"]"}
 button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"build.0","text":"Try It!"}
 
 {module:pdf}
 description:"A utility module for assembling PDF documents from Images and vector drawing streams."
-version:0.9
+version:1
 {script}
 
-on build parts do
+on build ...parts do
  local out:array[]
  local ob_offsets:()
  local ob_index:0
@@ -151,7 +151,7 @@ on build parts do
   object[p array[].cat["stream\n" x "\nendstream"]]
  end
  out.cat["%PDF-1.4\n%generated by Decker\n"]
- each row in rows parts
+ each row in rows raze parts
   local t:()
   t.MediaBox:fmt_list[0,0,row.size]
   t.Contents:fmt_ref[stream[row.code]]
@@ -180,10 +180,10 @@ end
 # image preparation:
 
 colors:"|" split "FFFFFF|FFFF00|FF6500|DC0000|FF0097|360097|0000CA|0097FF|00A800|006500|653600|976536|B9B9B9|868686|454545|000000"
-on set_palette pat do
+on palette pat do
  colors:each i in range 16 "%06H" format pat[32+i] end
 end
-on image_flatten img deck do
+on flatten img deck do
  anim:28,29,30,31
  img:img.copy[].map[anim dict first @ deck.patterns @ anim]
  c:deck.card.add["canvas"]
@@ -196,7 +196,7 @@ on image_flatten img deck do
  deck.card.remove[c]
  r
 end
-on image_inline img pos do
+on rasterize img pos do
  if 1<max keys img.hist
   pix:"" fuse colors @ 0|15& -32+ raze img.copy[].map[(0,1) dict (32,47)].pixels
   cs:"RGB"
@@ -209,60 +209,60 @@ end
 
 # page construction:
 
-on layout_raw size code do
+on page_raw size code do
  insert size code with size code end
 end
-on layout_center img margin do
- insert size code with img.size+2*margin image_inline[img margin,margin] end
+on page_center img margin do
+ insert size code with img.size+2*margin rasterize[img margin,margin] end
 end
-on layout_vertical images margin do
+on page_vertical images margin do
  local cw:max images..size[0]
  local ch:sum images..size[1]
  local w:cw+margin*2
  local h:ch+margin*1+count images
  local y:h-margin
  local code:"" fuse each img i in images
-  local r:image_inline[img (margin+.5*cw-img.size[0]),y-img.size[1]]
+  local r:rasterize[img (margin+.5*cw-img.size[0]),y-img.size[1]]
   y:y-img.size[1]+margin
   r
  end
  insert size code with w,h code end
 end
-on layout_horizontal images margin do
+on page_horizontal images margin do
  local cw:sum images..size[0]
  local ch:max images..size[1]
  local w:cw+margin*1+count images
  local h:ch+margin*2
  local x:margin
  local code:"" fuse each img i in images
-  local r:image_inline[img x,margin+.5*ch-img.size[1]]
+  local r:rasterize[img x,margin+.5*ch-img.size[1]]
   x:x+img.size[0]+margin
   r
  end
  insert size code with w,h code end
 end
-on layout_grid images margin width do
+on page_grid images margin width do
  local cell:max images..size
  local height:-floor-(count images)/width
  local w:(cell[0]*width )+margin*1+width
  local h:(cell[1]*height)+margin*1+height
  local code:"" fuse each pos i in (count images) take width cross height
   img:images[i]
-  image_inline[img ((.5*cell[0]-img.size[0])+margin+pos[0]*margin+cell[0]),(h-(-.5*cell[1]-img.size[1])+(pos[1]+1)*margin+cell[1])]
+  rasterize[img ((.5*cell[0]-img.size[0])+margin+pos[0]*margin+cell[0]),(h-(-.5*cell[1]-img.size[1])+(pos[1]+1)*margin+cell[1])]
  end
  insert size code with w,h code end
 end
 
 # public methods:
 
-module.build            :build
-module.set_palette      :set_palette
-module.image_flatten    :image_flatten
-module.image_inline     :image_inline
-module.layout_raw       :layout_raw
-module.layout_center    :layout_center
-module.layout_vertical  :layout_vertical
-module.layout_horizontal:layout_horizontal
-module.layout_grid      :layout_grid
+module.build          :build
+module.palette        :palette
+module.flatten        :flatten
+module.rasterize      :rasterize
+module.page_raw       :page_raw
+module.page_center    :page_center
+module.page_vertical  :page_vertical
+module.page_horizontal:page_horizontal
+module.page_grid      :page_grid
 {end}
 
