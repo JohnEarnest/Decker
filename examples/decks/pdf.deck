@@ -126,7 +126,7 @@ button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"build.0","text
 
 {module:pdf}
 description:"A utility module for assembling PDF documents from Images and vector drawing streams."
-version:1
+version:1.1
 {script}
 
 on build ...parts do
@@ -141,8 +141,8 @@ on build ...parts do
  on object props body do
   ob_index:ob_index+1
   ob_offsets:ob_offsets,out.size
-  out.cat["%i 0 obj %s " format ob_index,fmt_dict[props]]
-  if body out.cat["\n" body "\n"] end
+  out.cat["%i 0 obj\n%s\n" format ob_index,fmt_dict[props]]
+  if body out.cat[body "\n"] end
   out.cat["endobj\n"]
   ob_index
  end
@@ -161,8 +161,8 @@ on build ...parts do
  c.Pages:fmt_ref[ob_index+2]
  local index_catalog:object[c]
  l.Type:"/Pages"
- l.Kids:fmt_refs[(ob_index+2)+range count ob_pages]
  l.Count:count ob_pages
+ l.Kids:fmt_refs[(ob_index+2)+range count ob_pages]
  local index_pages:object[l]
  each p in ob_pages
   p.Type:"/Page"
@@ -170,10 +170,10 @@ on build ...parts do
   object[p]
  end
  local base:out.size
- out.cat["0 %i\n0000000000 65535 f\n" format ob_index]
+ out.cat["xref\n0 %i\n0000000000 65535 f\n" format 1+ob_index]
  each offset in ob_offsets out.cat["%010i 00000 n\n" format offset] end
- trailer:fmt_dict[("Size","Root") dict ob_index,fmt_ref[index_catalog]]
- out.cat["trailer %s\nstartxref\n%i\n%%EOF" format trailer,base]
+ trailer:fmt_dict[("Size","Root") dict (1+ob_index),fmt_ref[index_catalog]]
+ out.cat["trailer\n%s\nstartxref\n%i\n%%%%EOF" format trailer,base]
  out
 end
 
@@ -204,7 +204,7 @@ on rasterize img pos do
   pix:"" fuse ("FF","00") @ raze img.pixels
   cs:"G"
  end
- "q %i 0 0 %i %i %i cm BI /W %i /H %i /CS /%s /BPC 8 /F /AHx ID\n%s>\nEI Q\n" format img.size,pos,img.size,cs,pix
+ "q %i 0 0 %i %i %i cm BI /W %i /H %i /CS /%s /BPC 8 /F /AHx ID\n%s> EI Q " format img.size,pos,img.size,cs,pix
 end
 
 # page construction:
