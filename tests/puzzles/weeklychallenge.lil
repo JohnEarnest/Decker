@@ -25,6 +25,27 @@ on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':
 
 # the problems:
 
+problem[273.1]
+# return the percentage (nearest whole) of a given character in x
+# this one's slightly tricky because lil doesn't have a 'round' primitive:
+on f c x do
+ floor 100*0.005+(sum c="" split x)/count x
+end
+assert[f["e" "perl"     ] 25]
+assert[f["a" "java"     ] 50]
+assert[f["m" "python"   ]  0]
+assert[f["a" "ada"      ] 67]
+assert[f["l" "ballerina"] 22]
+assert[f["k" "analitik" ] 13]
+
+problem[273.2]
+# return true if there is at least one "b", and no "a" appears after the first "b"
+on f x do ("b" in x)&!x like "*b*a*" end
+assert[f["aabb"] 1]
+assert[f["abab"] 0]
+assert[f["aaa" ] 0]
+assert[f["bbb" ] 1]
+
 problem[272.1]
 # replace every period ("."") in an IP address with "[.]"
 on f x do "[.]" fuse "." split x end
