@@ -1,0 +1,262 @@
+{deck}
+version:1
+card:0
+size:[512,342]
+name:"bignums.deck"
+
+{card:Index}
+image:"%%IMG2AgABVgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wAlAf8B/wACAf8B/wACAf8B/wACAf8B/wACAf8B/wACAf8B/wACAf8B/wACASAACAGAAAYB/wFRAAIBGwATAXgADAH/AU0AAgEYABoBcgARAf8BSgACARYACQEHAA8BbQAVAf8BSAACARMACgELAA8BagAXAf8BRwACARIACgEOAA4BaAAZAf8BRgACAREACQERAA8BZQAbAf8BRQACAQ8ACwESAA8BZAAcAf8BRAACAQ4ACwEOAAEBBQAQARUABwFFAB4BFwAOAekAAgEyAAIBDQALAQ4AAgEFABABEwAKAUQAHwEWAA4B6AADATIAAgENAAsBDQADAQYAEAESAAsBQgAFAQQAGAEWAAwB6AAEATIAAgEMAAsBDQAEAQYAEQEQAA0BQQAEAQcAFwEWAAoBPwADAaYABQEyAAIBCwAMAQsABgEHABABEAANAUAABAEJABcBFQAKAT8AAwGkAAcBMgACAQsACwEKAAgBBwARAQ4ADwE/AAQBCwAVARYACAE/AAQBoQAKATIAAgEKAAwBBQANAQgAEAEOAA8BPwAEAQwAFQEVAAcBQAAEAZsAEAEyAAIBCgAeAQgAEQENAA8BPwAEAQwAFgEVAAYBPwAFAZcAFAEyAAIBCQAfAQgAEQENAA8BPwAEAQ4AFQEUAAYBPgAGAZgAEwEyAAIBCQAMAQIAEQEIABEBDgANAUAABQEOABQBFAAGAT4ABgGbABABMgACAQkADAEEAA8BCQARAQ0ADQElAAIBGQAFAQ4AFQEUAAUBPQAHAZwADwEyAAIBCgALAQQADwEJABEBDgALASQABgEXAAYBDgAVARMABAE9AAgBnAAPATIAAgENAAgBBAAPAQkAEQEPAAkBJAAIARYABwEOABUBEgAEATwACQGdAA4BMgACAQ8ABgEEAA8BCQARAREABQElAAkBFgAJAQ0AFQERAAQBOwAKAZ0ADgEyAAIBEgADAQQADwEJABEBOgALARUADAELABQBEQAEATkADAGdAA4BMgACARQAAQEEAA8BCQARATkABwEbAA8BCAAUARAABAE3AA4BnQAOATIAAgEZAA8BCQAQATAABQEFAAQBHgATAQQAFQEPAAMBFQANAREAHAEXAAEBGwABARcAAQEIAAcBFwANARUADgESAAcBGQACARkADwEJABABGgACAREACwEBAAQBIAASAQUAFQEOAAMBEgATAQ4AHAEWAAIBGgACARYAAgEGAAsBEgATARIADgEPAA8BFAACARkADwEIABEBGQADAQ8AEQEhABIBBgAVAQ0AAwEQAAcBBgAKAQwAHAEVAAMBGQADARUAAwEEAA8BDgAIAQUACgEQAA4BDAAGAQYACgEQAAIBGQAPAQgAEAEZAAQBDQAHAQIACwEhABEBBwAUAQ0AAwEPAAcBCAAKARAADgEdAAQBGAAEARQABAEDABEBDAAHAQgACgEPAA4BCwAFAQoACgEOAAIBGQAPAQgAEAEXAAYBDAAHAQQACwEhABABCAAUAQwAAwEOAAgBCQAKAQ8ADgEbAAYBFwAFARMABQECABMBCgAIAQkACwENAA4BCgAFAQ4ACAENAAIBGQAPAQcAEQEVAAgBCwAIAQUACwEgABABCAAVAQsAAwENAAgBCwAKAQ4ADgEaAAcBFQAHAREABwEBABQBCQAIAQsACwEMAA4BCQAFARAACAEMAAIBGQAPAQcAEAETAAsBCgAJAQYACwEgAA8BCQAVAQoAAwEMAAkBCwALAQ0ADgEWAAsBEgAKAQ4ACgEBAAQBBAANAQcACQELAAsBDAAOAQgABgERAAcBDAACARkADwEGABABDAATAQkACgEGAAwBIQANAQoAFQEJAAMBCwAKAQsACwENAA4BDgATAQkAEwEFABYBBwAMAQYACgELAAwBCwAOAQcABwESAAYBDAACARkADwEFABABDAAUAQkACgEHAAwBIQAMAQsAFAEJAAMBCwAKAQsADAEMAA4BDgATAQkAEwEFABYBCAAMAQUACgELAAwBCwAOAQcABwETAAUBDAACARkADwEEABEBDwARAQgACwEHAA0BIgAKAQwAFAEIAAMBCgALAQsADAEMAA4BEAARAQsAEQEIABIBCQAMAQQACwELAA0BCgAOAQYACQETAAQBDAACARkADwECABEBEgAQAQcADAEHAA0BJAAIAQ0AFAEHAAMBCgALAQsADQELAA4BEgAPAQ0ADwEJABEBCQAMAQQACwELAA0BCgAOAQYACgETAAMBDAACARkAIQEUAA8BBwAMAQgADQEmAAUBDQAVAQYAAwEKAAsBCwANAQsADgETAA4BDgAOAQkAEAELAAsBBAALAQsADQEKAA4BBgAMAREAAwEMAAIBGQAjARIADwEHAAwBCAANAScAAwEPABUBBQADAQoACwEKAA4BCwAOARMADgEOAA4BCgAPAQsACQEGAAsBCgAOAQoADgEGAA0BEQACAQwAAgEZACUBEAAPAQYADQEIAA4BJgADARAAFQEEAAMBCgALAQoADgELAA4BEwAOAQ4ADgEKAA4BDAAEAQsACwEKAA4BCgAOAQYADwEPAAIBDAACARkADwEGABIBDgAPAQYADQEJAA0BJgADAREAFAEEAAMBCgAKAQoADwELAA4BEwAOAQ4ADgEKAA4BDAABAQ4ACgEKAA8BCgAOAQYAEQENAAIBDAACARkADwEIABIBDAAPAQYADQEJAA0BJgADARIAFAEDAAMBCwAJAQkAEAELAA4BEwAOAQ4ADgEKAA4BHAAJAQkAEAEKAA4BBgATARkAAgEZAA8BCQARAQwADwEGAA0BCQANASYAAwESABUBAgADAQwABwEJABEBCwAOARMADgEOAA4BCgAOAR0ABwEJABEBCgAOAQYAFQEXAAIBGQAPAQoAEgEKAA8BBgANAQkADgElAAMBEwAVAQEAAwEOAAMBCAAUAQsADgETAA4BDgAOAQoADgEfAAMBCAAUAQoADgEGABcBFQACARkADwELABIBCQAPAQYADQEJAA4BJQADARQAGAEXABYBCwAOARMADgEOAA4BCgAOASgAFgEKAA4BBwAYARMAAgEZAA8BDAARAQkADwEGAA0BCQAOASUAAwEVABcBFQAIAQIADgELAA4BEwAOAQ4ADgEKAA4BJgAIAQIADgEKAA4BBwAaAREAAgEZAA8BDAASAQgADwEGAA0BCgANASUAAwEWABYBEwAJAQMADgELAA4BEwAOAQ4ADgEKAA4BJAAJAQMADgEKAA4BCAAaARAAAgEZAA8BDAASAQgADwEGAA4BCQAMASYAAwEXABUBEQAJAQUADgELAA4BEwAOAQ4ADgEKAA4BIgAKAQQADgEKAA4BCAAcAQ4AAgEZAA8BDQASAQcADwEGAA4BCQAMASYAAwEXABUBDwALAQUADgELAA4BEwAOAQ4ADgEKAA4BIAALAQUADgEKAA4BCQAcAQ0AAgEZAA8BDQASAQcADwEGAA4BCQAMASYAAwEYABQBDQAMAQYADgELAA4BEwAOAQ4ADgEKAA4BHgAMAQYADgEKAA4BCwAbAQwAAgEZAA8BDQASAQcADwEHAA0BCQAMASYAAwEZABMBDAAMAQcADgELAA4BEwAOAQ4ADgEKAA4BHQAMAQcADgEKAA4BDAAbAQsAAgEZAA8BDQATAQYADwEHAA4BCAALAScAAwEaABIBCwANAQcADgELAA4BEwAOAQ4ADgEKAA4BHAANAQcADgEKAA4BDQAaAQsAAgEZAA8BDgASAQYADwEIAA0BCAALAScAAwEbABEBCgANAQgADgELAA4BEwAOAQ4ADgEKAA4BGwANAQgADgEKAA4BDwAZAQoAAgEZAA8BDgASAQYADwEIAA0BCAAKASgAAwEbABEBCgANAQgADgELAA4BEwAOAQ4ADgEKAA4BGwANAQgADgEKAA4BEQAXAQoAAgEZAA8BDgASAQYADwEJAA0BBgALASgAAwEcABABCQANAQkADgELAA4BEwAOAQ4ADgEKAA4BGgAOAQgADgEKAA4BEwAWAQkAAgEZAA8BDgASAQYADwEKAAwBBgAKASkAAwEdAA8BCQANAQkADgELAA4BEwAOAQ4ADgEKAA4BGQAOAQkADgEKAA4BFQAUAQkAAgEZAA8BDQASAQcADwELAAwBBQAJASoABAEdAA4BCQANAQkADgELAA4BEwAOAQ4ADgEKAA4BGQAOAQkADgEKAA4BCQACAQwAEgEJAAIBGQAPAQ0AEgEHAA8BCwAMAQUACAErAAQBHgANAQgADgEJAA4BCwAOARMADgEOAA4BCgAOARkADgEJAA4BCgAOAQgAAwEOABABCQACARkADwENABIBBwAPAQsADQEEAAcBLAAEAR8ADAEIAA4BCQAOAQsADgEUAA0BDgAOAQoADgEZAA4BCQAOAQoADgEHAAQBEAAOAQkAAgEZAA8BDQASAQcADwEKAAMBAgAKAQIABwEtAAQBHwAMAQgADgEJAA4BDAANAQsAAQEIAA0BDgAOAQoADgEZAA4BCQAOAQoADgEGAAUBEQANAQkAAgEZAA8BDQARAQgADwEJAAQBBAAPAS4ABQEgAAsBCAAOAQkADgEMAA0BCgACAQgADQEOAA4BCgAOARkADgEJAA4BCgAOAQYABgESAAsBCQACARkADwEMABIBCAAPAQkAAwEIAAkBMQAFASEACgEIAA4BCQAOAQwADgEIAAMBCQAMAQ4ADgEKAA4BGQAOAQkADgEKAA4BBgAGARIACgEKAAIBGQAPAQwAEQEJAA8BCAADAUMABgEhAAkBCAAPAQcADwEMAA8BBgADAQoADQENAA4BCQAQARgADwEHABABCAAPAQYABgETAAkBCgACARkADwELABEBCgAPAQcAAwEVAAUBKQAHASIACAEIAA8BBwAQAQsAGAELAAwBDAAPAQkAEAEYABABBgAQAQgADwEGAAcBEwAIAQoAAgEZAA8BCwAQAQsADwEHAAMBEQAMASYABwEjAAcBCQAQAQQAEQEMABYBDQAMAQsAEAEIABABGQAQAQQAEQEIABABBQAIARIABwELAAIBGAAQAQoAEAELABEBBQADAQ4AEwEjAAgBIgAHAQkAJQEMABUBDwAMAQgAEgEIABABGQAlAQcAEQEGAAcBEgAGAQwAAgEYABABCQAQAQwAEQEFAAMBCwAXASEACgEiAAYBCgAlAQwAEwERABYBAgAOAQYAEgEZACUBBgARAQcACAEPAAYBDQACARcAEQEHABABDQASAQUAAwEJABoBIAAKASMABQELABMBAwAOAQ0AEQETABQBBAANAQYAEgEaABMBAwAOAQUAEwEHAAcBDgAGAQ4AAgEXABEBBAARAQ4AFAEEAAMBBgAeAR4ADAEjAAQBDAARAQUADgENAA8BFQARAQcADQEEABQBGgARAQUADgEEABMBCQAHAQsABgEPAAIBFgAjARIAFQEDACgBHAANASQAAwENAA8BCAAMAQ8ACwEZAA0BCwALAQQAFAEbAA8BCAANAQIAFQEKAAcBBgAGARIAAgEVAB8BFgAXAQMAJwEbAA8BJAACAQ8ACwEMAAoBEgAFASAABgEQAAoBAgAWARwACwEMAAoBAgAXAQsADwEUAAIBZgAFAREAEAH/AXMAAgF9AA8B/wFzAAIBYwAIARMADwH/AXIAAgFiAAsBEgAOAf8BcgACAWEADAESAA4B/wFyAAIBYQALARQADQH/AXIAAgFgAAwBFAAMAf8BcwACAWAADAEUAAwB/wFzAAIBYAAMARQADAH/AXMAAgFhAAwBEwALAf8BdAACAWEADAETAAoB/wF1AAIBYgALARIACwH/AXUAAgFiAAwBEQAKAf8BdgACAWMACwEQAAoB/wF3AAIBZQALAQ0ACQH/AXkAAgFmAAoBDAAJAf8BegACAWgACwEGAAkB/wF9AAIBawAVAf8BfwACAW4ADgH/AYMAAgH/Af8AAgH/Af8AAgH/Af8AAgH/Af8AAgH/Af8AAgH/Af8AAgH/Af8AAgH/Af8AAgH/Af8AAgH/Af8AAgH/Af8AAgH/Af8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8AtA=="
+script:"Index.0"
+{widgets}
+field1:{"type":"field","size":[261,14],"pos":[245,109],"locked":1,"show":"invert","border":0,"value":"arbitrary-precision natural number arithmetic for Decker"}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
+field2:{"type":"field","size":[248,15],"pos":[14,142],"locked":1,"show":"transparent","border":0,"value":{"text":["","Index:"],"font":["","menu"],"arg":["",""]}}
+index:{"type":"field","size":[243,155],"pos":[16,159],"locked":1,"volatile":1,"script":"Index.2","scrollbar":1}
+version:{"type":"field","size":[42,14],"pos":[16,318],"locked":1,"volatile":1,"border":0}
+
+{script:Index.0}
+on view do
+ bullet:image["%%IMG0AAYADQAAAAB49Pz8/HgAAAA="]
+ i:select c:key t:value..widgets.title.text where value..widgets.title from deck.cards
+ index.value:raze each row in rows i
+  rtext.make["" "" bullet],
+  rtext.make["  "],
+  rtext.make[("%s\n" format row.t) "mono" row.c]
+ end
+ version.text:"v%0.1f" format deck.modules.bn.version
+end
+{end}
+
+{script:Index.1}
+on click do
+ t.Prev:"SlideRight"
+ t.Next:"SlideLeft"
+ t.Index:"BoxOut"
+ go[me.text t[me.text] 15]
+end
+{end}
+
+{script:Index.2}
+on link val do
+ go[val "BoxIn" 15]
+end
+{end}
+
+{card:make}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"bn.make[]"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"The natural numbers are unsigned integers, which for our purposes include zero.\n\nThe \"bn\" module represents arbitrary precision naturals (bignums) as lists of digits in some radix. The bn.make[] function can convert an ordinary Lil number or a Lil string containing digits into a bignum. The bn.make[] function is an identity function for arguments that are already bignums.\n\nBignums are always made \"normalized\", stripping any leading zeroes; thus the empty list encodes the number zero. When converting strings, non-digit characters are ignored, so literals may optionally include comma separators, leading whitespace, or other non-semantic decoration."}
+ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"# the following equivalences hold:\n\nbn.make[1234]~bn.make[\"1234\"]\n\nbn.make[bn.make[5]]~bn.make[5]\n\nbn.make[0]~()\n\nbn.make[1234]~bn.make[\"-1,234\"]\n"}
+
+{card:formatting}
+image:"%%IMG2AgABVgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8APQETAP8A7gEBABEBAQD/AO4BAQARAQEA/wDuAQEAEQEBAP8A7gEBABEBAQD/AO4BAQARAQEA/wDuAQEAEQEBAP8A7gEBABEBAQD/AO4BAQARAQEA/wDuAQEAEQEBAP8A7gEBABEBAQD/AO4BAQARAQEA/wDuAQEAEQEBAP8A7gEBABEBAQD/AO4BAQARAQEA/wDuAQEAEQEBAP8A6AEHABEBBwD/AOIBAQAdAQEA/wDjAQEAGwEBAP8A5QEBABkBAQD/AOcBAQAXAQEA/wDpAQEAFQEBAP8A6wEBABMBAQD/AO0BAQARAQEA/wDvAQEADwEBAP8A8QEBAA0BAQD/APMBAQALAQEA/wD1AQEACQEBAP8A9wEBAAcBAQD/APkBAQAFAQEA/wD7AQEAAwEBAP8A/QEBAAEBAQD/AP8BAQD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8AjgETAP8A7gEBABEBAQD/AO4BAQARAQEA/wDuAQEAEQEBAP8A7gEBABEBAQD/AO4BAQARAQEA/wDuAQEAEQEBAP8A7gEBABEBAQD/AO4BAQARAQEA/wDuAQEAEQEBAP8A7gEBABEBAQD/AO4BAQARAQEA/wDuAQEAEQEBAP8A7gEBABEBAQD/AO4BAQARAQEA/wDuAQEAEQEBAP8A6AEHABEBBwD/AOIBAQAdAQEA/wDjAQEAGwEBAP8A5QEBABkBAQD/AOcBAQAXAQEA/wDpAQEAFQEBAP8A6wEBABMBAQD/AO0BAQARAQEA/wDvAQEADwEBAP8A8QEBAA0BAQD/APMBAQALAQEA/wD1AQEACQEBAP8A9wEBAAcBAQD/APkBAQAFAQEA/wD7AQEAAwEBAP8A/QEBAAEBAQD/AP8BAQD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AE4="
+script:"formatting.0"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"formatting"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["Having made bignums, it is important to be able to convert them back into a displayable number. The \"bn\" module offers three variations on converting bignums into strings:\n","\nbn.format_plain[x]\nbn.format_commas[x]\nbn.format_name[x]","\n\nA \"plain\" formatted number is a simple string of digits. A \"commas\" formatted number is displayed with commas between every three digits, to make magnitude clearer. A \"name\" formatted number displays up to the three leading significant figures and an appropriate human-readable name indicating magnitude, for compact display."],"font":["","mono",""],"arg":["","",""]}}
+ex1:{"type":"field","size":[232,37],"pos":[10,48],"script":"formatting.1","border":1,"style":"code","value":"71780085"}
+field2:{"type":"field","size":[232,37],"pos":[10,249],"locked":1,"volatile":1,"border":1,"style":"code"}
+mode:{"type":"grid","size":[100,43],"pos":[81,146],"locked":1,"script":"formatting.2","scrollbar":0,"headers":0,"lines":0,"value":{"value":["format_plain","format_commas","format_name"]},"row":1}
+
+{script:formatting.0}
+on view do
+ field2.text:bn[first mode.rowvalue][ex1.text]
+end
+{end}
+
+{script:formatting.1}
+on change val do
+ view[]
+end
+{end}
+
+{script:formatting.2}
+on click row do
+ view[]
+end
+{end}
+
+{card:logic}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"bn.equal[], bn.more[], bn.less[]"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["The \"bn\" module provides logical comparison functions equivalent to Lil's =, >, and < operators, which return a plain 1 or 0 result:\n\n","bn.equal[x y]\nbn.more[x y]\nbn.less[x y]","\n\nLike all arithmetic operations provided by \"bn\", these functions will automatically coerce their arguments as if with bn.make[]; thus they can be called with any combination of bignums, numbers, or digit-strings."],"font":["","mono",""],"arg":["","",""]}}
+ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"alert[bn.more[\"1235\" bn.make[1234]]]"}
+button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"logic.0","text":"Try It!"}
+
+{script:logic.0}
+on click do
+ eval[ex1.text () 1]
+end
+{end}
+
+{card:arith1}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"bn.add[], bn.sub[], bn.mul[]"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["The \"bn\" module provides several arithmetic functions which return bignums, including addition, subtraction, and multiplication:\n\n","bn.add[x y]\nbn.sub[x y]\nbn.mul[x y]","\n\nLike all arithmetic operations provided by \"bn\", these functions will automatically coerce their arguments as if with bn.make[]; thus they can be called with any combination of bignums, numbers, or digit-strings.\n\nBignums cannot represent negative values. If borrowing in bn.sub[] would underflow, the result will be the Lil number \"0\", consistent with undefined arithmetic results for Lil operators, and compatible with the \"unless\" operator for coercing error values."],"font":["","mono",""],"arg":["","",""]}}
+ex1:{"type":"field","size":[232,156],"pos":[10,48],"border":1,"style":"code","value":"on factorial x do\n t:bn.make[1]\n each v in 1+range x\n  t:bn.mul[t v]\n end\n t\nend\n\nresult.text:bn.format_commas[\n factorial[69]\n]"}
+button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"logic.0","text":"Try It!"}
+result:{"type":"field","size":[232,52],"pos":[10,234],"locked":1,"volatile":1,"border":1,"style":"code"}
+field2:{"type":"field","size":[232,13],"pos":[10,220],"locked":1,"show":"transparent","border":0,"style":"plain","value":"result"}
+
+{card:div}
+image:"%%IMG2AgABVgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD+Ad8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A1gETAP8A7gEBABEBAQD/AO4BAQARAQEA/wDuAQEAEQEBAP8A7gEBABEBAQD/AO4BAQARAQEA/wDuAQEAEQEBAP8A7gEBABEBAQD/AO4BAQARAQEA/wDuAQEAEQEBAP8A7gEBABEBAQD/AO4BAQARAQEA/wDuAQEAEQEBAP8A7gEBABEBAQD/AO4BAQARAQEA/wDuAQEAEQEBAP8A6AEHABEBBwD/AOIBAQAdAQEA/wDjAQEAGwEBAP8A5QEBABkBAQD/AOcBAQAXAQEA/wDpAQEAFQEBAP8A6wEBABMBAQD/AO0BAQARAQEA/wDvAQEADwEBAP8A8QEBAA0BAQD/APMBAQALAQEA/wD1AQEACQEBAP8A9wEBAAcBAQD/APkBAQAFAQEA/wD7AQEAAwEBAP8A/QEBAAEBAQD/AP8BAQD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AK4="
+script:"div.0"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"bn.div[], bn.mod[], bn.divmod[]"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["The \"bn\" module also provides division, calculating either the quotient (div), remainder (mod), or both as a two-element list (divmod).\n","\nbn.div[x y]\nbn.mod[x y]\nbn.divmod[x y]","\n\nLike all arithmetic operations provided by \"bn\", these functions will automatically coerce their arguments as if with bn.make[]; thus they can be called with any combination of bignums, numbers, or digit-strings.\n\nIf attempting to divide by 0, the result will be the Lil number \"0\", consistent with undefined arithmetic results for Lil operators, and compatible with the \"unless\" operator for coercing error values."],"font":["","mono",""],"arg":["","",""]}}
+dividend:{"type":"field","size":[232,21],"pos":[10,93],"script":"formatting.1","border":1,"style":"code","value":"80087"}
+quotient:{"type":"field","size":[111,17],"pos":[10,211],"locked":1,"volatile":1,"border":1,"style":"code"}
+divisor:{"type":"field","size":[232,21],"pos":[10,127],"script":"formatting.1","border":1,"style":"code","value":"221"}
+remainder:{"type":"field","size":[114,17],"pos":[128,211],"locked":1,"volatile":1,"border":1,"style":"code"}
+field3:{"type":"field","size":[110,13],"pos":[11,198],"locked":1,"show":"transparent","border":0,"style":"plain","value":"quotient"}
+field4:{"type":"field","size":[114,13],"pos":[128,198],"locked":1,"show":"transparent","border":0,"style":"plain","value":"remainder"}
+
+{script:div.0}
+on view do
+ r:bn.divmod[dividend.text divisor.text]
+ quotient.text:first r
+ remainder.text:last r
+end
+{end}
+
+{card:reduce}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Index","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"reduction"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["As an additional convenience, the \"bn\" module provides \"reducer\" functions which are equivalent to the Lil primitives sum, prod, min, and max, accumulating a list of bignums into a single bignum result:\n\n","bn.sumall[x]\nbn.prodall[x]\nbn.minall[x]\nbn.maxall[x]","\n\nIf the input list is empty, bn.prodall[] will return the bignum \"1\", consistent with the Lil primitive. All other functions will return the bignum \"0\"."],"font":["","mono",""],"arg":["","",""]}}
+ex1:{"type":"field","size":[232,73],"pos":[10,48],"border":1,"style":"code","value":"result.text:bn.format_commas[\n bn.sumall[\"\\n\" split input.text]\n]"}
+button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"logic.0","text":"Try It!"}
+result:{"type":"field","size":[232,32],"pos":[10,254],"locked":1,"volatile":1,"border":1,"style":"code"}
+field2:{"type":"field","size":[232,13],"pos":[10,240],"locked":1,"show":"transparent","border":0,"style":"plain","value":"result"}
+input:{"type":"field","size":[232,82],"pos":[10,147],"border":1,"scrollbar":1,"style":"code","value":"1\n20\n3000\n400000\n500000000\n600000000000"}
+field4:{"type":"field","size":[232,13],"pos":[10,133],"locked":1,"show":"transparent","border":0,"style":"plain","value":"input"}
+
+{module:bn}
+description:"arbitrary-precision arithmetic for natural numbers."
+version:1
+{script}
+digits:"" split "0123456789"
+names:"%j" parse "[
+ 'million','billion','trillion','quadrillion','quintillion','sextillion','septillion','octillion',
+ 'nonillion','decillion','undecillion','duodecillion','tredecillion','quattuordecillion','quindecillion',
+ 'sexdecillion','septendecillion','octodecillion','novemdecillion','vigintillion','unvigintillion',
+ 'duovigintillion','tresvigintillion','quattuor?vigint?illion','quinvigintillion','sesvigintillion',
+ 'septemvigintillion','octovigintillion','novemvigintillion','trigintillion','untrigintillion',
+ 'duotrigintillion','trestrigintillion','quattuor?trigint?illion','quintrigintillion','sestrigintillion',
+ 'septentrigintillion','octotrigintillion','noventrigintillion','quadragintillion'
+]"
+
+on make x do
+ if "list"~typeof x x else
+  x:0+"" split digits take "" fuse x # ignore _ and , place-separators
+  while (count x)&0~first x x:1 drop x end x # always normalize
+ end
+end
+on norm x do
+ x:make[x]
+ while (count x)&0~first x x:1 drop x end x
+end
+
+on align f do
+ on _ x y do
+  x:norm[x] cx:count x
+  y:norm[y] cy:count y
+  if cy<cx y:((cx-cy)take 0),y end
+  if cy>cx x:((cy-cx)take 0),x end
+  f[x y]
+ end
+end
+local more:align[on _ x y do 0<first norm[x-y] end]
+local less:align[on _ x y do 0>first norm[x-y] end]
+local add:align[on _ x y do
+ local a:0,x+y
+ while sum c:a>9 a:(10%a)+(1 drop c,0) end norm[a]
+end]
+local sub:align[on _ x y do
+ if 0>first norm[x-y] 0 else # return "0" on underflow
+  local a:x-y
+  while sum c:a<0 a:(10%a)-(1 drop c,0) end norm[a]
+ end
+end]
+
+on mul x y do
+ x:norm[x] y:norm[y]
+ norm[sumall[each digit i in y
+  sumall[digit take list x],((-1+count y)-i)take 0
+ end]]
+end
+
+on divmod x y do
+ x:norm[x] y:norm[y] local r:()
+ if !count y 0 else # return "0" on divide by zero
+  while !less[x y]
+   local a:() local i:0 local b:y local c:0 local digit:0
+   while (i<count x)&!more[a y] i:i+1 a:i take x end
+   while !more[b a] c:b digit:digit+1 b:add[b y] end
+   local z:((count x)-i)take 0
+   r:add[r digit,z]
+   x:sub[x     c,z]
+  end
+  (list r),(list x)
+ end
+end
+
+on format_plain x do
+ x:norm[x]
+ "" fuse if ()~x 0 else x end
+end
+on format_commas x do
+ "" fuse each digit i in x:"" split format_plain[x]
+  local p:(-1+count x)-i
+  if p&!3%p digit,"," else digit end
+ end
+end
+on format_name x do
+ x:"" split format_plain[x]
+ if 7>count x "" fuse x else
+  local p:floor (-7+count x)/3
+  if !p<count names "many" else
+   local sig:(count x)-(3*2+p)
+   local num:(0+"" fuse (3|sig) limit x)/10^3-sig
+   "%f %s" format num,names[p]
+  end
+ end
+end
+
+module:raze insert k v with
+ "make"          make
+ "equal"         on equal x y do norm[x]~norm[y] end
+ "more"          more
+ "less"          less
+ "add"           add
+ "sub"           sub
+ "mul"           mul
+ "divmod"        divmod
+ "div"           on div x y do first divmod[x y] end
+ "mod"           on mod x y do last  divmod[x y] end
+ "sumall"        on sumall  x do r:make[first x] each v in 1 drop x r:add[r v] end r end
+ "prodall"       on prodall x do if !count x make[1] else r:make[first x] each v in 1 drop x r:mul[r v] end r end end
+ "minall"        on minall  x do r:make[first x] each v in 1 drop x r:if less[v r] v else r end end r end
+ "maxall"        on maxall  x do r:make[first x] each v in 1 drop x r:if more[v r] v else r end end r end
+ "format_plain"  format_plain
+ "format_commas" format_commas
+ "format_name"   format_name
+end
+{end}
+
