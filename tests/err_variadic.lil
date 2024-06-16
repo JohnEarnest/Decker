@@ -1,0 +1,4 @@
+
+on foo ...baz quux do
+	# variadic functions should only take one argument.
+end
