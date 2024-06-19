@@ -1060,6 +1060,14 @@ Another application is applying a "mask" pattern to an entire list:
 (11,22,33,44,55)*(1,0)                # (11,0,33,0,55)     # mask off even items
 ```
 
+Yet another useful consequence of this behavior is that enlisting the right argument when conforming two lists can be used to compute a matrix giving the _cartesian product_: every combination of the elements of the left and right lists. Compare this with `cross`, which produces a flat list of pairings:
+```lil
+(11,22,33) +      100,200             # (111,222,133)
+(11,22,33) + list 100,200             # ((111,211),(122,222),(133,233))
+      (100,200) cross 11,22,33        # ((100,11),(200,11),(100,22),(200,22),(100,33),(200,33))
+sum @ (100,200) cross 11,22,33        # (111,211,122,222,133,233)
+```
+
 You can also conform dictionaries. Lil takes the union of keys in the dictionaries and applies the operator between dictionary elements (or `0` if the entry is missing). As when taking the union of dictionaries with `,`, conforming "prefers" the order of keys in the left argument:
 ```lil
 x:("White","Brown","Speckled") dict 10,34,27
