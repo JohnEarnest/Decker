@@ -313,6 +313,12 @@ dyad={
 			}return NONE
 		};return lil(x)?lml(x.v.map(x=>test(ls(x)))): test(ls(x))
 	},
+	window: (x,y)=>{
+		let n=ln(x), r=[], con;if(lis(y)){y=ls(y),con=lms}else{y=ll(y),con=lml}
+		if(n>0){     for(let z=0;z    <y.length;z+=n)r.push(con(y.slice(z,z+n)))}
+		if(n<0){n=-n;for(let z=0;z+n-1<y.length;z++ )r.push(con(y.slice(z,z+n)))}
+		return lml(r)
+	},
 	'@where': (col,tab)=>{
 		const w=dyad.take(lmn(count(tab)),lml(ll(col)))
 		const p=lml(range(count(tab)).filter(i=>lb(w.v[i])).map(lmn))

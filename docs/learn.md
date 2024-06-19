@@ -41,12 +41,13 @@ d.a        # -> 11         # dicts can be indexed with a dot and a name,
 d["b"]     # -> 22         # ...or equivalently, with []; required for non-string keys.
 
 # collection operators:
-count  11,22,33 # -> 3
-first  11,22,33 # -> 11
-last   11,22,33 # -> 33
-2 take 11,22,33 # -> (11,22)
-2 drop 11,22,33 # -> (33)
-typeof 11,22,33 # -> "list"
+count    11,22,33    # -> 3
+first    11,22,33    # -> 11
+last     11,22,33    # -> 33
+2 take   11,22,33    # -> (11,22)
+2 drop   11,22,33    # -> (33)
+typeof   11,22,33    # -> "list"
+2 window 11,22,33,44 # -> ((11,22),(33,44))
 
 ###################################################
 #

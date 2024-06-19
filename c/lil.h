@@ -564,6 +564,15 @@ dyad(l_like){
 		}r->lv[0]->c=s;
 	}if(lil(x)){MAP(r,x)like_test(ls(x->lv[z]),pats);return r;}else{return like_test(ls(x),pats);}
 }
+dyad(l_window){
+	int n=ln(x);lv*r=lml(0);if(lis(y)){
+		if(n>0){     for(int z=0;z    <y->c;z+=n){lv*t=lms(MIN(n,y->c-z));ll_add(r,t);memcpy(t->sv,y->sv+z,t->c);}}
+		if(n<0){n=-n;for(int z=0;z+n-1<y->c;z++ ){lv*t=lms(    n        );ll_add(r,t);memcpy(t->sv,y->sv+z,t->c);}}
+	}else{y=ll(y);
+		if(n>0){     for(int z=0;z    <y->c;z+=n){lv*t=lml(0);ll_add(r,t);for(int i=0;i<n&&z+i<y->c;i++)ll_add(t,y->lv[z+i]);}}
+		if(n<0){n=-n;for(int z=0;z+n-1<y->c;z++ ){lv*t=lml(0);ll_add(r,t);for(int i=0;i<n          ;i++)ll_add(t,y->lv[z+i]);}}
+	}return r;
+}
 lv* l_ins(lv*v,lv*n,lv*x){
 	int rc=ceil((1.0*v->c)/n->c);lv*c=lml(n->c);
 	EACH(z,c){c->lv[z]=lml(rc);for(int r=0;r<rc;r++){int x=(n->c*r)+z;c->lv[z]->lv[r]=x>=v->c?NONE:v->lv[x];}}
@@ -643,7 +652,7 @@ primitive dyads[]={
 	prim("|",l_max),prim("~",l_match),prim("split",l_split),prim("fuse",l_fuse),
 	prim("dict",l_dict),prim("take",l_take),prim("drop",l_drop),prim("in",l_in),
 	prim(",",l_comma),prim("join",l_join),prim("cross",l_cross),prim("parse",l_parse),
-	prim("format",l_format),prim("unless",l_unless),prim("limit",l_limit),prim("like",l_like),
+	prim("format",l_format),prim("unless",l_unless),prim("limit",l_limit),prim("like",l_like),prim("window",l_window),
 	prim("@where",l_where),prim("@by",l_by),prim("",NULL)
 };
 primitive triads[]={

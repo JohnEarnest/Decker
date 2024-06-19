@@ -21,7 +21,6 @@ on rev       x do x @ (-1+count x)-range count x                    end # k: |:
 on sortstr   x do "" fuse extract orderby value asc from x          end # k: {x@<x}
 on sumscan   x do a:0 each v in x a:a+v end                         end # k: +\
 on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
-on window  n x do each i in range (count x)-n-1 n take i drop x end end # k: x':y
 
 # the problems:
 
@@ -345,7 +344,7 @@ problem[247.2]
 # find the bi-gram which occurs most frequently, breaking ties by lexicographic order
 on f x do
  first extract orderby v asc by c orderby c desc from
-       select v:first value c:count value by value from window[2 x]
+       select v:first value c:count value by value from -2 window x
 end
 assert[f["abcdbca"          ] "bc"]
 assert[f["cdeabeabfcdfabgcd"] "ab"]
@@ -1009,7 +1008,7 @@ assert[f[(3, 4, 5          )] (list 5     )]
 
 problem[73.1]
 # find the minimum of each y-length sliding window of x.
-on f x y do min@window[y x] end
+on f x y do min@(-y)window x end
 assert[f[(1, 5, 0, 2, 9, 3, 7, 6, 4, 8) 3] (0, 0, 0, 2, 3, 3, 4, 4)]
 
 problem[71.1]

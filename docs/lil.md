@@ -520,7 +520,7 @@ extract value orderby index desc from jobs             # reverse a list
 extract list index by value from "ABBAAC"              # group a list
 # ((0,3,4),(1,2),(5))
 
-extract list value by floor index/3 from "ABCDEFGHI"   # partition a list
+extract list value by floor index/3 from "ABCDEFGHI"   # partition a list (see 'window')
 # (("A","B","C"),("D","E","F"),("G","H","I"))
 
 extract first value by value from "ABBAAC"             # distinct items in a list
@@ -1278,6 +1278,8 @@ x,y              # {"A":0,"B":0,"C":0} (union)
 
 `x limit y` returns up to `x` items from `y`. Equivalent to `if x<count y x take y else y end`.
 
+`x window y` divides a list or string `y` into slices of length `mag x`. If `x` is a negative number, the slices will overlap. For example, `3 window "ABCDEF"` is `("ABC","DEF")`, while `-3 window "ABCDEF"` is `("ABC","BCD","CDE","DEF")`. If there aren't enough elements in `y`, a positive `x` may result in a final slice with fewer than `x` elements.
+
 `x in y` returns the number 1 or 0 depending upon whether `y` appears in `x`. If `y` is a string, look for the string `x` anywhere in `y`. If `y` is a list, look for `x` as an element of `y`. If `y` is a dictionary, `x` must be a _key_ of that dictionary. If `y` is a table, it must likewise be a _key_ (column name) of that table. In all other cases, `in` returns 0. If `x` is a list, consider each element of x and return a list of 1 or 0.
 
 `x unless y` returns `x` unless `y` is not the number 0; otherwise it returns `y`. This "null-coalescing operator" is handy for providing default values when indexing into dictionaries or lists. For example, `() unless foo[x]` will evaluate to the empty list if `foo` contains no value with the key `x`.
@@ -1297,7 +1299,7 @@ The following is a slightly hand-waved EBNF description of Lil's syntax. The pro
 MONAD   := '-'|'!'|'floor'|'cos'|'sin'|'tan'|'exp'|'ln'|'sqrt'|'count'|'first'|'last'|'sum'|'min'|'max'|
            'raze'|'prod'|'range'|'keys'|'list'|'rows'|'cols'|'table'|'typeof'|'flip'|'mag'|'unit'|'heading'
 DYAD    := '+'|'-'|'*'|'/'|'%'|'^'|'<'|'>'|'='|'&'|'|'|','|'~'|'@'|'split'|'fuse'|'dict'|'take'|'drop'|
-           'in'|'join'|'cross'|'parse'|'format'|'unless'|'limit'|'like'
+           'in'|'join'|'cross'|'parse'|'format'|'unless'|'limit'|'like'|'window'
 DIGIT   := '0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'
 NUMBER  := '-'? DIGIT+ '.'? | DIGIT* '.' DIGIT+
 STRING  := '"' (NON_ESC|'\\'|'\"'|'\n')* '"'

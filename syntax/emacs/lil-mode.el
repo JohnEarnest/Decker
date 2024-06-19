@@ -20,7 +20,7 @@
              typeof count first last
              range keys list flip
              rows cols table mag heading unit
-             split fuse like dict take
+             split fuse like dict take window
              drop limit in unless join cross
              parse format))
      . 'font-lock-builtin-face)

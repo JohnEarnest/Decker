@@ -550,6 +550,15 @@ function l_like(x,y,  r,z,pats,p,t){
 	if(lil(x)){r=lml();for(z=0;z<count(x);z++)lst_add(r,like_test(lvs(ls(lst_get(x,z))),pats));return r}
 	else{return like_test(lvs(ls(x)),pats)}	# }
 }
+function l_window(x,y,  r,z,t,i){
+	x=int(ln(x));r=lml();if(lis(y)){y=lvs(y)
+		if(x>0){     for(z=0;z    <length(y);z+=x){lst_add(r,lms(substr(y,z+1,x)))}}
+		if(x<0){x=-x;for(z=0;z+x-1<length(y);z+=1){lst_add(r,lms(substr(y,z+1,x)))}}
+	}else{y=ll(y)
+		if(x>0){     for(z=0;z    <count(y) ;z+=x){t=lml();lst_add(r,t);for(i=0;i<x&&z+i<count(y);i++)lst_add(t,lst_get(y,z+i))}}
+		if(x<0){x=-x;for(z=0;z+x-1<count(y) ;z+=1){t=lml();lst_add(r,t);for(i=0;i<x              ;i++)lst_add(t,lst_get(y,z+i))}}
+	}return r
+}
 
 function format_has_names(str,  z,d,t){
 	for(z=1;z<=length(str);){
@@ -792,6 +801,7 @@ function dyads(name,x,y,  r,z,u,gi,gr,ki,t,ik,dk,ai,bi,m){
 	if(name=="limit" )return l_limit(x,y)
 	if(name=="in"    )return l_in(x,y)
 	if(name=="like"  )return l_like(x,y)
+	if(name=="window")return l_window(x,y)
 	if(name=="parse" )return l_parse(x,y)
 	if(name=="format")return l_format(x,y)
 	if(name==","     )return l_cat(x,y)
@@ -1943,7 +1953,7 @@ function expect(type,  p){
 BEGIN{
 	split("while|each|send|on|if|elseif|else|end|do|with|local|select|extract|update|insert|into|from|where|by|orderby|asc|desc",keywords,"|")
 	split("floor|cos|sin|tan|exp|ln|sqrt|count|first|last|sum|min|max|raze|prod|range|keys|list|rows|cols|table|typeof|flip|mag|unit|heading",mops,"|")
-	split("split|fuse|dict|take|drop|in|join|cross|parse|format|unless|limit|like",dops,"|")
+	split("split|fuse|dict|take|drop|in|join|cross|parse|format|unless|limit|like|window",dops,"|")
 }
 function is_monad(name){for(key in mops)if(name==mops[key])return 1;return index("-!",name)!=0}
 function is_dyad(name){for(key in dops)if(name==dops[key])return 1;return index("+-*/%^<>=&|,~",name)!=0}
