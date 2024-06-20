@@ -37,3 +37,4 @@ show[foo @ bar @ range 3]
 # mapping with monadic primitives
 show[count @ "one","two","three","four"]
 show[last  @ ((list 11,22),(list 33,44,55))]
+show[last  @ (11,22,33,44) dict "one","two","three","four"]
