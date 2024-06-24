@@ -1,7 +1,10 @@
 // Decker
 #include "lil.h"
 #include "dom.h"
-#include <SDL.h>
+
+int should_exit=0;
+
+#include "io_sdl2.h"
 
 void save_deck(lv*path); // forward refs
 void load_deck(lv*deck);
@@ -13,7 +16,7 @@ lv*CHECK,*LOCK,*ANIM,*ZOOM,*CHECKS[4],*CORNERS[4],*RADIOS[4],*ICONS[8],*GESTURES
 lv*FONT_BODY,*FONT_MENU,*FONT_MONO,*TOOLS,*ARROWS,*TOOLB,*PLAYING,*ATTRS;
 enum mini_icons {icon_dir,icon_doc,icon_sound,icon_font,icon_app,icon_lil,icon_pat,icon_chek,icon_none};
 enum cursor_styles {cursor_default,cursor_point,cursor_ibeam,cursor_drag};
-SDL_Cursor*CURSORS[4]; int uicursor=0, enable_touch=0, set_touch=0, should_exit=0;
+int uicursor=0, enable_touch=0, set_touch=0;
 int set_tracing=0, tracing=0, toolbar_scroll=0, toolbars_enable=0;
 #define PROFILE_HIST_SZ 200
 int profiler=0, profiler_ix=0, profiler_hist[PROFILE_HIST_SZ]={0};
@@ -36,19 +39,15 @@ char*pangram="How razorback jumping-frogs can level six piqued gymnasts.";
 
 lv*env,*deck=NULL,*doc_hist; int doc_hist_cursor=0;
 cstate context;
-SDL_Window  *win;
-SDL_Renderer*ren;
-SDL_Texture *gfx,*gtool;
-SDL_mutex*gil=NULL;
 int audio_playing=0,windowed=1,toggle_fullscreen=0;
-int nosound=0, autosave=0, noscale=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
+int autosave=0, noscale=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
 #define AUTOSAVE_DELAY (10*60)
-lv* deck_get(lv*text){SDL_LockMutex(gil);lv*r=deck_read(text);SDL_UnlockMutex(gil);return r;}
+lv* deck_get(lv*text){interpreter_lock();lv*r=deck_read(text);interpreter_unlock();return r;}
 void mark_dirty(void){dirty=1,dirty_timer=AUTOSAVE_DELAY;}
 void set_path(char*path){
 	snprintf(document_path,PATH_MAX,"%s",path);
 	char t[4096];snprintf(t,sizeof(t),"Decker - %s",path);
-	SDL_SetWindowTitle(win,strlen(path)?t:"Decker");
+	window_set_title(strlen(path)?t:"Decker");
 }
 
 typedef struct {
@@ -276,70 +275,6 @@ int in_widgets(void){return ms.type!=modal_none?ms.in_modal:1;}
 typedef struct {int shift,lock,on;char*heading;} keycaps_state;keycaps_state kc={0};
 int keydown[4096]={0},keyup[4096]={0};
 void keycaps_enter(void){if(!enable_touch||kc.on)return;kc.shift=0,kc.lock=0,kc.on=1,ev.mu=ev.md=0;}
-
-// Clipboard
-
-char clip_stash[16]={0};
-lv* get_clip(void){char*t=SDL_GetClipboardText();lv*r=lmcstr(t);SDL_free(t);return r;}
-void set_clip(lv*x){SDL_SetClipboardText(ls(x)->sv);}
-int has_clip(char*type){return strlen(clip_stash)>=strlen(type)&&memcmp(clip_stash,type,strlen(type))==0;}
-
-// Adaptation
-
-#ifdef LOSPEC
-// a set of customizations intended to make Decker more portable
-// and more performant on extremely limited devices such as the OLPC XO-4.
-int parity=0;
-lv* readimage(char*path,int grayscale){return n_readgif(NULL,lml2(lmcstr(path),grayscale?lmistr("gray"):NONE));}
-int*sgfx=NULL;
-void framebuffer_alloc(pair size,int minscale){
-	gfx=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,size.x*minscale,size.y*minscale);
-	sgfx=calloc(size.x*size.y,sizeof(int));
-}
-int framebuffer_flip(pair disp,pair size,int scale){
-	parity^=1;if(!parity)return 0;
-	int mask=dr.trans_mask&&uimode==mode_draw;
-	draw_frame(patterns_pal(ifield(deck,"patterns")),context.buffer,sgfx,size.x*4,dr.show_anim?frame_count:0,mask);frame_count++;
-	int*p, pitch;
-	SDL_LockTexture(gfx,NULL,(void**)&p,&pitch);
-	int stride=pitch/sizeof(int);
-	// SDL's X11 software renderer is outrageously slow at texture upscaling on the OLPC, so we'll do it by hand:
-	if(scale==1)for(int y=0,i=0,o=0;y<size.y;y++,o+=stride)for(int x=0;x<size.x;x++,i++     )p[o+x]=sgfx[i];
-	if(scale==2)for(int y=0,i=0,o=0;y<size.y;y++,o+=stride)for(int x=0;x<size.x;x++,i++,o+=2)p[o]=p[o+1]=p[o+stride]=p[o+stride+1]=sgfx[i];
-	SDL_UnlockTexture(gfx);
-	SDL_Rect dst={(disp.x-scale*size.x)/2,(disp.y-scale*size.y)/2,scale*size.x,scale*size.y};
-	SDL_RenderClear(ren);
-	SDL_RenderCopy(ren,gfx,NULL,&dst);
-	return 1;
-}
-#else
-#include <SDL_image.h>
-lv* readimage(char*path,int grayscale){
-	SDL_Surface*b=IMG_Load(path);if(b==NULL)return image_empty();lv*i=lmbuff((pair){b->w,b->h});
-	SDL_Surface*c=SDL_ConvertSurface(b,SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888),0);
-	for(int y=0;y<b->h;y++)for(int x=0;x<b->w;x++){
-		Uint32 v=((Uint32*)c->pixels)[x+(y*c->pitch/4)];Uint8 cr,cg,cb,ca;
-		SDL_GetRGBA(v,c->format,&cr,&cg,&cb,&ca),i->sv[x+y*b->w]=(ca!=0xFF)?(grayscale?0xFF:0x00):readcolor(cr,cg,cb,grayscale);
-	}SDL_FreeSurface(c),SDL_FreeSurface(b);return image_make(i);
-}
-void framebuffer_alloc(pair size,int minscale){
-	(void)minscale;
-	gfx=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,size.x,size.y);
-}
-int framebuffer_flip(pair disp,pair size,int scale){
-	int* p, pitch;
-	SDL_LockTexture(gfx,NULL,(void**)&p,&pitch);
-	int mask=dr.trans_mask&&uimode==mode_draw;
-	draw_frame(patterns_pal(ifield(deck,"patterns")),context.buffer,p,pitch,dr.show_anim?frame_count:0,mask);frame_count++;
-	SDL_UnlockTexture(gfx);
-	SDL_Rect src={0,0,size.x,size.y};
-	SDL_Rect dst={(disp.x-scale*size.x)/2,(disp.y-scale*size.y)/2,scale*size.x,scale*size.y};
-	SDL_SetRenderDrawColor(ren,0x00,0x00,0x00,0xFF);
-	SDL_RenderClear(ren);
-	SDL_RenderCopy(ren,gfx,&src,&dst);
-	return 1;
-}
-#endif
 
 // App Interface
 
@@ -769,15 +704,15 @@ void grid_keys(int code){
 	lv*fnt=wid.g.font?wid.g.font:FONT_MONO, *hfnt=FONT_BODY;
 	int m=0, nr=wid.gv->table->n, nc=wid.gv->table->c, r=wid.gv->row, c=wid.gv->col;
 	int rh=font_h(fnt)+5, bh=wid.g.headers?font_h(hfnt)+5:0, nrd=MIN(nr,((wid.g.size.h-bh+1)/rh));
-	if(code==SDLK_UP      ){m=1;if(r==-1){r=0;}else{r-=1;}}
-	if(code==SDLK_DOWN    ){m=1;if(r==-1){r=0;}else{r+=1;}}
-	if(code==SDLK_LEFT    ){m=1;if(c==-1){c=0;}else{c-=1;}}
-	if(code==SDLK_RIGHT   ){m=1;if(c==-1){c=0;}else{c+=1;}}
-	if(code==SDLK_PAGEUP  ){m=1;if(r==-1)r=0;r-=nrd;}
-	if(code==SDLK_PAGEDOWN){m=1;if(r==-1)r=0;r+=nrd;}
-	if(code==SDLK_HOME    ){m=1;r=0;}
-	if(code==SDLK_END     ){m=1;r=nr-1;}
-	if(!wid.g.locked&&(code==SDLK_BACKSPACE||code==SDLK_DELETE))grid_deleterow();
+	if(code==KEY_UP      ){m=1;if(r==-1){r=0;}else{r-=1;}}
+	if(code==KEY_DOWN    ){m=1;if(r==-1){r=0;}else{r+=1;}}
+	if(code==KEY_LEFT    ){m=1;if(c==-1){c=0;}else{c-=1;}}
+	if(code==KEY_RIGHT   ){m=1;if(c==-1){c=0;}else{c+=1;}}
+	if(code==KEY_PAGEUP  ){m=1;if(r==-1)r=0;r-=nrd;}
+	if(code==KEY_PAGEDOWN){m=1;if(r==-1)r=0;r+=nrd;}
+	if(code==KEY_HOME    ){m=1;r=0;}
+	if(code==KEY_END     ){m=1;r=nr-1;}
+	if(!wid.g.locked&&(code==KEY_BACKSPACE||code==KEY_DELETE))grid_deleterow();
 	if(!m)return;if(ms.type==modal_prototype_attrs)ms.text.table=ms.name.table=NULL;
 	wid.gv->row=r=MAX(0,MIN(r,nr-1)),wid.gv->col=c=MAX(0,MIN(c,nc-1));if(wid.gt){
 		iwrite(wid.gt,lmistr("row"),lmn(r)),iwrite(wid.gt,lmistr("col"),lmn(c)),mark_dirty();
@@ -917,6 +852,7 @@ void field_stylespan(lv*font,lv*arg){
 	field_edit(font,arg,rtext_string(wid.fv->table,wid.cursor)->sv,wid.cursor);
 }
 void field_input(char*text){
+	if(!wid.infield)return;
 	if(!strcmp(text,"\n")){
 		if(ms.type==modal_save)ev.action=1;
 		if(ev.shift||ms.type==modal_save)return;
@@ -925,29 +861,29 @@ void field_input(char*text){
 	field_edit(rtext_font(wid.fv->table,wid.cursor.y),lmistr(""),t.sv,wid.cursor);free(t.sv);
 }
 void field_keys(int code,int shift){
-	if(code==SDLK_RETURN&&ms.type==modal_gridcell){modal_exit(1);ev.action=0;return;}
+	if(code==KEY_RETURN&&ms.type==modal_gridcell){modal_exit(1);ev.action=0;return;}
 	rect b=wid.f.size, bi=inset(b,2);if(wid.f.scrollbar)bi.w-=image_size(ARROWS->lv[0]).x+3;
 	lv*fnt=wid.f.font?wid.f.font: wid.f.style==field_code?FONT_MONO: FONT_BODY; layout_richtext(deck,wid.fv->table,fnt,wid.f.align,bi.w);
 	int m=0, s=wid.cursor.x!=wid.cursor.y;
 	int l=wid.cursor.y>=layout_count?lines_count-1:layout[wid.cursor.y].line; rect c=layout_cursor(wid.cursor.y,fnt,wid.f);
-	if(code==SDLK_LEFT     ){m=1;if(s&&!shift){wid.cursor.x=wid.cursor.y=MIN(wid.cursor.x,wid.cursor.y);}else{wid.cursor.y--;}}
-	if(code==SDLK_RIGHT    ){m=1;if(s&&!shift){wid.cursor.x=wid.cursor.y=MAX(wid.cursor.x,wid.cursor.y);}else{wid.cursor.y++;}}
-	if(code==SDLK_UP       ){m=1;if(l>=0)wid.cursor.y=layout_index((pair){c.x-1,lines[l].pos.y               -1   });}
-	if(code==SDLK_DOWN     ){m=1;if(l>=0)wid.cursor.y=layout_index((pair){c.x-1,lines[l].pos.y+lines[l].pos.h+1   });}
-	if(code==SDLK_PAGEUP   ){m=1;if(l>=0)wid.cursor.y=layout_index((pair){c.x-1,lines[l].pos.y               -bi.h});}
-	if(code==SDLK_PAGEDOWN ){m=1;if(l>=0)wid.cursor.y=layout_index((pair){c.x-1,lines[l].pos.y+lines[l].pos.h+bi.h});}
-	if(code==SDLK_HOME     ){m=1;if(ev.alt){wid.cursor.y=0           ;}else if(l>=0)wid.cursor.y=lines[l].range.x;}
-	if(code==SDLK_END      ){m=1;if(ev.alt){wid.cursor.y=layout_count;}else if(l>=0)wid.cursor.y=lines[l].range.y+(l==lines_count-1?1:0);}
-	if(code==SDLK_BACKSPACE){field_edit(lmistr(""),lmistr(""),"",s?wid.cursor:(pair){wid.cursor.y-1,wid.cursor.y});}
-	if(code==SDLK_DELETE   ){field_edit(lmistr(""),lmistr(""),"",s?wid.cursor:(pair){wid.cursor.y,wid.cursor.y+1});}
-	if(code==SDLK_RETURN){
+	if(code==KEY_LEFT     ){m=1;if(s&&!shift){wid.cursor.x=wid.cursor.y=MIN(wid.cursor.x,wid.cursor.y);}else{wid.cursor.y--;}}
+	if(code==KEY_RIGHT    ){m=1;if(s&&!shift){wid.cursor.x=wid.cursor.y=MAX(wid.cursor.x,wid.cursor.y);}else{wid.cursor.y++;}}
+	if(code==KEY_UP       ){m=1;if(l>=0)wid.cursor.y=layout_index((pair){c.x-1,lines[l].pos.y               -1   });}
+	if(code==KEY_DOWN     ){m=1;if(l>=0)wid.cursor.y=layout_index((pair){c.x-1,lines[l].pos.y+lines[l].pos.h+1   });}
+	if(code==KEY_PAGEUP   ){m=1;if(l>=0)wid.cursor.y=layout_index((pair){c.x-1,lines[l].pos.y               -bi.h});}
+	if(code==KEY_PAGEDOWN ){m=1;if(l>=0)wid.cursor.y=layout_index((pair){c.x-1,lines[l].pos.y+lines[l].pos.h+bi.h});}
+	if(code==KEY_HOME     ){m=1;if(ev.alt){wid.cursor.y=0           ;}else if(l>=0)wid.cursor.y=lines[l].range.x;}
+	if(code==KEY_END      ){m=1;if(ev.alt){wid.cursor.y=layout_count;}else if(l>=0)wid.cursor.y=lines[l].range.y+(l==lines_count-1?1:0);}
+	if(code==KEY_BACKSPACE){field_edit(lmistr(""),lmistr(""),"",s?wid.cursor:(pair){wid.cursor.y-1,wid.cursor.y});}
+	if(code==KEY_DELETE   ){field_edit(lmistr(""),lmistr(""),"",s?wid.cursor:(pair){wid.cursor.y,wid.cursor.y+1});}
+	if(code==KEY_RETURN){
 		if(shift&&wid.ft){field_change();msg.target_run=wid.ft,msg.arg_run=rtext_string(wid.fv->table,s?wid.cursor:(pair){0,RTEXT_END});}
 		else{
 			int i=0;if(wid.f.style==field_code){pair s=field_sel_lines();while(s.x<layout_count&&layout[s.x].c==' ')i++,s.x++;}
 			char tmp[4096];snprintf(tmp,sizeof(tmp),"%-*s",i+1,"\n");field_input(tmp);
 		}
 	}
-	if(code==SDLK_TAB&&wid.f.style==field_code){if(!shift&&!s){field_input(" ");}else{field_indent(!shift);}}
+	if(code==KEY_TAB&&wid.f.style==field_code){if(!shift&&!s){field_input(" ");}else{field_indent(!shift);}}
 	wid.cursor.y=MAX(0,MIN(wid.cursor.y,layout_count)); if(!m)return;
 	wid.cursor_timer=0; if(!shift)wid.cursor.x=wid.cursor.y; field_showcursor();
 }
@@ -1118,9 +1054,6 @@ lv* n_panic(lv*self,lv*z){
 
 // Audio Editor
 
-#define SFX_FORMAT   AUDIO_S8
-#define SFX_CHANNELS 1
-#define SFX_SLOTS    4
 void sound_apply(lv*v){int len=v->b->c;au.target->b->c=len;memcpy(au.target->b->sv,v->b->sv,len);mark_dirty();}
 void sound_undo(void){lv*x=au.hist->lv[--(au.hist_cursor)];sound_apply(x->lv[0]);}
 void sound_redo(void){lv*x=au.hist->lv[(au.hist_cursor)++];sound_apply(x->lv[1]);}
@@ -1135,7 +1068,7 @@ void sound_delete(void){
 	sound_edit(sound_make(r));au.head=au.sel.y=au.sel.x;
 }
 void sound_finish(void){
-	SDL_PauseAudioDevice(au.input,1);
+	record_finish(au.input);
 	au.head=(au.sel.x!=au.sel.y)?au.sel.x:0;
 	sound_undo(),sound_redo();
 }
@@ -1160,16 +1093,6 @@ lv* contraptions_enumerate(void){
 	lv*r=lmt(),*i=lml(0),*n=lml(0),*defs=ifield(deck,"contraptions");dset(r,lmistr("icon"),i),dset(r,lmistr("name"),n);
 	EACH(z,defs){ll_add(i,lmn(icon_app)),ll_add(n,defs->kv[z]);}
 	return torect(r);
-}
-lv*n_readwav(lv*self,lv*a){
-	(void)self;char*name=ls(l_first(a))->sv;
-	Uint8* raw; Uint32 length; SDL_AudioSpec spec; SDL_AudioCVT cvt;
-	if(SDL_LoadWAV(name,&spec,&raw,&length)==NULL)return sound_make(lms(0));
-	if(SDL_BuildAudioCVT(&cvt, spec.format,spec.channels,spec.freq, SFX_FORMAT,SFX_CHANNELS,SFX_RATE)){
-		cvt.len=length,cvt.buf=malloc(cvt.len * cvt.len_mult);
-		memcpy(cvt.buf,raw,length),SDL_FreeWAV(raw),SDL_ConvertAudio(&cvt);
-		raw=cvt.buf, length=cvt.len_cvt;
-	}lv*r=lmv(1);r->c=MIN(length,10*SFX_RATE);r->sv=(char*)raw;return sound_make(r);
 }
 lv*n_readfile(lv*self,lv*a){
 	lv*name=ls(l_first(a)),*hint=a->c>1?ls(a->lv[1]):lms(0);
@@ -1253,12 +1176,12 @@ void do_transition(float tween,int errors){
 	cstate f=frame;n_canvas_clear(ms.canvas,lml(0));
 	lv*a=lml(4);a->lv[0]=ms.canvas,a->lv[1]=ms.carda,a->lv[2]=ms.cardb,a->lv[3]=lmn(tween);
 	lv*p=lmblk();blk_lit(p,ms.trans),blk_lit(p,a),blk_op(p,CALL);lv*e=lmenv(NULL);
-	SDL_LockMutex(gil),pushstate(e),issue(e,p);int quota=TRANS_QUOTA;while(quota&&running())runop(),quota--;
+	interpreter_lock(),pushstate(e),issue(e,p);int quota=TRANS_QUOTA;while(quota&&running())runop(),quota--;
 	if(running()&&errors){
 		char e[4096];snprintf(e,sizeof(e),"warning: transition %s exceeded quota and was halted.",ms.trans->sv);
 		listen_show(align_right,1,lmcstr(e));ms.time_curr=ms.time_end;
 	}
-	popstate(),SDL_UnlockMutex(gil);frame=f;sleep_play=0,sleep_frames=0;
+	popstate(),interpreter_unlock();frame=f;sleep_play=0,sleep_frames=0;
 }
 
 // Modal Dialogues
@@ -1292,10 +1215,9 @@ void modal_enter(int type){
 		lv*sounds=ifield(deck,"sounds");EACH(z,sounds)if(sounds->lv[z]==au.target)ms.name=(field_val){rtext_cast(sounds->kv[z]),0};
 		if(!ms.name.table)ms.name.table=rtext_cast(lmistr("unknown sound"));
 		int s=ln(ifield(au.target,"size"));sound_resize(au.target,10*SFX_RATE);au.target->b->c=s; // force pre-alloc to 10secs
-		if(!nosound&&au.input==0&&SDL_GetNumAudioDevices(1)>=1){
-			SDL_AudioSpec spec;SDL_zero(spec);
-			spec.freq=SFX_RATE,spec.format=SFX_FORMAT,spec.channels=SFX_CHANNELS,spec.samples=1024,spec.callback=record_pump;
-			int id=SDL_OpenAudioDevice(NULL,1,&spec,NULL,0);if(id>0)au.input=id;
+		if(!nosound&&au.input==0&&record_possible()){
+			int id=record_begin();
+			if(id>0)au.input=id;
 		}
 	}
 	if(type==modal_cards){ms.grid=(grid_val){NULL,0,-1,-1};}
@@ -1732,7 +1654,7 @@ void modals(void){
 		if(ui_toggle((rect){c.x,c.y,60,20},"Record",au.mode==record_recording,au.input!=0)){
 			if(au.mode==record_recording)sound_finish();
 			au.mode=(au.mode!=record_recording)?record_recording:record_stopped;
-			if(au.mode==record_recording){sound_edit(sound_slice((pair){0,au.target->b->c}));if(sc)au.head=au.sel.x;SDL_PauseAudioDevice(au.input,0);}
+			if(au.mode==record_recording){sound_edit(sound_slice((pair){0,au.target->b->c}));if(sc)au.head=au.sel.x;record_pause(au.input);}
 		};c.x+=65;
 		if(ui_button((rect){c.x,c.y,60,20},"Crop",sc&&au.mode==record_stopped)){sound_edit(sound_slice(au.sel));au.sel=(pair){0,0},au.head=0;}
 		draw_text((rect){b.x+(b.w/2),gsize.y+gsize.h+9,37,20},"Name",FONT_MENU,1);
@@ -1834,13 +1756,7 @@ void modals(void){
 		draw_textc((rect){b.x,b.y,b.w,20},"Do you wish to open this URL?",FONT_BODY,1);
 		ui_textedit((rect){b.x,b.y+20+5,b.w,40},1,&ms.text);
 		pair c={b.x+b.w-(b.w-(2*60+5))/2-60,b.y+b.h-20};
-		if(ui_button((rect){c.x,c.y,60,20},"Open",1)||ev.action){
-			#if SDL_VERSION_ATLEAST(2,0,14)
-				int e=SDL_OpenURL(rtext_all(ms.text.table)->sv);
-				if(e)printf("open url error: %s\n",SDL_GetError());
-			#endif
-			modal_exit(0);
-		};c.x-=65;
+		if(ui_button((rect){c.x,c.y,60,20},"Open",1)||ev.action){open_url(rtext_all(ms.text.table)->sv);modal_exit(0);};c.x-=65;
 		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_exit(0);
 	}
 	else if(ms.type==modal_link){
@@ -2369,22 +2285,22 @@ void script_editor(rect r){
 
 typedef struct {int v;char*l;float w;} keycap;
 typedef struct {int c;keycap caps[16];} keyrow;
-#define K(x,l) {(x-' ')+SDLK_SPACE,l,1.0}
+#define K(x,l) {(x-' ')+KEY_SPACE,l,1.0}
 #define KS(x,l,w) {x,l,w}
 #define KROWS 5
 keyrow LCAPS[KROWS]={
-	{14,{K('`',"`"),K('1',"1"),K('2',"2"),K('3',"3"),K('4',"4"),K('5',"5"),K('6',"6"),K('7',"7"),K('8',"8"),K('9',"9"),K('0',"0"),K('-',"-"),K('=',"="),KS(SDLK_BACKSPACE,"delete",1.5)}},
-	{14,{KS(SDLK_TAB,"tab",1.5),K('q',"q"),K('w',"w"),K('e',"e"),K('r',"r"),K('t',"t"),K('y',"y"),K('u',"u"),K('i',"i"),K('o',"o"),K('p',"p"),K('[',"["),K(']',"]"),K('\\',"\\")}},
-	{13,{KS(SDLK_CAPSLOCK,"capslock",2),K('a',"a"),K('s',"s"),K('d',"d"),K('f',"f"),K('g',"g"),K('h',"h"),K('j',"j"),K('k',"k"),K('l',"l"),K(';',";"),K('\'',"'"),KS(SDLK_RETURN,"return",2)}},
-	{12,{KS(SDLK_LSHIFT,"shift",2.5),K('z',"z"),K('x',"x"),K('c',"c"),K('v',"v"),K('b',"b"),K('n',"n"),K('m',"m"),K(',',","),K('.',"."),K('/',"/"),KS(SDLK_RSHIFT,"shift",2.5)}},
-	{9,{KS(SDLK_LEFT,"",1),KS(SDLK_DOWN,"",1),KS(SDLK_UP,"",1),KS(SDLK_RIGHT,"",1),KS(0,"",1),KS(SDLK_SPACE," ",5),KS(0,"",1),KS(-2,"",2),KS(-1,"OK",2)}},
+	{14,{K('`',"`"),K('1',"1"),K('2',"2"),K('3',"3"),K('4',"4"),K('5',"5"),K('6',"6"),K('7',"7"),K('8',"8"),K('9',"9"),K('0',"0"),K('-',"-"),K('=',"="),KS(KEY_BACKSPACE,"delete",1.5)}},
+	{14,{KS(KEY_TAB,"tab",1.5),K('q',"q"),K('w',"w"),K('e',"e"),K('r',"r"),K('t',"t"),K('y',"y"),K('u',"u"),K('i',"i"),K('o',"o"),K('p',"p"),K('[',"["),K(']',"]"),K('\\',"\\")}},
+	{13,{KS(KEY_CAPSLOCK,"capslock",2),K('a',"a"),K('s',"s"),K('d',"d"),K('f',"f"),K('g',"g"),K('h',"h"),K('j',"j"),K('k',"k"),K('l',"l"),K(';',";"),K('\'',"'"),KS(KEY_RETURN,"return",2)}},
+	{12,{KS(KEY_LSHIFT,"shift",2.5),K('z',"z"),K('x',"x"),K('c',"c"),K('v',"v"),K('b',"b"),K('n',"n"),K('m',"m"),K(',',","),K('.',"."),K('/',"/"),KS(KEY_RSHIFT,"shift",2.5)}},
+	{9,{KS(KEY_LEFT,"",1),KS(KEY_DOWN,"",1),KS(KEY_UP,"",1),KS(KEY_RIGHT,"",1),KS(0,"",1),KS(KEY_SPACE," ",5),KS(0,"",1),KS(-2,"",2),KS(-1,"OK",2)}},
 };
 keyrow UCAPS[KROWS]={
-	{14,{K('~',"~"),K('!',"!"),K('@',"@"),K('#',"#"),K('$',"$"),K('%',"%"),K('^',"^"),K('&',"&"),K('*',"*"),K('(',"("),K(')',")"),K('_',"_"),K('+',"+"),KS(SDLK_BACKSPACE,"delete",1.5)}},
-	{14,{KS(SDLK_TAB,"tab",1.5),K('Q',"Q"),K('W',"W"),K('E',"E"),K('R',"R"),K('T',"T"),K('Y',"Y"),K('U',"U"),K('I',"I"),K('O',"O"),K('P',"P"),K('{',"{"),K('}',"}"),K('|',"|")}},
-	{13,{KS(SDLK_CAPSLOCK,"capslock",2.0),K('A',"A"),K('S',"S"),K('D',"D"),K('F',"F"),K('G',"G"),K('H',"H"),K('J',"J"),K('K',"K"),K('L',"L"),K(':',":"),K('"',"\""),KS(SDLK_RETURN,"return",2)}},
-	{12,{KS(SDLK_LSHIFT,"shift",2.5),K('Z',"Z"),K('X',"X"),K('C',"C"),K('V',"V"),K('B',"B"),K('N',"N"),K('M',"M"),K('<',"<"),K('>',">"),K('?',"?"),KS(SDLK_RSHIFT,"shift",2.5)}},
-	{9,{KS(SDLK_LEFT,"",1),KS(SDLK_DOWN,"",1),KS(SDLK_UP,"",1),KS(SDLK_RIGHT,"",1),KS(0,"",1),KS(SDLK_SPACE," ",5),KS(0,"",1),KS(-2,"",2),KS(-1,"OK",2)}},
+	{14,{K('~',"~"),K('!',"!"),K('@',"@"),K('#',"#"),K('$',"$"),K('%',"%"),K('^',"^"),K('&',"&"),K('*',"*"),K('(',"("),K(')',")"),K('_',"_"),K('+',"+"),KS(KEY_BACKSPACE,"delete",1.5)}},
+	{14,{KS(KEY_TAB,"tab",1.5),K('Q',"Q"),K('W',"W"),K('E',"E"),K('R',"R"),K('T',"T"),K('Y',"Y"),K('U',"U"),K('I',"I"),K('O',"O"),K('P',"P"),K('{',"{"),K('}',"}"),K('|',"|")}},
+	{13,{KS(KEY_CAPSLOCK,"capslock",2.0),K('A',"A"),K('S',"S"),K('D',"D"),K('F',"F"),K('G',"G"),K('H',"H"),K('J',"J"),K('K',"K"),K('L',"L"),K(':',":"),K('"',"\""),KS(KEY_RETURN,"return",2)}},
+	{12,{KS(KEY_LSHIFT,"shift",2.5),K('Z',"Z"),K('X',"X"),K('C',"C"),K('V',"V"),K('B',"B"),K('N',"N"),K('M',"M"),K('<',"<"),K('>',">"),K('?',"?"),KS(KEY_RSHIFT,"shift",2.5)}},
+	{9,{KS(KEY_LEFT,"",1),KS(KEY_DOWN,"",1),KS(KEY_UP,"",1),KS(KEY_RIGHT,"",1),KS(0,"",1),KS(KEY_SPACE," ",5),KS(0,"",1),KS(-2,"",2),KS(-1,"OK",2)}},
 };
 void soft_keyboard(rect r,int*exit,int*eval){
 	int y=r.y, kh=r.h/KROWS, sh=ev.shift^kc.lock^kc.shift;char*pal=patterns_pal(ifield(deck,"patterns"));
@@ -2395,17 +2311,17 @@ void soft_keyboard(rect r,int*exit,int*eval){
 			rect b={r.x+x+1,y,z==LCAPS[row].c-1?(r.w-x):(k.w*(r.w/w)),kh+1};x+=b.w-1;
 			draw_box(b,0,1);
 			int e=k.v==-2&&wid.f.style==field_code&&uimode==mode_interact;
-			if     (k.v==SDLK_LEFT )draw_iconc(b,ARROWS->lv[4],1);
-			else if(k.v==SDLK_DOWN )draw_iconc(b,ARROWS->lv[1],1);
-			else if(k.v==SDLK_UP   )draw_iconc(b,ARROWS->lv[0],1);
-			else if(k.v==SDLK_RIGHT)draw_iconc(b,ARROWS->lv[5],1);
+			if     (k.v==KEY_LEFT )draw_iconc(b,ARROWS->lv[4],1);
+			else if(k.v==KEY_DOWN )draw_iconc(b,ARROWS->lv[1],1);
+			else if(k.v==KEY_UP   )draw_iconc(b,ARROWS->lv[0],1);
+			else if(k.v==KEY_RIGHT)draw_iconc(b,ARROWS->lv[5],1);
 			else                    draw_textc(b,e?"run":k.l,FONT_MENU,1);
 			int kd=k.v>0&&k.v<4096&&keydown[k.v];b=inset(b,2);
 			int a=dover(b)&&over(inset(b,-4))&&ev.down_modal==ms.type&&ev.down_uimode==uimode&&ev.down_caps==1;if(k.v&&a&&(ev.md||ev.drag))kd=1;
 			if(k.v==-1){draw_box(b,0,13);if(ev.mu&&a)*exit=1;}
 			else if(e){if(ev.mu&a)*eval=1;}
-			else if(k.v==SDLK_LSHIFT||k.v==SDLK_RSHIFT){if(ev.mu&&a)kc.shift^=1;if(kc.shift)kd=1;}
-			else if(k.v==SDLK_CAPSLOCK){if(ev.mu&&a)kc.lock^=1;if(kc.lock)kd=1;}
+			else if(k.v==KEY_LSHIFT||k.v==KEY_RSHIFT){if(ev.mu&&a)kc.shift^=1;if(kc.shift)kd=1;}
+			else if(k.v==KEY_CAPSLOCK){if(ev.mu&&a)kc.lock^=1;if(kc.lock)kd=1;}
 			else if(ev.mu&&a&&k.v){
 				if((k.v>=' '&&k.v<='~')||k.v=='\n'){char t[4]={0};snprintf(t,4,"%c",k.v);field_input(t);}
 				else{field_keys(k.v,sh);}
@@ -2428,7 +2344,7 @@ void keycaps(void){
 	int exit=0, eval=0;
 	soft_keyboard(inset((rect){r.x,r.y+r.h+1,r.w-2,frame.size.y-(r.y+r.h)},5),&exit,&eval);
 	if(ms.type==modal_listen&&(eval||ev.eval))listener_eval();
-	if(ms.type!=modal_listen&&(eval||ev.eval))field_keys(SDLK_RETURN,1);
+	if(ms.type!=modal_listen&&(eval||ev.eval))field_keys(KEY_RETURN,1);
 	if(exit||ev.exit){
 		field_exit();wid.active=-1;
 		if(uimode==mode_script)close_script(NULL);
@@ -3101,18 +3017,18 @@ int prototype_size_editor(void){
 
 // Audio
 
+#define SFX_SLOTS 4
 typedef struct {lv*clip; Uint32 sample; float volume;}clip_state;
 clip_state audio_loop={0};lv*orig_loop=NULL;
 clip_state audio_slots[SFX_SLOTS]={{0}};
 float master_volume=1.0;
-SDL_AudioSpec audio;
 
 void sfx_install(lv*sfx,clip_state*target){
 	lv*c=lms(sfx->b->c);memcpy(c->sv,sfx->b->sv,c->c); // clone the buffer so it can't be rewritten during playback (!)
 	target->clip=c,target->sample=0,target->volume=1.0;
 }
 void sfx_doloop(int clear){
-	SDL_LockMutex(gil);
+	interpreter_lock();
 	lv*a=orig_loop?orig_loop:NONE,*b=lmblk(),*r=NONE;
 	blk_get(b,lmistr("loop")),blk_lit(b,l_list(a)),blk_op(b,CALL);
 	int pp=pending_popstate;fire_hunk_async(ifield(deck,"card"),b);
@@ -3121,7 +3037,7 @@ void sfx_doloop(int clear){
 	if(clear)n_play(NULL,lml2(NONE,lmistr("loop")));
 	n_play(NULL,lml2(r,lmistr("loop"))),msg.pending_loop=0;
 	lv*loop=audio_loop.clip;if(loop&&audio_loop.sample>=((Uint32)loop->c))audio_loop.sample=0;
-	SDL_UnlockMutex(gil);
+	interpreter_unlock();
 }
 void sfx_pump(void*user,Uint8*stream,int len){
 	if(msg.pending_loop)sfx_doloop(0);
@@ -3150,10 +3066,6 @@ void sfx_pump(void*user,Uint8*stream,int len){
 	}audio_playing=play;
 }
 int sfx_any(void){if(nosound)return 0;for(int z=0;z<SFX_SLOTS;z++)if(audio_slots[z].clip!=NULL)return 1;return 0;}
-void sfx_init(void){
-	audio.freq=SFX_RATE,audio.format=SFX_FORMAT,audio.channels=SFX_CHANNELS,audio.samples=(SFX_RATE/10),audio.callback=sfx_pump;
-	SDL_OpenAudio(&audio,NULL),SDL_PauseAudio(0);
-}
 lv* n_play(lv*self,lv*z){
 	if(z->c>1&&matchr(z->lv[1],lmistr("loop"))){
 		lv*x=l_first(z);if(lis(x))x=dget(ifield(deck,"sounds"),x);
@@ -3245,17 +3157,129 @@ void rtoolbar(pair pos,pair dn){
 
 // Input and Events
 
-Uint32 tick_pump(Uint32 interval,void*param){
-	SDL_Event e; SDL_UserEvent u;
-	u.type=e.type=SDL_USEREVENT;
-	u.data1=param;
-	e.user=u;
-	SDL_PushEvent(&e);
-	return interval;
+void event_quit(void){
+	if(lb(ifield(deck,"locked")))should_exit=1;
+	ev.shortcuts['q']=1;
 }
+void event_touch(void){
+	if(!set_touch)enable_touch=1;
+}
+void event_key(int c,int m,int down,const char*name){
+	int cmd=m&(KMOD_LCTRL|KMOD_RCTRL|KMOD_LGUI|KMOD_RGUI);
+	if(down){
+		if(c>0&&c<4096)keydown[c]=1;
+		if(c==KEY_LSHIFT||c==KEY_RSHIFT)ev.shift=1;
+		if(c==KEY_UP   )ev.dir=dir_up;
+		if(c==KEY_DOWN )ev.dir=dir_down;
+		if(c==KEY_LEFT )ev.dir=dir_left;
+		if(c==KEY_RIGHT)ev.dir=dir_right;
+		if(cmd){
+			ev.alt=1;
+			if(strlen(name)==1){char i=ev.shift?toupper(name[0]):tolower(name[0]);ev.shortcuts[0xFF&i]=1;}
+		}
+		else if(uimode==mode_draw&&ms.type==modal_none){
+			if(c==KEY_1)modal_enter(modal_pattern);
+			if(c==KEY_2)modal_enter(modal_fill);
+			if(c==KEY_3)modal_enter(modal_brush);
+			if(c==KEY_BACKSPACE||c==KEY_DELETE)bg_delete_selection();
+		}
+		else if(uimode==mode_object&&ms.type==modal_none){
+			if(c==KEY_BACKSPACE||c==KEY_DELETE)ob_destroy();
+			if(c==KEY_LEFTBRACKET)ob_move_dn();
+			if(c==KEY_RIGHTBRACKET)ob_move_up();
+		}
+		else if(ms.type==modal_recording&&!wid.infield&&au.mode==record_stopped){
+			if(c==KEY_BACKSPACE||c==KEY_DELETE)sound_delete();
+		}
+		if(c==KEY_RETURN)ev.action=1;
+		if     (wid.ingrid )grid_keys(c);
+		else if(wid.infield)field_keys(c,m&(KMOD_LSHIFT|KMOD_RSHIFT));
+		if(uimode==mode_script)sc.status[0]='\0';
+		if(c==KEY_SPACE&&!wid.infield)ev.action=1;
+		if(c==KEY_TAB   )ev.tab=1;
+		if(c==KEY_l&&ms.type==modal_none&&!wid.ingrid&&!wid.infield&&ev.shift)ev.shortcuts['l']=1;
+		if(c==KEY_j&&ms.type==modal_none&&!cmd&&dr.limbo_dither&&dither_threshold>-2.0)dither_threshold-=.1;
+		if(c==KEY_k&&ms.type==modal_none&&!cmd&&dr.limbo_dither&&dither_threshold< 2.0)dither_threshold+=.1;
+	}
+	else{
+		if(c>0&&c<4096)keydown[c]=0,keyup[c]=1;
+		if(c==KEY_LCTRL||c==KEY_RCTRL||c==KEY_LGUI||c==KEY_RGUI)ev.alt=0;
+		if(c==KEY_RETURN&&ev.shift)ev.eval=1;
+		if(c==KEY_LSHIFT||c==KEY_RSHIFT)ev.shift=0;
+		if(c==KEY_m&&uimode==mode_draw&&in_layer())ev.hidemenu^=1;
+		if(c==KEY_t&&uimode==mode_draw&&in_layer())dr.trans^=1;
+		if(c==KEY_u&&uimode==mode_draw&&in_layer())dr.under^=1;
+		if(c==KEY_y&&uimode==mode_draw&&in_layer())set_tracing=!tracing;
+		if(c==KEY_ESCAPE)ev.exit=1;
+		if(!wid.infield&&!wid.ingrid&&uimode==mode_interact&&card_is(con())){
+			if(c==KEY_UP   )msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("up");
+			if(c==KEY_DOWN )msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("down");
+			if(c==KEY_LEFT )msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("left");
+			if(c==KEY_RIGHT)msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("right");
+		}
+		if((uimode==mode_interact||uimode==mode_object||uimode==mode_draw)&&ms.type==modal_none&&!kc.on){
+			if(c==KEY_F1)setmode(mode_interact);
+			if(c==KEY_F2)setmode(mode_object);
+			int f[]={KEY_F3,KEY_F4,KEY_F5,KEY_F6,KEY_F7,KEY_F8,KEY_F9,KEY_F10,KEY_F11,KEY_F12};
+			for(int z=0;z<10;z++)if(c==f[z])settool(z);
+		}
+		if(uimode==mode_draw&&ms.type==modal_none){
+			int brush_count=24+dget(deck->b,lmistr("brushes"))->c;
+			if(c==KEY_9)dr.brush=MAX(            0,dr.brush-1);
+			if(c==KEY_0)dr.brush=MIN(brush_count-1,dr.brush+1);
+		}
+	}
+}
+void event_scroll(pair s){
+	ev.scroll=s.y<0?1:s.y>0?-1:0;
+}
+void event_pointer_move(pair raw,pair scaled){
+	if(!msg.pending_drag)pointer_prev=pointer;
+	ev.rawpos=raw;pointer=ev.pos=scaled;
+	if(pointer_held)msg.pending_drag=1;
+}
+void event_pointer_button(int primary,int down){
+	if(down){
+		ev.rawdpos=ev.rawpos;
+		pointer_held=ev.drag=1;pointer_start=ev.dpos=pointer;ev.md=1;ev.clicktime=10;
+		ev.down_modal=ms.type,ev.down_uimode=uimode,ev.down_caps=kc.on;
+		if(!primary)ev.rdown=1;
+	}
+	else{
+		pointer_held=ev.drag=0;pointer_end=pointer;ev.mu=1;
+		if(ev.clicktime)ev.click =1;ev.clicktime=0;
+		if(ev.clicklast)ev.dclick=1;ev.clicklast=DOUBLE_CLICK_DELAY;
+		if(!primary)ev.rup=1;
+	}
+}
+void event_file(char*p){
+	if(lb(ifield(deck,"locked")))return;
+	if(has_suffix(p,".html")||has_suffix(p,".deck")){
+		modal_enter(modal_resources);
+		ms.message=deck_get(n_read(NULL,l_list(lmcstr(p))));
+		ms.grid=(grid_val){res_enumerate(ms.message),0,-1,-1};
+	}
+	if(has_suffix(p,".gif"))import_image(p);
+	if(has_suffix(p,".jpeg")||has_suffix(p,".jpg"))import_image(p);
+	if(has_suffix(p,".png"))import_image(p);
+	if(has_suffix(p,".bmp"))import_image(p);
+	if(has_suffix(p,".wav")){
+		au.target=n_deck_add(deck,l_list(lmistr("sound")));mark_dirty();modal_enter(modal_recording);
+		sound_edit(n_readwav(NULL,l_list(lmutf8(p))));au.sel=(pair){0,0},au.head=0;
+	}
+	if(has_suffix(p,".csv")||has_suffix(p,".psv")){
+		setmode(mode_object);lv*a=lmd();
+		lv* dat=n_read(NULL,l_list(lmcstr(p)));
+		lv* sep=lmistr(has_suffix(p,".csv")?",": "|");
+		lv* arg=lml(3);arg->lv[0]=dat,arg->lv[1]=NONE,arg->lv[2]=sep;
+		dset(a,lmistr("type"),lmistr("grid"));
+		dset(a,lmistr("value"),l_cols(n_readcsv(NULL,arg)));
+		ob_create(l_list(a));
+	}
+}
+
 void sync(void){
-	pair disp={0,0};
-	SDL_GetWindowSize(win,&disp.x,&disp.y);
+	pair disp=window_get_size();
 	pair size=buff_size(context.buffer);
 	int scale=noscale?1: MIN(disp.x/size.x,disp.y/size.y);
 	ev.mu=ev.md=ev.click=ev.dclick=ev.tab=ev.action=ev.dir=ev.exit=ev.eval=ev.scroll=ev.rdown=ev.rup=0;
@@ -3265,169 +3289,38 @@ void sync(void){
 	wid.cursor_timer=(wid.cursor_timer+1)%(2*FIELD_CURSOR_DUTY);
 	if(wid.change_timer){wid.change_timer--;if(wid.change_timer==0)field_change();}
 	for(int z=0;z<256;z++)ev.shortcuts[z]=0;memset(keyup,0,sizeof(keyup));
-	SDL_Event e;
-	while(SDL_WaitEvent(&e)){
-		if(e.type==SDL_QUIT){if(lb(ifield(deck,"locked")))should_exit=1;ev.shortcuts['q']=1;}
-		if(e.type==SDL_USEREVENT)break;
-		if(e.type==SDL_TEXTINPUT&&wid.infield)field_input(e.text.text);
-		if(e.type==SDL_KEYDOWN){
-			int c=e.key.keysym.sym, m=e.key.keysym.mod, cmd=m&(KMOD_LCTRL|KMOD_RCTRL|KMOD_LGUI|KMOD_RGUI);
-			if(c>0&&c<4096)keydown[c]=1;
-			if(c==SDLK_LSHIFT||c==SDLK_RSHIFT)ev.shift=1;
-			if(c==SDLK_UP   )ev.dir=dir_up;
-			if(c==SDLK_DOWN )ev.dir=dir_down;
-			if(c==SDLK_LEFT )ev.dir=dir_left;
-			if(c==SDLK_RIGHT)ev.dir=dir_right;
-			if(cmd){
-				ev.alt=1;
-				const char*n=SDL_GetKeyName(c);
-				if(strlen(n)==1){char i=ev.shift?toupper(n[0]):tolower(n[0]);ev.shortcuts[0xFF&i]=1;}
-			}
-			else if(uimode==mode_draw&&ms.type==modal_none){
-				if(c==SDLK_1)modal_enter(modal_pattern);
-				if(c==SDLK_2)modal_enter(modal_fill);
-				if(c==SDLK_3)modal_enter(modal_brush);
-				if(c==SDLK_BACKSPACE||c==SDLK_DELETE)bg_delete_selection();
-			}
-			else if(uimode==mode_object&&ms.type==modal_none){
-				if(c==SDLK_BACKSPACE||c==SDLK_DELETE)ob_destroy();
-				if(c==SDLK_LEFTBRACKET)ob_move_dn();
-				if(c==SDLK_RIGHTBRACKET)ob_move_up();
-			}
-			else if(ms.type==modal_recording&&!wid.infield&&au.mode==record_stopped){
-				if(c==SDLK_BACKSPACE||c==SDLK_DELETE)sound_delete();
-			}
-			if(c==SDLK_RETURN)ev.action=1;
-			if     (wid.ingrid )grid_keys(c);
-			else if(wid.infield)field_keys(c,m&(KMOD_LSHIFT|KMOD_RSHIFT));
-			if(uimode==mode_script)sc.status[0]='\0';
-			if(c==SDLK_SPACE&&!wid.infield)ev.action=1;
-			if(c==SDLK_TAB   )ev.tab=1;
-			if(c==SDLK_l&&ms.type==modal_none&&!wid.ingrid&&!wid.infield&&ev.shift)ev.shortcuts['l']=1;
-			if(c==SDLK_j&&ms.type==modal_none&&!cmd&&dr.limbo_dither&&dither_threshold>-2.0)dither_threshold-=.1;
-			if(c==SDLK_k&&ms.type==modal_none&&!cmd&&dr.limbo_dither&&dither_threshold< 2.0)dither_threshold+=.1;
-		}
-		if(e.type==SDL_KEYUP){
-			int c=e.key.keysym.sym;
-			if(c>0&&c<4096)keydown[c]=0,keyup[c]=1;
-			if(c==SDLK_LCTRL||c==SDLK_RCTRL||c==SDLK_LGUI||c==SDLK_RGUI)ev.alt=0;
-			if(c==SDLK_RETURN&&ev.shift)ev.eval=1;
-			if(c==SDLK_LSHIFT||c==SDLK_RSHIFT)ev.shift=0;
-			if(c==SDLK_m&&uimode==mode_draw&&in_layer())ev.hidemenu^=1;
-			if(c==SDLK_t&&uimode==mode_draw&&in_layer())dr.trans^=1;
-			if(c==SDLK_u&&uimode==mode_draw&&in_layer())dr.under^=1;
-			if(c==SDLK_y&&uimode==mode_draw&&in_layer())set_tracing=!tracing;
-			if(c==SDLK_ESCAPE)ev.exit=1;
-			if(!wid.infield&&!wid.ingrid&&uimode==mode_interact&&card_is(con())){
-				if(c==SDLK_UP   )msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("up");
-				if(c==SDLK_DOWN )msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("down");
-				if(c==SDLK_LEFT )msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("left");
-				if(c==SDLK_RIGHT)msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("right");
-			}
-			if((uimode==mode_interact||uimode==mode_object||uimode==mode_draw)&&ms.type==modal_none&&!kc.on){
-				if(c==SDLK_F1)setmode(mode_interact);
-				if(c==SDLK_F2)setmode(mode_object);
-				int f[]={SDLK_F3,SDLK_F4,SDLK_F5,SDLK_F6,SDLK_F7,SDLK_F8,SDLK_F9,SDLK_F10,SDLK_F11,SDLK_F12};
-				for(int z=0;z<10;z++)if(c==f[z])settool(z);
-			}
-			if(uimode==mode_draw&&ms.type==modal_none){
-				int brush_count=24+dget(deck->b,lmistr("brushes"))->c;
-				if(c==SDLK_9)dr.brush=MAX(            0,dr.brush-1);
-				if(c==SDLK_0)dr.brush=MIN(brush_count-1,dr.brush+1);
-			}
-		}
-		if(e.type==SDL_MOUSEMOTION){
-			pair b={(disp.x-(size.x*scale))/2,(disp.y-(size.y*scale))/2};
-			if(!msg.pending_drag)pointer_prev=pointer;
-			ev.rawpos=(pair){e.motion.x,e.motion.y};
-			pointer=ev.pos=(pair){(e.motion.x-b.x)/scale,(e.motion.y-b.y)/scale};
-			if(pointer_held)msg.pending_drag=1;
-		}
-		if(e.type==SDL_MOUSEWHEEL     ){ev.scroll=e.wheel.y<0?1:e.wheel.y>0?-1:0;}
-		if(e.type==SDL_MOUSEBUTTONUP  ){
-			pointer_held=ev.drag=0;pointer_end=pointer;ev.mu=1;
-			if(ev.clicktime)ev.click =1;ev.clicktime=0;
-			if(ev.clicklast)ev.dclick=1;ev.clicklast=DOUBLE_CLICK_DELAY;
-			if(e.button.button!=SDL_BUTTON_LEFT)ev.rup=1;
-		}
-		if(e.type==SDL_MOUSEBUTTONDOWN){
-			ev.rawdpos=ev.rawpos;
-			pointer_held=ev.drag=1;pointer_start=ev.dpos=pointer;ev.md=1;ev.clicktime=10;
-			ev.down_modal=ms.type,ev.down_uimode=uimode,ev.down_caps=kc.on;
-			if(e.button.button!=SDL_BUTTON_LEFT)ev.rdown=1;
-		}
-		if(e.type==SDL_FINGERDOWN){if(!set_touch)enable_touch=1;}
-		if(e.type==SDL_DROPFILE&&!lb(ifield(deck,"locked"))){
-			char*p=e.drop.file;
-			if(has_suffix(p,".html")||has_suffix(p,".deck")){
-				modal_enter(modal_resources);
-				ms.message=deck_get(n_read(NULL,l_list(lmcstr(p))));
-				ms.grid=(grid_val){res_enumerate(ms.message),0,-1,-1};
-			}
-			if(has_suffix(p,".gif"))import_image(p);
-			if(has_suffix(p,".jpeg")||has_suffix(p,".jpg"))import_image(p);
-			if(has_suffix(p,".png"))import_image(p);
-			if(has_suffix(p,".bmp"))import_image(p);
-			if(has_suffix(p,".wav")){
-				au.target=n_deck_add(deck,l_list(lmistr("sound")));mark_dirty();modal_enter(modal_recording);
-				sound_edit(n_readwav(NULL,l_list(lmutf8(p))));au.sel=(pair){0,0},au.head=0;
-			}
-			if(has_suffix(p,".csv")||has_suffix(p,".psv")){
-				setmode(mode_object);lv*a=lmd();
-				lv* dat=n_read(NULL,l_list(lmcstr(p)));
-				lv* sep=lmistr(has_suffix(p,".csv")?",": "|");
-				lv* arg=lml(3);arg->lv[0]=dat,arg->lv[1]=NONE,arg->lv[2]=sep;
-				dset(a,lmistr("type"),lmistr("grid"));
-				dset(a,lmistr("value"),l_cols(n_readcsv(NULL,arg)));
-				ob_create(l_list(a));
-			}
-			SDL_free(e.drop.file);
-		}
-	}
+	process_events(disp,size,scale);
 	pointer_down=ev.md,pointer_up=ev.mu;
-	SDL_FlushEvent(SDL_USEREVENT);
-	if(toggle_fullscreen){
-		toggle_fullscreen=0;
-		windowed=!windowed;
-		SDL_SetWindowFullscreen(win,windowed?0:SDL_WINDOW_FULLSCREEN_DESKTOP);
-	}
+	if(toggle_fullscreen){toggle_fullscreen=0;windowed=!windowed;window_set_fullscreen(!windowed);}
 	if(!windowed||uimode!=mode_draw)set_tracing=0;
-	if(set_tracing!=tracing){tracing=set_tracing,SDL_SetWindowOpacity(win,tracing?0.7:1.0);}
-	pair tsize=buff_size(TOOLB);int dpi=1,tscale=MIN((disp.x-scale*size.x)/(2*tsize.x),disp.y/tsize.y),tmscale=tscale;if(tscale&&noscale)tscale=tmscale=1;
-	#if SDL_VERSION_ATLEAST(2,26,0)
-		pair disp_pixels={0,0};SDL_GetWindowSizeInPixels(win,&disp_pixels.x,&disp_pixels.y);
-		if(disp_pixels.x>disp.x){int s=disp_pixels.x/disp.x;disp.x*=s,disp.y*=s,scale*=s,tscale*=s,dpi=s;}
-	#endif
+	if(set_tracing!=tracing){tracing=set_tracing,window_set_opacity(tracing?0.7:1.0);}
+	pair tsize=buff_size(TOOLB);
+	int tscale=MIN((disp.x-scale*size.x)/(2*tsize.x),disp.y/tsize.y),tmscale=tscale;if(tscale&&noscale)tscale=tmscale=1;
+	int dpi=get_display_density(disp);disp.x*=dpi,disp.y*=dpi,scale*=dpi,tscale*=dpi;
 	pick_palette(deck);
-	if(framebuffer_flip(disp,size,scale)){
-		int*p, pitch;
+	if(framebuffer_flip(disp,size,scale,dr.trans_mask&&uimode==mode_draw,dr.show_anim?frame_count:0,patterns_pal(ifield(deck,"patterns")),context.buffer)){
+		char*pal=patterns_pal(ifield(deck,"patterns"));
 		int showwings=!kc.on&&toolbars_enable&&tscale>0&&!(lb(ifield(deck,"locked")))&&ms.type==modal_none&&uimode!=mode_script;
 		if(showwings){
-			SDL_Rect src={0,0,tsize.x,tsize.y},dst={0,(disp.y-tscale*tsize.y)/2,tscale*tsize.x,tscale*tsize.y};
+			rect dst={0,(disp.y-tscale*tsize.y)/2,tscale*tsize.x,tscale*tsize.y};
 			ltoolbar(
 				(pair){(ev.rawpos .x-dst.x/dpi)/tmscale,(ev.rawpos .y-dst.y/dpi)/tmscale},
 				(pair){(ev.rawdpos.x-dst.x/dpi)/tmscale,(ev.rawdpos.y-dst.y/dpi)/tmscale}
 			);
-			SDL_LockTexture(gtool,NULL,(void**)&p,&pitch);
-			draw_frame(patterns_pal(ifield(deck,"patterns")),TOOLB,p,pitch,dr.show_anim?frame_count:0,0);
-			SDL_UnlockTexture(gtool);
-			SDL_RenderCopy(ren,gtool,&src,&dst);
+			toolbar_flip(TOOLB,dr.show_anim?frame_count:0,pal,dst);
 		}
 		if(showwings){
-			SDL_Rect src={0,0,tsize.x,tsize.y},dst={disp.x-tscale*tsize.x,(disp.y-tscale*tsize.y)/2,tscale*tsize.x,tscale*tsize.y};
+			rect dst={disp.x-tscale*tsize.x,(disp.y-tscale*tsize.y)/2,tscale*tsize.x,tscale*tsize.y};
 			rtoolbar(
 				(pair){(ev.rawpos .x-dst.x/dpi)/tmscale,(ev.rawpos .y-dst.y/dpi)/tmscale},
 				(pair){(ev.rawdpos.x-dst.x/dpi)/tmscale,(ev.rawdpos.y-dst.y/dpi)/tmscale}
 			);
 			int animate=box_in((rect){dst.x,dst.y,dst.w,dst.h},(pair){ev.rawpos.x*dpi,ev.rawpos.y*dpi})&&dr.show_anim?frame_count:0;
-			SDL_LockTexture(gtool,NULL,(void**)&p,&pitch);
-			draw_frame(patterns_pal(ifield(deck,"patterns")),TOOLB,p,pitch,animate,0);
-			SDL_UnlockTexture(gtool);
-			SDL_RenderCopy(ren,gtool,&src,&dst);
+			toolbar_flip(TOOLB,animate,pal,dst);
 		}
-		SDL_RenderPresent(ren);
+		finish_flip();
 	}
-	SDL_SetCursor(CURSORS[uicursor]);
+	window_set_cursor(uicursor);
 	if(do_panic)setmode(mode_object);
 	do_panic=0;
 }
@@ -3529,7 +3422,7 @@ void text_edit_menu(void){
 	if(menu_item("Undo",wid.hist_cursor>0          ,'z'))field_undo();
 	if(menu_item("Redo",wid.hist_cursor<wid.hist->c,'Z'))field_redo();
 	menu_separator();
-	if(menu_item("Cut",selection,'x')){set_clip(rtext_string(wid.fv->table,wid.cursor));field_keys(SDLK_DELETE,0);}
+	if(menu_item("Cut",selection,'x')){set_clip(rtext_string(wid.fv->table,wid.cursor));field_keys(KEY_DELETE,0);}
 	if(menu_item("Copy",selection,'c')){
 		lv*s=rtext_span(wid.fv->table,wid.cursor),*i=rtext_is_image(s);
 		set_clip((i?image_write(i):rtext_all(s)));
@@ -3540,7 +3433,7 @@ void text_edit_menu(void){
 	else if((!has_clip("%%RTX")||!rich)&&menu_item("Paste",wid.fv!=NULL&&strlen(clip_stash),'v')){
 		field_input(has_clip("%%RTX")?rtext_all(rtext_decode(get_clip()))->sv:get_clip()->sv);
 	}
-	if(menu_item("Clear",wid.fv!=NULL,0)){wid.cursor=(pair){0,RTEXT_END};field_keys(SDLK_DELETE,0);}
+	if(menu_item("Clear",wid.fv!=NULL,0)){wid.cursor=(pair){0,RTEXT_END};field_keys(KEY_DELETE,0);}
 	menu_separator();
 	if(menu_item("Select All",wid.fv!=NULL,'a')){wid.cursor=(pair){0,RTEXT_END};}
 }
@@ -4009,7 +3902,7 @@ lv* modal_track(modal_state*m){
 	return r;
 }
 void tick(lv*env){
-	SDL_LockMutex(gil);
+	interpreter_lock();
 	msg.pending_drag=0,msg.pending_halt=0;
 	if(dirty&&dirty_timer>0&&!running()&&autosave&&strlen(document_path)){
 		dirty_timer--;
@@ -4076,7 +3969,7 @@ void tick(lv*env){
 	track(audio_loop.clip)
 	track(orig_loop)
 	lv_collect();
-	SDL_UnlockMutex(gil);
+	interpreter_unlock();
 }
 
 void quit(void){
@@ -4097,19 +3990,12 @@ void save_deck(lv*path){
 }
 void resize_window(lv*deck){
 	lv*card=ifield(deck,"card");
-	pair size=getpair(ifield(card,"size"));
+	pair size=getpair(ifield(card,"size")), dis=get_display_size();
 	context=draw_buffer(lmbuff(size));
 	dset(env,lmistr("buff"),context.buffer);
-	#define serr(x) {if(x==NULL)printf("SDL error: %s\n",SDL_GetError()),exit(1);}
-	SDL_DisplayMode dis;SDL_GetDesktopDisplayMode(0,&dis);
-	int minscale=noscale?1: (size.x*2<=dis.w&&size.y*2<=dis.h)?2:1;
-	if(win){SDL_SetWindowSize(win,(size.x+(toolbars_enable?4+2*buff_size(TOOLB).x:0))*minscale,size.y*minscale+(toolbars_enable?4:0)),SDL_DestroyTexture(gfx);}
-	else{
-		win=SDL_CreateWindow("Decker",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,size.x*minscale,size.y*minscale,SDL_WINDOW_SHOWN|SDL_WINDOW_ALLOW_HIGHDPI);serr(win);
-		ren=SDL_CreateRenderer(win,-1,SDL_RENDERER_SOFTWARE);serr(ren);
-	}
-	framebuffer_alloc(size,minscale);
-	SDL_SetWindowPosition(win,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED);
+	int minscale=noscale?1: (size.x*2<=dis.x&&size.y*2<=dis.y)?2:1;
+	pair wsize={(size.x+(toolbars_enable?4+2*buff_size(TOOLB).x:0))*minscale,size.y*minscale+(toolbars_enable?4:0)};
+	window_set_size(wsize,size,minscale);
 }
 void load_deck(lv*d){
 	dirty=0; wid.active=-1; dr=ddr; con_set(NULL);
@@ -4122,7 +4008,6 @@ void load_deck(lv*d){
 	FONT_MENU=dget(fonts,lmistr("menu"));
 	FONT_MONO=dget(fonts,lmistr("mono"));
 	resize_window(deck);
-	if(!gtool){pair s=buff_size(TOOLB);gtool=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,s.x,s.y);}
 	time_t now;time(&now);seed=0xFFFFFFFF&now;
 	validate_modules();
 	setmode(mode_interact);n_play(NULL,lml2(NONE,lmistr("loop")));msg.next_view=1;
@@ -4135,7 +4020,7 @@ int main(int argc,char**argv){
 		if(!strcmp("--fullscreen" ,argv[z])){toggle_fullscreen=1;continue;}
 		file=argv[z],set_path(argv[z]);
 	}
-	init_interns();gil=SDL_CreateMutex();
+	init_interns();
 	if(file){directory_normalize(ms.path,file),directory_parent(ms.path);}else{directory_home(ms.path);}
 	env=lmenv(NULL);init(env);
 	{lv*i=image_read(lmcstr(TOOL_ICONS ));TOOLS =lml(12);EACH(z,TOOLS )TOOLS ->lv[z]=image_make(buffer_copy(i->b,(rect){0,z*16,16,16}));}
@@ -4180,20 +4065,16 @@ int main(int argc,char**argv){
 	dset(env,lmistr("viewed"   ),viewed    =lmd());
 	ob.sel=lml(0);
 
-	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK | (nosound?0:SDL_INIT_AUDIO));
-	CURSORS[0]=SDL_GetDefaultCursor();
-	CURSORS[1]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
-	CURSORS[2]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
-	CURSORS[3]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
+	io_init();
 
 	if(file){load_deck(deck_get(n_read(NULL,l_list(lmcstr(file))))),set_path(file);}
-	char*base=SDL_GetBasePath();struct stat buffer;if(!deck&&base){
+	char base[PATH_MAX];base_path(base);
+	struct stat buffer;if(!deck&&base[0]){
 		char p[PATH_MAX];snprintf(p,sizeof(p),"%s/start.deck",base);
 		if(stat(p,&buffer)==0)load_deck(deck_get(n_read(NULL,l_list(lmcstr(p))))),set_path(p);
 	}
-	if(base)SDL_free(base);
 	if(!deck){str doc=str_new();str_add(&doc,(char*)examples_decks_tour_deck,examples_decks_tour_deck_len);load_deck(deck_get(lmstr(doc)));}
-	SDL_AddTimer((1000/60),tick_pump,NULL);if(!nosound)sfx_init();
-	while(!should_exit){tick(env);sync();}
+
+	io_run(env);
 	return 0;
 }
