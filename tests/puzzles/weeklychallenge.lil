@@ -24,6 +24,29 @@ on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 
 # the problems:
 
+problem[275.1]
+# how many words in a sentence x can be typed with broken keyboard keys y?
+on f x y do
+ sum each w in " " split "%l" format x !max y in w end
+end
+assert[f["Perl Weekly Challenge"    ("l","a" )] 0]
+assert[f["Perl and Raku"            (list "a")] 1]
+assert[f["Well done Team PWC"       ("l","o") ] 2]
+assert[f["The joys of polyglottism" (list "t")] 2]
+
+problem[275.2]
+# replace each digit in the given string with the value of the previous letter plus (digit) places.
+on f x do
+ local l:0
+ "" fuse each c in x
+  if c like "#" "%a" format c+"%a" parse l else l:c end
+ end
+end
+assert[f["a1c1e1"  ] "abcdef"  ]
+assert[f["a1b2c3d4"] "abbdcfdh"]
+assert[f["b2b"     ] "bdb"     ]
+assert[f["a16z"    ] "abgz"    ]
+
 problem[273.1]
 # return the percentage (nearest whole) of a given character in x
 # this one's slightly tricky because lil doesn't have a 'round' primitive:
