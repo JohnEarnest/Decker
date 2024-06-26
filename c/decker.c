@@ -101,10 +101,10 @@ typedef struct {
 	int show_grid, snap; pair grid_size;
 	rect sel_here, sel_start; lv*limbo; int limbo_dither;
 	lv* scratch, *mask, *omask;
-	int pickfill;
+	int pickfill, zoom;
 } draw_state;
-draw_state ddr={tool_pencil,3,1,0,0, 1,1,0,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0};
-draw_state dr ={tool_pencil,3,1,0,0, 1,1,0,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0};
+draw_state ddr={tool_pencil,3,1,0,0, 1,1,0,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0, 8};
+draw_state dr ={tool_pencil,3,1,0,0, 1,1,0,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0, 8};
 int bg_pat(void){return dr.trans_mask&&dr.pattern==0?32:dr.pattern;}
 int bg_fill(void){return dr.trans_mask&&dr.fill==0?32:dr.fill;}
 int bg_has_sel(void){return dr.tool==tool_select&&(dr.sel_here.w>0||dr.sel_here.h>0);}
@@ -130,7 +130,7 @@ lv* con_wids(void){return ivalue(con(),"widgets");}
 lv* con_image(void){return ifield(con(),"image");}
 pair con_size(void){return getpair(ifield(con(),"size"));}
 rect con_dim(void){return rect_pair((pair){0,0},con_size());}
-#define FAT 8
+#define FAT (dr.zoom)
 rect con_clip(void){
 	pair size=con_size();
 	if(dr.fatbits)return box_center(frame.clip,pair_min(frame.size,(pair){size.x*FAT,size.y*FAT}));
@@ -1890,7 +1890,7 @@ void modals(void){
 		if(ev.dir&&dr.color&&*v>=2)*v=*v+31;
 	}
 	else if(ms.type==modal_grid){
-		rect b=draw_modalbox((pair){120,100});
+		rect b=draw_modalbox((pair){120,160});
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Grid Size",FONT_MENU,1);
 		draw_text((rect){b.x,b.y+22,42,20},"Width" ,FONT_MENU,1);
 		draw_text((rect){b.x,b.y+42,42,20},"Height",FONT_MENU,1);
@@ -1898,6 +1898,11 @@ void modals(void){
 		ui_field((rect){b.x+42,b.y+40,b.w-42,18},&ms.text);
 		dr.grid_size.x=ln(rtext_all(ms.name.table));dr.grid_size.x=MAX(1,dr.grid_size.x);
 		dr.grid_size.y=ln(rtext_all(ms.text.table));dr.grid_size.y=MAX(1,dr.grid_size.y);
+		pair zc={b.x,b.y+70};draw_hline(b.x,b.x+b.w,zc.y-5,13);
+		draw_textc((rect){zc.x,zc.y,b.w,20},"FatBits Scale",FONT_MENU,1);zc.y+=20;
+		if(ui_radio((rect){zc.x,zc.y,b.w,16},"2x",1,dr.zoom==2)){dr.zoom=2;}zc.y+=16;
+		if(ui_radio((rect){zc.x,zc.y,b.w,16},"4x",1,dr.zoom==4)){dr.zoom=4;}zc.y+=16;
+		if(ui_radio((rect){zc.x,zc.y,b.w,16},"8x",1,dr.zoom==8)){dr.zoom=8;}zc.y+=16;
 		pair c={b.x,b.y+b.h-20};
 		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
@@ -3726,7 +3731,7 @@ void all_menus(void){
 		menu_separator();
 		if(menu_check("Show Grid Overlay",1,dr.show_grid,0  ))dr.show_grid^=1;
 		if(menu_check("Snap to Grid"     ,1,dr.snap     ,'p'))dr.snap     ^=1;
-		if(menu_item("Grid Size...",1,'\0'))modal_enter(modal_grid);
+		if(menu_item("Grid and Scale..." ,1,'\0'))modal_enter(modal_grid);
 		menu_separator();
 		if(menu_check("Show Animation"   ,1,dr.show_anim   ,0))dr.show_anim   ^=1;
 		if(menu_check("Transparency Mask",1,dr.trans_mask  ,0))dr.trans_mask  ^=1;

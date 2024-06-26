@@ -412,14 +412,13 @@ con_wids=_=>con().widgets
 con_image=_=>ifield(con(),'image')
 con_size=_=>getpair(ifield(con(),'size'))
 con_dim=_=>rpair(rect(),con_size())
-const FAT=8
-con_clip=_=>{const size=con_size();return dr.fatbits?rcenter(frame.clip,rmin(frame.size,rmul(size,FAT))): rclip(frame.clip,rcenter(frame.clip,size))}
+con_clip=_=>{const size=con_size();return dr.fatbits?rcenter(frame.clip,rmin(frame.size,rmul(size,dr.zoom))): rclip(frame.clip,rcenter(frame.clip,size))}
 con_offset=_=>{const r=con_clip();return rect(r.x,r.y)}
-con_to_screen=a=>radd(dr.fatbits?rmul(rsub(a,dr.offset),FAT):a,con_offset())
-screen_to_con=a=>{a=rsub(a,con_offset());return dr.fatbits?radd(rdiv(a,FAT),dr.offset):a}
+con_to_screen=a=>radd(dr.fatbits?rmul(rsub(a,dr.offset),dr.zoom):a,con_offset())
+screen_to_con=a=>{a=rsub(a,con_offset());return dr.fatbits?radd(rdiv(a,dr.zoom),dr.offset):a}
 con_view_dim=_=>{const a=screen_to_con(rect(0,0)),b=screen_to_con(frame.size);return rpair(a,rsub(b,a))}
-clamp_fatbits=_=>{dr.offset=rclamp(rect(0,0),dr.offset,rmax(rsub(con_size(),rdiv(frame.size,FAT)),rect(0,0)))}
-center_fatbits=p=>{dr.offset=rsub(p,rdiv(rdiv(frame.size,FAT),2)),clamp_fatbits()}
+clamp_fatbits=_=>{dr.offset=rclamp(rect(0,0),dr.offset,rmax(rsub(con_size(),rdiv(frame.size,dr.zoom)),rect(0,0)))}
+center_fatbits=p=>{dr.offset=rsub(p,rdiv(rdiv(frame.size,dr.zoom),2)),clamp_fatbits()}
 ev_to_con=e=>{e.pos=screen_to_con(e.opos=rcopy(e.pos)),e.dpos=screen_to_con(e.odpos=rcopy(e.dpos)),pointer.prev=screen_to_con(pointer.prev);return e}
 con_to_ev=e=>{e.pos=e.opos,e.dpos=e.odpos,pointer.prev=con_to_screen(pointer.prev);return e}
 tracking=_=>{
@@ -509,7 +508,7 @@ draw_state=_=>({ // drawing tools state
 	tool:'pencil',brush:3,pattern:1,fill:0,erasing:0, dither_threshold:0,
 	show_widgets:1,show_anim:1,trans:0,trans_mask:0,under:0,color:0,fatbits:0,offset:rect(),
 	show_grid:0,snap:0,grid_size:rect(16,16), sel_here:rect(),sel_start:rect(),limbo:null,limbo_dither:0,
-	scratch:null,mask:null,omask:null, pickfill:0, poly:[]
+	scratch:null,mask:null,omask:null, pickfill:0, poly:[], zoom:8,
 })
 let dr=draw_state()
 settool=tool=>{setmode('draw'),dr.tool=tool}
@@ -1916,7 +1915,7 @@ modals=_=>{
 		if(ev.dir&&dr.color&&getv()>=2)setv(getv()+31)
 	}
 	else if(ms.type=='grid'){
-		const b=draw_modalbox(rect(120,100))
+		const b=draw_modalbox(rect(120,160))
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Grid Size',FONT_MENU,1)
 		draw_text(rect(b.x,b.y+22,42,20),'Width' ,FONT_MENU,1)
 		draw_text(rect(b.x,b.y+42,42,20),'Height',FONT_MENU,1)
@@ -1924,6 +1923,11 @@ modals=_=>{
 		ui_field(rect(b.x+42,b.y+40,b.w-42,18),ms.text)
 		dr.grid_size.x=ln(rtext_string(ms.name.table)),dr.grid_size.x=0|max(1,dr.grid_size.x)
 		dr.grid_size.y=ln(rtext_string(ms.text.table)),dr.grid_size.y=0|max(1,dr.grid_size.y)
+		const zc=rect(b.x,b.y+70);draw_hline(b.x,b.x+b.w,zc.y-5,13)
+		draw_textc(rect(zc.x,zc.y,b.w,20),'FatBits Scale',FONT_MENU,1),zc.y+=20
+		if(ui_radio(rect(zc.x,zc.y,b.w,16),'2x',1,dr.zoom==2))dr.zoom=2;zc.y+=16
+		if(ui_radio(rect(zc.x,zc.y,b.w,16),'4x',1,dr.zoom==4))dr.zoom=4;zc.y+=16
+		if(ui_radio(rect(zc.x,zc.y,b.w,16),'8x',1,dr.zoom==8))dr.zoom=8;zc.y+=16
 		const c=rect(b.x,b.y+b.h-20)
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
@@ -2317,7 +2321,7 @@ bg_edit=_=>{
 draw_limbo=(clip,scale)=>{
 	clip=rnorm(clip);if(!dr.limbo){/*nothing*/}
 	else if(scale&&dr.limbo_dither){draw_rect      (clip,21)}
-	else if(scale                 ){draw_fat_scaled(screen_to_con(clip),dr.limbo,!dr.trans,deck.patterns.pal.pix,frame_count,FAT,con_to_screen(rect(0,0)))}
+	else if(scale                 ){draw_fat_scaled(screen_to_con(clip),dr.limbo,!dr.trans,deck.patterns.pal.pix,frame_count,dr.zoom,con_to_screen(rect(0,0)))}
 	else if(       dr.limbo_dither){draw_dithered  (clip,dr.limbo,!dr.trans,dr.omask,dr.dither_threshold)}
 	else                           {draw_scaled    (clip,dr.limbo,!dr.trans)}
 }
@@ -2355,20 +2359,20 @@ bg_lasso_preview=_=>{
 	const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
 	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
 		if(!dr.omask.pix[b+a*o.w])continue
-		draw_rect(radd(rmul(rect(b+o.x,a+o.y,1,1),FAT),origin),dr.fill)
+		draw_rect(radd(rmul(rect(b+o.x,a+o.y,1,1),dr.zoom),origin),dr.fill)
 	}
 	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
 		if(!dr.mask.pix[b+a*r.w])continue
 		const v=dr.limbo.pix[b+a*r.w],c=anim_pattern(v,r.x+b,r.y+a),pat=draw_pattern(c,r.x+b,r.y+a)
-		if(c||!dr.trans)draw_rect(radd(rmul(rect(b+r.x,a+r.y,1,1),FAT),origin),c>=32?c: c==0?c: pat?1:32)
+		if(c||!dr.trans)draw_rect(radd(rmul(rect(b+r.x,a+r.y,1,1),dr.zoom),origin),c>=32?c: c==0?c: pat?1:32)
 	}
 	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
 		if((0xFF&dr.mask.pix[b+a*r.w])!=ANTS)continue
-		const p=radd(rmul(rect(b+r.x,a+r.y),FAT),origin)
-		if(b<=    0||!dr.mask.pix[(b-1)+a*r.w])draw_vline(p.x      ,p.y,p.y+FAT-1,ANTS)
-		if(b>=r.w-1||!dr.mask.pix[(b+1)+a*r.w])draw_vline(p.x+FAT-1,p.y,p.y+FAT-1,ANTS)
-		if(a<=    0||!dr.mask.pix[b+(a-1)*r.w])draw_hline(p.x,p.x+FAT-1,p.y      ,ANTS)
-		if(a>=r.h-1||!dr.mask.pix[b+(a+1)*r.w])draw_hline(p.x,p.x+FAT-1,p.y+FAT-1,ANTS)
+		const p=radd(rmul(rect(b+r.x,a+r.y),dr.zoom),origin)
+		if(b<=    0||!dr.mask.pix[(b-1)+a*r.w])draw_vline(p.x              ,p.y,p.y+dr.zoom-1,ANTS)
+		if(b>=r.w-1||!dr.mask.pix[(b+1)+a*r.w])draw_vline(p.x    +dr.zoom-1,p.y,p.y+dr.zoom-1,ANTS)
+		if(a<=    0||!dr.mask.pix[b+(a-1)*r.w])draw_hline(p.x,p.x+dr.zoom-1,p.y              ,ANTS)
+		if(a>=r.h-1||!dr.mask.pix[b+(a+1)*r.w])draw_hline(p.x,p.x+dr.zoom-1,p.y    +dr.zoom-1,ANTS)
 	}
 }
 bg_tools=_=>{
@@ -2411,7 +2415,7 @@ bg_tools=_=>{
 			bg_scratch_under(),frame=t;if(ev.mu)bg_edit(),clear=1
 		}
 		if(dr.scratch){
-			if(dr.fatbits){draw_fat(con_clip(),dr.scratch,deck.patterns.pal.pix,frame_count,BG_MASK,FAT,dr.offset)}
+			if(dr.fatbits){draw_fat(con_clip(),dr.scratch,deck.patterns.pal.pix,frame_count,BG_MASK,dr.zoom,dr.offset)}
 			else{image_overlay(frame.image,dr.scratch,BG_MASK,con_offset());}
 		}
 		if(clear)bg_scratch_clear()
@@ -3252,7 +3256,7 @@ all_menus=_=>{
 		menu_separator()
 		if(menu_check('Show Grid Overlay',1,dr.show_grid))dr.show_grid^=1
 		if(menu_check('Snap to Grid'     ,1,dr.snap     ))dr.snap     ^=1
-		if(menu_item('Grid Size...',1))modal_enter('grid')
+		if(menu_item('Grid and Scale...',1))modal_enter('grid')
 		menu_separator()
 		if(menu_check('Show Animation'   ,1,dr.show_anim ))dr.show_anim ^=1
 		if(menu_check('Transparency Mask',1,dr.trans_mask))dr.trans_mask^=1
@@ -3325,7 +3329,7 @@ main_view=_=>{
 	if(ms.type!='trans'){
 		const cl=con_clip(),s=con_size()
 		if(back.size.x!=s.x||back.size.y!=s.y)image_resize(back,s),mark_dirty()
-		if(dr.fatbits){frame.image.pix.fill(46),draw_rect(cl,dr.trans_mask?45:32),draw_fat(cl,back,pal,frame_count,0,FAT,dr.offset)}
+		if(dr.fatbits){frame.image.pix.fill(46),draw_rect(cl,dr.trans_mask?45:32),draw_fat(cl,back,pal,frame_count,0,dr.zoom,dr.offset)}
 		else if(s.x==frame.size.x&&s.y==frame.size.y){for(let z=0;z<back.pix.length;z++)frame.image.pix[z]=back.pix[z]}
 		else{frame.image.pix.fill(46),draw_rect(cl,dr.trans_mask?45:32),image_paste(cl,frame.clip,back,frame.image,0)}
 	}
