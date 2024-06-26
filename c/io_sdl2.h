@@ -74,10 +74,8 @@ void open_url(char*x){
 
 // clipboard
 
-char clip_stash[16]={0};
 lv* get_clip(void){char*t=SDL_GetClipboardText();lv*r=lmcstr(t);SDL_free(t);return r;}
 void set_clip(lv*x){SDL_SetClipboardText(ls(x)->sv);}
-int has_clip(char*type){return strlen(clip_stash)>=strlen(type)&&memcmp(clip_stash,type,strlen(type))==0;}
 
 // audio
 

@@ -307,6 +307,8 @@ lv*interface_app(lv*self,lv*i,lv*x){
 
 // Menus
 
+char clip_stash[16]={0};
+int has_clip(char*type){return strlen(clip_stash)>=strlen(type)&&memcmp(clip_stash,type,strlen(type))==0;}
 int menus_off(void){return lb(ifield(deck,"locked"));}
 int menus_hidden(void){return uimode==mode_draw&&ev.hidemenu&&ms.type==modal_none;}
 void menus_clear(void){menu.active=-1,menu.stick=-1;}
