@@ -78,7 +78,7 @@ The _View_ menu will be available when the _Widgets_ or drawing tools are chosen
 - _Show Alignment Guides_: Toggle displaying indicators when the edges of a widget are aligned with other widgets on the card.
 - _Show Grid Overlay_: Toggle displaying a configurable "graph paper" overlay while editing.
 - _Snap to Grid_: Toggle making a number of tools discretize to the grid. This impacts the Select, Line, Box, Filled Box, Oval, and Filled Oval tools, as well as moving and resizing one widget at a time with the _Widgets_ tool.
-- _Grid Size..._: Change the width and height of the "cells" in the _Grid Overlay_.
+- _Grid and Scale..._: Configure the width and height of the "cells" in the _Grid Overlay_, as well as the zoom scale in Fat Bits mode.
 - _Show Animation_: Toggle animating the special patterns 28-31.
 - _Transparency Mask_: Toggle displaying pattern 0 in a distinct color, revealing transparent elements. While the transparency mask is shown, using drawing tools with the first pattern will use pattern index 32 (opaque white) instead of the "true" pattern 0 (transparent white). Erasing with the pencil tool and deleting selections will still result in transparency.
 - _Fat Bits_: Toggle displaying the card background zoomed-in, to aid in editing individual pixels.  Select the part of the card to zoom into with the _Select_ or _Lasso_ tool; in other cases, the center of the card is defaulted to.  In this mode, the cursor keys can be used to scroll the viewport and "escape" will exit Fat Bits mode.
