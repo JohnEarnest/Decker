@@ -47,6 +47,20 @@ assert[f["a1b2c3d4"] "abbdcfdh"]
 assert[f["b2b"     ] "bdb"     ]
 assert[f["a16z"    ] "abgz"    ]
 
+problem[274.1]
+# translate a sentence into "goat-latin":
+# - If a word begins with a vowel ("a", "e", "i", "o", "u"), append "ma" to the end of the word.
+# - If a word begins with consonant i.e. not a vowel, remove first letter and append it to the end then add "ma".
+# - Add letter "a" to the end of first word in the sentence, "aa" to the second word, etc etc.
+on f x do
+ " " fuse each word i in " " split x
+  if (first word) in "aeiouyAEIOUY" word else (1 drop word),(first word) end,"m",(i+2) take "a"
+ end
+end
+assert[f["I love Perl"              ] "Imaa ovelmaaa erlPmaaaa"                           ]
+assert[f["Perl and Raku are friends"] "erlPmaa andmaaa akuRmaaaa aremaaaaa riendsfmaaaaaa"]
+assert[f["The Weekly Challenge"     ] "heTmaa eeklyWmaaa hallengeCmaaaa"                  ]
+
 problem[273.1]
 # return the percentage (nearest whole) of a given character in x
 # this one's slightly tricky because lil doesn't have a 'round' primitive:
