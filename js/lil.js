@@ -511,7 +511,8 @@ parse=text=>{
 			if(matchsp('['))i.push(quotesub())
 			if(matchsp('.')){
 				if(peek().t in{'[':1,'.':1}){
-					i.map(v=>(blk_cat(b,v),blk_op(b,op.CALL))),blk_loop(b,['x'],_=>{blk_get(b,lms('x')),parseindex(b)});return
+					const vn=tempname()
+					i.map(v=>(blk_cat(b,v),blk_op(b,op.CALL))),blk_loop(b,[vn.v],_=>{blk_get(b,vn),parseindex(b)});return
 				}else{i.push(quotedot())}
 			}
 		}

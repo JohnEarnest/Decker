@@ -13,6 +13,10 @@ on step x y z do
 end
 show[step @ ("a","b") dict 11,22]
 
+# but note that we do not actually shadow a local v!
+local v:100
+show[(on tmp x do x+v end) @ 11,22,33]
+
 # ...with the exception that `x` is evaluated only once:
 on fetch do
 	print["fetched"]

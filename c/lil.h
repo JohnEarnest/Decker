@@ -851,8 +851,9 @@ void parseindex(lv*b,lv*name){
 		if(matchsp('['))ll_add(i,quotesub());
 		if(matchsp('.')){
 			if(strchr("[.",peek()->type)){
+				lv*vn=tempname();
 				EACH(z,i){blk_cat(b,i->lv[z]),blk_op(b,CALL);}
-				lv*l=lmblk();blk_get(l,lmistr("x")),parseindex(l,NULL),blk_loop(b,l_list(lmistr("x")),l);return;
+				lv*l=lmblk();blk_get(l,vn),parseindex(l,NULL),blk_loop(b,l_list(vn),l);return;
 			}else{ll_add(i,quotedot());}
 		}
 	}

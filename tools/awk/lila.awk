@@ -2026,13 +2026,14 @@ function parseinsert(b,  n,v,i){
 function quotesub(  c,r){c=0;r=lmblk();while(hasnext()&&!tmatchsp("]")){expr(r);c++};blk_opa(r,"BUND",c);return r}
 function quotedot(    r){r=lmblk();blk_lit(r,l_list(lms(name("member"))));return r}
 
-function parseindex(b,nm,  i,ix,z,l){
+function parseindex(b,nm,  i,ix,z,l,vn){
 	ix=0;while(perr==0&&peek_type()~/^[\[.]/){
 		if(tmatchsp("[")){i[ix++]=quotesub()}
 		if(tmatchsp(".")){
 			if(peek_type()~/^[\[.]/){
+				vn=tempname()
 				for(z=0;z<ix;z++){blk_cat(b,i[z]);blk_op(b,"CALL")}
-				l=lmblk();blk_get(l,"x");parseindex(l);blk_loop(b,l_list(lms("x")),l);return
+				l=lmblk();blk_get(l,vn);parseindex(l);blk_loop(b,l_list(lms(vn)),l);return
 			}else{i[ix++]=quotedot()}
 		}
 	}

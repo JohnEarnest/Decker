@@ -27,3 +27,7 @@ show[t1.[1]] # extract the first row
 
 # nesting
 show[((range 3)..a:99)..b:32]
+
+# old versions of lil accidentally shadowed a local 'x':
+local x:5
+show[ds..a:x]
