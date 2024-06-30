@@ -1904,7 +1904,7 @@ slider_write=x=>{
 	if(x.interval)dset(r,lms('interval'),lmpair(x.interval))
 	if(x.value!=undefined&&x.value!=0&&!x.volatile)dset(r,lms('value'),lmn(x.value))
 	if(x.step!=undefined&&x.step!=1)dset(r,lms('step'),lmn(x.step))
-	if(x.format&&x.format!='%f')dset(r,lms('format'),lms(x.format))
+	if(x.format!=undefined&&x.format!='%f')dset(r,lms('format'),lms(x.format))
 	if(x.style&&x.style!='horiz')dset(r,lms('style'),lms(x.style))
 	return r
 }
