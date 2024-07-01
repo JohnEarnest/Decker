@@ -2282,12 +2282,13 @@ apply=(fwd,x)=>{
 	}
 	else if(t=='ob_destroy'){
 		if(uimode!='object')setmode('object')
+		ob.sel=[]
 		if(fwd){
 			const w=x.props.map(z=>dget(wids,dget(z,lms('name')))).filter(x=>x!=null)
 			x.props=con_copy_raw(container,w),w.map(z=>card_remove(container,z))
 		}
 		else{
-			ob.sel=[];const w=con_paste_raw(container,x.props);w.map((z,i)=>{
+			const w=con_paste_raw(container,x.props);w.map((z,i)=>{
 				dset(x.props[i],lms('name'),ifield(z,'name')),ob.sel.push(z)
 				if(!dget(x.props[i],lms('pos')))iwrite(z,lms('pos'),lmpair(rcenter(con_dim(),getpair(ifield(z,'size')))))
 			})

@@ -2404,12 +2404,13 @@ void apply(int fwd,lv*x){
 	else if(t==edit_ob_destroy){
 		if(uimode!=mode_object)setmode(mode_object);
 		lv* props=dget(x,lmistr("props"));
+		ob.sel->c=0;
 		if(fwd){
 			lv*w=lml(0);EACH(z,props){lv*wid=dget(wids,dget(props->lv[z],lmistr("name")));if(wid)ll_add(w,wid);}
 			dset(x,lmistr("props"),con_copy_raw(container,w)); EACH(z,w)n_con_remove(container,l_list(w->lv[z]));
 		}
 		else{
-			ob.sel->c=0;lv*w=con_paste_raw(container,props);EACH(z,w){
+			lv*w=con_paste_raw(container,props);EACH(z,w){
 				dset(props->lv[z],lmistr("name"),ifield(w->lv[z],"name"));ll_add(ob.sel,w->lv[z]);
 				if(dget(props->lv[z],lmistr("pos")))continue;
 				rect c=box_center(con_dim(),getpair(ifield(w->lv[z],"size")));
