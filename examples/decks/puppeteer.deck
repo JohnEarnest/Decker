@@ -943,14 +943,14 @@ size:[100,25]
 resizable:1
 margin:[5,5,5,5]
 description:"select from among enumerated string values."
-script:"enum.0"
+script:"enum.0p"
 template:"on change val do\n \nend"
 attributes:{"name":["options"],"label":["Options"],"type":["code"]}
 {widgets}
 s:{"type":"slider","size":[100,25],"pos":[0,0],"interval":[0,100],"style":"compact"}
 o:{"type":"field","size":[100,20],"pos":[0,-30],"locked":1,"style":"plain"}
 
-{script:enum.0}
+{script:enum.0p}
 on get_options   do o.text end
 on get_value     do ("\n" split o.text)[s.value] end
 on set_options x do o.text:x s.value:0 view[] end
@@ -986,7 +986,7 @@ end
 size:[154,140]
 margin:[0,0,0,0]
 description:"it's an egg; it's a bug"
-script:"buggo.0"
+script:"buggo.0p"
 {widgets}
 lwing:{"type":"canvas","size":[122,122],"pos":[2,-2],"locked":1,"show":"transparent","border":0,"image":"%%IMG2AHoAegD/AP8A/wD/AHkBAwBwAQ0AAgEBAGIBGQBhAQgABgEBAAMBCABfAQMAEwEHAFwBAwAXAQUAWgEDABoBBABZAQQAHAEEAFYBAwAeAQMAVQEDAB8BBABUAQMAIAEDAFUBAwAfAQMAVQEDACABAwBUAQMAIAEDAFQBAwAgAQMAVAEEAB8BAwBVAQMAHwEDAFUBBAAeAQMAVQEEAB8BAwBVAQMAHwEDAFUBBAAeAQMAVQEEAB4BAwBXAQMAHwEDAFUBAwAfAQMAVQEEAB4BAwBVAQEAAQEDAB0BAwBXAQMAHAEEAFcBBAAbAQMAWQEDABsBAwBaAQMAGgEDAFoBBAAZAQMAWwEDABkBAwBbAQQAGAEDAFwBBAAXAQMAXQEEABYBAwBdAQQAFgEDAF4BBAAVAQMAYAEEABQBAwBgAQMAFAEDAGEBBAASAQMAYgEDABEBBABjAQMAEAEDAGQBAwAQAQMAZAEEAA8BAwBlAQMADgEDAGYBBAANAQMAZwEDAA0BAwBnAQQADQEBAGkBBAB3AQQAdwEDAHgBAwB3AQQAdwECAP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8AgA==","scale":1}
 body:{"type":"canvas","size":[123,92],"pos":[15,34],"locked":1,"animated":1,"show":"transparent","border":0,"image":"%%IMG2AHsAXABADRYAYQ0cAFsNJABSDS0ASw0yAEYNNwBCDTsAPQ1BADgNRAA1DUgAMg1KAC8NTQAsDVAAKg1SACcNVQAkDVgAIg1aAB8NXQAdDV8AGw1gABoNYgAYDWQAFQ1mABMNaAARDWoAEA1sAA4NbQANDW4ADA1wAAsNcQAJDXIACQ1yAAgNcwAIDXMABw10AAYNdgAFDXYABA13AAMNeAACDXkAAg15AAINeQACDXkAAQ16AAENegABDf8NcAABDQ4BBA1oAAENDAEIDWYAAQ0LAQoNZAACDQsBBwABAQINZAACDQoBBwADAQINEQEEDU4AAg0KAQgAAQEDDQ8BCA1MAAINCgEMDQ4BBwABAQINSgADDQoBDA0OAQYAAwEBDUoAAw0LAQoNDgEIAAEBAw1IAAQNCwEKDQ4BDA1HAAUNDAEIDQ8BDA1HAAUNDgEEDREBDA1GAAcNIwEKDUYACA0jAQoNRgAIDRMBAQ0QAQgNRgAJDRIBAw0EAQENDAEEDUcACg0SAQQNAgEDDVYACg0TAQkNBAECDU4ADA0TAQ8NTAANDRQBBA0BAQgNTAAODRoBBQ1NABANagASDWgAEw1mABYNZAAYDWIAGQ1fAB0NXQAfDVsAIg1XACUNVQAnDVIAKg1OAC4NTAAwDUkAMw1EADgNQAA9DTwAQg01AEgNMABODSkAVg0iAF0NGgBkDRMAQg==","scale":1}
@@ -999,7 +999,7 @@ face:{"type":"canvas","size":[48,32],"pos":[23,79],"locked":1,"show":"transparen
 emote:{"type":"field","size":[100,20],"pos":[-135,-9],"show":"none"}
 faces:{"type":"grid","size":[100,50],"pos":[-136,25],"show":"none","value":{"name":["mad","open"],"value":["%%IMG2ADAAIAAJAQEALgEEACwBBQAsAQQALgEEAC0BBQAsAQUALQEEABABCAAVAQQACQEPABUBAgAFARMAHAEMACUBBQD/AP8A/wDW","%%IMG2ADAAIAD/AP8A/wDTAQMALAEHACoBBwApAQcAKQEGACsBBAD/ADw="]}}
 
-{script:buggo.0}
+{script:buggo.0p}
 
 on set_anim  x do app.show["set buggo anim" x] end
 on set_flip  x do app.show["set buggo flip" x] end

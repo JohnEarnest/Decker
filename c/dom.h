@@ -2584,9 +2584,10 @@ void esc_write(str*r,int id,lv*x){
 	}
 }
 
-lv* script_ref(lv*scripts,lv*base,int*index,lv*x){
+lv* script_ref(lv*scripts,lv*base,int*index,lv*x,char suff){
 	EACH(z,scripts)if(matchr(scripts->lv[z],x))return scripts->kv[z];
-	str k=str_new();if(base)str_addz(&k,base->sv),str_addc(&k,'.');char t[4096];snprintf(t,sizeof(t),"%d",*index);str_addz(&k,t);lv*key=lmstr(k);
+	str k=str_new();if(base)str_addz(&k,base->sv),str_addc(&k,'.');
+	char t[4096];snprintf(t,sizeof(t),"%d",*index);str_addz(&k,t);if(suff)str_addc(&k,suff);lv*key=lmstr(k);
 	dset(scripts,key,x),(*index)++;return key;
 }
 void scripts_write(lv*scripts,str*r,int*index){
@@ -2605,14 +2606,14 @@ lv* deck_write(lv*x,int html){
 	char*pal=patterns_pal(dget(data,lmistr("patterns")));lv*pa=anims_write(pal),*da=l_parse(lmistr("%j"),lmistr(DEFAULT_ANIMS));
 	lv*f=dget(data,lmistr("fonts"));f=l_drop(lmistr("body"),f),f=l_drop(lmistr("menu"),f),f=l_drop(lmistr("mono"),f);
 	lv*s=dget(data,lmistr("sounds"));
-	write_line("card"      ,1                                             ,v                              )
-	write_line("size"      ,1                                             ,v                              )
-	write_line("locked"    ,lb(v)                                         ,v                              )
-	write_line("script"    ,v->c                                          ,script_ref(scripts,NULL,&sci,v))
-	write_line("name"      ,v->c                                          ,v                              )
-	write_line("author"    ,v->c                                          ,v                              )
-	write_line("patterns"  ,strcmp(patterns_write(v)->sv,DEFAULT_PATTERNS),patterns_write(v)              )
-	write_line("animations",!matchr(pa,da)                                ,pa                             )
+	write_line("card"      ,1                                             ,v                                )
+	write_line("size"      ,1                                             ,v                                )
+	write_line("locked"    ,lb(v)                                         ,v                                )
+	write_line("script"    ,v->c                                          ,script_ref(scripts,NULL,&sci,v,0))
+	write_line("name"      ,v->c                                          ,v                                )
+	write_line("author"    ,v->c                                          ,v                                )
+	write_line("patterns"  ,strcmp(patterns_write(v)->sv,DEFAULT_PATTERNS),patterns_write(v)                )
+	write_line("animations",!matchr(pa,da)                                ,pa                               )
 	scripts_write(scripts,&r,&si);
 	write_dict("\n{fonts}\n" ,f,font_write )
 	write_dict("\n{sounds}\n",s,sound_write)
@@ -2620,8 +2621,8 @@ lv* deck_write(lv*x,int html){
 		lv*card=c->lv[z],*data=card_write(card),*wids=dget(data,lmistr("widgets"));lv*base=dget(data,lmistr("name"));sci=0;
 		str_addz(&r,"\n{card:"),esc_write(&r,1,base);str_addz(&r,"}\n");
 		write_line("image" ,v,v                              )
-		write_line("script",v,script_ref(scripts,base,&sci,v))
-		EACH(w,wids){lv*k=lmistr("script"),*v=dget(wids->lv[w],k);if(v)dset(wids->lv[w],k,script_ref(scripts,base,&sci,v));}
+		write_line("script",v,script_ref(scripts,base,&sci,v,0))
+		EACH(w,wids){lv*k=lmistr("script"),*v=dget(wids->lv[w],k);if(v)dset(wids->lv[w],k,script_ref(scripts,base,&sci,v,0));}
 		write_dict("{widgets}\n",wids,)
 		scripts_write(scripts,&r,&si);
 	}
@@ -2636,16 +2637,16 @@ lv* deck_write(lv*x,int html){
 	lv*d=dget(data,lmistr("contraptions"));EACH(z,d){
 		lv*def=d->lv[z],*data=prototype_write(def),*wids=dget(data,lmistr("widgets"));lv*base=dget(data,lmistr("name"));sci=0;
 		str_addz(&r,"\n{contraption:"),esc_write(&r,1,base),str_addz(&r,"}\n");
-		write_line("size"       ,1       ,v                              )
-		write_line("resizable"  ,v&&lb(v),v                              )
-		write_line("margin"     ,1       ,v                              )
-		write_line("description",v       ,v                              )
-		write_line("version"    ,v       ,v                              )
-		write_line("image"      ,v       ,v                              )
-		write_line("script"     ,v&&v->c ,script_ref(scripts,base,&sci,v))
-		write_line("template"   ,v&&v->c ,v                              )
-		write_line("attributes" ,v&&v->c ,v                              )
-		EACH(w,wids){lv*k=lmistr("script"),*v=dget(wids->lv[w],k);if(v)dset(wids->lv[w],k,script_ref(scripts,base,&sci,v));}
+		write_line("size"       ,1       ,v                                  )
+		write_line("resizable"  ,v&&lb(v),v                                  )
+		write_line("margin"     ,1       ,v                                  )
+		write_line("description",v       ,v                                  )
+		write_line("version"    ,v       ,v                                  )
+		write_line("image"      ,v       ,v                                  )
+		write_line("script"     ,v&&v->c ,script_ref(scripts,base,&sci,v,'p'))
+		write_line("template"   ,v&&v->c ,v                                  )
+		write_line("attributes" ,v&&v->c ,v                                  )
+		EACH(w,wids){lv*k=lmistr("script"),*v=dget(wids->lv[w],k);if(v)dset(wids->lv[w],k,script_ref(scripts,base,&sci,v,'p'));}
 		write_dict("{widgets}\n",wids,)
 		scripts_write(scripts,&r,&si);
 	}

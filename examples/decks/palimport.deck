@@ -18,17 +18,17 @@ margin:[0,0,0,0]
 description:"a tool for importing color palettes in the .hex format as used by lospec.com."
 image:"%%IMG2AIkAZAACAYUAAwEBDYUBAQABAQENhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQINhwECDYcBAg2HAQEAAQEBDYUBAQADAYUAAg=="
 {widgets}
-button1:{"type":"button","size":[60,20],"pos":[6,74],"script":"palImport.0","text":"Import"}
-button2:{"type":"button","size":[60,20],"pos":[71,74],"script":"palImport.1","text":"Apply"}
+button1:{"type":"button","size":[60,20],"pos":[6,74],"script":"palImport.0p","text":"Import"}
+button2:{"type":"button","size":[60,20],"pos":[71,74],"script":"palImport.1p","text":"Apply"}
 p:{"type":"field","size":[125,62],"pos":[6,7],"scrollbar":1,"style":"code"}
 
-{script:palImport.0}
+{script:palImport.0p}
 on click do
  p.text:read[]
 end
 {end}
 
-{script:palImport.1}
+{script:palImport.1p}
 on color_dist a b do
  aa:"%2h%2h%2h" parse "%06h" format a
  bb:"%2h%2h%2h" parse "%06h" format b

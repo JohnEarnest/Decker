@@ -202,14 +202,14 @@ box1:{"type":"contraption","size":[32,32],"pos":[192,160],"show":"transparent","
 size:[32,32]
 margin:[0,0,0,0]
 description:"A self-tweening sprite."
-script:"mover.0"
+script:"mover.0p"
 attributes:{"name":["img"],"label":["Image"],"type":["string"]}
 {widgets}
 c:{"type":"canvas","size":[32,32],"pos":[0,0],"locked":1,"animated":1,"volatile":1,"show":"transparent","border":0,"scale":1}
 s:{"type":"field","size":[100,22],"pos":[71,-36],"show":"none","style":"plain","value":"{}"}
 i:{"type":"field","size":[100,20],"pos":[64,0],"show":"none","style":"plain"}
 
-{script:mover.0}
+{script:mover.0p}
 on get_img     do i.text   end
 on set_img   x do i.text:x end
 on get_state   do "%j" parse s.text end

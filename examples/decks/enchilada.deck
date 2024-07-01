@@ -762,30 +762,30 @@ size:[150,50]
 resizable:1
 margin:[0,0,0,0]
 description:"unbounded numeric picker"
-script:"spinner.0"
+script:"spinner.0p"
 template:"on change do\n \nend"
 attributes:{"name":["value","step"],"label":["value","step"],"type":["number","number"]}
 {widgets}
-down:{"type":"button","size":[40,40],"pos":[5,5],"script":"spinner.1","text":"<"}
-up:{"type":"button","size":[40,40],"pos":[105,5],"script":"spinner.2","text":">"}
+down:{"type":"button","size":[40,40],"pos":[5,5],"script":"spinner.1p","text":"<"}
+up:{"type":"button","size":[40,40],"pos":[105,5],"script":"spinner.2p","text":">"}
 value:{"type":"field","size":[40,40],"pos":[55,5],"locked":1,"value":"0"}
 step:{"type":"field","size":[8,8],"pos":[0,0],"show":"none","value":"1"}
 
-{script:spinner.0}
+{script:spinner.0p}
 on set_value x do value.text:0+x end
 on get_value   do 0+value.text   end
 on set_step  x do step.text:0+x  end
 on get_step    do 0+step.text    end
 {end}
 
-{script:spinner.1}
+{script:spinner.1p}
 on click do
   value.text:value.text-step.text
   card.event["change"]
 end
 {end}
 
-{script:spinner.2}
+{script:spinner.2p}
 on click do
   value.text:value.text+step.text
   card.event["change"]
@@ -797,7 +797,7 @@ size:[200,140]
 resizable:1
 margin:[0,0,0,0]
 description:"Demo of every attribute type."
-script:"enchilada.0"
+script:"enchilada.0p"
 attributes:{"name":["bool","number","string","code","rich"],"label":["Boolean","Number","String","Code","Rich Text"],"type":["bool","number","string","code","rich"]}
 {widgets}
 bool:{"type":"button","size":[190,20],"pos":[5,5],"text":"boolean value","style":"check","value":1}
@@ -806,7 +806,7 @@ string:{"type":"field","size":[190,20],"pos":[5,55],"value":"some string"}
 code:{"type":"field","size":[190,20],"pos":[5,80],"value":"some code"}
 rich:{"type":"field","size":[190,20],"pos":[5,105],"value":"some rich text"}
 
-{script:enchilada.0}
+{script:enchilada.0p}
 on set_bool   x do bool.value:x   end
 on get_bool     do bool.value     end
 on set_number x do number.value:x end
@@ -837,11 +837,11 @@ attributes:{"name":[],"label":[],"type":[]}
 size:[102,26]
 margin:[0,0,0,0]
 description:"counts times the view event fires"
-script:"viewCounter.0"
+script:"viewCounter.0p"
 {widgets}
 c:{"type":"field","size":[92,20],"pos":[4,3],"value":"0"}
 
-{script:viewCounter.0}
+{script:viewCounter.0p}
 on view do
  c.text:c.text+1
 end
@@ -852,13 +852,13 @@ size:[137,23]
 resizable:1
 margin:[90,8,8,9]
 description:"roll dice using \"1d6+5\" notation."
-script:"dieRoller.0"
+script:"dieRoller.0p"
 attributes:{"name":["formula"],"label":["Formula"],"type":["string"]}
 {widgets}
 result:{"type":"field","size":[51,19],"pos":[84,2],"style":"plain"}
-button1:{"type":"button","size":[79,19],"pos":[2,2],"script":"dieRoller.1","text":"2d6","style":"rect"}
+button1:{"type":"button","size":[79,19],"pos":[2,2],"script":"dieRoller.1p","text":"2d6","style":"rect"}
 
-{script:dieRoller.0}
+{script:dieRoller.0p}
 on roll x do
  r:() i:0
  x:"" fuse " " split x
@@ -878,7 +878,7 @@ on set_formula x do button1.text:x end
 on get_formula   do button1.text   end
 {end}
 
-{script:dieRoller.1}
+{script:dieRoller.1p}
 on click do
  v:roll[me.text]
  result.text:if 1=count v
@@ -894,21 +894,21 @@ size:[100,100]
 resizable:1
 margin:[8,8,10,10]
 description:"a realtime clock, with a configurable UTC offset."
-script:"clock.0"
+script:"clock.0p"
 attributes:{"name":["utcoffset","24hour"],"label":["UTC Offset","24 hour format"],"type":["number","bool"]}
 {widgets}
-canvas1:{"type":"canvas","size":[100,100],"pos":[0,0],"locked":1,"animated":1,"script":"clock.1","image":"%%IMG2AGQAZAD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wAnAQMAAgEFAAcBAQAEAQMABgEFAAIBAwA6AQEAAwEBAAUBAQAGAQIAAwEBAAMBAQAIAQEAAgEBAAMBAQA5AQEAAwEBAAQBAQADAQEABAEBAAMBAQADAQEAAgEBAAQBAQADAQEAAwEBADkBAQADAQEABAEBAAgBAQADAQEAAwEBAAYBAwACAQEAAwEBADkBAQADAQEAAwEBAAkBAQADAQEAAwEBAAkBAQABAQEAAwEBADkBAQADAQEAAwEBAAkBAQADAQEAAwEBAAUBAQADAQEAAQEBAAMBAQA6AQMABAEBAAQBAQAEAQEABAEDAAMBAQADAQMAAwEDAP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AIw=","scale":1}
+canvas1:{"type":"canvas","size":[100,100],"pos":[0,0],"locked":1,"animated":1,"script":"clock.1p","image":"%%IMG2AGQAZAD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wAnAQMAAgEFAAcBAQAEAQMABgEFAAIBAwA6AQEAAwEBAAUBAQAGAQIAAwEBAAMBAQAIAQEAAgEBAAMBAQA5AQEAAwEBAAQBAQADAQEABAEBAAMBAQADAQEAAgEBAAQBAQADAQEAAwEBADkBAQADAQEABAEBAAgBAQADAQEAAwEBAAYBAwACAQEAAwEBADkBAQADAQEAAwEBAAkBAQADAQEAAwEBAAkBAQABAQEAAwEBADkBAQADAQEAAwEBAAkBAQADAQEAAwEBAAUBAQADAQEAAQEBAAMBAQA6AQMABAEBAAQBAQAEAQEABAEDAAMBAQADAQMAAwEDAP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AIw=","scale":1}
 tz:{"type":"field","size":[35,18],"pos":[6,75],"locked":1,"show":"none","style":"plain","align":"center","value":"-8"}
 mil:{"type":"button","size":[31,19],"pos":[54,73],"show":"none","style":"check","value":0}
 
-{script:clock.0}
+{script:clock.0p}
 on set_utcoffset x do tz.text:x   end
 on get_utcoffset   do 0+tz.text   end
 on set_24hour    x do mil.value:x end
 on get_24hour      do mil.value   end
 {end}
 
-{script:clock.1}
+{script:clock.1p}
 on view do
  h:if mil.value 24 else 12 end
  t:"%i:%i:%i" parse last "T" split "%e" format sys.now
@@ -924,16 +924,16 @@ size:[109,123]
 margin:[0,0,0,0]
 description:"a date picker showing a monthly calendar."
 image:"%%IMG2AG0Aew3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/DZM="
-script:"datePicker.0"
+script:"datePicker.0p"
 template:"on change x do\n \nend"
 attributes:{"name":["text"],"label":["Text"],"type":["string"]}
 {widgets}
-canv:{"type":"canvas","size":[103,100],"pos":[3,3],"script":"datePicker.1","image":"%%IMG0AGcAZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEEAAIAAAAAAAAAAAABjAACAAAAAAAAAAAAAVTLM4AAAAAAAAAAAAEkLEpAAAAAAAAAAAABBOhCQAAAAAAAAAAAAQUoSkAAAAAAAAAAAAEE6DJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAggHwBBAH0B4AHAAiAMYAQAQQARAQACIAIJCqYESCowEcELAgYByQkpBEgqSBEhzAHBACkIKQRIFHgRIQgAJwIpCCkESBRAESEIAikBxwgmBDgUMBEhCAHHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////////+AAAAAAAD//gAIACAAgAAAAAAA//4ACAAgAIAAAAAAAP9+Bwg+IBCAAAAAAAD+fgiIBCAwgAAAAAAA/34AiAggUIAAAAAAAP9+AQgcIJCAAAAAAAD/fgIIAiD4gAAAAAAA/34ECCIgEIAAAAAAAP9+D4gcIBCAAAAAAAD//gAIACAAgAAAAAAA//4ACAAgAIAAAAAAAP/+AAgAIACD////////////////ggAIACAAgAIACAAgAIIACAAgAIACAAgAIACCD4gMIPiBwgcIhyIIgggIECAIgiIIiYimGIIPCCAgEIIiCIiIogiCAIg8IBCBwgeIiKIIggCIIiAggiIAiIiiCIIIiCIgIIIiAQiIogiCBwgcICCBwgYIhyIIggAIACAAgAIACAAgAIIACAAgAIACAAgAIACCAAgAIACAAgAIACAAg////////////////4IACAAgAIACAAgAIACCAAgAIACAAgAIACAAgiHIj6IEiPogyI+iHIJiKYEmDJiCYQmApiKCICiCIhSI8iIIgSIigiBIhyIkiAojyIEiHIIgiICiPogKIiiCIiKCIQiIogSIiiIogiIigiPohyIEiHIhyIIiHIIACAAgAIACAAgAIACCAAgAIACAAgAIACAAggAIACAAgAIACAAgAIP///////////////+CAAgAIACAAgAIACAAggAIACAAgAIACAAgAIIhyccnCJxyc+nBJz6CYiooqJiiiohKIyiggiIoKKCIggoIiCUgvIIh6EihCIQSEchJIQKCICiIogiIIiAoj6ICgiBJCKQIkEJCKQEkIoIhi+cviL76+cvhL5yCAAgAIACAAgAIACAAggAIACAAgAIACAAgAIIACAAgAIACAAgAIACD////////////////ggAIACAAgAIACAAgAAIACAAgAIACAAgAIAACcMnPpxyccvnL4iAAAokKIKiioooSKEYgAAIKCCEgooKKIiiCIAACE8hBIRyEenIpwiAAAiIogiIiiAoKKCIgAAJCKQIkIpASiioiIAAC+cviL5y+YnHJwiAAAgAIACAAgAIACAAgAAIACAAgAIACAAgAIAACAAgAIACAAgAIACAAA//////////////gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=","scale":1}
-val:{"type":"field","size":[103,13],"pos":[3,107],"script":"datePicker.2","style":"plain","value":"2023-03-01"}
-next:{"type":"button","size":[19,13],"pos":[84,6],"script":"datePicker.3","text":">","style":"rect"}
-prev:{"type":"button","size":[19,13],"pos":[6,6],"script":"datePicker.4","text":"<","style":"rect"}
+canv:{"type":"canvas","size":[103,100],"pos":[3,3],"script":"datePicker.1p","image":"%%IMG0AGcAZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEEAAIAAAAAAAAAAAABjAACAAAAAAAAAAAAAVTLM4AAAAAAAAAAAAEkLEpAAAAAAAAAAAABBOhCQAAAAAAAAAAAAQUoSkAAAAAAAAAAAAEE6DJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAggHwBBAH0B4AHAAiAMYAQAQQARAQACIAIJCqYESCowEcELAgYByQkpBEgqSBEhzAHBACkIKQRIFHgRIQgAJwIpCCkESBRAESEIAikBxwgmBDgUMBEhCAHHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////////+AAAAAAAD//gAIACAAgAAAAAAA//4ACAAgAIAAAAAAAP9+Bwg+IBCAAAAAAAD+fgiIBCAwgAAAAAAA/34AiAggUIAAAAAAAP9+AQgcIJCAAAAAAAD/fgIIAiD4gAAAAAAA/34ECCIgEIAAAAAAAP9+D4gcIBCAAAAAAAD//gAIACAAgAAAAAAA//4ACAAgAIAAAAAAAP/+AAgAIACD////////////////ggAIACAAgAIACAAgAIIACAAgAIACAAgAIACCD4gMIPiBwgcIhyIIgggIECAIgiIIiYimGIIPCCAgEIIiCIiIogiCAIg8IBCBwgeIiKIIggCIIiAggiIAiIiiCIIIiCIgIIIiAQiIogiCBwgcICCBwgYIhyIIggAIACAAgAIACAAgAIIACAAgAIACAAgAIACCAAgAIACAAgAIACAAg////////////////4IACAAgAIACAAgAIACCAAgAIACAAgAIACAAgiHIj6IEiPogyI+iHIJiKYEmDJiCYQmApiKCICiCIhSI8iIIgSIigiBIhyIkiAojyIEiHIIgiICiPogKIiiCIiKCIQiIogSIiiIogiIigiPohyIEiHIhyIIiHIIACAAgAIACAAgAIACCAAgAIACAAgAIACAAggAIACAAgAIACAAgAIP///////////////+CAAgAIACAAgAIACAAggAIACAAgAIACAAgAIIhyccnCJxyc+nBJz6CYiooqJiiiohKIyiggiIoKKCIggoIiCUgvIIh6EihCIQSEchJIQKCICiIogiIIiAoj6ICgiBJCKQIkEJCKQEkIoIhi+cviL76+cvhL5yCAAgAIACAAgAIACAAggAIACAAgAIACAAgAIIACAAgAIACAAgAIACD////////////////ggAIACAAgAIACAAgAAIACAAgAIACAAgAIAACcMnPpxyccvnL4iAAAokKIKiioooSKEYgAAIKCCEgooKKIiiCIAACE8hBIRyEenIpwiAAAiIogiIiiAoKKCIgAAJCKQIkIpASiioiIAAC+cviL5y+YnHJwiAAAgAIACAAgAIACAAgAAIACAAgAIACAAgAIAACAAgAIACAAgAIACAAA//////////////gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=","scale":1}
+val:{"type":"field","size":[103,13],"pos":[3,107],"script":"datePicker.2p","style":"plain","value":"2023-03-01"}
+next:{"type":"button","size":[19,13],"pos":[84,6],"script":"datePicker.3p","text":">","style":"rect"}
+prev:{"type":"button","size":[19,13],"pos":[6,6],"script":"datePicker.4p","text":"<","style":"rect"}
 
-{script:datePicker.0}
+{script:datePicker.0p}
 dateparts: "year","month","day"
 dateform: "%04i-%02i-%02i"
 
@@ -991,7 +991,7 @@ on view do
 end
 {end}
 
-{script:datePicker.1}
+{script:datePicker.1p}
 on inside p r do
  min(p>r)&(p<r+cellsize)
 end
@@ -1009,14 +1009,14 @@ end
 
 {end}
 
-{script:datePicker.2}
+{script:datePicker.2p}
 on change val do
  set_text[val]
  do_change[]
 end
 {end}
 
-{script:datePicker.3}
+{script:datePicker.3p}
 on click do
  v:get_value[]
  if v.month=12
@@ -1030,7 +1030,7 @@ on click do
 end
 {end}
 
-{script:datePicker.4}
+{script:datePicker.4p}
 on click do
  v:get_value[]
  if v.month=1
@@ -1064,7 +1064,7 @@ size:[100,100]
 resizable:1
 margin:[10,10,10,10]
 description:"a palette of patterns and (optionally) colors."
-script:"patternPicker.0"
+script:"patternPicker.0p"
 template:"on change val do\n \nend"
 attributes:{"name":["value","color"],"label":["Value","Color"],"type":["number","bool"]}
 {widgets}
@@ -1072,7 +1072,7 @@ c:{"type":"canvas","size":[100,100],"pos":[0,0],"locked":1,"border":0,"scale":1}
 v:{"type":"slider","size":[60,25],"pos":[2,-41],"locked":1,"show":"none","interval":[0,47]}
 cc:{"type":"button","size":[14,20],"pos":[73,-40],"locked":1,"show":"none","style":"check","value":1}
 
-{script:patternPicker.0}
+{script:patternPicker.0p}
 on get_value do v.value end
 on set_value x do v.value:x view[] end
 on get_color do cc.value end

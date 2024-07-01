@@ -443,14 +443,14 @@ size:[137,23]
 resizable:1
 margin:[90,8,8,9]
 description:"roll dice using \"1d6+5\" notation."
-script:"dieRoller.0"
+script:"dieRoller.0p"
 attributes:{"name":["formula"],"label":["Formula"],"type":["string"]}
 {widgets}
 result:{"type":"field","size":[51,19],"pos":[84,2],"style":"plain"}
-button:{"type":"button","size":[79,19],"pos":[2,2],"script":"dieRoller.1","text":"2d6","style":"rect"}
+button:{"type":"button","size":[79,19],"pos":[2,2],"script":"dieRoller.1p","text":"2d6","style":"rect"}
 formula:{"type":"field","size":[33,20],"pos":[-8,-29],"locked":1,"show":"none","style":"plain","value":"2d6"}
 
-{script:dieRoller.0}
+{script:dieRoller.0p}
 on roll x do
  r:() i:0
  x:"" fuse " " split x
@@ -471,7 +471,7 @@ on set_formula x do formula.text:x view[] end
 on get_formula   do formula.text          end
 {end}
 
-{script:dieRoller.1}
+{script:dieRoller.1p}
 on click do
  v:roll[me.text]
  result.text:if 1=count v
@@ -487,21 +487,21 @@ size:[100,100]
 resizable:1
 margin:[8,8,10,10]
 description:"a realtime clock, with a configurable UTC offset."
-script:"clock.0"
+script:"clock.0p"
 attributes:{"name":["utcoffset","24hour"],"label":["UTC Offset","24 hour format"],"type":["number","bool"]}
 {widgets}
-canvas1:{"type":"canvas","size":[100,100],"pos":[0,0],"locked":1,"animated":1,"volatile":1,"script":"clock.1","scale":1}
+canvas1:{"type":"canvas","size":[100,100],"pos":[0,0],"locked":1,"animated":1,"volatile":1,"script":"clock.1p","scale":1}
 tz:{"type":"field","size":[35,18],"pos":[6,75],"locked":1,"show":"none","style":"plain","align":"center","value":"-8"}
 mil:{"type":"button","size":[31,19],"pos":[54,73],"show":"none","style":"check","value":0}
 
-{script:clock.0}
+{script:clock.0p}
 on set_utcoffset x do tz.text:x   end
 on get_utcoffset   do 0+tz.text   end
 on set_24hour    x do mil.value:x end
 on get_24hour      do mil.value   end
 {end}
 
-{script:clock.1}
+{script:clock.1p}
 on view do
  t:"%i:%i:%i" parse last "T" split "%e" format sys.now
  t[0]:if mil.value 24 else 12 end % t[0]+tz.text
@@ -518,16 +518,16 @@ size:[109,118]
 margin:[0,0,0,0]
 description:"a date picker showing a monthly calendar."
 image:"%%IMG2AG0Adg3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8N/w3/Df8NcA=="
-script:"datePicker.0"
+script:"datePicker.0p"
 template:"on change x do\n \nend"
 attributes:{"name":["text"],"label":["Text"],"type":["string"]}
 {widgets}
-canv:{"type":"canvas","size":[103,95],"pos":[3,3],"locked":1,"script":"datePicker.1","image":"%%IMG0AGcAXwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4ACAAIAAAAAAAAAAARAAgACAAAAAAAAAAAEDOczs4ywAAAAAAAAA5KSSkpSwAAAAAAAAABeknpKXoAAAAAAAAAEUJJCSlCAAAAAAAAAA4zhMkuMgAAAAAAAAAAAgAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwBBAPgEEA+gPABwAAiAYwAgBBACICAAiAAIJFUwIkKjAjghYIGAByRJSCJCpIIkOYBwQACkQUgiQUeCJCEACcAIpEFIIkFEAiQhAIpABxxBMCHBQwIkIQBxwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////+AAAAAAAAAAAAIACAAgAAAAAAAAAAACAggcIAAAAAAAAAAAAgYIIiAAAAAAAAAAAAICCAIgAAAAAAAAAAACAggEIAAAAAAAAAAAAgIICCAAAAAAAAAAAAICCBAgAAAAAAAAAAACAgg+IAAAAAAAAAAAAgAIACD////////////////ggAIACAAgAIACAAgAIIPiAQg+IDCD4gcIHCCAQgMIICBAgCIIiCIggIIFCDwggIBCCIgiIIHCCQgCIPCAQgcIHiCAIg+IAiCIgIIIiAIggiIBCCIgiICCCIgEIIHCAQgcIHCAggcIGCCAAgAIACAAgAIACAAg////////////////4IACAAgAIACAAgAIACCIciCIhyI+iBIj6IMgmIphiYimBJgyYgmEIIiKIIiAogiIUiPIiCCIiiCIgSIciJIgKI8giIogiIIiAoj6ICiIoIiKIIiEIiKIEiIoiKCIciCIj6IciBIhyIcggAIACAAgAIACAAgAIP///////////////+CAAgAIACAA//4ACAAgiPohyIcnHOPeccnPoJgKYimIqKLdnooqISCIEiIoiKCi/d4IKCIgiBIhyIehIvveEEhHIIgiIiiAoiL33iCIgKCIIiIogSQi795BCQigiCIhyIYvnMHe++vnIIACAAgAIAD//gAIACD////////////////ggAIACAAgAIACAAgAIJwSc+nDJz6ccnHL5yCiMooKJCiCooqKKEigglILyCgghIKKCiiIoISSEChPIQSEchHpyKCI+iAoiKIIiIogKCigkBJCKQikCJCKQEoooL4S+cvnL4i+cvmJxyCAAgAIACAAgAIACAAg////////////////4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","scale":1}
-val:{"type":"field","size":[103,13],"pos":[3,101],"script":"datePicker.2","style":"plain","value":"2023-09-21"}
-next:{"type":"button","size":[19,13],"pos":[84,6],"script":"datePicker.3","text":">","style":"rect"}
-prev:{"type":"button","size":[19,13],"pos":[6,6],"script":"datePicker.4","text":"<","style":"rect"}
+canv:{"type":"canvas","size":[103,95],"pos":[3,3],"locked":1,"script":"datePicker.1p","image":"%%IMG0AGcAXwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4ACAAIAAAAAAAAAAARAAgACAAAAAAAAAAAEDOczs4ywAAAAAAAAA5KSSkpSwAAAAAAAAABeknpKXoAAAAAAAAAEUJJCSlCAAAAAAAAAA4zhMkuMgAAAAAAAAAAAgAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwBBAPgEEA+gPABwAAiAYwAgBBACICAAiAAIJFUwIkKjAjghYIGAByRJSCJCpIIkOYBwQACkQUgiQUeCJCEACcAIpEFIIkFEAiQhAIpABxxBMCHBQwIkIQBxwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////+AAAAAAAAAAAAIACAAgAAAAAAAAAAACAggcIAAAAAAAAAAAAgYIIiAAAAAAAAAAAAICCAIgAAAAAAAAAAACAggEIAAAAAAAAAAAAgIICCAAAAAAAAAAAAICCBAgAAAAAAAAAAACAgg+IAAAAAAAAAAAAgAIACD////////////////ggAIACAAgAIACAAgAIIPiAQg+IDCD4gcIHCCAQgMIICBAgCIIiCIggIIFCDwggIBCCIgiIIHCCQgCIPCAQgcIHiCAIg+IAiCIgIIIiAIggiIBCCIgiICCCIgEIIHCAQgcIHCAggcIGCCAAgAIACAAgAIACAAg////////////////4IACAAgAIACAAgAIACCIciCIhyI+iBIj6IMgmIphiYimBJgyYgmEIIiKIIiAogiIUiPIiCCIiiCIgSIciJIgKI8giIogiIIiAoj6ICiIoIiKIIiEIiKIEiIoiKCIciCIj6IciBIhyIcggAIACAAgAIACAAgAIP///////////////+CAAgAIACAA//4ACAAgiPohyIcnHOPeccnPoJgKYimIqKLdnooqISCIEiIoiKCi/d4IKCIgiBIhyIehIvveEEhHIIgiIiiAoiL33iCIgKCIIiIogSQi795BCQigiCIhyIYvnMHe++vnIIACAAgAIAD//gAIACD////////////////ggAIACAAgAIACAAgAIJwSc+nDJz6ccnHL5yCiMooKJCiCooqKKEigglILyCgghIKKCiiIoISSEChPIQSEchHpyKCI+iAoiKIIiIogKCigkBJCKQikCJCKQEoooL4S+cvnL4i+cvmJxyCAAgAIACAAgAIACAAg////////////////4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","scale":1}
+val:{"type":"field","size":[103,13],"pos":[3,101],"script":"datePicker.2p","style":"plain","value":"2023-09-21"}
+next:{"type":"button","size":[19,13],"pos":[84,6],"script":"datePicker.3p","text":">","style":"rect"}
+prev:{"type":"button","size":[19,13],"pos":[6,6],"script":"datePicker.4p","text":"<","style":"rect"}
 
-{script:datePicker.0}
+{script:datePicker.0p}
 dateform: "%[year]04i-%[month]02i-%[day]02i"
 
 on do_change do
@@ -584,7 +584,7 @@ on view do
 end
 {end}
 
-{script:datePicker.1}
+{script:datePicker.1p}
 on inside p r do
  min(p>r)&(p<r+cellsize)
 end
@@ -602,14 +602,14 @@ end
 
 {end}
 
-{script:datePicker.2}
+{script:datePicker.2p}
 on change val do
  set_text[val]
  do_change[]
 end
 {end}
 
-{script:datePicker.3}
+{script:datePicker.3p}
 on click do
  v:get_value[]
  if v.month=12
@@ -623,7 +623,7 @@ on click do
 end
 {end}
 
-{script:datePicker.4}
+{script:datePicker.4p}
 on click do
  v:get_value[]
  if v.month=1

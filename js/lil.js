@@ -2606,10 +2606,10 @@ deck_write=(x,html)=>{
 			lc=c,c=x[z],r+=c=='{'?'{l}': c=='}'?'{r}': c==':'&&id?'{c}': c=='/'&&lc=='<'?'{s}': c
 		}return r
 	}
-	const script_ref=(base,x)=>{
+	const script_ref=(base,x,suff)=>{
 		if(ls(x)=='undefined')throw new Error('welp')
 		for(let z=0;z<scripts.v.length;z++)if(match(scripts.v[z],x))return scripts.k[z]
-		const k=lms(base?`${base}.${sci}`:`${sci}`);sci++;dset(scripts,k,x);return k
+		const k=lms(base?`${base}.${sci}${suff||''}`:`${sci}${suff||''}`);sci++;dset(scripts,k,x);return k
 	}
 	const write_scripts=_=>{while(si<scripts.v.length)r+=`\n{script:${esc_write(1,ls(scripts.k[si]))}}\n${esc_write(0,ls(scripts.v[si++]))}\n{end}\n`}
 	const write_line=(s,k,p,f)=>{const v=s[k];if(p(v))r+=`${k}:${fjson(f(v))}\n`}
@@ -2653,10 +2653,10 @@ deck_write=(x,html)=>{
 		write_key(data,'description',x=>x       ,x=>x)
 		write_key(data,'version'    ,x=>x       ,x=>x)
 		write_key(data,'image'      ,x=>x       ,x=>x)
-		write_key(data,'script'     ,x=>count(x),x=>script_ref(base,x))
+		write_key(data,'script'     ,x=>count(x),x=>script_ref(base,x,'p'))
 		write_key(data,'template'   ,x=>count(x),x=>x)
 		write_key(data,'attributes' ,x=>count(x),x=>x)
-		wids.v.map(wid=>{const k=lms('script'),v=dget(wid,k);if(v)dset(wid,k,script_ref(base,v))})
+		wids.v.map(wid=>{const k=lms('script'),v=dget(wid,k);if(v)dset(wid,k,script_ref(base,v,'p'))})
 		write_dict('{widgets}\n',wids,x=>x)
 		write_scripts()
 	})

@@ -104,7 +104,15 @@ on highlight_to_html text raw do
    if raw s.attr.style:inlines[row.font] else s.attr.class:row.font end
    s.children:list row.text
   else
-   list row.text
+   t:row.text
+   esc:array[]
+   while count t
+    if     " " ~first t           esc.cat["&nbsp;"] t:1 drop t
+    elseif "\n"~first t           esc.cat["<br>"  ] t:1 drop t
+    else   c:"%-.2r\n %n" parse t esc.cat[first c ] t:(last c) drop t
+    end
+   end
+   list esc #list row.text
   end
  end
  writexml[r]

@@ -2049,6 +2049,16 @@ assert["prototype paste final arrangement"
 	d4.card.widgets..val
 ]
 
+d:readdeck[]
+d.card.name:"collision"
+d.card.script:"# the card script"
+c:d.add["contraption" "collision"]
+c.script:"# the proto script"
+writedeck["temp.deck" d]
+d:readdeck["temp.deck"]
+assert["name collision card script disambiguation" "# the card script"  (d.card                  .script)]
+assert["name collision card script disambiguation" "# the proto script" (d.contraptions.collision.script)]
+
 #######################################
 #
 #  Lilt features

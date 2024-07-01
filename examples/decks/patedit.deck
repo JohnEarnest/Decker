@@ -147,7 +147,7 @@ size:[100,100]
 resizable:1
 margin:[10,10,10,10]
 description:"a palette of mutable patterns"
-script:"patternPicker.0"
+script:"patternPicker.0p"
 template:"on change val do\n \nend"
 attributes:{"name":["value","color"],"label":["Value","Color"],"type":["number","bool"]}
 {widgets}
@@ -155,7 +155,7 @@ c:{"type":"canvas","size":[100,100],"pos":[0,0],"locked":1,"border":1,"scale":1}
 v:{"type":"slider","size":[60,25],"pos":[2,-41],"locked":1,"show":"none","interval":[0,47]}
 cc:{"type":"button","size":[14,20],"pos":[73,-40],"locked":1,"show":"none","style":"check","value":1}
 
-{script:patternPicker.0}
+{script:patternPicker.0p}
 on get_value do v.value end
 on set_value x do v.value:x view[] end
 on get_color do cc.value end

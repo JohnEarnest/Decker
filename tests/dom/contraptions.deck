@@ -12,16 +12,16 @@ b:{"type":"contraption","size":[150,50],"pos":[0,0],"def":"spinner","widgets":{"
 size:[150,50]
 margin:[0,0,0,0]
 description:"unbounded numeric picker"
-script:"spinner.0"
+script:"spinner.0p"
 template:"on change do\n \nend"
 attributes:{"name":["value","step"],"label":["Value","Step"],"type":["number","number"]}
 {widgets}
-down:{"type":"button","size":[60,20],"pos":[0,0],"script":"spinner.1","text":"<"}
-up:{"type":"button","size":[60,20],"pos":[0,0],"script":"spinner.2","text":">"}
+down:{"type":"button","size":[60,20],"pos":[0,0],"script":"spinner.1p","text":"<"}
+up:{"type":"button","size":[60,20],"pos":[0,0],"script":"spinner.2p","text":">"}
 value:{"type":"field","size":[100,20],"pos":[0,0],"locked":1,"value":"0"}
 step:{"type":"field","size":[100,20],"pos":[0,0],"show":"none","value":"1"}
 
-{script:spinner.0}
+{script:spinner.0p}
 
 on set_value x do value.text:0+x end
 on get_value   do 0+value.text   end
@@ -29,13 +29,13 @@ on set_step  x do step.text:0+x  end
 on get_step    do 0+step.text    end
 {end}
 
-{script:spinner.1}
+{script:spinner.1p}
 on click do
   value.text:value.text-step.text
 end
 {end}
 
-{script:spinner.2}
+{script:spinner.2p}
 on click do
   value.text:value.text+step.text
 end
