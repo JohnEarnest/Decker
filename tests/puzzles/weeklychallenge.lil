@@ -24,6 +24,26 @@ on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 
 # the problems:
 
+problem[276.1]
+# how many pairs of elements from x form a multiple of 24?
+on f x do
+ sum each a i in x
+  sum 0=24%a+(i+1)drop x
+ end
+end
+assert[f[(12,12,30,24,24)] 2]
+assert[f[(72,48,24,5    )] 3]
+assert[f[(12,18,24      )] 0]
+
+problem[276.2]
+# how many elements of x have the maximum frequency?
+on f x do
+ r:extract count value by value from x
+ sum r*r=max r
+end
+assert[f[(1,2,2,4,1,5)] 4]
+assert[f[(1,2,3,4,5  )] 5]
+
 problem[275.1]
 # how many words in a sentence x can be typed with broken keyboard keys y?
 on f x y do
