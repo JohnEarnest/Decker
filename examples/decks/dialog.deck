@@ -142,6 +142,18 @@ field2:{"type":"field","size":[236,238],"pos":[266,56],"locked":1,"border":0,"va
 button4:{"type":"button","size":[60,20],"pos":[266,274],"script":"say.0","text":"Try It!"}
 button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
 
+{card:windowpos}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,28],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"window position"}
+ex1:{"type":"field","size":[244,238],"pos":[10,56],"style":"code","value":"o:()\no.pos:\"center\"\ndd.open[deck o]\ndd.say[\"A vertically and horizontally centered dialog box.\\nNeat, eh?\"]\n\no.size:100,0\no.pos:\"place1\"\ndd.style[o]\ndd.say[\"Over Here...\"]\n\no.pos:\"place2\"\ndd.style[o]\ndd.say[\"...Or over here!\"]\n\no.size:0,0\no.pos:0\ndd.style[o]\ndd.close[]"}
+field2:{"type":"field","size":[236,238],"pos":[266,56],"locked":1,"border":0,"value":"The \"pos\" property can be used to configure a custom location for the dialog box on the card.\n\nIf the pos property is 0 (the default), the dialog box will be horizontally centered on the bottom edge of the card.\n\nIf the pos property is the string \"center\", the dialog box will be horizontally and vertically centered on the card.\n\nOtherwise, if the pos property is the name of a widget on the current card, the dialog box will be centered on that widget. This combines nicely with the \"size\" property."}
+button4:{"type":"button","size":[60,20],"pos":[266,274],"script":"say.0","text":"Try It!"}
+button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+place1:{"type":"button","size":[8,8],"pos":[92,96],"show":"none"}
+place2:{"type":"button","size":[8,8],"pos":[416,155],"show":"none"}
+
 {card:textspeed}
 {widgets}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
@@ -409,6 +421,7 @@ local nsound:"" # advance to next box
 local asound:"" # make a choice
 local tsound:"" # talk
 local dsize:(0,0)
+local dpos:0
 
 on ifmt x do x format names end
 on fmt x do update text:ifmt @ text from rtext.cat[x] end
@@ -432,11 +445,21 @@ on draw_border do
  end
 end
 
+on repos pos size do
+ if dpos~"center"
+  .5*host.card.size-size
+ elseif dpos in host.card.widgets
+  t:host.card.widgets[dpos]
+  t.pos+.5*t.size-size
+ else pos
+ end
+end
+
 on resize height do
  cs0:canvas.size
  cs1:((host.card.size[0]-2*margin) unless dsize[0]),height
  cp0:canvas.pos
- cp1:(.5*host.card.size[0]-cs1[0]),host.card.size[1]-cs1[1]+margin
+ cp1:repos[(.5*host.card.size[0]-cs1[0]),host.card.size[1]-cs1[1]+margin cs1]
  each t in .2*range 6
   canvas.size:tween[cs0 cs1 t]
   canvas.pos :tween[cp0 cp1 t]
@@ -451,7 +474,7 @@ module.open:on open deck etc do
  canvas:host.card.add["canvas" "dd_overlay"]
  style[etc]
  canvas.size:((host.card.size[0]-2*margin) unless dsize[0]),0
- canvas.pos:(.5*host.card.size[0]-canvas.size[0]),host.card.size[1]-margin
+ canvas.pos:repos[(.5*host.card.size[0]-canvas.size[0]),host.card.size[1]-margin canvas.size]
  canvas.show:"transparent"
  canvas.border:0
  sfx[osound]
@@ -471,6 +494,7 @@ module.style:on style etc do
  asound:if "asound" in etc etc.asound else ""       end
  tsound:if "tsound" in etc etc.tsound else ""       end
  dsize: if "size"   in etc etc.size   else (0,0)    end
+ dpos:  if "pos"    in etc etc.pos    else 0        end
  border:etc.border.image.copy[]
  pad:"ltrb" dict 4 take if !0~etc.border.margin etc.border.margin else padding end
 end

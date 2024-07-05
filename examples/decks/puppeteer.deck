@@ -779,6 +779,7 @@ local nsound:"" # advance to next box
 local asound:"" # make a choice
 local tsound:"" # talk
 local dsize:(0,0)
+local dpos:0
 
 on ifmt x do x format names end
 on fmt x do update text:ifmt @ text from rtext.cat[x] end
@@ -802,11 +803,21 @@ on draw_border do
  end
 end
 
+on repos pos size do
+ if dpos~"center"
+  .5*host.card.size-size
+ elseif dpos in host.card.widgets
+  t:host.card.widgets[dpos]
+  t.pos+.5*t.size-size
+ else pos
+ end
+end
+
 on resize height do
  cs0:canvas.size
  cs1:((host.card.size[0]-2*margin) unless dsize[0]),height
  cp0:canvas.pos
- cp1:(.5*host.card.size[0]-cs1[0]),host.card.size[1]-cs1[1]+margin
+ cp1:repos[(.5*host.card.size[0]-cs1[0]),host.card.size[1]-cs1[1]+margin cs1]
  each t in .2*range 6
   canvas.size:tween[cs0 cs1 t]
   canvas.pos :tween[cp0 cp1 t]
@@ -821,7 +832,7 @@ module.open:on open deck etc do
  canvas:host.card.add["canvas" "dd_overlay"]
  style[etc]
  canvas.size:((host.card.size[0]-2*margin) unless dsize[0]),0
- canvas.pos:(.5*host.card.size[0]-canvas.size[0]),host.card.size[1]-margin
+ canvas.pos:repos[(.5*host.card.size[0]-canvas.size[0]),host.card.size[1]-margin canvas.size]
  canvas.show:"transparent"
  canvas.border:0
  sfx[osound]
@@ -841,6 +852,7 @@ module.style:on style etc do
  asound:if "asound" in etc etc.asound else ""       end
  tsound:if "tsound" in etc etc.tsound else ""       end
  dsize: if "size"   in etc etc.size   else (0,0)    end
+ dpos:  if "pos"    in etc etc.pos    else 0        end
  border:etc.border.image.copy[]
  pad:"ltrb" dict 4 take if !0~etc.border.margin etc.border.margin else padding end
 end
