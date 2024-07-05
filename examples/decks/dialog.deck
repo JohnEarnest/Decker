@@ -20,8 +20,8 @@ script:"Index.0"
 field1:{"type":"field","size":[132,17],"pos":[322,133],"locked":1,"font":"menu","show":"invert","border":0,"align":"center","value":"Dialogs for Decker"}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
 field2:{"type":"field","size":[248,55],"pos":[14,142],"locked":1,"show":"transparent","border":0,"value":{"text":["Decker Dialogizer is  a module (\"dd\") which provides customizable, aesthetically pleasant modal dialog boxes for use in Visual Novels and similar interactive content.\n\n","Index:"],"font":["","menu"],"arg":["",""]}}
-index:{"type":"field","size":[243,117],"pos":[16,197],"locked":1,"script":"Index.2","scrollbar":1,"value":{"text":["i","  ","dd.open[], dd.say[], dd.close[]\n","i","  ","dd.ask[]\n","i","  ","dd.open[] configuration\n","i","  ","dd.style[]\n","i","  ","dd.show[]\n","i","  ","custom borders\n","i","  ","text speed\n","i","  ","sound effects\n","i","  ","rich text\n","i","  ","string interpolation\n","i","  ","commands\n","i","  ","event pumping\n","i","  ","a complete cutscene\n"],"font":["","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono"],"arg":["%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","say","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","ask","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","configuration","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","style","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","show","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","borders","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","textspeed","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","soundeffects","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","richtext","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","interpolation","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","card1","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","eventpumping","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","conclusions"]}}
-version:{"type":"field","size":[42,14],"pos":[16,318],"locked":1,"border":0,"value":"v1.2"}
+index:{"type":"field","size":[243,117],"pos":[16,197],"locked":1,"volatile":1,"script":"Index.2","scrollbar":1}
+version:{"type":"field","size":[42,14],"pos":[16,318],"locked":1,"volatile":1,"border":0}
 
 {script:Index.0}
 on view do
@@ -32,6 +32,7 @@ on view do
   rtext.make["  "],
   rtext.make[("%s\n" format row.t) "mono" row.c]
  end
+ version.text:"v%0.1f" format deck.modules.dd.version
 end
 {end}
 
@@ -129,6 +130,16 @@ field3:{"type":"field","size":[34,14],"pos":[157,239],"locked":1,"border":0,"sty
 ex2:{"type":"field","size":[244,81],"pos":[10,148],"style":"code","value":"o:()\no.border:deck.contraptions.paper\no.fcolor:colors.black\no.bcolor:colors.white\ndd.open[deck o]\ndd.say[\"Prototype Border.\"]\ndd.close[]\n"}
 button4:{"type":"button","size":[60,20],"pos":[267,118],"script":"say.0","text":"Try It!"}
 windoid:{"type":"canvas","size":[36,24],"pos":[22,253],"locked":1,"border":0,"image":"%%IMG2ACQAGAAlASIAAgEBIB8BAgACAQEgAQEBIAEBByABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQECAAIBASADAQEgBQEBIBUBAgACAQEgAQEBIAEBASAFAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBAgACAQEgAwEBIAUBASAVAQIAAgEBIAEBASABAQEgBQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQIAAgEBIAMBASAFAQEgFQECAAIBASABAQEgAQEHIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQIAAgEBIB8BAgACASIAAgEBIB8BAgACAQEgHwECAAIBASAfAQIAAgEBIB8BAgACAQEgHwECAAIBASAfAQIAAgEBIB8BAgACAQEgHwECAAIBASAfAQIAAgEiAAIBIgAl","scale":1}
+button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+
+{card:windowsize}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,28],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"window size"}
+ex1:{"type":"field","size":[244,238],"pos":[10,56],"style":"code","value":"o:()\no.size:200,0\ndd.open[deck o]\ndd.say[\"Fixed width.\"]\n\no.size:0,100\ndd.style[o]\ndd.say[\"Fixed height.\"]\n\no.size:200,120\ndd.style[o]\ndd.say[\"Fixed width and height.\"]\n\ndd.ask[\"Question...\" (\"one\",\"two\")]\n\no.size:0,0\ndd.style[o]\ndd.close[]"}
+field2:{"type":"field","size":[236,238],"pos":[266,56],"locked":1,"border":0,"value":"The \"size\" property can be used to configure a fixed width and/or height for dialog boxes. This can be particularly useful for making custom borders look their best.\n\nThe size property is specifed as a (width,height) pair. If either is 0, it is treated as the default behavior: full screen width minus a small margin, and the height required to display the specified text. If either is nonzero, that axis will take on exactly the specified size.\n\nIf you fix the size of the dialog box, it's up to you to ensure that your text (including option buttons for dd.ask[]) will fit properly! "}
+button4:{"type":"button","size":[60,20],"pos":[266,274],"script":"say.0","text":"Try It!"}
 button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
 
 {card:textspeed}
@@ -373,7 +384,7 @@ image:"%%IMG2AgABVgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8
 
 {module:dd}
 description:"Display sequential, styled modal dialogs for visual novels."
-version:1.2
+version:1.3
 {script}
 # state/constants:
 local host:0
@@ -397,6 +408,7 @@ local osound:"" # open box
 local nsound:"" # advance to next box
 local asound:"" # make a choice
 local tsound:"" # talk
+local dsize:(0,0)
 
 on ifmt x do x format names end
 on fmt x do update text:ifmt @ text from rtext.cat[x] end
@@ -422,9 +434,9 @@ end
 
 on resize height do
  cs0:canvas.size
- cs1:canvas.size[0],height
+ cs1:((host.card.size[0]-2*margin) unless dsize[0]),height
  cp0:canvas.pos
- cp1:canvas.pos[0],host.card.size[1]-cs1[1]+margin
+ cp1:(.5*host.card.size[0]-cs1[0]),host.card.size[1]-cs1[1]+margin
  each t in .2*range 6
   canvas.size:tween[cs0 cs1 t]
   canvas.pos :tween[cp0 cp1 t]
@@ -437,11 +449,11 @@ module.open:on open deck etc do
  if canvas & canvas.show~"transparent" close[] end
  host:deck
  canvas:host.card.add["canvas" "dd_overlay"]
- canvas.size:(host.card.size[0]-2*margin),0
- canvas.pos:margin,host.card.size[1]-margin
+ style[etc]
+ canvas.size:((host.card.size[0]-2*margin) unless dsize[0]),0
+ canvas.pos:(.5*host.card.size[0]-canvas.size[0]),host.card.size[1]-margin
  canvas.show:"transparent"
  canvas.border:0
- style[etc]
  sfx[osound]
 end
 
@@ -458,6 +470,7 @@ module.style:on style etc do
  nsound:if "nsound" in etc etc.nsound else ""       end
  asound:if "asound" in etc etc.asound else ""       end
  tsound:if "tsound" in etc etc.tsound else ""       end
+ dsize: if "size"   in etc etc.size   else (0,0)    end
  border:etc.border.image.copy[]
  pad:"ltrb" dict 4 take if !0~etc.border.margin etc.border.margin else padding end
 end
@@ -481,7 +494,8 @@ module.say:on say text do
    host.card.event["command" (1 drop t)]
   else
    dim:canvas.textsize[seg canvas.size[0]-(pad.l+pad.r)]
-   resize[dim[1]+(pad.t+pad.b)+next.size[1]]
+   szh:dim[1]+(pad.t+pad.b)+next.size[1]
+   resize[szh unless dsize[1]]
    canvas.pattern:fcolor
    if speed
     splits: extract index,1+count t where value in (" ","\n") from "" split t
@@ -530,7 +544,8 @@ module.ask:on ask text choices do
  dims:each choice in segs
   canvas.textsize[choice canvas.size[0]-(2*padding)+(pad.l+pad.r)][1]+2*padding
  end
- resize[dim[1]+(pad.t+pad.b)+(sum dims)+(padding*count dims)]
+ szh:dim[1]+(pad.t+pad.b)+(sum dims)+(padding*count dims)
+ resize[szh unless dsize[1]]
  local r:-1 while -1~r
   draw_border[]
   canvas.font:tfont

@@ -754,7 +754,7 @@ end
 
 {module:dd}
 description:"Display sequential, styled modal dialogs for visual novels."
-version:1.2
+version:1.3
 {script}
 # state/constants:
 local host:0
@@ -778,6 +778,7 @@ local osound:"" # open box
 local nsound:"" # advance to next box
 local asound:"" # make a choice
 local tsound:"" # talk
+local dsize:(0,0)
 
 on ifmt x do x format names end
 on fmt x do update text:ifmt @ text from rtext.cat[x] end
@@ -803,9 +804,9 @@ end
 
 on resize height do
  cs0:canvas.size
- cs1:canvas.size[0],height
+ cs1:((host.card.size[0]-2*margin) unless dsize[0]),height
  cp0:canvas.pos
- cp1:canvas.pos[0],host.card.size[1]-cs1[1]+margin
+ cp1:(.5*host.card.size[0]-cs1[0]),host.card.size[1]-cs1[1]+margin
  each t in .2*range 6
   canvas.size:tween[cs0 cs1 t]
   canvas.pos :tween[cp0 cp1 t]
@@ -818,11 +819,11 @@ module.open:on open deck etc do
  if canvas & canvas.show~"transparent" close[] end
  host:deck
  canvas:host.card.add["canvas" "dd_overlay"]
- canvas.size:(host.card.size[0]-2*margin),0
- canvas.pos:margin,host.card.size[1]-margin
+ style[etc]
+ canvas.size:((host.card.size[0]-2*margin) unless dsize[0]),0
+ canvas.pos:(.5*host.card.size[0]-canvas.size[0]),host.card.size[1]-margin
  canvas.show:"transparent"
  canvas.border:0
- style[etc]
  sfx[osound]
 end
 
@@ -839,6 +840,7 @@ module.style:on style etc do
  nsound:if "nsound" in etc etc.nsound else ""       end
  asound:if "asound" in etc etc.asound else ""       end
  tsound:if "tsound" in etc etc.tsound else ""       end
+ dsize: if "size"   in etc etc.size   else (0,0)    end
  border:etc.border.image.copy[]
  pad:"ltrb" dict 4 take if !0~etc.border.margin etc.border.margin else padding end
 end
@@ -862,7 +864,8 @@ module.say:on say text do
    host.card.event["command" (1 drop t)]
   else
    dim:canvas.textsize[seg canvas.size[0]-(pad.l+pad.r)]
-   resize[dim[1]+(pad.t+pad.b)+next.size[1]]
+   szh:dim[1]+(pad.t+pad.b)+next.size[1]
+   resize[szh unless dsize[1]]
    canvas.pattern:fcolor
    if speed
     splits: extract index,1+count t where value in (" ","\n") from "" split t
@@ -911,7 +914,8 @@ module.ask:on ask text choices do
  dims:each choice in segs
   canvas.textsize[choice canvas.size[0]-(2*padding)+(pad.l+pad.r)][1]+2*padding
  end
- resize[dim[1]+(pad.t+pad.b)+(sum dims)+(padding*count dims)]
+ szh:dim[1]+(pad.t+pad.b)+(sum dims)+(padding*count dims)
+ resize[szh unless dsize[1]]
  local r:-1 while -1~r
   draw_border[]
   canvas.font:tfont
