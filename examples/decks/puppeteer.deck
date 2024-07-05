@@ -875,7 +875,7 @@ module.say:on say text do
   if t[0]~"!"
    host.card.event["command" (1 drop t)]
   else
-   dim:canvas.textsize[seg canvas.size[0]-(pad.l+pad.r)]
+   dim:canvas.textsize[seg (canvas.size[0] unless dsize[0])-(pad.l+pad.r)]
    szh:dim[1]+(pad.t+pad.b)+next.size[1]
    if dsize[0] dim[0]:dsize[0]-pad.l+pad.r end
    resize[szh unless dsize[1]]
@@ -920,12 +920,12 @@ end
 module.ask:on ask text choices do
  seg:fmt[text]
  canvas.font:tfont
- dim:canvas.textsize[seg canvas.size[0]-(pad.l+pad.r)]
+ dim:canvas.textsize[seg (canvas.size[0] unless dsize[0])-(pad.l+pad.r)]
  if (1>count choices)|0~choices choices:list "error: empty choice list for dd.ask!" end
  segs:fmt @ choices
  canvas.font:bfont
  dims:each choice in segs
-  canvas.textsize[choice canvas.size[0]-(2*padding)+(pad.l+pad.r)][1]+2*padding
+  canvas.textsize[choice (canvas.size[0] unless dsize[0])-(2*padding)+(pad.l+pad.r)][1]+2*padding
  end
  szh:dim[1]+(pad.t+pad.b)+(sum dims)+(padding*count dims)
  if dsize[0] dim[0]:dsize[0]-pad.l+pad.r end

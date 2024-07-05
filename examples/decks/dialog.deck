@@ -137,7 +137,7 @@ button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text"
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
 title:{"type":"field","size":[492,17],"pos":[10,28],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"window size"}
-ex1:{"type":"field","size":[244,238],"pos":[10,56],"style":"code","value":"o:()\no.size:200,0\ndd.open[deck o]\ndd.say[\"Fixed width.\"]\n\no.size:0,100\ndd.style[o]\ndd.say[\"Fixed height.\"]\n\no.size:200,120\ndd.style[o]\ndd.say[\"Fixed width and height, with a somewhat longer line to ensure text wrapping is actually happening as intended.\"]\n\ndd.ask[\"Question...\" (\"one\",\"two\")]\n\no.size:0,0\ndd.style[o]\ndd.close[]"}
+ex1:{"type":"field","size":[244,238],"pos":[10,56],"scrollbar":1,"style":"code","value":"o:()\no.size:200,0\ndd.open[deck o]\ndd.say[\"Fixed width, with a somewhat longer line to ensure text wrapping is actually happening as intended.\"]\n\no.size:0,100\ndd.style[o]\ndd.say[\"Fixed height.\"]\n\no.size:200,120\ndd.style[o]\ndd.say[\"Fixed width and height, with a somewhat longer line to ensure text wrapping is actually happening as intended.\"]\n\ndd.ask[\"Question...\" (\"one\",\"two\")]\n\no.size:0,0\ndd.style[o]\ndd.close[]"}
 field2:{"type":"field","size":[236,238],"pos":[266,56],"locked":1,"border":0,"value":"The \"size\" property can be used to configure a fixed width and/or height for dialog boxes. This can be particularly useful for making custom borders look their best.\n\nThe size property is specifed as a (width,height) pair. If either is 0, it is treated as the default behavior: full screen width minus a small margin, and the height required to display the specified text. If either is nonzero, that axis will take on exactly the specified size.\n\nIf you fix the size of the dialog box, it's up to you to ensure that your text (including option buttons for dd.ask[]) will fit properly! "}
 button4:{"type":"button","size":[60,20],"pos":[266,274],"script":"say.0","text":"Try It!"}
 button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
@@ -147,7 +147,7 @@ button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text"
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
 title:{"type":"field","size":[492,17],"pos":[10,28],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"window position"}
-ex1:{"type":"field","size":[244,238],"pos":[10,56],"style":"code","value":"o:()\no.pos:\"center\"\ndd.open[deck o]\ndd.say[\"A vertically and horizontally centered dialog box.\\nNeat, eh?\"]\n\no.size:100,0\no.pos:\"place1\"\ndd.style[o]\ndd.say[\"Over Here...\"]\n\no.pos:\"place2\"\ndd.style[o]\ndd.say[\"...Or over here!\"]\n\no.size:0,0\no.pos:0\ndd.style[o]\ndd.close[]"}
+ex1:{"type":"field","size":[244,238],"pos":[10,56],"scrollbar":1,"style":"code","value":"o:()\no.pos:\"center\"\ndd.open[deck o]\ndd.say[\"A vertically and horizontally centered dialog box.\\nNeat, eh?\"]\n\no.size:100,0\no.pos:\"place1\"\ndd.style[o]\ndd.say[\"Over Here...wih enough text to wrap multiple lines...\"]\n\no.pos:\"place2\"\ndd.style[o]\ndd.say[\"...Or over here!\"]\n\no.pos:\"place1\"\no.size:150,0\ndd.style[o]\ndd.ask[\"A question up here, long enough for word wrapping?\" (\"Red\",\"Blue\")]\n\no.size:0,0\no.pos:0\ndd.style[o]\ndd.close[]"}
 field2:{"type":"field","size":[236,238],"pos":[266,56],"locked":1,"border":0,"value":"The \"pos\" property can be used to configure a custom location for the dialog box on the card.\n\nIf the pos property is 0 (the default), the dialog box will be horizontally centered on the bottom edge of the card.\n\nIf the pos property is the string \"center\", the dialog box will be horizontally and vertically centered on the card.\n\nOtherwise, if the pos property is the name of a widget on the current card, the dialog box will be centered on that widget. This combines nicely with the \"size\" property."}
 button4:{"type":"button","size":[60,20],"pos":[266,274],"script":"say.0","text":"Try It!"}
 button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
@@ -517,7 +517,7 @@ module.say:on say text do
   if t[0]~"!"
    host.card.event["command" (1 drop t)]
   else
-   dim:canvas.textsize[seg canvas.size[0]-(pad.l+pad.r)]
+   dim:canvas.textsize[seg (canvas.size[0] unless dsize[0])-(pad.l+pad.r)]
    szh:dim[1]+(pad.t+pad.b)+next.size[1]
    if dsize[0] dim[0]:dsize[0]-pad.l+pad.r end
    resize[szh unless dsize[1]]
@@ -562,12 +562,12 @@ end
 module.ask:on ask text choices do
  seg:fmt[text]
  canvas.font:tfont
- dim:canvas.textsize[seg canvas.size[0]-(pad.l+pad.r)]
+ dim:canvas.textsize[seg (canvas.size[0] unless dsize[0])-(pad.l+pad.r)]
  if (1>count choices)|0~choices choices:list "error: empty choice list for dd.ask!" end
  segs:fmt @ choices
  canvas.font:bfont
  dims:each choice in segs
-  canvas.textsize[choice canvas.size[0]-(2*padding)+(pad.l+pad.r)][1]+2*padding
+  canvas.textsize[choice (canvas.size[0] unless dsize[0])-(2*padding)+(pad.l+pad.r)][1]+2*padding
  end
  szh:dim[1]+(pad.t+pad.b)+(sum dims)+(padding*count dims)
  if dsize[0] dim[0]:dsize[0]-pad.l+pad.r end
