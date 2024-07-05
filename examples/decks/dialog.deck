@@ -137,7 +137,7 @@ button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text"
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
 title:{"type":"field","size":[492,17],"pos":[10,28],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"window size"}
-ex1:{"type":"field","size":[244,238],"pos":[10,56],"style":"code","value":"o:()\no.size:200,0\ndd.open[deck o]\ndd.say[\"Fixed width.\"]\n\no.size:0,100\ndd.style[o]\ndd.say[\"Fixed height.\"]\n\no.size:200,120\ndd.style[o]\ndd.say[\"Fixed width and height.\"]\n\ndd.ask[\"Question...\" (\"one\",\"two\")]\n\no.size:0,0\ndd.style[o]\ndd.close[]"}
+ex1:{"type":"field","size":[244,238],"pos":[10,56],"style":"code","value":"o:()\no.size:200,0\ndd.open[deck o]\ndd.say[\"Fixed width.\"]\n\no.size:0,100\ndd.style[o]\ndd.say[\"Fixed height.\"]\n\no.size:200,120\ndd.style[o]\ndd.say[\"Fixed width and height, with a somewhat longer line to ensure text wrapping is actually happening as intended.\"]\n\ndd.ask[\"Question...\" (\"one\",\"two\")]\n\no.size:0,0\ndd.style[o]\ndd.close[]"}
 field2:{"type":"field","size":[236,238],"pos":[266,56],"locked":1,"border":0,"value":"The \"size\" property can be used to configure a fixed width and/or height for dialog boxes. This can be particularly useful for making custom borders look their best.\n\nThe size property is specifed as a (width,height) pair. If either is 0, it is treated as the default behavior: full screen width minus a small margin, and the height required to display the specified text. If either is nonzero, that axis will take on exactly the specified size.\n\nIf you fix the size of the dialog box, it's up to you to ensure that your text (including option buttons for dd.ask[]) will fit properly! "}
 button4:{"type":"button","size":[60,20],"pos":[266,274],"script":"say.0","text":"Try It!"}
 button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
@@ -495,6 +495,7 @@ module.say:on say text do
   else
    dim:canvas.textsize[seg canvas.size[0]-(pad.l+pad.r)]
    szh:dim[1]+(pad.t+pad.b)+next.size[1]
+   if dsize[0] dim[0]:dsize[0]-pad.l+pad.r end
    resize[szh unless dsize[1]]
    canvas.pattern:fcolor
    if speed
@@ -545,6 +546,7 @@ module.ask:on ask text choices do
   canvas.textsize[choice canvas.size[0]-(2*padding)+(pad.l+pad.r)][1]+2*padding
  end
  szh:dim[1]+(pad.t+pad.b)+(sum dims)+(padding*count dims)
+ if dsize[0] dim[0]:dsize[0]-pad.l+pad.r end
  resize[szh unless dsize[1]]
  local r:-1 while -1~r
   draw_border[]

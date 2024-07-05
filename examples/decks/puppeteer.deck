@@ -865,6 +865,7 @@ module.say:on say text do
   else
    dim:canvas.textsize[seg canvas.size[0]-(pad.l+pad.r)]
    szh:dim[1]+(pad.t+pad.b)+next.size[1]
+   if dsize[0] dim[0]:dsize[0]-pad.l+pad.r end
    resize[szh unless dsize[1]]
    canvas.pattern:fcolor
    if speed
@@ -915,6 +916,7 @@ module.ask:on ask text choices do
   canvas.textsize[choice canvas.size[0]-(2*padding)+(pad.l+pad.r)][1]+2*padding
  end
  szh:dim[1]+(pad.t+pad.b)+(sum dims)+(padding*count dims)
+ if dsize[0] dim[0]:dsize[0]-pad.l+pad.r end
  resize[szh unless dsize[1]]
  local r:-1 while -1~r
   draw_border[]
