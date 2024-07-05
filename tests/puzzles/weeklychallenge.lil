@@ -800,7 +800,7 @@ problem[134.2]
 # generate a multiplcation table and display count of distinct terms.
 # (took some liberties with the display format here)
 on f m n do
- t:each y in 1+range m y*1+range n end
+ t:(1+range m)*list 1+range n
  d:extract first value by value from raze t
  w:floor 2+(1/ln 10)*ln max t
  c:("","%%%ii")format w
