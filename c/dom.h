@@ -2658,6 +2658,9 @@ lv* deck_write(lv*x,int html){
 		str_addz(&r,"VERSION=\""),str_addz(&r,VERSION),str_addz(&r,"\"\n");
 		str_add(&r,(char*)js_lil_js,js_lil_js_len);
 		str_add(&r,(char*)js_decker_js,js_decker_js_len);
+		#ifdef DANGER_ZONE
+			str_add(&r,(char*)js_danger_js,js_danger_js_len);
+		#endif
 		str_addz(&r,"</script></body>\n");
 	}
 	return lmstr(r);

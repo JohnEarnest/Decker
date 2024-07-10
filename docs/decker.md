@@ -143,7 +143,7 @@ Web-Decker has generally the same tools and functionality as Native-Decker, but 
 - Most web browsers do not allow programs to play audio until the user has interacted with a page, so any `play[]` commands issued before a user has clicked, tapped, or pressed a keyboard key will have no effect.
 - If Web-Decker is accessed via a URL containing a `#` suffix (as in a page anchor), it will attempt to `go[]` to the [URI-decoded](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURI) suffix, making it possible to link to a specific card within a deck.
 - Tracing Mode (_View &#8594; Tracing Mode_) is not available.
-- [The Danger Zone](#thedangerzone) is not available.
+- [The Danger Zone](#thedangerzone) offers a different set of functionality.
 
 In a nutshell, Web-Decker provides an excellent way to share your decks with other people, and a convenient way to play with Decker when you're unable or unwilling to install the native application. If you're making new decks, Native-Decker's saving functionality and keyboard shortcuts may provide a better experience. You can use both however you please- a deck is a deck!
 
@@ -1892,6 +1892,7 @@ When enabled, the _danger_ interface is available as a global constant named `da
 | `danger.read[path hint]` | Read a file `path` using `hint` as necessary to control its interpretation.                 |
 | `danger.write[path x]`   | Write a value `x` to a file `path`. Returns `1` on success.                                 |
 
+
 The `danger.path[]` function can perform a number of useful operations:
 
 - `danger.path["."]` returns the current working directory.
@@ -1912,6 +1913,34 @@ table t.dataset_data.column_names dict flip t.dataset_data.data
 ```
 
 Note that this function executes subcommands _synchronously_; a long-running shell invocation can lock up Decker! The `danger.shell[]` function is not available on Windows.
+
+When Native-Decker is compiled with support for the _danger zone_, Web-Decker exports from it will also contain a _danger_ interface which exposes a low-level interface for browser interaction:
+
+| Name                     | Description                                                                                 |
+| :----------------------- | :------------------------------------------------------------------------------------------ |
+| `typeof danger`          | `"danger"`                                                                                  |
+| `danger.js[x args...]`   | Evaluate a string `x` as JavaScript, optionally called with arguments `args`                |
+
+If `danger.js[x]` is called with a single argument, it will evaluate `x` as JavaScript and return the result. If the result of evaluating `x` is a JS function and additional arguments are supplied, those arguments will be passed to the function and it will be called. Lil values are automatically translated to JS values and vice-versa. Numbers, strings, lists, and dictionaries are recursively converted as copies, with appropriate coercion between the respective type systems. Array interfaces are converted into `Uint8Array` objects and vice-versa (irrespective of `cast`) using a shared underlying data store, allowing both Lil and JS to observe future mutations to such a data structure. Arrays may not be slices, and resizing Array interfaces may reallocate the internal buffer, breaking any shared references. Functions are wrapped in thunks: Lil functions are exposed to JS as JS functions accepting and returning JS values, and JS functions are exposed to Lil as Lil functions accepting and returning Lil values. Any other value- including arbitrary JS objects and Lil interfaces are- converted to a JS `null` or a Lil `0`, respectively.
+
+Thunked Lil functions called from JS do not include any execution quota limits, and can therefore lock up Decker if used improperly. If any errors are thrown when evaluating `x`, it will return `0` and print error messages to the JS console; if more elaborate error handling is desired, implement it JS-side. Directly calling internal Decker functions is not advised, as these do not represent a stable API; prefer passing Lil functions into JS to allow it to manipulate the Decker environment whenever possible. Decker reserves a global JavaScript Object named `ext` where injected JS may attach functions or data without risk of colliding with Decker's global definitions. Decker also offers a function named `ext_add_constant(k,v)` which can be used to install functions or data in Lil's global scope, binding a JS string `k` with a JS value (which will be converted as described above), although when feasible it is recommended that users instead package their JS extensions as Lil modules and expose thunked JS functions in the module dictionary instead of installing new global functions.
+
+A few examples:
+```lil
+danger.js["2+3"]
+# 5
+
+danger.js["x=>3*x" 7]
+# 21
+
+danger.js["ext.util=x=>(x+'').toUpperCase()"]
+danger.js["ext_add_constant('my_util',x=>ext.util(x))"]
+my_util["some string"]
+# "SOME STRING"
+
+danger.js["f=>f(f(47))" (on twice x do x,x end)]
+# (47,47,47,47)
+```
 
 
 Startup

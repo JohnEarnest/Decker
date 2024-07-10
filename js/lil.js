@@ -2682,6 +2682,8 @@ n_go=([x,t,delay],deck)=>{
 n_sleep=([z])=>{if(lis(z)&&ls(z)=='play'){sleep_play=1}else{sleep_frames=max(1,ln(z))};return z}
 n_transition=(f,deck)=>{const t=deck.transit;if(lion(f))dset(t,lms(f.n),f);return t}
 
+const ext={}
+const ext_constants={}
 constants=env=>{
 	env.local('sys'    ,interface_system)
 	env.local('app'    ,interface_app)
@@ -2694,6 +2696,7 @@ constants=env=>{
 		'white|yellow|orange|red|magenta|purple|blue|cyan|green|darkgreen|brown|tan|lightgray|mediumgray|darkgray|black'.split('|').map(lms),
 		range(16).map(x=>lmn(x+32))
 	))
+	Object.keys(ext_constants).map(key=>env.local(key,ext_constants[key]))
 }
 primitives=(env,deck)=>{
 	env.local('show'      ,lmnat(n_show    ))
