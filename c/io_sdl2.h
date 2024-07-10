@@ -66,6 +66,7 @@ void base_path(char*path){
 	if(t){snprintf(path,PATH_MAX,"%s",t);SDL_free(t);}else{snprintf(path,PATH_MAX,"");}
 }
 void open_url(char*x){
+	(void)x;
 	#if SDL_VERSION_ATLEAST(2,0,14)
 		int e=SDL_OpenURL(x);
 		if(e)printf("open url error: %s\n",SDL_GetError());
@@ -224,6 +225,7 @@ void finish_flip(void){SDL_RenderPresent(ren);}
 SDL_Window*win;
 pair get_display_size(void){SDL_DisplayMode dis;SDL_GetDesktopDisplayMode(0,&dis);return (pair){dis.w,dis.h};}
 int get_display_density(pair disp){
+	(void)disp;
 	#if SDL_VERSION_ATLEAST(2,26,0)
 		pair disp_pixels={0,0};SDL_GetWindowSizeInPixels(win,&disp_pixels.x,&disp_pixels.y);
 		if(disp_pixels.x>disp.x)return disp_pixels.x/disp.x;
