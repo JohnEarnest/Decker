@@ -38,6 +38,7 @@ interface_danger=lmi((self,i,x)=>{
 	})
 	return x?x:NONE
 },'danger')
-ext_constants.danger=interface_danger
 ext_add_constant=(k,v)=>{ext_constants[k]=js_to_lil(v)}
+endanger=_=>{ext_constants.danger=interface_danger}
+if(DANGEROUS)endanger()
 

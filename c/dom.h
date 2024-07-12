@@ -2656,11 +2656,15 @@ lv* deck_write(lv*x,int html){
 		str_add(&r,(char*)js_decker_html,js_decker_html_len);
 		str_addz(&r,"<script>\n");
 		str_addz(&r,"VERSION=\""),str_addz(&r,VERSION),str_addz(&r,"\"\n");
-		str_add(&r,(char*)js_lil_js,js_lil_js_len);
-		str_add(&r,(char*)js_decker_js,js_decker_js_len);
 		#ifdef DANGER_ZONE
-			str_add(&r,(char*)js_danger_js,js_danger_js_len);
+			char*df="DANGEROUS=1\n";
+		#else
+			char*df="DANGEROUS=0\n";
 		#endif
+		str_addz(&r,df);
+		str_add(&r,(char*)js_lil_js,js_lil_js_len);
+		str_add(&r,(char*)js_danger_js,js_danger_js_len);
+		str_add(&r,(char*)js_decker_js,js_decker_js_len);
 		str_addz(&r,"</script></body>\n");
 	}
 	return lmstr(r);
