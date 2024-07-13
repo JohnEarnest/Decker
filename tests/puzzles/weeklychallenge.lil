@@ -24,6 +24,16 @@ on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 
 # the problems:
 
+problem[277.1]
+# how many strings appear exactly once in both x and y?
+on f x y do
+ on once x do extract value where 1=count gindex by value from x end
+ count once[x] take once[y]
+end
+assert[f[("Perl", "is", "my", "friend") ("Perl", "and", "Raku", "are", "friend")] 2]
+assert[f[("Perl", "and", "Python", "are", "very", "similar") ("Python", "is", "top", "in", "guest", "languages")] 1]
+assert[f[("Perl", "is", "imperative", "Lisp", "is", "functional") ("Crystal", "is", "similar", "to", "Ruby")] 0]
+
 problem[276.1]
 # how many pairs of elements from x form a multiple of 24?
 on f x do
