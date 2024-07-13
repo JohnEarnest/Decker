@@ -3,6 +3,7 @@
 
 function js_to_lil(x){
 	if(x==null||x==undefined)return NONE
+	if(deck_is(x)||card_is(x)||widget_is(x))return x
 	if('number'==typeof x)return lmn(x)
 	if('string'==typeof x)return lms(clchars(x))
 	if(Array.isArray(x))return lml(x.slice(0).map(js_to_lil))
@@ -14,6 +15,7 @@ function js_to_lil(x){
 	return NONE
 }
 function lil_to_js(x){
+	if(deck_is(x)||card_is(x)||widget_is(x))return x
 	if(lin(x))return ln(x)
 	if(lis(x))return ls(x)
 	if(lil(x))return ll(x).slice(0).map(lil_to_js)
@@ -23,7 +25,6 @@ function lil_to_js(x){
 		// note that this ignores quota, and can therefore lock up Decker if misused!
 		const p=lmblk();blk_lit(p,x),blk_lit(p,js_to_lil(args)),blk_op(p,op.CALL)
 		const e=lmenv();pushstate(e),issue(e,p);while(running())runop();const r=arg();popstate()
-		console.log('lil return value: ',r)
 		return lil_to_js(r)
 	}
 	return null
