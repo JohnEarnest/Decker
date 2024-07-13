@@ -82,12 +82,13 @@ button1:{"type":"button","size":[60,20],"pos":[6,316],"script":"warning.0","text
 button2:{"type":"button","size":[96,20],"pos":[409,316],"script":"about-ls.0","text":"See Inside...","style":"rect"}
 field1:{"type":"field","size":[256,96],"pos":[249,47],"locked":1,"border":0,"value":{"text":["the ajax.send[verb url payload target] function makes an HTTP request with verb (usually GET or POST) to a url  with a string payload. If a response is recieved, the target will be sent a \"http_response[x]\" event with the response value as a string.\n\nthere are some interesting web APIs which do not require authentication listed ","here",", but not all of them appear to provide wildcard CORS headers."],"font":["","",""],"arg":["","https://mixedanalytics.com/blog/list-actually-free-open-no-auth-needed-apis/",""]}}
 field2:{"type":"field","size":[256,157],"pos":[249,153],"locked":1,"show":"invert","value":{"text":["","Why Not?","\n\nDecker does not ordinarily support making HTTP requests out of concern for fidelity and security.\n\nMaking HTTP requests is complex, and would likely draw in a dependency on libcurl in Native-Decker. Web-Decker is subject to ","CORS"," restrictions, which would severely limit consistency between Web- and Native-Decker, and in many cases also render locally-saved instances of Web-Decker nonfunctional. Making remote requests can be used maliciously, violating user privacy, and depending upon remote resources can cause decks to break in the future if those services become unavailable."],"font":["","olympiad_italic","","",""],"arg":["","","","https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS",""]}}
-button3:{"type":"button","size":[166,31],"pos":[46,59],"script":"about-ajax.0","text":"request Lipsum..."}
 response:{"type":"field","size":[236,196],"pos":[6,114],"locked":1,"volatile":1,"scrollbar":1,"style":"code"}
+button3:{"type":"button","size":[47,25],"pos":[186,64],"script":"about-ajax.0","text":"GET"}
+url:{"type":"field","size":[163,25],"pos":[15,64],"style":"code","value":"http://httpbin.org/get"}
 
 {script:about-ajax.0}
 on click do
- ajax.send["GET" "https://loripsum.net/api/5/short/headers" 0 me]
+ ajax.send["GET" url.text 0 me]
  response.text:"<awaiting response...>"
 end
 
@@ -195,7 +196,6 @@ natives:danger.js["_=>({l}
  send:function send(verb,url,payload,callback){l}
   const x=new XMLHttpRequest()
   x.onreadystatechange=_=>{l}
-   console.log('ajax state...',x.readyState,x.status)
    if(x.readyState==XMLHttpRequest.DONE&&x.status==200)callback(x.responseText)
   {r}
   x.open(verb,url)
@@ -282,18 +282,33 @@ on validate do
  end
 end
 
-# stash the Audio object in ext.bgm so that we can access it (and stop it)
+# safari requires audio playback be initiated in direct response to
+# user action the first time it happens, so we play a dummy sound
+# in response to a user's clicks.
+
+# stash the Audio object in ext.bgm.a so that we can access it (and stop it)
 # even if the deck is reloaded:
 
 natives:danger.js["_=>{l}
- function volume(x){l}if(ext.bgm)ext.bgm.volume=x{r}
- function stop(){l}if(ext.bgm)ext.bgm.pause(){r}
+ if(!ext.bgm){l}
+  ext.bgm={l}init:0,a:null{r}
+  document.body.addEventListener('mousedown',_=>{l}
+   if(!ext.bgm.init){l}
+    new Audio().play().catch(e=>console.log('init',e))
+    ext.bgm.init=1
+   {r}
+  {r})
+ {r}
+
+ function volume(x){l}if(ext.bgm.a)ext.bgm.a.volume=x{r}
+ function stop(){l}if(ext.bgm.a)ext.bgm.a.pause(){r}
  function play(path){l}
   stop()
-  ext.bgm=new Audio(path)
-  ext.bgm.loop=true
-  ext.bgm.play().catch(e=>{l}console.log(e){r})
+  ext.bgm.a=new Audio(path)
+  ext.bgm.a.loop=true
+  ext.bgm.a.play().catch(e=>{l}console.log(e){r})
  {r}
+
  return {l}play,stop,volume{r}
 {r}" 0]
 
