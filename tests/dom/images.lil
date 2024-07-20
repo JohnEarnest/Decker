@@ -332,6 +332,12 @@ assert["scale image up nonuniform" "%%IMG0AA4AGAAAAAAAAA/AD8APwD/wP/A/8DzwPPA88D
 assert["scale image down"          "%%IMG0AAQACAAgcFBwUFAA"                                                         image[b].scale[.7,1].encoded]
 assert["scale image negative"      "%%IMG2AAAAAA=="                                                                 image[b].scale[-3,4].encoded]
 assert["scale image none"          "%%IMG2AAAAAA=="                                                                 image[b].scale[    ].encoded]
+assert["scale 0x0 image"           "%%IMG2AAAAAA==" image[0,0].scale[2,3].encoded]
+
+assert["scale image exact"
+	"%%IMG0AAwAbj/AP8DAMMAw//D/8MAwwDD/8P/wwDDAMP/w//DAMMAw//D/8MAwwDD/8P/wwDDAMP/w//DAMMAw//D/8MAwwDD/8P/wwDDAMP/w//DAMMAw//D/8MAwwDD/8P/wwDDAMP/w//DAMMAw//D/8MAwwDD/8P/wwDDAMP/w//DAMMAw//D/8MAwwDD/8P/wwDDAMP/w//DAMMAw//D/8MAwwDD/8P/wwDDAMP/w//DAMMAw//D/8MAwwDD/8P/wwDDAMP/w//DAMMAw//D/8MAwwDD/8P/wwDDAMD/AP8A="
+	image["%%IMG0AAYAN3iE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hHg="].scale[2].encoded
+]
 
 i:image[4,3]
 i.pixels:range 16

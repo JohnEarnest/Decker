@@ -173,12 +173,12 @@ draw_scaled=(r,image,opaque)=>{
 	image_paste_scaled(r,frame.clip,image,frame.image,opaque)
 }
 draw_invert_scaled=(pal,r,image)=>{
-	if(r.w==0||r.h==0)return;const s=image.size, fb=frame.image.pix, fs=frame.image.size.x
+	if(r.w==0||r.h==0)return;const s=image.size, fb=frame.image.pix, fs=frame.image.size.x, sc=lerp_scale(r,s)
 	const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal[(x%8)+(8*(y%8))+(8*8*pix)]&1
 	const gpix=p=>fb[p.x+p.y*fs], pix=(p,v)=>fb[p.x+p.y*fs]=v
 	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
-		const sx=0|(s.x==r.w?b:((b*1.0)/r.w)*s.x), sy=0|(s.y==r.h?a:((a*1.0)/r.h)*s.y), dx=r.x+b, dy=r.y+a
-		const c=draw_pattern(image.pix[sx+sy*s.x],dx,dy), h=rect(dx,dy)
+		const sx=0|(b/sc.x), sy=0|(a/sc.y), dx=r.x+b, dy=r.y+a, v=image.pix[sx+sy*s.x]
+		const c=draw_pattern(v,dx,dy), h=rect(dx,dy)
 		if(inclip(h))pix(h,c^draw_pattern(gpix(h),dx,dy))
 	}
 }
@@ -197,10 +197,11 @@ draw_fat_scaled=(r,image,opaque,pal,frame_count,scale,offset)=>{
 	const anim=deck.patterns.anim
 	const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][(0|(frame_count/4))%max(1,anim[pix-28].length)]
 	const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal[(x%8)+(8*(y%8))+(8*8*pix)]&1
-	if(r.w==0||r.h==0)return;const s=image.size;for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++){
-		const sx=0|(s.x==r.w?x:((x*1.0)/r.w)*s.x), sy=0|(s.y==r.h?y:((y*1.0)/r.h)*s.y), v=image.pix[sx+sy*s.x]
-		const c=anim_pattern(v,r.x+x,r.y+y),p=draw_pattern(c,r.x+x,r.y+y)
-		if(opaque||v!=0)draw_rect(radd(rect((r.x+x)*scale,(r.y+y)*scale,scale,scale),offset),c>=32?c: p?1:0)
+	if(r.w==0||r.h==0)return;const s=image.size, sc=lerp_scale(r,s)
+	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
+		const sx=0|(b/sc.x), sy=0|(a/sc.y), dx=r.x+b, dy=r.y+a, v=image.pix[sx+sy*s.x]
+		const c=anim_pattern(v,dx,dy),p=draw_pattern(c,dx,dy)
+		if(opaque||v!=0)draw_rect(radd(rect(dx*scale,dy*scale,scale,scale),offset),c>=32?c: p?1:0)
 	}
 }
 draw_dithered=(r,image,opaque,mask,threshold)=>{

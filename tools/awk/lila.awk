@@ -1651,10 +1651,10 @@ function image_paste(img,src,opaque,rx,ry,  sx,sy,dx,dy){
 	}
 }
 function image_paste_scaled(img,src,opaque,rx,ry,rw,rh,  sx,sy,dx,dy,a,b,c,tx,ty){
-	if(rw==0||rh==0)return;sx=image_w(src);sy=image_h(src);dx=image_w(img);dy=image_h(img)
+	if(rw==0||rh==0)return;sx=image_w(src);sy=image_h(src);dx=image_w(img);dy=image_h(img);sx=rw/sx;sy=rh/sy;
 	if(rw==sx&&rh==sy){image_paste(dst,src,opaque,rx,ry);return}
 	for(a=0;a<rh;a++)for(b=0;b<rw;b++){
-		c=image_get_px(src,int((b/rw)*sx),int((a/rh)*sy));if(!opaque&&c==0)continue
+		c=image_get_px(src,int(b/sx),int(a/sy));if(!opaque&&c==0)continue
 		tx=rx+b;ty=ry+a;if(tx>=0&&ty>=0&&tx<dx&&ty<dy)image_set_px(img,tx,ty,c)
 	}
 }

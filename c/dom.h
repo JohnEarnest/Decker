@@ -464,11 +464,15 @@ void buffer_paste(rect r,rect cl,lv*src,lv*dst,int opaque){
 	pair ss=buff_size(src),ds=buff_size(dst);
 	for(int y=0;y<ss.y;y++)for(int x=0;x<ss.x;x++)if(box_in(cl,(pair){r.x+x,r.y+y})&&(opaque||src->sv[x+ss.x*y]))dst->sv[r.x+x+ds.x*(r.y+y)]=src->sv[x+ss.x*y];
 }
+
+#define EPSILON      0.000001
+#define lerp_scale() fpair sc={MAX(EPSILON,(r.w*1.0)/(s.x==0?EPSILON:s.x)),MAX(EPSILON,(r.h*1.0)/(s.y==0?EPSILON:s.y))};
+
 void buffer_paste_scaled(rect r,rect cl,lv*src,lv*dst,int opaque){
-	if(r.w==0||r.h==0)return;pair s=buff_size(src),ds=buff_size(dst);
+	if(r.w==0||r.h==0)return;pair s=buff_size(src),ds=buff_size(dst);lerp_scale();
 	if(r.w==s.x&&r.h==s.y){buffer_paste(r,cl,src,dst,opaque);return;}
 	for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++){
-		int sx=((b*1.0)/r.w)*s.x, sy=((a*1.0)/r.h)*s.y, c=src->sv[sx+sy*s.x];
+		int sx=b/sc.x, sy=a/sc.y, c=src->sv[sx+sy*s.x];
 		if((opaque||c!=0)&&box_in(cl,(pair){r.x+b,r.y+a}))dst->sv[r.x+b+ds.x*(r.y+a)]=c;
 	}
 }
@@ -867,18 +871,18 @@ void draw_fill(pair r,int pattern,char*src){
 	}
 }
 void draw_scaled(rect r,lv*buff,int opaque){
-	if(r.w==0||r.h==0)return;pair s=buff_size(buff);
+	if(r.w==0||r.h==0)return;pair s=buff_size(buff);lerp_scale()
 	if(r.w==s.x&&r.h==s.y){buffer_paste(r,frame.clip,buff,frame.buffer,opaque);return;}
 	for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++){
-		int sx=((b*1.0)/r.w)*s.x, sy=((a*1.0)/r.h)*s.y, c=buff->sv[sx+sy*s.x];
+		int sx=b/sc.x, sy=a/sc.y, c=buff->sv[sx+sy*s.x];
 		if((opaque||c!=0)&&inclip(r.x+b,r.y+a))PIX(r.x+b,r.y+a)=c;
 	}
 }
 void draw_invert_scaled(char*pal,rect r,lv*buff){
-	if(r.w==0||r.h==0)return;pair s=buff_size(buff);
+	if(r.w==0||r.h==0)return;pair s=buff_size(buff);lerp_scale();
 	for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++){
-		int sx=s.x==r.w?b:((b*1.0)/r.w)*s.x, sy=s.y==r.h?a:((a*1.0)/r.h)*s.y, dx=r.x+b, dy=r.y+a;
-		int c=draw_pattern(pal,buff->sv[sx+sy*s.x],dx,dy);
+		int sx=b/sc.x, sy=a/sc.y, dx=r.x+b, dy=r.y+a, v=buff->sv[sx+sy*s.x];
+		int c=draw_pattern(pal,v,dx,dy);
 		if(inclip(dx,dy))PIX(dx,dy)=c^draw_pattern(pal,PIX(dx,dy),dx,dy);
 	}
 }
@@ -891,10 +895,11 @@ void draw_fat(rect r,lv*buff,char*pal,int frame_count,int mask,float scale,pair 
 	}
 }
 void draw_fat_scaled(rect r,lv*buff,int opaque,char*pal,int frame_count,int scale,pair offset){
-	if(r.w==0||r.h==0)return;pair s=buff_size(buff);for(int y=0;y<r.h;y++)for(int x=0;x<r.w;x++){
-		int sx=s.x==r.w?x:((x*1.0)/r.w)*s.x, sy=s.y==r.h?y:((y*1.0)/r.h)*s.y, v=buff->sv[sx+sy*s.x];
-		int c=anim_pattern(pal,v,frame_count),p=draw_pattern(pal,c,r.x+x,r.y+y);
-		if(opaque||v!=0)draw_rect(rect_add((rect){(r.x+x)*scale,(r.y+y)*scale,scale,scale},offset),c>=32?c: p?1:0);
+	if(r.w==0||r.h==0)return;pair s=buff_size(buff);lerp_scale();
+	for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++){
+		int sx=b/sc.x, sy=a/sc.y, dx=r.x+b, dy=r.y+a, v=buff->sv[sx+sy*s.x];
+		int c=anim_pattern(pal,v,frame_count),p=draw_pattern(pal,c,dx,dy);
+		if(opaque||v!=0)draw_rect(rect_add((rect){dx*scale,dy*scale,scale,scale},offset),c>=32?c: p?1:0);
 	}
 }
 float*dither_err=NULL;int dither_err_size=0;float dither_threshold=0.5;
