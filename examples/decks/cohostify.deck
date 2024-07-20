@@ -95,6 +95,17 @@ end
 # taking advantage of writexml[] to manage
 # all the hideous entity escaping:
 
+html_escapes:raze insert k v with
+ "\n" "<br>"
+ " "  "&nbsp;"
+ "\"" "&quot;"
+ "'"  "&apos;"
+ "<"  "&lt;"
+ ">"  "&gt;"
+ "&"  "&amp;"
+end
+html_specials:"" fuse keys html_escapes
+
 on highlight_to_html text raw do
  r.tag:"pre"
  if raw r.attr.style:inlines.pre else r.attr.class:"lil" end
@@ -107,12 +118,11 @@ on highlight_to_html text raw do
    t:row.text
    esc:array[]
    while count t
-    if     " " ~first t           esc.cat["&nbsp;"] t:1 drop t
-    elseif "\n"~first t           esc.cat["<br>"  ] t:1 drop t
-    else   c:"%-.2r\n %n" parse t esc.cat[first c ] t:(last c) drop t
+    if (first t) in html_specials  esc.cat[html_escapes[first t]] t:1 drop t
+    else c:"%-.7r\n \"'<>&%n" parse t esc.cat[first c ] t:(last c) drop t
     end
    end
-   list esc #list row.text
+   list esc
   end
  end
  writexml[r]
