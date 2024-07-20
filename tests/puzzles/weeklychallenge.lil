@@ -24,6 +24,26 @@ on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 
 # the problems:
 
+problem[278.1]
+# unsort words in a sentence x based on their trailing index digit
+# (the parsing pattern is a little awkward, but it results in a nice clean query pipeline)
+on f x do
+ " " fuse extract c0 orderby c1 asc from table "%-.10r0123456789%i" parse " " split x
+end
+assert[f["and2 Raku3 cousins5 Perl1 are4"] "Perl and Raku are cousins"]
+assert[f["guest6 Python1 most4 the3 popular5 is2 language7"] "Python is the most popular guest language"]
+assert[f["Challenge3 The1 Weekly2"] "The Weekly Challenge"]
+
+problem[278.2]
+# sort characters of x ascending up to the first occurrence of y (if any)
+on f x y do
+ i:1+first extract index where value=y from x
+ "" fuse (extract orderby value asc from i take x),i drop x
+end
+assert[f["challenge"   "e"] "acehllnge"  ]
+assert[f["programming" "a"] "agoprrmming"]
+assert[f["champion"    "b"] "champion"   ]
+
 problem[277.1]
 # how many strings appear exactly once in both x and y?
 on f x y do
