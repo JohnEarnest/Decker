@@ -1,23 +1,15 @@
 # Command-line minesweeper in Lil
 
-if !5~count args
- print["Usage: lilt mines.lil width height mines_count"]
- exit[0]
-end
-
-# game state:
 local mines :0  # {0,1} image; is there a mine here?
-local seen  :0  # {0,1} image; has this tile been revealed?
+local cover :0  # {0,1} image; is this tile covered?
 local around:0  # [0-9] image; adjacent mine count
+local deltas:flip (list 0,0) drop (3 cross 3)-1
 
 on setup size mine_count do
  mines:image[size]
- seen :image[size]
- # select mine positions without replacement:
- each pos in random[(size[0] cross size[1]) (-mine_count)]
-  mines[pos]:1
- end
- # compute adjacent mine counts for all tiles in parallel:
+ cover:image[size].map[() 1]
+ sys.seed:sys.ms
+ mines.pixels:random[mine_count>range prod size (-prod size)]
  horiz:mines.copy[]
   .merge["+" mines.copy[].translate[-1,0]]
   .merge["+" mines.copy[].translate[ 1,0]]
@@ -26,54 +18,44 @@ on setup size mine_count do
   .merge["+" horiz.copy[].translate[0, 1]]
 end
 
-on reveal pos do
- # depth-first traversal of empty tiles:
- on revealrec here do
-  if !seen[here]
-   seen[here]:1
-   if (!around[here])&(min -1<here)&(min here<mines.size)
-    revealrec @ flip here+flip (list 0,0) drop (3 cross 3)-1
-   end
-  end
- end
- revealrec[pos]
- # the game is over if we picked a mined tile
- # OR we've revealed everything except the mines:
- if     mines[pos]                "lose"
- elseif mines.pixels~!seen.pixels "win"
- else                             "play"
- end
-end
-
 on display do
- # include legends on the top and left,
- # to aid in arriving at coordinates:
- print["\n   %s" floor .1*range mines.size[0]]
- print["   %s\n" 10%      range mines.size[0]]
- each row in range mines.size[1]
-  print[("%02i " format row),each col in range mines.size[0]
-   pos:col,row
-   if     !seen[pos] "#"
-   elseif mines[pos] "*"
-   else "_" unless around[pos]
+ cm:range mines.size[0]
+ print["\n   %s\n   %s\n" floor .1*cm 10%cm]
+ each row ri in mines.pixels
+  print[("%02i " format ri),each mine ci in row
+   if     cover[ci,ri] "#"
+   elseif mine         "*"
+   else "_" unless around[ci,ri]
    end
   end]
  end
  print[""]
 end
 
-# lilt uses a hardcoded initial seed for reproducibility,
-# which is undesirable for an entertaining game:
-sys.seed:sys.ms
-setup[0+args@2,3 0+args[4]]
+on reveal here do
+ if cover[here]
+  cover[here]:0
+  if !around[here] reveal @ flip here+deltas end
+ end
+end
 
-while 1
+on finish outcome do
+ cover.map[() 0]
  display[]
- r:reveal["%i,%i" parse input["x,y > "]]
- if r in ("win","lose")
-  seen.map[() 1]
+ print["You %s!" outcome]
+ exit[0]
+end
+
+if !5~count args
+ print["Usage: lilt mines.lil width height mines_count"]
+else
+ setup[0+args@2,3 0+args[4]]
+ while 1
   display[]
-  print["You %s!" r]
-  exit[0]
+  pos:"%i,%i" parse input["x,y > "]
+  reveal[pos]
+  if     mines[pos]                finish.lose
+  elseif mines.pixels~cover.pixels finish.win
+  end
  end
 end
