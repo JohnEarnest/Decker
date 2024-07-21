@@ -2145,7 +2145,7 @@ BEGIN{
 	env_loc(rootenv,"random",lmnat("random","random"))
 	split("white|yellow|orange|red|magenta|purple|blue|cyan|green|darkgreen|brown|tan|lightgray|mediumgray|darkgray|black",color_arr,"|")
 	color_dic=lmd();for(key in color_arr)dset(color_dic,lms(color_arr[key]),lmn(key+31));env_loc(rootenv,"colors",color_dic)
-	arg_list =lml();for(key in ARGV     )lst_add(arg_list,lms(ARGV[key]))               ;env_loc(rootenv,"args"  ,arg_list )
+	arg_list =lml();for(z=0;z<ARGC;z++)lst_add(arg_list,lms(ARGV[z]))                   ;env_loc(rootenv,"args"  ,arg_list )
 	env_dic=lmd();env_loc(rootenv,"env",env_dic);for(k in ENVIRON)dset(env_dic,lms(k),lms(ENVIRON[k]));
 }
 
