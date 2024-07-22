@@ -3024,7 +3024,7 @@ all_menus=_=>{
 	if(menu_check('Toolbars',tzoom>0,toolbars_enable))toolbars_enable^=1,resize()
 	if(blocked){
 		menu_bar('Script',1)
-		if(menu_item('Stop',1)){msg.pending_halt=1;if(ms.type!=null&&ms.type!='query'&&ms.type!='listen')modal_exit(0)}
+		if(menu_item('Stop',1)){msg.pending_halt=1;if(ms.type!=null&&ms.type!='query'&&ms.type!='listen')modal_exit(0),setmode('object')}
 		menu_bar('Edit',(ms.type=='input'||ms.type=='save')&&wid.fv)
 		text_edit_menu()
 		return
