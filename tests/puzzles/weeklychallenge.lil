@@ -24,6 +24,25 @@ on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 
 # the problems:
 
+problem[279.1]
+# sort the characters of a string x by weights y
+on f x y do "" fuse extract orderby y asc from x end
+assert[f["REPL"   (3,2,1,4    )] "PERL"  ]
+assert[f["AURK"   (2,4,1,3    )] "RAKU"  ]
+assert[f["OHYNPT" (5,4,2,6,1,3)] "PYTHON"]
+
+problem[279.2]
+# is there a split point which divides x into two strings containing the same number of vowels?
+on f x do
+ x:("" split x) in "aeiouy"
+ max each i in range count x
+  (sum i take x)~(sum i drop x)
+ end
+end
+assert[f["perl"        ] 0]
+assert[f["book"        ] 1]
+assert[f["good morning"] 1]
+
 problem[278.1]
 # unsort words in a sentence x based on their trailing index digit
 # (the parsing pattern is a little awkward, but it results in a nice clean query pipeline)
