@@ -1040,9 +1040,13 @@ void listener(rect r){
 		int cy=0;EACH(z,li.hist){
 			lv*l=li.hist->lv[z]->lv[0],*t=li.hist->lv[z]->lv[1]; pair s=buff_size(l); rect lb={b.x,b.y+cy-li.scroll,s.x,s.y};
 			buffer_paste(lb,b,l,frame.buffer,0);cy+=s.y+5;
-			lb=box_intersect(b,lb);int v=lis(t)&&over(lb), a=v&&dover(lb);
+			lb=box_intersect(b,lb);int v=over(lb), a=v&&dover(lb);
 			if(v)uicursor=cursor_point,draw_box(inset(lb,-1),0,13); if(a&&(ev.md||ev.drag))draw_invert(pal,lb);
-			if(a&&ev.mu)ms.text=(field_val){rtext_cast(t),0};
+			if(a&&ev.mu){
+				if(image_is(t)){t=l_format(lmistr("image[\"%s\"]"),ifield(t,"encoded"));}
+				else if(!lis(t)){str s=str_new();show(&s,t,0);t=lmstr(s);}
+				ms.text=(field_val){rtext_cast(t),0};
+			}
 		}
 	}
 }

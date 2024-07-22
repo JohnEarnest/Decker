@@ -1121,9 +1121,9 @@ listener=r=>{
 		let cy=0;li.hist.map(x=>{
 			const l=x[0], t=x[1], s=l.size; let lb=rect(b.x,b.y+cy-li.scroll,s.x,s.y)
 			image_paste(lb,b,l,frame.image,0),cy+=s.y+5
-			lb=rclip(b,lb);const v=lis(t)&&over(lb), a=v&&dover(lb)
+			lb=rclip(b,lb);const v=over(lb), a=v&&dover(lb)
 			if(v)uicursor=cursor.point,draw_box(inset(lb,-1),0,13); if(a&&(ev.md||ev.drag))draw_invert(pal,lb)
-			if(a&&ev.mu)ms.text=fieldstr(t)
+			if(a&&ev.mu)ms.text=fieldstr(image_is(t)?lms(`image["${ls(ifield(t,'encoded'))}"]`): !lis(t)?lms(show(t)): t)
 		})
 	}
 }
