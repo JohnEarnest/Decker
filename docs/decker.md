@@ -1619,6 +1619,7 @@ Contraptions and prototypes have a few important limitations to keep in mind:
 
 - Prototypes cannot contain contraptions. In other words, contraptions are non-recursive.
 - Unlike a card, contraption instances cannot add or remove "child" widgets dynamically.
+- The [Contraption Interface](#contraptioninterface) does not have a `.widgets` attribute: using `card.widgets` to enumerate and search inner widgets by name will work in the Prototype editor, but will _not_ work in actual contraption instances!
 - Custom attribute reads and writes (from the outside) run in a brief quota, just like transition functions and module startup. If they take too long to execute, they halt and return `0`.
 - Custom attributes cannot be invoked recursively or directly call other custom attributes. If this is attempted, they halt and return `0`. For example, a script inside a prototype should use `get_value[]` instead of `card.value` to access the `value` attribute.
 
