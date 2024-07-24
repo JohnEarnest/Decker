@@ -2561,7 +2561,7 @@ lv* deck_read(lv*x){
 	{lv*k=lmistr("patterns");dset(r,k,patterns_read(deck));}
 	{lv*k=lmistr("version" ),*f=dget(deck,k);dset(r,k,f?f:lmn(1));}
 	{lv*k=lmistr("locked"  ),*f=dget(deck,k);dset(r,k,bool_read(f,0));}
-	{lv*k=lmistr("size"    ),*f=dget(deck,k);dset(r,k,f?lmpair(pair_max(getpair(normalize_pair(f)),(pair){320,240})):lmpair((pair){512,342}));}
+	{lv*k=lmistr("size"    ),*f=dget(deck,k);dset(r,k,f?lmpair(pair_max(getpair(normalize_pair(f)),(pair){8,8})):lmpair((pair){512,342}));}
 	{lv*k=lmistr("name"    ),*f=dget(deck,k);dset(r,k,str_read(f,""));}
 	{lv*k=lmistr("author"  ),*f=dget(deck,k);dset(r,k,str_read(f,""));}
 	{lv*k=lmistr("script"  ),*f=dget(deck,k);dset(r,k,str_read(f,""));}

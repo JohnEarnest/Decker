@@ -2591,7 +2591,7 @@ deck_read=x=>{
 	ri.author      ='author'  in deck?ls(deck.author ):''
 	ri.script      ='script'  in deck?scripts[ln(deck.script)]:''
 	ri.card        ='card'    in deck?clamp(0,ln(deck.card),Object.keys(cards).length-1):0
-	ri.size        ='size'    in deck?rclamp(rect(320,240),getpair(deck.size),rect(4096,4096)):rect(512,342)
+	ri.size        ='size'    in deck?rclamp(rect(8,8),getpair(deck.size),rect(4096,4096)):rect(512,342)
 	if(Object.keys(cards).length==0)cards.home=lmd(['name'].map(lms),[lms('home')])
 	const root=lmenv();constants(root),primitives(root,ri)
 	pushstate(root),issue(root,parse(DEFAULT_TRANSITIONS));while(running())runop();popstate()
