@@ -395,14 +395,15 @@ int is_blank(lv*x){if(!image_is(x))return 0;EACH(z,x->b)if(x->b->sv[z])return 0;
 void buff_merge_op(lv*target,lv*src,char op){
 	pair ts=buff_size(target),bs=buff_size(src);char*t=target->sv,*b=src->sv;if(bs.x==0||bs.y==0)return;
 	#define op_kernel for(int y=0,i=0;y<ts.y;y++)for(int x=0;x<ts.x;x++,i++)
-	#define op_index  b[(x%bs.x)+(y%bs.y)*bs.x]
-	if(op=='+'){op_kernel t[i]+=op_index                   ;}
-	if(op=='-'){op_kernel t[i]-=op_index                   ;}
-	if(op=='&'){op_kernel {int c=op_index;t[i]=MIN(t[i],c);}}
-	if(op=='|'){op_kernel {int c=op_index;t[i]=MAX(t[i],c);}}
-	if(op=='<'){op_kernel t[i]=t[i] <op_index              ;}
-	if(op=='>'){op_kernel t[i]=t[i] >op_index              ;}
-	if(op=='='){op_kernel t[i]=t[i]==op_index              ;}
+	#define op_index  (0xFF&b[(x%bs.x)+(y%bs.y)*bs.x])
+	if(op=='+'){op_kernel t[i]=0xFF&((0xFF&t[i])+op_index)             ;}
+	if(op=='-'){op_kernel t[i]=0xFF&((0xFF&t[i])-op_index)             ;}
+	if(op=='*'){op_kernel t[i]=0xFF&((0xFF&t[i])*op_index)             ;}
+	if(op=='&'){op_kernel {int c=op_index;t[i]=0xFF&MIN((0xFF&t[i]),c);}}
+	if(op=='|'){op_kernel {int c=op_index;t[i]=0xFF&MAX((0xFF&t[i]),c);}}
+	if(op=='<'){op_kernel t[i]=(0xFF&t[i]) <op_index                   ;}
+	if(op=='>'){op_kernel t[i]=(0xFF&t[i]) >op_index                   ;}
+	if(op=='='){op_kernel t[i]=(0xFF&t[i])==op_index                   ;}
 }
 lv* n_image_merge(lv*self,lv*z){
 	if(lis(l_first(z))){if(z->c>=2&&image_is(z->lv[1]))buff_merge_op(self->b,z->lv[1]->b,ls(l_first(z))->sv[0]);return self;}

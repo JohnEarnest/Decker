@@ -214,12 +214,18 @@ horiz:image["%%IMG2AAgACAAIAQgCCAMIBAgFCAYIBwg="]
 vert :image["%%IMG1AAgACAABAgMEBQYHAAECAwQFBgcAAQIDBAUGBwABAgMEBQYHAAECAwQFBgcAAQIDBAUGBwABAgMEBQYHAAECAwQFBgc="]
 assert["image + merge" "%%IMG1AAgACAABAgMEBQYHAQIDBAUGBwgCAwQFBgcICQMEBQYHCAkKBAUGBwgJCgsFBgcICQoLDAYHCAkKCwwNBwgJCgsMDQ4=" horiz.copy[].merge["+" vert].encoded]
 assert["image - merge" "%%IMG1AAgACAD//v38+/r5AQD//v38+/oCAQD//v38+wMCAQD//v38BAMCAQD//v0FBAMCAQD//gYFBAMCAQD/BwYFBAMCAQA=" horiz.copy[].merge["-" vert].encoded]
+assert["image * merge" "%%IMG1AAgACAAAAAAAAAAAAAECAwQFBgcAAgQGCAoMDgADBgkMDxIVAAQIDBAUGBwABQoPFBkeIwAGDBIYHiQqAAcOFRwjKjE=" horiz.copy[].merge["*" vert].encoded]
 assert["image & merge" "%%IMG1AAgACAAAAAAAAAAAAAEBAQEBAQEAAQICAgICAgABAgMDAwMDAAECAwQEBAQAAQIDBAUFBQABAgMEBQYGAAECAwQFBgc=" horiz.copy[].merge["&" vert].encoded]
 assert["image | merge" "%%IMG1AAgACAABAgMEBQYHAQECAwQFBgcCAgIDBAUGBwMDAwMEBQYHBAQEBAQFBgcFBQUFBQUGBwYGBgYGBgYHBwcHBwcHBwc=" horiz.copy[].merge["|" vert].encoded]
 assert["image = merge" "%%IMG0AAgACIBAIBAIBAIB"                                                                             horiz.copy[].merge["=" vert].encoded]
 assert["image > merge" "%%IMG0AAgACACAwODw+Pz+"                                                                             horiz.copy[].merge[">" vert].encoded]
 assert["image < merge" "%%IMG0AAgACH8/Hw8HAwEA"                                                                             horiz.copy[].merge["<" vert].encoded]
 assert["image op merge with empty image" horiz.encoded horiz.copy[].merge["+" image[0,0]].encoded]
+
+a:image[8,1] a.pixels:1,2,3,4,5,6,7,8
+b:image[8,1] b.pixels:254,253,128,127,126,125
+a.merge["|" b]
+assert["image merge limits" (list(254,253,128,127,126,125,7,8)) a.pixels]
 
 a:image[2,1] a[0,0]:100 a[1,0]:1
 b:image[2,1] b[0,0]:200 b[1,0]:5

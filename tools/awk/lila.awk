@@ -1574,6 +1574,7 @@ function n_image_merge(img,args,  src,op,y,x,r,sx,sy,bx,by,z,v){
 			bx=image_w(src);by=image_h(src);if(bx==0||by==0)return img
 			if(op=="+"){r="";for(y=0;y<sy;y++)for(x=0;x<sx;x++){r=r b2h[mod(image_get_px(img,x,y)+image_get_px(src,x%bx,y%by),256)]};heap_v[img]=r}
 			if(op=="-"){r="";for(y=0;y<sy;y++)for(x=0;x<sx;x++){r=r b2h[mod(image_get_px(img,x,y)-image_get_px(src,x%bx,y%by),256)]};heap_v[img]=r}
+			if(op=="*"){r="";for(y=0;y<sy;y++)for(x=0;x<sx;x++){r=r b2h[mod(image_get_px(img,x,y)*image_get_px(src,x%bx,y%by),256)]};heap_v[img]=r}
 			if(op=="&"){r="";for(y=0;y<sy;y++)for(x=0;x<sx;x++){r=r b2h[min(image_get_px(img,x,y), image_get_px(src,x%bx,y%by))    ]};heap_v[img]=r}
 			if(op=="|"){r="";for(y=0;y<sy;y++)for(x=0;x<sx;x++){r=r b2h[max(image_get_px(img,x,y), image_get_px(src,x%bx,y%by))    ]};heap_v[img]=r}
 			if(op==">"){r="";for(y=0;y<sy;y++)for(x=0;x<sx;x++){r=r b2h[    image_get_px(img,x,y)> image_get_px(src,x%bx,y%by)     ]};heap_v[img]=r}

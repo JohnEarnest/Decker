@@ -39,8 +39,11 @@ echo "successfully compiled lilt.com"
 
 # sanity-check against the full test suite
 ./scripts/test_interpreter.sh "./lilt.com"
+./lilt.com tests/dom/arrays.lil
+./lilt.com tests/dom/images.lil
 ./lilt.com tests/dom/domtests.lil
 ./lilt.com tests/dom/test_roundtrip.lil
+./lilt.com tests/puzzles/weeklychallenge.lil
 
 # note: on osx (zsh) it is necessary to invoke the output as:
 # bash -c './lilt.com'
