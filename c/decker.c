@@ -3472,7 +3472,7 @@ void all_menus(void){
 		menu_bar("Script",1);
 		if(menu_item("Stop",1,'\0')){
 			msg.pending_halt=1;
-			if(ms.type!=modal_none&&ms.type!=modal_query&&ms.type!=modal_listen)modal_exit(0),setmode(mode_object);
+			if(ms.type!=modal_query&&ms.type!=modal_listen){if(ms.type!=modal_none){modal_exit(0);}setmode(mode_object);}
 		}
 		menu_bar("Edit",(ms.type==modal_input||ms.type==modal_save)&&wid.fv);
 		text_edit_menu();
