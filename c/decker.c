@@ -3229,7 +3229,7 @@ void event_key(int c,int m,int down,const char*name){
 			if(c==KEY_LEFT )msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("left");
 			if(c==KEY_RIGHT)msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("right");
 		}
-		if((uimode==mode_interact||uimode==mode_object||uimode==mode_draw)&&ms.type==modal_none&&!kc.on){
+		if((uimode==mode_interact||uimode==mode_object||uimode==mode_draw)&&ms.type==modal_none&&!kc.on&&deck&&!lb(ifield(deck,"locked"))){
 			if(c==KEY_F1)setmode(mode_interact);
 			if(c==KEY_F2)setmode(mode_object);
 			int f[]={KEY_F3,KEY_F4,KEY_F5,KEY_F6,KEY_F7,KEY_F8,KEY_F9,KEY_F10,KEY_F11,KEY_F12};
