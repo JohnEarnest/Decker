@@ -1848,8 +1848,8 @@ void modals(void){
 		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"OK",1)||ev.exit)modal_exit(0);
 	}
 	else if(ms.type==modal_choose_lil){
-		rect b=modal_rtext((pair){0,5+60+5+20});
-		int choose=ui_table((rect){b.x,b.y+b.h-(20+5+60),b.w,60},0,0,0,"s",&ms.grid);
+		rect b=modal_rtext((pair){0,5+80+5+20});
+		int choose=ui_table((rect){b.x,b.y+b.h-(20+5+80),b.w,80},0,0,0,"s",&ms.grid);
 		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"OK",ms.grid.row>=0)||choose)modal_exit(1);
 	}
 	else if(ms.type==modal_brush){
