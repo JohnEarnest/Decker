@@ -567,15 +567,24 @@ parse=text=>{
 		}
 		if(matchsp('(')){if(matchsp(')')){blk_lit(b,lml([]));return}expr(b),expect(')');return}
 		const s=peek().v;if(findop(s,monad)>=0&&peek().t in{'symbol':1,'name':1}){
-			next();if(matchsp('@')){expr(b),blk_opa(b,op.FMAP,findop(s,monad))}else{expr(b),blk_op1(b,s)};return
+			next();if(matchsp('@')){
+				let depth=0,l=lmblk();while(matchsp('@'))depth++
+				expr(b),blk_opa(l,op.FMAP,findop(s,monad))
+				while(depth-->0){const t=tempname(),m=lmblk();blk_loop(m,[ls(t)],_=>{blk_get(m,t),blk_cat(m,l)}),l=m}
+				blk_cat(b,l)
+			}else{expr(b),blk_op1(b,s)};return
 		}const n=lms(name('variable'));if(matchsp(':')){expr(b),blk_set(b,n);return}blk_get(b,n),parseindex(b,n)
 	}
 	const expr=b=>{
 		term(b);if(peek().t in {'[':1,'.':1}){parseindex(b)}
 		if(matchsp('@')){
-			const temp=tempname(),names=['v'];blk_set(b,temp),expr(b);const fidx=blk_opa(b,op.FIDX,0)
-			blk_loop(b,names,_=>{blk_get(b,temp),names.map(n=>blk_get(b,lms(n))),blk_opa(b,op.BUND,1),blk_op(b,op.CALL)})
-			blk_sets(b,fidx,blk_here(b));return
+			let depth=0;while(matchsp('@'))depth++
+			const func=tempname();blk_set(b,func),blk_op(b,op.DROP),expr(b)
+			let l=lmblk();blk_get(l,func),blk_op(l,op.SWAP);const fidx=blk_opa(l,op.FIDX,0)
+			blk_loop(l,['v'],_=>{blk_get(l,func),blk_get(l,lms('v')),blk_opa(l,op.BUND,1),blk_op(l,op.CALL)})
+			blk_sets(l,fidx,blk_here(l))
+			while(depth-->0){const t=tempname(),m=lmblk();blk_loop(m,[ls(t)],_=>{blk_get(m,t),blk_cat(m,l)}),l=m}
+			blk_cat(b,l);return
 		}const s=peek().v;if(findop(s,dyad)>=0&&peek().t in {'symbol':1,'name':1}){next(),expr(b),blk_op2(b,s)}
 	}
 	const b=lmblk();if(hasnext())expr(b);while(hasnext())blk_op(b,op.DROP),expr(b)

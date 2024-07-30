@@ -42,3 +42,16 @@ show[foo @ bar @ range 3]
 show[count @ "one","two","three","four"]
 show[last  @ ((list 11,22),(list 33,44,55))]
 show[last  @ (11,22,33,44) dict "one","two","three","four"]
+
+# chained @ with monadic primitives
+show[count @ @ ((list "one","two"),(list "three","four"))]
+show[first @ @ ((list "one","two"),(list "three","four"))]
+show[count @     ((list(list "one","two"),(list "three","four","five")),(list(list "six","seven")))]
+show[count @ @   ((list(list "one","two"),(list "three","four","five")),(list(list "six","seven")))]
+show[count @ @ @ ((list(list "one","two"),(list "three","four","five")),(list(list "six","seven")))]
+
+# chained @ with monadic functions
+on fc x do (first x),count x end
+show[fc @     ((list(list "one","two"),(list "three","four","five")),(list(list "six","seven")))]
+show[fc @ @   ((list(list "one","two"),(list "three","four","five")),(list(list "six","seven")))]
+show[fc @ @ @ ((list(list "one","two"),(list "three","four","five")),(list(list "six","seven")))]

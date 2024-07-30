@@ -910,7 +910,12 @@ void term(lv*b){
 	if(matchsp('(')){if(matchsp(')')){blk_lit(b,lml(0));return;}expr(b);expect(')',0);return;}
 	str s=token_str(peek());
 	if(findop(s.sv,monads)>=0&&strchr("mn",peek()->type)){
-		next();if(matchsp('@')){expr(b);blk_opa(b,FMAP,findop(s.sv,monads));}else{expr(b),blk_op1(b,s.sv);}free(s.sv);return;
+		next();if(matchsp('@')){
+			int depth=0;while(matchsp('@'))depth++;
+			expr(b);lv*l=lmblk();blk_opa(l,FMAP,findop(s.sv,monads));
+			while(depth-->0){lv*t=tempname(),*m=lmblk(),*n=lmblk();blk_get(n,t),blk_cat(n,l),blk_loop(m,l_list(t),n);l=m;}
+			blk_cat(b,l);
+		}else{expr(b),blk_op1(b,s.sv);}free(s.sv);return;
 	}
 	free(s.sv);lv* n=lmstr(name("variable"));
 	if(matchsp(':')){expr(b),blk_set(b,n);return;}
@@ -919,10 +924,13 @@ void term(lv*b){
 void expr(lv*b){
 	term(b);if(strchr("[.",peek()->type)){parseindex(b,NULL);}
 	if(matchsp('@')){
-		lv*temp=tempname();blk_set(b,temp);
-		lv*names=l_list(lmistr("v"));expr(b);int fidx=blk_opa(b,FIDX,0);
-		lv*l=lmblk();blk_get(l,temp);blk_get(l,l_first(names));blk_opa(l,BUND,1);blk_op(l,CALL);
-		blk_loop(b,names,l);blk_sets(b,fidx,blk_here(b));return;
+		int depth=0;while(matchsp('@'))depth++;
+		lv*func=tempname();blk_set(b,func);blk_op(b,DROP);expr(b);
+		lv*l=lmblk();blk_get(l,func),blk_op(l,SWAP);int fidx=blk_opa(l,FIDX,0);
+		lv*ll=lmblk();blk_get(ll,func);blk_get(ll,lmistr("v"));blk_opa(ll,BUND,1);blk_op(ll,CALL);
+		blk_loop(l,l_list(lmistr("v")),ll);blk_sets(l,fidx,blk_here(l));
+		while(depth-->0){lv*t=tempname(),*m=lmblk(),*n=lmblk();blk_get(n,t),blk_cat(n,l),blk_loop(m,l_list(t),n);l=m;}
+		blk_cat(b,l);return;
 	}
 	str s=token_str(peek());if(findop(s.sv,dyads)>=0&&strchr("mn",peek()->type)){next(),expr(b),blk_op2(b,s.sv);}free(s.sv);
 }

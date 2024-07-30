@@ -2070,11 +2070,19 @@ function parse_while(b,  t,n){
 function parse_send(b){
 	blk_lit(b,lmnat("uplevel","uplevel"));blk_lit(b,lms(name("function")));blk_op(b,"CALL");expect("[");blk_cat(b,quotesub());blk_op(b,"CALL")
 }
-function parse_atmonad(b,n,  l){expr(b);l=lmblk();blk_get(l,"v");blk_op1(l,n);blk_loop(b,l_list(lms("v")),l)}
-function parse_atdyad(b,  temp,nm,l,z){
-	temp=tempname();l=lmblk();nm=l_list(lms("v"))
-	blk_get(l,temp);blk_get(l,"v");blk_opa(l,"BUND",1);blk_op(l,"CALL")
-	blk_set(b,temp);blk_op(b,"DROP");expr(b);blk_loop(b,nm,l)
+function parse_atmonad(b,n,  l,li,depth,t,m,mi){
+	depth=0;while(tmatchsp("@"))depth++
+	expr(b);l=lmblk();li=lmblk();blk_get(li,"v");blk_op1(li,n);blk_loop(l,l_list(lms("v")),li)
+	while(depth-->0){t=tempname();m=lmblk();mi=lmblk();blk_get(mi,t);blk_cat(mi,l);blk_loop(m,l_list(lms(t)),mi);l=m}
+	blk_cat(b,l)
+}
+function parse_atdyad(b,  func,l,li,z,depth,t,m,mi){
+	depth=0;while(tmatchsp("@"))depth++
+	func=tempname();blk_set(b,func);blk_op(b,"DROP");expr(b)
+	li=lmblk();blk_get(li,func);blk_get(li,"v");blk_opa(li,"BUND",1);blk_op(li,"CALL");
+	l=lmblk();blk_loop(l,l_list(lms("v")),li);
+	while(depth-->0){t=tempname();m=lmblk();mi=lmblk();blk_get(mi,t);blk_cat(mi,l);blk_loop(m,l_list(lms(t)),mi);l=m}
+	blk_cat(b,l)
 }
 function term(b,  n,t,v){
 	if(peek_type()=="d"){blk_lit(b,lmn(token_val(next_token())));return}
