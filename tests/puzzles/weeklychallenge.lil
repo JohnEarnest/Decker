@@ -24,6 +24,30 @@ on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 
 # the problems:
 
+problem[280.1]
+# find the first letter to appear twice
+# (this is kinda ugly; is there a cleaner approach?)
+on f x do
+ v:() r:0
+ each c in x
+  if v[c]&!r r:c end
+  v[c]:1
+ end
+ r
+end
+assert[f["acbddbca"] "d"]
+assert[f["abccd"   ] "c"]
+assert[f["abcdabbb"] "a"]
+
+problem[280.2]
+# count asterisks excluding those between a pair of pipes
+on f x do
+ sum "*" = "" split "" fuse first @ 2 window "|" split x
+end
+assert[f["p|*e*rl|w**e|*ekly|"          ] 2]
+assert[f["perl"                         ] 0]
+assert[f["th|ewe|e**|k|l***ych|alleng|e"] 5]
+
 problem[279.1]
 # sort the characters of a string x by weights y
 on f x y do "" fuse extract orderby y asc from x end
