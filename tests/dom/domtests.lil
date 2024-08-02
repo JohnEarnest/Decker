@@ -100,6 +100,7 @@ on cardattrs x do
 end
 assert["card default attributes and types" dattr cardattrs[card]]
 assert["card default image size" (512,342) card.image.size]
+assert["card parent" 1 card.parent~deck]
 
 w1:card.add["button" "thingy"]
 w2:card.add["field" "zoot"]
@@ -239,6 +240,8 @@ s:(b.toggle["solid" 1],b.toggle["solid" 37],b.toggle["solid" 0],b.toggle["solid"
 assert["button toggle with value" ("solid","solid","none","none") s]
 s:(b.toggle["transparent" b.show],b.toggle["transparent" "solid"])
 assert["button toggle with svalue" ("none","transparent") s]
+
+assert["button parent" 1 card~b.parent]
 
 #######################################
 #
@@ -1575,6 +1578,7 @@ defaults:def @ "type","description","script","size","font","show"
 assert["prototype default attributes" ("prototype","","",(list 100,100),deck.fonts.body,"solid") defaults]
 assert["deck contraptions"        "dict"                  (typeof deck.contraptions)]
 assert["deck contraption content" ("prototype","spinner") (typeof deck.contraptions.spinner),(keys deck.contraptions)]
+assert["prototype parent" 1 deck.card~def.parent]
 
 def.description:"unbounded numeric picker"
 def.size:150,50
@@ -1589,6 +1593,7 @@ on set_step  x do step.text:0+x  end
 on get_step    do 0+step.text    end"
 def.template:"on change do\n \nend"
 down:def.add["button" "down"]
+assert["prototype widget parent" 1 def~down.parent]
 down.text:"<"
 down.script:"on click do
   value.text:value.text-step.text

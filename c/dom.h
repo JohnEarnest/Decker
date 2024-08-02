@@ -1925,7 +1925,10 @@ void contraption_reflow(lv*c){
 	}
 }
 lv* interface_contraption(lv*self,lv*i,lv*x){
-	lv*data=self->b;char*masks[]={"name","index","image","script","locked","animated","volatile","pos","show","font","toggle","event","offset",NULL};
+	lv*data=self->b;char*masks[]={
+		"name","index","image","script","locked","animated","volatile","pos","show","font","toggle","event","offset","parent",
+		NULL
+	};
 	lv*def=dget(data,lmistr("def"));
 	if(!is_rooted(self))return NONE;
 	if(x){
@@ -2007,6 +2010,7 @@ lv* interface_widget(lv*self,lv*i,lv*x){
 		ikey("font"    ){lv*r=dget(data,i);return r?dget(fonts,r): fonts->lv[button_is(self)?1:0];}
 		ikey("toggle"  )return lmnat(n_toggle,self);
 		ikey("event"   )return lmnat(n_event,self);
+		ikey("parent"  )return card;
 		ikey("offset"  ){
 			pair c=getpair(ifield(card,"size")),p=getpair(ifield(self,"pos")),d=getpair(ivalue(deck,"size"));
 			lv*con=card;while(contraption_is(con)){pair o=getpair(ifield(con,"pos"));p.x+=o.x,p.y+=o.y;con=ivalue(con,"card"),c=getpair(ifield(con,"size"));}
@@ -2218,6 +2222,7 @@ lv* interface_card(lv*self,lv*i,lv*x){
 		ikey("script"  ){lv*r=dget(data,i);return r?r:lmistr("");}
 		ikey("image"   )return dget(data,i);
 		ikey("widgets" )return dget(data,i);
+		ikey("parent"  )return deck;
 		ikey("add"     )return lmnat(n_card_add,self);
 		ikey("remove"  )return lmnat(n_card_remove,self);
 		ikey("event"   )return lmnat(n_event,self);
@@ -2312,6 +2317,7 @@ lv* interface_prototype(lv*self,lv*i,lv*x){
 		ikey("template"   ){lv*r=dget(data,i);return r?r:lmistr("");}
 		ikey("font"       )return l_first(ifield(ivalue(self,"deck"),"fonts"));
 		ikey("show"       )return lmistr("solid");
+		ikey("parent"     )return ifield(deck,"card");
 		ikey("size"       )return dget(data,i);
 		ikey("margin"     )return dget(data,i);
 		ikey("resizable"  )return dget(data,i);

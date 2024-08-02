@@ -2116,7 +2116,7 @@ contraption_read=(x,card)=>{
 			iwrite(dwid,lms('pos'),lmpair(a)),iwrite(dwid,lms('size'),lmpair(rsub(b,a)))
 		})
 	}
-	const masks={name:1,index:1,image:1,script:1,locked:1,animated:1,volatile:1,pos:1,show:1,font:1,toggle:1,event:1,offset:1}
+	const masks={name:1,index:1,image:1,script:1,locked:1,animated:1,volatile:1,pos:1,show:1,font:1,toggle:1,event:1,offset:1,parent:1}
 	const ri=lmi((self,i,x)=>{
 		if(!is_rooted(self))return NONE
 		if(x){
@@ -2179,6 +2179,7 @@ interface_widget=(self,i,x)=>{
 		if(ikey(i,'show'    ))return lms(ivalue(self,ls(i),'solid'))
 		if(ikey(i,'font'    ))return dget(self.card.deck.fonts,lms(ivalue(self,ls(i),button_is(self)?'menu':'body')))
 		if(ikey(i,'event'   ))return lmnat(args=>n_event(self,args))
+		if(ikey(i,'parent'  ))return self.card
 		if(ikey(i,'toggle'  ))return lmnat(([s,v])=>{
 			const a=v==undefined;s=s||lms('solid'),v=v||NONE;const o=ifield(self,'show'),n=lms('none')
 			const r=(a?match(o,n):(lb(v)&&!match(v,n)))?s:n;iwrite(self,lms('show'),r);return r
@@ -2308,6 +2309,7 @@ card_read=(x,deck,cdata)=>{
 			if(ikey(i,'index'  ))return lmn(dvix(deck.cards,self))
 			if(ikey(i,'script' ))return lms(self.script||'')
 			if(ikey(i,'widgets'))return self.widgets
+			if(ikey(i,'parent' ))return self.deck
 			if(ikey(i,'image'  ))return self.image
 			if(ikey(i,'add'    ))return lmnat(([t,n1,n2])=>card_add(self,t,n1,n2))
 			if(ikey(i,'remove' ))return lmnat(([x])=>lmn(card_remove(self,x)))
@@ -2395,6 +2397,7 @@ prototype_read=(x,deck)=>{
 			if(ikey(i,'template'   ))return lms(self.template||'')
 			if(ikey(i,'font'       ))return monad.first(self.deck.fonts)
 			if(ikey(i,'show'       ))return lms('solid')
+			if(ikey(i,'parent'     ))return ifield(self.deck,'card')
 			if(ikey(i,'size'       ))return lmpair(self.size)
 			if(ikey(i,'margin'     ))return lmrect(self.margin)
 			if(ikey(i,'resizable'  ))return lmn(self.resizable)

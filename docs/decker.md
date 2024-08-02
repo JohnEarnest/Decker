@@ -1001,6 +1001,7 @@ The card interface gives access to the contents of a given card.
 | `x.size`          | The `size` of this card in pixels.                                                                |
 | `x.image`         | An _image_ interface representing the card's background. r/w.                                     |
 | `x.widgets`       | A dictionary of widget interfaces on this card, keyed by name.                                    |
+| `x.parent`        | The [Deck Interface](#deckinterface) containing this card.                                        |
 | `x.index`         | The ordinal position of this card in the deck, counting from 0. r/w.                              |
 | `x.add[x y z]`    | Add a widget to this card, and return it.                                                         |
 | `x.remove[x]`     | Remove a widget `x` (or list/dict of widgets) from this card. Returns 1 on success.               |
@@ -1033,6 +1034,7 @@ The button widget is a clickable button, possibly with a stateful checkbox.
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
+| `x.parent`              | The Card, Contraption or Prototype containing this widget.                                            |
 | `x.text`                | String. The label shown on this button. r/w.                                                          |
 | `x.value`               | Bool. Is this checkbox checked? r/w.                                                                  |
 | `x.shortcut`            | String. A keyboard key which can be used as an alternative to pressing this button. r/w.              |
@@ -1069,6 +1071,7 @@ The field widget displays and possibly allows the editing of text.
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
+| `x.parent`              | The Card, Contraption or Prototype containing this widget.                                            |
 | `x.text`                | String. The plain-text content of this field. r/w.                                                    |
 | `x.value`               | Table. The rtext content of this field. r/w.                                                          |
 | `x.scroll`              | Int. The number of pixels the viewport of the field is scrolled down. r/w.                            |
@@ -1101,6 +1104,7 @@ The slider widget represents a single number, constrained within a configurable 
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
+| `x.parent`              | The Card, Contraption or Prototype containing this widget.                                            |
 | `x.value`               | Number. The numeric content of this slider. r/w.                                                      |
 | `x.step`                | Number. The minimum change to the value when manipulating this slider. Must be greater than 0. r/w.   |
 | `x.interval`            | A list of numbers giving a minimum and maximum for the value, inclusive. r/w.                         |
@@ -1127,6 +1131,7 @@ The grid widget represents an interactive spreadsheet-style view of a table.
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
+| `x.parent`              | The Card, Contraption or Prototype containing this widget.                                            |
 | `x.value`               | The table displayed in this grid. r/w.                                                                |
 | `x.headers`             | Bool. Display table header row? r/w.                                                                  |
 | `x.scrollbar`           | Bool. Draw a scrollbar for this widget? r/w.                                                          |
@@ -1175,6 +1180,7 @@ The canvas will scale _up_ logical pixels to display them on the card (resulting
 | `x.pattern`             | The current drawing pattern, used by all drawing operations. r/w.                                                 |
 | `x.font`                | The current drawing font. Can be set by font name or a font interface. r/w.                                       |
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                            |
+| `x.parent`              | The Card, Contraption or Prototype containing this widget.                                                        |
 | `x.clip[pos size a]`    | Restrict drawing to within the rectangle given by `pos`/`size`. If no args provided, unclip.                      |
 | `x.clear[pos size a]`   | Erase a rectangle given by `pos`/`size` using pattern 0. if no args provided, clear the whole canvas.             |
 | `x.rect[pos size a]`    | Fill a rectangle given by `pos`/`size` with the drawing pattern.                                                  |
@@ -1241,6 +1247,7 @@ Contraptions are custom widgets, defined in a [Prototype](#prototypeinterface). 
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
+| `x.parent`              | The Card, Contraption or Prototype containing this widget.                                            |
 | `x.def`                 | The Prototype of this contraption.                                                                    |
 | `x.event[n ...x]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
@@ -1303,6 +1310,7 @@ Prototypes are definitions from which [Contraptions](#contraptioninterface) are 
 | `x.image`               | An _image_ interface representing the Prototype's background. r/w.                                     |
 | `x.show`                | The string `"solid"`.                                                                                  |
 | `x.font`                | The default font `body`.                                                                               |
+| `x.parent`              | Equivalent to `deck.card`.                                                                             |
 | `x.resizable`           | Bool. Can instances of this Prototype be resized? r/w.                                                 |
 | `x.margin`              | A list of 4 integers. See below for details. r/w.                                                      |
 | `x.widgets`             | A dictionary of widget interfaces in this Prototype, keyed by name.                                    |
