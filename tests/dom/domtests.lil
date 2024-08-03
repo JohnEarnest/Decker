@@ -304,6 +304,16 @@ assert["non-rich text fields even coalesce existing values"
 	cf.value
 ]
 
+cf.style:"rich"
+ia:image[3,3]
+ib:image[4,7]
+cf.text:"plain text"
+assert["field.images of plain text"  ()         cf.images]
+cf.images:ia,ib,ia
+assert["field.images read and write" (ia,ib,ia) cf.images]
+cf.images:0
+assert["field.images bogus write"    ()         cf.images]
+
 #######################################
 #
 #  Slider

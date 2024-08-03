@@ -1073,6 +1073,7 @@ The field widget displays and possibly allows the editing of text.
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
 | `x.parent`              | The Card, Contraption or Prototype containing this widget.                                            |
 | `x.text`                | String. The plain-text content of this field. r/w.                                                    |
+| `x.images`              | List. Any inline Image interfaces that appear in the rtext content of this field. r/w.                |
 | `x.value`               | Table. The rtext content of this field. r/w.                                                          |
 | `x.scroll`              | Int. The number of pixels the viewport of the field is scrolled down. r/w.                            |
 | `x.border`              | Bool. Draw an outline around this widget? r/w.                                                        |

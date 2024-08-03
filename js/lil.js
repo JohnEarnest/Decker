@@ -1745,6 +1745,8 @@ rtext_is_image=x=>{
 	for(let z=0;z<count(x);z++){if(image_is(a[z])){if(!r)r=a[z]}else if(ls(t[z]).trim()!=''){return null}}
 	return r
 }
+rtext_read_images=x=>lml((x.v.arg||[]).filter(image_is))
+rtext_write_images=x=>rtext_cat(ll(x))
 rtext_span=(tab,pos)=>{
 	let r=dyad.take(NONE,tab), i=0,c=0,a=min(pos.x,pos.y),b=max(pos.x,pos.y), partial=_=>{
 		let rr='';for(let z=0;z<count(tab.v.text[c]);z++,i++)if(i>=a&&i<b)rr+=tab.v.text[c].v[z]
@@ -1844,6 +1846,7 @@ field_read=(x,card)=>{
 		if(!is_rooted(self))return NONE
 		if(x){
 			if(ikey(i,'text'  ))return self.value=rtext_cast(lms(ls(x))),x
+			if(ikey(i,'images'))return self.value=rtext_write_images(x),x
 			if(ikey(i,'scroll'))return self.scroll=max(0,ln(x)),x
 			if(ikey(i,'value' )){
 				if(ls(ifield(self,'style'))!='rich'&&!rtext_is_plain(x))x=rtext_string(rtext_cast(x))
@@ -1855,6 +1858,7 @@ field_read=(x,card)=>{
 			if(ikey(i,'align'    ))return self.align=normalize_enum(field_aligns,ls(x)),x
 		}else{
 			if(ikey(i,'text'     )){const v=value_inherit(self,'value');return v!=undefined?rtext_string(v):lms('')}
+			if(ikey(i,'images'   )){const v=value_inherit(self,'value');return v!=undefined?rtext_read_images(v):lml([])}
 			if(ikey(i,'border'   ))return lmn(ivalue(self,ls(i),1))
 			if(ikey(i,'value'    ))return value_inherit(self,ls(i))||rtext_cast()
 			if(ikey(i,'scroll'   ))return value_inherit(self,ls(i))||NONE
