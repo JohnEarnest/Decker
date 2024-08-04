@@ -2868,6 +2868,11 @@ lv* n_write(lv*self,lv*a){
 	(void)self;lv*x=a->c>0?ls(a->lv[0]):lms(0),*y=a->c>1?ls(a->lv[1]):lms(0);
 	FILE*f=fopen(x->sv,"w");if(f)fwrite(y->sv,1,y->c,f),fclose(f);return f?ONE:NONE;
 }
+lv* idecode(lv*x){
+	return has_prefix(x->sv,"%%img")?image_read(x):
+	       has_prefix(x->sv,"%%snd")?sound_read(x):
+	       has_prefix(x->sv,"%%dat")?array_read(x):NONE;
+}
 
 // Filesystem Traversal
 

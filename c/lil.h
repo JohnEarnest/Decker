@@ -19,6 +19,7 @@ int seed=0x12345;lv interned[1024]={{0}};unsigned int intern_count=383+1, do_pan
 lv*n_show (lv*self,lv*a); // user-supplied function which displays raw to stdout.
 lv*n_print(lv*self,lv*a); // user-supplied function which formats/displays to stdout.
 lv*debug_show(lv*x);      // version of l_show() which _always_ goes to stdout, for internal use.
+lv*idecode(lv*x);         // decode datablock representation of interfaces into an instance or 0.
 
 #define NUM          512 // number parsing/formatting buffer size
 #define NONE         lmn(0)
@@ -412,6 +413,13 @@ lv* pjson(char*t,int*i,int*f,int*n){
 	int ns=*i;jm('-');jd();jm('.');jd();if(jm('e')||jm('E')){jm('-')||jm('+');jd();}if(*i<=ns){*f=0;return NONE;}
 	char tb[NUM];snprintf(tb,MIN(*i-ns+1,NUM),"%s",t+ns);return lmn(atof(tb));
 }
+lv* plove(char*t,int*i,int*f,int*n){
+	if(jm('[')){lv*r=lml(0);while(jc()){js();if(jm(']'))break;ll_add(r,plove(t,i,f,n));js();jm(',');}return r;}
+	if(jm('{')){lv*r=lmd( );while(jc()){js();if(jm('}'))break;lv*k=plove(t,i,f,n);js();jm(':');js();if(*f)dset(r,k,plove(t,i,f,n));js();jm(',');}return r;}
+	if(jm('<')){lv*r=lmd( );while(jc()){js();if(jm('>'))break;lv*k=plove(t,i,f,n);js();jm(':');js();if(*f)dset(r,ls(k),ll(plove(t,i,f,n)));js();jm(',');}return l_table(r);}
+	if(jm('%')){jm('%');str r=str_new();str_addz(&r,"%%");while(jc()&&(isalnum(jc())||strchr("+/=",jc())))str_addc(&r,jn());return idecode(lmstr(r));}
+	return pjson(t,i,f,n);
+}
 int cumulative_month_days[12]={0,31,59,90,120,151,181,212,243,273,304,334};
 int leap_year(int year){return year%400==0?1: year%100==0?0: year%4==0?1: 0;}
 time_t parts_to_epoch(struct tm *p){
@@ -439,7 +447,7 @@ dyad(l_parse){
 		int n=0,d=0,si=h,sk=fc=='*'&&(f++,1),lf=fc=='-'&&(f++,1);if(fc=='0')f++;
 		while(isdigit(fc))n=n*10+fc-'0',f++;if(fc=='.')f++;
 		while(isdigit(fc))d=d*10+fc-'0',f++;if(!fc)break;char t=fc;f++;
-		if(!strchr("%mnzsluqaroj",t))while(hn&&isspace(hc))h++;lv*v=NULL;
+		if(!strchr("%mnzsluqarojJ",t))while(hn&&isspace(hc))h++;lv*v=NULL;
 		if     (t=='%'){if(m&&t==hc){h++;}else{m=0;}}
 		else if(t=='m')v=m?ONE:NONE;
 		else if(t=='n')v=lmn(h);
@@ -450,6 +458,7 @@ dyad(l_parse){
 		else if(t=='a'){v=lml(0);while(hn&&(n?1:hc!=fc))ll_add(v,lmn(hc)),h++;}
 		else if(t=='b'){v=strchr("tTyYx1",hc)?ONE:NONE;while(hn&&n?1:hc!=fc)h++;}
 		else if(t=='j'){int f=1,c=n?n:y->c;v=m?pjson(y->sv,&h,&f,&c):NONE;}
+		else if(t=='J'){int f=1,c=n?n:y->c;v=m?plove(y->sv,&h,&f,&c):NONE;}
 		else if(t=='v'){str r=str_new();m&=!isdigit(hc);while(hn&&hc!='\n'&&ncc[hc-32]=='n')str_addc(&r,hc),h++;v=lmstr(r);m&=v->c>0;}
 		else if(t=='q'){
 			str r=str_new();m&=hc=='"';if(m)h++;while(hn&&hc!='"'){
@@ -495,6 +504,14 @@ void fjson(str*s,lv*x){
 		}str_addc(s,'"');
 	}else{str_addz(s,"null");}
 }
+void flove(str*s,lv*x){
+	if(lin(x)||lis(x)){fjson(s,x);}
+	else if(lil(x)){wrap('[',']',{if(z)str_addc(s,',');flove(s,x->lv[z]);})}
+	else if(lid(x)){wrap('{','}',{if(z)str_addc(s,',');flove(s,x->kv[z]);str_addc(s,':');flove(s,x->lv[z]);})}
+	else if(lit(x)){wrap('<','>',{if(z)str_addc(s,',');flove(s,x->kv[z]);str_addc(s,':');flove(s,x->lv[z]);})}
+	else if(lii(x)){str_addl(s,((lv*(*)(lv*,lv*,lv*))x->f)(x,lmistr("encoded"),NULL));}
+	else{str_addz(s,"null");}
+}
 void format_type(str*r,lv*a,char t,int n,int d,int lf,int pz,int*f,char*c){
 	char o[NUM]={0},*op=o;
 	if     (t=='%')snprintf(o,NUM,"%%");
@@ -509,6 +526,7 @@ void format_type(str*r,lv*a,char t,int n,int d,int lf,int pz,int*f,char*c){
 	else if(t=='h')snprintf(o,NUM,"%llx",(long long)ln(a));
 	else if(t=='H')snprintf(o,NUM,"%llX",(long long)ln(a));
 	else if(t=='j'){str v=str_new();fjson(&v,a    );op=lmstr(v)->sv;}
+	else if(t=='J'){str v=str_new();flove(&v,a    );op=lmstr(v)->sv;}
 	else if(t=='q'){str v=str_new();fjson(&v,ls(a));op=lmstr(v)->sv;}
 	else if(t=='e'){time_t v=ln(a);strftime(o,NUM,"%FT%TZ",gmtime(&v));}
 	else if(t=='p'){

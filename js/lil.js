@@ -118,6 +118,10 @@ fstr=x=>{
 }
 fjson=x=>lin(x)?wnum(x.v): lit(x)?fjson(rows(x)): lil(x)?`[${x.v.map(fjson).join(',')}]`:
          lis(x)?`"${fstr(x.v)}"`:lid(x)?`{${x.k.map((k,i)=>`${fjson(lms(ls(k)))}:${fjson(x.v[i])}`).join(',')}}`:'null'
+flove=x=>lin(x)||lis(x)?fjson(x): lil(x)?`[${x.v.map(flove).join(',')}]`:
+         lid(x)?`{${x.k.map((k,i)=>`${flove(k)}:${flove(x.v[i])}`).join(',')}}`:
+         lit(x)?`<${Object.keys(x.v).map(k=>`${flove(lms(k))}:${flove(lml(x.v[k]))}`).join(',')}>`:
+         lii(x)?ls(ifield(x,'encoded')): 'null'
 pjson=(y,h,n)=>{
 	const si=h, hn=_=>m&&y[h]&&(n?h-si<n:1), hnn=x=>m&&h+x<=y.length&&(n?h+x-si<n:1)
 	const jd=_=>{while(hn()&&/[0-9]/.test(y[h]))h++}, jm=x=>hn()&&y[h]==x?(h++,1):0, iw=_=>/[ \n]/.test(y[h]), ws=_=>{while(hn()&&iw())h++}
@@ -126,6 +130,25 @@ pjson=(y,h,n)=>{
 		const t={null:NONE,false:NONE,true:ONE};for(let k in t)if(hnn(k.length)&&y.slice(h,h+k.length)==k)return h+=k.length,t[k]
 		if(jm('[')){const r=lml([]);while(f&&hn()){ws();if(jm(']'))break;r.v.push(rec()),ws(),jm(',')}return r}
 		if(jm('{')){const r=lmd();while(f&&hn()){ws();if(jm('}'))break;const k=rec();ws(),jm(':'),ws();if(f)dset(r,k,rec());ws(),jm(',')}return r}
+		if(jm('"')){let r='';while(f&&hn()&&!jm('"'))r+=hnn(2)&&jm('\\')?esc(y[h++]):y[h++];return lms(r)}
+		if(jm("'")){let r='';while(f&&hn()&&!jm("'"))r+=hnn(2)&&jm('\\')?esc(y[h++]):y[h++];return lms(r)}
+		const ns=h;jm('-'),jd(),jm('.'),jd();if(jm('e')||jm('E')){jm('-')||jm('+');jd();}return h<=ns?(f=0,NONE): lmn(+y.slice(ns,h))
+	}, r=rec();return {value:r,index:h}
+}
+idecode=x=>{
+	const p=x.slice(0,5).toLowerCase()
+	return p=='%%img'?image_read(x): p=='%%snd'?sound_read(x): p=='%%dat'?array_read(x): NONE
+}
+plove=(y,h,n)=>{
+	const si=h, hn=_=>m&&y[h]&&(n?h-si<n:1), hnn=x=>m&&h+x<=y.length&&(n?h+x-si<n:1)
+	const jd=_=>{while(hn()&&/[0-9]/.test(y[h]))h++}, jm=x=>hn()&&y[h]==x?(h++,1):0, iw=_=>/[ \n]/.test(y[h]), ws=_=>{while(hn()&&iw())h++}
+	const esc=e=>e=='n'?'\n': /[\\/"']/.test(e)?e: e=='u'&&hnn(4)?String.fromCharCode(parseInt(y.slice(h,h+=4),16)):' '
+	let f=1, m=1, rec=_=>{
+		const t={null:NONE,false:NONE,true:ONE};for(let k in t)if(hnn(k.length)&&y.slice(h,h+k.length)==k)return h+=k.length,t[k]
+		if(jm('[')){const r=lml([]);while(f&&hn()){ws();if(jm(']'))break;r.v.push(rec()),ws(),jm(',')}return r}
+		if(jm('{')){const r=lmd();while(f&&hn()){ws();if(jm('}'))break;const k=rec();ws(),jm(':'),ws();if(f)dset(r,       k,         rec()  );ws(),jm(',')}return r}
+		if(jm('<')){const r=lmd();while(f&&hn()){ws();if(jm('>'))break;const k=rec();ws(),jm(':'),ws();if(f)dset(r,lms(ls(k)),lml(ll(rec())));ws(),jm(',')}return monad.table(r)}
+		if(jm('%')){jm('%');let r='%%';while(f&&hn()&&/[a-zA-Z0-9+/=]/.test(y[h]))r+=y[h++];return idecode(r)}
 		if(jm('"')){let r='';while(f&&hn()&&!jm('"'))r+=hnn(2)&&jm('\\')?esc(y[h++]):y[h++];return lms(r)}
 		if(jm("'")){let r='';while(f&&hn()&&!jm("'"))r+=hnn(2)&&jm('\\')?esc(y[h++]):y[h++];return lms(r)}
 		const ns=h;jm('-'),jd(),jm('.'),jd();if(jm('e')||jm('E')){jm('-')||jm('+');jd();}return h<=ns?(f=0,NONE): lmn(+y.slice(ns,h))
@@ -224,7 +247,7 @@ dyad={
 			const hn=_=>m&&y[h]&&(n?h-si<n:1), id=x=>/[0-9]/.test(x), ix=_=>/[0-9a-fA-F]/.test(y[h]), iw=_=>/[ \n]/.test(y[h])
 			while(id(x[f]))n=n*10+(+x[f++]);x[f]=='.'&&f++
 			while(id(x[f]))d=d*10+(+x[f++]);if(!x[f])break;const t=x[f++]
-			if('%mnzsluqaroj'.indexOf(t)<0)while(hn()&&iw())h++
+			if('%mnzsluqarojJ'.indexOf(t)<0)while(hn()&&iw())h++
 			if(t=='%'){if(m&&t==y[h]){h++}else{m=0}}
 			else if(t=='m'){v=m?ONE:NONE}
 			else if(t=='n'){v=lmn(h)}
@@ -235,6 +258,7 @@ dyad={
 			else if(t=='i'){v=lmn(0);const s=(y[h]=='-')?(h++,-1):1;m&=id(y[h]);while(hn()&&id(y[h]))v.v=v.v*10+(+y[h++]);v.v*=s}
 			else if(t=='h'||t=='H'){v=lmn(0),                       m&=ix();    while(hn()&&ix())v.v=v.v*16+parseInt(y[h++],16)}
 			else if(t=='j'){if(m){const j=pjson(y,h,n);h=j.index,v=j.value}else{v=NONE}}
+			else if(t=='J'){if(m){const j=plove(y,h,n);h=j.index,v=j.value}else{v=NONE}}
 			else if(t=='v'){v=lms(''),m&=!id(y[h]);while(hn()&&/[0-9a-zA-Z_?]/.test(y[h]))v.v+=y[h++];m&=count(v)>0}
 			else if(t=='q'){
 				v=lms(''),m&=y[h]=='"';if(m)h++;while(hn()&&y[h]!='"'){
@@ -287,6 +311,7 @@ dyad={
 			else if(t=='e'){o=new Date(ln(a)*1000).toISOString().split('.')[0]+'Z'}
 			else if(t=='p'){const d=ld(a);o=dyad.format(ISODATE,lml(PARTS.map(x=>dget(d,x)))).v}
 			else if(t=='j'){o=fjson(a)}
+			else if(t=='J'){o=flove(a)}
 			else if(t=='q'){o=fjson(lms(ls(a)))}
 			let vn=o.length; if(d&&(t=='f'||t=='c'||t=='C'))d=0;if(d&&lf)vn=min(d,vn)
 			if(n&&!lf)for(let z=0;z<n-vn;z++)r+=pz?'0':' '

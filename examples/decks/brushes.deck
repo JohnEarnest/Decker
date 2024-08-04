@@ -9,7 +9,7 @@ script:"home.0"
 {widgets}
 c:{"type":"canvas","size":[291,224],"pos":[54,88],"brush":32,"scale":1}
 button1:{"type":"button","size":[42,20],"pos":[361,58],"script":"home.1","text":"Clear"}
-b:{"type":"grid","size":[96,169],"pos":[360,141],"script":"home.2","scrollbar":0,"lines":0,"value":{"brush":["OvalSml","OvalMed","OvalLrg","OvalHuge","A","SumiSml","SumiMed","SumiLrg","Dotted","SoftSml","SoftLrg","StippleSml","StippleLrg"]}}
+b:{"type":"grid","size":[96,169],"pos":[360,141],"script":"home.2","scrollbar":1,"lines":0,"value":{"brush":["OvalSml","OvalMed","OvalLrg","OvalHuge","SumiSml","SumiMed","SumiLrg","Dotted","SoftSml","SoftMed","SoftLrg","StippleSml","StippleLrg"]}}
 preview:{"type":"canvas","size":[96,48],"pos":[360,87],"locked":1,"animated":1,"brush":32,"scale":2}
 button2:{"type":"button","size":[45,20],"pos":[411,58],"script":"home.3","text":"Invert"}
 field1:{"type":"field","size":[289,36],"pos":[54,43],"locked":1,"border":0,"value":"This deck contains a number of modules which define new brushes, grouped by style. Try them out here, and then import them into your own decks using the Font/DA mover!"}
@@ -53,26 +53,27 @@ brush["OvalHuge" image["%%IMG0ABIAEgAHgAAfwAB/wAH/wAP/wAf/gA//gB//AB//AD/+AD/+AH
 
 {module:sumis}
 description:"Velocity-sensitive sumi-style brushes"
-version:1
+version:1.1
 {script}
 # 16 round brush images ranging from 1px to 13px:
-b:image@"\n"split 1 drop "
-%%IMG0AA0ADQ+AP+B/8H/w//j/+P/4//j/+H/wf/A/4A+A
-%%IMG0AAwADB+AP8B/4P/w//D/8P/w//D/8H/gP8AfgA==
-%%IMG0AAsACx8AP4B/wP/g/+D/4P/g/+B/wD+AHwA=
-%%IMG0AAoACh4Af4B/gP/A/8D/wP/Af4B/gB4A
-%%IMG0AAkACT4AfwD/gP+A/4D/gP+AfwA+AA==
-%%IMG0AAgACDx+/////348
-%%IMG0AAcAB3z+/v7+/nw=
-%%IMG0AAcABzh8/v7+fDg=
-%%IMG0AAYABnj8/Pz8eA==
-%%IMG0AAYABjB4/Px4MA==
-%%IMG0AAUABXD4+Phw
-%%IMG0AAQABGDw8GA=
-%%IMG0AAMAA+Dg4A==
-%%IMG0AAMAA0DgQA==
-%%IMG0AAIAAsDA
-%%IMG0AAEAAYA="
+b:"%J" parse "[
+ %%IMG0AA0ADQ+AP+B/8H/w//j/+P/4//j/+H/wf/A/4A+A,
+ %%IMG0AAwADB+AP8B/4P/w//D/8P/w//D/8H/gP8AfgA==,
+ %%IMG0AAsACx8AP4B/wP/g/+D/4P/g/+B/wD+AHwA=,
+ %%IMG0AAoACh4Af4B/gP/A/8D/wP/Af4B/gB4A,
+ %%IMG0AAkACT4AfwD/gP+A/4D/gP+AfwA+AA==,
+ %%IMG0AAgACDx+/////348,
+ %%IMG0AAcAB3z+/v7+/nw=,
+ %%IMG0AAcABzh8/v7+fDg=,
+ %%IMG0AAYABnj8/Pz8eA==,
+ %%IMG0AAYABjB4/Px4MA==,
+ %%IMG0AAUABXD4+Phw,
+ %%IMG0AAQABGDw8GA=,
+ %%IMG0AAMAA+Dg4A==,
+ %%IMG0AAMAA0DgQA==,
+ %%IMG0AAIAAsDA,
+ %%IMG0AAEAAYA=,
+]"
 brush[on SumiSml delta do b[10+ 5&.2*mag delta]end]
 brush[on SumiMed delta do b[ 5+10&.5*mag delta]end]
 brush[on SumiLrg delta do b[   15&.8*mag delta]end]
@@ -80,7 +81,7 @@ brush[on SumiLrg delta do b[   15&.8*mag delta]end]
 
 {module:stipplers}
 description:"Stippling brushes"
-version:1
+version:1.1
 {script}
 # a rough dotted line:
 pix:image["%%IMG0AAEAAYA="] # a single pixel
@@ -124,27 +125,29 @@ end
 brush[on SoftLrg do random[sl] end]
 
 # 8x8 stipples; 4 sparse, 4 dense:
-s:image@"\n"split 1 drop"
-%%IMG0AAgACAAQAIIgACAI
-%%IMG0AAgACAASAARCEAQA
-%%IMG0AAgACAAQAEAEoAgA
-%%IMG0AAgACCAEAIgCQAgg
-%%IMG0AAgACAAYGANjYAAA
-%%IMG0AAgACBgYAMDYGAAA
-%%IMG0AAgACAAAGBgGxsAA
-%%IMG0AAgACAAMbGAADAwA"
+s:"%J" parse "[
+ %%IMG0AAgACAAQAIIgACAI,
+ %%IMG0AAgACAASAARCEAQA,
+ %%IMG0AAgACAAQAEAEoAgA,
+ %%IMG0AAgACCAEAIgCQAgg,
+ %%IMG0AAgACAAYGANjYAAA,
+ %%IMG0AAgACBgYAMDYGAAA,
+ %%IMG0AAgACAAAGBgGxsAA,
+ %%IMG0AAgACAAMbGAADAwA,
+]"
 brush[on StippleSml do random[s] end]
 
 # 16x16 stipples; 4 sparse, 4 dense:
-l:image@"\n"split 1 drop"
-%%IMG0ABAAEAAAAAAAAAIAAAAAQCACAAAAAAIAAAgIAACAAAAAIAAA
-%%IMG0ABAAEAAAAAACEAAAAAABAABAIAgAAQAAAAAAiAgAAAAAQAAA
-%%IMG0ABAAEAAAAAAEAAAAACAQAAAAAIAACAAAEAABAAAAABAAAAAA
-%%IMG0ABAAEAAAAEAQAAEAAAEIIAAAAAAACCAAAgAAAAAQAgAAAAAA
-%%IMG0ABAAEAAAAAAAAAGAAYAYABgAAAAAGAGYAYAAAAwADAAAAAAA
-%%IMG0ABAAEAAAAAAAAADAGMAYAAAAAAAYABgYABgAAAwADAAAAAAA
-%%IMG0ABAAEAAAAAAAAAAAAGAMYAwAAAAAwADAAAAGGAYYAAAAAAAA
-%%IMG0ABAAEAAAAAAAAAAADAAMYABgAAAAAAYABgAAYABgAAAAAAAA"
+l:"%J" parse "[
+ %%IMG0ABAAEAAAAAAAAAIAAAAAQCACAAAAAAIAAAgIAACAAAAAIAAA,
+ %%IMG0ABAAEAAAAAACEAAAAAABAABAIAgAAQAAAAAAiAgAAAAAQAAA,
+ %%IMG0ABAAEAAAAAAEAAAAACAQAAAAAIAACAAAEAABAAAAABAAAAAA,
+ %%IMG0ABAAEAAAAEAQAAEAAAEIIAAAAAAACCAAAgAAAAAQAgAAAAAA,
+ %%IMG0ABAAEAAAAAAAAAGAAYAYABgAAAAAGAGYAYAAAAwADAAAAAAA,
+ %%IMG0ABAAEAAAAAAAAADAGMAYAAAAAAAYABgYABgAAAwADAAAAAAA,
+ %%IMG0ABAAEAAAAAAAAAAAAGAMYAwAAAAAwADAAAAGGAYYAAAAAAAA,
+ %%IMG0ABAAEAAAAAAAAAAADAAMYABgAAAAAAYABgAAYABgAAAAAAAA,
+]"
 brush[on StippleLrg do random[l] end]
 {end}
 

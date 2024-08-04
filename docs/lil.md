@@ -797,6 +797,7 @@ Pattern types are as follows:
 | `h`  | `0`    | hexadecimal integer. parses lower- or uppercase.               | format int as hexadecimal in lowercase.              |
 | `H`  | `0`    | hexadecimal integer. parses lower- or uppercase.               | format int as hexadecimal in uppercase.              |
 | `j`  | `0`    | a [JSON](https://www.json.org) value.                          | any value to a JSON string.                          |
+| `J`  | `0`    | a superset of JSON that supports any Lil value.                | any value to a string.                               |
 | `q`  | `""`   | quoted. a Lil string literal, like `"foo\nbar"`.               | any string to a Lil string literal.                  |
 | `v`  | `""`   | variable. a Lil variable name, like `ice_9`.                   | any string.                                          |
 | `e`  | `0`    | read ISO-8601 date-time into a unix epoch int.                 | format unix epoch int as ISO-8601 date-time.         |
@@ -926,6 +927,13 @@ When parsing JSON, the value `true` will become the number `1`, and `false` or `
 "%j" parse "[true,false,null,1]"   # (1,0,0,1)
 "%j" parse "{11:22,33:44"          # {11:22,33:44}
 "%j" parse "{'foo':22}"            # {"foo":22}
+```
+
+The `%J` pattern handles a _superset_ of JSON that can represent all of Lil's basic datatypes and certain Interface types losslessly. Beyond the behavior of `%j`, `%J` supports dictionaries with keys of any Lil type, represents tables in `<>` (otherwise like a string-keyed dictionary of columns), and recognizes "Data Block" encodings for _Images_, _Sounds_, and _Arrays_, as described in _The Decker File Format_:
+```lil
+"%J" format ((list 11,22),(list 33,44)) dict "one","two" # "{[11,22]:\"one\",[33,44]:\"two\"}"
+"%J" format insert a b with 11 22 33 44 end              # "<\"a\":[11,33],\"b\":[22,44]>"
+"%J" format image[3,4]                                   # "%%IMG0AAMABAAAAAA="
 ```
 
 If any patterns specify names, the result of `parse` will be a dictionary, and `format` will likewise expect a dictionary as its right argument:

@@ -174,6 +174,16 @@ show["%1s%3j%1s" parse "A12.34e5B"               ] # truncated number
 show["%1s%5j%1s" parse "A\"\\u0041\"B"           ] # truncated escape sequence
 show["A%jB%m"    parse "23B"                     ] # non-matching sequence
 
+print["love:"]
+show["%J" format ((list 11,22),(list 33,44)) dict "one","two"       ]
+show["%J" format insert a b with 11 22 33 44 end                    ]
+show["%J" format image[3,4]                                         ]
+
+show["%J" parse "{[11,22]:'one',[33,44]:'two'}"                     ]
+show["%J" parse "<'a':[11,33],'b':[22,44]>"                         ]
+show[("%J" parse "[%%IMG0AAMABAAAAAA=,%%IMG0AAMABAAAAAA=]")..encoded]
+
+
 print["recursive:"]
 show[()                            format (11,"two")                     ] # identity
 show[(list "%s.mp3")               format ("one","two","three")          ] # format a column

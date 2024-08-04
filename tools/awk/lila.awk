@@ -600,6 +600,33 @@ function json_parse(  r,mc,k,e,ns){
 	if(json_m("e")||json_m("E")){json_m("-")||json_m("+");json_d()}
 	if(json_i<=ns){json_f=0;return NONE};return lmn(substr(json_t,ns,min(json_i-ns,512)))
 }
+function love_parse(  r,k){
+	if(json_m("[")){
+		r=lml();while(json_c()!=""){
+			json_s();if(json_m("]"))break;lst_add(r,love_parse());json_s();json_m(",")
+		};return r
+	}
+	if(json_m("{")){
+		r=lmd();while(json_c()!=""){
+			json_s();if(json_m("}"))break;k=love_parse()json_s();json_m(":")
+			json_s();if(json_f)dset(r,k,love_parse());json_s();json_m(",")
+		}return r
+	}
+	if(json_m("<")){
+		r=lmd();while(json_c()!=""){
+			json_s();if(json_m(">"))break;k=love_parse()json_s();json_m(":")
+			json_s();if(json_f)dset(r,ls(k),ll(love_parse()));json_s();json_m(",")
+		}return l_table(r)
+	}
+	if(json_m("%")){
+		json_m("%");r="%%"
+		while(json_c()~/[a-zA-Z0-9+/=]/)r=r json_nx()
+		if(substr(r,1,5)=="%%IMG")return image_read(r)
+		if(substr(r,1,5)=="%%DAT")return array_read(r)
+		return NONE
+	}
+	return json_parse()
+}
 BEGIN{
 	ISODATE=lms("%[year]04i-%[month]02i-%[day]02iT%[hour]02i:%[minute]02i:%[second]02iZ%n%m")
 	split("0,31,59,90,120,151,181,212,243,273,304,334",cumulative_month_days,",")
@@ -618,12 +645,13 @@ function l_parse(x,y,  r,z,f,h,m,pi,named,nk,hn,si,sk,lf,n,d,t,v,s,p,mc,yr,k){
 		n=0;while(substr(x,f,1)~/[0-9]/){n=n*10+substr(x,f,1);f++};if(substr(x,f,1)==".")f++
 		d=0;while(substr(x,f,1)~/[0-9]/){d=d*10+substr(x,f,1);f++};if(f>length(x))break
 		t=substr(x,f,1);f++
-		if(t~/[^%mnzsluqaroj]/){while(m&&h<=length(y)&&(n?h-si<n:1)&&substr(y,h,1)~/[ \n]/)h++;}
+		if(t~/[^%mnzsluqarojJ]/){while(m&&h<=length(y)&&(n?h-si<n:1)&&substr(y,h,1)~/[ \n]/)h++;}
 		if     (t=="%"){if(m&&h<=length(y)&&(n?h-si<n:1)){h++}else{m=0}}
 		else if(t=="m")v=m?ONE:NONE
 		else if(t=="n")v=lmn(h-1)
 		else if(t=="z")v=(m&&h==length(y)+1)?ONE:NONE
 		else if(t=="j"){json_t=y;json_i=h;json_f=1;json_n=n?n:length(y);v=m?json_parse():NONE;h=json_i;}
+		else if(t=="J"){json_t=y;json_i=h;json_f=1;json_n=n?n:length(y);v=m?love_parse():NONE;h=json_i;}
 		else if(t=="i"){
 			if(m&&substr(y,h,1)=="-"){h++;s=-1}else{s=1}
 			m=m&&substr(y,h,1)~/[0-9]/
@@ -715,6 +743,14 @@ function format_json(x,  r,z,ct,c,e){
 		}return "\""r"\""
 	}return "null"
 }
+function format_love(x, r,z){
+	if(lin(x)||lis(x))return format_json(x)
+	if(lil(x)){r="[";for(z=0;z<count(x);z++){if(z)r=r",";r=r format_love(lst_get(x,z))};return r"]"}
+	if(lid(x)){r="{";for(z=0;z<count(x);z++){if(z)r=r",";r=r format_love(dic_getk(x,z))":"format_love(dic_getv(x,z))};return r"}"}
+	if(lit(x)){r="<";for(z=0;z<count(x);z++){if(z)r=r",";r=r format_love(tab_getk(x,z))":"format_love(tab_getv(x,z))};return r">"}
+	if(lii(x)){return lvs(interfaces(x,lms("encoded")))}
+	return "null"
+}
 function format_type(a,t,n,d,lf,pz,  o,v,vn,r,z){
 	o=""
 	if     (t=="%")o="%"
@@ -728,6 +764,7 @@ function format_type(a,t,n,d,lf,pz,  o,v,vn,r,z){
 	else if(t=="h"){o=sprintf("%x",int(ln(a)))}
 	else if(t=="H"){o=sprintf("%X",int(ln(a)))}
 	else if(t=="j"){o=format_json(a)}
+	else if(t=="J"){o=format_love(a)}
 	else if(t=="q"){o=format_json(ls(a))}
 	else if(t=="e"){o=epoch_to_isodate(int(ln(a)))}
 	else if(t=="p"){o=lvs(l_format(ISODATE,ld(a)))}
