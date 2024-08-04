@@ -463,11 +463,11 @@ cst:{"type":"button","size":[100,20],"pos":[109,31],"locked":1,"show":"none","st
 
 {script:wigglyPlayer.0p}
 on frames do fr.images end
-on order  do "%j" parse or.text end
+on order  do or.data end
 
 on set_value x do
  if x.frames fr.images:x.frames..copy[] end
- or.text:"%j" format list (range count x.frames) unless x.order
+ or.data: (range count x.frames) unless x.order
 end
 on get_value do
  r.frames:frames[]
@@ -499,13 +499,13 @@ on set_stretch x do cst.value:x end
 on get_frames do fr.value end
 on set_frames x do fr.value:x end
 on get_order_text do "," fuse order[] end
-on set_order_text x do or.text:"%j" format list 0+"," split x end
+on set_order_text x do or.data: 0+"," split x end
 on get_animate do view end
 on get_flip do fl.value end
 on set_flip x do fl.value:x end
-on get_emotes do "%j" parse em.text end
-on set_emotes x do em.text:"%j" format x end
-on set_emote x do or.text:"%j" format list () unless get_emotes[][x] end
+on get_emotes do em.data end
+on set_emotes x do em.data: x end
+on set_emote x do or.data:() unless get_emotes[][x] end
 
 {end}
 
@@ -557,12 +557,12 @@ on wiggle x do return random[delta  2]+x end
 on get_init do
  on init do
   card.show:"transparent"
-  locks.text:"%j" format deck.card.widgets..locked
+  locks.data:deck.card.widgets..locked
   deck.card.widgets..locked:1
  end
 end
 on cleanup do
- each v k in "%j" parse locks.text
+ each v k in locks.data
   deck.card.widgets[k].locked:v
  end
  deck.remove[card]

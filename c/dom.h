@@ -1716,6 +1716,7 @@ lv* interface_field(lv*self,lv*i,lv*x){
 	if(x){
 		ikey("text"     ){dset(data,lmistr("value"),rtext_cast(ls(x)));return x;}
 		ikey("images"   ){dset(data,lmistr("value"),rtext_write_images(x));return x;}
+		ikey("data"     ){dset(data,lmistr("value"),rtext_cast(l_format(lmistr("%J"),l_list(x))));return x;}
 		ikey("scroll"   ){int n=MAX(0,ln(x));dset(data,i,lmn(n));return x;}
 		ikey("value"    ){
 			lv*style=ivalue(self,"style");int plain=style&&strcmp(ls(style)->sv,"rich");
@@ -1729,6 +1730,7 @@ lv* interface_field(lv*self,lv*i,lv*x){
 	}else{
 		ikey("text"     ){lv*r=value_inherit(self,lmistr("value"));return r?rtext_all(r):lmistr("");}
 		ikey("images"   ){lv*r=value_inherit(self,lmistr("value"));return r?rtext_read_images(r):lml(0);}
+		ikey("data"     ){lv*r=value_inherit(self,lmistr("value"));return r?l_parse(lmistr("%J"),rtext_all(r)):NONE;}
 		ikey("value"    ){lv*r=value_inherit(self,i);return r?r:rtext_cast(NULL);}
 		ikey("scroll"   ){lv*r=value_inherit(self,i);return r?r:NONE;}
 		ikey("scrollbar"){lv*r=dget(data,i);return r?r:NONE;}

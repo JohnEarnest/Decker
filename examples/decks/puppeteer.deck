@@ -448,13 +448,13 @@ on init_puppet name do
   s.hflip:0
   s.pos:"center"
   s.blink:blink_interval[]
-  ps.text:"%j" format s
+  ps.data:s
  end
 end
 
 on get_puppet name do
  init_puppet[name]
- r:"%j" parse target.widgets[get_state_name[name]].text
+ r:target.widgets[get_state_name[name]].data
  r.wid:target.widgets[name]
  r.name:name
  r
@@ -462,7 +462,7 @@ end
 
 on set_puppet state do
  init_puppet[state.name]
- target.widgets[get_state_name[state.name]].text:"%j" format ("wid","name") drop state
+ target.widgets[get_state_name[state.name]].data:("wid","name") drop state
 end
 
 #######################################

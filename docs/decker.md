@@ -1074,6 +1074,7 @@ The field widget displays and possibly allows the editing of text.
 | `x.parent`              | The Card, Contraption or Prototype containing this widget.                                            |
 | `x.text`                | String. The plain-text content of this field. r/w.                                                    |
 | `x.images`              | List. Any inline Image interfaces that appear in the rtext content of this field. r/w.                |
+| `x.data`                | Any. Lil values are encoded as text as by the `%J` pattern for `parse` and `format`. r/w.             |
 | `x.value`               | Table. The rtext content of this field. r/w.                                                          |
 | `x.scroll`              | Int. The number of pixels the viewport of the field is scrolled down. r/w.                            |
 | `x.border`              | Bool. Draw an outline around this widget? r/w.                                                        |
@@ -1086,6 +1087,9 @@ The field widget displays and possibly allows the editing of text.
 If a field has a `style` other than `rich`, any rtext written to the `value` attribute will be coalesced into a single run of ordinary text with the default font.
 
 See also: [rtext](#rtextinterface).
+
+The `field.data` and `field.images` attributes offer a convenient way to stash arbitrary Lil values (excluding functions and interfaces that are not an _Image_, _Sound_, or _Array_), or a list of Image values, respectively, in a Field. Note that reading `field.images` retrieves images _by reference_ from rtext content, whereas reading `field.data` always decodes a fresh copy of any contained images; the former is therefore more efficient when storing and retrieving large images.
+
 
 Slider Interface
 ----------------

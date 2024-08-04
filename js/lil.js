@@ -1872,6 +1872,7 @@ field_read=(x,card)=>{
 		if(x){
 			if(ikey(i,'text'  ))return self.value=rtext_cast(lms(ls(x))),x
 			if(ikey(i,'images'))return self.value=rtext_write_images(x),x
+			if(ikey(i,'data'  ))return self.value=rtext_cast(dyad.format(lms('%J'),monad.list(x))),x
 			if(ikey(i,'scroll'))return self.scroll=max(0,ln(x)),x
 			if(ikey(i,'value' )){
 				if(ls(ifield(self,'style'))!='rich'&&!rtext_is_plain(x))x=rtext_string(rtext_cast(x))
@@ -1884,6 +1885,7 @@ field_read=(x,card)=>{
 		}else{
 			if(ikey(i,'text'     )){const v=value_inherit(self,'value');return v!=undefined?rtext_string(v):lms('')}
 			if(ikey(i,'images'   )){const v=value_inherit(self,'value');return v!=undefined?rtext_read_images(v):lml([])}
+			if(ikey(i,'data'     )){const v=value_inherit(self,'value');return v!=undefined?dyad.parse(lms('%J'),rtext_string(v)):NONE}
 			if(ikey(i,'border'   ))return lmn(ivalue(self,ls(i),1))
 			if(ikey(i,'value'    ))return value_inherit(self,ls(i))||rtext_cast()
 			if(ikey(i,'scroll'   ))return value_inherit(self,ls(i))||NONE

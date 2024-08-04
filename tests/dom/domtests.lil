@@ -314,6 +314,12 @@ assert["field.images read and write" (ia,ib,ia) cf.images]
 cf.images:0
 assert["field.images bogus write"    ()         cf.images]
 
+dat.a:insert a b with 11 22 33 44 end
+cf.data:dat
+assert["field.data round-tripping 1" dat cf.data]
+cf.data:11,22,33
+assert["field.data round-tripping 2" (11,22,33) cf.data]
+
 #######################################
 #
 #  Slider
