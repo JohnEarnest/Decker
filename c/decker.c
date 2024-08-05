@@ -480,7 +480,7 @@ int widget_button(lv*target,button x,int value){
 	}
 	int a=!l&&dover(b)&&over(b), cs=(sel&&ev.action), cl=cs||sh||((ev.md||ev.drag)&&a), cr=cs||shh|(ev.mu&&a);
 	if(!l&&over(b)&&!ev.drag&&x.show!=show_none)uicursor=cursor_point;
-	if(x.show==show_none)return cr; rect ar=inset(b,2);
+	if(x.show==show_none)return 0; rect ar=inset(b,2);
 	if(x.style==button_round){
 		draw_boxr(b,fcol,bcol,x.show!=show_transparent);
 		draw_textc(inset(b,3),x.text,x.font,fcol);

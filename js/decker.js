@@ -642,7 +642,7 @@ widget_button=(target,x,value,func)=>{
 	const a=!l&&dover(b)&&over(b), cs=sel&&!func&&ev.action, cl=cs||sh||((ev.md||ev.drag)&&a), cr=cs||shh|(ev.mu&&a)
 	if(func&&a){ev.callback=func,ev.callback_rect=rcopy(b)}
 	if(!l&&over(b)&&!ev.drag&&x.show!='none')uicursor=cursor.point
-	if(x.show=='none')return cr; let ar=inset(b,2)
+	if(x.show=='none')return 0; let ar=inset(b,2)
 	if(x.style=='round'){
 		draw_boxr(b,fcol,bcol,x.show!='transparent')
 		draw_textc(inset(b,3),x.text,font,fcol)
