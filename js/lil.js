@@ -1534,7 +1534,7 @@ image_resize=(i,size)=>{
 }
 buffer_map=(buff,x,fill)=>{
 	const m=new Uint8Array(256);for(let z=0;z<256;z++)m[z]=fill?ln(fill):z;x=ld(x)
-	for(let z=0;z<x.k.length;z++)m[0xFF&ln(x.k[z])]=0xFF&ln(x.v[z])
+	for(let z=0;z<x.k.length;z++){let k=0|ln(x.k[z]);if(k>=-128&&k<=255)m[0xFF&k]=0xFF&ln(x.v[z])}
 	for(let z=0;z<buff.length;z++)buff[z]=m[buff[z]]
 }
 buffer_hist=(buff,sign)=>{

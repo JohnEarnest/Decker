@@ -116,6 +116,16 @@ assert_image["image dict map and fill"
 	 (list 9,9,8,8))
 	img.copy[].map[1 dict 8 9]
 ]
+
+i:image[3,3]
+i[1,1]:1
+i.map[0,2+range 256]
+assert["image map oversized list" ("%j" parse "[[0,0,0],[0,2,0],[0,0,0]]") i.pixels]
+i:image[3,3]
+i[1,1]:1
+i.map[((200+range 300)dict 0),((range 257) dict 0,2+range 256)]
+assert["image map oversized dict" ("%j" parse "[[0,0,0],[0,2,0],[0,0,0]]") i.pixels]
+
 img.transform["horiz"]
 assert_image["image mirror horiz"
 	((list 1,3,1,1),

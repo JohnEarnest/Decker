@@ -1597,9 +1597,9 @@ function image_get(img,z){return h2b[substr(heap_v[img],1+2*z,2)]}
 function image_get_px(img,x,y){return h2b[substr(heap_v[img],1+2*(x+(y*image_w(img))),2)]}
 function image_set_px(img,x,y,v,  t,i){t=heap_v[img];i=1+2*(x+(y*image_w(img)));heap_v[img]=substr(t,1,i-1) b2h[mod(v,256)] substr(t,i+2)}
 
-function n_image_map(img,args,  z,m,f,r){
+function n_image_map(img,args,  z,m,f,r,k){
 	if(count(args)>=2){f=mod(int(ln(lst_get(args,1))),256);for(z=0;z<256;z++)m[z]=b2h[f]}else{for(z=0;z<256;z++)m[z]=b2h[z];}
-	f=ld(l_first(args));for(z=0;z<count(f);z++)m[mod(int(ln(dic_getk(f,z))),256)]=b2h[mod(int(ln(dic_getv(f,z))),256)]
+	f=ld(l_first(args));for(z=0;z<count(f);z++){k=int(ln(dic_getk(f,z)));if(k>=-128&&k<=255)m[mod(k,256)]=b2h[mod(int(ln(dic_getv(f,z))),256)]}
 	r="";sx=image_w(img);sy=image_h(img);for(y=0;y<sy;y++)for(x=0;x<sx;x++)r=r m[image_get_px(img,x,y)];heap_v[img]=r
 	return img
 }

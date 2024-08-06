@@ -382,7 +382,7 @@ void buffer_flip_v(lv*x){pair s=buff_size(x);for(int z=0;z<s.x;z++){int a=z,b=z+
 lv* buffer_transpose(lv*x){pair s=buff_size(x);lv*r=lmbuff((pair){s.y,s.x});for(int a=0;a<s.y;a++)for(int b=0;b<s.x;b++)r->sv[a+s.y*b]=x->sv[b+s.x*a];return r;}
 lv* n_buffer_map(lv*self,lv*z){
 	int m[256]={0};if(z->c>1){int f=ln(z->lv[1]);for(int z=0;z<256;z++)m[z]=f;}else{for(int z=0;z<256;z++)m[z]=z;}
-	z=ld(l_first(z));EACH(i,z)m[0xFF&(int)ln(z->kv[i])]=0xFF&(int)ln(z->lv[i]);
+	z=ld(l_first(z));EACH(i,z){int k=ln(z->kv[i]);if(k>=-128&&k<=255)m[0xFF&k]=0xFF&(int)ln(z->lv[i]);}
 	EACH(z,self->b)self->b->sv[z]=m[0xFF&(int)self->b->sv[z]];return self;
 }
 lv* buffer_hist(lv*x,int sign){
