@@ -2232,7 +2232,7 @@ void go_notify(lv*deck,lv*args,int dest){
 	if(args->c&&lis(args->lv[0])){
 		char*s=l_first(args)->sv;char*p[]={"http://","https://","ftp://","gopher://","gemini://",NULL};
 		int f=0;for(int z=0;p[z];z++)if(has_prefix(s,p[z])){f=1;break;}
-		if(f){modal_enter(modal_url);ms.text=(field_val){rtext_cast(l_first(args)),0};}
+		if(f){modal_enter(modal_url);ms.text=(field_val){rtext_cast(l_first(args)),0};return;}
 	}
 	lv*tfun=args->c<2?NULL: lion(args->lv[1])?args->lv[1]: dget(dget(deck->b,lmistr("transit")),args->lv[1]);
 	int moved=dest!=ln(ifield(ifield(deck,"card"),"index"));
