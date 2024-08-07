@@ -2159,7 +2159,7 @@ free_canvas=deck=>{ // make a drawing surface that isn't attached to the parent 
 go_notify=(deck,x,t,url,delay)=>{
 	if(url&&/^(http|https|ftp|gopher|gemini):\/\//.test(url)){modal_enter('url'),ms.text=fieldstr(lms(url));return}
 	const moved=x!=ln(ifield(ifield(deck,'card'),'index'))
-	if(moved)con_set(null)
+	if(moved){con_set(null);if(uimode=='script')close_script()}
 	if(moved&&!deck.locked&&x>=0){try{window.location.hash=ls(ifield(deck.cards.v[x],'name'))}catch(e){}}
 	const tfun=t==null?null: lion(t)?t: dget(deck.transit,t)
 	if(ms.type!='trans'&&x>=0&&tfun){

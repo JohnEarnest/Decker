@@ -2228,6 +2228,12 @@ lv*n_save(lv*self,lv*z){
 	ms.grid=(grid_val){directory_enumerate(ms.path,ms.filter,0),0,0,-1};
 	return value;
 }
+void close_script(lv*next){
+	sc.next=next;field_exit();lv*text=rtext_all(sc.f.table);parse(text->sv);
+	if(!perr()){script_save(text),finish_script();return;}
+	char t[4096];snprintf(t,sizeof(t),"The current script contains errors:\n\n%s\n\nDo you wish to discard your changes?",par.error);
+	modal_enter(modal_confirm_script);ms.message=lmcstr(t),ms.verb=lmcstr("Discard");
+}
 void go_notify(lv*deck,lv*args,int dest){
 	if(args->c&&lis(args->lv[0])){
 		char*s=l_first(args)->sv;char*p[]={"http://","https://","ftp://","gopher://","gemini://",NULL};
@@ -2236,7 +2242,7 @@ void go_notify(lv*deck,lv*args,int dest){
 	}
 	lv*tfun=args->c<2?NULL: lion(args->lv[1])?args->lv[1]: dget(dget(deck->b,lmistr("transit")),args->lv[1]);
 	int moved=dest!=ln(ifield(ifield(deck,"card"),"index"));
-	if(moved)con_set(NULL);
+	if(moved){con_set(NULL);if(uimode==mode_script)close_script(NULL);}
 	if(dest>=0&&tfun!=NULL&&ms.type!=modal_trans){
 		modal_enter(modal_trans);ms.time_curr=0,ms.time_end=args->c<3?30: MAX(1,ln(args->lv[2]));
 		ms.trans=tfun, ms.canvas=free_canvas(deck);
@@ -2247,12 +2253,6 @@ void go_notify(lv*deck,lv*args,int dest){
 		grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel->c=0,wid.active=ms.type==modal_listen?0:-1;mark_dirty();
 	}
 	if(uimode==mode_interact)msg.next_view=1;
-}
-void close_script(lv*next){
-	sc.next=next;field_exit();lv*text=rtext_all(sc.f.table);parse(text->sv);
-	if(!perr()){script_save(text),finish_script();return;}
-	char t[4096];snprintf(t,sizeof(t),"The current script contains errors:\n\n%s\n\nDo you wish to discard your changes?",par.error);
-	modal_enter(modal_confirm_script);ms.message=lmcstr(t),ms.verb=lmcstr("Discard");
 }
 void validate_modules(void){
 	lv*modules=ifield(deck,"modules");EACH(z,modules){
