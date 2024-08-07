@@ -86,6 +86,17 @@ field2:{"type":"field","size":[217,72],"pos":[285,56],"locked":1,"border":0,"val
 button3:{"type":"button","size":[60,20],"pos":[285,278],"script":"say.0","text":"Try It!"}
 button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
 
+{card:chat}
+image:"%%IMG2AgABVgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8AFwFIAP8AuQEBAEYBAQD/ALkBAQBGAQEA/wC5AQEARgEBAP8AuQEBAEYBAQD/ALkBAQAGAQ4ACAEOAAgBDgAGAQEA/wC5AQEABgEBAAwBAQAIAQEADAEBAAgBAQAMAQEABgEBAP8AuQEBAAYBAQAMAQEACAEBAAwBAQAIAQEADAEBAAYBAQD/ALkBAQAGAQEABQEBAAYBAQAIAQEABAEDAAUBAQAIAQEABAEDAAUBAQAGAQEA/wC5AQEABgEBAAQBAgAGAQEACAEBAAMBAQADAQEABAEBAAgBAQADAQEAAwEBAAQBAQAGAQEA/wC5AQEABgEBAAMBAQABAQEABgEBAAgBAQAHAQEABAEBAAgBAQAHAQEABAEBAAYBAQD/ALkBAQAGAQEABQEBAAYBAQAIAQEABgEBAAUBAQAIAQEABgEBAAUBAQAGAQEA/wC5AQEABgEBAAUBAQAGAQEACAEBAAUBAQAGAQEACAEBAAcBAQAEAQEABgEBAP8AuQEBAAYBAQAFAQEABgEBAAgBAQAEAQEABwEBAAgBAQAHAQEABAEBAAYBAQD/ALkBAQAGAQEABQEBAAYBAQAIAQEAAwEBAAgBAQAIAQEAAwEBAAMBAQAEAQEABgEBAP8AuQEBAAYBAQADAQUABAEBAAgBAQADAQUABAEBAAgBAQAEAQMABQEBAAYBAQD/ALkBAQAGAQEADAEBAAgBAQAMAQEACAEBAAwBAQAGAQEA/wC5AQEABgEBAAwBAQAIAQEADAEBAAgBAQAMAQEABgEBAP8AuQEBAAYBDgAIAQ4ACAEOAAYBAQD/ALkBAQAUAQMACwEBAAwBAwAUAQEA/wC5AQEAFAECAAsBAwAMAQIAFAEBAP8AuQEBABQBAQABAQEACQEFAAoBAQABAQEAFAEBAP8AuQEBABcBAQAKAQEACwEBABcBAQD/ALkBAQAYAQEACQEBAAoBAQAYAQEA/wC5AQEAGQEBAAEBAQAEAQUABQEBAAEBAQAZAQEA/wC5AQEAGgECAAUBAwAGAQIAGgEBAP8AuQEBABkBAwAGAQEABwEDABkBAQD/ALkBAQAcAQ4AHAEBAP8AuQEBABwBAQAMAQEAHAEBAP8AuQEBABwBAQAMAQEAHAEBAP8AuQEBABwBAQAEAQQABAEBABwBAQD/ALQBAQAEAQEAHAEBAAMBAQAEAQEAAwEBABwBAQAOAQEA/wClAQIAAwEBABwBAQAIAQEAAwEBABwBAQAOAQIA/wCkAQMAAgEBABwBAQAGAQIABAEBABwBAQAOAQMA/wCjAQQAAQEBABwBAQAFAQEABgEBABwBAQAOAQQA/wCUARUAAQEBAAEBAQABAQEAAQEBAAEBAQABAQEAAQEBAAEBAQABAQEAAQEBAAEBAQABAQEAAQEBAAEBAQAFAQEABgECAAEBAQABAQEAAQEBAAEBAQABAQEAAQEBAAEBAQABAQEAAQEBAAEBAQABAQEAAQEBAAEBAQABARQA/wChAQQAAQEBABwBAQAMAQEAHAEBAA4BBAD/AKIBAwACAQEAHAEBAAUBAQAGAQEAHAEBAA4BAwD/AKMBAgADAQEAHAEBAAwBAQAcAQEADgECAP8ApAEBAAQBAQAcAQEADAEBABwBAQAOAQEA/wCqAQEAHAEOABwBAQD/ALkBAQBGAQEA/wC5AQEARgEBAP8AuQEBAEYBAQD/ALkBAQBGAQEA/wC5AQEARgEBAP8AuQFIAP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/API="
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,28],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"dd.chat[]"}
+ex1:{"type":"field","size":[266,242],"pos":[10,56],"style":"code","value":"ct:\"Chickens are fantastic animals.\n\nDid you know chickens can lay an egg roughly every 24 hours?\n\nThey stop laying when they moult.\"\nbt:\"Honestly I don't know much about bugs.\"\n\ndd.open[deck]\nr:dd.chat[\n \"Ask me anything you like.\"\n raze insert q a with\n  \"Tell me about chickens.\" ct\n  \"Tell me about bugs.\"     bt\n  \"I have to go.\" 0\n end\n]\ndd.say[\"goodbye, then.\"]\ndd.close[]"}
+field2:{"type":"field","size":[217,154],"pos":[285,56],"locked":1,"border":0,"value":"The dd.chat[] function makes certain patterns of dialog trees built out of dd.ask[] and dd.say[] easier to write.\n\nThe dd.chat[] function accepts a string as a prompt and a dictionary mapping strings (options) to responses. It will display a dialog box (as with dd.ask[]), and then consult the response corresponding to the user's choice. If the response is a number, dd.chat[] will return it immediately. Otherwise, dd.say[] will be called with the response, the selected choice will be removed from the list of choices, and the user will be prompted again with dd.ask[] until no options remain."}
+button3:{"type":"button","size":[60,20],"pos":[285,278],"script":"say.0","text":"Try It!"}
+button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+
 {card:configuration}
 {widgets}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
@@ -100,9 +111,9 @@ button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text"
 {widgets}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
-title:{"type":"field","size":[492,17],"pos":[10,28],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"dd.style[]"}
+title:{"type":"field","size":[492,17],"pos":[10,28],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"dd.style[], dd.getstyle[]"}
 ex1:{"type":"field","size":[244,242],"pos":[10,56],"style":"code","value":"a:()\na.fcolor:colors.white\na.bcolor:colors.black\nb:()\nb.fcolor:colors.black\nb.bcolor:colors.red\n\ndd.open[deck a]\ndd.say[\"Style A\"]\n\ndd.style[b]\ndd.say[\"Switch to:\\nStyle B\"]\n\ndd.style[a]\ndd.say[\"Back to Style A!\"]\ndd.close[]\n"}
-field2:{"type":"field","size":[236,242],"pos":[266,56],"locked":1,"border":0,"value":"You can also change the configuration of a dialog sequence in mid-stream with dd.style[].\n\nThe dd.style[] function takes a single dictionary as an argument and accepts all the same options as dd.open[]."}
+field2:{"type":"field","size":[236,242],"pos":[266,56],"locked":1,"border":0,"value":"You can also change the configuration of a dialog sequence in mid-stream with dd.style[].\n\nThe dd.style[] function takes a single dictionary as an argument and accepts all the same options as dd.open[].\n\nThe dd.getstyle[] function can be called with no arguments to retrieve a dictionary of all the current style settings. This can be useful if you need to save the current style and restore it at a later time."}
 button3:{"type":"button","size":[60,20],"pos":[266,278],"script":"say.0","text":"Try It!"}
 button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
 
@@ -131,6 +142,21 @@ ex2:{"type":"field","size":[244,81],"pos":[10,148],"style":"code","value":"o:()\
 button4:{"type":"button","size":[60,20],"pos":[267,118],"script":"say.0","text":"Try It!"}
 windoid:{"type":"canvas","size":[36,24],"pos":[22,253],"locked":1,"border":0,"image":"%%IMG2ACQAGAAlASIAAgEBIB8BAgACAQEgAQEBIAEBByABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQECAAIBASADAQEgBQEBIBUBAgACAQEgAQEBIAEBASAFAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBAgACAQEgAwEBIAUBASAVAQIAAgEBIAEBASABAQEgBQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQIAAgEBIAMBASAFAQEgFQECAAIBASABAQEgAQEHIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQEgAQEBIAEBASABAQIAAgEBIB8BAgACASIAAgEBIB8BAgACAQEgHwECAAIBASAfAQIAAgEBIB8BAgACAQEgHwECAAIBASAfAQIAAgEBIB8BAgACAQEgHwECAAIBASAfAQIAAgEiAAIBIgAl","scale":1}
 button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+
+{card:buttonborders}
+image:"%%IMG2AgABVgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AEsgAQD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8AxBPSAP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AMo="
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,28],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"button borders, alignment"}
+ex1:{"type":"field","size":[244,241],"pos":[10,56],"scrollbar":0,"style":"code","value":"o.bborder:deck.contraptions.rbutton\no.fcolor:colors.black\no.bcolor:colors.white\ndd.open[deck o]\ndd.ask[\n \"Which button do you like?\"\n (\"First\",\"Second\",\"Third\")\n]\n\no.bborder:deck.contraptions.bracket\no.balign:\"left\"\ndd.style[o]\ndd.ask[\n \"How about this?\"\n (\"This one\",\"Nah, This one\")\n]\ndd.close[]\n"}
+field2:{"type":"field","size":[236,172],"pos":[266,56],"locked":1,"border":0,"value":"The \"bborder\" property can be used to configure a custom border image for the buttons in dd.ask[] dialogs. This works just like the \"border\" property, and can be either a dictionary with an image and explicit margin, or a contraption.\n\nThe image used for the \"bborder\" property should be partially transparent, to allow the foreground fill color to show through when a button is clicked, highlighting the button.\n\nThe \"balign\" property works just like the \"align\" property but controls the alignment of text within dd.ask[] buttons, and can be set to \"left\", \"right\", or \"center\" (the default)."}
+button3:{"type":"button","size":[60,20],"pos":[266,222],"script":"say.0","text":"Try It!"}
+button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+rbutton1:{"type":"contraption","size":[64,25],"pos":[314,272],"def":"rbutton","widgets":{}}
+field1:{"type":"field","size":[44,12],"pos":[324,259],"locked":1,"border":0,"style":"plain","align":"center","value":"rbutton:"}
+arrow1:{"type":"contraption","size":[21,13],"pos":[417,278],"def":"bracket","widgets":{}}
+field3:{"type":"field","size":[44,12],"pos":[404,259],"locked":1,"border":0,"style":"plain","align":"center","value":"bracket:"}
 
 {card:windowsize}
 {widgets}
@@ -205,8 +231,8 @@ field6:{"type":"field","size":[61,16],"pos":[344,95],"locked":1,"style":"code","
 field7:{"type":"field","size":[67,16],"pos":[418,95],"locked":1,"style":"code","value":"%[key]8.3f"}
 button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
 
-{card:card1}
-script:"card1.0"
+{card:commands}
+script:"commands.0"
 {widgets}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
@@ -218,7 +244,7 @@ source:{"type":"field","size":[244,183],"pos":[10,115],"value":{"text":["!light\
 field5:{"type":"field","size":[100,12],"pos":[89,101],"locked":1,"border":0,"style":"plain","align":"center","value":"source:"}
 button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
 
-{script:card1.0}
+{script:commands.0}
 on command x do
  if x~"light"
   o.fcolor:colors.black
@@ -396,7 +422,7 @@ image:"%%IMG2AgABVgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8
 
 {module:dd}
 description:"Display sequential, styled modal dialogs for visual novels."
-version:1.3
+version:1.4
 {script}
 # state/constants:
 local host:0
@@ -409,13 +435,16 @@ local arrow:image["%%IMG0AAsABv/gf8A/gB8ADgAEAA=="]
 local tfont:"body"
 local bfont:"body"
 local align:"left"
+local balign:"center"
 local fcolor:32
 local bcolor:1
 local next:arrow
 local speed:0
 local names:() dict ()
 local border:0
+local bborder:0
 local pad:()
+local bpad:()
 local osound:"" # open box
 local nsound:"" # advance to next box
 local asound:"" # make a choice
@@ -486,6 +515,7 @@ module.style:on style etc do
  tfont :if "tfont"  in etc etc.tfont  else "body"   end
  bfont :if "bfont"  in etc etc.bfont  else "body"   end
  align :if "align"  in etc etc.align  else "left"   end
+ balign:if "balign" in etc etc.balign else "center" end
  names :if "names"  in etc etc.names  else ()dict() end
  next  :if "next"   in etc etc.next   else arrow    end
  speed :if "speed"  in etc etc.speed  else 0        end
@@ -497,6 +527,32 @@ module.style:on style etc do
  dpos:  if "pos"    in etc etc.pos    else 0        end
  border:etc.border.image.copy[]
  pad:"ltrb" dict 4 take if !0~etc.border.margin etc.border.margin else padding end
+ bborder:etc.bborder.image.copy[]
+ bpad:"ltrb" dict 4 take if !0~etc.bborder.margin etc.bborder.margin else (2,10,2,10) end
+ if balign~"left"  balign:"center_left"  end
+ if balign~"right" balign:"center_right" end
+end
+
+module.getstyle:on getstyle do
+ raze insert k v with
+  "fcolor"  fcolor
+  "bcolor"  bcolor
+  "tfont"   tfont
+  "bfont"   bfont
+  "align"   align
+  "balign"  (("center_left","center_right","center") dict ("left","right","center"))[balign]
+  "names"   names
+  "next"    next
+  "speed"   speed
+  "osound"  osound
+  "nsound"  nsound
+  "asound"  asound
+  "tsound"  tsound
+  "size"    dsize
+  "pos"     dpos
+  "border"  (("image","margin")dict((list  border),(list range  pad)))
+  "bborder" (("image","margin")dict((list bborder),(list range bpad)))
+ end
 end
 
 module.show:on show x do
@@ -567,7 +623,7 @@ module.ask:on ask text choices do
  segs:fmt @ choices
  canvas.font:bfont
  dims:each choice in segs
-  canvas.textsize[choice (canvas.size[0] unless dsize[0])-(2*padding)+(pad.l+pad.r)][1]+2*padding
+  canvas.textsize[choice (canvas.size[0] unless dsize[0])-(bpad.t+bpad.b)+(pad.t+pad.b)][1]+(bpad.t+bpad.b)
  end
  szh:dim[1]+(pad.t+pad.b)+(sum dims)+(padding*count dims)
  if dsize[0] dim[0]:dsize[0]-pad.l+pad.r end
@@ -575,24 +631,58 @@ module.ask:on ask text choices do
  local r:-1 while -1~r
   draw_border[]
   canvas.font:tfont
+  canvas.pattern:fcolor
   canvas.text[seg (pad.l,pad.t),dim ("top_%s" format align)]
   c:dim[1]+pad.t+padding
   ow:canvas.size[0]-(pad.l+pad.r)
   each choice i in segs
+   local rpos:pad.l,c
+   local rsize:ow,dims[i]
+   local tpos:rpos+bpad.l,bpad.t
+   local tsize:rsize-((bpad.l+bpad.r),(bpad.t+bpad.b))
+   # active background (invert label)
    canvas.pattern:fcolor
-   rpos:pad.l,c
-   rsize:ow,dims[i]
-   canvas.box[rpos rsize]
    if (pointer.held|pointer.down|pointer.up)&rin[pointer.pos-canvas.pos rpos rsize]
-    canvas.rect[rpos+2 rsize-4]
-    canvas.pattern:bcolor
+    if bborder.type~"image"
+     canvas.rect[rpos rsize]
+    else
+     canvas.rect[rpos+2 rsize-4]
+    end
     if pointer.up r:i sfx[asound] end
+    canvas.pattern:bcolor
    end
+   # label
    canvas.font:bfont
-   canvas.text[choice (rpos+padding),(rsize-2*padding) "center"]
+   canvas.text[choice tpos,tsize balign]
+   # border
+   if bborder.type~"image"
+    canvas.segment[bborder rpos,rsize (range bpad)]
+   else
+    canvas.pattern:fcolor
+    canvas.box[rpos rsize]
+   end
    c:c+padding+dims[i]
   end
   tick[]
+ end
+ r
+end
+
+module.chat:on chat text choices do
+ r:0
+ st:getstyle[]
+ while count choices
+  k:keys choices
+  style[st]
+  v:ask[text k]
+  vv:choices[k[v]]
+  if "number"~typeof vv
+   choices:()
+   r:vv
+  else
+   choices:k[v] drop choices
+   say[vv]
+  end
  end
  r
 end
@@ -604,4 +694,18 @@ resizable:1
 margin:[10,10,15,20]
 description:"a resizable scrap of ragged paper."
 image:"%%IMG2AQoAKgH/AQoAAQEBIP8gCAEBAAEBASD/IAgBAQABAQEg/yAHAQIAAQEBIP8gBwEBAAIBASD/IAYBAgACAQEg/yAGAQIAAgEBIP8gBQECAAMBASD/IAYBAQADAQEg/yAGAQIAAgEBIP8gBwEBAAIBASD/IAcBAQACAQEg/yAGAQIAAgEBIP8gBgEBAAMBASD/IAUBAgADAQEg/yAFAQIAAwEBIP8gBQEBAAQBASD/IAUBAQAEAQEg/yAEAQEABQEBIP8gAwECAAUBASD/IAMBAgAFAQEg/yADAQMABAEBIP8gBAEDAAMBASD/IAUBAwACAQEg/yAGAQIAAgEBIP8gBgECAAIBASD/IAYBAQADAQEg/yAFAQEABAEBIP8gBAECAAQBASD/IAQBAwADAQEg/yAFAQIAAwEBIP8gBQEDAAIBASD/IAYBAgACAQEg/yAGAQMAAQEBIGIBAiBWAQMgSQEBAAIBASBZAQIgBQEFICwBAiAmAQggFQEFICoBAgACAQEgDAEHIAkBBCAmAQIgDgEGIAMBAgACAQMgJwEHIAQBAyALAQkgCAECAAMBDiAIAQwgCgEDIBoBAgACAQEgCQENIAUBCSACAQUgGgEEIAsBBAACAQUABQEEIBkBBiAEAQUAAgELIAYBDiAFAQIACAEOIAMBBAAFAQggAwELIAoBAiAJAQMAAQEBIAQBBwAHAQkABAEQIAMBCSAJAQEAAgEDIAgBAwAGAQMABwEKIBEBDAAHAQQAAwEFIAMBAwAJAQgAEwEIAAwBCgADARggBAECAAEBASACAQYADQEFAAkBAgAFARQgBQEBAAQBCwAUAQogDAEDAAYBBAASAQYADgEFABgBAwARAQMACwEKAAIBDQABAQQAKwEDAAkBCQAGAQgAHQERAB8BAwBgAQYAAgECADwBBQAuAQwAjQ=="
+
+{contraption:rbutton}
+size:[31,28]
+resizable:1
+margin:[7,7,8,8]
+description:"a resizable rounded button."
+image:"%%IMG2AB8AHCAFARQgCQECIBQBAiAGAQEgAgAUIAIBASAEAQEgAQAYIAEBASADAQEgAQAYIAEBAiABAQEgAQAaIAEBASABAQEgAQAaIAEBAyABABogAQEDIAEAGiABAQMgAQAaIAEBAyABABogAQEDIAEAGiABAQMgAQAaIAEBAyABABogAQEDIAEAGiABAQMgAQAaIAEBAyABABogAQEDIAEAGiABAQMgAQAaIAEBAyABABogAQEDIAEAGiABAQMgAQAaIAEBAiABAQEgAQAYIAEBAyABAQEgAQAYIAEBAiADAQEgAgAUIAIBAyADAQMgFAEEIAUBGSAIARUgBQ=="
+
+{contraption:bracket}
+size:[35,9]
+resizable:1
+margin:[10,3,3,3]
+description:"a resizable bracket-shaped outline."
+image:"%%IMG2ACMACSAkAQUgHgECIAYAGCADAQIgBgAYIAMBAiAGABggAwECIAYAGCADAQIgBgAYIAMBBSBA"
 
