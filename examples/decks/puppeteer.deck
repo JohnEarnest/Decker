@@ -18,8 +18,8 @@ script:"Index.0"
 field1:{"type":"field","size":[132,17],"pos":[338,111],"locked":1,"font":"menu","show":"invert","border":0,"align":"center","value":"Puppets for Decker"}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
 field2:{"type":"field","size":[248,55],"pos":[14,142],"locked":1,"show":"transparent","border":0,"value":{"text":["Puppeteer is  a module (\"pt\") which provides a system for organizing and animating character sprites for use in Visual Novels and similar interactive content.\n\n","Index:"],"font":["","menu"],"arg":["",""]}}
-index:{"type":"field","size":[243,117],"pos":[16,197],"locked":1,"script":"Index.2","scrollbar":1,"value":{"text":["i","  ","what's a puppet?\n","i","  ","character sheets\n","i","  ","stage directions\n","i","  ","pt.command[], pt.clear[]\n","i","  ","!show, !hide\n","i","  ","custom positions\n","i","  ","!flip\n","i","  ","!order\n","i","  ","!anim\n","i","  ","!move, !wait\n","i","  ","!clear\n","i","  ","puppeteer and dialogizer\n","i","  ","custom commands\n","i","  ","!lil\n","i","  ","fancy puppets\n","i","  ","pt.setup[]\n"],"font":["","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono","","","mono"],"arg":["%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","puppets","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","boxy","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","positions","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","commandandclear","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","showhide","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","custompositions","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","flip","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","order","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","anim","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","movewait","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","clear","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","dialogizer","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","customcommands","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","lil","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","fancypuppets","%%IMG0AAYADQAAAAB49Pz8/HgAAAA=","","setup"]}}
-version:{"type":"field","size":[42,14],"pos":[16,318],"locked":1,"border":0,"value":"v1.0"}
+index:{"type":"field","size":[243,117],"pos":[16,197],"locked":1,"volatile":1,"script":"Index.2","scrollbar":1}
+version:{"type":"field","size":[42,14],"pos":[16,318],"locked":1,"volatile":1,"border":0}
 
 {script:Index.0}
 on view do
@@ -30,6 +30,7 @@ on view do
   rtext.make["  "],
   rtext.make[("%s\n" format row.t) "mono" row.c]
  end
+ version.text:"v%0.1f" format deck.modules.pt.version
 end
 {end}
 
@@ -250,6 +251,17 @@ ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","va
 button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"commandandclear.0","text":"Try It!"}
 button6:{"type":"button","size":[108,20],"pos":[214,312],"script":"showhide.0","text":"Clear Puppets","style":"rect"}
 
+{card:shake}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"!shake"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["The !shake command shakes the screen, as a convenient, simple way to add emphasis to your cutscenes.\n\n","!shake XMAG YMAG DELAY","\n\nXMAG and YMAG control the magnitude of the shake along the X (horizontal) and Y (vertical) axis of the screen, respectively. Each is specified in terms of pixels.\n\nDELAY specifies the duration of the shake effect in frames, at 60 frames per second. The minimum delay is 1.  The shake effect is synchronous, blocking other interaction and animation until it is complete.\n\nIf any arguments are omitted, the arguments provided to the most recent !shake will be re-used; this is helpful if you want to have several shakes in sequence."],"font":["","mono",""],"arg":["","",""]}}
+ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"pt.command[deck\n \"!show lily neutral center\",\n \"!wait 60\",\n \"!show lily ohno\",\n \"!shake 5 5 15\",\n \"!wait 30\",\n \n \"!shake 30 30 15\",\n \"!wait 30\",\n \n \"!shake 60 0 15\",\n \"!wait 10\", \n \"!shake\",\n \"!wait 10\",\n \"!shake\",\n \"!wait 30\",\n \n \"!shake 0 30 15\",\n \"!clear\"\n]"}
+button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"commandandclear.0","text":"Try It!"}
+button6:{"type":"button","size":[108,20],"pos":[214,312],"script":"showhide.0","text":"Clear Puppets","style":"rect"}
+
 {card:dialogizer}
 {widgets}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
@@ -389,7 +401,7 @@ image:"%%IMG0AgABVr/7/9v//v//3/9///9v///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 {module:pt}
 description:"Display and animate sprites for visual novels."
-version:1
+version:1.1
 {script}
 
 local FRONT:999999  # foremost (reasonable) widget index
@@ -625,6 +637,7 @@ end
 #  anim  NAME TYPE          # (none, bob, shake, breathe)
 #  wait                     # blocking wait for all in-progress anims to finish
 #  wait DELAY               # blocking wait for exactly N frames
+#  shake XMAG YMAG DELAY    # screen shake for N frames with horizontal/vertical intensity
 #  lil ANYTHING             # execute a lil snippet
 #  clear                    # remove all puppets
 #
@@ -694,6 +707,19 @@ commands.wait:on cmd_wait x do
   while max (get_puppet @ puppet_names[])..steps tick[] end
  end
  target.widgets.dd_overlay.show:"transparent"
+end
+
+local shake_mag:30,30
+local shake_dur:15
+commands.shake:on cmd_shake x do
+ if 1<count x shake_mag:0|0+2 take x end
+ if 2<count x shake_dur:1|0+x[2] end
+ go[host.card on shake_trans c a b t do
+  local m:shake_mag*1-t
+  c.pattern:1
+  c.rect[0,0 c.size]
+  c.paste[a (random@2*m)-m]
+ end shake_dur]
 end
 
 commands.clear:on cmd_clear do
