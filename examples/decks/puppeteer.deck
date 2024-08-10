@@ -251,17 +251,6 @@ ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","va
 button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"commandandclear.0","text":"Try It!"}
 button6:{"type":"button","size":[108,20],"pos":[214,312],"script":"showhide.0","text":"Clear Puppets","style":"rect"}
 
-{card:shake}
-{widgets}
-button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
-button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
-title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"!shake"}
-button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
-field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["The !shake command shakes the screen, as a convenient, simple way to add emphasis to your cutscenes.\n\n","!shake XMAG YMAG DELAY","\n\nXMAG and YMAG control the magnitude of the shake along the X (horizontal) and Y (vertical) axis of the screen, respectively. Each is specified in terms of pixels.\n\nDELAY specifies the duration of the shake effect in frames, at 60 frames per second. The minimum delay is 1.  The shake effect is synchronous, blocking other interaction and animation until it is complete.\n\nIf any arguments are omitted, the arguments provided to the most recent !shake will be re-used; this is helpful if you want to have several shakes in sequence."],"font":["","mono",""],"arg":["","",""]}}
-ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"pt.command[deck\n \"!show lily neutral center\",\n \"!wait 60\",\n \"!show lily ohno\",\n \"!shake 5 5 15\",\n \"!wait 30\",\n \n \"!shake 30 30 15\",\n \"!wait 30\",\n \n \"!shake 60 0 15\",\n \"!wait 10\", \n \"!shake\",\n \"!wait 10\",\n \"!shake\",\n \"!wait 30\",\n \n \"!shake 0 30 15\",\n \"!clear\"\n]"}
-button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"commandandclear.0","text":"Try It!"}
-button6:{"type":"button","size":[108,20],"pos":[214,312],"script":"showhide.0","text":"Clear Puppets","style":"rect"}
-
 {card:dialogizer}
 {widgets}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
@@ -276,6 +265,26 @@ script:{"type":"field","size":[232,67],"pos":[10,237],"scrollbar":1,"value":{"te
 field3:{"type":"field","size":[57,14],"pos":[10,223],"locked":1,"border":0,"value":"script"}
 button4:{"type":"button","size":[60,20],"pos":[254,284],"script":"commandandclear.0","text":"Try It!"}
 
+{card:shake}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"!shake"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,255],"pos":[254,48],"locked":1,"border":0,"value":{"text":["The !shake command shakes the screen, as a convenient, simple way to add emphasis to your cutscenes.\n\n","!shake XMAG YMAG DELAY","\n\nXMAG and YMAG control the magnitude of the shake along the X (horizontal) and Y (vertical) axis of the screen, respectively. Each is specified in terms of pixels.\n\nDELAY specifies the duration of the shake effect in frames, at 60 frames per second. The minimum delay is 1.  The shake effect is synchronous, blocking other interaction and animation until it is complete.\n\nIf any arguments are omitted, the arguments provided to the most recent !shake will be re-used; this is helpful if you want to have several shakes in sequence."],"font":["","mono",""],"arg":["","",""]}}
+button4:{"type":"button","size":[60,20],"pos":[254,283],"script":"shake.0","text":"Try It!"}
+script:{"type":"field","size":[232,241],"pos":[10,62],"scrollbar":1,"value":{"text":["!show lily neutral center\n!wait 30\n!show lily neutral_open\n\n","Lily:"," Hi there.\n\n!show lily ohno\n\n","Lily:"," W-What are you doing with my dishes?\n\n!shake 5 5 15\n!wait 30\n\n!shake 30 30 15\n!wait 30\n\n!shake 60 0 15\n!wait 10\n!shake\n!wait 10\n!shake\n!wait 30\n\n!shake 0 30 15\n!wait 60\n\n!show lily sad\n\n","Lily:"," Those were limited-edition novelties..."],"font":["","menu","","menu","","menu",""],"arg":["","","","","","",""]}}
+field3:{"type":"field","size":[57,14],"pos":[10,48],"locked":1,"border":0,"value":"script"}
+
+{script:shake.0}
+on click do
+ dd.open[deck]
+ dd.say[script.value]
+ dd.close[]
+ pt.clear[]
+end
+{end}
+
 {card:customcommands}
 script:"customcommands.0"
 {widgets}
@@ -285,9 +294,9 @@ title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","sh
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
 field1:{"type":"field","size":[248,70],"pos":[254,48],"locked":1,"border":0,"value":"It's also possible to handle your own custom commands before passing the buck to pt. The current card script is shown to the left, defining some custom styles for dd.\n\nThis approach works equally well as a card-level or deck-level script."}
 field2:{"type":"field","size":[232,149],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","value":"on command x do\n if x~\"light\"\n  o.speed:2\n  o.fcolor:colors.black\n  o.bcolor:colors.white\n  dd.style[o]\n elseif x~\"dark\"\n  o.speed:2\n  o.fcolor:colors.white\n  o.bcolor:colors.black\n  dd.style[o]\n else\n  pt.command[deck x]\n end\nend"}
-script:{"type":"field","size":[232,80],"pos":[10,224],"scrollbar":1,"value":{"text":["!show lily neutral offcenterleft\n!anim lily bob\n!move lily centerleft\n!wait\n!show lily neutral_open\n\n!dark\n\n","Lily:"," Hey, Lilac!\n\n!show lily neutral\n!show lilac neutral offcenterright\n!anim lilac bob\n!flip lilac 1\n!move lilac centerright\n!wait\n!show lilac neutral_open\n\n!light\n\n","Lilac:"," Y-yeah?\n\n!show lilac neutral\n!show lily neutral_open\n\n!dark\n\n","Lily:"," Could you help me with a quick demo?\n\n!show lily neutral\n!show lilac neutral_open\n\n!light\n\n","Lilac:"," I d-don't really want to do a demo...\nThat sounds stressful.\n\n!show lilac neutral\n!show lily neutral_open\n\n!dark\n\n","Lily:"," You just did one!\n\n!show lily neutral\n!show lilac happy\n!wait 60\n!move lily offcenterleft\n!move lilac offcenterright\n!wait"],"font":["","menu","","menu","","menu","","menu","","menu",""],"arg":["","","","","","","","","","",""]}}
+script:{"type":"field","size":[232,80],"pos":[10,224],"scrollbar":1,"scroll":439,"value":{"text":["!show lily neutral offcenterleft\n!anim lily bob\n!move lily centerleft\n!wait\n!show lily neutral_open\n\n!dark\n\n","Lily:"," Hey, Lilac!\n\n!show lily neutral\n!show lilac neutral offcenterright\n!anim lilac bob\n!flip lilac 1\n!move lilac centerright\n!wait\n!show lilac neutral_open\n\n!light\n\n","Lilac:"," Y-yeah?\n\n!show lilac neutral\n!show lily neutral_open\n\n!dark\n\n","Lily:"," Could you help me with a quick demo?\n\n!show lily neutral\n!show lilac neutral_open\n\n!light\n\n","Lilac:"," I d-don't really want to do a demo...\nThat sounds stressful.\n\n!show lilac neutral\n!show lily neutral_open\n\n!dark\n\n","Lily:"," You just did one!\n\n!show lily neutral\n!show lilac happy\n!wait 60\n!move lily offcenterleft\n!move lilac offcenterright\n!wait"],"font":["","menu","","menu","","menu","","menu","","menu",""],"arg":["","","","","","","","","","",""]}}
 field3:{"type":"field","size":[57,14],"pos":[10,208],"locked":1,"border":0,"value":"script"}
-button4:{"type":"button","size":[60,20],"pos":[254,284],"script":"customcommands.1","text":"Try It!"}
+button4:{"type":"button","size":[60,20],"pos":[254,284],"script":"shake.0","text":"Try It!"}
 
 {script:customcommands.0}
 on command x do
@@ -307,15 +316,6 @@ on command x do
 end
 {end}
 
-{script:customcommands.1}
-on click do
- dd.open[deck]
- dd.say[script.value]
- dd.close[]
- pt.clear[]
-end
-{end}
-
 {card:lil}
 {widgets}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
@@ -325,7 +325,7 @@ button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text"
 field1:{"type":"field","size":[248,81],"pos":[254,48],"locked":1,"border":0,"value":"Yet another approach would be to use the !lil command, which can be followed by any arbitrary lil code you like, as long as it doesn't contain any blank lines.\n\nThis is very convenient for one-off logic, but anything you find yourself doing repeatedly should probably go in a custom command."}
 script:{"type":"field","size":[232,244],"pos":[10,60],"scrollbar":1,"value":{"text":["!show lily neutral_open center\n!anim lily bob\n\n","Lily:"," Look what I can do:\n\n!lil alert[2+3]\n\n!show lily ohno\n\n","Lily:"," Woah.\n\n!show lily neutral_open\n\n","Lily:"," Did you notice how that kinda froze time for a moment?\nCreepy, right?\n\n","Lily:"," Built-in alerts don't service   ","animate[]","  events, so Puppeteer can't drive blinking or idle animations, like Dialogizer permits."],"font":["","menu","","menu","","menu","","menu","","mono",""],"arg":["","","","","","","","","","",""]}}
 field3:{"type":"field","size":[57,14],"pos":[10,44],"locked":1,"border":0,"value":"script"}
-button4:{"type":"button","size":[60,20],"pos":[254,284],"script":"customcommands.1","text":"Try It!"}
+button4:{"type":"button","size":[60,20],"pos":[254,284],"script":"shake.0","text":"Try It!"}
 
 {card:fancypuppets}
 {widgets}
@@ -336,7 +336,7 @@ button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text"
 field1:{"type":"field","size":[248,208],"pos":[254,48],"locked":1,"border":0,"value":"The puppets we've seen so far use a collection of canvases as their character sheet. Alternatively, you can make a character sheet containing a single contraption, which we'll call a \"Fancy Puppet\".\n\nFancy puppets are entirely responsible for drawing and animating their internal appearance, but obey !move, !hide, etc. They may have the following attributes:\n\n- .animate[]: should do exactly the same thing as an internal call to view[]\n- .anim: fed the argument to !anim\n- .flip: fed the argument to !flip\n- .emote: fed the emote name whenever it changes\n\nFancy puppets are an advanced feature, and not for the faint of heart, or those strongly averse to Lil."}
 script:{"type":"field","size":[232,236],"pos":[10,68],"scrollbar":1,"value":{"text":["!show eggbug neutral\n!anim eggbug bob\n!wait 60\n\n!show eggbug open\n\n","Eggbug:"," *purring noises*\n\n!show eggbug neutral\n!wait 60\n!show eggbug mad\n\n","Eggbug:"," *mischevious noises*\n\n!move eggbug offcenterleft\n!wait"],"font":["","menu","","menu",""],"arg":["","","","",""]}}
 field3:{"type":"field","size":[57,14],"pos":[10,53],"locked":1,"border":0,"value":"script"}
-button4:{"type":"button","size":[60,20],"pos":[254,284],"script":"customcommands.1","text":"Try It!"}
+button4:{"type":"button","size":[60,20],"pos":[254,284],"script":"shake.0","text":"Try It!"}
 
 {card:setup}
 {widgets}
@@ -699,14 +699,16 @@ commands.anim:on cmd_anim x do
 end
 
 commands.wait:on cmd_wait x do
- target.widgets.dd_overlay.show:"none"
+ local ol:target.widgets.dd_overlay
+ local sh:ol.show
+ ol.show:"none"
  on tick do target.event["animate"] sleep[] end
  if first x
   each in range 0+first x tick[] end
  else
   while max (get_puppet @ puppet_names[])..steps tick[] end
  end
- target.widgets.dd_overlay.show:"transparent"
+ ol.show:sh
 end
 
 local shake_mag:30,30
@@ -714,12 +716,16 @@ local shake_dur:15
 commands.shake:on cmd_shake x do
  if 1<count x shake_mag:0|0+2 take x end
  if 2<count x shake_dur:1|0+x[2] end
+ local ol:target.widgets.dd_overlay
+ local sh:ol.show
+ ol.show:"none"
  go[host.card on shake_trans c a b t do
   local m:shake_mag*1-t
   c.pattern:1
   c.rect[0,0 c.size]
   c.paste[a (random@2*m)-m]
  end shake_dur]
+ ol.show:sh
 end
 
 commands.clear:on cmd_clear do
@@ -780,7 +786,7 @@ end
 
 {module:dd}
 description:"Display sequential, styled modal dialogs for visual novels."
-version:1.3
+version:1.4
 {script}
 # state/constants:
 local host:0
@@ -793,13 +799,16 @@ local arrow:image["%%IMG0AAsABv/gf8A/gB8ADgAEAA=="]
 local tfont:"body"
 local bfont:"body"
 local align:"left"
+local balign:"center"
 local fcolor:32
 local bcolor:1
 local next:arrow
 local speed:0
 local names:() dict ()
 local border:0
+local bborder:0
 local pad:()
+local bpad:()
 local osound:"" # open box
 local nsound:"" # advance to next box
 local asound:"" # make a choice
@@ -870,6 +879,7 @@ module.style:on style etc do
  tfont :if "tfont"  in etc etc.tfont  else "body"   end
  bfont :if "bfont"  in etc etc.bfont  else "body"   end
  align :if "align"  in etc etc.align  else "left"   end
+ balign:if "balign" in etc etc.balign else "center" end
  names :if "names"  in etc etc.names  else ()dict() end
  next  :if "next"   in etc etc.next   else arrow    end
  speed :if "speed"  in etc etc.speed  else 0        end
@@ -881,6 +891,32 @@ module.style:on style etc do
  dpos:  if "pos"    in etc etc.pos    else 0        end
  border:etc.border.image.copy[]
  pad:"ltrb" dict 4 take if !0~etc.border.margin etc.border.margin else padding end
+ bborder:etc.bborder.image.copy[]
+ bpad:"ltrb" dict 4 take if !0~etc.bborder.margin etc.bborder.margin else (2,10,2,10) end
+ if balign~"left"  balign:"center_left"  end
+ if balign~"right" balign:"center_right" end
+end
+
+module.getstyle:on getstyle do
+ raze insert k v with
+  "fcolor"  fcolor
+  "bcolor"  bcolor
+  "tfont"   tfont
+  "bfont"   bfont
+  "align"   align
+  "balign"  (("center_left","center_right","center") dict ("left","right","center"))[balign]
+  "names"   names
+  "next"    next
+  "speed"   speed
+  "osound"  osound
+  "nsound"  nsound
+  "asound"  asound
+  "tsound"  tsound
+  "size"    dsize
+  "pos"     dpos
+  "border"  (("image","margin")dict((list  border),(list range  pad)))
+  "bborder" (("image","margin")dict((list bborder),(list range bpad)))
+ end
 end
 
 module.show:on show x do
@@ -951,7 +987,7 @@ module.ask:on ask text choices do
  segs:fmt @ choices
  canvas.font:bfont
  dims:each choice in segs
-  canvas.textsize[choice (canvas.size[0] unless dsize[0])-(2*padding)+(pad.l+pad.r)][1]+2*padding
+  canvas.textsize[choice (canvas.size[0] unless dsize[0])-(bpad.t+bpad.b)+(pad.t+pad.b)][1]+(bpad.t+bpad.b)
  end
  szh:dim[1]+(pad.t+pad.b)+(sum dims)+(padding*count dims)
  if dsize[0] dim[0]:dsize[0]-pad.l+pad.r end
@@ -959,24 +995,58 @@ module.ask:on ask text choices do
  local r:-1 while -1~r
   draw_border[]
   canvas.font:tfont
+  canvas.pattern:fcolor
   canvas.text[seg (pad.l,pad.t),dim ("top_%s" format align)]
   c:dim[1]+pad.t+padding
   ow:canvas.size[0]-(pad.l+pad.r)
   each choice i in segs
+   local rpos:pad.l,c
+   local rsize:ow,dims[i]
+   local tpos:rpos+bpad.l,bpad.t
+   local tsize:rsize-((bpad.l+bpad.r),(bpad.t+bpad.b))
+   # active background (invert label)
    canvas.pattern:fcolor
-   rpos:pad.l,c
-   rsize:ow,dims[i]
-   canvas.box[rpos rsize]
    if (pointer.held|pointer.down|pointer.up)&rin[pointer.pos-canvas.pos rpos rsize]
-    canvas.rect[rpos+2 rsize-4]
-    canvas.pattern:bcolor
+    if bborder.type~"image"
+     canvas.rect[rpos rsize]
+    else
+     canvas.rect[rpos+2 rsize-4]
+    end
     if pointer.up r:i sfx[asound] end
+    canvas.pattern:bcolor
    end
+   # label
    canvas.font:bfont
-   canvas.text[choice (rpos+padding),(rsize-2*padding) "center"]
+   canvas.text[choice tpos,tsize balign]
+   # border
+   if bborder.type~"image"
+    canvas.segment[bborder rpos,rsize (range bpad)]
+   else
+    canvas.pattern:fcolor
+    canvas.box[rpos rsize]
+   end
    c:c+padding+dims[i]
   end
   tick[]
+ end
+ r
+end
+
+module.chat:on chat text choices do
+ r:0
+ st:getstyle[]
+ while count choices
+  k:keys choices
+  style[st]
+  v:ask[text k]
+  vv:choices[k[v]]
+  if "number"~typeof vv
+   choices:()
+   r:vv
+  else
+   choices:k[v] drop choices
+   say[vv]
+  end
  end
  r
 end
