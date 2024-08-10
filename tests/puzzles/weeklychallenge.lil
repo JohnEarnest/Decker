@@ -24,6 +24,29 @@ on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 
 # the problems:
 
+problem[281.1]
+# is chess square x light?
+on chess_coord x do ("%a" parse x)-97,49 end
+on f x do 2%sum chess_coord[x] end
+assert[f.d3 1]
+assert[f.g5 0]
+assert[f.e6 1]
+
+problem[281.2]
+# how many knight's moves between chess squares x and y?
+on f x y do
+ x:chess_coord[x] y:chess_coord[y]
+ local d:"%j" parse "[[-2,-1],[-1,-2],[1,-2],[2,-1],[-2,1],[-1,2],[1,2],[2,1]]"
+ local b:image[8,8]  b[x]:1
+ while !b[y]
+  local t:b.copy[].map[0,2 + range 255]
+  each delta in d b.merge["|" t.copy[].translate[delta]] end
+ end
+ b[y]-1
+end
+assert[f["g2" "a8"] 4] # g2 -> e3 -> d5 -> c7 -> a8
+assert[f["g2" "h2"] 3] # g2 -> e3 -> f1 -> h2
+
 problem[280.1]
 # find the first letter to appear twice
 # (this is kinda ugly; is there a cleaner approach?)
