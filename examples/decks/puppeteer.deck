@@ -193,9 +193,9 @@ button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"!flip"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
-field1:{"type":"field","size":[248,147],"pos":[254,48],"locked":1,"border":0,"value":{"text":["The !flip command mirrors puppets horizontally.\n\n","!flip NAME DIR","\n\nDIR is 1 (flip horizontally) or 0 (restore to original).\n\nAll the puppets we've worked with so far have had character sheets drawn to face right by default, so a DIR of 1 makes them face left, while a DIR of 0 makes them face right. Sticking to this convention (or breaking it) is entirely up to you!"],"font":["","mono",""],"arg":["","",""]}}
-ex1:{"type":"field","size":[232,147],"pos":[10,48],"border":1,"style":"code","value":"pt.command[deck\n \"!show boxy smile centerleft\",\n \"!flip boxy 1\"\n]\n"}
-button4:{"type":"button","size":[60,20],"pos":[254,175],"script":"commandandclear.0","text":"Try It!"}
+field1:{"type":"field","size":[248,254],"pos":[254,48],"locked":1,"border":0,"value":{"text":["The !flip command mirrors puppets horizontally.\n\n","!flip NAME DIR","\n\nDIR is 1 (flip horizontally) or 0 (restore to original).\n\nAll the puppets we've worked with so far have had character sheets drawn to face right by default, so a DIR of 1 makes them face left, while a DIR of 0 makes them face right. Sticking to this convention (or breaking it) is entirely up to you!\n\nIf the DIR argument is missing, the !flip command will make the indicated puppet face the opposite direction."],"font":["","mono",""],"arg":["","",""]}}
+ex1:{"type":"field","size":[232,175],"pos":[10,48],"border":1,"style":"code","value":"pt.command[deck\n \"!show boxy smile centerleft\",\n \"!flip boxy 1\"\n]\n"}
+button4:{"type":"button","size":[60,20],"pos":[254,203],"script":"commandandclear.0","text":"Try It!"}
 button6:{"type":"button","size":[108,20],"pos":[214,312],"script":"showhide.0","text":"Clear Puppets","style":"rect"}
 
 {card:order}
@@ -664,7 +664,8 @@ end
 commands.flip:on cmd_flip x do
  if count x 
   state:get_puppet[first x]
-  state.hflip:0+x[1] state.wid.flip:state.hflip
+  state.hflip:0+if 1<count x x[1] else !state.hflip end
+  state.wid.flip:state.hflip
   paint_puppet[state]
   set_puppet[state]
  else alert["error: missing puppet name for !flip"] end
