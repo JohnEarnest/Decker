@@ -24,6 +24,27 @@ on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 
 # the problems:
 
+problem[282.1]
+# return a sequence of *exactly* 3 identical adjancent digits or -1
+on f x do
+ on perfect x do min x=first x end
+ r:extract where perfect@value from -3 window "" split x
+ if 1~count r "" fuse first r else -1 end
+end
+assert[f[12344456] "444"]
+assert[f[ 1233334]    -1]
+assert[f[10020003] "000"]
+
+problem[282.2]
+# how many times would you have to change letter keys to type x?
+on f x do
+ t:"" split "%l" format x
+ sum !(1 drop t)=t
+end
+assert[f.pPeERrLl 3]
+assert[f.rRr      0]
+assert[f.GoO      1]
+
 problem[281.1]
 # is chess square x light?
 on chess_coord x do ("%a" parse x)-97,49 end
