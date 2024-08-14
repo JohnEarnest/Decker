@@ -388,7 +388,7 @@ end
 {end}
 
 {module:path}
-description:"generic flood-fill pathfinding routines"
+description:"generic grid-based pathfinding routines"
 version:1
 {script}
 local default_cell:16,16
