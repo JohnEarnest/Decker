@@ -579,6 +579,7 @@ module.say:on say text do
    resize[szh unless dsize[1]]
    canvas.pattern:fcolor
    if speed
+    host.modules.pt.value.talk[1]
     splits: extract index,1+count t where value in (" ","\n") from "" split t
     si:0 db:0 while si<count splits
      sfx[tsound]
@@ -591,6 +592,7 @@ module.say:on say text do
      canvas.text[rtext.span[seg 0,splits[si]] pad.l,pad.t,dim ("top_%s" format align)]
      si:si+1
     end
+    host.modules.pt.value.talk[0]
     if db
      while pointer.held|pointer.down tick[] end
     end
