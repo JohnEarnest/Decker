@@ -568,8 +568,16 @@ on set_aux x do sa.data:x end
 on get_done do c.animated~0 end
 on get_path do () unless sp.data.path end
 on set_path x do
- sp.data: ().path:x
- c.animated:x
+ if x~() # do nothing
+ elseif (!x~0)&1~count x # direct warp
+  card.pos:(first x)-.5*card.size
+  sp.data:().path:0
+  c.animated:0
+  card.event.finish
+ else # animate along path
+  sp.data:().path:x
+  c.animated:x
+ end
 end
 on click do
  if !card.locked
