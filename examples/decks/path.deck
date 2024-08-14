@@ -397,7 +397,7 @@ local rects:"|"split"field|button|canvas|grid|slider|contraption|dict"
 local deltas:"%j" parse "{l}
  'ortho'    :[[-1,0],[0,-1],[1,0],[0,1]],
  'diag'     :[[-1,-1],[1,-1],[1,1],[-1,1]],
- 'orthodiag':[[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1]],
+ 'orthodiag':[[-1,0],[0,-1],[1,0],[0,1],[-1,-1],[1,-1],[1,1],[-1,1]],
 {r}"
 on is_rect x do (typeof x) in rects     end
 on is_pair x do "number"~typeof first x end
