@@ -506,7 +506,7 @@ let sc={target:null,others:[],next:null, f:null,prev_mode:null,xray:0,status:''}
 script_save=x=>{const k=lms('script');mark_dirty();if(sc.target)iwrite(sc.target,k,x);if(sc.others)sc.others.map(o=>iwrite(o,k,x))}
 
 draw_state=_=>({ // drawing tools state
-	tool:'pencil',brush:3,pattern:1,fill:0,erasing:0, dither_threshold:0,
+	tool:'pencil',brush:0,pattern:1,fill:0,erasing:0, dither_threshold:0,
 	show_widgets:1,show_anim:1,trans:0,trans_mask:0,under:0,color:0,fatbits:0,offset:rect(),
 	show_grid:0,snap:0,grid_size:rect(16,16), sel_here:rect(),sel_start:rect(),limbo:null,limbo_dither:0,
 	scratch:null,mask:null,omask:null, pickfill:0, poly:[], zoom:8,
@@ -3650,7 +3650,7 @@ dopaste=x=>{
 cutcard=_=>{const c=ifield(deck,'card');setclipboard(ls(deck_copy(deck,c))),deck_remove(deck,c),mark_dirty()}
 copycard=_=>{const c=ifield(deck,'card');setclipboard(ls(deck_copy(deck,c)))}
 copywidgetimg=_=>{setclipboard(image_write(draw_widget(ob.sel[0]))),frame=context}
-pasteascanvas=_=>getclipboard(t=>{ob_create([lmd([lms('type'),lms('locked'),lms('image')],[lms('canvas'),ONE,lms(t)])]),frame=context})
+pasteascanvas=_=>getclipboard(t=>{ob_create([lmd(['type','locked','image','border'].map(lms),[lms('canvas'),ONE,lms(t),NONE])]),frame=context})
 pasteintocanvas=_=>getclipboard(t=>{const i=image_read(t),c=ob.sel[0];iwrite(c,lms('size'),ifield(i,'size')),c.image=i})
 menucut=_=>{const r=docut();if(r)setclipboard(r)}
 menucopy=_=>{const r=docopy();if(r)setclipboard(r)}
