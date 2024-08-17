@@ -3681,6 +3681,16 @@ q('body').ondrop=e=>{
 			modal_enter('resources'),ms.message=deck_read(t),ms.grid=gridtab(res_enumerate(ms.message))
 		})
 	}
+	if(/\.hex$/i.test(file.name)){
+		file.text().then(t=>{
+			let pal=ll(dyad.parse(lms('%h'),lml(t.split('\n').slice(0,-1).map(lms))))
+			if(pal.length>14){
+				let a=0,b=0;pal.map((v,i)=>{if(ln(v)<ln(pal[a]))a=i;if(ln(v)>ln(pal[b]))b=i})
+				iwrite(deck.patterns,lmn(47),pal[a]),iwrite(deck.patterns,lmn(32),pal[b])
+				pal=pal.filter((_,i)=>i!=a&&i!=b)
+			}for(let z=0;z<15&&z<pal.length;z++)iwrite(deck.patterns,lmn(33+z),pal[z])
+		})
+	}
 	if(/^image\//.test(file.type)){load_image(file)}
 	if(/^audio\//.test(file.type)){load_sound(file)}
 }

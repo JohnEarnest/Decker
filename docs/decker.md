@@ -111,6 +111,7 @@ You can drag and drop files directly onto the Decker window, and it will take an
 - `.wav`: open the audio file in the [Audio Editor](#sound).
 - `.csv`: switch to the widgets tool and create a new grid containing the data in the CSV file, as if parsed with `readcsv[text]`.
 - `.psv`: switch to the widgets tool and create a new grid containing the data in the PSV file, as if parsed with `readcsv[text 0 "|"]`.
+- `.hex`: attempt to import a newline-delimited series of hexadecimal `RRGGBB` palette colors. If 14 or fewer colors are provided, override patterns 33-46 and leave 32/47 (white and black) unchanged. Otherwise, make a best-guess attempt at selecting a "black" and "white" color from the provided palette and then place the next 14 colors into slots 33-46.
 
 The Decker menu allows you to turn on "Touch Input", which modifies several aspects of the user interface to be more suitable for use on touch- or pen-based devices which may not have a physical keyboard:
 

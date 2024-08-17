@@ -3288,6 +3288,19 @@ void event_file(char*p){
 		dset(a,lmistr("value"),l_cols(n_readcsv(NULL,arg)));
 		ob_create(l_list(a));
 	}
+	if(has_suffix(p,".hex")){
+		lv*pat=ifield(deck,"patterns");
+		lv*t=l_parse(lmistr("%h"),l_split(lmistr("\n"),ls(n_read(NULL,l_list(lmcstr(p))))));
+		if(t->c&&ln(t->lv[t->c-1])==0)t->c--; // trailing newline?
+		if(t->c>14){
+			int a=0,b=0;EACH(z,t){
+				if(ln(t->lv[z])<ln(t->lv[a]))a=z; // darkest  -> black
+				if(ln(t->lv[z])>ln(t->lv[b]))b=z; // lightest -> white
+			}iwrite(pat,lmn(47),t->lv[a]),iwrite(pat,lmn(32),t->lv[b]);
+			lv*f=lml(0);EACH(z,t)if(z!=a&&z!=b)ll_add(f,t->lv[z]);t=f;
+		}
+		for(int z=0;z<14&&z<t->c;z++)iwrite(pat,lmn(33+z),t->lv[z]);
+	}
 }
 
 void sync(void){
