@@ -2495,9 +2495,15 @@ void bg_edit_sel(void){
 lv* bg_copy_selection(rect s){lv*bg=container_image(con(),1)->b;return buffer_copy(bg,s);}
 void bg_scoop_selection(void){if(dr.limbo)return;dr.sel_start=dr.sel_here;dr.limbo=bg_copy_selection(dr.sel_start),dr.limbo_dither=0;}
 void bg_draw_lasso(rect r,rect o,int show_ants,int fill){
-	if(dr.omask)for(int a=0;a<o.h;a++)for(int b=0;b<o.w;b++)if(inclip(b+o.x,a+o.y)&&dr.omask->sv[b+a*o.w])PIX(b+o.x,a+o.y)=fill;
-	if(dr.mask)for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++)if(inclip(b+r.x,a+r.y)&&dr.mask->sv[b+a*r.w]){
-		int c=show_ants&&ANTS==(0xFF&dr.mask->sv[b+a*r.w]),p=c?ANTS:dr.limbo->sv[b+a*r.w];if(p||!dr.trans)PIX(b+r.x,a+r.y)=p;
+	if(dr.omask){
+		pair s=buff_size(dr.omask);
+		for(int a=0;a<s.y;a++)for(int b=0;b<s.x;b++)if(inclip(b+o.x,a+o.y)&&dr.omask->sv[b+a*s.x])PIX(b+o.x,a+o.y)=fill;
+	}
+	if(dr.mask){
+		pair s=buff_size(dr.mask),ls=buff_size(dr.limbo);
+		for(int a=0;a<s.y;a++)for(int b=0;b<s.x;b++)if(inclip(b+r.x,a+r.y)&&dr.mask->sv[b+a*s.x]){
+			int c=show_ants&&ANTS==(0xFF&dr.mask->sv[b+a*s.x]),p=c?ANTS:dr.limbo->sv[b+a*ls.x];if(p||!dr.trans)PIX(b+r.x,a+r.y)=p;
+		}
 	}
 }
 void bg_lasso_preview(void){
@@ -2508,8 +2514,9 @@ void bg_lasso_preview(void){
 	rect r=ev.drag&&insel?dh:dr.sel_here;pair origin=con_to_screen((pair){0,0});
 	if(dr.fatbits){
 		rect o=dr.sel_start;char*pal=patterns_pal(ifield(deck,"patterns"));
-		for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++){
-			if(!dr.omask->sv[b+a*o.w])continue;
+		pair os=buff_size(dr.omask);
+		for(int a=0;a<os.y;a++)for(int b=0;b<os.x;b++){
+			if(!dr.omask->sv[b+a*os.x])continue;
 			draw_rect(rect_add((rect){(b+o.x)*FAT,(a+o.y)*FAT,FAT,FAT},origin),dr.fill);
 		}
 		for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++){
@@ -2589,9 +2596,11 @@ void bg_tools(void){
 			rect r=poly_bounds();if(r.w>1&&r.h>1){
 				dr.mask=lmbuff((pair){r.w,r.h});
 				cstate t=frame;frame=draw_buffer(dr.mask);
-				for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++)if(poly_in((fpair){b+r.x,a+r.y}))PIX(b,a)=1; dr.omask=buffer_clone(dr.mask);
+				for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++)if(poly_in((fpair){b+r.x,a+r.y}))PIX(b,a)=1;
 				for(int z=0;z<poly_count;z++)draw_line_simple((rect){poly[z].x-r.x,poly[z].y-r.y,poly[(z+1)%poly_count].x-r.x,poly[(z+1)%poly_count].y-r.y},0,ANTS);
-				frame=t;dr.sel_here=dr.sel_start=r;bg_scoop_selection();
+				frame=t;dr.sel_here=dr.sel_start=r;
+				dr.omask=buffer_clone(dr.mask);EACH(z,dr.omask)dr.omask->sv[z]=dr.omask->sv[z]!=0;
+				bg_scoop_selection();
 			}poly_count=0;
 		}
 		if(dr.mask&&dr.limbo){
@@ -2639,8 +2648,8 @@ void bg_tools(void){
 }
 void bg_end_lasso(void){
 	if(uimode!=mode_draw||dr.tool!=tool_lasso)return;
-	int data=dr.mask&&dr.limbo, diffrect=!rect_same(dr.sel_here,dr.sel_start), diffmask=dr.omask==NULL;
-	if(dr.omask)for(int z=0;data&&z<dr.mask->c;z++)if((dr.mask->sv[z]>0)!=(dr.omask->sv[z]>0)){diffmask=1;break;}
+	int data=dr.mask&&dr.limbo, diffrect=!rect_same(dr.sel_here,dr.sel_start), diffmask=dr.omask==NULL||dr.omask->c!=dr.mask->c;
+	if(dr.omask&&!diffmask)for(int z=0;data&&z<dr.mask->c;z++)if((dr.mask->sv[z]>0)!=(dr.omask->sv[z]>0)){diffmask=1;break;}
 	if(data&&(diffrect||diffmask)){
 		bg_scratch();cstate t=frame;frame=draw_buffer(dr.scratch);
 		bg_draw_lasso(dr.sel_here,dr.sel_start,0,dr.fill);frame=t;bg_edit();bg_scratch_clear();

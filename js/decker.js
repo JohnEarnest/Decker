@@ -2350,10 +2350,16 @@ bg_edit_sel=_=>{
 bg_copy_selection=s=>image_copy(container_image(con(),1),s)
 bg_scoop_selection=_=>{if(dr.limbo)return;dr.sel_start=rcopy(dr.sel_here);dr.limbo=bg_copy_selection(dr.sel_start),dr.limbo_dither=0}
 bg_draw_lasso=(r,o,show_ants,fill)=>{
-	if(dr.omask)for(let a=0;a<o.h;a++)for(let b=0;b<o.w;b++){const h=rect(b+o.x,a+o.y);if(inclip(h)&&dr.omask.pix[b+a*o.w])pix(h,fill)}
-	if(dr.mask)for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){const h=rect(b+r.x,a+r.y);if(inclip(h)&&dr.mask.pix[b+a*r.w]){
-		const c=show_ants&&ANTS==(0xFF&dr.mask.pix[b+a*r.w]),p=c?ANTS:dr.limbo.pix[b+a*r.w];if(p||!dr.trans)pix(h,p)
-	}}
+	if(dr.omask){
+		const s=dr.omask.size
+		for(let a=0;a<s.y;a++)for(let b=0;b<s.x;b++){const h=rect(b+o.x,a+o.y);if(inclip(h)&&dr.omask.pix[b+a*s.x])pix(h,fill)}
+	}
+	if(dr.mask){
+		const s=dr.mask.size, ls=dr.limbo.size
+		for(let a=0;a<s.y;a++)for(let b=0;b<s.x;b++){const h=rect(b+r.x,a+r.y);if(inclip(h)&&dr.mask.pix[b+a*s.x]){
+			const c=show_ants&&ANTS==(0xFF&dr.mask.pix[b+a*s.x]),p=c?ANTS:dr.limbo.pix[b+a*ls.x];if(p||!dr.trans)pix(h,p)
+		}}
+	}
 }
 bg_lasso_preview=_=>{
 	if(!bg_has_lasso())return
@@ -2364,7 +2370,7 @@ bg_lasso_preview=_=>{
 	const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][(0|(frame_count/4))%max(1,anim[pix-28].length)]
 	const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
 	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
-		if(!dr.omask.pix[b+a*o.w])continue
+		if(!dr.omask.pix[b+a*dr.omask.size.x])continue
 		draw_rect(radd(rmul(rect(b+o.x,a+o.y,1,1),dr.zoom),origin),dr.fill)
 	}
 	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
@@ -2437,9 +2443,11 @@ bg_tools=_=>{
 			const r=poly_bounds(dr.poly);if(r.w>1&&r.h>1){
 				dr.mask=image_make(rect(r.w,r.h))
 				const t=frame;frame=draw_frame(dr.mask)
-				for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++)if(poly_in(dr.poly,rect(b+r.x,a+r.y)))pix(rect(b,a),1); dr.omask=image_copy(dr.mask)
+				for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++)if(poly_in(dr.poly,rect(b+r.x,a+r.y)))pix(rect(b,a),1)
 				if(dr.poly.length>0)draw_lines(dr.poly.concat(dr.poly[0]).map(p=>rsub(p,rect(r.x,r.y))),0,ANTS,deck)
-				frame=t,dr.sel_here=rcopy(r),dr.sel_start=rcopy(r),bg_scoop_selection()
+				frame=t,dr.sel_here=rcopy(r),dr.sel_start=rcopy(r)
+				dr.omask=image_copy(dr.mask);dr.omask.pix.forEach((v,i)=>dr.omask.pix[i]=v!=0)
+				bg_scoop_selection()
 			}dr.poly=[]
 		}
 		if(dr.mask&&dr.limbo){
@@ -2479,8 +2487,8 @@ bg_tools=_=>{
 }
 bg_end_lasso=_=>{
 	if(uimode!='draw'||dr.tool!='lasso')return
-	const data=dr.mask&&dr.limbo, diffrect=!requ(dr.sel_here,dr.sel_start);let diffmask=dr.omask==null;
-	if(dr.omask)for(let z=0;data&&z<dr.mask.pix.length;z++)if((dr.mask.pix[z]>0)!=(dr.omask.pix[z]>0)){diffmask=1;break}
+	const data=dr.mask&&dr.limbo, diffrect=!requ(dr.sel_here,dr.sel_start);let diffmask=dr.omask==null||dr.omask.pix.length!=dr.mask.pix.length;
+	if(dr.omask&&!diffmask)for(let z=0;data&&z<dr.mask.pix.length;z++)if((dr.mask.pix[z]>0)!=(dr.omask.pix[z]>0)){diffmask=1;break}
 	if(data&&(diffrect||diffmask)){
 		bg_scratch();const t=frame;frame=draw_frame(dr.scratch),bg_draw_lasso(dr.sel_here,dr.sel_start,0,dr.fill),frame=t,bg_edit(),bg_scratch_clear()
 	}dr.poly=[],dr.mask=null,dr.omask=null,dr.limbo=null,dr.sel_here=rect(),dr.sel_start=rect()
