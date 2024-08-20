@@ -509,7 +509,7 @@ draw_state=_=>({ // drawing tools state
 	tool:'pencil',brush:0,pattern:1,fill:0,erasing:0, dither_threshold:0,
 	show_widgets:1,show_anim:1,trans:0,trans_mask:0,under:0,color:0,fatbits:0,offset:rect(),
 	show_grid:0,snap:0,grid_size:rect(16,16), sel_here:rect(),sel_start:rect(),limbo:null,limbo_dither:0,
-	scratch:null,mask:null,omask:null, pickfill:0, poly:[], zoom:8,
+	scratch:null,mask:null,omask:null, pickfill:0, poly:[], zoom:8, lasso_dirty:0,
 })
 let dr=draw_state()
 settool=tool=>{setmode('draw'),dr.tool=tool}
@@ -2489,9 +2489,9 @@ bg_end_lasso=_=>{
 	if(uimode!='draw'||dr.tool!='lasso')return
 	const data=dr.mask&&dr.limbo, diffrect=!requ(dr.sel_here,dr.sel_start);let diffmask=dr.omask==null||dr.omask.pix.length!=dr.mask.pix.length;
 	if(dr.omask&&!diffmask)for(let z=0;data&&z<dr.mask.pix.length;z++)if((dr.mask.pix[z]>0)!=(dr.omask.pix[z]>0)){diffmask=1;break}
-	if(data&&(diffrect||diffmask)){
+	if(data&&(diffrect||diffmask||dr.lasso_dirty)){
 		bg_scratch();const t=frame;frame=draw_frame(dr.scratch),bg_draw_lasso(dr.sel_here,dr.sel_start,0,dr.fill),frame=t,bg_edit(),bg_scratch_clear()
-	}dr.poly=[],dr.mask=null,dr.omask=null,dr.limbo=null,dr.sel_here=rect(),dr.sel_start=rect()
+	}dr.poly=[],dr.mask=null,dr.omask=null,dr.limbo=null,dr.lasso_dirty=0,dr.sel_here=rect(),dr.sel_start=rect()
 }
 bg_end_selection=_=>{
 	if(uimode!='draw'||dr.tool!='select')return
@@ -2574,29 +2574,51 @@ bg_select=_=>{
 	}
 	return s
 }
-bg_tighten=_=>{
+bg_box_to_lasso=_=>{
 	const r=dr.sel_here
-	const set=(p,v)=>dr.mask.pix[p.x+p.y*dr.sel_here.w]=v
-	const get=p=>(p.x<0||p.y<0||p.x>=dr.sel_here.w||p.y>=dr.sel_here.h)?0:dr.mask.pix[p.x+p.y*dr.sel_here.w]
-	if(dr.tool=='select'){ // convert box selections into masked lasso selections
+	if(dr.tool=='select'){
 		dr.tool='lasso',bg_scoop_selection();const s=dr.sel_start, l=dr.limbo, t=frame
 		dr.limbo=image_make(rect(r.w,r.h)),frame=draw_frame(dr.limbo)
 		if(dr.limbo_dither){draw_dithered(frame.clip,l,1,dr.omask,dr.dither_threshold),dr.limbo_dither=0}else{draw_scaled(frame.clip,l,1)}frame=t
 		dr.mask=image_make(rect(r.w,r.h)),dr.mask.pix.fill(1)
 		if(s.w>0&&s.h>0){dr.omask=image_make(rect(s.w,s.h)),dr.omask.pix.fill(1)}else{dr.omask=null}
 	}
+}
+bg_regenerate_lasso_outline=_=>{
+	const r=dr.sel_here
+	const set=(p,v)=>dr.mask.pix[p.x+p.y*dr.sel_here.w]=v
+	const get=p=>(p.x<0||p.y<0||p.x>=dr.sel_here.w||p.y>=dr.sel_here.h)?0:dr.mask.pix[p.x+p.y*dr.sel_here.w]
+	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++)if(get(rect(b,a))){ // regenerate the ANTS outline
+		const n=get(rect(b-1,a))&&get(rect(b,a-1))&&get(rect(b+1,a))&&get(rect(b,a+1));if(!n)set(rect(b,a),ANTS)
+	}
+}
+bg_tighten=_=>{
+	const r=dr.sel_here
+	bg_box_to_lasso()
+	const set=(p,v)=>dr.mask.pix[p.x+p.y*dr.sel_here.w]=v
+	const get=p=>(p.x<0||p.y<0||p.x>=dr.sel_here.w||p.y>=dr.sel_here.h)?0:dr.mask.pix[p.x+p.y*dr.sel_here.w]
 	let changed=1,background=dr.fill;while(changed){changed=0 // erode the mask, iterating to a fixed point
 		for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++)if(get(rect(b,a))&&dr.limbo.pix[b+a*r.w]==background){
 			const n=get(rect(b-1,a))&&get(rect(b,a-1))&&get(rect(b+1,a))&&get(rect(b,a+1));if(!n)set(rect(b,a),0),changed=1
 		}
 	}
-	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++)if(get(rect(b,a))){ // regenerate the ANTS outline
-		const n=get(rect(b-1,a))&&get(rect(b,a-1))&&get(rect(b+1,a))&&get(rect(b,a+1));if(!n)set(rect(b,a),ANTS)
-	}
+	bg_regenerate_lasso_outline()
 	const d=find_occupied(dr.mask,0);if(d.w<1||d.h<1||(d.w==r.w&&d.h==r.h))return // trim excess?
 	dr.limbo=image_copy(dr.limbo,d);if(dr.mask)dr.mask=image_copy(dr.mask,d);if(dr.omask)dr.omask=image_copy(dr.omask,d)
 	dr.sel_here .x+=d.x,dr.sel_here .y+=d.y,dr.sel_here .w=d.w,dr.sel_here .h=d.h
 	dr.sel_start.x+=d.x,dr.sel_start.y+=d.y,dr.sel_start.w=d.w,dr.sel_start.h=d.h
+}
+bg_outline=_=>{
+	const r=dr.sel_here;bg_box_to_lasso()
+	dr.mask.pix.forEach((v,i)=>dr.mask.pix[i]=v!=0) // strip the ANTS outline
+	const l=image_copy(dr.limbo);for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
+		const i=b+a*r.w;if(dr.limbo.pix[i]||!dr.mask.pix[i])continue;let n=0
+		if(b>0    ){const i=(b-1)+(a  )*r.w; n|=dr.limbo.pix[i]&&dr.mask.pix[i]}
+		if(b<r.w-1){const i=(b+1)+(a  )*r.w; n|=dr.limbo.pix[i]&&dr.mask.pix[i]}
+		if(a>0    ){const i=(b  )+(a-1)*r.w; n|=dr.limbo.pix[i]&&dr.mask.pix[i]}
+		if(a<r.h-1){const i=(b  )+(a+1)*r.w; n|=dr.limbo.pix[i]&&dr.mask.pix[i]}
+		if(n)l.pix[i]=bg_pat()
+	}dr.limbo=l,dr.lasso_dirty=1;bg_regenerate_lasso_outline()
 }
 
 // Object Edit Mode
@@ -3128,6 +3150,7 @@ all_menus=_=>{
 			menu_separator()
 			if(menu_item('Select All',1,'a')){settool('select'),dr.sel_here=rcopy(con_dim())}
 			if(menu_item('Tight Selection',sel,'g'))bg_tighten()
+			if(menu_item('Add Outline',sel))bg_outline()
 			if(menu_item('Resize to Original',sel&&dr.tool=='select',0)){bg_scoop_selection();const s=dr.limbo.size;dr.sel_here.w=s.x,dr.sel_here.h=s.y}
 			if(menu_item(`Resize to ${prototype_is(con())?'Prototype':'Card'}`,sel&&dr.tool=='select',0)){bg_scoop_selection(),dr.sel_here=con_dim()}
 			menu_separator()

@@ -101,10 +101,10 @@ typedef struct {
 	int show_grid, snap; pair grid_size;
 	rect sel_here, sel_start; lv*limbo; int limbo_dither;
 	lv* scratch, *mask, *omask;
-	int pickfill, zoom;
+	int pickfill, zoom, lasso_dirty;
 } draw_state;
-draw_state ddr={tool_pencil,0,1,0,0, 1,1,0,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0, 8};
-draw_state dr ={tool_pencil,0,1,0,0, 1,1,0,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0, 8};
+draw_state ddr={tool_pencil,0,1,0,0, 1,1,0,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0, 8, 0};
+draw_state dr ={tool_pencil,0,1,0,0, 1,1,0,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0, 8, 0};
 int bg_pat(void){return dr.trans_mask&&dr.pattern==0?32:dr.pattern;}
 int bg_fill(void){return dr.trans_mask&&dr.fill==0?32:dr.fill;}
 int bg_has_sel(void){return dr.tool==tool_select&&(dr.sel_here.w>0||dr.sel_here.h>0);}
@@ -2650,10 +2650,10 @@ void bg_end_lasso(void){
 	if(uimode!=mode_draw||dr.tool!=tool_lasso)return;
 	int data=dr.mask&&dr.limbo, diffrect=!rect_same(dr.sel_here,dr.sel_start), diffmask=dr.omask==NULL||dr.omask->c!=dr.mask->c;
 	if(dr.omask&&!diffmask)for(int z=0;data&&z<dr.mask->c;z++)if((dr.mask->sv[z]>0)!=(dr.omask->sv[z]>0)){diffmask=1;break;}
-	if(data&&(diffrect||diffmask)){
+	if(data&&(diffrect||diffmask||dr.lasso_dirty)){
 		bg_scratch();cstate t=frame;frame=draw_buffer(dr.scratch);
 		bg_draw_lasso(dr.sel_here,dr.sel_start,0,dr.fill);frame=t;bg_edit();bg_scratch_clear();
-	}poly_count=0,dr.mask=NULL,dr.omask=NULL,dr.limbo=NULL,dr.sel_here=dr.sel_start=(rect){0};
+	}poly_count=0,dr.mask=NULL,dr.omask=NULL,dr.limbo=NULL,dr.lasso_dirty=0,dr.sel_here=dr.sel_start=(rect){0};
 }
 void bg_end_selection(void){
 	if(uimode!=mode_draw||dr.tool!=tool_select)return;
@@ -2767,29 +2767,50 @@ rect bg_select(void){
 }
 void bg_mask_set(pair p,int v){dr.mask->sv[p.x+p.y*dr.sel_here.w]=v;}
 int bg_mask_get(pair p){return (p.x<0||p.y<0||p.x>=dr.sel_here.w||p.y>=dr.sel_here.h)?0:dr.mask->sv[p.x+p.y*dr.sel_here.w];}
-void bg_tighten(void){
+void bg_box_to_lasso(void){
 	rect r=dr.sel_here;
-	if(dr.tool==tool_select){ // convert box selections into masked lasso selections
+	if(dr.tool==tool_select){
 		dr.tool=tool_lasso;bg_scoop_selection();rect s=dr.sel_start;
 		lv*l=dr.limbo;dr.limbo=lmbuff((pair){r.w,r.h});cstate t=frame;frame=draw_buffer(dr.limbo);
 		if(dr.limbo_dither){draw_dithered(frame.clip,l,1,dr.omask),dr.limbo_dither=0;}else{draw_scaled(frame.clip,l,1);}frame=t;
 		dr.mask=lmbuff((pair){r.w,r.h}),memset(dr.mask->sv,1,r.w*r.h);
 		if(s.w>0&&s.h>0){dr.omask=lmbuff((pair){s.w,s.h}),memset(dr.omask->sv,1,s.w*s.h);}else{dr.omask=NULL;}
 	}
+}
+void bg_regenerate_lasso_outline(void){
+	rect r=dr.sel_here;
+	for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++)if(bg_mask_get((pair){b,a})){
+		int n=bg_mask_get((pair){b-1,a})&&bg_mask_get((pair){b,a-1})&&bg_mask_get((pair){b+1,a})&&bg_mask_get((pair){b,a+1});
+		if(!n)bg_mask_set((pair){b,a},ANTS);
+	}
+}
+void bg_tighten(void){
+	rect r=dr.sel_here;
+	bg_box_to_lasso();
 	int changed=1,background=dr.fill;while(changed){changed=0; // erode the mask, iterating to a fixed point
 		for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++)if(bg_mask_get((pair){b,a})&&dr.limbo->sv[b+a*r.w]==background){
 			int n=bg_mask_get((pair){b-1,a})&&bg_mask_get((pair){b,a-1})&&bg_mask_get((pair){b+1,a})&&bg_mask_get((pair){b,a+1});
 			if(!n)bg_mask_set((pair){b,a},0),changed=1;
 		}
 	}
-	for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++)if(bg_mask_get((pair){b,a})){ // regenerate the ANTS outline
-		int n=bg_mask_get((pair){b-1,a})&&bg_mask_get((pair){b,a-1})&&bg_mask_get((pair){b+1,a})&&bg_mask_get((pair){b,a+1});
-		if(!n)bg_mask_set((pair){b,a},ANTS);
-	}
+	bg_regenerate_lasso_outline();
 	rect d=find_occupied(dr.mask,0);if(d.w<1||d.h<1||(d.w==r.w&&d.h==r.h))return; // trim excess?
 	dr.limbo=buffer_copy(dr.limbo,d);if(dr.mask)dr.mask=buffer_copy(dr.mask,d);if(dr.omask)dr.omask=buffer_copy(dr.omask,d);
 	dr.sel_here .x+=d.x,dr.sel_here .y+=d.y,dr.sel_here .w=d.w,dr.sel_here .h=d.h;
 	dr.sel_start.x+=d.x,dr.sel_start.y+=d.y,dr.sel_start.w=d.w,dr.sel_start.h=d.h;
+}
+void bg_outline(void){
+	rect r=dr.sel_here;
+	bg_box_to_lasso();
+	EACH(z,dr.mask)if((0xFF&dr.mask->sv[z])==ANTS)dr.mask->sv[z]=1; // strip the ANTS outline
+	lv*l=buffer_clone(dr.limbo);for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++){
+		int i=b+a*r.w, n=0;if(dr.limbo->sv[i]||!dr.mask->sv[i])continue;
+		if(b>0    ){int i=(b-1)+(a  )*r.w; n|=dr.limbo->sv[i]&&dr.mask->sv[i];}
+		if(b<r.w-1){int i=(b+1)+(a  )*r.w; n|=dr.limbo->sv[i]&&dr.mask->sv[i];}
+		if(a>0    ){int i=(b  )+(a-1)*r.w; n|=dr.limbo->sv[i]&&dr.mask->sv[i];}
+		if(a<r.h-1){int i=(b  )+(a+1)*r.w; n|=dr.limbo->sv[i]&&dr.mask->sv[i];}
+		if(n)l->sv[i]=bg_pat();
+	}dr.limbo=l,dr.lasso_dirty=1;bg_regenerate_lasso_outline();
 }
 
 // Object Edit Mode
@@ -3602,6 +3623,7 @@ void all_menus(void){
 			menu_separator();
 			if(menu_item("Select All",1,'a')){settool(tool_select),dr.sel_here=con_dim();}
 			if(menu_item("Tight Selection",sel,'g'))bg_tighten();
+			if(menu_item("Add Outline",sel,'\0'))bg_outline();
 			if(menu_item("Resize to Original",sel&&dr.tool==tool_select,'\0')){
 				bg_scoop_selection();pair s=buff_size(dr.limbo);dr.sel_here.w=s.x,dr.sel_here.h=s.y;
 			}
