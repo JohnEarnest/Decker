@@ -160,6 +160,9 @@ lv* lt(lv*x){
 		r->n=x->c; lv*v=lml(x->c);EACH(z,x)v->lv[z]=x->lv[z];dset(r,lmistr("value"),v);
 	}else{x=ll(x);dset(r,lmistr("value"),x);r->n=x->c;}return r;
 }
+lv* lml2(lv*x,lv*y){lv*r=lml(2);r->lv[0]=x,r->lv[1]=y;return r;}
+lv* lml3(lv*x,lv*y,lv*z){lv*r=lml(3);r->lv[0]=x,r->lv[1]=y,r->lv[2]=z;return r;}
+lv* lml4(lv*x,lv*y,lv*z,lv*w){lv*r=lml(4);r->lv[0]=x,r->lv[1]=y,r->lv[2]=z,r->lv[3]=w;return r;}
 int matchr(lv*x,lv*y){
 	if(x==y)return 1;if(x->t!=y->t||x->n!=y->n||x->c!=y->c)return 0;
 	if(lin(x))return x->nv==y->nv; if(lis(x))return !strcmp(x->sv,y->sv);
@@ -1045,8 +1048,9 @@ lv*n_feval(lv*self,lv*a){
 lv*n_eval(lv*self,lv*a){
 	(void)self;lv*y=a->c>1?ld(a->lv[1]):lmd(),*r=lmd();DMAP(yy,y,y->lv[z]);
 	dset(r,lmistr("value"),NONE),dset(r,lmistr("vars"),yy);
-	lv* prog=parse(ls(l_first(a))->sv);dset(r,lmistr("error"),perr()?lmcstr(par.error):lms(0));
-	if(perr())return r;GEN(k,yy->c)yy->kv[z];GEN(v,yy->c)yy->lv[z];
+	lv* prog=parse(ls(l_first(a))->sv);
+	if(perr()){dset(r,lmistr("error"),lmcstr(par.error)),dset(r,lmistr("errorpos"),lml2(lmn(par.r),lmn(par.c)));return r;}
+	GEN(k,yy->c)yy->kv[z];GEN(v,yy->c)yy->lv[z];
 	blk_opa(prog,BUND,2),blk_lit(prog,lmnat(n_feval,NULL)),blk_op(prog,SWAP),blk_op(prog,CALL);
 	issue(env_bind(a->c>2&&lb(a->lv[2])?ev():NULL,k,v),prog);return r;
 }

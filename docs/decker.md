@@ -450,8 +450,9 @@ If specified, the transition time `z` is the number of frames (at 60 frames/seco
 
 4) If `sleep[]` is provided the string `"play"` as an argument, instead of waiting for some number of frames to pass, it will pause script execution until all sound clips triggered with `play[]` complete.
 
-5) `eval[x y z]` returns a dictionary containing:
-- `error`: a string giving any error message produced during parsing, or the empty string.
+5) `eval[x y z]` returns a dictionary which may contain:
+- `error`: a string giving any error message produced during parsing.
+- `errorpos`: a pair giving a `(line,column)` position (both counting from 0) in `x` where any errors were encountered.
 - `value`: the value of the last expression in the program. On a parse error, `value` will be the number `0`.
 - `vars`: a dictionary containing any variable bindings made while executing the program. (This also includes bindings from argument `y`.)
 

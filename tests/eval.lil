@@ -1,6 +1,6 @@
 
 # parse error
-show[eval["99`5"]]
+show[eval["\n99`5"]]
 
 # inappropriate keyword
 show[eval["if 1 do 2 else 3 end"].error]

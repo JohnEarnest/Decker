@@ -254,9 +254,6 @@ int lcm(int x,int y){int r=gcd(x,y);return (x*y)/(r?r:1);}
 int has_prefix(char*x,char*px){for(int z=0;px[z];z++)if(px[z]!=tolower(x[z]))return 0;return 1;}
 int has_suffix(char*x,char*sx){int a=strlen(x),b=strlen(sx);if(b>a)return 0;for(int z=0;z<b;z++)if(sx[z]!=tolower(x[a-b+z]))return 0;return 1;}
 int read2(char*src,int off){int a=0xFF&src[off],b=0xFF&src[off+1];return (a<<8)|b;}
-lv* lml2(lv*x,lv*y){lv*r=lml(2);r->lv[0]=x,r->lv[1]=y;return r;}
-lv* lml3(lv*x,lv*y,lv*z){lv*r=lml(3);r->lv[0]=x,r->lv[1]=y,r->lv[2]=z;return r;}
-lv* lml4(lv*x,lv*y,lv*z,lv*w){lv*r=lml(4);r->lv[0]=x,r->lv[1]=y,r->lv[2]=z,r->lv[3]=w;return r;}
 lv* lmpair(pair x){return lml2(lmn(x.x),lmn(x.y));}
 lv* lmfpair(fpair x){return lml2(lmn(x.x),lmn(x.y));}
 lv* lmrect(rect x){lv*r=lml(4);r->lv[0]=lmn(x.x),r->lv[1]=lmn(x.y),r->lv[2]=lmn(x.w),r->lv[3]=lmn(x.h);return r;}

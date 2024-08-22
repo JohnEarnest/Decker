@@ -1172,7 +1172,8 @@ function natives(name,self,args,  z,r,prog,vars,n,t,pv,j,file){
 	if(name=="eval"){
 		r=lmd();dset(r,lms("value"),NONE)
 		vars=count(args)>1?ld(lst_get(args,1)):lmd();dset(r,lms("vars" ),vars)
-		prog=parse(lvs(ls(l_first(args))));dset(r,lms("error"),lms(perr==0?"":perr));if(perr!=0)return r
+		prog=parse(lvs(ls(l_first(args))));
+		if(perr!=0){dset(r,lms("error"),lms(perr));dset(r,lms("errorpos"),lml2(lmn(parse_r),lmn(parse_c)));return r}
 		blk_opa(prog,"BUND",2);blk_lit(prog,lmnat("feval","feval"));blk_op(prog,"SWAP");blk_op(prog,"CALL")
 		issue(env_bind(count(args)>2&&lb(lst_get(args,2))?ev():lmenv(),vars), prog);return r
 	}
