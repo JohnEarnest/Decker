@@ -24,6 +24,20 @@ on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 
 # the problems:
 
+problem[283.1]
+# find the one element in x that appears exactly one time
+on f x do first extract where 1=count gindex by value from x end
+assert[f[(3, 3, 1         )] 1]
+assert[f[(3, 2, 4, 2, 4   )] 3]
+assert[f[(list 1          )] 1]
+assert[f[(4, 3, 1, 1, 1, 4)] 3]
+
+problem[283.2]
+# for every index i in the range [0<=i<count x], does the digit i occur exactly x[i] times?
+on f x do x~sum x=list range count x end
+assert[f[(1, 2, 1, 0)] 1]
+assert[f[(0, 3, 0   )] 0]
+
 problem[282.1]
 # return a sequence of *exactly* 3 identical adjancent digits or -1
 on f x do
