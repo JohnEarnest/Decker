@@ -178,6 +178,7 @@ print["love:"]
 show["%J" format ((list 11,22),(list 33,44)) dict "one","two"       ]
 show["%J" format insert a b with 11 22 33 44 end                    ]
 show["%J" format image[3,4]                                         ]
+show["%J" format sys                                                ]
 
 show["%J" parse "{[11,22]:'one',[33,44]:'two'}"                     ]
 show["%J" parse "<'a':[11,33],'b':[22,44]>"                         ]

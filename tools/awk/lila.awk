@@ -748,7 +748,7 @@ function format_love(x, r,z){
 	if(lil(x)){r="[";for(z=0;z<count(x);z++){if(z)r=r",";r=r format_love(lst_get(x,z))};return r"]"}
 	if(lid(x)){r="{";for(z=0;z<count(x);z++){if(z)r=r",";r=r format_love(dic_getk(x,z))":"format_love(dic_getv(x,z))};return r"}"}
 	if(lit(x)){r="<";for(z=0;z<count(x);z++){if(z)r=r",";r=r format_love(tab_getk(x,z))":"format_love(tab_getv(x,z))};return r">"}
-	if(lii(x)){return lvs(interfaces(x,lms("encoded")))}
+	if(lii(x)){return lvs(ls(interfaces(x,lms("encoded"),-1)))}
 	return "null"
 }
 function format_type(a,t,n,d,lf,pz,  o,v,vn,r,z){

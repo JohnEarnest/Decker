@@ -512,7 +512,7 @@ void flove(str*s,lv*x){
 	else if(lil(x)){wrap('[',']',{if(z)str_addc(s,',');flove(s,x->lv[z]);})}
 	else if(lid(x)){wrap('{','}',{if(z)str_addc(s,',');flove(s,x->kv[z]);str_addc(s,':');flove(s,x->lv[z]);})}
 	else if(lit(x)){wrap('<','>',{if(z)str_addc(s,',');flove(s,x->kv[z]);str_addc(s,':');flove(s,x->lv[z]);})}
-	else if(lii(x)){str_addl(s,((lv*(*)(lv*,lv*,lv*))x->f)(x,lmistr("encoded"),NULL));}
+	else if(lii(x)){str_addl(s,ls(((lv*(*)(lv*,lv*,lv*))x->f)(x,lmistr("encoded"),NULL)));}
 	else{str_addz(s,"null");}
 }
 void format_type(str*r,lv*a,char t,int n,int d,int lf,int pz,int*f,char*c){
