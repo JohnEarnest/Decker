@@ -120,9 +120,9 @@ void draw_invert(char*pal,rect r){
 
 enum uimodes{mode_interact,mode_draw,mode_object,mode_script};
 int uimode=mode_interact;lv*ui_container=NULL;
-void setmode(int mode);// forward ref
+void setuimode(int mode);// forward ref
 void con_set(lv*x){
-	if(x!=ui_container)setmode(uimode),msg.next_view=1;
+	if(x!=ui_container)setuimode(uimode),msg.next_view=1;
 	if(x!=ui_container&&prototype_is(ui_container))n_prototype_update(ui_container,NONE);ui_container=x;
 }
 lv* con(void){return ui_container?ui_container:ifield(deck,"card");}
@@ -382,7 +382,7 @@ void field_exit(void){
 	wid.field_dirty=0,wid.change_timer=0;
 }
 void bg_end_selection(void);void bg_end_lasso(void); // forward-ref
-void setmode(int mode){
+void setuimode(int mode){
 	n_play(NULL,lml2(NONE,lmistr("loop")));
 	grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel->c=0,wid.active=-1;poly_count=0;sc.others=NULL;
 	msg.next_view   =(uimode!=mode)&&mode==mode_interact;
@@ -391,9 +391,9 @@ void setmode(int mode){
 	if(mode!=mode_draw&&!prototype_is(con()))dr.fatbits=0;
 	if(mode==mode_interact)dr.fatbits=0;
 }
-void settool(int tool){setmode(mode_draw);dr.tool=tool;}
+void settool(int tool){setuimode(mode_draw);dr.tool=tool;}
 void setscript(lv*x){
-	if(uimode!=mode_script)sc.prev_mode=uimode;setmode(mode_script);
+	if(uimode!=mode_script)sc.prev_mode=uimode;setuimode(mode_script);
 	sc.target=lil(x)?x->lv[0]:x, sc.others=lil(x)?l_drop(ONE,x):lml(0);
 	sc.status[0]='\0';lv*v=ifield(sc.target,"script");int p=0;
 	if(!v->c)v=card_is  (sc.target)?(p=1,lmistr("on view do\n \nend")):
@@ -407,7 +407,7 @@ void setscript(lv*x){
 	if(p)snprintf(sc.status,sizeof(sc.status),"No existing script; populated a template.");
 	sc.f=(field_val){rtext_cast(v),0};wid.active=0;
 }
-void finish_script(void){if(sc.next){setscript(sc.next),sc.next=NULL;}else{setmode(sc.prev_mode);}}
+void finish_script(void){if(sc.next){setscript(sc.next),sc.next=NULL;}else{setuimode(sc.prev_mode);}}
 void widget_setup(void){
 	if(ev.mu||wid.active==-1)wid.col_drag=0;
 	if(wid.active>=wid.count)wid.active=0;
@@ -1371,7 +1371,7 @@ void import_image(char*path){
 	int tw=c[0],ow=c[32];c[32]=0,c[47]=0;for(int z=2;z<256;z++)if(c[z]){color=1;break;}
 	if(color&&tw){EACH(z,i->b)i->b->sv[z]=i->b->sv[z]!=0;m=i->b;}
 	if(color){i=readimage(path,1);}else if(ow&&!tw){EACH(z,i->b)i->b->sv[z]=i->b->sv[z]!=32;}
-	setmode(mode_draw),bg_paste(i->b,1);if(color)dr.limbo_dither=1,dither_threshold=0.5;dr.fatbits=0;dr.omask=m;
+	setuimode(mode_draw),bg_paste(i->b,1);if(color)dr.limbo_dither=1,dither_threshold=0.5;dr.fatbits=0;dr.omask=m;
 }
 lv* table_decode(lv*text,lv*format){return ms.edit_json?l_table(l_parse(lmistr("%j"),text)): n_readcsv(NULL,format->c?lml2(text,format):l_list(text));}
 lv* modal_open_path(void){
@@ -2387,7 +2387,7 @@ void apply(int fwd,lv*x){
 	lv* wids=con_wids();
 	if(t==edit_ob_create){fwd=!fwd,t=edit_ob_destroy;}
 	if(t==edit_bg_block){
-		if(uimode!=mode_draw)setmode(mode_draw);
+		if(uimode!=mode_draw)setuimode(mode_draw);
 		rect r=getrect(dget(x,lmistr("pos")));
 		lv*  p=dget(x,lmistr(fwd?"after":"before"));
 		lv* bg=container_image(container,1);pair s=image_size(bg), cs=getpair(ifield(container,"size"));
@@ -2401,12 +2401,12 @@ void apply(int fwd,lv*x){
 		if(!fwd&&cb)buffer_paste(c,clip,cb,bg->b,1);
 	}
 	else if(t==edit_ob_props){
-		if(uimode!=mode_object)setmode(mode_object);
+		if(uimode!=mode_object)setuimode(mode_object);
 		lv* p=dget(x,lmistr(fwd?"after":"before"));
 		EACH(z,p){lv*d=p->lv[z],*w=dget(wids,p->kv[z]);if(w)EACH(i,d)iwrite(w,d->kv[i],d->lv[i]);}
 	}
 	else if(t==edit_ob_destroy){
-		if(uimode!=mode_object)setmode(mode_object);
+		if(uimode!=mode_object)setuimode(mode_object);
 		lv* props=dget(x,lmistr("props"));
 		ob.sel->c=0;
 		if(fwd){
@@ -3146,7 +3146,7 @@ void brushbtn(pair pos,pair dn,rect b,int brush){
 	pair i={b.x+(b.w/2),b.y+(b.h/2)};
 	draw_box(b,0,1),draw_line((rect){i.x,i.y,i.x,i.y},brush,1,deck);
 	if(dr.brush==brush)draw_box(inset(b,2),0,1);
-	if(!box_in(b,pos))return;uicursor=cursor_point;if(!ev.mu||!box_in(b,dn))return;setmode(mode_draw);
+	if(!box_in(b,pos))return;uicursor=cursor_point;if(!ev.mu||!box_in(b,dn))return;setuimode(mode_draw);
 	if(dr.tool==tool_select||dr.tool==tool_lasso||dr.tool==tool_fill)settool(tool_pencil);
 	dr.brush=brush;
 }
@@ -3154,7 +3154,7 @@ void cbrushbtn(pair pos,pair dn,rect b,int brush,lv*bt){
 	lv*icon=bt->lv[brush-24];rect oc=frame.clip;frame.clip=b;
 	rect p=box_center(b,image_size(icon));draw_icon((pair){p.x,p.y},icon,1);frame.clip=oc;draw_box(b,0,1);
 	if(dr.brush==brush)draw_box(inset(b,2),0,1);
-	if(!box_in(b,pos))return;uicursor=cursor_point;if(!ev.mu||!box_in(b,dn))return;setmode(mode_draw);
+	if(!box_in(b,pos))return;uicursor=cursor_point;if(!ev.mu||!box_in(b,dn))return;setuimode(mode_draw);
 	if(dr.tool==tool_select||dr.tool==tool_lasso||dr.tool==tool_fill)settool(tool_pencil);
 	dr.brush=brush;
 }
@@ -3172,8 +3172,8 @@ void ltoolbar(pair pos,pair dn){
 	toolbar_scroll=CLAMP(0,toolbar_scroll,bs->c);int th=bs->c?17:tcellh;
 	pair size=buff_size(TOOLB);frame=draw_buffer(TOOLB);
 	memset(frame.buffer->sv,0,frame.buffer->c),draw_box((rect){0,0,size.x,size.y},0,1),draw_rect((rect){0,6*tcellh,size.x,tgap},1);
-	if(toolbtn(pos,dn,(rect){0     ,0,tcellw+1,tcellh+1},0,uimode==mode_interact))setmode(mode_interact),ev.mu=ev.md=0;
-	if(toolbtn(pos,dn,(rect){tcellw,0,tcellw+1,tcellh+1},1,uimode==mode_object  ))setmode(mode_object  ),ev.mu=ev.md=0;
+	if(toolbtn(pos,dn,(rect){0     ,0,tcellw+1,tcellh+1},0,uimode==mode_interact))setuimode(mode_interact),ev.mu=ev.md=0;
+	if(toolbtn(pos,dn,(rect){tcellw,0,tcellw+1,tcellh+1},1,uimode==mode_object  ))setuimode(mode_object  ),ev.mu=ev.md=0;
 	for(int z=0;z<10;z++){if(toolbtn(pos,dn,(rect){(z%2)*tcellw,(1+(z/2))*tcellh,tcellw+1,tcellh+1},z+2,uimode==mode_draw&&dr.tool==z))settool(z),ev.mu=ev.md=0;}
 	int cy=(6*tcellh)+tgap;int brow=0;for(int z=0;z<12-toolbar_scroll;z++){
 		brushbtn(pos,dn,(rect){0     ,cy,tcellw+1,th+1},z   +toolbar_scroll);
@@ -3260,8 +3260,8 @@ void event_key(int c,int m,int down,const char*name){
 			if(c==KEY_RIGHT)msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("right");
 		}
 		if((uimode==mode_interact||uimode==mode_object||uimode==mode_draw)&&ms.type==modal_none&&!kc.on&&deck&&!lb(ifield(deck,"locked"))){
-			if(c==KEY_F1)setmode(mode_interact);
-			if(c==KEY_F2)setmode(mode_object);
+			if(c==KEY_F1)setuimode(mode_interact);
+			if(c==KEY_F2)setuimode(mode_object);
 			int f[]={KEY_F3,KEY_F4,KEY_F5,KEY_F6,KEY_F7,KEY_F8,KEY_F9,KEY_F10,KEY_F11,KEY_F12};
 			for(int z=0;z<10;z++)if(c==f[z])settool(z);
 		}
@@ -3310,7 +3310,7 @@ void event_file(char*p){
 		sound_edit(n_readwav(NULL,l_list(lmutf8(p))));au.sel=(pair){0,0},au.head=0;
 	}
 	if(has_suffix(p,".csv")||has_suffix(p,".psv")){
-		setmode(mode_object);lv*a=lmd();
+		setuimode(mode_object);lv*a=lmd();
 		lv* dat=n_read(NULL,l_list(lmcstr(p)));
 		lv* sep=lmistr(has_suffix(p,".csv")?",": "|");
 		lv* arg=lml(3);arg->lv[0]=dat,arg->lv[1]=NONE,arg->lv[2]=sep;
@@ -3376,7 +3376,7 @@ void sync(void){
 		finish_flip();
 	}
 	window_set_cursor(uicursor);
-	if(do_panic)setmode(mode_object);
+	if(do_panic)setuimode(mode_object);
 	do_panic=0;
 }
 
@@ -3447,7 +3447,7 @@ int interpret(void){
 }
 void paste_any(void){
 	if(has_clip("%%IMG")){if(menu_item("Paste Image",1,'v')){
-		lv*b=image_read(get_clip())->b;setmode(mode_draw);bg_paste(b,0);
+		lv*b=image_read(get_clip())->b;setuimode(mode_draw);bg_paste(b,0);
 	}}
 	else if(has_clip("%%WGT")){if(menu_item("Paste Widgets",1,'v')){
 		lv*t=get_clip();int f=1,i=6,n=t->c-i;lv*v=pjson(t->sv,&i,&f,&n);
@@ -3515,7 +3515,7 @@ void all_menus(void){
 		menu_bar("Script",1);
 		if(menu_item("Stop",1,'\0')){
 			msg.pending_halt=1;
-			if(ms.type!=modal_query&&ms.type!=modal_listen){if(ms.type!=modal_none){modal_exit(0);}setmode(mode_object);}
+			if(ms.type!=modal_query&&ms.type!=modal_listen){if(ms.type!=modal_none){modal_exit(0);}setuimode(mode_object);}
 		}
 		menu_bar("Edit",(ms.type==modal_input||ms.type==modal_save)&&wid.fv);
 		text_edit_menu();
@@ -3759,8 +3759,8 @@ void all_menus(void){
 	}
 	if(uimode==mode_interact||uimode==mode_draw||uimode==mode_object){
 		menu_bar("Tool",ms.type==modal_none&&!kc.on);
-		if(menu_check("Interact",1,uimode==mode_interact,0))setmode(mode_interact);
-		if(menu_check("Widgets" ,1,uimode==mode_object  ,0))setmode(mode_object);
+		if(menu_check("Interact",1,uimode==mode_interact,0))setuimode(mode_interact);
+		if(menu_check("Widgets" ,1,uimode==mode_object  ,0))setuimode(mode_object);
 		menu_separator();
 		if(menu_check("Select"     ,1,uimode==mode_draw&&dr.tool==tool_select     ,0))settool(tool_select     );
 		if(menu_check("Lasso"      ,1,uimode==mode_draw&&dr.tool==tool_lasso      ,0))settool(tool_lasso      );
@@ -3788,7 +3788,7 @@ void all_menus(void){
 		if(menu_check("Show Animation"   ,1,dr.show_anim   ,0))dr.show_anim   ^=1;
 		if(menu_check("Transparency Mask",1,dr.trans_mask  ,0))dr.trans_mask  ^=1;
 		if(menu_check("Fat Bits"         ,1,dr.fatbits     ,0)){
-			if(ms.type==modal_none&&uimode!=mode_draw)setmode(mode_draw);
+			if(ms.type==modal_none&&uimode!=mode_draw)setuimode(mode_draw);
 			dr.fatbits^=1;if(dr.fatbits){center_fatbits(box_midpoint(bg_has_sel()||bg_has_lasso()?dr.sel_here:con_dim()));}
 		}
 	}
@@ -4069,7 +4069,7 @@ void load_deck(lv*d){
 	resize_window(deck);
 	time_t now;time(&now);seed=0xFFFFFFFF&now;
 	validate_modules();
-	setmode(mode_interact);n_play(NULL,lml2(NONE,lmistr("loop")));msg.next_view=1;
+	setuimode(mode_interact);n_play(NULL,lml2(NONE,lmistr("loop")));msg.next_view=1;
 }
 int main(int argc,char**argv){
 	char*file=NULL;for(int z=1;z<argc;z++){
