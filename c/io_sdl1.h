@@ -24,8 +24,8 @@ SDL_Cursor*CURSORS[4];
 #define KEY_RSHIFT       SDLK_RSHIFT
 #define KEY_LCTRL        SDLK_LCTRL
 #define KEY_RCTRL        SDLK_RCTRL
-#define KEY_LGUI         SDLK_LGUI
-#define KEY_RGUI         SDLK_RGUI
+#define KEY_LGUI         SDLK_LMETA
+#define KEY_RGUI         SDLK_RMETA
 #define KEY_LEFTBRACKET  SDLK_LEFTBRACKET
 #define KEY_RIGHTBRACKET SDLK_RIGHTBRACKET
 #define KEY_0            SDLK_0
@@ -59,8 +59,8 @@ SDL_Cursor*CURSORS[4];
 #define KEYM_RCTRL       KMOD_RCTRL
 #define KEYM_LALT        KMOD_LALT
 #define KEYM_RALT        KMOD_RALT
-#define KEYM_LGUI        KMOD_LGUI
-#define KEYM_RGUI        KMOD_RGUI
+#define KEYM_LGUI        KMOD_LMETA
+#define KEYM_RGUI        KMOD_RMETA
 
 // global interpreter lock
 
@@ -70,22 +70,13 @@ void interpreter_unlock(void){SDL_UnlockMutex(gil);}
 
 // resources
 
-void base_path(char*path){
-	char*t=SDL_GetBasePath();
-	if(t){snprintf(path,PATH_MAX,"%s",t);SDL_free(t);}else{snprintf(path,PATH_MAX,"");}
-}
-void open_url(char*x){
-	(void)x;
-	#if SDL_VERSION_ATLEAST(2,0,14)
-		int e=SDL_OpenURL(x);
-		if(e)printf("open url error: %s\n",SDL_GetError());
-	#endif
-}
+void base_path(char*path){snprintf(path,PATH_MAX,"");} // stubbed
+void open_url(char*x){(void)x;} // stubbed
 
 // clipboard
 
-lv* get_clip(void){char*t=SDL_GetClipboardText();lv*r=lmcstr(t);SDL_free(t);return r;}
-void set_clip(lv*x){SDL_SetClipboardText(ls(x)->sv);}
+lv* get_clip(void){return lmcstr("");} // stubbed
+void set_clip(lv*x){(void)x;} // stubbed
 
 // audio
 
@@ -108,14 +99,10 @@ lv*n_readwav(lv*self,lv*a){
 	}lv*r=lmv(1);r->c=MIN(length,10*SFX_RATE);r->sv=(char*)raw;return sound_make(r);
 }
 
-int record_possible(void){return SDL_GetNumAudioDevices(1)>=1;}
-int record_begin(void){
-	SDL_AudioSpec spec;SDL_zero(spec);
-	spec.freq=SFX_RATE,spec.format=SFX_FORMAT,spec.channels=SFX_CHANNELS,spec.samples=1024,spec.callback=record_pump;
-	return SDL_OpenAudioDevice(NULL,1,&spec,NULL,0);
-}
-void record_pause(int device){SDL_PauseAudioDevice(device,0);}
-void record_finish(int device){SDL_PauseAudioDevice(device,1);}
+int record_possible(void){return 0;} // stubbed
+int record_begin(void){return -1;} // stubbed
+void record_pause(int device){(void)device;} // stubbed
+void record_finish(int device){(void)device;} // stubbed
 
 // input events
 
@@ -133,20 +120,30 @@ void process_events(pair disp,pair size,int scale){
 	while(SDL_WaitEvent(&e)){
 		if(e.type==SDL_QUIT     )event_quit();
 		if(e.type==SDL_USEREVENT)break;
-		if(e.type==SDL_TEXTINPUT)field_input(e.text.text);
-		if(e.type==SDL_KEYDOWN  )event_key(e.key.keysym.sym,e.key.keysym.mod,1,SDL_GetKeyName(e.key.keysym.sym));
+		if(e.type==SDL_KEYDOWN  ){
+			int c=e.key.keysym.unicode;
+			if(c>=32&&c<127)field_input((char[2]){(char)c,'\0'});
+			event_key(e.key.keysym.sym,e.key.keysym.mod,1,SDL_GetKeyName(e.key.keysym.sym));
+		}
 		if(e.type==SDL_KEYUP    )event_key(e.key.keysym.sym,e.key.keysym.mod,0,SDL_GetKeyName(e.key.keysym.sym));
 		if(e.type==SDL_MOUSEMOTION){
 			pair b={(disp.x-(size.x*scale))/2,(disp.y-(size.y*scale))/2};
 			event_pointer_move((pair){e.motion.x,e.motion.y},(pair){(e.motion.x-b.x)/scale,(e.motion.y-b.y)/scale});
 		}
-		if(e.type==SDL_MOUSEWHEEL     )event_scroll((pair){e.wheel.x,e.wheel.y});
-		if(e.type==SDL_MOUSEBUTTONDOWN)event_pointer_button(e.button.button==SDL_BUTTON_LEFT,1);
-		if(e.type==SDL_MOUSEBUTTONUP  )event_pointer_button(e.button.button==SDL_BUTTON_LEFT,0);
-		if(e.type==SDL_FINGERDOWN     )event_touch();
-		if(e.type==SDL_DROPFILE       )event_file(e.drop.file),SDL_free(e.drop.file);
+		if(e.type==SDL_MOUSEBUTTONDOWN){
+			if(e.button.button==SDL_BUTTON_WHEELUP       )event_scroll((pair){0,1});
+			else if(e.button.button==SDL_BUTTON_WHEELDOWN)event_scroll((pair){0,-1});
+			else                                          event_pointer_button(e.button.button==SDL_BUTTON_LEFT,1);
+		}
+		if(e.type==SDL_MOUSEBUTTONUP){
+			if(e.button.button==SDL_BUTTON_WHEELUP       );
+			else if(e.button.button==SDL_BUTTON_WHEELDOWN);
+			else                                          event_pointer_button(e.button.button==SDL_BUTTON_LEFT,0);
+		}
+		//if(e.type==SDL_FINGERDOWN     )event_touch();
+		//if(e.type==SDL_DROPFILE       )event_file(e.drop.file),SDL_free(e.drop.file);
 	}
-	SDL_FlushEvent(SDL_USEREVENT);
+	//SDL_FlushEvent(SDL_USEREVENT);
 }
 
 Uint32 tick_pump(Uint32 interval,void*param){
@@ -160,9 +157,22 @@ Uint32 tick_pump(Uint32 interval,void*param){
 
 // rendering
 
-SDL_Renderer*ren;
-SDL_Texture*gfx;
-SDL_Texture*gtool;
+// SDL1.2 doesn't have software scaling so we'll do it by hand
+void surface_blit(SDL_Surface*src,SDL_Surface*dst,pair pos,int scale){
+	if(scale==1){
+		SDL_Rect dstrect={pos.x,pos.y,src->w,src->h};
+		SDL_BlitSurface(src,NULL,dst,&dstrect);
+		return;
+	}
+	SDL_LockSurface(src);SDL_LockSurface(dst);
+	int*a=(int*)src->pixels;int*b=(int*)dst->pixels;
+	for(int y=0;y<src->h*scale;y++)for(int x=0;x<src->w*scale;x++)b[(y+pos.y)*dst->w+(x+pos.x)]=a[(y/scale)*src->w+(x/scale)];
+	SDL_UnlockSurface(dst);SDL_UnlockSurface(src);
+}
+
+SDL_Surface*vid;
+SDL_Surface*gfx;
+SDL_Surface*gtool;
 #ifdef LOSPEC
 // a set of customizations intended to make Decker more portable
 // and more performant on extremely limited devices such as the OLPC XO-4.
@@ -170,29 +180,29 @@ int parity=0;
 lv* readimage(char*path,int grayscale){return n_readgif(NULL,lml2(lmcstr(path),grayscale?lmistr("gray"):NONE));}
 int*sgfx=NULL;
 void framebuffer_alloc(pair size,int minscale){
-	gfx=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,size.x*minscale,size.y*minscale);
+	SDL_FreeSurface(gfx);
+	gfx=SDL_CreateRGBSurface(0,size.x*minscale,size.y*minscale,32,0,0,0,0);
 	sgfx=calloc(size.x*size.y,sizeof(int));
 }
 int framebuffer_flip(pair disp,pair size,int scale,int mask,int frame,char*pal,lv*buffer){
 	parity^=1;if(!parity)return 0;
 	draw_frame(pal,buffer,sgfx,size.x*4,frame,mask);frame_count++;
-	int*p, pitch;
-	SDL_LockTexture(gfx,NULL,(void**)&p,&pitch);
-	int stride=pitch/sizeof(int);
+	SDL_LockSurface(gfx);
+	int stride=gfx->pitch/sizeof(int);
+	int*p=gfx->pixels;
 	// SDL's X11 software renderer is outrageously slow at texture upscaling on the OLPC, so we'll do it by hand:
 	if(scale==1)for(int y=0,i=0,o=0;y<size.y;y++,o+=stride)for(int x=0;x<size.x;x++,i++     )p[o+x]=sgfx[i];
 	if(scale==2)for(int y=0,i=0,o=0;y<size.y;y++,o+=stride)for(int x=0;x<size.x;x++,i++,o+=2)p[o]=p[o+1]=p[o+stride]=p[o+stride+1]=sgfx[i];
-	SDL_UnlockTexture(gfx);
+	SDL_UnlockSurface(gfx);
 	SDL_Rect dst={(disp.x-scale*size.x)/2,(disp.y-scale*size.y)/2,scale*size.x,scale*size.y};
-	SDL_RenderClear(ren);
-	SDL_RenderCopy(ren,gfx,NULL,&dst);
+	SDL_BlitSurface(gfx,NULL,vid,&dst);
 	return 1;
 }
 #else
 #include <SDL_image.h>
 lv* readimage(char*path,int grayscale){
 	SDL_Surface*b=IMG_Load(path);if(b==NULL)return image_empty();lv*i=lmbuff((pair){b->w,b->h});
-	SDL_Surface*c=SDL_ConvertSurface(b,SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888),0);
+	SDL_Surface*c=SDL_DisplayFormat(b);
 	for(int y=0;y<b->h;y++)for(int x=0;x<b->w;x++){
 		Uint32 v=((Uint32*)c->pixels)[x+(y*c->pitch/4)];Uint8 cr,cg,cb,ca;
 		SDL_GetRGBA(v,c->format,&cr,&cg,&cb,&ca),i->sv[x+y*b->w]=(ca!=0xFF)?(grayscale?0xFF:0x00):readcolor(cr,cg,cb,grayscale);
@@ -200,18 +210,15 @@ lv* readimage(char*path,int grayscale){
 }
 void framebuffer_alloc(pair size,int minscale){
 	(void)minscale;
-	gfx=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,size.x,size.y);
+	SDL_FreeSurface(gfx);
+	gfx=SDL_CreateRGBSurface(0,size.x,size.y,32,0,0,0,0);
 }
 int framebuffer_flip(pair disp,pair size,int scale,int mask,int frame,char*pal,lv*buffer){
-	int* p, pitch;
-	SDL_LockTexture(gfx,NULL,(void**)&p,&pitch);
-	draw_frame(pal,buffer,p,pitch,frame,mask);frame_count++;
-	SDL_UnlockTexture(gfx);
-	SDL_Rect src={0,0,size.x,size.y};
-	SDL_Rect dst={(disp.x-scale*size.x)/2,(disp.y-scale*size.y)/2,scale*size.x,scale*size.y};
-	SDL_SetRenderDrawColor(ren,0x00,0x00,0x00,0xFF);
-	SDL_RenderClear(ren);
-	SDL_RenderCopy(ren,gfx,&src,&dst);
+	SDL_LockSurface(gfx);
+	draw_frame(pal,buffer,gfx->pixels,gfx->pitch,frame,mask);frame_count++;
+	SDL_UnlockSurface(gfx);
+	pair pos={(disp.x-scale*size.x)/2,(disp.y-scale*size.y)/2};
+	surface_blit(gfx,vid,pos,scale);
 	return 1;
 }
 #endif
@@ -219,43 +226,27 @@ int framebuffer_flip(pair disp,pair size,int scale,int mask,int frame,char*pal,l
 void toolbar_flip(lv*buffer,int frame,char*pal,rect dest){
 	pair tsize=buff_size(buffer);
 	SDL_Rect src={0,0,tsize.x,tsize.y},dst={dest.x,dest.y,dest.w,dest.h};
-	if(!gtool){pair s=buff_size(buffer);gtool=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,s.x,s.y);}
-	int*p, pitch;
-	SDL_LockTexture(gtool,NULL,(void**)&p,&pitch);
-	draw_frame(pal,buffer,p,pitch,frame,0);
-	SDL_UnlockTexture(gtool);
-	SDL_RenderCopy(ren,gtool,&src,&dst);
+	if(!gtool){pair s=buff_size(buffer);gtool=SDL_CreateRGBSurface(0,s.x,s.y,32,0,0,0,0);}
+	SDL_LockSurface(gtool);
+	draw_frame(pal,buffer,gtool->pixels,gtool->pitch,frame,0);
+	SDL_UnlockSurface(gtool);
+	SDL_BlitSurface(gtool,&src,vid,&dst);
 }
-void finish_flip(void){SDL_RenderPresent(ren);}
+void finish_flip(void){SDL_Flip(vid);}
 
 // windows
 
-SDL_Window*win;
-pair get_display_size(void){SDL_DisplayMode dis;SDL_GetDesktopDisplayMode(0,&dis);return (pair){dis.w,dis.h};}
-int get_display_density(pair disp){
-	(void)disp;
-	#if SDL_VERSION_ATLEAST(2,26,0)
-		pair disp_pixels={0,0};SDL_GetWindowSizeInPixels(win,&disp_pixels.x,&disp_pixels.y);
-		if(disp_pixels.x>disp.x)return disp_pixels.x/disp.x;
-	#endif
-	return 1;
-}
-void window_set_title(char*x){SDL_SetWindowTitle(win,x);}
-void window_set_opacity(float x){SDL_SetWindowOpacity(win,x);}
+pair get_display_size(void){return (pair){800,600};} // stubbed
+int get_display_density(pair disp){(void)disp;return 1;} // stubbed
+void window_set_title(char*x){SDL_WM_SetCaption(x,NULL);}
+void window_set_opacity(float x){(void)x;} // stubbed
 void window_set_cursor(int x){SDL_SetCursor(CURSORS[x]);}
-void window_set_fullscreen(int full){SDL_SetWindowFullscreen(win,full?SDL_WINDOW_FULLSCREEN_DESKTOP:0);}
-pair window_get_size(void){pair r={0,0};SDL_GetWindowSize(win,&r.x,&r.y);return r;}
+void window_set_fullscreen(int full){vid=SDL_SetVideoMode(vid->w,vid->h,32,SDL_DOUBLEBUF | (full?SDL_FULLSCREEN:0));}
+pair window_get_size(void){return (pair){vid->w,vid->h};}
 void window_set_size(pair wsize,pair size,int scale){
-	if(win){SDL_SetWindowSize(win,wsize.x,wsize.y),SDL_DestroyTexture(gfx);}
-	else{
-		win=SDL_CreateWindow("Decker",
-			SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,size.x*scale,size.y*scale,
-			SDL_WINDOW_SHOWN|SDL_WINDOW_ALLOW_HIGHDPI
-		);
-		ren=SDL_CreateRenderer(win,-1,SDL_RENDERER_SOFTWARE);
-	}
+	vid=SDL_SetVideoMode(size.x*scale,size.y*scale,32,SDL_DOUBLEBUF);
+	window_set_title("Decker");
 	framebuffer_alloc(size,scale);
-	SDL_SetWindowPosition(win,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED);
 }
 
 // entrypoint
@@ -266,10 +257,10 @@ void sync(void);
 void io_init(void){
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | (nosound?0:SDL_INIT_AUDIO));
 	gil=SDL_CreateMutex();
-	CURSORS[0]=SDL_GetDefaultCursor();
-	CURSORS[1]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
-	CURSORS[2]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
-	CURSORS[3]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
+	//CURSORS[0]=SDL_GetDefaultCursor();
+	//CURSORS[1]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
+	//CURSORS[2]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
+	//CURSORS[3]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
 	if(!nosound){
 		audio.freq=SFX_RATE;
 		audio.format=SFX_FORMAT;
@@ -279,6 +270,8 @@ void io_init(void){
 		SDL_OpenAudio(&audio,NULL),SDL_PauseAudio(0);
 	}
 	SDL_AddTimer((1000/60),tick_pump,NULL);
+	SDL_EnableUNICODE(1);
+	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY,SDL_DEFAULT_REPEAT_INTERVAL);
 }
 void io_run(lv*env){
 	while(!should_exit){tick(env);sync();}
