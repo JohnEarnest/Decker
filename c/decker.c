@@ -3207,7 +3207,7 @@ void event_touch(void){
 	if(!set_touch)enable_touch=1;
 }
 void event_key(int c,int m,int down,const char*name){
-	int cmd=m&(KMOD_LCTRL|KMOD_RCTRL|KMOD_LGUI|KMOD_RGUI);
+	int cmd=m&(KEYM_LCTRL|KEYM_RCTRL|KEYM_LGUI|KEYM_RGUI);
 	if(down){
 		if(c>0&&c<4096)keydown[c]=1;
 		if(c==KEY_LSHIFT||c==KEY_RSHIFT)ev.shift=1;
@@ -3235,7 +3235,7 @@ void event_key(int c,int m,int down,const char*name){
 		}
 		if(c==KEY_RETURN)ev.action=1;
 		if     (wid.ingrid )grid_keys(c);
-		else if(wid.infield)field_keys(c,m&(KMOD_LSHIFT|KMOD_RSHIFT));
+		else if(wid.infield)field_keys(c,m&(KEYM_LSHIFT|KEYM_RSHIFT));
 		if(uimode==mode_script)sc.status[0]='\0';
 		if(c==KEY_SPACE&&!wid.infield)ev.action=1;
 		if(c==KEY_TAB   )ev.tab=1;

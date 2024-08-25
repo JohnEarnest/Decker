@@ -53,6 +53,15 @@ SDL_Cursor*CURSORS[4];
 #define KEY_F11          SDLK_F11
 #define KEY_F12          SDLK_F12
 
+#define KEYM_LSHIFT      KMOD_LSHIFT
+#define KEYM_RSHIFT      KMOD_RSHIFT
+#define KEYM_LCTRL       KMOD_LCTRL
+#define KEYM_RCTRL       KMOD_RCTRL
+#define KEYM_LALT        KMOD_LALT
+#define KEYM_RALT        KMOD_RALT
+#define KEYM_LGUI        KMOD_LGUI
+#define KEYM_RGUI        KMOD_RGUI
+
 // global interpreter lock
 
 SDL_mutex*gil=NULL;
