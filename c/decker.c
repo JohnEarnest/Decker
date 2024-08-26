@@ -248,7 +248,7 @@ typedef struct {
 	rect pending_grid_cell;
 } modal_state; modal_state ms={0};
 typedef struct {modal_state ms;widget_state wid;} modal_context;
-modal_context ms_stack[8]={0};int ms_index=0;
+modal_context ms_stack[8]={{{0},{0}}};int ms_index=0;
 void modal_enter(int type);void modal_exit(int value);void field_stylespan(lv*font,lv*arg); // forward refs
 void modal_push(int type){
 	if(ms.type!=modal_none){
@@ -3505,7 +3505,7 @@ void all_menus(void){
 	if(menu_item("About...",1,'\0'))modal_enter(modal_about);
 	if(menu_check("Listener",canlisten,ms.type==modal_listen,'l')){if(ms.type!=modal_listen){modal_enter(modal_listen);}else{modal_exit(0);}}
 	menu_separator();
-	#ifndef __ANDROID__
+	#ifndef NO_FULLSCREEN
 		if(menu_check("Fullscreen",1,!windowed,'f' ))toggle_fullscreen=1;
 	#endif
 	if(menu_check("Touch Input"    ,1                    ,enable_touch   ,'\0'))enable_touch^=1,set_touch=1;
@@ -3806,7 +3806,7 @@ void all_menus(void){
 		if(menu_check("Color"       ,1,dr.color,0))dr.color^=1;
 		if(menu_check("Transparency",1,dr.trans,0))dr.trans^=1;
 		if(menu_check("Underpaint"  ,1,dr.under,0))dr.under^=1;
-		#ifndef LOSPEC
+		#ifndef NO_TRACING
 		if(menu_check("Tracing Mode",windowed,tracing,0))set_tracing=!tracing;
 		#endif
 	}

@@ -1,8 +1,15 @@
 VERSION=$(shell cat VERSION)
 UNAME=$(shell uname)
-SDL=$(shell sdl2-config --cflags --libs)
 EXTRA_FLAGS?=
 
+ifneq ("$(wildcard /usr/bin/olpc-hwinfo)","")
+	# building on an OLPC; use SDL 1.2
+	SDL=$(shell sdl-config --cflags --libs)
+	SDL:=$(SDL) -lSDL_image
+else
+	SDL=$(shell sdl2-config --cflags --libs)
+	SDL:=$(SDL) -lSDL2_image
+endif
 ifeq ($(UNAME),Darwin)
 	OPEN=open
 	COMPILER=clang
@@ -31,12 +38,6 @@ ifeq ($(UNAME),OpenBSD)
 	# -Wno-misleading-indentation silences warnings which are entirely spurious.
 	FLAGS:=$(FLAGS) -Wno-misleading-indentation -Wno-unknown-warning-option
 	FLAGS:=$(FLAGS) -lm
-endif
-ifneq ("$(wildcard /usr/bin/olpc-hwinfo)","")
-	# building on an OLPC, disable some features and enable some performance boosts.
-	FLAGS:=$(FLAGS) -DLOSPEC
-else
-	SDL:=$(SDL) -lSDL2_image
 endif
 ifneq ("$(EXTRA_FLAGS)","")
 	FLAGS:=$(FLAGS) $(EXTRA_FLAGS)

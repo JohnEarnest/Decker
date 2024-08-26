@@ -1,5 +1,21 @@
+// compatibility shim for SDL 1.2
+
+// many features have reduced or missing functionality:
+// - Decker does not check the application base path for start.deck
+// - Decker cannot open URI as by go["http://..."]
+// - Decker cannot interact with the system clipboard; it instead uses an internal buffer
+// - Decker cannot record audio
+// - Decker does not automatically engage touch mode
+// - Decker does not support file drag-and-drop
+// - Decker does not support partial window opacity (tracing mode)
+// - Decker does not support fullscreen (might work on some platforms?)
 
 #include <SDL.h>
+#define NO_TRACING
+#define NO_FULLSCREEN   // try commenting this out, if you dare...
+#ifndef SYNC_DUTY
+#define SYNC_DUTY 2     // how many logical frames execute per rendered frame?
+#endif
 
 SDL_Cursor*CURSORS[4];
 
@@ -70,13 +86,20 @@ void interpreter_unlock(void){SDL_UnlockMutex(gil);}
 
 // resources
 
-void base_path(char*path){snprintf(path,PATH_MAX,"");} // stubbed
+void base_path(char*path){snprintf(path,PATH_MAX,"%s","");} // stubbed
 void open_url(char*x){(void)x;} // stubbed
 
 // clipboard
 
-lv* get_clip(void){return lmcstr("");} // stubbed
-void set_clip(lv*x){(void)x;} // stubbed
+char*clip_data=NULL;
+int clip_size=0;
+lv* get_clip(void){return clip_data?lmcstr(clip_data): lmistr("");}
+void set_clip(lv*x){
+	x=ls(x);
+	if(!clip_data    ){clip_size=x->c,clip_data=malloc(x->c);}
+	if(clip_size<x->c){clip_size=x->c,clip_data=realloc(clip_data,x->c);}
+	memcpy(clip_data,x->sv,clip_size);
+}
 
 // audio
 
@@ -117,33 +140,31 @@ void field_input(char*text);
 
 void process_events(pair disp,pair size,int scale){
 	SDL_Event e;
-	while(SDL_WaitEvent(&e)){
-		if(e.type==SDL_QUIT     )event_quit();
-		if(e.type==SDL_USEREVENT)break;
-		if(e.type==SDL_KEYDOWN  ){
-			int c=e.key.keysym.unicode;
-			if(c>=32&&c<127)field_input((char[2]){(char)c,'\0'});
-			event_key(e.key.keysym.sym,e.key.keysym.mod,1,SDL_GetKeyName(e.key.keysym.sym));
+	int can_tick=0;
+	while(1){
+		while(SDL_PollEvent(&e)){
+			if(e.type==SDL_QUIT     )event_quit();
+			if(e.type==SDL_USEREVENT)can_tick=1;
+			if(e.type==SDL_KEYDOWN  ){
+				int c=e.key.keysym.unicode;
+				if(c>=32&&c<127)field_input((char[2]){(char)c,'\0'});
+				event_key(e.key.keysym.sym,e.key.keysym.mod,1,SDL_GetKeyName(e.key.keysym.sym));
+			}
+			if(e.type==SDL_KEYUP    )event_key(e.key.keysym.sym,e.key.keysym.mod,0,SDL_GetKeyName(e.key.keysym.sym));
+			if(e.type==SDL_MOUSEMOTION){
+				pair b={(disp.x-(size.x*scale))/2,(disp.y-(size.y*scale))/2};
+				event_pointer_move((pair){e.motion.x,e.motion.y},(pair){(e.motion.x-b.x)/scale,(e.motion.y-b.y)/scale});
+			}
+			if(e.type==SDL_MOUSEBUTTONUP){event_pointer_button(e.button.button==SDL_BUTTON_LEFT,0);}
+			if(e.type==SDL_MOUSEBUTTONDOWN){
+				if     (e.button.button==SDL_BUTTON_WHEELUP  ){event_scroll((pair){0, 1});}
+				else if(e.button.button==SDL_BUTTON_WHEELDOWN){event_scroll((pair){0,-1});}
+				else                                          {event_pointer_button(e.button.button==SDL_BUTTON_LEFT,1);}
+			}
 		}
-		if(e.type==SDL_KEYUP    )event_key(e.key.keysym.sym,e.key.keysym.mod,0,SDL_GetKeyName(e.key.keysym.sym));
-		if(e.type==SDL_MOUSEMOTION){
-			pair b={(disp.x-(size.x*scale))/2,(disp.y-(size.y*scale))/2};
-			event_pointer_move((pair){e.motion.x,e.motion.y},(pair){(e.motion.x-b.x)/scale,(e.motion.y-b.y)/scale});
-		}
-		if(e.type==SDL_MOUSEBUTTONDOWN){
-			if(e.button.button==SDL_BUTTON_WHEELUP       )event_scroll((pair){0,1});
-			else if(e.button.button==SDL_BUTTON_WHEELDOWN)event_scroll((pair){0,-1});
-			else                                          event_pointer_button(e.button.button==SDL_BUTTON_LEFT,1);
-		}
-		if(e.type==SDL_MOUSEBUTTONUP){
-			if(e.button.button==SDL_BUTTON_WHEELUP       );
-			else if(e.button.button==SDL_BUTTON_WHEELDOWN);
-			else                                          event_pointer_button(e.button.button==SDL_BUTTON_LEFT,0);
-		}
-		//if(e.type==SDL_FINGERDOWN     )event_touch();
-		//if(e.type==SDL_DROPFILE       )event_file(e.drop.file),SDL_free(e.drop.file);
+		if(can_tick)return;
+		SDL_WaitEvent(NULL);
 	}
-	//SDL_FlushEvent(SDL_USEREVENT);
 }
 
 Uint32 tick_pump(Uint32 interval,void*param){
@@ -157,48 +178,27 @@ Uint32 tick_pump(Uint32 interval,void*param){
 
 // rendering
 
-// SDL1.2 doesn't have software scaling so we'll do it by hand
 void surface_blit(SDL_Surface*src,SDL_Surface*dst,pair pos,int scale){
-	if(scale==1){
+	if(scale<=1){
 		SDL_Rect dstrect={pos.x,pos.y,src->w,src->h};
 		SDL_BlitSurface(src,NULL,dst,&dstrect);
 		return;
 	}
 	SDL_LockSurface(src);SDL_LockSurface(dst);
-	int*a=(int*)src->pixels;int*b=(int*)dst->pixels;
-	for(int y=0;y<src->h*scale;y++)for(int x=0;x<src->w*scale;x++)b[(y+pos.y)*dst->w+(x+pos.x)]=a[(y/scale)*src->w+(x/scale)];
+	int*a=(int*)src->pixels,*b=(int*)dst->pixels;
+	int w=src->w,h=src->h,ai=0,bi=pos.x+(pos.y*dst->w);
+	for(int y=0;y<h;y++){
+		int row=bi;
+		for(int x=0;x<w;x++){for(int z=0;z<scale;z++)b[bi++]=a[ai];ai++;}
+		bi+=dst->w-(w*scale);
+		for(int z=0;z<scale-1;z++){memcpy(b+bi,b+row,w*scale*sizeof(int));bi+=dst->w;}
+	}
 	SDL_UnlockSurface(dst);SDL_UnlockSurface(src);
 }
 
 SDL_Surface*vid;
 SDL_Surface*gfx;
 SDL_Surface*gtool;
-#ifdef LOSPEC
-// a set of customizations intended to make Decker more portable
-// and more performant on extremely limited devices such as the OLPC XO-4.
-int parity=0;
-lv* readimage(char*path,int grayscale){return n_readgif(NULL,lml2(lmcstr(path),grayscale?lmistr("gray"):NONE));}
-int*sgfx=NULL;
-void framebuffer_alloc(pair size,int minscale){
-	SDL_FreeSurface(gfx);
-	gfx=SDL_CreateRGBSurface(0,size.x*minscale,size.y*minscale,32,0,0,0,0);
-	sgfx=calloc(size.x*size.y,sizeof(int));
-}
-int framebuffer_flip(pair disp,pair size,int scale,int mask,int frame,char*pal,lv*buffer){
-	parity^=1;if(!parity)return 0;
-	draw_frame(pal,buffer,sgfx,size.x*4,frame,mask);frame_count++;
-	SDL_LockSurface(gfx);
-	int stride=gfx->pitch/sizeof(int);
-	int*p=gfx->pixels;
-	// SDL's X11 software renderer is outrageously slow at texture upscaling on the OLPC, so we'll do it by hand:
-	if(scale==1)for(int y=0,i=0,o=0;y<size.y;y++,o+=stride)for(int x=0;x<size.x;x++,i++     )p[o+x]=sgfx[i];
-	if(scale==2)for(int y=0,i=0,o=0;y<size.y;y++,o+=stride)for(int x=0;x<size.x;x++,i++,o+=2)p[o]=p[o+1]=p[o+stride]=p[o+stride+1]=sgfx[i];
-	SDL_UnlockSurface(gfx);
-	SDL_Rect dst={(disp.x-scale*size.x)/2,(disp.y-scale*size.y)/2,scale*size.x,scale*size.y};
-	SDL_BlitSurface(gfx,NULL,vid,&dst);
-	return 1;
-}
-#else
 #include <SDL_image.h>
 lv* readimage(char*path,int grayscale){
 	SDL_Surface*b=IMG_Load(path);if(b==NULL)return image_empty();lv*i=lmbuff((pair){b->w,b->h});
@@ -221,22 +221,19 @@ int framebuffer_flip(pair disp,pair size,int scale,int mask,int frame,char*pal,l
 	surface_blit(gfx,vid,pos,scale);
 	return 1;
 }
-#endif
-
 void toolbar_flip(lv*buffer,int frame,char*pal,rect dest){
-	pair tsize=buff_size(buffer);
-	SDL_Rect src={0,0,tsize.x,tsize.y},dst={dest.x,dest.y,dest.w,dest.h};
 	if(!gtool){pair s=buff_size(buffer);gtool=SDL_CreateRGBSurface(0,s.x,s.y,32,0,0,0,0);}
 	SDL_LockSurface(gtool);
 	draw_frame(pal,buffer,gtool->pixels,gtool->pitch,frame,0);
 	SDL_UnlockSurface(gtool);
-	SDL_BlitSurface(gtool,&src,vid,&dst);
+	int scale=1; // TODO!
+	surface_blit(gtool,vid,(pair){dest.x,dest.y},scale);
 }
 void finish_flip(void){SDL_Flip(vid);}
 
 // windows
 
-pair get_display_size(void){return (pair){800,600};} // stubbed
+pair get_display_size(void){return (pair){1280,768};} // stubbed
 int get_display_density(pair disp){(void)disp;return 1;} // stubbed
 void window_set_title(char*x){SDL_WM_SetCaption(x,NULL);}
 void window_set_opacity(float x){(void)x;} // stubbed
@@ -247,20 +244,37 @@ void window_set_size(pair wsize,pair size,int scale){
 	vid=SDL_SetVideoMode(size.x*scale,size.y*scale,32,SDL_DOUBLEBUF);
 	window_set_title("Decker");
 	framebuffer_alloc(size,scale);
+	(void)wsize;
 }
 
 // entrypoint
 
 void tick(lv*env);
 void sync(void);
+int sync_parity=0;
 
+SDL_Cursor* makeCursor(pair offset,lv*image){
+	pair s=image_size(image);
+	Uint8*data=malloc((s.x/8)*s.y);
+	Uint8*mask=malloc((s.y/8)*s.y);
+	// see: https://www.libsdl.org/release/SDL-1.2.15/docs/html/sdlcreatecursor.html
+	for(int y=0,i=0;y<s.y;y++)for(int bx=0;bx<s.x;bx+=8,i++){
+		int d=0,m=0;for(int x=0;x<8;x++){
+			int c=image->b->sv[x+bx+(s.x*y)];
+			d=(d*2)+(c==1?1:0);
+			m=(m*2)+(c>0 ?1:0);
+		}
+		data[i]=d,mask[i]=m;
+	}
+	return SDL_CreateCursor(data,mask,s.x,s.y,offset.x,offset.y);
+}
 void io_init(void){
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | (nosound?0:SDL_INIT_AUDIO));
 	gil=SDL_CreateMutex();
-	//CURSORS[0]=SDL_GetDefaultCursor();
-	//CURSORS[1]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
-	//CURSORS[2]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
-	//CURSORS[3]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
+	CURSORS[0]=makeCursor((pair){0,0},image_read(lmistr("%%IMG2ABAAESABAA8gAgAOIAEBASABAA0gAQECIAEADCABAQMgAQALIAEBBCABAAogAQEFIAEACSABAQYgAQAIIAEBByABAAcgAQEIIAEABiABAQUgBQAFIAEBAiABAQIgAQAJIAEBASABAAEgAQECIAEACCACAAIgAQECIAEACCABAAQgAQECIAEADCABAQIgAQANIAIACA==")));
+	CURSORS[1]=makeCursor((pair){7,0},image_read(lmistr("%%IMG2ABAAEAAGAQMADAEBIAIBAgALAQEgAgECAAsBASACAQIACwEBIAIBAgALAQEgAgECAAcBAwABAQEgAgEFAAMBASACAQMgAgEBIAEBASABAQMAAgEBIAIBAiACAQEgAQEBIAEBASABAQIAAgEBIAIBASAGAQEgAQECAAIBASACAQEgCAECAAMBASAKAQIABAEBIAkBAgAEAQEgCAECAAYBASAHAQIABgEBIAcBAgAB")));
+	CURSORS[2]=makeCursor((pair){3,4},image_read(lmistr("%%IMG0AAgAEMYoEBAQEBAQEBAQEBAQKMY=")));
+	CURSORS[3]=makeCursor((pair){7,7},image_read(lmistr("%%IMG2ABAAEAAHIAIADSABAQIgAQALIAEBBCABAAkgAQEGIAEAByAEAQIgBAAFIAEBASABAAEgAQECIAEAASABAQEgAQADIAEBAiADAQIgAwECIAEAASABAQ4gAgEOIAEAASABAQIgAwECIAMBAiABAAMgAQEBIAEAASABAQIgAQABIAEBASABAAUgBAECIAQAByABAQYgAQAJIAEBBCABAAsgAQECIAEADSACAAc=")));
 	if(!nosound){
 		audio.freq=SFX_RATE;
 		audio.format=SFX_FORMAT;
@@ -274,5 +288,9 @@ void io_init(void){
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY,SDL_DEFAULT_REPEAT_INTERVAL);
 }
 void io_run(lv*env){
-	while(!should_exit){tick(env);sync();}
+	while(!should_exit){
+		tick(env);
+		sync_parity=(sync_parity+1)%SYNC_DUTY;
+		if(!sync_parity)sync();
+	}
 }
