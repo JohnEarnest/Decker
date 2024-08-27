@@ -366,7 +366,7 @@ function env_set(env,k,v,  r){r=env_getr(env,k);if(r==-1){env_loc(env,k,v)}else{
 ###########################################################
 
 function l_count(x){return lmn(lit(x)?rowcount(x): lii(x)?1: count(x))}
-function l_first(x){return lis(x)?lms(substr(lvs(x),1,1)): lit(x)?l_first(l_rows(x)): lion(x)?lms(lon_name(x)): count(x)?lst_get(ll(x),0): NONE}
+function l_first(x){return lis(x)?lms(substr(lvs(x),1,1)): lit(x)?l_first(l_rows(x)): lion(x)?lms(lon_name(x)): linat(x)?lms("native"): count(x)?lst_get(ll(x),0): NONE}
 function l_last(x){return lis(x)?lms(substr(lvs(x),count(x),1)): lit(x)?l_last(l_rows(x)): count(x)?lst_get(ll(x),count(x)-1): NONE}
 function l_keys(x,  r,z){return lii(x)?lml(): lion(x)?lon_args(x): dic_keys(ld(x))}
 function l_rows(x,  r,z){x=lt(x);r=lml();for(z=0;z<rowcount(x);z++)lst_add(r,tab_row(x,z))            ;return r}

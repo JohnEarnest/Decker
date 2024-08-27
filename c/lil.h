@@ -241,7 +241,9 @@ vm(sin,sin,ln) vm(tan   ,tan,ln) vm(exp  ,exp  ,ln) vm(ln ,log,ln) vm(sqrt,sqrt,
 monad(l_count){return lmn(lin(x)||lis(x)||lil(x)||lid(x)?x->c:lit(x)?x->n:0);}
 monad(l_list ){lv*r=lml(1);r->lv[0]=x;return r;}
 monad(l_first){
-	if(lit(x))return l_first(l_rows(x));if(lion(x))return lmcstr(x->sv);
+	if(lit(x))return l_first(l_rows(x));
+	if(linat(x))return lmistr("native");
+	if(lion(x))return lmcstr(x->sv);
 	if(lis(x))return l_at(x,NONE);
 	lv*l=ll(x);return!l->c?NONE:l->lv[0];
 }
