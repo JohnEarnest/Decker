@@ -2653,7 +2653,7 @@ void bg_tools(void){
 }
 void bg_end_lasso(void){
 	if(uimode!=mode_draw||dr.tool!=tool_lasso)return;
-	int data=dr.mask&&dr.limbo, diffrect=!rect_same(dr.sel_here,dr.sel_start), diffmask=dr.omask==NULL||dr.omask->c!=dr.mask->c;
+	int data=dr.mask&&dr.limbo, diffrect=!rect_same(dr.sel_here,dr.sel_start), diffmask=dr.omask==NULL||(dr.mask&&dr.omask->c!=dr.mask->c);
 	if(dr.omask&&!diffmask)for(int z=0;data&&z<dr.mask->c;z++)if((dr.mask->sv[z]>0)!=(dr.omask->sv[z]>0)){diffmask=1;break;}
 	if(data&&(diffrect||diffmask||dr.lasso_dirty)){
 		bg_scratch();cstate t=frame;frame=draw_buffer(dr.scratch);
