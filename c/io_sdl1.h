@@ -213,7 +213,11 @@ void framebuffer_alloc(pair size,int minscale){
 	SDL_FreeSurface(gfx);
 	gfx=SDL_CreateRGBSurface(0,size.x,size.y,32,0,0,0,0);
 }
+
+int sync_parity=0;
 int framebuffer_flip(pair disp,pair size,int scale,int mask,int frame,char*pal,lv*buffer){
+	sync_parity=(sync_parity+1)%SYNC_DUTY;
+	if(sync_parity)return 0;
 	SDL_LockSurface(gfx);
 	draw_frame(pal,buffer,gfx->pixels,gfx->pitch,frame,mask);frame_count++;
 	SDL_UnlockSurface(gfx);
@@ -222,6 +226,7 @@ int framebuffer_flip(pair disp,pair size,int scale,int mask,int frame,char*pal,l
 	return 1;
 }
 void toolbar_flip(lv*buffer,int frame,char*pal,rect dest){
+	if(sync_parity)return;
 	if(!gtool){pair s=buff_size(buffer);gtool=SDL_CreateRGBSurface(0,s.x,s.y,32,0,0,0,0);}
 	SDL_LockSurface(gtool);
 	draw_frame(pal,buffer,gtool->pixels,gtool->pitch,frame,0);
@@ -251,7 +256,6 @@ void window_set_size(pair wsize,pair size,int scale){
 
 void tick(lv*env);
 void sync(void);
-int sync_parity=0;
 
 SDL_Cursor* makeCursor(pair offset,lv*image){
 	pair s=image_size(image);
@@ -288,9 +292,5 @@ void io_init(void){
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY,SDL_DEFAULT_REPEAT_INTERVAL);
 }
 void io_run(lv*env){
-	while(!should_exit){
-		tick(env);
-		sync_parity=(sync_parity+1)%SYNC_DUTY;
-		if(!sync_parity)sync();
-	}
+	while(!should_exit){tick(env);sync();}
 }
