@@ -4124,11 +4124,12 @@ void load_deck(lv*d){
 	setuimode(mode_interact);n_play(NULL,lml2(NONE,lmistr("loop")));msg.next_view=1;
 }
 int main(int argc,char**argv){
-	char*file=NULL;for(int z=1;z<argc;z++){
+	char*file=NULL,*startcard=NULL;for(int z=1;z<argc;z++){
 		if(!strcmp("--no-sound"   ,argv[z])){nosound=1;continue;}
 		if(!strcmp("--no-scale"   ,argv[z])){noscale=1;continue;}
 		if(!strcmp("--no-touch"   ,argv[z])){set_touch=1;continue;}
 		if(!strcmp("--fullscreen" ,argv[z])){toggle_fullscreen=1;continue;}
+		if(!strcmp("--card"       ,argv[z])){if(z<argc-1)startcard=argv[++z];continue;}
 		file=argv[z],set_path(argv[z]);
 	}
 	init_interns();
@@ -4185,7 +4186,7 @@ int main(int argc,char**argv){
 		if(stat(p,&buffer)==0)load_deck(deck_get(n_read(NULL,l_list(lmcstr(p))))),set_path(p);
 	}
 	if(!deck){str doc=str_new();str_add(&doc,(char*)examples_decks_tour_deck,examples_decks_tour_deck_len);load_deck(deck_get(lmstr(doc)));}
-
+	if(startcard){iwrite(deck,lmistr("card"),lmcstr(startcard));}
 	io_run(env);
 	return 0;
 }

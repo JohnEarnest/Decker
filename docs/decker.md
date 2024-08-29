@@ -142,7 +142,7 @@ Web-Decker has generally the same tools and functionality as Native-Decker, but 
 - Web-Decker will always report `sys.platform` as `"web"`, irrespective of the operating system the browser is running on.
 - The Web-Decker implementation of Lil uses the browser's garbage collector, so less information is available in `sys.workspace`.
 - Most web browsers do not allow programs to play audio until the user has interacted with a page, so any `play[]` commands issued before a user has clicked, tapped, or pressed a keyboard key will have no effect.
-- If Web-Decker is accessed via a URL containing a `#` suffix (as in a page anchor), it will attempt to `go[]` to the [URI-decoded](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURI) suffix, making it possible to link to a specific card within a deck.
+- If Web-Decker is accessed via a URL containing a `#` suffix (as in a page anchor), it will attempt to `go[]` to the [URI-decoded](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURI) suffix, making it possible to link to a specific card within a deck. In Native-Decker, the `--card` CLI flag offers similar functionality.
 - Tracing Mode (_View &#8594; Tracing Mode_) is not available.
 - [The Danger Zone](#thedangerzone) offers a different set of functionality.
 
@@ -1972,6 +1972,7 @@ Native-Decker accepts several other optional CLI flags:
 - `--no-scale`: Disable upscaling the display in windowed mode. Useful for recording screenshots.
 - `--no-touch`: Disable touch input unless explicitly opted-in.
 - `--fullscreen`: Open in fullscreen mode.
+- `--card x`: Open the deck (if any) to a specified card name.
 
 If a file path is not specified (or you open Decker by double-clicking the application), Decker will next check for the existence of a file named `start.deck` in the same directory as the executable (or on MacOS within the `.app/Resources/` directory of the application bundle), opening it if available. This can be helpful if you wish to build a personal "home deck", or if you wish to distribute your own decks along with a Decker runtime.
 
