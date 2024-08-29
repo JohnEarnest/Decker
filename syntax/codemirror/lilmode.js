@@ -30,7 +30,7 @@ CodeMirror.defineMode('lil',(config,options)=>{
 			if(stream.match('"')){state.mode='str';return'string'}
 			// line comments, keywords/builtins, function definitions:
 			if(stream.match('#')||stream.match(/[\t\n\r ]+\//))return stream.skipToEnd(),'comment'
-			const n=stream.match(/^[a-zA-Z][a-zA-Z0-9_?]*/)
+			const n=stream.match(/^[a-zA-Z_?][a-zA-Z0-9_?]*/)
 			if(state.mode=='fname'&&n){state.mode=0;return 'property'}
 			if(n=='on'){state.mode='fname'}
 			if(KEYWORDS[n])return 'keyword'
