@@ -1521,19 +1521,23 @@ modals=_=>{
 		const b=draw_modalbox(rect(210,frame.size.y-46)),def=con(),wids=ll(ifield(def,'widgets'))
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Widget Order',FONT_MENU,1)
 		const gsize=rect(b.x,b.y+15,b.w,b.h-20-20), slot=16, ch=slot*wids.length
-		let m=ms.grid.col==-99, props=0, gutter=-1, curr=ob.sel.length?ob.sel[0]:null; draw_box(gsize,0,1)
+		let m=ms.grid.col==-99?-1:0, props=0, gutter=-1; draw_box(gsize,0,1)
 		const sbar=scrollbar(gsize,max(0,ch-(gsize.h-2)),10,gsize.h,ms.grid.scroll,ch>=gsize.h,0),bb=sbar.size;ms.grid.scroll=sbar.scroll,bb.y++
 		const oc=frame.clip;frame.clip=bb;for(let z=0;z<wids.length;z++){
 			const c=rect(bb.x,bb.y+(z*slot)-ms.grid.scroll,bb.w,slot), wid=wids[z]
 			if(c.y>bb.y+bb.h||c.y+c.h<bb.y)continue; const cb=rclip(c,bb) // coarse clip
-			if(ev.md&&dover(cb)){m=1,ms.grid.row=z,curr=wid,object_select(curr)}if(ev.dclick&&over(cb))props=1
+			if(ev.dclick&&over(cb))props=1
+			if(ev.md&&dover(cb)){
+				if(ev.shift){if(ob.sel.indexOf(wid)>=0){ob.sel=ob.sel.filter(x=>x!=wid),props=0}else{ob.sel.push(wid)}}
+				else{object_select(wid),ms.grid.row=z}
+			}
 			const col=ev.drag&&ms.grid.row==z?13:1
 			draw_text_fit(rect(c.x+3,c.y+2,bb.w-6,font_h(FONT_BODY)),ls(ifield(wid,'name')),FONT_BODY,col)
 			if(ls(ifield(wid,'script')).length){
 				const i=rect(c.x+c.w-13,c.y+2,12,12)
 				draw_rect(rect(i.x+2,i.y+1,i.w-2,i.h-2),0),draw_icon(i,ICONS[ICON.lil],1)
 			}
-			if(wid==curr&&col==1)draw_invert(pal,c)
+			if(ob.sel.indexOf(wid)>=0)draw_invert(pal,c)
 			if((ev.drag||ev.mu)&&ms.grid.row!=-1){
 				{const g=rect(c.x,c.y-3    ,c.w,7);if(over(g)){draw_hline(c.x,c.x+c.w,c.y      ,13),gutter=z  }}
 				{const g=rect(c.x,c.y-3+c.h,c.w,7);if(over(g)){draw_hline(c.x,c.x+c.w,c.y+c.h-1,13),gutter=z+1}}
@@ -1541,20 +1545,21 @@ modals=_=>{
 		}frame.clip=oc
 		if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'OK',1)||ev.exit)modal_exit(0)
 		const c=rect(b.x,b.y+b.h-20)
-		if(ui_button(rect(c.x,c.y,80,20),'Properties...',curr!=null)||props)object_properties(curr)
+		if(ui_button(rect(c.x,c.y,80,20),'Properties...',ob.sel.length==1)||props)if(ob.sel.length)object_properties(ob.sel[0])
 		if(ev.mu){
 			if(ms.grid.row!=-1&&gutter!=-1){
 				const s=wids[ms.grid.row], oi=ln(ifield(s,'index'))
-				iwrite(s,lms('index'),lmn(gutter>oi?gutter-1:gutter)),m=1,curr=s,object_select(curr)
+				iwrite(s,lms('index'),lmn(gutter>oi?gutter-1:gutter)),m=1,object_select(s)
 			}ms.grid.row=-1
 		}
 		else if(ev.drag&&ms.grid.row!=-1){const r=rect(ev.pos.x-5,ev.pos.y-5,10,10);draw_rect(r,0),draw_box(r,0,1),uicursor=cursor.drag}
-		else if(curr&&(ev.dir=='up'  &&ev.shift)){iwrite(curr,lms('index'),lmn(ln(ifield(curr,'index'))-1)),m=1}
-		else if(curr&&(ev.dir=='down'&&ev.shift)){iwrite(curr,lms('index'),lmn(ln(ifield(curr,'index'))+1)),m=1}
-		else if(curr&&(ev.dir=='left' ||ev.dir=='up'  )){curr=wids[mod(ln(ifield(curr,'index'))-1,wids.length)],object_select(curr),m=1}
-		else if(curr&&(ev.dir=='right'||ev.dir=='down')){curr=wids[mod(ln(ifield(curr,'index'))+1,wids.length)],object_select(curr),m=1}
-		if(m&&curr){
-			ms.grid.col=-1;const y=(ln(ifield(curr,'index'))*slot)-ms.grid.scroll
+		else if(ev.shift     &&ev.dir=='up'  ){ob_move_dn(),m=-1}
+		else if(ev.shift     &&ev.dir=='down'){ob_move_up(),m= 1}
+		else if(ob.sel.length&&ev.dir=='up'  ){ob_order(),object_select(wids[mod(ln(ifield(ob.sel[0              ],'index'))-1,wids.length)]),m=-1}
+		else if(ob.sel.length&&ev.dir=='down'){ob_order(),object_select(wids[mod(ln(ifield(ob.sel[ob.sel.length-1],'index'))+1,wids.length)]),m= 1}
+		if(m!=0&&ob.sel.length){
+			ms.grid.col=-1;ob_order();const target=m==-1?ob.sel[0]:ob.sel[ob.sel.length-1]
+			const y=(ln(ifield(target,'index'))*slot)-ms.grid.scroll
 			if(y<0){ms.grid.scroll+=y}if(y+slot>=bb.h){ms.grid.scroll+=(y+slot)-bb.h}
 		}
 	}
