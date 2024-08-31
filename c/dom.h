@@ -34,6 +34,7 @@ lv* n_sleep(lv*self,lv*z){(void)self;z=l_first(z);if(matchr(z,lmistr("play"))){s
 lv* n_transition(lv*self,lv*z){lv*t=dget(self->b,lmistr("transit"));z=l_first(z);if(lion(z))dset(t,lmcstr(z->sv),z);return t;}
 
 void go_notify(lv*deck,lv*args,int dest); // forward refs
+void field_notify(lv*field);
 lv*n_alert(lv*self,lv*z);
 lv*n_open(lv*self,lv*z);
 lv*n_save(lv*self,lv*z);
@@ -1711,14 +1712,14 @@ lv* interface_field(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	lv*data=self->b;
 	if(x){
-		ikey("text"     ){dset(data,lmistr("value"),rtext_cast(ls(x)));return x;}
-		ikey("images"   ){dset(data,lmistr("value"),rtext_write_images(x));return x;}
-		ikey("data"     ){dset(data,lmistr("value"),rtext_cast(l_format(lmistr("%J"),l_list(x))));return x;}
+		ikey("text"     ){dset(data,lmistr("value"),rtext_cast(ls(x)));field_notify(self);return x;}
+		ikey("images"   ){dset(data,lmistr("value"),rtext_write_images(x));field_notify(self);return x;}
+		ikey("data"     ){dset(data,lmistr("value"),rtext_cast(l_format(lmistr("%J"),l_list(x))));field_notify(self);return x;}
 		ikey("scroll"   ){int n=MAX(0,ln(x));dset(data,i,lmn(n));return x;}
 		ikey("value"    ){
 			lv*style=ivalue(self,"style");int plain=style&&strcmp(ls(style)->sv,"rich");
 			if(plain&&!rtext_is_plain(x)){x=rtext_all(rtext_cast(x));}
-			dset(data,i,rtext_cast(x));return x;
+			dset(data,i,rtext_cast(x));field_notify(self);return x;
 		}
 		ikey("border"   ){dset(data,i,lmn(lb(x)));return x;}
 		ikey("scrollbar"){dset(data,i,lmn(lb(x)));return x;}

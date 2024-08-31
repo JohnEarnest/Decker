@@ -53,6 +53,7 @@ lv*n_error(lv*self,lv*a){(void)self;return a->c==1&&array_is(a->lv[0])?print_arr
 extern char **environ;
 
 void go_notify(lv*deck,lv*args,int dest){(void)deck,(void)args,(void)dest;}
+void field_notify(lv*field){(void)field;}
 lv* n_panic(lv*self,lv*z){(void)self,(void)z;return NONE;}
 lv* n_alert(lv*self,lv*z){(void)self,(void)z;return ONE;}
 lv* n_open (lv*self,lv*z){(void)self,(void)z;return lmistr("");}

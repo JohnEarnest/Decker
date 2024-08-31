@@ -1870,13 +1870,13 @@ field_read=(x,card)=>{
 	const ri=lmi((self,i,x)=>{
 		if(!is_rooted(self))return NONE
 		if(x){
-			if(ikey(i,'text'  ))return self.value=rtext_cast(lms(ls(x))),x
-			if(ikey(i,'images'))return self.value=rtext_write_images(x),x
-			if(ikey(i,'data'  ))return self.value=rtext_cast(dyad.format(lms('%J'),monad.list(x))),x
+			if(ikey(i,'text'  ))return self.value=rtext_cast(lms(ls(x))),field_notify(self),x
+			if(ikey(i,'images'))return self.value=rtext_write_images(x),field_notify(self),x
+			if(ikey(i,'data'  ))return self.value=rtext_cast(dyad.format(lms('%J'),monad.list(x))),field_notify(self),x
 			if(ikey(i,'scroll'))return self.scroll=max(0,ln(x)),x
 			if(ikey(i,'value' )){
 				if(ls(ifield(self,'style'))!='rich'&&!rtext_is_plain(x))x=rtext_string(rtext_cast(x))
-				return self.value=rtext_cast(x),x
+				return self.value=rtext_cast(x),field_notify(self),x
 			}
 			if(ikey(i,'border'   ))return self.border=lb(x),x
 			if(ikey(i,'scrollbar'))return self.scrollbar=lb(x),x

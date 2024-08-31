@@ -887,7 +887,7 @@ layout_cursor=(x,index,font,f)=>{
 }
 field_change=_=>{
 	if(!wid.field_dirty||!wid.ft)return
-	iwrite(wid.ft,lms('value'),wid.fv.table),mark_dirty()
+	field_notify_disable=1,iwrite(wid.ft,lms('value'),wid.fv.table),mark_dirty(),field_notify_disable=0
 	msg.target_change=wid.ft, msg.arg_change=rtext_string(wid.fv.table)
 }
 field_exit=_=>{field_change(),kc.on=0;wid.infield=0,wid.fv=null,wid.ft=null,wid.cursor=rect(),wid.field_dirty=0,wid.change_timer=0}
@@ -2222,6 +2222,15 @@ go_notify=(deck,x,t,url,delay)=>{
 		grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel=[],wid.active=ms.type=='listen'?0:-1,mark_dirty()
 	}
 	if(uimode=='interact')msg.next_view=1
+}
+let field_notify_disable=0
+field_notify=(field)=>{
+	if(field_notify_disable||!wid.infield||wid.ft!=field)return
+	const v=ifield(field,'value');if(rtext_len(v))return
+	wid.fv={table:v,scroll:0}
+	wid.cursor=rect(),wid.field_dirty=0
+	wid.hist=[],wid.hist_cursor=0
+	if(enable_touch){field_exit(),wid.active=-1}
 }
 
 // Keycaps

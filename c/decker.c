@@ -371,9 +371,10 @@ void menu_finish(void){
 
 // Widgets
 
+int field_notify_disable=0;
 void field_change(void){
 	if(!wid.field_dirty||!wid.ft)return;
-	iwrite(wid.ft,lmistr("value"),wid.fv->table),mark_dirty();
+	field_notify_disable=1;iwrite(wid.ft,lmistr("value"),wid.fv->table),mark_dirty();field_notify_disable=0;
 	msg.target_change=wid.ft, msg.arg_change=rtext_all(wid.fv->table);
 }
 void grid_exit(void){
@@ -2308,6 +2309,14 @@ void go_notify(lv*deck,lv*args,int dest){
 		grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel->c=0,wid.active=ms.type==modal_listen?0:-1;mark_dirty();
 	}
 	if(uimode==mode_interact)msg.next_view=1;
+}
+void field_notify(lv*field){
+	if(field_notify_disable||!wid.infield||wid.ft!=field)return;
+	lv*v=ifield(field,"value");if(rtext_len(v))return;
+	wid.fv->table=v;
+	wid.cursor=(pair){0,0},wid.field_dirty=0;
+	wid.hist=lml(0);wid.hist_cursor=0;
+	if(enable_touch){field_exit();wid.active=-1;}
 }
 void validate_modules(void){
 	lv*modules=ifield(deck,"modules");EACH(z,modules){

@@ -1092,6 +1092,8 @@ See also: [rtext](#rtextinterface).
 
 The `field.data` and `field.images` attributes offer a convenient way to stash arbitrary Lil values (excluding functions and interfaces that are not an _Image_, _Sound_, or _Array_), or a list of Image values, respectively, in a Field. Note that reading `field.images` retrieves images _by reference_ from rtext content, whereas reading `field.data` always decodes a fresh copy of any contained images; the former is therefore more efficient when storing and retrieving large images.
 
+When a Field widget has focus in Decker, it is generally not possible for scripts to modify its `.value` attribute; the user's in-progress input will take priority. The single exception to this is _clearing_ the field's contents with `x.value:""` (or an equivalent). If Decker's on-screen keyboard is active, clearing the focused field will additionally dismiss the on-screen keyboard. This feature can be used in combination with `change[]` and/or `run[]` event handlers to produce "command-line" interfaces in Decker, for applications like parser-based Interactive Fiction or programming REPLs like Decker's built-in Listener.
+
 
 Slider Interface
 ----------------
