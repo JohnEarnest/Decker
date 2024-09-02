@@ -85,14 +85,14 @@ Built-in Functions
 | `exit[x]`        | Stop execution with exit code `x`.                                                                                          | System  |
 | `shell[x]`       | Execute string `x` as a shell command and block for its completion.(4)                                                      | System  |
 | `eval[x y z]`    | Parse and execute a string `x` as a Lil program, using any variable bindings in dictionary `y`.(5)                          | System  |
-| `import[x]`      | Execute a `.lil` script `x` in an isolated scope and return a dictionary of definitions made within that script.            | System  |
+| `import[x]`      | Execute a `.lil` script `x` in an isolated scope and return a dictionary of definitions made within that script. (6)        | System  |
 | `random[x y]`    | Choose `y` random elements from `x`. In Lilt, `sys.seed` is always pre-initialized to a constant.                           | System  |
 | `readcsv[x y d]` | Turn a [RFC-4180](https://datatracker.ietf.org/doc/html/rfc4180) CSV string `x` into a Lil table with column spec `y`.(5)   | Data    |
 | `writecsv[x y d]`| Turn a Lil table `x` into a CSV string with column spec `y`.(5)                                                             | Data    |
 | `readxml[x]`     | Turn a useful subset of XML/HTML into a Lil structure.(5)                                                                   | Data    |
 | `writexml[x fmt]`| Turn a Lil structure `x` into an XML string, formatted with whitespace if `fmt` is truthy.(5)                               | Data    |
 | `readdeck[x]`    | Produce a _deck_ interface from a file at path `x`. If no path is given, produce a new _deck_ from scratch.                 | Decker  |
-| `writedeck[x y]` | Serialize a _deck_ interface `y` to a file at path `x`. Returns `1` on success.(6)                                          | Decker  |
+| `writedeck[x y]` | Serialize a _deck_ interface `y` to a file at path `x`. Returns `1` on success.(7)                                          | Decker  |
 | `array[x y]`     | Create a new _array_ with size `x` and cast string `y`, or decode an encoded array string `x`.                              | Decker  |
 | `image[x]`       | Create a new _image_ interface with size `x` (`(width,height)`) or decode an encoded image string.                          | Decker  |
 | `sound[x]`       | Create a new _sound_ interface with size `x` (sample count) or decode an encoded sound string.                              | Decker  |
@@ -143,7 +143,9 @@ ffmpeg -i input.mp3 -bitexact -map_metadata -1 -ac 1 -ar 8000 -acodec pcm_u8 out
 
 5) See the Decker Manual for details of `eval[]`, `readcsv[]`, `writecsv[]`, `readxml[]`, and `writexml[]`.
 
-6) If the path given to `writedeck[]` ends in a `.html` suffix, the deck will be written as a "standalone" deck with a bundled HTML+JS runtime. Otherwise, the deck will be written as a "bare" deck, which is smaller.
+6) Scripts loaded with `import[]` will not have access to `args` or `env`. Scripts may use `args~0` as an idiom to detect when they have been imported as a library.
+
+7) If the path given to `writedeck[]` ends in a `.html` suffix, the deck will be written as a "standalone" deck with a bundled HTML+JS runtime. Otherwise, the deck will be written as a "bare" deck, which is smaller.
 
 Working With Decks
 ------------------
