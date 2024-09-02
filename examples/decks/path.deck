@@ -389,7 +389,7 @@ end
 
 {module:path}
 description:"generic grid-based pathfinding routines"
-version:1
+version:1.1
 {script}
 local default_cell:16,16
 local minusone:0|-1+range 256
@@ -543,7 +543,7 @@ size:[100,100]
 resizable:1
 margin:[1,1,1,1]
 description:"A semi-autonomous \"agent\" that can animate itself along a provided path of waypoints."
-version:1
+version:1.1
 script:"follower.0p"
 template:"on finish do end\non step do end\non tween t a b do end\non click do end\non release do end"
 attributes:{"name":["sprite","speed","draggable"],"label":["Sprite","Frames per step","Draggable"],"type":["rich","number","bool"]}
@@ -568,13 +568,7 @@ on set_aux x do sa.data:x end
 on get_done do c.animated~0 end
 on get_path do () unless sp.data.path end
 on set_path x do
- if x~() # do nothing
- elseif (!x~0)&1~count x # direct warp
-  card.pos:(first x)-.5*card.size
-  sp.data:().path:0
-  c.animated:0
-  card.event.finish
- else # animate along path
+ if !x~() # animate along path
   sp.data:().path:x
   c.animated:x
  end
@@ -608,7 +602,12 @@ on view do
   fin:0
   stp:0
   s:sp.data
-  if s.i>get_speed[]-1
+  if 1~count s.path # direct warp; no tween
+   card.pos:(first s.path)-.5*card.size
+   sp.data:().path:()
+   c.animated:0
+   fin:1
+  elseif s.i>get_speed[]-1
    stp:1
    if s.s>(count s.path)-3
     c.animated:0
