@@ -62,6 +62,8 @@ assert_image["new image with size"
 	image[3,4]
 ]
 
+assert["image with decimal size" (2,3) image[2.5,3.7].size]
+
 smol:image[3,4]
 smol[1,1]:2
 smol[2,3]:6

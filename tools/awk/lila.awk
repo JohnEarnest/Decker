@@ -1591,7 +1591,7 @@ function array_print(arr,  c,r,z){
 function image_is(x){return x!=-1&&lii(x)&&li_name(x)=="image"}
 function image_w(img){return heap_c[img]}
 function image_h(img){return heap_n[img]}
-function image_make(x,y,  r){r=lmi("image");heap_c[r]=x;heap_n[r]=y;heap_v[r]=repeat_char("00",x*y);return r}
+function image_make(x,y,  r){r=lmi("image");x=int(x);y=int(y);heap_c[r]=x;heap_n[r]=y;heap_v[r]=repeat_char("00",x*y);return r}
 function image_clone(img,  r){r=lmi("image");heap_c[r]=heap_c[img];heap_n[r]=heap_n[img];heap_v[r]=heap_v[img];return r}
 function image_empty(   r){r=lmi("image");heap_c[r]=0;heap_n[r]=0;heap_v[r]="";return r}
 function image_get(img,z){return h2b[substr(heap_v[img],1+2*z,2)]}
