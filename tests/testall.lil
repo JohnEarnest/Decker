@@ -370,6 +370,26 @@ tb: table b
 show[ta]
 show[tb]
 show[ta join tb]
+show[ # a natural join over tables that share multiple columns:
+	insert category id name with
+		"food"        1 "Nuts and Gum"
+		"food"        2 "Prune Extract"
+		"food"        5 "Cracklin' Oat Bran"
+		"misc"        1 "Pickle Paste"
+		"electronics" 2 "4D Printer"
+		"electronics" 1 "Yak Shaver"
+	end
+	join
+	insert category id quantity with
+		"food"        5 10
+		"electronics" 1 2
+		"food"        3 999 # this doesn't have a match in the left table!
+		"misc"        1 20
+		"food"        1 3
+		"food"        1 7
+		"electronics" 1 7
+	end
+]
 show[ta cross tb]
 show[(1,2) cross 3,4,5]
 show[3 cross 2]

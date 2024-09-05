@@ -385,11 +385,15 @@ dyad(l_join){
 		int i=-1;FIND(w,x,y->kv[z]){i=w;break;}
 		if(i>=0){ll_add(ik,y->kv[z]);}else{ll_add(dk,lmn(z)),dset(r,y->kv[z],lml(0));}
 	}
-	for(int ai=0;ai<x->n;ai++)for(int bi=0;bi<y->n;bi++){
-		int m=1;EACH(z,ik){if(!matchr(dget(x,ik->lv[z])->lv[ai],dget(y,ik->lv[z])->lv[bi])){m=0;break;}}
-		if(!m)continue;
-		EACH(z,x )ll_add(r->lv[z     ],x->lv[z                   ]->lv[ai]);
-		EACH(z,dk)ll_add(r->lv[x->c+z],y->lv[(int)(dk->lv[z]->nv)]->lv[bi]);r->n++;
+	#define join_key(t,r) lv*k;if(ik->c==1){k=dget(t,ik->lv[0])->lv[r];}else{k=lml(ik->c);EACH(z,ik)k->lv[z]=dget(t,ik->lv[z])->lv[r];}
+	lv*km=lmd();for(int bi=0;bi<y->n;bi++){
+		join_key(y,bi);lv*ix=dget(km,k);if(ix){ll_add(ix,lmn(bi));}else{dset(km,k,l_list(lmn(bi)));}
+	}
+	for(int ai=0;ai<x->n;ai++){
+		join_key(x,ai);lv*ix=dget(km,k);if(ix)EACH(ii,ix){int bi=ln(ix->lv[ii]);
+			EACH(z,x )ll_add(r->lv[z     ],x->lv[z                   ]->lv[ai]);
+			EACH(z,dk)ll_add(r->lv[x->c+z],y->lv[(int)(dk->lv[z]->nv)]->lv[bi]);r->n++;
+		}
 	}return r;
 }
 monad(l_sum ){x=ll(x);lv*r=NONE      ;for(int z=0;z<x->c;z++)r=l_add  (r,x->lv[z]);return r;}
