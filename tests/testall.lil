@@ -390,7 +390,15 @@ show[ # a natural join over tables that share multiple columns:
 		"electronics" 1 7
 	end
 ]
+show[ # a natural join which has no matching rows
+	insert category id name     with "food" 1 "Nuts and Gum" end join
+	insert category id quantity with "misc" 1 20 end
+]
 show[ta cross tb]
+show[ # a cross join which has no result rows
+	insert one two with end cross
+	insert two three with end
+]
 show[(1,2) cross 3,4,5]
 show[3 cross 2]
 show[2 cross "ABC"]
