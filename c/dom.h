@@ -2585,8 +2585,8 @@ lv* deck_read(lv*x){
 	MAP(mdata,modules)modules->lv[z];
 	{lv*k=lmistr("contraptions");defs   =lmd();dset(r,k,defs   );EACH(z,ddata){lv*v=prototype_read(ddata->lv[z],ri);dset(defs   ,ifield(v,"name"),v);}}
 	{lv*k=lmistr("cards"       );cards  =lmd();dset(r,k,cards  );EACH(z,cdata){lv*v=card_read     (cdata->lv[z],ri);dset(cards  ,ifield(v,"name"),v);}}
-	{lv*k=lmistr("modules"     );modules=lmd();dset(r,k,modules);EACH(z,mdata){lv*v=module_read   (mdata->lv[z],ri);dset(modules,ifield(v,"name"),v);}}
 	dset(r,lmistr("history"),l_list(ifield(ifield(ri,"card"),"index")));
+	{lv*k=lmistr("modules"     );modules=lmd();dset(r,k,modules);EACH(z,mdata){lv*v=module_read   (mdata->lv[z],ri);dset(modules,ifield(v,"name"),v);}}
 	return ri;
 }
 void esc_write(str*r,int id,lv*x){

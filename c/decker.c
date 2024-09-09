@@ -389,7 +389,7 @@ void field_exit(void){
 }
 void bg_end_selection(void);void bg_end_lasso(void); // forward-ref
 void setuimode(int mode){
-	n_play(NULL,lml2(NONE,lmistr("loop")));
+	n_play(deck,lml2(NONE,lmistr("loop")));
 	grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel->c=0,wid.active=-1;poly_count=0;sc.others=NULL;
 	msg.next_view   =(uimode!=mode)&&mode==mode_interact;
 	msg.pending_loop=(uimode!=mode)&&mode==mode_interact;
@@ -3141,8 +3141,8 @@ void sfx_doloop(int clear){
 	int pp=pending_popstate;fire_hunk_async(ifield(deck,"card"),b);
 	int quota=LOOP_QUOTA;while(quota>0&&running()){runop(),quota--;}
 	if(!running())r=arg();popstate();pending_popstate=pp;
-	if(clear)n_play(NULL,lml2(NONE,lmistr("loop")));
-	n_play(NULL,lml2(r,lmistr("loop"))),msg.pending_loop=0;
+	if(clear)n_play(deck,lml2(NONE,lmistr("loop")));
+	n_play(deck,lml2(r,lmistr("loop"))),msg.pending_loop=0;
 	lv*loop=audio_loop.clip;if(loop&&audio_loop.sample>=((Uint32)loop->c))audio_loop.sample=0;
 	interpreter_unlock();
 }
@@ -3173,7 +3173,7 @@ void sfx_pump(void*user,Uint8*stream,int len){
 	}audio_playing=play;
 }
 int sfx_any(void){if(nosound)return 0;for(int z=0;z<SFX_SLOTS;z++)if(audio_slots[z].clip!=NULL)return 1;return 0;}
-lv* n_play(lv*self,lv*z){
+lv* n_play(lv*deck,lv*z){
 	if(z->c>1&&matchr(z->lv[1],lmistr("loop"))){
 		lv*x=l_first(z);if(lis(x))x=dget(ifield(deck,"sounds"),x);
 		if(orig_loop&&orig_loop==x){} // don't re-trigger!
@@ -3181,7 +3181,7 @@ lv* n_play(lv*self,lv*z){
 		else{audio_loop.clip=orig_loop=NULL;} // stop the loop
 		return NONE;
 	}
-	(void)self;lv*x=l_first(z),*sfx=sound_is(x)?x: dget(ifield(deck,"sounds"),ls(x));if(!sfx)return NONE;
+	lv*x=l_first(z),*sfx=sound_is(x)?x: dget(ifield(deck,"sounds"),ls(x));if(!sfx)return NONE;
 	if(!sound_is(sfx)||ln(ifield(sfx,"size"))<1)return NONE;
 	int max_sample=0;int avail=-1;for(int z=0;z<SFX_SLOTS;z++){
 		if(!audio_slots[z].clip){avail=z;break;}
@@ -4136,7 +4136,7 @@ void load_deck(lv*d){
 	resize_window(deck);
 	time_t now;time(&now);seed=0xFFFFFFFF&now;
 	validate_modules();
-	setuimode(mode_interact);n_play(NULL,lml2(NONE,lmistr("loop")));msg.next_view=1;
+	setuimode(mode_interact);n_play(deck,lml2(NONE,lmistr("loop")));msg.next_view=1;
 }
 int main(int argc,char**argv){
 	char*file=NULL,*startcard=NULL;for(int z=1;z<argc;z++){
@@ -4191,6 +4191,12 @@ int main(int argc,char**argv){
 	dset(env,lmistr("li vars"  ),li.vars   =lmd());
 	dset(env,lmistr("viewed"   ),viewed    =lmd());
 	ob.sel=lml(0);
+
+	FONT_BODY=font_read(lmistr(FONT_BLOCK_BODY));
+	FONT_MENU=font_read(lmistr(FONT_BLOCK_MENU));
+	FONT_MONO=font_read(lmistr(FONT_BLOCK_MONO));
+	context=draw_buffer(lmbuff((pair){512,342}));
+	dset(env,lmistr("buff"),context.buffer);
 
 	io_init();
 
