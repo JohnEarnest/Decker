@@ -10,7 +10,7 @@ lmi  =(f,n,x)=>(allocs++,{t:'int',f,n}),                  lii  =x=>x&&x.t=='int'
 lmon =(n,a,b)=>(allocs++,{t:'on' ,n:n,a:a,b:b,c:null}),   lion =x=>x&&x.t=='on'
 lmnat=f      =>(allocs++,{t:'nat',f:f}),                  linat=x=>x&&x.t=='nat'
 lmblk=_      =>(allocs++,{t:'blk',b:[],locals:[]}),       liblk=x=>x&&x.t=='blk'
-lmenv=p      =>{allocs++;const r={t:'env',v:{},p:p};r.local=(n,x)=>env_local(r,lms(n),x);return r}
+lmenv=p      =>{allocs++;const r={t:'env',v:new Map(),p:p};r.local=(n,x)=>env_local(r,lms(n),x);return r}
 
 NONE=lmn(0), ONE=lmn(1), seed=0x12345, max=Math.max, min=Math.min, abs=Math.abs
 ISODATE=lms('%04i-%02i-%02iT%02i:%02i:%02iZ%n%m'), PARTS=['year','month','day','hour','minute','second'].map(lms)
@@ -49,7 +49,7 @@ match=(x,y)=>x==y?1: (x.t!=y.t)||(count(x)!=count(y))?0: (lin(x)||lis(y))?x.v==y
 
 splicet=(f,x,t)=>{const r={};Object.keys(t.v).map(k=>r[k]=f(x,t.v[k]));return lmt(r)}
 splice=(f,x,y)=>lis(y)?lms(f(x,ll(y)).map(ls).join('')): lid(y)?lmd(f(x,y.k),f(x,y.v)): lit(y)?splicet(f,x,y): lml(f(x,ll(y)))
-ina=(x,y)=>lmn(lis(y)?y.v.indexOf(ls(x))>=0: lil(y)?y.v.some(y=>match(x,y)): lid(y)?dget(y,x)!=undefined: lit(y)?ls(x)in y.v: x==y)
+ina=(x,y)=>lmn(lis(y)?y.v.indexOf(ls(x))>=0: lil(y)?y.v.some(y=>match(x,y)): lid(y)?dget(y,x)!=undefined: lit(y)?y.v.hasOwnProperty(ls(x)): x==y)
 filter=(i,x,y)=>{
 	x=lis(x)?monad.list(x):lml(ll(x))
 	if(lid(y)){const r=lmd();y.k.forEach((k,v)=>i==lb(ina(k,x))&&dset(r,k,y.v[v]));return r}
@@ -68,7 +68,7 @@ amend=(x,i,y)=>{
 	const clonetab=x=>{const r={};Object.keys(x.v).map((k,i)=>{r[k]=x.v[k].slice(0)});return r}
 	if(lit(x)&&lin(i)){
 		const r=clonetab(x), rn=count(x), cols=ll(monad.keys(x)), ri=0|ln(i); y=lid(y)?y: lmd(cols, new Array(cols.length).fill(y))
-		if(ri>=0&&ri<rn)y.k.map((k,i)=>{k=ls(k);if(k in r)r[k][ri]=y.v[i]});return lmt(r)
+		if(ri>=0&&ri<rn)y.k.map((k,i)=>{k=ls(k);if(r.hasOwnProperty(k))r[k][ri]=y.v[i]});return lmt(r)
 	}
 	if(lit(x)&&lis(i)){
 		const r=clonetab(x), rn=count(x), c=lil(y)?ll(y).slice(0,rn): new Array(rn).fill(y)
@@ -366,10 +366,13 @@ merge=(vals,keys,widen)=>{
 	if(widen){ix=lml(r.v['@index']),r=dyad.drop(i,r)}
 	return {r,ix}
 }
-n_uplevel=([a])=>{let i=2, e=getev(), r=null, name=ls(a); while(e&&i){r=e.v[name];if(r)i--;e=e.p};return r||NONE}
+n_uplevel=([a])=>{let i=2, e=getev(), r=null, name=ls(a); while(e&&i){r=e.v.get(name);if(r)i--;e=e.p};return r||NONE}
 n_eval=([x,y,extend])=>{
 	y=y?ld(y):lmd();const yy=lmd(y.k.slice(0),y.v.slice(0)), r=lmd(['value','vars'].map(lms),[NONE,yy])
-	const feval=([r,x])=>{dset(r,lms('value'),x);const b=dget(r,lms('vars')), v=getev().v; Object.keys(v).map(k=>dset(b,lms(k),v[k]));return r}
+	const feval=([r,x])=>{
+		dset(r,lms('value'),x);const b=dget(r,lms('vars')), v=getev().v;
+		for(let k of v.keys()){dset(b,lms(k),v.get(k))};return r
+	}
 	try{
 		const prog=parse(x?ls(x):'')
 		blk_opa(prog,op.BUND,2),blk_lit(prog,lmnat(feval)),blk_op(prog,op.SWAP),blk_op(prog,op.CALL)
@@ -403,7 +406,7 @@ triad={
 	'@upd': (orig,vals,keys)=>{
 		orig=dyad.drop(lml(['index','gindex','group'].map(lms)),orig);const mv=merge(vals,keys,1),r=mv.r,ix=mv.ix
 		Object.keys(r.v).map(c=>{
-			if(r.v[c]==ix)return;const ci=c in orig.v, col=range(count(orig)).map(z=>ci?orig.v[c][z]:NONE)
+			if(r.v[c]==ix)return;const ci=orig.v.hasOwnProperty(c), col=range(count(orig)).map(z=>ci?orig.v[c][z]:NONE)
 			orig.v[c]=col,ix.v.map((x,row)=>col[0|ln(x)]=r.v[c][row])
 		});return orig
 	},
@@ -465,7 +468,7 @@ parse=text=>{
 	const ncc='                nnnnnnnnnn     n nnnnnnnnnnnnnnnnnnnnnnnnnn    n nnnnnnnnnnnnnnnnnnnnnnnnnn    '
 	const mcc='     xx x xxxx x          x xxx x                          x  x                             x x'
 	const esc={'\\':'\\','"':'"','n':'\n'}
-	const ne=_=>{const e=nc();return e in esc?esc[e]: er(`Invalid escape character '\\${e}' in string.`)}
+	const ne=_=>{const e=nc();return esc[e]?esc[e]: er(`Invalid escape character '\\${e}' in string.`)}
 	const nw=x=>{let v=+x;    while(id())v=(v*10)+(+nc());  return v} 
 	const nf=_=>{let v=0,p=10;while(id())v+=(+nc())/p,p*=10;return v}
 	const nn=(x,tr,tc,v,sign)=>{
@@ -492,7 +495,7 @@ parse=text=>{
 	const expect=t=>peek().t==t?next().v:er(`Expected ${t}, but found ${peek().t}.`)
 	const ident=n=>{
 		const kw={while:1,each:1,send:1,on:1,if:1,elseif:1,else:1,end:1,do:1,with:1,local:1,select:1,extract:1,update:1,insert:1,
-			into:1,from:1,where:1,by:1,orderby:1,asc:1,desc:1};return !(n in kw||n in monad||n in dyad)
+			into:1,from:1,where:1,by:1,orderby:1,asc:1,desc:1};return !(kw.hasOwnProperty(n)||monad.hasOwnProperty(n)||dyad.hasOwnProperty(n))
 	}
 	const name=n=>{const r=expect('name');if(!ident(r)&&n!='member')er(`'${r}' is a keyword, and cannot be used for a ${n} name.`);return r}
 	const names=(x,n)=>{const r=[];while(!match(x))r.push(name(n));return r}
@@ -532,10 +535,10 @@ parse=text=>{
 		}),blk_lit(b,keys),blk_op3(b,func)
 	}
 	const parseindex=(b,name)=>{
-		const i=[];while(peek().t in{'[':1,'.':1}){
+		const i=[];while(({'[':1,'.':1})[peek().t]){
 			if(matchsp('['))i.push(quotesub())
 			if(matchsp('.')){
-				if(peek().t in{'[':1,'.':1}){
+				if(({'[':1,'.':1})[peek().t]){
 					const vn=tempname()
 					i.map(v=>(blk_cat(b,v),blk_op(b,op.CALL))),blk_loop(b,[vn.v],_=>{blk_get(b,vn),parseindex(b)});return
 				}else{i.push(quotedot())}
@@ -591,7 +594,7 @@ parse=text=>{
 			blk_op3(b,'@ins');return
 		}
 		if(matchsp('(')){if(matchsp(')')){blk_lit(b,lml([]));return}expr(b),expect(')');return}
-		const s=peek().v;if(findop(s,monad)>=0&&peek().t in{'symbol':1,'name':1}){
+		const s=peek().v;if(findop(s,monad)>=0&&({'symbol':1,'name':1})[peek().t]){
 			next();if(matchsp('@')){
 				let depth=0,l=lmblk();while(matchsp('@'))depth++
 				expr(b),blk_opa(l,op.FMAP,findop(s,monad))
@@ -601,7 +604,7 @@ parse=text=>{
 		}const n=lms(name('variable'));if(matchsp(':')){expr(b),blk_set(b,n);return}blk_get(b,n),parseindex(b,n)
 	}
 	const expr=b=>{
-		term(b);if(peek().t in {'[':1,'.':1}){parseindex(b)}
+		term(b);if(({'[':1,'.':1})[peek().t]){parseindex(b)}
 		if(matchsp('@')){
 			let depth=0;while(matchsp('@'))depth++
 			const func=tempname();blk_set(b,func),blk_op(b,op.DROP),expr(b)
@@ -610,15 +613,15 @@ parse=text=>{
 			blk_sets(l,fidx,blk_here(l))
 			while(depth-->0){const t=tempname(),m=lmblk();blk_loop(m,[ls(t)],_=>{blk_get(m,t),blk_cat(m,l)}),l=m}
 			blk_cat(b,l);return
-		}const s=peek().v;if(findop(s,dyad)>=0&&peek().t in {'symbol':1,'name':1}){next(),expr(b),blk_op2(b,s)}
+		}const s=peek().v;if(findop(s,dyad)>=0&&({'symbol':1,'name':1})[peek().t]){next(),expr(b),blk_op2(b,s)}
 	}
 	const b=lmblk();if(hasnext())expr(b);while(hasnext())blk_op(b,op.DROP),expr(b)
 	if(blk_here(b)==0)blk_lit(b,NONE);return b
 }
 
-env_local=(e,n,x)=>{e.v[ls(n)]=x}
-env_getr =(e,n  )=>{const r=e.v[ls(n)];return r?r: e.p?env_getr(e.p,n): null}
-env_setr =(e,n,x)=>{const r=e.v[ls(n)];return r?e.v[ls(n)]=x: e.p?env_setr(e.p,n,x): null}
+env_local=(e,n,x)=>{e.v.set(ls(n),x)}
+env_getr =(e,n  )=>{const k=ls(n);r=e.v.get(k);return r?r: e.p?env_getr(e.p,n): null}
+env_setr =(e,n,x)=>{const k=ls(n);r=e.v.get(k);return r?e.v.set(k,x): e.p?env_setr(e.p,n,x): null}
 env_get  =(e,n  )=>env_getr(e,n)||NONE
 env_set  =(e,n,x)=>{const r=env_getr(e,n);r?env_setr(e,n,x):env_local(e,n,x)}
 env_bind =(e,k,v)=>{const r=lmenv(e); k.map((a,i)=>env_local(r,lms(a),v.v[i]||NONE));return r}
@@ -942,9 +945,9 @@ deck_is       =x=>lii(x)&&x.n=='deck'
 card_is       =x=>lii(x)&&x.n=='card'
 patterns_is   =x=>lii(x)&&x.n=='patterns'
 module_is     =x=>lii(x)&&x.n=='module'
-widget_is     =x=>lii(x)&&x.n in {button:1,field:1,grid:1,slider:1,canvas:1,contraption:1,proxy:1}
+widget_is     =x=>lii(x)&&({button:1,field:1,grid:1,slider:1,canvas:1,contraption:1,proxy:1})[x.n]
 ikey  =(x,k)=>lis(x)&&x.v==k
-ivalue=(x,k,d)=>k in x?x[k]:d
+ivalue=(x,k,d)=>x.hasOwnProperty(k)?x[k]:d
 ifield=(x,k)  =>x.f(x,lms(k))
 iindex=(x,k,v)=>x.f(x,lmn(k),v)
 iwrite=(x,k,v)=>x.f(x,k,v)
@@ -955,7 +958,7 @@ value_inherit=(self,key)=>{
 	const v=ifield(p,key);if(r&&v&&match(r,v))delete self[key];return r||v
 }
 init_field=(dst,key,src)=>{const k=lms(key),v=dget(src,k);if(v)iwrite(dst,k,v)}
-normalize_enum=(x,v)=>v in x?v:Object.keys(x)[0]
+normalize_enum=(x,v)=>x.hasOwnProperty(v)?v:Object.keys(x)[0]
 normalize_font=(x,v)=>ls(dkey(x,v)||x.k[dkix(x,v)]||lms('body'))
 data_enc=x=>x[5]==undefined?-1:+x[5]
 data_read=(type,x)=>(x.slice(0,2)!='%%'||x.slice(2,5)!=type)?null:new Uint8Array(atob(x.slice(6)).split('').map(x=>x.charCodeAt(0)))
@@ -2158,13 +2161,13 @@ contraption_read=(x,card)=>{
 				const m=self.def.margin
 				return self.size=rmax(rect(m.x+m.w,m.y+m.h),getpair(x)),reflow(self),x
 			}
-			if(lis(i)&&ls(i) in masks)return interface_widget(self,i,x)
+			if(lis(i)&&masks.hasOwnProperty(ls(i)))return interface_widget(self,i,x)
 			return fire_attr_sync(self,'set_'+ls(i),x),x
 		}else{
 			if(ikey(i,'def'  ))return self.def
 			if(ikey(i,'size' ))return lmpair((def.resizable?self.size:def.size)||def.size)
 			if(ikey(i,'image'))return ifield(self.def,'image')
-			if(lis(i)&&ls(i) in masks)return interface_widget(self,i,x)
+			if(lis(i)&&masks.hasOwnProperty(ls(i)))return interface_widget(self,i,x)
 			return fire_attr_sync(self,'get_'+ls(i),null)
 		}
 	},'contraption')
@@ -2630,13 +2633,13 @@ deck_read=x=>{
 	ri.brushes     =lmd()
 	ri.brusht      =lmd()
 	ri.patterns    =patterns_read(deck)
-	ri.version     ='version' in deck?ln(deck.version):1
-	ri.locked      ='locked'  in deck?lb(deck.locked ):0
-	ri.name        ='name'    in deck?ls(deck.name   ):''
-	ri.author      ='author'  in deck?ls(deck.author ):''
-	ri.script      ='script'  in deck?scripts[ln(deck.script)]:''
-	ri.card        ='card'    in deck?clamp(0,ln(deck.card),Object.keys(cards).length-1):0
-	ri.size        ='size'    in deck?rclamp(rect(8,8),getpair(deck.size),rect(4096,4096)):rect(512,342)
+	ri.version     =deck.hasOwnProperty('version')?ln(deck.version):1
+	ri.locked      =deck.hasOwnProperty('locked' )?lb(deck.locked ):0
+	ri.name        =deck.hasOwnProperty('name'   )?ls(deck.name   ):''
+	ri.author      =deck.hasOwnProperty('author' )?ls(deck.author ):''
+	ri.script      =deck.hasOwnProperty('script' )?scripts[ln(deck.script)]:''
+	ri.card        =deck.hasOwnProperty('card'   )?clamp(0,ln(deck.card),Object.keys(cards).length-1):0
+	ri.size        =deck.hasOwnProperty('size'   )?rclamp(rect(8,8),getpair(deck.size),rect(4096,4096)):rect(512,342)
 	if(Object.keys(cards).length==0)cards.home=lmd(['name'].map(lms),[lms('home')])
 	const root=lmenv();constants(root),primitives(root,ri)
 	pushstate(root),issue(root,parse(DEFAULT_TRANSITIONS));while(running())runop();popstate()

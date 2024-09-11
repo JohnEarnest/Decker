@@ -500,7 +500,7 @@ let msg={ // interpreter event messages
 	target_click:null,target_drag:null,target_release:null,target_order:null,target_run:null,target_link:null,target_ccell:null,target_change:null,target_navigate:null,
 	arg_click:rect(),arg_drag:rect(),lastdrag:rect(),arg_release:rect(),arg_order:null,arg_run:null,arg_link:null,arg_ccell:null,arg_change:null,arg_navigate:null,
 }
-let li={hist:[],vars:{},scroll:0} // listener state
+let li={hist:[],vars:new Map(),scroll:0} // listener state
 let ob={sel:[],show_bounds:1,show_names:0,show_cursor:0,show_margins:0,show_guides:1,move:0,move_first:0,resize:0,resize_first:0,handle:-1,prev:rect(),orig:rect()} // object editor state
 let sc={target:null,others:[],next:null, f:null,prev_mode:null,xray:0,status:''} // script editor state
 script_save=x=>{const k=lms('script');mark_dirty();if(sc.target)iwrite(sc.target,k,x);if(sc.others)sc.others.map(o=>iwrite(o,k,x))}
@@ -1093,13 +1093,14 @@ listen_show=(align,bare,x)=>listen_show_image(draw_lil(rsub(LISTEN_SIZE(),rect(1
 n_show=(a)=>{a[0]=a[0]||NONE;if(a.length<2){listen_show(ALIGN.right,0,a[0])}else{listen_show(ALIGN.right,1,lms(a.map(show).join(' ')))};return a[0]}
 n_print=(a)=>{a[0]=a[0]||NONE;if(a.length<2){listen_show(ALIGN.right,1,lms(ls(a[0])))}else{listen_show(ALIGN.right,1,a[0]=dyad.format(a[0],lml(a.slice(1))))}return a[0]}
 n_pre_listen=([a])=>{
-	const ev=getev();Object.keys(li.vars).map(name=>{if(!ev.v[name])ev.v[name]=li.vars[name]})
+	const ev=getev();
+	for(let name of li.vars.keys()){if(!ev.v.get(name))ev.v.set(name,li.vars.get(name))}
 	if(ob.sel.length&&uimode=='object')ev.v.selected=lml(ob.sel.slice(0))
 	return a
 }
 n_post_listen=([a])=>{
-	const ev=getev();Object.keys(ev.v).map(name=>{li.vars[name]=ev.v[name]})
-	li.vars['_']=a,listen_show(ALIGN.right,0,a);return a
+	const ev=getev();for(let name of ev.v.keys())li.vars.set(name,ev.v.get(name))
+	li.vars.set('_',a),listen_show(ALIGN.right,0,a);return a
 }
 n_post_query=([a])=>{ms.grid=gridtab(lt(a));return a}
 listener_eval=_=>{
@@ -1131,7 +1132,7 @@ n_panic=z=>{
 	do_panic=1,halt(),states.map(x=>x.t=[]),modal_enter('listen')
 	const s=rect((512-22)-18,16),b=rpair(rect(0,0),s),r=image_make(s),t=frame;frame=draw_frame(r)
 	draw_box(b,0,35),draw_textc(inset(b,2),'PANIC',FONT_MONO,35),frame=t,listen_show_image(r,NONE)
-	n_show(z),li.vars['_']=z[0]||NONE;return NONE
+	n_show(z),li.vars.set('_',z[0]||NONE);return NONE
 }
 
 // Audio
@@ -1308,7 +1309,7 @@ modal_enter=type=>{
 	ms.from_keycaps=kc.on
 	ms.type=ms.subtype=type
 	ms.old_wid=wid,wid=wid_state()
-	if(enable_touch){wid.active=type in {link:1,gridcell:1,listen:1}?0:-1}
+	if(enable_touch){wid.active=({link:1,gridcell:1,listen:1})[type]?0:-1}
 	if(type=='listen'){
 		if(uimode=='script'){
 			try{const text=ls(rtext_string(sc.f.table));parse(text),script_save(text)}
@@ -1398,7 +1399,7 @@ modal_enter=type=>{
 		if(fs!=null||fg!=null||ft!=null){
 			if(fs!=null){ms.act_sound=1,ms.message=lms(fs)}
 			if(ft!=null){ms.grid.table.v.value.map((x,i)=>{if(ft==ls(x))ms.act_trans=1,ms.grid.row=i})}
-			ms.act_go=fg!=null;if(fg!=null){if(fg in fk)ms.act_gomode=fk[fg];if(ms.act_gomode==5)ms.verb=lms(fg)}
+			ms.act_go=fg!=null;if(fg!=null){if(fk[fg]!=undefined)ms.act_gomode=fk[fg];if(ms.act_gomode==5)ms.verb=lms(fg)}
 		}
 	}
 	const dname=(x,e)=>{x=x||'untitled';return lms(/\.(deck|html)$/.test(x)?x:x+e)}
@@ -3406,9 +3407,12 @@ all_menus=_=>{
 	if(ms.type=='listen'){
 		menu_bar('Listener',1)
 		if(menu_item('Clear History',1))li.hist=[],li.scroll=0
-		if(menu_item('Clear Locals' ,1))li.vars={}
+		if(menu_item('Clear Locals' ,1))li.vars=new Map()
 		menu_separator()
-		if(menu_item('Show Locals',1))listen_show(ALIGN.right,0,lmd(Object.keys(li.vars).map(lms),Object.values(li.vars)))
+		if(menu_item('Show Locals',1)){
+			const loc=lmd();for(let k of li.vars.keys())dset(loc,lms(k),li.vars.get(k))
+			listen_show(ALIGN.right,0,loc)
+		}
 		menu_separator()
 		if(menu_item('Evaluate',rtext_len(ms.text.table)))listener_eval()
 	}
@@ -3476,7 +3480,7 @@ main_view=_=>{
 			draw_text_outlined(rect(size.x,size.y-s.y,s.x,s.y),n,FONT_BODY)
 		})
 	}
-	if(ob.show_cursor&&ms.type==null&&uimode in {draw:1,object:1}){
+	if(ob.show_cursor&&ms.type==null&&({draw:1,object:1})[uimode]){
 		ev=ev_to_con(ev);
 		const cursor=(x,r)=>{
 			const t=ls(dyad.format(lms(x),lml([r.x,r.y,r.w,r.h].map(lmn)))),s=font_textsize(FONT_BODY,t)
@@ -3646,7 +3650,7 @@ q('body').onkeydown=e=>{
 	if(e.key=='f'&&ms.type==null&&!wid.ingrid&&!wid.infield)toggle_fullscreen
 	if(e.key=='j'&&ms.type==null&&dr.limbo_dither&&dr.dither_threshold>-2.0)dr.dither_threshold-=.1
 	if(e.key=='k'&&ms.type==null&&dr.limbo_dither&&dr.dither_threshold< 2.0)dr.dither_threshold+=.1
-	if((e.metaKey||e.ctrlKey)&&e.key in {c:1,x:1,v:1}){}
+	if((e.metaKey||e.ctrlKey)&&({c:1,x:1,v:1})[e.key]){}
 	else{e.preventDefault()}
 }
 q('body').onkeyup=e=>{

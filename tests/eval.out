@@ -1,5 +1,6 @@
 {"value":0,"vars":{},"error":"Invalid character '`'.","errorpos":(1,3)}
 "'do' is a keyword, and cannot be used for a variable name."
+{"value":0,"vars":{"__proto__":0}}
 {"value":0,"vars":{}}
 {"value":3,"vars":{}}
 5

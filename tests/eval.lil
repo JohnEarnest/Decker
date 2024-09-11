@@ -5,6 +5,9 @@ show[eval["\n99`5"]]
 # inappropriate keyword
 show[eval["if 1 do 2 else 3 end"].error]
 
+# cursed identifiers
+show[eval["__proto__:toString"]]
+
 # empty expression
 show[eval[""]]
 
