@@ -958,7 +958,7 @@ function triads(name,x,y,z,  r,rc,i,j,col,ci,t){
 function show_dat(row,w,cols,  r,z,c){
 	r="|";for(z=0;z<count(cols);z++){c=lvs(l_limit(lmn(w[z]),lst_get(dic_getv(cols,z),row)));r=r " "c repeat_char(" ",w[z]-length(c))" |"};return r
 }
-function show(ptr,toplevel,  r,z,t,w,cols,col,row,fmt,arr,c){
+function show(ptr,toplevel,  r,z,t,w,cols,col,row,fmt,arr,c,d){
 	if(ptr==-1)return "NULL"
 	if(lin(ptr))return wnum(lvn(ptr))
 	if(lis(ptr)){
@@ -971,7 +971,10 @@ function show(ptr,toplevel,  r,z,t,w,cols,col,row,fmt,arr,c){
 	if(lion(ptr)){return "on "lon_name(ptr)" "lvs(l_fuse(lms(" "),lon_args(ptr)))(count(lon_args(ptr))?" ":"")"do ... end"}
 	if(linat(ptr)){return "on native x do ... end"}
 	if(lii(ptr)){return "<"li_name(ptr)">"}
-	if(lit(ptr)&&!toplevel){return "insert "lvs(ls(l_fuse(lms(" "),l_keys(ptr))))" with "lvs(l_fuse(lms(" "),l_raze(l_flip(l_range(ptr)))))" end"}
+	if(lit(ptr)&&!toplevel){
+		d=rowcount(ptr)?lvs(l_fuse(lms(" "),l_raze(l_flip(l_range(ptr)))))" ":"";
+		return "insert "lvs(ls(l_fuse(lms(" "),l_keys(ptr))))" with "d"end"
+	}
 	if(lit(ptr)){
 		if(!count(ptr))return"++\n||\n++"
 		cols=lml();for(z=0;z<count(ptr);z++){

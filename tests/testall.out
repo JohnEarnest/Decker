@@ -58,6 +58,7 @@ monads:
 +-----+
 | key |
 +-----+
+insert value with end insert key with end
 +-------+-----+-----+-------+------+
 | key   | tax | gas | power | food |
 +-------+-----+-----+-------+------+

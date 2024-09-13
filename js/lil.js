@@ -800,7 +800,10 @@ interface_system=lmi((self,i,x)=>{
 	return x?x:NONE
 },'system')
 showt=(x,toplevel)=>{
-	if(!toplevel)return `insert ${tab_cols(x).join(' ')} with ${monad.rows(x).v.map(r=>r.v.map(v=>show(v)).join(' ')).join(' ')} end`
+	if(!toplevel){
+		const d=monad.rows(x).v.map(r=>r.v.map(v=>show(v)).join(' ')).join(' ')
+		return `insert ${tab_cols(x).join(' ')} with ${d?d+' ':''}end`
+	}
 	try{
 	const w=tab_cols(x).map(k=>tab_get(x,k).reduce((x,y)=>max(x,show(y).length+2),k.length+2))
 	const s='+'+tab_cols(x).map((x,i)=>"-".repeat(w[i])).join('+')+'+'
