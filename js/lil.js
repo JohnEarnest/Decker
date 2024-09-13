@@ -5,7 +5,7 @@ lmn  =x      =>(allocs++,{t:'num',v:isFinite(x)?+x:0}),   lin  =x=>x&&x.t=='num'
 lms  =x      =>(allocs++,{t:'str',v:''+x }),              lis  =x=>x&&x.t=='str'
 lml  =x      =>(allocs++,{t:'lst',v:x    }),              lil  =x=>x&&x.t=='lst'
 lmd  =(k,v)  =>(allocs++,{t:'dic',k:k||[],v:v||[]}),      lid  =x=>x&&x.t=='dic'
-lmt  =x      =>(allocs++,{t:'tab',v:x    }),              lit  =x=>x&&x.t=='tab'
+lmt  =_      =>(allocs++,{t:'tab',v:new Map()}),          lit  =x=>x&&x.t=='tab'
 lmi  =(f,n,x)=>(allocs++,{t:'int',f,n}),                  lii  =x=>x&&x.t=='int'
 lmon =(n,a,b)=>(allocs++,{t:'on' ,n:n,a:a,b:b,c:null}),   lion =x=>x&&x.t=='on'
 lmnat=f      =>(allocs++,{t:'nat',f:f}),                  linat=x=>x&&x.t=='nat'
@@ -23,20 +23,42 @@ wnum=y=>{
 }
 mod=(x,y)=>x-y*Math.floor(x/y)
 range=x=>Array.from(Array(x)).map((_,i)=>i)
-torect=t=>{const n=Object.values(t).reduce((x,y)=>max(x,lil(y)?count(y):1),0);Object.keys(t).map(k=>t[k]=take(n,lil(t[k])?t[k].v:[t[k]]))}
-count=x=>lin(x)?1: lis(x)||lil(x)||lid(x)?x.v.length: lit(x)?(Object.values(x.v)[0]||[]).length:0
-rows=x=>{const t=lt(x);return lml(range(count(t)).map(i=>lmd(Object.keys(t.v).map(lms),Object.values(t.v).map(x=>x[i]))))}
+tab_get=(t,c)=>t.v.get(c)
+tab_has=(t,c)=>t.v.get(c)!=undefined
+tab_cell=(t,c,i)=>(t.v.get(c)||[])[i]
+tab_set=(t,c,v)=>t.v.set(c,v)
+tab_cols=t        =>{const r=[]   ;for(let k of t.v.keys())r.push(k);return r}
+tab_row=(t,i)     =>{const r=lmd();for(let k of t.v.keys())dset(r,lms(k),tab_cell(t,k,i));return r}
+tab_splice=(f,x,t)=>{const r=lmt();for(let k of t.v.keys())tab_set(r,k,f(x,tab_get(t,k)));return r}
+tab_clone=t       =>{const r=lmt();for(let k of t.v.keys())tab_set(r,k,tab_get(t,k).slice(0));return r}
+tab_rowcount=t=>!t.v.size?0: t.v.values().next().value.length
+torect=t=>{
+	let n=0;for(let x of t.v.values())n=max(n,lil(x)?count(x):1);
+	for(let k of t.v.keys()){const v=tab_get(t,k);tab_set(t,k,take(n,lil(v)?v.v:[v]))}
+}
+count=x=>lin(x)?1: lis(x)||lil(x)||lid(x)?x.v.length: lit(x)?tab_rowcount(x): 0
+rows=x=>{const t=lt(x);return lml(range(tab_rowcount(t)).map(i=>tab_row(t,i)))}
 coltab=x=>{
-	const n=lmn(x.v.reduce((x,y)=>max(x,lil(y)?count(y):1),0))
-	return lmt(x.k.reduce((r,k,i)=>(r[ls(k)]=dyad.take(n,lil(x.v[i])?x.v[i]:lml([x.v[i]])).v,r),{}))
+	const n=lmn(x.v.reduce((x,y)=>max(x,lil(y)?count(y):1),0)),r=lmt()
+	x.k.map((k,i)=>tab_set(r,ls(k),dyad.take(n,dyad.take(n,lil(x.v[i])?x.v[i]:lml([x.v[i]]))).v));return r
 }
 rowtab=x=>{
-	const ok=[],t={};x.v.map(r=>r.k.map(k=>{if(!t[ls(k)])ok.push(k);t[ls(k)]=[]}))
-	x.v.map(x=>Object.keys(t).map((k,i)=>t[k].push(dget(x,ok[i])||NONE)));return lmt(t)
+	const ok=[],t=lmt()
+	x.v.map(r=>r.k.map(k=>{if(!tab_has(t,ls(k)))ok.push(k);tab_set(t,ls(k),[])}))
+	x.v.map(x=>ok.map(k=>tab_get(t,ls(k)).push(dget(x,k)||NONE)));return t
 }
 listab=x=>{
-	const m=x.v.reduce((r,x)=>max(r,count(x)),0);const t={};for(let z=0;z<m;z++)t['c'+z]=[]
-	x.v.map(row=>{for(let z=0;z<m;z++)t['c'+z].push(z>=count(row)?NONE:row.v[z])});return lmt(t)
+	const m=x.v.reduce((r,x)=>max(r,count(x)),0);const t=lmt();for(let z=0;z<m;z++)tab_set(t,'c'+z,[])
+	x.v.map(row=>{for(let z=0;z<m;z++)tab_get(t,'c'+z).push(z>=count(row)?NONE:row.v[z])});return t
+}
+tflip=x=>{
+	const c=tab_cols(x),kk=c.indexOf('key')>-1?'key':c[0],k=(tab_get(x,kk)||[]).map(ls),cc=c.filter(k=>k!=kk),r=lmt()
+	tab_set(r,'key',cc.map(lms));k.map((k,i)=>tab_set(r,k,cc.map(c=>tab_cell(x,c,i))));return r
+}
+tcat=(x,y)=>{
+	const r=lmt()
+	tab_cols(x).map(k=>tab_set(r,k,tab_get(x,k).concat(tab_has(y,k)?[]:range(count(y)).map(x=>NONE))))
+	tab_cols(y).map(k=>tab_set(r,k,(tab_has(x,k)?tab_get(x,k):range(count(x)).map(x=>NONE)).concat(tab_get(y,k))));return r
 }
 zip=(x,y,f)=>{const n=count(x),o=count(y)<n?take(n,y.v):y.v;return x.v.map((x,i)=>f(x,o[i%n]))}
 dzip=(x,y,f)=>{
@@ -46,17 +68,16 @@ dzip=(x,y,f)=>{
 match=(x,y)=>x==y?1: (x.t!=y.t)||(count(x)!=count(y))?0: (lin(x)||lis(y))?x.v==y.v:
 	         lil(x)?x.v.every((z,i)=>dyad['~'](z,y.v[i]).v): lit(x)?dyad['~'](rows(x),rows(y)).v:
 	         lid(x)?x.v.every((z,i)=>dyad['~'](z,y.v[i]).v&&dyad['~'](x.k[i],y.k[i]).v):0
-
-splicet=(f,x,t)=>{const r={};Object.keys(t.v).map(k=>r[k]=f(x,t.v[k]));return lmt(r)}
-splice=(f,x,y)=>lis(y)?lms(f(x,ll(y)).map(ls).join('')): lid(y)?lmd(f(x,y.k),f(x,y.v)): lit(y)?splicet(f,x,y): lml(f(x,ll(y)))
-ina=(x,y)=>lmn(lis(y)?y.v.indexOf(ls(x))>=0: lil(y)?y.v.some(y=>match(x,y)): lid(y)?dget(y,x)!=undefined: lit(y)?y.v.hasOwnProperty(ls(x)): x==y)
+splice=(f,x,y)=>lis(y)?lms(f(x,ll(y)).map(ls).join('')): lid(y)?lmd(f(x,y.k),f(x,y.v)): lit(y)?tab_splice(f,x,y): lml(f(x,ll(y)))
+ina=(x,y)=>lmn(lis(y)?y.v.indexOf(ls(x))>=0: lil(y)?y.v.some(y=>match(x,y)): lid(y)?dget(y,x)!=undefined: lit(y)?tab_has(y,ls(x)): x==y)
 filter=(i,x,y)=>{
 	x=lis(x)?monad.list(x):lml(ll(x))
 	if(lid(y)){const r=lmd();y.k.forEach((k,v)=>i==lb(ina(k,x))&&dset(r,k,y.v[v]));return r}
-	if(!lit(y))return lml(ll(y).filter(z=>i==lb(ina(z,x)))); const n=x.v.every(lin),nx=x.v.map(ln),ix=y.v[Object.keys(y.v)[0]]||[]
-	if(n&&i){const r=dyad.take(NONE,y);nx.forEach(i=>{Object.keys(y.v).map(c=>{const v=y.v[c][i];if(v)r.v[c].push(v)})});return r}
-	if(n&&!i){const r=dyad.take(NONE,y);ix.forEach((_,i)=>{if(nx.indexOf(i)<0)Object.keys(y.v).map(c=>r.v[c].push(y.v[c][i]))});return r}
-	return lmt(Object.keys(y.v).reduce((t,k)=>(i==lb(ina(lms(k),x))&&(t[k]=y.v[k]),t),{}))
+	if(!lit(y))return lml(ll(y).filter(z=>i==lb(ina(z,x))))
+	const n=x.v.every(lin),nx=x.v.map(ln),ix=range(tab_rowcount(y))
+	if(n&& i){const r=dyad.take(NONE,y);nx.forEach(i=>{for(c of y.v.keys()){const v=tab_cell(y,c,i);if(v)tab_get(r,c).push(v)}});return r}
+	if(n&&!i){const r=dyad.take(NONE,y);ix.forEach(i=>{if(nx.indexOf(i)<0){for(let c of y.v.keys())tab_get(r,c).push(tab_cell(y,c,i))}});return r}
+	const r=lmt();for(let k of y.v.keys())if(i==lb(ina(lms(k),x)))tab_set(r,k,tab_get(y,k));return r
 }
 take=(x,y)=>{const n=y.length, s=x<0?mod(x,n):0; return range(abs(x)).map(z=>y[mod(z+s,n)]||NONE)}
 dkix=(dict,key)=>dict.k.findIndex(x=>match(key,x)), dget=(dict,key)=>dict.v[dkix(dict,key)]
@@ -65,14 +86,13 @@ dset=(d,k,v)=>{const i=d.k.findIndex(x=>match(x,k));if(i<0){d.k.push(k),d.v.push
 union=(x,y)=>{const r=lmd(x.k.slice(0),x.v.slice(0));y.k.forEach(k=>dset(r,k,dget(y,k)));return r}
 amend=(x,i,y)=>{
 	if(lii(x))return x.f(x,i,y)
-	const clonetab=x=>{const r={};Object.keys(x.v).map((k,i)=>{r[k]=x.v[k].slice(0)});return r}
 	if(lit(x)&&lin(i)){
-		const r=clonetab(x), rn=count(x), cols=ll(monad.keys(x)), ri=0|ln(i); y=lid(y)?y: lmd(cols, new Array(cols.length).fill(y))
-		if(ri>=0&&ri<rn)y.k.map((k,i)=>{k=ls(k);if(r.hasOwnProperty(k))r[k][ri]=y.v[i]});return lmt(r)
+		const r=tab_clone(x), rn=count(x), cols=ll(monad.keys(x)), ri=0|ln(i); y=lid(y)?y: lmd(cols, new Array(cols.length).fill(y))
+		if(ri>=0&&ri<rn)y.k.map((k,i)=>{k=ls(k);if(tab_has(r,k))tab_get(r,k)[ri]=y.v[i]});return r
 	}
 	if(lit(x)&&lis(i)){
-		const r=clonetab(x), rn=count(x), c=lil(y)?ll(y).slice(0,rn): new Array(rn).fill(y)
-		while(c.length<rn)c.push(NONE);r[ls(i)]=c;return lmt(r)
+		const r=tab_clone(x), rn=count(x), c=lil(y)?ll(y).slice(0,rn): new Array(rn).fill(y)
+		while(c.length<rn)c.push(NONE);tab_set(r,ls(i),c);return r
 	}
 	if(!lis(x)&&!lil(x)&&!lid(x))return amend(lml([]),i,y)
 	if((lil(x)||lis(x))&&(!lin(i)||(ln(i)<0||ln(i)>count(x))))return amend(ld(x),i,y)
@@ -82,7 +102,7 @@ amend=(x,i,y)=>{
 l_at=(x,y)=>{
 	if(lii(x))return lis(y)&&y.v=='type'?lms(x.n): x.f(x,y)
 	if(lit(x)&&lin(y))x=monad.rows(x); if((lis(x)||lil(x))&&!lin(y))x=ld(x)
-	return lis(x)?lms(x.v[ln(y)|0]||''): lil(x)?x.v[ln(y)|0]||NONE: lid(x)?dget(x,y)||NONE: lit(x)&&lis(y)?lml(x.v[ls(y)]): NONE
+	return lis(x)?lms(x.v[ln(y)|0]||''): lil(x)?x.v[ln(y)|0]||NONE: lid(x)?dget(x,y)||NONE: lit(x)&&lis(y)?lml(tab_get(x,ls(y))): NONE
 }
 amendv=(x,i,y,n,tla)=>{
 	if(lii(x))tla.v=0;const f=monad.first(i[n]||NONE)
@@ -94,22 +114,12 @@ ln=x=>lin(x)?x.v: lis(x)?(isFinite(x.v)?+x.v:0): lil(x)||lid(x)?ln(x.v[0]): 0
 ls=x=>lin(x)?wnum(x.v): lis(x)?x.v: lil(x)?x.v.map(ls).join(''): ''
 ll=x=>lis(x)?x.v.split('').map(lms): lil(x)||lid(x)?x.v: lit(x)?rows(x).v: [x]
 ld=x=>lid(x)?x:lit(x)?monad.cols(x):lil(x)||lis(x)?lmd(range(count(x)).map(lmn),lis(x)?ll(x):x.v):lmd()
-lt=x=>lit(x)?x: lid(x)||lil(x)?lmt((lid(x)?['key','value']:['value']).reduce((t,k,i)=>(t[k]=x[k[0]],t),{})): lmt({value:ll(x)})
+lt=x=>{if(lit(x))return x;const r=lmt();if(lid(x)){tab_set(r,'key',x.k.slice(0))};tab_set(r,'value',ll(x));return r}
 vm=f=>{const r=x=>lid(x)?lmd(x.k,x.v.map(r)):lil(x)?lml(x.v.map(r)):f(x);return r}
 vd=f=>{const r=(x,y)=>
 	 lid(x)&lid(y)?dzip(x,y,r)    :lid(x)&!lid(y)?lmd(x.k.slice(0),x.v.map(x=>r(x,y))):!lid(x)&lid(y)?lmd(y.k.slice(0),y.v.map(y=>r(x,y))):
 	 lil(x)&lil(y)?lml(zip(x,y,r)):lil(x)&!lil(y)?lml(x.v.map(x=>r(x,y)))             :!lil(x)&lil(y)?lml(y.v.map(y=>r(x,y))): f(x,y);return r}
 vmnl=f=>{const r=x=>lil(x)?(ll(x).some(x=>!lin(x))?lml(x.v.map(r)):f(x)):f(x);return r}
-tflip=x=>{
-	const c=Object.keys(x.v), kk=c.indexOf('key')>-1?'key':c[0], k=(x.v[kk]||[]).map(ls), cc=c.filter(k=>k!=kk)
-	return lmt(k.reduce((r,k,i)=>{r[k]=cc.map(c=>x.v[c][i]);return r},{key:cc.map(lms)}))
-}
-tcat=(x,y)=>{
-	const r={}
-	Object.keys(x.v).map(k=>r[k]=x.v[k].concat(y.v[k]?[]:range(count(y)).map(x=>NONE)))
-	Object.keys(y.v).map(k=>r[k]=(x.v[k]?x.v[k]:range(count(x)).map(x=>NONE)).concat(y.v[k]))
-	return lmt(r)
-}
 fstr=x=>{
 	let ct=0;return x.split('').map(x=>{
 		let e=0;if(x=='<'){ct=1}else if(x=='/'&&ct){e=1}else if(x!=' '&&x!='\n'){ct=0}
@@ -120,7 +130,7 @@ fjson=x=>lin(x)?wnum(x.v): lit(x)?fjson(rows(x)): lil(x)?`[${x.v.map(fjson).join
          lis(x)?`"${fstr(x.v)}"`:lid(x)?`{${x.k.map((k,i)=>`${fjson(lms(ls(k)))}:${fjson(x.v[i])}`).join(',')}}`:'null'
 flove=x=>lin(x)||lis(x)?fjson(x): lil(x)?`[${x.v.map(flove).join(',')}]`:
          lid(x)?`{${x.k.map((k,i)=>`${flove(k)}:${flove(x.v[i])}`).join(',')}}`:
-         lit(x)?`<${Object.keys(x.v).map(k=>`${flove(lms(k))}:${flove(lml(x.v[k]))}`).join(',')}>`:
+         lit(x)?`<${tab_cols(x).map(k=>`${flove(lms(k))}:${flove(lml(tab_get(x,k)))}`).join(',')}>`:
          lii(x)?ls(ifield(x,'encoded')): 'null'
 pjson=(y,h,n)=>{
 	const si=h, hn=_=>m&&y[h]&&(n?h-si<n:1), hnn=x=>m&&h+x<=y.length&&(n?h+x-si<n:1)
@@ -161,7 +171,7 @@ format_has_names=x=>{
 		let d=0;while(/[0-9]/.test(x[f]))d=d*10+(+x[f++]);if(!x[f])break;const t=x[f++];if(t=='r'||t=='o')while(d&&x[f])d--,f++
 	}return 0
 }
-razetab=x=>{const t=Object.values(x.v);return dyad.dict(lml(t[0]||[]),lml(t[1]||[]))}
+razetab=x=>{const k=tab_cols(x);return dyad.dict(lml(tab_get(x,k[0])||[]),lml(tab_get(x,k[1])||[]))}
 monad={
 	'-':    vm(x=>lmn(-ln(x))),
 	'!':    vm(x=>lb(x)?NONE:ONE),
@@ -189,11 +199,14 @@ monad={
 	typeof: x=>lms(({num:"number",str:"string",lst:"list",dic:"dict",tab:"table",on:"function",nat:"function"})[x.t]||x.n||"interface"),
 	flip:   x=>lit(x)?tflip(x):lml(range(ll(x).reduce((w,z)=>max(w,lil(z)?count(z):1),0)).map(i=>lml(ll(x).map(c=> !lil(c)?c: i<count(c)?c.v[i]: NONE)))),
 	rows:   x=>rows(x),
-	cols:   x=>{const t=lt(x).v;return lmd(Object.keys(t).map(lms),Object.values(t).map(lml))},
+	cols:   x=>{const t=lt(x),k=tab_cols(t);return lmd(k.map(lms),k.map(x=>lml(tab_get(t,x))))},
 	table:  x=>lid(x)?coltab(x): lil(x)&&x.v.every(lid)?rowtab(x): lil(x)&&x.v.every(lil)?listab(x): lt(x),
 	'@tab': t=>{
-		t=lt(t);const r=lmt({});Object.keys(t.v).map(k=>r.v[k]=t.v[k].slice(0))
-		r.v.index=range(count(r)).map(lmn),r.v.gindex=r.v.index.slice(0),r.v.group=r.v.index.map(x=>NONE);return r
+		t=lt(t);const r=tab_clone(t)
+		tab_set(r,'index' ,range(count(r)).map(lmn))
+		tab_set(r,'gindex',range(count(r)).map(lmn))
+		tab_set(r,'group' ,range(count(r)).map(x=>NONE))
+		return r
 	},
 }
 dyad={
@@ -225,18 +238,20 @@ dyad={
 	unless:(x,y)=>lin(y)&&ln(y)==0?x:y,
 	join: (x,y)=>{ // natural join on tables.
 		const f=x=>lin(x)?monad.range(x):lml(ll(x));if(!lit(x)||!lit(y))return lml(zip(f(x),f(y),dyad[',']))
-		const a=x,b=y,ak=Object.keys(a.v),bk=Object.keys(b.v), ik=bk.filter(x=>ak.indexOf(x)>=0),dk=bk.filter(x=>ak.indexOf(x)<0)
-		const r=lmt({}); ak.forEach(k=>r.v[k]=[]), dk.forEach(k=>r.v[k]=[])
-		for(let ai=0;ai<count(a);ai++)for(let bi=0;bi<count(b);bi++)
-			if(ik.every(k=>match(a.v[k][ai],b.v[k][bi])))ak.forEach(k=>r.v[k].push(a.v[k][ai])),dk.forEach(k=>r.v[k].push(b.v[k][bi]))
+		const a=x,b=y,ak=tab_cols(a),bk=tab_cols(b), ik=bk.filter(x=>ak.indexOf(x)>=0),dk=bk.filter(x=>ak.indexOf(x)<0)
+		const r=lmt(); ak.forEach(k=>tab_set(r,k,[])), dk.forEach(k=>tab_set(r,k,[]))
+		for(let ai=0;ai<count(a);ai++)for(let bi=0;bi<count(b);bi++)if(ik.every(k=>match(tab_cell(a,k,ai),tab_cell(b,k,bi))))
+			ak.forEach(k=>tab_get(r,k).push(tab_cell(a,k,ai))),dk.forEach(k=>tab_get(r,k).push(tab_cell(b,k,bi)))
 		return r
 	},
 	cross: (x,y)=>{ // cartesian join; force columns to be unique:
 		const f=x=>lt(lin(x)?monad.range(x):lml(ll(x)));if(!lit(x)||!lit(y))return lml(rows(dyad.cross(f(x),f(y))).v.map(x=>lml(x.v)))
-		const a=lt(x),b=lt(y), ak=Object.keys(a.v),bk=Object.keys(b.v), uk=bk.map(x=>ak.indexOf(x)>=0?x+'_':x)
-		const r=lmt({}); ak.forEach(k=>r.v[k]=[]), uk.forEach(k=>r.v[k]=[])
-		for(let bi=0;bi<count(b);bi++)for(let ai=0;ai<count(a);ai++)ak.forEach(k=>r.v[k].push(a.v[k][ai])),bk.forEach((k,i)=>r.v[uk[i]].push(b.v[k][bi]))
-		return r
+		const a=lt(x),b=lt(y), ak=tab_cols(a),bk=tab_cols(b), uk=bk.map(x=>ak.indexOf(x)>=0?x+'_':x)
+		const r=lmt(); ak.forEach(k=>tab_set(r,k,[])), uk.forEach(k=>tab_set(r,k,[]))
+		for(let bi=0;bi<count(b);bi++)for(let ai=0;ai<count(a);ai++){
+			ak.forEach(k=>tab_get(r,k).push(tab_cell(a,k,ai)))
+			bk.forEach((k,i)=>tab_get(r,uk[i]).push(tab_cell(b,k,bi)))
+		}return r
 	},
 	parse: (x,y)=>{
 		if(lil(y))return lml(y.v.map(y=>dyad.parse(x,y)))
@@ -347,13 +362,13 @@ dyad={
 	'@where': (col,tab)=>{
 		const w=dyad.take(lmn(count(tab)),lml(ll(col)))
 		const p=lml(range(count(tab)).filter(i=>lb(w.v[i])).map(lmn))
-		const r=dyad.take(p,tab);r.v.gindex=range(count(r)).map(lmn);return r
+		const r=dyad.take(p,tab);tab_set(r,'gindex',range(count(r)).map(lmn));return r
 	},
 	'@by': (col,tab)=>{
 		const b=dyad.take(lmn(count(tab)),lml(ll(col))), r=monad.rows(tab), u=b.v.reduce((x,y)=>{dset(x,y,y);return x},lmd([],[]))
 		const rows=u.v.map((v,group)=>{
 			const p=lml(range(count(tab)).filter(x=>match(v,b.v[x])).map(lmn))
-			const s=dyad.take(p,tab);s.v.gindex=range(count(s)).map(lmn),s.v.group=range(count(s)).map(_=>lmn(group));return s;
+			const s=dyad.take(p,tab);tab_set(s,'gindex',range(count(s)).map(lmn)),tab_set(s,'group',range(count(s)).map(_=>lmn(group)));return s
 		});return lml(rows)
 	},
 }
@@ -363,7 +378,7 @@ merge=(vals,keys,widen)=>{
 	if(widen)vals.v=vals.v.filter(x=>count(dget(x,i)))
 	if(count(vals)==0)vals.v.push(keys.v.reduce((x,y)=>dset(x,y,lml([])),lmd()))
 	let r=monad.raze(lml(vals.v.map(x=>monad.table(widen?x:dyad.drop(i,x)))))
-	if(widen){ix=lml(r.v['@index']),r=dyad.drop(i,r)}
+	if(widen){ix=lml(tab_get(r,'@index')),r=dyad.drop(i,r)}
 	return {r,ix}
 }
 n_uplevel=([a])=>{let i=2, e=getev(), r=null, name=ls(a); while(e&&i){r=e.v.get(name);if(r)i--;e=e.p};return r||NONE}
@@ -394,7 +409,7 @@ triad={
 			return a-b // produce a stable sort
 		})
 		const rt=dyad.take(lml(pv.map(lmn)),tab)
-		rt.v.gindex=range(count(tab)).map(lmn);return rt
+		tab_set(rt,'gindex',range(count(tab)).map(lmn));return rt
 	},
 	'@sel': (orig,vals,keys)=>{
 		const mv=merge(vals,keys,0);return count(keys)>1?mv.r: dyad.take(mv.ix,dyad.drop(lml(['index','gindex','group'].map(lms)),orig))
@@ -405,9 +420,9 @@ triad={
 	},
 	'@upd': (orig,vals,keys)=>{
 		orig=dyad.drop(lml(['index','gindex','group'].map(lms)),orig);const mv=merge(vals,keys,1),r=mv.r,ix=mv.ix
-		Object.keys(r.v).map(c=>{
-			if(r.v[c]==ix)return;const ci=orig.v.hasOwnProperty(c), col=range(count(orig)).map(z=>ci?orig.v[c][z]:NONE)
-			orig.v[c]=col,ix.v.map((x,row)=>col[0|ln(x)]=r.v[c][row])
+		tab_cols(r).map(c=>{
+			if(tab_get(r,c)==ix)return;const ci=tab_has(orig,c),col=range(count(orig)).map(z=>ci?tab_cell(orig,c,z):NONE)
+			tab_set(orig,c,col),ix.v.map((x,row)=>col[0|ln(x)]=tab_cell(r,c,row))
 		});return orig
 	},
 	'@ins': (v,n,x)=>{
@@ -682,17 +697,17 @@ runop=_=>{
 		}
 		case op.NEXT :{const v=arg(),r=arg(),s=arg();state.e.pop();if(lid(r))r.k.push(s.k[r.v.length]);r.v.push(v),ret(s),ret(r),setpc(imm);break}
 		case op.COL  :{
-			const ex=arg(),t=arg(),n=Object.keys(t.v),v=lml(Object.values(t.v).map(lml));ret(t)
-			n.push('column'),v.v.push(t),issue(env_bind(getev(),n,v),ex);break
+			const ex=arg(),t=arg(),n=tab_cols(t),v=ll(monad.cols(t));ret(t)
+			n.push('column'),v.push(t),issue(env_bind(getev(),n,lml(v)),ex);break
 		}
 	}while(running()&&getpc()>=blk_here(getblock()))descope()
 }
 
 fchar=x=>x=='I'?'i': x=='B'?'b': x=='L'?'s': x
 n_writecsv=([x,y,d])=>{
-	let r='', spec=y?ls(y).split(''):[];const t=lt(x), c=Object.keys(t.v).length; d=d?ls(d)[0]:','
+	let r='', spec=y?ls(y).split(''):[];const t=lt(x), c=tab_cols(t).length; d=d?ls(d)[0]:','
 	while(spec.length<c)spec.push('s')
-	let n=0;spec.forEach((x,i)=>{if(x=='_')return;if(n)r+=d;n++;r+=Object.keys(t.v)[i]||`c${i+1}`})
+	let n=0;spec.forEach((x,i)=>{if(x=='_')return;if(n)r+=d;n++;r+=tab_cols(t)[i]||`c${i+1}`})
 	rows(t).v.forEach(row=>{
 		r+='\n';let n=0, cols=Object.keys(row.v);spec.forEach((x,i)=>{
 			if(x=='_')return;if(n)r+=d;n++
@@ -702,24 +717,24 @@ n_writecsv=([x,y,d])=>{
 	});return lms(r)
 }
 n_readcsv=([x,y,d])=>{
-	let i=0,n=0, spec=y&&lis(y)?ls(y):null, text=count(x)?ls(x):'', r=lmt({}); d=d?ls(d)[0]:','
+	let i=0,n=0, spec=y&&lis(y)?ls(y):null, text=count(x)?ls(x):'', r=lmt(); d=d?ls(d)[0]:','
 	const nv=_=>{let r='';while(text[i]&&text[i]!='\n'&&text[i]!=d)r+=text[i++];return r}, match=x=>text[i]==x?(i++,1):0
 	while(i<text.length&&text[i]!='\n'){
-		while(match(' '));const v=nv();if(!spec||(n<spec.length&&spec[n]!='_'))r.v[v]=[];n++;if(match('\n'))break;while(match(' '));match(d)
+		while(match(' '));const v=nv();if(!spec||(n<spec.length&&spec[n]!='_'))tab_set(r,v,[]);n++;if(match('\n'))break;while(match(' '));match(d)
 	}
-	while(spec&&n<spec.length){if(spec[n]!='_'){r.v['c'+n]=[]};n++}
-	if(!spec)spec='s'.repeat(Object.keys(r.v).length)
-	let slots=0,slot=0;spec.split('').map(z=>{if(z!='_')slots++;});slots=min(slots,Object.keys(r.v).length),n=0
+	while(spec&&n<spec.length){if(spec[n]!='_'){tab_set(r,'c'+n,[])};n++}
+	if(!spec)spec='s'.repeat(tab_cols(r).length)
+	let slots=0,slot=0;spec.split('').map(z=>{if(z!='_')slots++;});slots=min(slots,tab_cols(r).length),n=0
 	if(i>=text.length)return r;while(i<=text.length){
 		while(match(' '));
 		let val='';if(match('"')){while(text[i]){if(match('"')){if(match('"')){val+='"'}else{break}}else{val+=text[i++]}}}else{val=nv()}
 		if(spec[n]&&spec[n]!='_'){
-			const k=Object.keys(r.v)[slot], x=(val[0]||'').toLowerCase(), s=spec[n]
+			const k=tab_cols(r)[slot], x=(val[0]||'').toLowerCase(), s=spec[n]
 			let sign=1,o=0; if(val[o]=='-')sign=-1,o++;if(val[o]=='$')o++;
-			r.v[k].push(dyad.parse(lms('%'+fchar(s)),lms(val))),slot++
+			tab_get(r,k).push(dyad.parse(lms('%'+fchar(s)),lms(val))),slot++
 		};n++
 		if(i>=text.length||text[i]=='\n'){
-			while(n<spec.length){const u=spec[n++];if(u!='_'&&slot<slots)r.v[Object.keys(r.v)[slot++]].push('sluvroq'.indexOf(u)>=0?lms(''):NONE);}
+			while(n<spec.length){const u=spec[n++];if(u!='_'&&slot<slots)tab_get(r,tab_cols(r)[slot++]).push('sluvroq'.indexOf(u)>=0?lms(''):NONE);}
 			if(text[i]=='\n'&&i==text.length-1)break;i++,n=0,slot=0
 		}else{while(match(' '));match(d)}
 	};return r
@@ -785,13 +800,13 @@ interface_system=lmi((self,i,x)=>{
 	return x?x:NONE
 },'system')
 showt=(x,toplevel)=>{
-	if(!toplevel)return `insert ${Object.keys(x.v).join(' ')} with ${monad.rows(x).v.map(r=>r.v.map(v=>show(v)).join(' ')).join(' ')} end`
+	if(!toplevel)return `insert ${tab_cols(x).join(' ')} with ${monad.rows(x).v.map(r=>r.v.map(v=>show(v)).join(' ')).join(' ')} end`
 	try{
-	const w=Object.keys(x.v).map(k=>x.v[k].reduce((x,y)=>max(x,show(y).length+2),k.length+2))
-	const s='+'+Object.keys(x.v).map((x,i)=>"-".repeat(w[i])).join('+')+'+'
-	const v=(Object.values(x.v)[0]||[]).map((_,r)=>Object.keys(x.v).map(k=>' '+show(x.v[k][r])).map((f,i)=>f+(' '.repeat(max(0,w[i]-f.length)))))
+	const w=tab_cols(x).map(k=>tab_get(x,k).reduce((x,y)=>max(x,show(y).length+2),k.length+2))
+	const s='+'+tab_cols(x).map((x,i)=>"-".repeat(w[i])).join('+')+'+'
+	const v=range(tab_rowcount(x)).map(r=>tab_cols(x).map(k=>' '+show(tab_cell(x,k,r))).map((f,i)=>f+(' '.repeat(max(0,w[i]-f.length)))))
 	         .map(x=>`|${x.join('|')}|`).join('\n')
-	return `${s}\n|${Object.keys(x.v).map((x,i)=>` ${x+(' '.repeat(w[i]-x.length-2))} `).join('|')}|\n${s}${v.length?'\n'+v+'\n'+s:''}`
+	return `${s}\n|${tab_cols(x).map((x,i)=>` ${x+(' '.repeat(w[i]-x.length-2))} `).join('|')}|\n${s}${v.length?'\n'+v+'\n'+s:''}`
 	}catch(err){console.log('cannot serialize',x);throw err}
 }
 show=(x,toplevel)=>linat(x)?'on native x do ... end':
@@ -1219,7 +1234,7 @@ layout_plaintext=(text,font,align,mx)=>{
 }
 layout_richtext=(deck,table,font,align,width)=>{
 	const layout=[],lines=[],cursor=rect(0,0), lnl=_=>(cursor.x=0,cursor.y+=1), ws=x=>x=='\n'||x==' '
-	const texts=table.v.text, fonts=table.v.font, args=table.v.arg
+	const texts=tab_get(table,'text'), fonts=tab_get(table,'font'), args=tab_get(table,'arg')
 	for(let chunk=0;chunk<texts.length;chunk++){
 		const f=dget(deck.fonts,fonts[chunk])||font, fh=font_h(f), fs=font_sw(f)
 		if(image_is(args[chunk])){
@@ -1741,48 +1756,53 @@ font_read=s=>{
 }
 font_write=x=>data_write('FNT0',x.pix)
 
-rtext_len=tab=>tab.v.text.reduce((x,y)=>x+ls(y).length,0)
-rtext_get=(tab,n)=>{let i=0;for(let z=0;z<tab.v.text.length;z++){i+=count(tab.v.text[z]);if(i>=n)return z}return -1}
-rtext_getr=(tab,x)=>{let i=0;for(let z=0;z<tab.v.text.length;z++){const c=count(tab.v.text[z]);if(i+c>=x)return rect(i,i+c);i+=c}return rect(x,x)}
+rtext_empty=_=>{const r=lmt();tab_set(r,'text',[]),tab_set(r,'font',[]),tab_set(r,'arg',[]);return r}
+rtext_len=tab=>tab_get(tab,'text').reduce((x,y)=>x+ls(y).length,0)
+rtext_get=(tab,n)=>{const t=tab_get(tab,'text');let i=0;for(let z=0;z<t.length;z++){i+=count(t[z]);if(i>=n)return z}return -1}
+rtext_getr=(tab,x)=>{const t=tab_get(tab,'text');let i=0;for(let z=0;z<t.length;z++){const c=count(t[z]);if(i+c>=x)return rect(i,i+c);i+=c}return rect(x,x)}
 rtext_make=(t,f,a)=>{
 	a=!a?'':image_is(a)?a:ls(a), f=!f?'':ls(f), t=image_is(a)?'i':!t?'':count(t)?ls(t):''
-	return lmt({text:[lms(t)],font:[lms(f)],arg:[image_is(a)?a:lms(a)]})
+	const r=lmt();tab_set(r,'text',[lms(t)]),tab_set(r,'font',[lms(f)]),tab_set(r,'arg',[image_is(a)?a:lms(a)]);return r
 }
 rtext_cast=x=>{
 	if(!x)x=lms('');if(image_is(x))return rtext_make('','',x);if(lid(x))x=monad.table(x);if(!lit(x))return rtext_make(x)
-	if(x.v.text&&x.v.font&&x.v.arg&&x.v.text.every((t,i)=>lis(t)&&lis(x.v.font[i])&&(image_is(x.v.arg[i])||lis(x.v.arg[i]))))return x
-	let r={text:lml(x.v.text||[lms('')]),font:lml(x.v.font||[lms('')]),arg:lml(x.v.arg||[lms('')])};torect(r)
-	r.text.map((_,z)=>{let i=image_is(r.arg[z]);r.text[z]=i?lms('i'):lms(ls(r.text[z])),r.font[z]=lms(ls(r.font[z])),r.arg[z]=i?r.arg[z]:lms(ls(r.arg[z]))})
-	return lmt(r)
+	const tv=tab_get(x,'text'),fv=tab_get(x,'font'),av=tab_get(x,'arg')
+	if(tv&&fv&&av&&tv.every((t,i)=>lis(t)&&lis(fv[i])&&(image_is(av[i])||lis(av[i]))))return x
+	const r=lmt();tab_set(r,'text',tv||[lms('')]),tab_set(r,'font',fv||[lms('')]),tab_set(r,'arg',av||[lms('')])
+	const tr=tab_get(r,'text'),fr=tab_get(r,'font'),ar=tab_get(r,'arg')
+	tr.map((_,z)=>{const i=image_is(ar[z]);tr[z]=i?lms('i'):lms(ls(tr[z]));fr[z]=lms(ls(fr[z]));ar[z]=i?ar[z]:lms(ls(ar[z]))});return r
 }
 rtext_append=(tab,t,f,a)=>{
 	if(image_is(a)){if(count(t)>1)t=lms('i');if(count(t)<1)return 0;}if(!count(t))return 0;
-	if(tab.v.text.length&&match(f,last(tab.v.font))&&!image_is(a)&&match(a,last(tab.v.arg))){tab.v.text[tab.v.text.length-1]=lms(last(tab.v.text).v+t.v)}
-	else{tab.v.text.push(t),tab.v.font.push(f),tab.v.arg.push(a)};return count(t)
+	const tv=tab_get(tab,'text'),fv=tab_get(tab,'font'),av=tab_get(tab,'arg')
+	if(tv.length&&match(f,last(fv))&&!image_is(a)&&match(a,last(av))){tv[tv.length-1]=lms(ls(last(tv))+ls(t))}
+	else{tv.push(t),fv.push(f),av.push(a)}return count(t)
 }
-rtext_appendr=(tab,row)=>{row.v.text.map((t,i)=>rtext_append(tab,t,row.v.font[i],row.v.arg[i]))}
+rtext_appendr=(tab,row)=>{fv=tab_get(row,'font'),av=tab_get(row,'arg');tab_get(row,'text').map((t,i)=>rtext_append(tab,t,fv[i],av[i]))}
 rtext_string=(tab,pos)=>{
 	pos=pos||rect(0,RTEXT_END);let r='',i=0,a=min(pos.x,pos.y),b=max(pos.x,pos.y)
-	tab.v.text.map(s=>{for(let z=0;z<s.v.length;z++,i++)if(i>=a&&i<b)r+=s.v[z]});return lms(r)
+	tab_get(tab,'text').map(s=>{for(let z=0;z<s.v.length;z++,i++)if(i>=a&&i<b)r+=s.v[z]});return lms(r)
 }
 rtext_is_plain=x=>{
-	if(!lit(x)||!x.v.text||!x.v.font||!x.v.arg||x.v.text.length>1)return 0;if(x.v.text.length==0)return 1
-	return ls(x.v.font[0])==''&&!image_is(x.v.arg[0])&&ls(x.v.arg[0])==''
+	if(!lit(x))return 0;const tv=tab_get(x,'text'),fv=tab_get(x,'font'),av=tab_get(x,'arg');
+	if(!tv||!fv||!av||tv.length>1)return 0;if(tv.length==0)return 1
+	return ls(fv[0])==''&&!image_is(av[0])&&ls(av[0])==''
 }
 rtext_is_image=x=>{
-	let r=null,t=x.v.text,a=x.v.arg; // look for at least one image, and other spans must be only whitespace.
+	let r=null,t=tab_get(x,'text'),a=tab_get(x,'arg'); // look for at least one image, and other spans must be only whitespace.
 	for(let z=0;z<count(x);z++){if(image_is(a[z])){if(!r)r=a[z]}else if(ls(t[z]).trim()!=''){return null}}
 	return r
 }
-rtext_read_images=x=>lml((x.v.arg||[]).filter(image_is))
+rtext_read_images=x=>lml((tab_get(x,'arg')||[]).filter(image_is))
 rtext_write_images=x=>rtext_cat(ll(x))
 rtext_span=(tab,pos)=>{
+	const tv=tab_get(tab,'text'),fv=tab_get(tab,'font'),av=tab_get(tab,'arg')
 	let r=dyad.take(NONE,tab), i=0,c=0,a=min(pos.x,pos.y),b=max(pos.x,pos.y), partial=_=>{
-		let rr='';for(let z=0;z<count(tab.v.text[c]);z++,i++)if(i>=a&&i<b)rr+=tab.v.text[c].v[z]
-		rtext_append(r,lms(rr),tab.v.font[c],tab.v.arg[c]),c++
+		let rr='';for(let z=0;z<count(tv[c]);z++,i++)if(i>=a&&i<b)rr+=tv[c].v[z]
+		rtext_append(r,lms(rr),fv[c],av[c]),c++
 	}
-	while(c<tab.v.text.length&&(i+count(tab.v.text[c]))<a)i+=count(tab.v.text[c++])                                      ;if(c<tab.v.text.length&&i<=a)partial()
-	while(c<tab.v.text.length&&(i+count(tab.v.text[c]))<b)i+=rtext_append(r,tab.v.text[c],tab.v.font[c],tab.v.arg[c]),c++;if(c<tab.v.text.length&&i< b)partial()
+	while(c<tv.length&&(i+count(tv[c]))<a)i+=count(tv[c++])                       ;if(c<tv.length&&i<=a)partial()
+	while(c<tv.length&&(i+count(tv[c]))<b)i+=rtext_append(r,tv[c],fv[c],av[c]),c++;if(c<tv.length&&i< b)partial()
 	return r
 }
 rtext_splice=(tab,font,arg,text,cursor,endcursor)=>{
@@ -1807,7 +1827,7 @@ rtext_read=x=>{
 }
 rtext_encode=x=>`%%RTX0${fjson(rtext_write(x))}`
 rtext_decode=x=>rtext_read(pjson(x,6,x.length-6).value)
-rtext_cat=x=>{let r=lmt({text:[],font:[],arg:[]});x.map(x=>rtext_appendr(r,rtext_cast(x)));return r}
+rtext_cat=x=>{let r=rtext_empty();x.map(x=>rtext_appendr(r,rtext_cast(x)));return r}
 interface_rtext=lmi((self,i,x)=>{
 	if(ikey(i,'end'   ))return lmn(RTEXT_END)
 	if(ikey(i,'make'  ))return lmnat(([t,f,a])=>rtext_make(t,f,a))
@@ -1964,7 +1984,7 @@ grid_read=(x,card)=>{
 			if(ikey(i,'scroll'   ))return self.scroll=max(0,ln(x)),x
 			if(ikey(i,'row'      ))return self.row=max(-1,ln(x)),x
 			if(ikey(i,'col'      ))return (!lin(x)?iwrite(self,lms('colname'),x): self.col=max(-1,ln(x))),x
-			if(ikey(i,'colname'  ))return iwrite(self,lms('col'),lmn(Object.keys(ifield(self,'value').v).indexOf(ls(x)))),x
+			if(ikey(i,'colname'  ))return iwrite(self,lms('col'),lmn(tab_cols(ifield(self,'value')).indexOf(ls(x)))),x
 			if(ikey(i,'cell'     ))return iwrite(self,lms('col'),l_at(x,NONE)),iwrite(self,lms('row'),l_at(x,ONE)),x
 			if(ikey(i,'scrollbar'))return self.scrollbar=lb(x),x
 			if(ikey(i,'headers'  ))return self.headers=lb(x),x
@@ -1975,7 +1995,7 @@ grid_read=(x,card)=>{
 			if(ikey(i,'rowvalue' ))return iwrite(self,lms('value'   ),amend(ifield(self,'value'   ),ifield(self,'row'    ),x)),x
 			if(ikey(i,'cellvalue'))return iwrite(self,lms('rowvalue'),amend(ifield(self,'rowvalue'),ifield(self,'colname'),x)),x
 		}else{
-			if(ikey(i,'value'    ))return value_inherit(self,ls(i))||lmt({})
+			if(ikey(i,'value'    ))return value_inherit(self,ls(i))||lmt()
 			if(ikey(i,'scroll'   ))return value_inherit(self,ls(i))||NONE
 			if(ikey(i,'scrollbar'))return lmn(ivalue(self,ls(i),1))
 			if(ikey(i,'headers'  ))return lmn(ivalue(self,ls(i),1))
@@ -1987,9 +2007,12 @@ grid_read=(x,card)=>{
 			if(ikey(i,'cell'     ))return lml([ifield(self,'col'),ifield(self,'row')])
 			if(ikey(i,'row'      )){const r=value_inherit(self,ls(i))||lmn(-1);return lmn(clamp(-1,ln(r),count(ifield(self,'value'))-1))}
 			if(ikey(i,'col'      )){const c=value_inherit(self,ls(i))||lmn(-1);return lmn(clamp(-1,ln(c),count(monad.keys(ifield(self,'value')))-1))}
-			if(ikey(i,'colname'  )){const c=ln(ifield(self,'col'));k=Object.keys(ifield(self,'value').v);return c<0||c>=k.length?NONE: lms(k[c])}
-			if(ikey(i,'rowvalue' )){const r=ln(ifield(self,'row')),                         v=ifield(self,'value');return r<0||     r>=count(v)?lmd():l_at(v,lmn(r))}
-			if(ikey(i,'cellvalue')){const r=ln(ifield(self,'row')),c=ln(ifield(self,'col')),v=ifield(self,'value');return r<0||c<0||r>=count(v)||c>=Object.keys(v.v).length?NONE: Object.values(v.v)[c][r]}
+			if(ikey(i,'colname'  )){const c=ln(ifield(self,'col'));k=tab_cols(ifield(self,'value'));return c<0||c>=k.length?NONE: lms(k[c])}
+			if(ikey(i,'rowvalue' )){const r=ln(ifield(self,'row')),v=ifield(self,'value');return r<0||r>=count(v)?lmd():l_at(v,lmn(r))}
+			if(ikey(i,'cellvalue')){
+				const r=ln(ifield(self,'row')),c=ln(ifield(self,'col')),v=ifield(self,'value'),cn=tab_cols(v);
+				return r<0||c<0||r>=count(v)||c>=tab_cols(v).length?NONE: tab_cell(v,cn[c],r)
+			}
 		}return interface_widget(self,i,x)
 	},'grid');ri.card=card
 	init_field(ri,'scrollbar',x)
@@ -2288,7 +2311,7 @@ find_fonts=(deck,target,widgets)=>{
 			wid.widgets.v.map(w=>ifield(w,'font')).map(f=>dset(fonts,dkey(deck.fonts,f),f))
 		}
 		if(field_is(wid)&&match(ifield(wid,'style'),lms('rich'))){ // inside rtext field values
-			ifield(wid,'value').v.font.filter(n=>count(n)&&!dget(fonts,n)).map(n=>dset(fonts,n,dget(deck.fonts,n)))
+			tab_get(ifield(wid,'value'),'font').filter(n=>count(n)&&!dget(fonts,n)).map(n=>dset(fonts,n,dget(deck.fonts,n)))
 		}
 	})
 	fonts=dyad.drop(lml(['body','menu','mono'].map(lms)),fonts),fonts.v.map((x,i)=>{fonts.v[i]=lms(font_write(x))})
@@ -2401,10 +2424,11 @@ prototype_read=(x,deck)=>{
 	x=ld(x)
 	const attribute_types={'':1,bool:1,number:1,string:1,code:1,rich:1}
 	const normalize_attributes=x=>{
-		const r=lmt({name:[],label:[],type:[]});if(!lit(x))return r
-		const sn=x.v.name,sl=x.v.label||sn,st=x.v.type;if(sn&&st)sn.filter(n=>lis(n)&&count(n)).map((n,i)=>{
+		const r=lmt();tab_set(r,'name',[]),tab_set(r,'label',[]),tab_set(r,'type',[]);if(!lit(x))return r
+		const sn=tab_get(x,'name'),sl=tab_get(x,'label')||sn,st=tab_get(x,'type')
+		if(sn&&st)sn.filter(n=>lis(n)&&count(n)).map((n,i)=>{
 			const type=normalize_enum(attribute_types,ls(st[i]))
-			if(type.length)r.v.name.push(n),r.v.label.push(lms(ls(sl[i]))),r.v.type.push(lms(type))
+			if(type.length)tab_get(r,'name').push(n),tab_get(r,'label').push(lms(ls(sl[i]))),tab_get(r,'type').push(lms(type))
 		});return r
 	}
 	const prototype_pos=self=>lmpair(rcenter(rect(0,0,deck.size.x,deck.size.y),self.size))

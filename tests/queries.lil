@@ -104,3 +104,5 @@ show[insert with 42 end]                           # no column names, single
 show[insert a b c with 11 22 33 44 end]            # ragged value count -> pad with 0
 show[insert a "quoted name" with 55 66 77 88 end]  # quoted column names
 show[insert a a with "one" 11 "two" 22 end]        # repeat column names: take the last one
+
+show[insert __proto__ with 11 22 end] # cursed column names

@@ -247,21 +247,21 @@ draw_lil=(size,align,bare,x)=>{
 	const GAP=50, w=size.x-GAP; let xo=align==ALIGN.right?GAP: align==ALIGN.left?0: 0|(GAP/2)
 	const r=image_make(size), t=frame; frame=draw_frame(r)
 	if(lit(x)){
-		const tk=Object.keys(x.v), tc=tk.length, tr=tk.length?x.v[tk[0]].length:0
+		const tk=tab_cols(x), tc=tk.length, tr=tab_rowcount(x)
 		const hh=tc?3+font_h(FONT_BODY):3, ch=font_h(FONT_MONO), fh=font_h(FONT_BODY), rows=0|min((size.y-(hh+fh))/ch,tr)
 		const f=dyad.take(NONE,x), cw=range(256).map(x=>0)
 		for(let c=0;c<tc&&c<256;c++){
 			const dr=rows<tr?rows-1:rows;cw[c]=0;for(let r=0;r<dr;r++){
-				const s=show(x.v[tk[c]][r]);f.v[tk[c]].push(lms(s))
+				const s=show(tab_cell(x,tk[c],r));tab_get(f,tk[c]).push(lms(s))
 				cw[c]=max(cw[c],font_textsize(FONT_MONO,s).x+10)
-			}if(rows<tr)f.v[tk[c]].push(lms(' \x7f'))
+			}if(rows<tr)tab_get(f,tk[c]).push(lms(' \x7f'))
 			cw[c]=min(100,max(cw[c],font_textsize(FONT_BODY,tk[c]).x+10))
 		}
 		let cols=0,tw=0,ve=0;for(let c=0;c<tc&&c<256;c++){if(tw+cw[c]>=w){ve=1;break};cols++;if(c+1<=tc&&c+1<=256)tw+=cw[c]}
 		xo=align==ALIGN.right?size.x-tw: align==ALIGN.left?0: 0|((size.x-tw)/2)
 		let cx=xo;for(let c=0;c<cols;c++){
 			if(c)draw_vline(cx,0,hh+ch*rows+(rows==0),1);draw_text_fit(rect(cx+2,0,cw[c]-4,hh),tk[c],FONT_BODY,1)
-			for(let r=0;r<rows;r++)draw_text_fit(rect(cx+2,hh+ch*r,cw[c]-4,ch),ls(f.v[tk[c]][r]),FONT_MONO,1)
+			for(let r=0;r<rows;r++)draw_text_fit(rect(cx+2,hh+ch*r,cw[c]-4,ch),ls(tab_cell(f,tk[c],r)),FONT_MONO,1)
 			if(c+1<=cols)cx+=cw[c]
 		}draw_hline(xo,cx,hh-1,1);const bh=hh+ch*rows+1+(rows==0);if(cx==xo)cx+=min(25,w)
 		const desc=`(${tc} column${tc==1?'':'s'}, ${tr} row${tr==1?'':'s'}.)`
@@ -753,7 +753,7 @@ grid_exit=_=>{
 widget_grid=(target,x,value)=>{
 	if(x.show=='none')return 0; const hfnt=FONT_BODY, hsize=x.headers?font_h(hfnt)+5:0, showscroll=x.size.h<=(50+hsize)||x.size.w<16?0:x.scrollbar
 	const fnt=x.font?x.font:FONT_MONO, os=value.scroll, or=value.row, oc=value.col, files=x.headers==2, headers=files||x.size.h<=hsize?0:x.headers
-	const tk=Object.keys(value.table.v), nr=count(value.table), nc=tk.length, rh=font_h(fnt)+(x.lines?5:3)
+	const tk=tab_cols(value.table), nr=count(value.table), nc=tk.length, rh=font_h(fnt)+(x.lines?5:3)
 	const fcol=!in_layer()?13:x.show=='invert'?32:1, bcol=x.show=='invert'?1:32, b=x.size, pal=deck.patterns.pal.pix
 	let sel=in_layer()&&x.show!='none'&&wid.active==wid.count
 	if(in_layer()&&dover(b)&&(ev.md||ev.mu||ev.drag)){if(!sel&&wid.gv)grid_exit(); wid.active=wid.count,sel=1}
@@ -791,7 +791,7 @@ widget_grid=(target,x,value)=>{
 		}
 		if(cols&&x.lines)draw_invert(pal,rect(hs.x-3,b.y+1,1,b.h-2));cx+=cw(cols)
 		for(let y=0;y<nrd;y++){
-			const cell=rect(hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1), v=value.table.v[tk[z]][y+value.scroll]
+			const cell=rect(hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1), v=tab_cell(value.table,tk[z],y+value.scroll)
 			const fc=x.format[z]=='L'?'s':(x.format[z]||'s'), ccol=y+value.scroll==hrow&&(x.bycell?cols==hcol :1)?bcol:fcol
 			const cf=ls(dyad.format(lms(`%${fc}`),fc=='j'||fc=='a'?monad.list(v):v)), ip=rcenter(cell,ICONS[0].size)
 			const oc=frame.clip; frame.clip=rclip(cell,frame.clip)
@@ -828,7 +828,7 @@ widget_grid=(target,x,value)=>{
 	if(in_widgets())wid.count++
 	return files?((clicked&&ev.dclick)||(sel&&ev.action)): clicked
 }
-grid_format=_=>lms(wid.g.format.length?wid.g.format:'s'.repeat(Object.keys(wid.gv.table.v).length))
+grid_format=_=>lms(wid.g.format.length?wid.g.format:'s'.repeat(tab_cols(wid.gv.table).length))
 grid_apply=v=>{
 	wid.gv.table=v,wid.gv.row=-1;if(!wid.gt)return
 	iwrite(wid.gt,lms('value'),v),iwrite(wid.gt,lms('row'),lmn(-1)),mark_dirty()
@@ -839,9 +839,11 @@ grid_redo=_=>{const x=wid.hist[(wid.hist_cursor)++];grid_apply(x[1])}
 grid_edit=v=>{wid.hist=wid.hist.slice(0,wid.hist_cursor),wid.hist.push([wid.gv.table,v]),grid_redo()}
 grid_deleterow=_=>grid_edit(dyad.drop(lml([lmn(wid.gv.row)]),wid.gv.table))
 grid_insertrow=_=>{
-	const f=grid_format(), x=wid.gv.table.v, r={}, s=wid.gv.row+1
-	Object.keys(x).map((k,col)=>{r[k]=range(x[k].length+1).map(i=>(i==s)?('sluro'.indexOf(f[col])>=0?lms(''):NONE): x[k][i-(i>=s?1:0)])})
-	grid_edit(lmt(r))
+	const f=grid_format(), x=wid.gv.table, r=lmt(), s=wid.gv.row+1
+	tab_cols(x).map((k,col)=>{
+		const o=tab_get(x,k)
+		tab_set(r,k,range(o.length+1).map(i=>(i==s)?('sluro'.indexOf(f[col])>=0?lms(''):NONE): o[i-(i>=s?1:0)]))
+	});grid_edit(r)
 }
 grid_edit_cell=(cell,v)=>{
 	wid.gv.col=cell.x,iwrite(wid.gt,lms('col'),lmn(cell.x))
@@ -849,7 +851,7 @@ grid_edit_cell=(cell,v)=>{
 	msg.target_ccell=wid.gt,msg.arg_ccell=lms(ls(v))
 }
 grid_keys=(code,shift)=>{
-	const fnt=wid.g.font?wid.g.font:FONT_MONO, hfnt=FONT_BODY, nr=count(wid.gv.table), nc=Object.keys(wid.gv.table.v).length
+	const fnt=wid.g.font?wid.g.font:FONT_MONO, hfnt=FONT_BODY, nr=count(wid.gv.table), nc=tab_cols(wid.gv.table).length
 	let m=0, r=wid.gv.row, c=wid.gv.col
 	const rh=font_h(fnt)+5, bh=wid.g.headers?font_h(hfnt)+5:0, nrd=min(nr,0|((wid.g.size.h-bh+1)/rh))
 	if(code=='ArrowUp'   ){m=1;if(r==-1){r=0}else{r-=1}}
@@ -996,7 +998,7 @@ field_indent=add=>{
 field_stylespan=(font,arg)=>field_edit(font,arg,ls(rtext_string(wid.fv.table,wid.cursor)),wid.cursor)
 field_input=text=>{
 	if(text=='\n'){if(ms.type=='save')ev.action=1;if(ms.type=='save'||ev.shift)return}
-	const rtext_font=(table,x)=>{const i=rtext_get(table,x);return i<0?lms(''):table.v.font[i]}
+	const rtext_font=(table,x)=>{const i=rtext_get(table,x);return i<0?lms(''):tab_cell(table,'font',i)}
 	field_edit(rtext_font(wid.fv.table,wid.cursor.y),lms(''),clchars(text),wid.cursor)
 }
 field_keys=(code,shift)=>{
@@ -1095,7 +1097,7 @@ n_print=(a)=>{a[0]=a[0]||NONE;if(a.length<2){listen_show(ALIGN.right,1,lms(ls(a[
 n_pre_listen=([a])=>{
 	const ev=getev();
 	for(let name of li.vars.keys()){if(!ev.v.get(name))ev.v.set(name,li.vars.get(name))}
-	if(ob.sel.length&&uimode=='object')ev.v.selected=lml(ob.sel.slice(0))
+	if(ob.sel.length&&uimode=='object')ev.v.set('selected',lml(ob.sel.slice(0)))
 	return a
 }
 n_post_listen=([a])=>{
@@ -1270,26 +1272,38 @@ sound_record=_=>{
 table_decode=(text,format)=>ms.edit_json?monad.table(dyad.parse(lms('%j'),text)): n_readcsv(count(format)?[text,format]:[text])
 transit_enumerate=_=>monad.table(monad.keys(deck.transit))
 sounds_enumerate=_=>{
-	const r={icon:[],name:[],bytes:[],secs:[]};deck.sounds.v.map((sn,i)=>{
-		r.icon .push(lmn(ICON.sound)),r.name.push(deck.sounds.k[i])
-		r.bytes.push(dyad.format(lms('%.2fkb'),lmn(ln(ifield(sn,'size'))/1000.0*1.33)))
-		r.secs .push(dyad.format(lms('%.2fs' ),ifield(sn,'duration')))
-	});return lmt(r)
+	const r=lmt(),iv=[],nv=[],bv=[],sv=[];tab_set(r,'icon',iv),tab_set(r,'name',nv),tab_set(r,'bytes',bv),tab_set(r,'secs',sv)
+	deck.sounds.v.map((sn,i)=>{
+		iv.push(lmn(ICON.sound)),nv.push(deck.sounds.k[i])
+		bv.push(dyad.format(lms('%.2fkb'),lmn(ln(ifield(sn,'size'))/1000.0*1.33)))
+		sv.push(dyad.format(lms('%.2fs' ),ifield(sn,'duration')))
+	});return r
 }
-contraptions_enumerate=_=>{const r={icon:[],name:[]};deck.contraptions.k.map(k=>{r.icon.push(lmn(ICON.app)),r.name.push(k)});return lmt(r)}
+fonts_enumerate=_=>{ // note that this ALSO finds the selected font, if any!
+	const r=lmt(),iv=[],nv=[];tab_set(r,'icon',iv),tab_set(r,'name',nv);let fi=-1
+	deck.fonts.v.map((font,z)=>{
+		if(uimode=='object'){if(ob.sel.every(x=>ifield(x,'font')==font))fi=z}
+		else if(ms.old_wid.ft){if(ifield(ms.old_wid.ft,'font')==font)fi=z}
+		iv.push(lmn(ICON.font)),nv.push(deck.fonts.k[z])
+	});return gridtab(r,fi)
+}
+contraptions_enumerate=_=>{
+	const r=lmt(),iv=[],nv=[];tab_set(r,'icon',iv),tab_set(r,'name',nv)
+	deck.contraptions.k.map(k=>{iv.push(lmn(ICON.app)),nv.push(k)});return r
+}
 res_enumerate=(source)=>{
-	const r={icon:[],name:[],value:[]}
+	const r=lmt(),iv=[],nv=[],vv=[];tab_set(r,'icon',iv),tab_set(r,'name',nv),tab_set(r,'value',vv)
 	const pat=source.patterns,pp=patterns_write(pat),pa=anims_write(pat),da=dyad.parse(lms('%j'),lms(DEFAULT_ANIMS))
-	if(!match(pa,da)||pp!=DEFAULT_PATTERNS)r.icon.push(lmn(ICON.pat)),r.name.push(lms('patterns')),r.value.push(pat)
+	if(!match(pa,da)||pp!=DEFAULT_PATTERNS)iv.push(lmn(ICON.pat)),nv.push(lms('patterns')),vv.push(pat)
 	const fonts=dyad.drop(lms('mono'),dyad.drop(lms('menu'),dyad.drop(lms('body'),source.fonts)))
-	fonts.v.map((font,i)=>{r.icon.push(lmn(ICON.font)),r.name.push(fonts.k[i]),r.value.push(font)})
+	fonts.v.map((font,i)=>{iv.push(lmn(ICON.font)),nv.push(fonts.k[i]),vv.push(font)})
 	const sounds=source.sounds
-	sounds.v.map((sound,i)=>{r.icon.push(lmn(ICON.sound)),r.name.push(sounds.k[i]),r.value.push(sound)})
+	sounds.v.map((sound,i)=>{iv.push(lmn(ICON.sound)),nv.push(sounds.k[i]),vv.push(sound)})
 	const modules=source.modules
-	modules.v.map((mod,i)=>{r.icon.push(lmn(ICON.lil)),r.name.push(modules.k[i]),r.value.push(mod)})
+	modules.v.map((mod,i)=>{iv.push(lmn(ICON.lil)),nv.push(modules.k[i]),vv.push(mod)})
 	const defs=source.contraptions
-	defs.v.map((def,i)=>{r.icon.push(lmn(ICON.app)),r.name.push(defs.k[i]),r.value.push(def)})
-	return lmt(r)
+	defs.v.map((def,i)=>{iv.push(lmn(ICON.app)),nv.push(defs.k[i]),vv.push(def)})
+	return r
 }
 title_caps=x=>{let w=1;return x.split('').map(c=>{if(w)c=c.toUpperCase();w=c==' '||c=='\n';return c}).join('')}
 do_transition=(tween,dest,errors)=>{
@@ -1326,17 +1340,10 @@ modal_enter=type=>{
 	if(type=='orderwids')ms.grid=gridtab(null),ms.grid.col=-99
 	if(type=='sounds')ms.grid=gridtab(sounds_enumerate())
 	if(type=='contraptions'||type=='pick_contraption')ms.grid=gridtab(contraptions_enumerate())
-	if(type=='fonts'){
-		const r=lmt({icon:[],name:[]});let fi=-1
-		deck.fonts.v.map((font,z)=>{
-			if(uimode=='object'){if(ob.sel.every(x=>ifield(x,'font')==font))fi=z}
-			else if(ms.old_wid.ft){if(ifield(ms.old_wid.ft,'font')==font)fi=z}
-			r.v.icon.push(lmn(ICON.font)),r.v.name.push(deck.fonts.k[z])
-		}),ms.grid=gridtab(r,fi)
-	}
-	if(type=='resources')ms.message=null,ms.grid=gridtab(lmt({})),ms.grid2=gridtab(res_enumerate(deck))
+	if(type=='fonts')ms.grid=fonts_enumerate()
+	if(type=='resources')ms.message=null,ms.grid=gridtab(lmt()),ms.grid2=gridtab(res_enumerate(deck))
 	if(type=='link'){
-		const t=ms.old_wid.fv.table,ol=t.v.arg[rtext_get(t,ms.old_wid.cursor.y)]
+		const t=ms.old_wid.fv.table,ol=tab_cell(t,'arg',rtext_get(t,ms.old_wid.cursor.y))
 		ms.text=fieldstr(ol);if(count(ol))ms.old_wid.cursor=rtext_getr(t,ms.old_wid.cursor.y)
 	}
 	if(type=='grid'        )ms.name=fieldstr(lmn(dr.grid_size.x     )),ms.text=fieldstr(lmn(dr.grid_size.y       ))
@@ -1355,8 +1362,8 @@ modal_enter=type=>{
 	}
 	if(type=='contraption_props'){
 		const w=ob.sel[0],a=ifield(w.def,'attributes');ms.name=fieldstr(ifield(w,'name'))
-		attrs=[],attrs_scroll=0;a.v.name.map((n,i)=>{
-			const v=iwrite(w,n), item={type:ls(a.v.type[i]), label:ls(a.v.label[i]), bval:0, value:fieldstr('')}
+		attrs=[],attrs_scroll=0;tab_get(a,'name').map((n,i)=>{
+			const v=iwrite(w,n), item={type:ls(tab_cell(a,'type',i)), label:ls(tab_cell(a,'label',i)), bval:0, value:fieldstr('')}
 			if     (item.type=='bool'){item.bval=lb(v)}
 			else if(item.type=='rich'){item.value.table=rtext_cast(v)}
 			else {item.value.table=rtext_cast(v)}
@@ -1398,7 +1405,7 @@ modal_enter=type=>{
 		const fk={First:0,Prev:1,Next:2,Last:3,Back:4}
 		if(fs!=null||fg!=null||ft!=null){
 			if(fs!=null){ms.act_sound=1,ms.message=lms(fs)}
-			if(ft!=null){ms.grid.table.v.value.map((x,i)=>{if(ft==ls(x))ms.act_trans=1,ms.grid.row=i})}
+			if(ft!=null){tab_get(ms.grid.table,'value').map((x,i)=>{if(ft==ls(x))ms.act_trans=1,ms.grid.row=i})}
 			ms.act_go=fg!=null;if(fg!=null){if(fk[fg]!=undefined)ms.act_gomode=fk[fg];if(ms.act_gomode==5)ms.verb=lms(fg)}
 		}
 	}
@@ -1428,8 +1435,8 @@ modal_exit=value=>{
 		if(!match(t,ifield(ob.sel[0],'value')))ob_edit_prop('value',t)
 	}
 	if(ms.type=='contraption_props'){
-		const w=ob.sel[0],a=ifield(w.def,'attributes');a.v.name.map((n,i)=>{
-			const t=ls(a.v.type[i]);let v=lmn(attrs[i].bval)
+		const w=ob.sel[0],a=ifield(w.def,'attributes');tab_get(a,'name').map((n,i)=>{
+			const t=ls(tab_cell(a,'type',i));let v=lmn(attrs[i].bval)
 			if(t=='number')v=lmn(ln(rtext_string(attrs[i].value.table)))
 			if(t=='string')v=rtext_string(attrs[i].value.table)
 			if(t=='code'  )v=rtext_string(attrs[i].value.table)
@@ -1443,7 +1450,7 @@ modal_exit=value=>{
 		if(ms.act_go){
 			r+='  go['
 			r+=ms.act_gomode==0?'"First"': ms.act_gomode==1?'"Prev"': ms.act_gomode==2?'"Next"': ms.act_gomode==3?'"Last"': ms.act_gomode==4?'"Back"': show(ms.verb)
-			if(ms.act_trans)r+=` ${show(ms.grid.table.v.value[ms.grid.row])}`
+			if(ms.act_trans)r+=` ${show(tab_cell(ms.grid.table,'value',ms.grid.row))}`
 			r+=']\n'
 		}r+='end',script_save(lms(r))
 	}
@@ -1567,7 +1574,7 @@ modals=_=>{
 	else if(ms.type=='sounds'){
 		const b=draw_modalbox(rect(250,frame.size.y-16-30)), gsize=rect(b.x,b.y+15,b.w,b.h-16-(2*25))
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Sounds',FONT_MENU,1)
-		const s=ms.grid.row>=0?dget(deck.sounds,ms.grid.table.v.name[ms.grid.row]):null
+		const s=ms.grid.row>=0?dget(deck.sounds,tab_cell(ms.grid.table,'name',ms.grid.row)):null
 		if(ui_table(gsize,[16,130],'Isss',ms.grid))n_play([s])
 		if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'OK',1)||ev.exit){
 			if(ms.from_action){
@@ -1624,7 +1631,7 @@ modals=_=>{
 			const l=layout_plaintext(PANGRAM,deck.fonts.v[ms.grid.row],ALIGN.left,rect(psize.w,psize.h));draw_text_wrap(psize,l,1)}
 		const c=rect(b.x+b.w-60,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,60,20),'OK',ms.grid.row>=0)||choose){
-			const nf=ms.grid.table.v.name[ms.grid.row],nested=ms_stack.length>0;modal_pop(1)
+			const nf=tab_cell(ms.grid.table,'name',ms.grid.row),nested=ms_stack.length>0;modal_pop(1)
 			if(uimode=='object'&&!nested){ob_edit_prop('font',nf)}
 			else if(wid.fv&&wid.cursor.x!=wid.cursor.y){const c=wid.cursor;field_stylespan(nf,lms('')),wid.cursor=c,mark_dirty()}
 			else if(wid.ft){iwrite(wid.ft,lms('font'),nf),wid.f=unpack_field(ms.old_wid.ft),wid.fv=unpack_field_value(ms.old_wid.ft),mark_dirty()}
@@ -1658,7 +1665,7 @@ modals=_=>{
 		}
 		if(ms.type=='pick_contraption'){
 			if(ui_button(rect(c.x,c.y,60,20),'Create',ms.grid.row>=0)||choose){
-				ob_create([lmd(['type','def'].map(lms),[lms('contraption'),ms.grid.table.v.name[ms.grid.row]])]),modal_exit(1)
+				ob_create([lmd(['type','def'].map(lms),[lms('contraption'),tab_cell(ms.grid.table,'name',ms.grid.row)])]),modal_exit(1)
 			};c.x-=65
 			if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_exit(0)
 		}
@@ -1700,8 +1707,8 @@ modals=_=>{
 		const gsize=rect(b.x,b.y+20,80,b.h-(20+5+20))
 		const before=ms.grid.row;ui_table(gsize,[gsize.w-18],'s',ms.grid)
 		if(before!=ms.grid.row||ms.name.table==null||ms.text.table==null){
-			ms.name=fieldstr(ms.grid.row>=0?ms.grid.table.v.name [ms.grid.row]:lms(''))
-			ms.text=fieldstr(ms.grid.row>=0?ms.grid.table.v.label[ms.grid.row]:lms(''))
+			ms.name=fieldstr(ms.grid.row>=0?tab_cell(ms.grid.table,'name' ,ms.grid.row):lms(''))
+			ms.text=fieldstr(ms.grid.row>=0?tab_cell(ms.grid.table,'label',ms.grid.row):lms(''))
 		}
 		const sel=ms.grid.row>=0
 		draw_text(rect(gsize.x+gsize.w+10,b.y+20+2,lw,20),'Name' ,FONT_MENU,1)
@@ -1710,20 +1717,20 @@ modals=_=>{
 		ui_dfield(rect(gsize.x+gsize.w+5+lw,b.y+20,b.w-(lw+5+gsize.w),18),sel,ms.name)
 		ui_dfield(rect(gsize.x+gsize.w+5+lw,b.y+40,b.w-(lw+5+gsize.w),18),sel,ms.text)
 		if(sel){
-			ms.grid.table.v.name [ms.grid.row]=rtext_string(ms.name.table)
-			ms.grid.table.v.label[ms.grid.row]=rtext_string(ms.text.table)
+			tab_get(ms.grid.table,'name' )[ms.grid.row]=rtext_string(ms.name.table)
+			tab_get(ms.grid.table,'label')[ms.grid.row]=rtext_string(ms.text.table)
 		}
 		const cr=rect(gsize.x+gsize.w+5+lw,b.y+62), c=rect(b.x,b.y+b.h-20)
 		const attr_types=['bool','number','string','code','rich']
 		const attr_labels=['Boolean','Number','String','Code','Rich Text']
-		const t=sel?ls(ms.grid.table.v.type[ms.grid.row]):''
+		const t=sel?ls(tab_cell(ms.grid.table,'type',ms.grid.row)):''
 		for(let z=0;z<attr_types.length;z++,cr.y+=16)if(ui_radio(rect(cr.x,cr.y,b.w-(lw+5+gsize.w),16),attr_labels[z],sel,t==attr_types[z])){
-			ms.grid.table.v.type[ms.grid.row]=lms(attr_types[z])
+			tab_get(ms.grid.table,'type')[ms.grid.row]=lms(attr_types[z])
 		}
 		if(ui_button(rect(c.x,c.y,60,20),'Add',1)){
-			ms.grid.table.v.name .push(lms('untitled'))
-			ms.grid.table.v.label.push(lms(''))
-			ms.grid.table.v.type .push(lms('bool'))
+			tab_get(ms.grid.table,'name' ).push(lms('untitled'))
+			tab_get(ms.grid.table,'label').push(lms(''))
+			tab_get(ms.grid.table,'type' ).push(lms('bool'))
 			ms.grid.row=count(ms.grid.table)-1,ms.name.table=null,ms.text.table=null
 		};c.x+=65
 		if(ui_button(rect(c.x,c.y,60,20),'Remove',sel)){
@@ -1745,7 +1752,7 @@ modals=_=>{
 		draw_textc(rect(lgrid.x,lgrid.y+lgrid.h+3,lgrid.w,15),ms.message?ls(ifield(ms.message,'name')):'(Choose a Deck)',FONT_BODY,1)
 		draw_textc(rect(rgrid.x,rgrid.y+rgrid.h+3,rgrid.w,15),ls(ifield(deck,'name')),FONT_BODY,1)
 		const cb=rect(lgrid.x+lgrid.w+5,lgrid.y+5,b.w-(lgrid.w+5+5+rgrid.w),20)
-		const rvalue=(g,k)=>g.table.v[k][g.row]
+		const rvalue=(g,k)=>tab_cell(g.table,k,g.row)
 		let sel=(ms.grid.table&&ms.grid.row>-1)?rvalue(ms.grid,'value'): ms.grid2.row>-1?rvalue(ms.grid2,'value'): null
 		let copy_message='>> Copy >>',can_copy=1
 		if(ms.grid.row>-1&&sel&&(module_is(sel)||prototype_is(sel))){
@@ -1789,7 +1796,7 @@ modals=_=>{
 	}
 	else if(ms.type=='query'){
 		const b=draw_modalbox(rect(frame.size.x-30,frame.size.y-16-30)),t=ms.grid.table
-		const desc=t?`${Object.keys(t.v).length} column${Object.keys(t.v).length==1?'':'s'}, ${count(t)} row${count(t)==1?'':'s'}.`:'Executing Query.'
+		const desc=t?`${tab_cols(t).length} column${tab_cols(t).length==1?'':'s'}, ${count(t)} row${count(t)==1?'':'s'}.`:'Executing Query.'
 		let compiles=0,error=' ';try{parse(ls(rtext_string(ms.text.table))),compiles=1}catch(e){error=e.x}
 		const dsize=font_textsize(FONT_BODY,desc);draw_text(b,desc,FONT_BODY,1)
 		const msize=font_textsize(FONT_BODY,error), gsize=rint(rect(b.x,b.y+dsize.y,b.w,(b.h-(2*5)-dsize.y-20)/2))
@@ -1841,7 +1848,7 @@ modals=_=>{
 		draw_text(rect(b.x   ,tbox.y+tbox.h+7,    56,20),'Filename',FONT_MENU,1)
 		ui_field (rect(b.x+56,tbox.y+tbox.h+5,b.w-56,18),ms.text)
 		const c=rect(b.x+b.w-60,b.y+b.h-20),subtype=ms.subtype
-		const grid=ms.old_wid.gv, format=subtype!='export_table'?null:lms(ms.old_wid.g.format.length?ms.old_wid.g.format:'s'.repeat(Object.keys(grid.table.v).length))
+		const grid=ms.old_wid.gv, format=subtype!='export_table'?null:lms(ms.old_wid.g.format.length?ms.old_wid.g.format:'s'.repeat(tab_cols(grid.table).length))
 		if(ui_button(rect(c.x,c.y,60,20),'Save',1,_=>{
 			const name=ls(rtext_string(ms.text.table))
 			const savedeck=_=>{
@@ -2102,7 +2109,7 @@ modals=_=>{
 		ui_field   (rect(b.x+47,b.y+20,b.w-47,18),ms.name)
 		ui_field   (rect(b.x+47,b.y+40,b.w-47,18),ms.text)
 		ui_codeedit(rect(b.x+47,b.y+60,b.w-47,118),1,ms.form0)
-		const etext=rtext_string(ms.form0.table),format=rtext_string(ms.text.table),val=table_decode(etext,format),cn=Object.keys(val.v).length,rn=count(val)
+		const etext=rtext_string(ms.form0.table),format=rtext_string(ms.text.table),val=table_decode(etext,format),cn=tab_cols(val).length,rn=count(val)
 		draw_text(rect(b.x+47,b.y+120+60,b.w-47,18),`${cn} column${cn==1?'':'s'}, ${rn} row${rn==1?'':'s'}.`,FONT_BODY,1)
 		iwrite(grid,lms('name'  ),rtext_string(ms.name.table))
 		iwrite(grid,lms('format'),format),mark_dirty()
@@ -2145,7 +2152,7 @@ modals=_=>{
 			if(ms.act_trans){
 				ui_list(rect(b.x+b.w/2,b.y+36,b.w/2,70),ms.grid)
 				const pv=rpair(rect(b.x+b.w-17,b.y+20),ms.canvas.size), pi=image_make(ms.canvas.size)
-				ms.trans=dget(deck.transit,ms.grid.table.v.value[ms.grid.row])
+				ms.trans=dget(deck.transit,tab_cell(ms.grid.table,'value',ms.grid.row))
 				do_transition((frame_count%60)/60.0,pi,0),draw_scaled(pv,pi,1),draw_box(pv,0,1)
 			}
 		}

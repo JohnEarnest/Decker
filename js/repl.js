@@ -26,11 +26,12 @@ env.local('shell',lmnat(([x])=>{
 	return lmd(['exit','out'].map(lms),[lmn(e),lms(o)])
 }))
 env.local('dir',lmnat(([x])=>{
-	const path=x?ls(x):'.', r={dir:[],name:[],type:[]}, fs=require('fs'), pt=require('path')
+	const path=x?ls(x):'.', fs=require('fs'), pt=require('path')
+	const rd=[],rn=[],rt=[],r=lmt();tab_set(r,'dir',rd),tab_set(r,'name',rn),tab_set(r,'type',rt)
 	fs.readdirSync(path).map(name=>{
-		r.dir.push(lmn(fs.lstatSync(`${path}/${name}`).isDirectory()))
-		r.name.push(lms(name)),r.type.push(lms(pt.extname(name)))
-	});return lmt(r)
+		rd.push(lmn(fs.lstatSync(`${path}/${name}`).isDirectory()))
+		rn.push(lms(name)),rt.push(lms(pt.extname(name)))
+	});return r
 }))
 env.local('random',lmnat(n_random))
 env.local('array',lmnat(n_array))
