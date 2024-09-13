@@ -24,6 +24,35 @@ on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 
 # the problems:
 
+problem[286.2]
+# the "order game";
+# repeatedly take alternate min/max of pairs of numbers until we're left with one
+# (input is guaranteed to have a power-of-two >2 size)
+on f x do
+ first while 1<count x
+  x:each p i in 2 window x if 2%i max p else min p end end
+ end
+end
+assert[f[(0, 5, 3, 2)] 0]
+assert[f[(2, 1, 4, 5, 6, 3, 0, 2)] 1]
+assert[f[(9, 2, 1, 4, 5, 6, 0, 7, 3, 1, 3, 5, 7, 9, 0, 8)] 2]
+
+problem[285.1]
+# given a list of directed edges, find the node with no outgoing connection
+# (this solution picks arbitrarily if there are multiple such nodes:)
+on f x do first (first @ x) drop last @ x end
+assert[f["%j" parse "[['B','C'],['D','B'],['C','A']]"] "A"]
+assert[f["%j" parse "[['A','Z']]"                    ] "Z"]
+
+problem[284.1]
+# return an int with a frequency equal to its value or -1
+on f x do
+ max -1,extract where value=count gindex by value from x
+end
+assert[f[2,2,3,4    ]  2]
+assert[f[1,2,2,3,3,3]  3]
+assert[f[1,1,1,3    ] -1]
+
 problem[283.1]
 # find the one element in x that appears exactly one time
 on f x do first extract where 1=count gindex by value from x end
