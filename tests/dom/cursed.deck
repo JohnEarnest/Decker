@@ -1,0 +1,27 @@
+{deck}
+version:1
+card:0
+size:[512,342]
+script:"__proto__"
+
+{script:__proto__}
+2+3
+{end}
+
+{card:home}
+
+{card:__proto__}
+{widgets}
+but:{"type":"button","size":[60,20],"pos":[0,0],"text":"click meeee"}
+
+{module:__proto__}
+description:"a deeply cursed module."
+{script}
+
+{end}
+
+{contraption:__proto__}
+size:[100,100]
+margin:[0,0,0,0]
+description:"a deeply cursed contraption."
+

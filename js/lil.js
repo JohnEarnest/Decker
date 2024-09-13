@@ -2586,7 +2586,7 @@ widget_purge=x=>{
 }
 deck_purge=x=>{x.cards.v.map(c=>c.widgets.v.map(w=>widget_purge(w)))}
 deck_read=x=>{
-	const deck={},scripts={},cards={},modules={},defs={}, fonts=lmd(),sounds=lmd(); let i=0,m=0,md=0,lc=0
+	const deck={},scripts=new Map(),cards={},modules={},defs={}, fonts=lmd(),sounds=lmd(); let i=0,m=0,md=0,lc=0
 	Object.keys(FONTS).map(k=>dset(fonts,lms(k),font_read(FONTS[k])))
 	const match=k=>x.startsWith(k,i)?(i+=k.length,1):0
 	const end=_=>i>=x.length||x.startsWith('<\/script>',i)
@@ -2600,7 +2600,7 @@ deck_read=x=>{
 		else if(match('{sounds}\n' ))m=3
 		else if(match('{widgets}\n'))m=4
 		else if(match('{card:')){const k=str('}');cards['~'+k]=lmd(['name','widgets'].map(lms),[lms(k),lml([])]),m=5,lc=0}
-		else if(match('{script:')){const k=str('}\n');scripts[k]=str('\n{end}')}
+		else if(match('{script:')){const k=str('}\n');scripts.set(k,str('\n{end}'))}
 		else if(match('{module:')){const k=str('}');modules['~'+k]=lmd(['name','script','data'].map(lms),[lms(k),lms(''),lmd()]),m=6,md=0}
 		else if(match('{contraption:')){const k=str('}');defs['~'+k]=lmd(['name','widgets'].map(lms),[lms(k),lml([])]),m=7,lc=1}
 		else if(m==6&&match('{data}\n')){md=1}
@@ -2617,7 +2617,7 @@ deck_read=x=>{
 			if(m==7)dset(last(defs),lms(k),v)
 		}
 	}
-	const dscript=x=>{const k=lms('script'),s=dget(x,k);if(s)dset(x,k,lms(scripts[ls(s)]))}
+	const dscript=x=>{const k=lms('script'),s=dget(x,k);if(s)dset(x,k,lms(scripts.get(ls(s))))}
 	Object.values(cards).map(c=>{dscript(c),dget(c,lms('widgets')).v.map(dscript)})
 	Object.values(defs ).map(c=>{dscript(c),dget(c,lms('widgets')).v.map(dscript)})
 	const ri=lmi((self,i,x)=>{
@@ -2661,7 +2661,7 @@ deck_read=x=>{
 	ri.locked      =deck.hasOwnProperty('locked' )?lb(deck.locked ):0
 	ri.name        =deck.hasOwnProperty('name'   )?ls(deck.name   ):''
 	ri.author      =deck.hasOwnProperty('author' )?ls(deck.author ):''
-	ri.script      =deck.hasOwnProperty('script' )?scripts[ln(deck.script)]:''
+	ri.script      =deck.hasOwnProperty('script' )?scripts.get(ls(deck.script)):''
 	ri.card        =deck.hasOwnProperty('card'   )?clamp(0,ln(deck.card),Object.keys(cards).length-1):0
 	ri.size        =deck.hasOwnProperty('size'   )?rclamp(rect(8,8),getpair(deck.size),rect(4096,4096)):rect(512,342)
 	if(Object.keys(cards).length==0)cards.home=lmd(['name'].map(lms),[lms('home')])

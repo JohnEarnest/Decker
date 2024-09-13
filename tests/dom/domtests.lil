@@ -1868,6 +1868,19 @@ assert["custom brush enumeration" ("star","diag","dotted") (keys deck.card.event
 
 #######################################
 #
+#  Misc
+#
+#######################################
+
+deck:readdeck["tests/dom/cursed.deck"]
+assert["cursed script id"    "2+3"                          deck.script                              ]
+assert["cursed card names"   ("home","__proto__")           (keys deck.cards                        )]
+assert["cursed card content" "click meeee"                  (deck.cards.__proto__.widgets.but.text  )]
+assert["cursed modules"      "a deeply cursed module."      (deck.modules.__proto__.description     )]
+assert["cursed prototypes"   "a deeply cursed contraption." (deck.contraptions.__proto__.description)]
+
+#######################################
+#
 #  Wrap Up
 #
 #######################################
