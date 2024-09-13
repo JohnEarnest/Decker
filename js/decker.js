@@ -839,7 +839,7 @@ grid_redo=_=>{const x=wid.hist[(wid.hist_cursor)++];grid_apply(x[1])}
 grid_edit=v=>{wid.hist=wid.hist.slice(0,wid.hist_cursor),wid.hist.push([wid.gv.table,v]),grid_redo()}
 grid_deleterow=_=>grid_edit(dyad.drop(lml([lmn(wid.gv.row)]),wid.gv.table))
 grid_insertrow=_=>{
-	const f=grid_format(), x=wid.gv.table, r=lmt(), s=wid.gv.row+1
+	const f=ls(grid_format()), x=wid.gv.table, r=lmt(), s=wid.gv.row+1
 	tab_cols(x).map((k,col)=>{
 		const o=tab_get(x,k)
 		tab_set(r,k,range(o.length+1).map(i=>(i==s)?('sluro'.indexOf(f[col])>=0?lms(''):NONE): o[i-(i>=s?1:0)]))
