@@ -838,12 +838,15 @@ grid_undo=_=>{const x=wid.hist[--(wid.hist_cursor)];grid_apply(x[0])}
 grid_redo=_=>{const x=wid.hist[(wid.hist_cursor)++];grid_apply(x[1])}
 grid_edit=v=>{wid.hist=wid.hist.slice(0,wid.hist_cursor),wid.hist.push([wid.gv.table,v]),grid_redo()}
 grid_deleterow=_=>grid_edit(dyad.drop(lml([lmn(wid.gv.row)]),wid.gv.table))
+grid_rowsvisible=(t,g)=>min(count(t),0|((g.size.h-(g.headers?font_h(FONT_BODY)+5:0)+1)/(font_h(g.font||FONT_MONO)+5)))
+grid_scrollto=(t,g,s,r)=>{const n=grid_rowsvisible(t,g);return (r-s<0)?r: (r-s>=n)?r-(n-1): s}
 grid_insertrow=_=>{
 	const f=ls(grid_format()), x=wid.gv.table, r=lmt(), s=wid.gv.row+1
 	tab_cols(x).map((k,col)=>{
 		const o=tab_get(x,k)
 		tab_set(r,k,range(o.length+1).map(i=>(i==s)?('sluro'.indexOf(f[col])>=0?lms(''):NONE): o[i-(i>=s?1:0)]))
-	});grid_edit(r)
+	});grid_edit(r),iwrite(wid.gt,lms('col'),NONE),iwrite(wid.gt,lms('row'),lmn(s))
+	const os=wid.gv.scroll,ns=grid_scrollto(x,wid.g,os,s);if(os!=ns){wid.gv.scroll=ns,iwrite(wid.gt,lms('scroll'),lmn(ns))}
 }
 grid_edit_cell=(cell,v)=>{
 	wid.gv.col=cell.x,iwrite(wid.gt,lms('col'),lmn(cell.x))
