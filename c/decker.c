@@ -1347,7 +1347,7 @@ void modal_enter(int type){
 		char*fk[]={"First","Prev","Next","Last","Back"};
 		if(fs!=NULL||fg!=NULL||ft!=NULL){
 			if(fs!=NULL){ms.act_sound=1,ms.message=fs;}
-			if(ft!=NULL){for(int r=0;r<ms.grid.table->n;r++)if(matchr(ft,ms.grid.table->lv[0]->lv[r]))ms.act_trans=1,ms.grid.row=r;}
+			if(ft!=NULL){ms.grid.scroll=-99;for(int r=0;r<ms.grid.table->n;r++)if(matchr(ft,ms.grid.table->lv[0]->lv[r]))ms.act_trans=1,ms.grid.row=r;}
 			ms.act_go=fg!=NULL;if(fg!=NULL){for(int z=0;z<5;z++)if(!strcmp(fk[z],fg->sv))ms.act_gomode=z;if(ms.act_gomode==5)ms.verb=fg;}
 		}
 	}
@@ -2194,8 +2194,9 @@ void modals(void){
 		if(ms.act_go){
 			if(ui_checkbox((rect){b.x+b.w/2,b.y+20,b.w/2-19,16},"With Transition",1,ms.act_trans))ms.act_trans^=1;
 			if(ms.act_trans){
-				ui_list((rect){b.x+b.w/2,b.y+36,b.w/2,70},&ms.grid);rect pv={b.x+b.w-17,b.y+20,17,13};
-				ms.trans=dget(dget(deck->b,lmistr("transit")),ms.grid.table->lv[0]->lv[ms.grid.row]);
+				rect gd={b.x+b.w/2,b.y+36,b.w/2,70},pv={b.x+b.w-17,b.y+20,17,13};
+				if(ms.grid.scroll==-99){ms.grid.scroll=grid_scrollto(ms.grid.table,(grid){gd,FONT_BODY,{0},"",0,1,0,0,show_solid,1},-1,ms.grid.row);}
+				ui_list(gd,&ms.grid);ms.trans=dget(dget(deck->b,lmistr("transit")),ms.grid.table->lv[0]->lv[ms.grid.row]);
 				do_transition((frame_count%60)/60.0,0),buffer_paste(pv,frame.clip,container_image(ms.canvas,1)->b,frame.buffer,1),draw_box(pv,0,1);
 			}
 		}

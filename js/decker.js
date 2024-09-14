@@ -1408,7 +1408,7 @@ modal_enter=type=>{
 		const fk={First:0,Prev:1,Next:2,Last:3,Back:4}
 		if(fs!=null||fg!=null||ft!=null){
 			if(fs!=null){ms.act_sound=1,ms.message=lms(fs)}
-			if(ft!=null){tab_get(ms.grid.table,'value').map((x,i)=>{if(ft==ls(x))ms.act_trans=1,ms.grid.row=i})}
+			if(ft!=null){ms.grid.scroll=-99;tab_get(ms.grid.table,'value').map((x,i)=>{if(ft==ls(x))ms.act_trans=1,ms.grid.row=i})}
 			ms.act_go=fg!=null;if(fg!=null){if(fk[fg]!=undefined)ms.act_gomode=fk[fg];if(ms.act_gomode==5)ms.verb=lms(fg)}
 		}
 	}
@@ -2150,7 +2150,9 @@ modals=_=>{
 		if(ms.act_go){
 			if(ui_checkbox(rint(rect(b.x+b.w/2,b.y+20,b.w/2-19,16)),'With Transition',1,ms.act_trans))ms.act_trans^=1
 			if(ms.act_trans){
-				ui_list(rect(b.x+b.w/2,b.y+36,b.w/2,70),ms.grid)
+				const gd=rint(rect(b.x+b.w/2,b.y+36,b.w/2,70))
+				if(ms.grid.scroll==-99){ms.grid.scroll=grid_scrollto(ms.grid.table,{size:gd,font:FONT_BODY,headers:0},-1,ms.grid.row)}
+				ui_list(gd,ms.grid)
 				const pv=rpair(rect(b.x+b.w-17,b.y+20),ms.canvas.size), pi=image_make(ms.canvas.size)
 				ms.trans=dget(deck.transit,tab_cell(ms.grid.table,'value',ms.grid.row))
 				do_transition((frame_count%60)/60.0,pi,0),draw_scaled(pv,pi,1),draw_box(pv,0,1)
