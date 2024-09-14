@@ -225,7 +225,6 @@ enum modal_type{
 	modal_none,modal_about,modal_query,modal_listen,modal_link,modal_gridcell,modal_open,modal_save,
 	modal_alert,modal_confirm,modal_input,modal_url,
 	modal_alert_lil,modal_confirm_lil,modal_input_lil,modal_choose_lil,modal_open_lil,modal_save_lil,
-	modal_import_table,modal_export_table,
 	modal_import_image,modal_export_image,
 	modal_import_script,modal_export_script,
 	modal_import_sound,
@@ -1361,8 +1360,6 @@ void modal_enter(int type){
 	if(type==modal_confirm_new   ){ms.type=type=modal_confirm;}
 	if(type==modal_confirm_script){ms.type=type=modal_confirm;}
 	if(type==modal_multiscript   ){ms.type=type=modal_confirm;}
-	if(type==modal_import_table  ){ms.type=type=modal_open, ms.filter=filter_data, ms.desc="Open any .csv or .txt file.";}
-	if(type==modal_export_table  ){ms.type=type=modal_save, ms.filter=filter_data, ms.desc="Save table as a .csv file.";}
 	if(type==modal_import_script ){ms.type=type=modal_open, ms.filter=filter_code, ms.desc="Open any .lil or .txt file.";}
 	if(type==modal_export_script ){ms.type=type=modal_save, ms.filter=filter_code, ms.desc="Save script as a .lil file.";}
 	if(type==modal_import_sound  ){ms.type=type=modal_open, ms.filter=filter_sound,ms.desc="Open a .wav sound file.";}
@@ -1405,11 +1402,6 @@ void modal_exit(int value){
 	wid=ms.old_wid;
 	if(wid.gv==&ms.old_wid.gv_slot)wid.gv=&wid.gv_slot;
 	if(wid.fv==&ms.old_wid.fv_slot)wid.fv=&wid.fv_slot;
-	if(ms.subtype==modal_import_table&&value){
-		lv*a=l_list(n_read(NULL,l_list(modal_open_path())));
-		if(strlen(wid.g.format))ll_add(a,lmcstr(wid.g.format));
-		grid_edit(n_readcsv(NULL,a));
-	}
 	if(ms.subtype==modal_import_script&&value){
 		field_exit(),sc.f=(field_val){rtext_cast(n_read(NULL,l_list(modal_open_path()))),0};
 	}
@@ -1475,16 +1467,10 @@ void modal_exit(int value){
 		lv*name=rtext_all(ms.name.table);rename_sound(deck,au.target,name);mark_dirty();
 		au.mode=record_stopped;modal_enter(modal_sounds);ms.grid.row=dgeti(ifield(deck,"sounds"),name);return;
 	}
-	if(ms.type==modal_confirm&&ms.subtype==modal_export_table &&!value){modal_enter(ms.subtype);return;}
 	if(ms.type==modal_confirm&&ms.subtype==modal_export_script&&!value){modal_enter(ms.subtype);return;}
 	if(ms.type==modal_confirm&&ms.subtype==modal_save_deck    &&!value){modal_enter(ms.subtype);return;}
 	if(ms.type==modal_confirm&&ms.subtype==modal_save_locked  &&!value){modal_enter(ms.subtype);return;}
 	if(ms.type==modal_confirm&&ms.subtype==modal_save_lil     &&!value){modal_enter(ms.subtype);return;}
-	if(ms.subtype==modal_export_table&&value){
-		lv*path=modal_save_path(".csv");
-		if(directory_exists(path->sv)&&ms.type!=modal_confirm){modal_save_replace(modal_export_table,"CSV file",path);return;}
-		field_exit(),n_write(NULL,lml2(path,n_writecsv(NULL,lml2(wid.gv->table,grid_format()))));
-	}
 	if(ms.subtype==modal_export_script&&value){
 		lv*path=modal_save_path(".lil");
 		if(directory_exists(path->sv)&&ms.type!=modal_confirm){modal_save_replace(modal_export_script,"Lil script",path);return;}
@@ -3632,16 +3618,9 @@ void all_menus(void){
 		if(menu_item("Open...",1,'o'))modal_enter(modal_open_deck);
 		if(menu_item("Save",dirty&&strlen(document_path),'s'))save_deck(lmcstr(document_path));
 		if(menu_item("Save As...",1,'\0'))modal_enter(modal_save_deck);
-		if(wid.gv){
-			menu_separator();
-			if(menu_item("Import Table...",!wid.g.locked,'\0'))modal_enter(modal_import_table);
-			if(menu_item("Export Table...",1,'\0'))modal_enter(modal_export_table);
-		}
-		else{
-			menu_separator();
-			if(menu_item("Import Image..."   ,1,'\0'))modal_enter(modal_import_image);
-			if(menu_item("Export Image..."   ,1,'\0'))modal_enter(modal_export_image);
-		}
+		menu_separator();
+		if(menu_item("Import Image..."   ,1,'\0'))modal_enter(modal_import_image);
+		if(menu_item("Export Image..."   ,1,'\0'))modal_enter(modal_export_image);
 		menu_separator();
 		if(menu_item("Purge Volatiles",1,'\0')){n_deck_purge(deck,NONE);msg.next_view=1;}
 		menu_separator();

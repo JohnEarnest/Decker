@@ -1423,7 +1423,6 @@ modal_enter=type=>{
 	if(type=='multiscript'   )ms.type=type='confirm'
 	if(type=='save_deck'     )ms.type=type='save',ms.text=fieldstr(dname(deck.name,'.deck')),ms.desc='Save a .deck or .html file.'
 	if(type=='save_locked'   )ms.type=type='save',ms.text=fieldstr(dname(deck.name,'.html')),ms.desc='Save locked standalone deck as an .html file.'
-	if(type=='export_table'  )ms.type=type='save',ms.text=fieldstr(lms(ls(ifield(ms.old_wid.gt,'name'))+'.csv')),ms.desc='Save table as a .csv file.'
 	if(type=='export_script' )ms.type=type='save',ms.text=fieldstr(lms('script.lil'  )),ms.desc='Save script as a .lil file.'
 	if(type=='export_image'  )ms.type=type='save',ms.text=fieldstr(lms('image.gif'   )),ms.desc='Save a .gif image file.'
 	if(type=='save_lil'      )ms.type=type='save',ms.text=fieldstr(lms('untitled.txt')),ms.desc='Save a text file.'
@@ -1851,7 +1850,6 @@ modals=_=>{
 		draw_text(rect(b.x   ,tbox.y+tbox.h+7,    56,20),'Filename',FONT_MENU,1)
 		ui_field (rect(b.x+56,tbox.y+tbox.h+5,b.w-56,18),ms.text)
 		const c=rect(b.x+b.w-60,b.y+b.h-20),subtype=ms.subtype
-		const grid=ms.old_wid.gv, format=subtype!='export_table'?null:lms(ms.old_wid.g.format.length?ms.old_wid.g.format:'s'.repeat(tab_cols(grid.table).length))
 		if(ui_button(rect(c.x,c.y,60,20),'Save',1,_=>{
 			const name=ls(rtext_string(ms.text.table))
 			const savedeck=_=>{
@@ -1879,7 +1877,6 @@ modals=_=>{
 			if(subtype=='save_deck'    )savedeck()
 			if(subtype=='save_locked'  )iwrite(deck,lms('locked'),ONE),savedeck(),iwrite(deck,lms('locked'),NONE)
 			if(subtype=='export_script')save_text(name,ls(rtext_string(sc.f.table)))
-			if(subtype=='export_table' )field_exit(),save_text(name,ls(n_writecsv([grid.table,format])))
 			if(subtype=='export_image' )save_image()
 			if(subtype=='save_lil'){
 				let x=ms.verb;arg();ret(ONE)
@@ -3165,17 +3162,8 @@ all_menus=_=>{
 		menu_item('Open...',1,0,_=>open_text('.html,.deck',text=>{load_deck(deck_read(text))}))
 		if(menu_item('Save As...',1))modal_enter('save_deck')
 		menu_separator()
-		if(wid.gv){
-			menu_item('Import Table...',!wid.g.locked,0,_=>open_text('.csv',text=>{
-				const a=[lms(text)];if(wid.g.format.length)a.push(lms(wid.g.format))
-				grid_edit(n_readcsv(a))
-			}))
-			if(menu_item('Export Table...',1))modal_enter('export_table')
-		}
-		else{
-			menu_item("Import Image...",1,0,_=>{open_file('image/*',load_image)})
-			if(menu_item("Export Image...",1))modal_enter('export_image')
-		}
+		menu_item("Import Image...",1,0,_=>{open_file('image/*',load_image)})
+		if(menu_item("Export Image...",1))modal_enter('export_image')
 		menu_separator()
 		if(menu_item('Purge Volatiles',1)){deck_purge(deck),msg.next_view=1}
 		menu_separator()

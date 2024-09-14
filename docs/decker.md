@@ -265,8 +265,6 @@ In interact mode, you can select a particular row by clicking on it. If the grid
 
 If a grid is set to "Select by Cell", clicking within the grid will highlight a specific cell, instead of an entire row. In this mode, the left and right arrow keys may be used to move between columns, and pressing space or return will edit the selected cell just like a double-click.
 
-The _File_ menu offers options for importing or exporting [Comma Separated Value](https://en.wikipedia.org/wiki/Comma-separated_values) (CSV) data, respecting the grid's format string, when a grid is selected.
-
 Additionally, you can use the _Edit &#8594; Query_ dialog to issue Lil queries against the contents of the grid, preview results, and update the grid if desired:
 
 ![](images/query.gif)
