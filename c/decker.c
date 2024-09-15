@@ -1247,7 +1247,7 @@ void modal_enter(int type){
 			if(uimode==mode_object){int f=1;EACH(o,ob.sel)if(!matchr(ifield(ob.sel->lv[o],"font"),fonts->lv[z])){f=0;break;}if(f)fi=z;}
 			else if(ms.old_wid.ft){if(matchr(ifield(ms.old_wid.ft,"font"),fonts->lv[z]))fi=z;}
 			ll_add(i,lmn(icon_font)),ll_add(n,fonts->kv[z]);
-		}ms.grid=(grid_val){torect(r),0,fi,-1};
+		}ms.grid=(grid_val){torect(r),-99,fi,-1};
 	}
 	if(type==modal_resources){
 		ms.message=NULL;
@@ -1718,6 +1718,7 @@ void modals(void){
 		rect b=draw_modalbox((pair){170,170});
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Fonts",FONT_MENU,1);
 		rect gsize={b.x,b.y+15,b.w,b.h-20-50-25};
+		if(ms.grid.scroll==-99){ms.grid.scroll=grid_scrollto(ms.grid.table,(grid){gsize,FONT_BODY,{0},"",0,1,0,0,show_solid,1},-1,ms.grid.row);}
 		int choose=ui_table(gsize,1,16,0,"Is",&ms.grid);
 		rect psize={b.x,gsize.y+gsize.h+5,b.w,50};draw_box(psize,0,1);psize=inset(psize,2);
 		if(ms.grid.row>=0){layout_plaintext(pangram,ifield(deck,"fonts")->lv[ms.grid.row],align_left,(pair){psize.w,psize.h});draw_text_wrap(psize,1);}

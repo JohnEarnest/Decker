@@ -1343,7 +1343,7 @@ modal_enter=type=>{
 	if(type=='orderwids')ms.grid=gridtab(null),ms.grid.col=-99
 	if(type=='sounds')ms.grid=gridtab(sounds_enumerate())
 	if(type=='contraptions'||type=='pick_contraption')ms.grid=gridtab(contraptions_enumerate())
-	if(type=='fonts')ms.grid=fonts_enumerate()
+	if(type=='fonts')ms.grid=fonts_enumerate(),ms.grid.scroll=-99
 	if(type=='resources')ms.message=null,ms.grid=gridtab(lmt()),ms.grid2=gridtab(res_enumerate(deck))
 	if(type=='link'){
 		const t=ms.old_wid.fv.table,ol=tab_cell(t,'arg',rtext_get(t,ms.old_wid.cursor.y))
@@ -1627,7 +1627,9 @@ modals=_=>{
 	else if(ms.type=='fonts'){
 		const b=draw_modalbox(rect(170,170))
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Fonts',FONT_MENU,1)
-		const gsize=rect(b.x,b.y+15,b.w,b.h-20-50-25), choose=ui_table(gsize,[16],'Is',ms.grid)
+		const gsize=rect(b.x,b.y+15,b.w,b.h-20-50-25)
+		if(ms.grid.scroll==-99){ms.grid.scroll=grid_scrollto(ms.grid.table,{size:gsize,font:FONT_BODY,headers:0},-1,ms.grid.row)}
+		const choose=ui_table(gsize,[16],'Is',ms.grid)
 		let psize=rect(b.x,gsize.y+gsize.h+5,b.w,50);draw_box(psize,0,1),psize=inset(psize,2)
 		if(ms.grid.row>=0){
 			const l=layout_plaintext(PANGRAM,deck.fonts.v[ms.grid.row],ALIGN.left,rect(psize.w,psize.h));draw_text_wrap(psize,l,1)}
