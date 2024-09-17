@@ -620,7 +620,7 @@ function love_parse(  r,k){
 	}
 	if(json_m("%")){
 		json_m("%");r="%%"
-		while(json_c()~/[a-zA-Z0-9+/=]/)r=r json_nx()
+		while(json_c()~/[a-zA-Z0-9+\/=]/)r=r json_nx()
 		if(substr(r,1,5)=="%%IMG")return image_read(r)
 		if(substr(r,1,5)=="%%DAT")return array_read(r)
 		return NONE
@@ -2117,10 +2117,10 @@ function parse_atmonad(b,n,  l,li,depth,t,m,mi){
 	while(depth-->0){t=tempname();m=lmblk();mi=lmblk();blk_get(mi,t);blk_cat(mi,l);blk_loop(m,l_list(lms(t)),mi);l=m}
 	blk_cat(b,l)
 }
-function parse_atdyad(b,  func,l,li,z,depth,t,m,mi){
+function parse_atdyad(b,  f,l,li,z,depth,t,m,mi){
 	depth=0;while(tmatchsp("@"))depth++
-	func=tempname();blk_set(b,func);blk_op(b,"DROP");expr(b)
-	li=lmblk();blk_get(li,func);blk_get(li,"v");blk_opa(li,"BUND",1);blk_op(li,"CALL");
+	f=tempname();blk_set(b,f);blk_op(b,"DROP");expr(b)
+	li=lmblk();blk_get(li,f);blk_get(li,"v");blk_opa(li,"BUND",1);blk_op(li,"CALL");
 	l=lmblk();blk_loop(l,l_list(lms("v")),li);
 	while(depth-->0){t=tempname();m=lmblk();mi=lmblk();blk_get(mi,t);blk_cat(mi,l);blk_loop(m,l_list(lms(t)),mi);l=m}
 	blk_cat(b,l)
