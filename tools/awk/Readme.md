@@ -42,9 +42,9 @@ Lila has been tested against several Awk implementations:
 - `awk` 20200816
 - `awk` 20070501
 - `mawk` v1.3.4
+- `goawk` v1.29.0
 - `gawk` v5.3.0 (requires the additional `-b` flag to disable locale-specific character handling)
 - `gawk` v4.0.1 (see above)
-- `goawk` v1.27.0 (`sys.ms` and `sys.now` do not work correctly)
 
 Lila includes a large subset of the standard library provided with [Lilt](http://beyondloom.com/decker/lilt.html), with the following omissions, limitations, and caveats:
 
