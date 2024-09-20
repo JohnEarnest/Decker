@@ -509,7 +509,7 @@ draw_state=_=>({ // drawing tools state
 	tool:'pencil',brush:0,pattern:1,fill:0,erasing:0, dither_threshold:0,
 	show_widgets:1,show_anim:1,trans:0,trans_mask:0,under:0,color:0,fatbits:0,offset:rect(),
 	show_grid:0,snap:0,grid_size:rect(16,16), sel_here:rect(),sel_start:rect(),limbo:null,limbo_dither:0,
-	scratch:null,mask:null,omask:null, pickfill:0, poly:[], zoom:8, lasso_dirty:0,
+	scratch:null,mask:null,omask:null, pickfill:0, poly:[], zoom:4, lasso_dirty:0,
 })
 let dr=draw_state()
 settool=tool=>{setmode('draw'),dr.tool=tool}

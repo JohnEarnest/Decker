@@ -108,8 +108,8 @@ typedef struct {
 	lv* scratch, *mask, *omask;
 	int pickfill, zoom, lasso_dirty;
 } draw_state;
-draw_state ddr={tool_pencil,0,1,0,0, 1,1,0,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0, 8, 0};
-draw_state dr ={tool_pencil,0,1,0,0, 1,1,0,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0, 8, 0};
+draw_state ddr={tool_pencil,0,1,0,0, 1,1,0,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0, 4, 0};
+draw_state dr ={tool_pencil,0,1,0,0, 1,1,0,0,0,0,0,{0}, 0,0,{16,16}, {0},{0},NULL,0, NULL,NULL,NULL, 0, 4, 0};
 int bg_pat(void){return dr.trans_mask&&dr.pattern==0?32:dr.pattern;}
 int bg_fill(void){return dr.trans_mask&&dr.fill==0?32:dr.fill;}
 int bg_has_sel(void){return dr.tool==tool_select&&(dr.sel_here.w>0||dr.sel_here.h>0);}
