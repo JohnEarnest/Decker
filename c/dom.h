@@ -1846,6 +1846,18 @@ grid unpack_grid(lv*x,grid_val*value){
 	lv*w=ifield(x,"widths");r.widths[0]=w->c;EACH(z,w)r.widths[1+z]=ln(w->lv[z]);
 	return r;
 }
+int grid_scrollto(lv*t,grid g,int s,int r){
+	int head=g.headers?10+5:0;         // default to body font height
+	int row=g.font?font_h(g.font):11;  // default to mono font height
+	int n=MIN(t->n,0|((g.size.h-head+1)/(row+5)));
+	return (r-s<0)?r: (r-s>=n)?r-(n-1): s;
+}
+lv* n_grid_scrollto(lv*self,lv*x){
+	grid_val v;grid g=unpack_grid(self,&v);
+	int t=grid_scrollto(v.table,g,v.scroll,ln(l_first(x)));
+	if(t!=v.scroll)iwrite(self,lmistr("scroll"),lmn(t));
+	return self;
+}
 lv* interface_grid(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	lv*data=self->b;
@@ -1880,6 +1892,7 @@ lv* interface_grid(lv*self,lv*i,lv*x){
 		ikey("colname"  ){int c=ln(ifield(self,"col"));lv*v=ifield(self,"value");return c<0||c>=v->c?NONE: v->kv[c];}
 		ikey("rowvalue" ){int r=ln(ifield(self,"row"))                         ;lv*v=ifield(self,"value");return r<0||     r>=v->n         ?lmd():l_at(v,lmn(r));}
 		ikey("cellvalue"){int r=ln(ifield(self,"row")),c=ln(ifield(self,"col"));lv*v=ifield(self,"value");return r<0||c<0||r>=v->n||c>=v->c?NONE:v->lv[c]->lv[r];}
+		ikey("scrollto" )return lmnat(n_grid_scrollto,self);
 	}return interface_widget(self,i,x);
 }
 lv* grid_read(lv*x,lv*r){

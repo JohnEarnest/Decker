@@ -838,8 +838,6 @@ grid_undo=_=>{const x=wid.hist[--(wid.hist_cursor)];grid_apply(x[0])}
 grid_redo=_=>{const x=wid.hist[(wid.hist_cursor)++];grid_apply(x[1])}
 grid_edit=v=>{wid.hist=wid.hist.slice(0,wid.hist_cursor),wid.hist.push([wid.gv.table,v]),grid_redo()}
 grid_deleterow=_=>grid_edit(dyad.drop(lml([lmn(wid.gv.row)]),wid.gv.table))
-grid_rowsvisible=(t,g)=>min(count(t),0|((g.size.h-(g.headers?font_h(FONT_BODY)+5:0)+1)/(font_h(g.font||FONT_MONO)+5)))
-grid_scrollto=(t,g,s,r)=>{const n=grid_rowsvisible(t,g);return (r-s<0)?r: (r-s>=n)?r-(n-1): s}
 grid_insertrow=_=>{
 	const f=ls(grid_format()), x=wid.gv.table, r=lmt(), s=wid.gv.row+1
 	tab_cols(x).map((k,col)=>{

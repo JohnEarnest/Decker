@@ -696,11 +696,6 @@ void grid_apply(lv*v){
 void grid_undo(void){lv*x=wid.hist->lv[--(wid.hist_cursor)];grid_apply(x->lv[0]);}
 void grid_redo(void){lv*x=wid.hist->lv[(wid.hist_cursor)++];grid_apply(x->lv[1]);}
 void grid_edit(lv*v){wid.hist->c=wid.hist_cursor,ll_add(wid.hist,lml2(wid.gv->table,v)),grid_redo();}
-int grid_scrollto(lv*t,grid g,int s,int r){
-	lv*h=g.font?g.font:FONT_MONO;
-	int n=MIN(t->n,0|((g.size.h-(g.headers?font_h(FONT_BODY)+5:0)+1)/(font_h(h)+5)));
-	return (r-s<0)?r: (r-s>=n)?r-(n-1): s;
-}
 void grid_deleterow(void){grid_edit(l_drop(l_list(lmn(wid.gv->row)),wid.gv->table));}
 void grid_insertrow(void){
 	lv*f=grid_format(),*x=wid.gv->table,*r=lmt();int s=wid.gv->row+1;EACH(z,x){

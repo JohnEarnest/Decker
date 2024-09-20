@@ -1978,6 +1978,10 @@ slider_write=x=>{
 	if(x.style&&x.style!='horiz')dset(r,lms('style'),lms(x.style))
 	return r
 }
+grid_scrollto=(t,g,s,r)=>{
+	const head=g.headers?10+5:0, row=g.font?font_h(g.font):11, n=min(count(t),0|((g.size.h-head+1)/(row+5)));
+	return (r-s<0)?r: (r-s>=n)?r-(n-1): s
+}
 grid_read=(x,card)=>{
 	const ints=(x,n)=>{const r=[];for(let z=0;z<n&&z<x.length;z++)r.push(ln(x[z]));return r}
 	const ri=lmi((self,i,x)=>{
@@ -2016,6 +2020,12 @@ grid_read=(x,card)=>{
 				const r=ln(ifield(self,'row')),c=ln(ifield(self,'col')),v=ifield(self,'value'),cn=tab_cols(v);
 				return r<0||c<0||r>=count(v)||c>=tab_cols(v).length?NONE: tab_cell(v,cn[c],r)
 			}
+			if(ikey(i,'scrollto'))return lmnat(z=>{
+				const sz=rpair(getpair(ifield(self,'pos')),getpair(ifield(self,'size'))), s=ln(ifield(self,'scroll'))
+				const g={size:sz,font:ifield(self,'font'),headers:lb(ifield(self,'headers'))}
+				const t=grid_scrollto(ifield(self,'value'),g,s,ln(z.length?z[0]:NONE))
+				if(t!=s)iwrite(self,lms('scroll'),lmn(t));return self
+			})
 		}return interface_widget(self,i,x)
 	},'grid');ri.card=card
 	init_field(ri,'scrollbar',x)

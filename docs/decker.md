@@ -1153,6 +1153,7 @@ The grid widget represents an interactive spreadsheet-style view of a table.
 | `x.rowvalue`            | Dict. The selected row of the table, or an empty dictionary for no selection. r/w.                    |
 | `x.cellvalue`           | Anything. The selected cell value of the table, or `0` for no selection. r/w.                         |
 | `x.format`              | String. A column spec for formatting columns of the table. See `writecsv[]`. r/w.                     |
+| `x.scrollto[r]`         | Scroll as needed to ensure that row `r` of the grid is visible.                                       |
 | `x.event[n ...x]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
 
