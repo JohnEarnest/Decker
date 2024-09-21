@@ -3348,6 +3348,12 @@ void event_pointer_button(int primary,int down){
 		if(!primary)ev.rup=1;
 	}
 }
+float color_dist(int a,int b){
+	int dr=(0xFF&(a>>16))-(0xFF&(b>>16));
+	int dg=(0xFF&(a>> 8))-(0xFF&(b>> 8));
+	int db=(0xFF&(a    ))-(0xFF&(b    ));
+	return (dr*dr)+(dg*dg)+(db*db);
+}
 void event_file(char*p){
 	if(lb(ifield(deck,"locked")))return;
 	if(has_suffix(p,".html")||has_suffix(p,".deck")){
@@ -3373,14 +3379,15 @@ void event_file(char*p){
 		ob_create(l_list(a));
 	}
 	if(has_suffix(p,".hex")){
-		lv*pat=ifield(deck,"patterns");
+		lv*pat=ifield(deck,"patterns");iwrite(pat,lmn(32),lmn(0xFFFFFF));iwrite(pat,lmn(47),NONE);
 		lv*t=l_parse(lmistr("%h"),l_split(lmistr("\n"),ls(n_read(NULL,l_list(lmcstr(p))))));
 		if(t->c&&ln(t->lv[t->c-1])==0)t->c--; // trailing newline?
 		if(t->c>14){
 			int a=0,b=0;EACH(z,t){
-				if(ln(t->lv[z])<ln(t->lv[a]))a=z; // darkest  -> black
-				if(ln(t->lv[z])>ln(t->lv[b]))b=z; // lightest -> white
-			}iwrite(pat,lmn(47),t->lv[a]),iwrite(pat,lmn(32),t->lv[b]);
+				if(color_dist(ln(t->lv[z]),0x000000)<color_dist(ln(t->lv[a]),0x000000))a=z; // darkest  -> black
+				if(color_dist(ln(t->lv[z]),0xFFFFFF)<color_dist(ln(t->lv[b]),0xFFFFFF))b=z; // lightest -> white
+			}
+			iwrite(pat,lmn(47),t->lv[a]),iwrite(pat,lmn(32),t->lv[b]);
 			lv*f=lml(0);EACH(z,t)if(z!=a&&z!=b)ll_add(f,t->lv[z]);t=f;
 		}
 		for(int z=0;z<14&&z<t->c;z++)iwrite(pat,lmn(33+z),t->lv[z]);

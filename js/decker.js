@@ -3777,9 +3777,19 @@ q('body').ondrop=e=>{
 	}
 	if(/\.hex$/i.test(file.name)){
 		file.text().then(t=>{
+			const color_dist=(a,b)=>{
+				const dr=(0xFF&(a>>16))-(0xFF&(b>>16))
+				const dg=(0xFF&(a>> 8))-(0xFF&(b>> 8))
+				const db=(0xFF&(a    ))-(0xFF&(b    ))
+				return (dr*dr)+(dg*dg)+(db*db)
+			}
+			iwrite(deck.patterns,lmn(32),lmn(0xFFFFFF)),iwrite(deck.patterns,lmn(47),NONE)
 			let pal=ll(dyad.parse(lms('%h'),lml(t.split('\n').slice(0,-1).map(lms))))
 			if(pal.length>14){
-				let a=0,b=0;pal.map((v,i)=>{if(ln(v)<ln(pal[a]))a=i;if(ln(v)>ln(pal[b]))b=i})
+				let a=0,b=0;pal.map((v,i)=>{
+					if(color_dist(ln(v),0x000000)<color_dist(ln(pal[a]),0x000000))a=i
+					if(color_dist(ln(v),0xFFFFFF)<color_dist(ln(pal[b]),0xFFFFFF))b=i
+				})
 				iwrite(deck.patterns,lmn(47),pal[a]),iwrite(deck.patterns,lmn(32),pal[b])
 				pal=pal.filter((_,i)=>i!=a&&i!=b)
 			}for(let z=0;z<15&&z<pal.length;z++)iwrite(deck.patterns,lmn(33+z),pal[z])
