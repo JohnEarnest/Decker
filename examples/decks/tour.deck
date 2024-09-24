@@ -491,6 +491,8 @@ helpful early feedback on lil:{"type":"field","size":[104,19],"pos":[183,289],"l
 best possible hens:{"type":"field","size":[104,19],"pos":[49,266],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"pippi & galena"}
 usability feedback:{"type":"field","size":[104,19],"pos":[329,257],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"tomr"}
 improvements to draw tools:{"type":"field","size":[104,19],"pos":[348,299],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"darzington"}
+lilt qa and design feedback:{"type":"field","size":[104,19],"pos":[230,214],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"razetime"}
+forever in our hearts:{"type":"field","size":[104,19],"pos":[91,299],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"eggbug"}
 
 {script:credits.0}
 on click do
