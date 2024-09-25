@@ -1672,6 +1672,23 @@ lv*n_rtext_replace(lv*self,lv*z){
 		}if(!any)c.y++;
 	}if(c.x<text->c)ll_add(r,rtext_span(t,(pair){c.x,RTEXT_END}));return n_rtext_cat(self,r);
 }
+lv*n_rtext_find(lv*self,lv*z){
+	(void)self;lv*r=lml(0);if(z->c<2)return r;int nocase=z->c>=3&&lb(z->lv[2]);
+	lv*text=lit(z->lv[0])?rtext_all(rtext_cast(z->lv[0])): ls(z->lv[0]), *k=z->lv[1];
+	if(!lil(k))k=l_list(k);EACH(z,k)k->lv[z]=ls(k->lv[z]);
+	for(int x=0;x<text->c;){
+		int any=0;EACH(ki,k){
+			lv*key=k->lv[ki];int f=1;
+			if(nocase){EACH(i,key)if(tolower(text->sv[x+i])!=tolower(key->sv[i])){f=0;break;}}
+			else      {EACH(i,key)if(        text->sv[x+i] !=        key->sv[i] ){f=0;break;}}
+			if(f){ll_add(r,lml2(lmn(x),lmn(x+key->c)));x+=MAX(1,key->c);any=1;break;}
+		}if(!any)x++;
+	}return r;
+}
+lv*n_rtext_index(lv*self,lv*z){
+	(void)self;if(!z->c)return NONE;int r=0;lv*t=rtext_all(rtext_cast(l_first(z)));pair g=z->c>1?getpair(z->lv[1]):(pair){0,0};
+	while(r<t->c&&g.x>0)if(t->sv[r++]=='\n')g.x--; while(r<t->c&&g.y>0&&t->sv[r]!='\n'){g.y--,r++;} return lmn(r);
+}
 lv* rtext_read_images(lv*x){lv*r=lml(0),*a=dget(x,lmistr("arg"));if(a)EACH(z,a)if(image_is(a->lv[z]))ll_add(r,a->lv[z]);return r;}
 lv* rtext_write_images(lv*x){return n_rtext_cat(NULL,ll(x));}
 lv* interface_rtext(lv*self,lv*i,lv*x){
@@ -1679,10 +1696,12 @@ lv* interface_rtext(lv*self,lv*i,lv*x){
 	ikey("make"   )return lmnat(n_rtext_make   ,self);
 	ikey("len"    )return lmnat(n_rtext_len    ,self);
 	ikey("get"    )return lmnat(n_rtext_get    ,self);
+	ikey("index"  )return lmnat(n_rtext_index  ,self);
 	ikey("string" )return lmnat(n_rtext_string ,self);
 	ikey("span"   )return lmnat(n_rtext_span   ,self);
 	ikey("split"  )return lmnat(n_rtext_split  ,self);
 	ikey("replace")return lmnat(n_rtext_replace,self);
+	ikey("find"   )return lmnat(n_rtext_find   ,self);
 	ikey("cat"    )return lmnat(n_rtext_cat    ,self);
 	return x?x:NONE;
 }

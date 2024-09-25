@@ -663,22 +663,28 @@ Rich text is represented as a table with columns `text`, `font`, and `arg`. The 
 
 The _rtext_ interface contains a number of helper routines for building and manipulating rtext tables. It is available as a global constant named `rtext`.
 
-| Name                         | Description                                                                      |
-| :--------------------------- | :------------------------------------------------------------------------------- |
-| `typeof rtext`               | `"rtext"`                                                                        |
-| `rtext.end`                  | The end position of any rtext table.                                             |
-| `rtext.make[text font arg]`  | Make a new single-row rtext table from `text`. `font` and `arg` are optional.    |
-| `rtext.len[table]`           | The number of character positions in the text content of `table`.                |
-| `rtext.get[table x]`         | The row number of `table` containing character position `x`, or -1.              |
-| `rtext.string[table (x,y)]`  | The text content of `table` between character positions `x` and `y`.             |
-| `rtext.span[table (x,y)]`    | An rtext subtable containing content between character positions `x` and `y`.    |
-| `rtext.split[delim table]`   | Break an rtext into a list of tables at instances of a delimiter string `delim`. |
-| `rtext.replace[table x y i]` | Replace every instance in `table` of `x` with `y`. If `i`, ignore case.          |
-| `rtext.cat[...x]`            | Concatenate rtext tables sequentially. Accepts any number of arguments.          |
+| Name                         | Description                                                                       |
+| :--------------------------- | :-------------------------------------------------------------------------------- |
+| `typeof rtext`               | `"rtext"`                                                                         |
+| `rtext.end`                  | The end position of any rtext table.                                              |
+| `rtext.make[text font arg]`  | Make a new single-row rtext table from `text`. `font` and `arg` are optional.     |
+| `rtext.len[table]`           | The number of character positions in the text content of `table`.                 |
+| `rtext.get[table x]`         | The row number of `table` containing character position `x`, or -1.               |
+| `rtext.index[table (l,c)]`   | The character position of line `l` and column `c` of the text content of `table`. |
+| `rtext.string[table (x,y)]`  | The text content of `table` between character positions `x` and `y`.              |
+| `rtext.span[table (x,y)]`    | An rtext subtable containing content between character positions `x` and `y`.     |
+| `rtext.split[delim table]`   | Break an rtext into a list of tables at instances of a delimiter string `delim`.  |
+| `rtext.replace[table x y i]` | Replace every instance in `table` of `x` with `y`. If `i`, ignore case.           |
+| `rtext.find[table x i]`      | Find every instance in `table` of `x`. If `i`, ignore case.                       |
+| `rtext.cat[...x]`            | Concatenate rtext tables sequentially. Accepts any number of arguments.           |
 
 Dictionary arguments to `rtext.cat[]` are promoted to tables, Image interfaces are turned into inline image spans, and any other arguments which are not already tables will be interpreted as strings and converted to text runs as by `rtext.make[x "" ""]`. Thus, with a single argument, `rtext.cat[]` can be used to _cast_ values to properly formed rtext tables. Sequential rows with matching `font` and (non-image) `arg` values will be coalesced together, and rows with empty `text` spans will be dropped.
 
+Note that `rtext.index[]` measures lines and columns from 0, and only treats newline characters (`\n`) as starting a new line. In practice, rich text may additionally be word-wrapped to fit a field or other region, so _logical_ lines supplied here do not necessarily correspond to _visible_ lines as drawn with word-wrap.
+
 The `rtext.replace[table x y i]` function expects `x` to be a key string or list of strings, which will be greedily matched against the text content of `table`. The argument `y` should be an rtext table or a list of such tables (or a string or list of strings). If more than one value is provided for both `x` and `y`, corresponding elements of `x` will be replaced with elements of `y`.
+
+The `rtext.find[table x i]` function expects `x` to be a key string or list of strings, which will be greedily matched against the text content of the `table` (which may also be provided as a string). The result will always be a list of pairs of `(x,y)` character positions, each representing the start and end a span that was matched, consistent with input for `rtext.span[]`.
 
 To measure the on-screen dimensions of an rtext, see `canvas.textsize[]`.
 

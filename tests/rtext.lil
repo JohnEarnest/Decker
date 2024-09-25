@@ -23,6 +23,15 @@ show[rtext.get[rt1 18]]
 show[rtext.get[rt1 -5]]
 show[rtext.get[rt1 1000]]
 
+show[rtext.index[]]                       # bogus args 1
+show[rtext.index["one\ntwo\nthree"     ]] # bogus args 2
+show[rtext.index["one\ntwo\nthree" 1,0 ]] # line number
+show[rtext.index["one\ntwo\nthree" 2,1 ]] # line, column
+show[rtext.index["one\ntwo\nthree" 4,0 ]] # pos clamp line number
+show[rtext.index["one\ntwo\nthree" -4,0]] # neg clamp line number
+show[rtext.index["one\ntwo\nthree" 1,6 ]] # pos clamp row number
+show[rtext.index["one\ntwo\nthree" 2,-5]] # neg clamp row number
+
 show[rtext.cat[insert text with "single" end]]# cast
 show[rtext.cat[rt1 rt2]]                      # catenate
 show[rtext.cat["one" rt2 "another"]]          # catenate w/ strings
@@ -53,6 +62,7 @@ print["--d2--"] each v in rtext.split["\n\n" d2] show[v] end
 
 norm:select text font arg from rt1
 show[rt1~rtext.replace[rt1]]                             # bogus args
+show[rtext.cat[rt1]~rtext.replace[rt1 "" "NEVER"]]       # empty key
 show[norm~rtext.replace[rt1 "bogus" "AAAAAAAA"]]         # no matches
 show[rtext.replace[rt1 "salsa" "pineapple"]]             # simple a->b
 show[rtext.replace[rt1 "sa?" "{C}"]]                     # trailing replacement
@@ -61,3 +71,15 @@ show[rtext.replace[rt1 ("Hello","about") "?!?"]]         # multiple keys, one va
 show[rtext.replace[rt1 ("Hello","about") ("{A}","{B}")]] # multiple keys, multiple values
 show[rtext.replace[rt1 "about" rtext.make["ABOUT" "menu" "http://about.com"]]] # rtext replacement
 show[rtext.replace["Some some somE none" "some" "Q" 1]]  # case-insensitive
+
+show[rtext.find[]]                                        # bogus args 1
+show[rtext.find[rt1]]                                     # bogus args 2
+show[rtext.find["ABC" ""]]                                # empty key
+show[rtext.find[rt1 "how"]]                               # find word
+show[rtext.find["one two one one" "one"]]                 # find words
+show[rtext.find["one two three" "nope"]]                  # no match
+show[rtext.find["eye\nbee\nsea" "\n"]]                    # find newlines
+show[rtext.find["one two one three one" ("two","three")]] # multiple keys
+show[rtext.find["one a two A A three a" "a" 0]]           # case-sensitive
+show[rtext.find["one a two A A three a" "a" 1]]           # case-insensitive
+show[rtext.find["aaaaaa" "aaa"]]                          # matches don't overlap

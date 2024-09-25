@@ -1218,10 +1218,12 @@ function natives(name,self,args,  z,r,prog,vars,n,t,pv,j,file){
 	if(name=="rtext_make"     )return n_rtext_make(args)
 	if(name=="rtext_len"      )return n_rtext_len(args)
 	if(name=="rtext_get"      )return n_rtext_get(args)
+	if(name=="rtext_index"    )return n_rtext_index(args)
 	if(name=="rtext_string"   )return n_rtext_string(args)
 	if(name=="rtext_span"     )return n_rtext_span(args)
 	if(name=="rtext_split"    )return n_rtext_split(args)
 	if(name=="rtext_replace"  )return n_rtext_replace(args)
+	if(name=="rtext_find"     )return n_rtext_find(args)
 	if(name=="rtext_cat"      )return n_rtext_cat(args)
 	if(name=="image_map"      )return n_image_map(self,args)
 	if(name=="image_merge"    )return n_image_merge(self,args)
@@ -1276,10 +1278,12 @@ function interfaces(self,i,x,  r){
 		if(lvs(i)=="make"   )return lmnat("make"   ,"rtext_make"   )
 		if(lvs(i)=="len"    )return lmnat("len"    ,"rtext_len"    )
 		if(lvs(i)=="get"    )return lmnat("get"    ,"rtext_get"    )
+		if(lvs(i)=="index"  )return lmnat("index"  ,"rtext_index"  )
 		if(lvs(i)=="string" )return lmnat("string" ,"rtext_string" )
 		if(lvs(i)=="span"   )return lmnat("span"   ,"rtext_span"   )
 		if(lvs(i)=="split"  )return lmnat("split"  ,"rtext_split"  )
 		if(lvs(i)=="replace")return lmnat("replace","rtext_replace")
+		if(lvs(i)=="find"   )return lmnat("find"   ,"rtext_find"   )
 		if(lvs(i)=="cat"    )return lmnat("cat"    ,"rtext_cat"    )
 	}
 	else if(li_name(self)=="image"){
@@ -1913,6 +1917,28 @@ function n_rtext_replace(args,  r,t,k,v,text,z,cx,cy,ki,any,key,val,f,i){
 			if(f){if(cx!=cy)lst_add(r,rtext_span(t,cx,cy));lst_add(r,val);cx=cy=(cy+count(key));any=1}
 		}if(!any)cy++
 	}if(cx<count(text))lst_add(r,rtext_span(t,cx,RTEXT_END));return n_rtext_cat(r)
+}
+function n_rtext_find(args,  r,nocase,text,ki,k,z,x,any,key,f){
+	r=lml();if(count(args)<2)return r
+	nocase=count(args)>=3&&lb(lst_get(args,2))
+	text=lvs(lit(l_first(args))?ls(rtext_string(rtext_cast(l_first(args)),0,RTEXT_END)): ls(l_first(args)))
+	ki=lst_get(args,1);if(!lil(ki))ki=l_list(ki);k=lml();for(z=0;z<count(ki);z++)lst_add(k,ls(lst_get(ki,z)))
+	for(x=0;x<length(text);){
+		any=0;for(ki=0;ki<count(k);ki++){
+			key=lst_get(k,ki);f=1
+			f=nocase?tolower(lvs(key))==tolower(substr(text,x+1,count(key))): lvs(key)==substr(text,x+1,count(key))
+			if(f){lst_add(r,lml2(lmn(x),lmn(x+count(key))));x+=max(1,count(key));any=1;break}
+		};if(!any)x++
+	};return r
+}
+function n_rtext_index(args,  r,t,gx,gy){
+	if(count(args)<1)return NONE;r=0
+	t=lvs(rtext_string(rtext_cast(l_first(args)),0,RTEXT_END))
+	gx=count(args)>1?ln(l_first(lst_get(args,1))):0
+	gy=count(args)>1?ln(l_last(lst_get(args,1))):0
+	while(r<length(t)&&gx>0){if(substr(t,r+1,1)=="\n"){gx--};r++}
+	while(r<length(t)&&gy>0&&(substr(t,r+1,1)!="\n")){gy--;r++}
+	return lmn(r)
 }
 function n_rtext_cat(args,  r,z){
 	r=l_take(NONE,rtext_cast(lmt()))

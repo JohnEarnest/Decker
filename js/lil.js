@@ -1857,6 +1857,20 @@ interface_rtext=lmi((self,i,x)=>{
 			});if(!any)c.y++
 		}if(c.x<text.length)r.push(rtext_span(t,rect(c.x,RTEXT_END)));return rtext_cat(r)
 	})
+	if(ikey(i,'find'))return lmnat(([tab,k,i])=>{
+		const r=[];if(!tab||!k)return lml(r);const nocase=i&&lb(i),tx=ls(rtext_string(rtext_cast(tab))),text=nocase?tx.toLowerCase():tx
+		k=lil(k)?ll(k):[k];k=k.map(x=>nocase?ls(x).toLowerCase(): ls(x))
+		for(let x=0;x<text.length;){
+			let any=0;for(let ki=0;ki<k.length;ki++){
+				const key=k[ki];let f=1;for(let i=0;i<key.length;i++)if(text[x+i]!=key[i]){f=0;break}
+				if(f){r.push(lml([lmn(x),lmn(x+key.length)])),x+=max(1,key.length),any=1;break}
+			}if(!any)x++
+		}return lml(r)
+	})
+	if(ikey(i,'index'))return lmnat(([tab,g])=>{
+		if(!tab)return NONE;let r=0;const t=ls(rtext_string(rtext_cast(tab)));g=g?rint(getpair(g)):rect()
+		while(r<t.length&&g.x>0)if(t[r++]=='\n')g.x--;while(r<t.length&&g.y>0&&t[r]!='\n'){g.y--,r++};return lmn(r)
+	})
 	return x?x:NONE
 },'rtext')
 button_styles={round:1,rect:1,check:1,invisible:1}
