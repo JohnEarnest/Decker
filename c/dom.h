@@ -1727,6 +1727,13 @@ field unpack_field(lv*x,field_val*value){
 		lb(ifield(x,"locked")),
 	};
 }
+lv* n_field_scrollto(lv*self,lv*x){
+	field_val v;field f=unpack_field(self,&v);rect bi=inset(f.size,2);if(f.scrollbar)bi.w-=12+3; // arrow size+pad
+	layout_richtext(ivalue(ivalue(self,"card"),"deck"),v.table,f.font,f.align,bi.w);
+	int i=ln(l_first(x));rect c=layout[MIN(MAX(0,i),(layout_count-1))].pos;c.y-=v.scroll;int ch=MIN(bi.h,c.h),t=v.scroll;
+	if(c.y<0){t+=c.y;}if(c.y+ch>=bi.h){t+=((c.y+ch)-bi.h);}if(t!=v.scroll)iwrite(self,lmistr("scroll"),lmn(t));
+	return self;
+}
 lv* interface_field(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	lv*data=self->b;
@@ -1760,6 +1767,7 @@ lv* interface_field(lv*self,lv*i,lv*x){
 			lv*style=ivalue(self,"style"); int code=style&&!strcmp(ls(style)->sv,"code");
 			lv*r=dget(data,i);return r?dget(fonts,r): code?dget(fonts,lmistr("mono")): fonts->lv[0];
 		}
+		ikey("scrollto" )return lmnat(n_field_scrollto,self);
 	}return interface_widget(self,i,x);
 }
 lv* field_read(lv*x,lv*r){

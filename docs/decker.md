@@ -1087,12 +1087,20 @@ The field widget displays and possibly allows the editing of text.
 | `x.scrollbar`           | Bool. Draw a scrollbar for this widget? r/w.                                                          |
 | `x.style`               | The style of field; one of {`"rich"`, `"plain"`, `"code"`}. r/w.                                      |
 | `x.align`               | The text alignment of the field; one of {`"left"`, `"center"`, `"right"`}. r/w.                       |
+| `x.scrollto[x]`         | Scroll as needed to ensure that character position `x` of the field's text content is visible.        |
 | `x.event[n ...x]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
 
 If a field has a `style` other than `rich`, any rtext written to the `value` attribute will be coalesced into a single run of ordinary text with the default font.
 
 See also: [rtext](#rtextinterface).
+
+The `field.scrollto[x]` function accepts `x` as a character position, like most of the functions in the rtext interface. The `rtext.index[table (line,column)]` function can convert a logical line and column (as you might get in `eval[].errorpos`) to a character position. The `rtext.find[table key nocase]` function can find the spans within which any instances of a given keyword appear; the first of each such span is the character position where it begins. As a practical example, if we wanted to scroll a field `f` to ensure that the first instance of the string `"NEEDLE"` within it (case-insensitive) is visible, we might do something like:
+
+```lil
+s:first rtext.find[f.value "NEEDLE" 1] # the first match, if any
+f.scrollto[first s]                    # the starting point of the matching span
+```
 
 The `field.data` and `field.images` attributes offer a convenient way to stash arbitrary Lil values (excluding functions and interfaces that are not an _Image_, _Sound_, or _Array_), or a list of Image values, respectively, in a Field. Note that reading `field.images` retrieves images _by reference_ from rtext content, whereas reading `field.data` always decodes a fresh copy of any contained images; the former is therefore more efficient when storing and retrieving large images.
 

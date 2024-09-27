@@ -1935,6 +1935,13 @@ field_read=(x,card)=>{
 			if(ikey(i,'align'    ))return lms(ivalue(self,ls(i),'left'))
 			if(ikey(i,'size'     ))return lmpair(ivalue(self,ls(i),rect(100,20)))
 			if(ikey(i,'font'     ))return dget(self.card.deck.fonts,lms(self.font||(self.style=='code'?'mono':'body')))
+			if(ikey(i,'scrollto' ))return lmnat(([x])=>{
+				const bi=inset(rpair(getpair(ifield(self,'pos')),getpair(ifield(self,'size'))),2);if(lb(ifield(self,'scrollbar')))bi.w-=12+3
+				const l=layout_richtext(self.card.deck,ifield(self,'value'),ifield(self,'font'),ALIGN[ls(ifield(self,'align'))],bi.w)
+				const i=x?min(max(0,0|ln(monad.first(x))),l.layout.length-1):0, c=rcopy(l.layout[i].pos), os=ln(ifield(self,'scroll'));c.y-=os
+				const ch=min(bi.h,c.h);let t=os;if(c.y<0){t+=c.y};if(c.y+ch>=bi.h){t+=((c.y+ch)-bi.h)}
+				if(t!=os)iwrite(self,lms('scroll'),lmn(t));return self
+			})
 		}return interface_widget(self,i,x)
 	},'field');ri.card=card
 	{const k=lms('value'),v=dget(x,k);if(v)iwrite(ri,k,rtext_read(v))}
