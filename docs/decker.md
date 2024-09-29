@@ -1819,21 +1819,22 @@ An example functional brush, a round brush which gets smaller for faster strokes
 ```lil
 # 11 round brush images ranging from 8px to 1px:
 
-b:image @ "\n" split 1 drop "
-%%IMG0AAgACDx+/////348
-%%IMG0AAcAB3z+/v7+/nw=
-%%IMG0AAcABzh8/v7+fDg=
-%%IMG0AAYABnj8/Pz8eA==
-%%IMG0AAYABjB4/Px4MA==
-%%IMG0AAUABXD4+Phw
-%%IMG0AAQABGDw8GA=
-%%IMG0AAMAA+Dg4A==
-%%IMG0AAMAA0DgQA==
-%%IMG0AAIAAsDA
-%%IMG0AAEAAYA="
+b:"%J" parse "[
+ %%IMG0AAgACDx+/////348,
+ %%IMG0AAcAB3z+/v7+/nw=,
+ %%IMG0AAcABzh8/v7+fDg=,
+ %%IMG0AAYABnj8/Pz8eA==,
+ %%IMG0AAYABjB4/Px4MA==,
+ %%IMG0AAUABXD4+Phw,
+ %%IMG0AAQABGDw8GA=,
+ %%IMG0AAMAA+Dg4A==,
+ %%IMG0AAMAA0DgQA==,
+ %%IMG0AAIAAsDA,
+ %%IMG0AAEAAYA=,
+]"
 
 # pre-computing the above table outside the function avoids
-# unnecessary work every time Velocity[] is called!
+# unnecessary work every time Sumi[] is called!
 
 brush[on Sumi delta do
 	b[10 & .5 * mag delta]
