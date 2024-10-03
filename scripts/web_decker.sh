@@ -20,4 +20,4 @@ cat js/danger.js >> $DST
 cat js/decker.js >> $DST
 echo -e "</script></body>" >> $DST
 
-echo "built web-decker"
+echo "built web-decker: ${DST}"
