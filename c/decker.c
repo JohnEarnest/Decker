@@ -1319,9 +1319,13 @@ void modal_enter(int type){
 		ms.name=(field_val){rtext_cast(lmistr("")),0};
 		ms.text=(field_val){rtext_cast(lmistr("")),0};
 	}
+	if(type==modal_pick_card){
+		ms.act_card=ln(ifield(ifield(deck,"card"),"index"));
+		ms.carda=l_first(ob.sel);
+	}
 	if(type==modal_action){
 		sc.target=ob.sel->lv[0],sc.others=lml(0);
-		ms.act_go=1,ms.act_gomode=5,ms.act_trans=0,ms.act_sound=0,ms.act_card=ln(ifield(ifield(deck,"card"),"index"));
+		ms.act_go=1,ms.act_gomode=5,ms.act_trans=0,ms.act_sound=0;
 		ms.verb   =lmistr(""); // card name
 		ms.message=lmistr(""); // sound name
 		ms.grid=(grid_val){l_table(l_keys(dget(deck->b,lmistr("transit")))),0,0,-1};
@@ -1810,12 +1814,13 @@ void modals(void){
 		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_exit(0);
 	}
 	else if(ms.type==modal_link){
-		rect b=draw_modalbox((pair){170,70});
+		rect b=draw_modalbox((pair){230,70});
 		draw_textc((rect){b.x,b.y,b.w,20},kc.heading="Enter a link string for\nthe selected text span:",FONT_BODY,1);
 		ui_field((rect){b.x,b.y+20+5,b.w,20},&ms.text);
-		pair c={b.x+b.w-(b.w-(2*60+5))/2-60,b.y+b.h-20};
+		pair c={b.x+b.w-60,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,60,20},"OK",1))modal_pop(1);c.x-=65;
 		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_pop(0);
+		if(ui_button((rect){b.x,c.y,60,20},"Card...",1))modal_push(modal_pick_card);
 	}
 	else if(ms.type==modal_gridcell){
 		rect c=ms.pending_grid_cell;
@@ -2184,7 +2189,7 @@ void modals(void){
 		if(ms.act_go&&ms.act_gomode==5){
 			rect l={cr.x+5+45,cr.y,b.w-5-45-5-60,16};
 			draw_hline(l.x,l.x+l.w,l.y+l.h,13),draw_text_fit(inset(l,1),ms.verb->sv,FONT_BODY,1);
-			if(ui_button((rect){b.x+b.w-60,cr.y,60,20},"Choose...",ms.act_go&&ms.act_gomode==5))ms.type=modal_pick_card;
+			if(ui_button((rect){b.x+b.w-60,cr.y,60,20},"Choose...",ms.act_go&&ms.act_gomode==5))modal_push(modal_pick_card);
 		}cr.y+=26;
 		if(ui_checkbox((rect){cr.x,cr.y,80,16},"Play a Sound",1,ms.act_sound))ms.act_sound^=1;
 		if(ms.act_go){
@@ -2210,8 +2215,12 @@ void modals(void){
 		pair c={b.x+(b.w-60-5-60-5-60)/2,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,60,20},"Previous",1)||ev.dir==dir_left){n_go(deck,l_list(lmistr("Prev")));}c.x+=65;
 		if(ui_button((rect){c.x,c.y,60,20},"Choose",1)){
-			ms.verb=ifield(ifield(deck,"card"),"name");
-			n_go(deck,l_list(lmn(ms.act_card)));ms.type=modal_action;
+			lv*name=ifield(ifield(deck,"card"),"name");
+			n_go(deck,l_list(lmn(ms.act_card)));
+			if(lb(ms.carda))ob.sel=l_list(ms.carda);
+			modal_pop(0);
+			if(ms.type==modal_action)ms.verb=name;
+			if(ms.type==modal_link)ms.text=(field_val){rtext_cast(name),0};
 		}c.x+=65;
 		if(ui_button((rect){c.x,c.y,60,20},"Next",1)||ev.dir==dir_right){n_go(deck,l_list(lmistr("Next")));}
 	}
@@ -3307,7 +3316,7 @@ void event_key(int c,int m,int down,const char*name){
 		if(c==KEY_u&&uimode==mode_draw&&in_layer())dr.under^=1;
 		if(c==KEY_y&&uimode==mode_draw&&in_layer())set_tracing=!tracing;
 		if(c==KEY_ESCAPE)ev.exit=1;
-		if(!wid.infield&&!wid.ingrid&&uimode==mode_interact&&card_is(con())){
+		if(!wid.infield&&!wid.ingrid&&ms.type==modal_none&&uimode==mode_interact&&card_is(con())){
 			if(c==KEY_UP   )msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("up");
 			if(c==KEY_DOWN )msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("down");
 			if(c==KEY_LEFT )msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("left");
