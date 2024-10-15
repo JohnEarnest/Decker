@@ -73,6 +73,15 @@ on click do
 end
 {end}
 
+{card:installation}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"installation"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,245],"pos":[254,48],"locked":1,"border":0,"value":{"text":["In addition to the importing the \"pt\" module into your own decks, you will need to ensure that any animate[] or command[] events sent to cards where puppets will appear are forwarded to the \"pt\" module along with a reference to the deck.\n\nThe simplest way to meet this requirement is to copy and paste the script fragments on the left into your deck's top-level script. (\"File -> Properties... -> Script...\" in the menu)\n\nFor more advanced applications of Puppeteer or interoperation with ","Dialogizer"," you may additionally find it useful to override these definitions on a card-by-card basis; we'll see some examples later."],"font":["","",""],"arg":["","dialogizer",""]}}
+field2:{"type":"field","size":[232,87],"pos":[10,48],"border":1,"style":"code","value":"on animate do\n pt.animate[deck]\nend\n\non command x do\n pt.command[deck x]\nend\n"}
+
 {card:boxy}
 {widgets}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
@@ -261,10 +270,10 @@ button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"puppeteer and dialogizer"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
-field1:{"type":"field","size":[248,97],"pos":[254,48],"locked":1,"border":0,"value":{"text":["Puppeteer is designed as a companion to ","Dialogizer",", a Decker module which manages modal dialogs.\n\nThe easiest way to use these modules together is to install a deck-level script which dispatches the animate[] and command[] events produced by Dialogizer to pt, like the example on the left. By defining these in the deck script, they will apply to every card that doesn't define a replacement."],"font":["","",""],"arg":["","http://beyondloom.com/decker/dialog.html",""]}}
+field1:{"type":"field","size":[248,97],"pos":[254,48],"locked":1,"border":0,"value":{"text":["Puppeteer is designed as a companion to ","Dialogizer",", a Decker module which manages modal dialogs.\n\nAs described in ","installation",", puppeteer requires that animate[] and command[] events sent to the current card be forwarded to the \"pt\" module. Dialogizer sends compatible events to the current card while dialog boxes are open."],"font":["","","","",""],"arg":["","http://beyondloom.com/decker/dialog.html","","installation",""]}}
 field2:{"type":"field","size":[232,84],"pos":[10,48],"border":1,"style":"code","value":"on animate do\n pt.animate[deck]\nend\n\non command x do\n pt.command[deck x]\nend\n"}
 ex1:{"type":"field","size":[232,54],"pos":[10,163],"border":1,"style":"code","value":"dd.open[deck]\ndd.say[script.value]\ndd.close[]\npt.clear[]"}
-field4:{"type":"field","size":[248,141],"pos":[254,163],"locked":1,"border":0,"value":"With the above plumbing handled, we can now use Puppeteer commands from within rich text prose fed to Dialogizer!\n\nAs a convenience, you can group several Puppeteer commands together, separated by only a single newline. The leading \"!\" is mandatory when you're embedding commands in Dialogizer prose."}
+field4:{"type":"field","size":[248,141],"pos":[254,163],"locked":1,"border":0,"value":"Thanks to the above plumbing, we can use Puppeteer commands from within rich text prose fed to Dialogizer!\n\nAs a convenience, you can group several Puppeteer commands together, separated by only a single newline. The leading \"!\" is mandatory when you're embedding commands in Dialogizer prose."}
 script:{"type":"field","size":[232,67],"pos":[10,237],"scrollbar":1,"value":{"text":["!show lily neutral\n!anim lily bob\n!wait 30\n!show lily neutral_open\n\n","Weird Bug:"," Hiya, I'm Lily!\n\n","Lily:"," I'm an exposition fairy.\n\n!show lily smug\n\n","Lily:"," Exposition Fairies are among the world's largest insects!\n\n!show lily mad\n\n","Lily:"," We are also extremely venomous.\n\n!show lily happy\n\n","Lily:"," Isn't learning fun?\n\n!show lily neutral\n!move lily offtop\n!wait"],"font":["","menu","","menu","","menu","","menu","","menu",""],"arg":["","","","","","","","","","",""]}}
 field3:{"type":"field","size":[57,14],"pos":[10,223],"locked":1,"border":0,"value":"script"}
 button4:{"type":"button","size":[60,20],"pos":[254,284],"script":"commandandclear.0","text":"Try It!"}
