@@ -88,7 +88,7 @@ The _Style_ menu will be available whenever drawing tools are chosen:
 - _Stroke..._: Select a pattern for most drawing tools.
 - _Fill..._: Select a background pattern used for the _Filled Box_ and _Filled Oval_ tool as well as empty space behind a deleted or moved selection.
 - _Brush..._: Select a brush shape used for most drawing tools.
-- _Color_: Toggle offering Decker's 16-color palette instead of its 28  1-bit drawing patterns.
+- _Color_: Toggle offering Decker's 16-color palette instead of its 28 1-bit drawing patterns. When enabled, imported images will be imported in 16 colors instead of dithered to 1-bit.
 - _Transparency_: Toggle treating pattern 0 as transparent when moving selections. Also applies to imported and exported images!
 - _Underpaint_: Toggle making all drawing tools leave pattern 1 alone. This is helpful for adding patterns or color "underneath" solid black lineart.
 - _Tracing Mode_: Toggle drawing the Decker window in a semi-transparent fashion, to allow you to trace images underneath the window.
@@ -107,7 +107,7 @@ A number of shortcuts are available with any of the drawing tools selected:
 You can drag and drop files directly onto the Decker window, and it will take an appropriate action depending on the type of the file:
 
 - `.html` or `.deck`: open the deck in the [Font/Deck Accessory Mover](#resources).
-- `.gif`, `.png`, `.bmp`, `.jpg` or `.jpeg`: switch to the selection tool and paste the image onto the card, dithered to 1-bit.
+- `.gif`, `.png`, `.bmp`, `.jpg` or `.jpeg`: switch to the selection tool and paste the image onto the card. In "color" mode, Decker will posterize the image to the 16-color palette, and otherwise the image will be dithered to 1-bit.
 - `.wav`: open the audio file in the [Audio Editor](#sound).
 - `.csv`: switch to the widgets tool and create a new grid containing the data in the CSV file, as if parsed with `readcsv[text]`.
 - `.psv`: switch to the widgets tool and create a new grid containing the data in the PSV file, as if parsed with `readcsv[text 0 "|"]`.
