@@ -3572,9 +3572,9 @@ tick=_=>{
 let id=null
 sync=_=>{
 	pick_palette(deck)
-	const anim=deck.patterns.anim, pal=deck.patterns.pal.pix, mask=dr.trans_mask&&uimode=='draw'
+	const anim=deck.patterns.anim, pal=deck.patterns.pal.pix, mask=dr.trans_mask&&uimode=='draw', fc=dr.show_anim?0|(frame_count/4):0
 	const anim_ants   =(x,y)=>(0|((x+y+(0|(frame_count/2)))/3))%2?15:0
-	const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][(0|(frame_count/4))%max(1,anim[pix-28].length)]
+	const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][fc%max(1,anim[pix-28].length)]
 	const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
 	const draw_color  =(pix,x,y)=>pix==ANTS?anim_ants(x,y): pix>47?0: pix>31?pix-32: draw_pattern(pix,x,y)?15:0
 	if(!id||id.width!=fb.size.x||id.height!=fb.size.y){id=new ImageData(fb.size.x,fb.size.y);id.data.fill(0xFF)}
