@@ -58,6 +58,23 @@ Decker's scripting language, [Lil](http://beyondloom.com/tools/trylil.html), is 
 make lilt
 ```
 
+Lilt can be used to programmatically create, inspect, and manipulate decks, as well as package them as Web-Decker self-executing documents:
+```
+$ lilt
+ d:readdeck["examples/decks/color.deck"]
+<deck>
+ d.card:d.cards.colhex
+<card>
+ d.card.widgets.hex.text:"FFAA00"
+"FFAA00"
+ d.card.widgets.hex.event["change"]
+0
+ d.card.widgets.rgb.text
+"16755200"
+ writedeck["color.html" d]
+1
+```
+
 You can build Lilt against [Cosmopolitan Libc](https://github.com/jart/cosmopolitan), producing a single binary that will run on most popular operating systems:
 ```
 $ ./apelilt.sh
