@@ -4,15 +4,14 @@ Decker is a multimedia platform for creating and sharing interactive documents, 
 
 ![Decker, complete with toolbars](images/wings.gif)
 
-You can learn more about Decker on [my website](http://beyondloom.com/decker/), or just dive in and [try it online](http://beyondloom.com/decker/tour.html).
+You can learn more about Decker on [my website](http://beyondloom.com/decker/), on the [community forum](https://internet-janitor.itch.io/decker/community), or you can just dive in and [try it online](http://beyondloom.com/decker/tour.html). Periodic binary releases of Decker for MacOS and Windows are available on [Itch.io](https://internet-janitor.itch.io/decker).
 
-There is also a [community forum](https://internet-janitor.itch.io/decker/community) on itch.io.
+If you're interested in _Lil_, Decker's scripting language, you can access documentation and play with it in your browser at [trylil](http://beyondloom.com/tools/trylil.html).
 
-If you're interested in Lil, Decker's scripting language, you can play with it in your browser at [trylil](http://beyondloom.com/tools/trylil.html).
 
-Building
---------
-The [web version](http://beyondloom.com/decker/tour.html) of Decker (web-decker) can be built with a `make` script. The test suite uses [Node.js](https://nodejs.org/en/):
+Web-Decker
+----------
+Decker is available as [a web application](http://beyondloom.com/decker/tour.html) (written in vanilla JavaScript) which is distributed as a single freestanding HTML file. Web-Decker can be built with a `make` script. The test suite uses [Node.js](https://nodejs.org/en/):
 
 ```
 make testjs
@@ -20,38 +19,46 @@ make web-decker
 make runweb      # (optional) open in your default browser
 ```
 
-Periodic binary releases of the native version of Decker (c-decker) for OSX and Windows are available on [itch.io](https://internet-janitor.itch.io/decker). Building from source requires:
+
+Native-Decker
+-------------
+Decker is also available as a native application, written in C. Building Native-Decker from source requires:
 
 - a c compiler and libc
-- the `xxd` utility (standard with OSX and most \*nix distros)
+- the `xxd` utility (standard with MacOS and most \*nix distros)
 - [SDL2](https://www.libsdl.org/download-2.0.php)
-- [SDL_image](https://github.com/libsdl-org/SDL_image)
+- [SDL2_image](https://github.com/libsdl-org/SDL_image)
 
-On OSX, BSD, or Linux, fetch the appropriate SDL2 packages and then build with `make`. This has also been reported to build and run successfully under WSL.
+On MacOS, BSD, or Linux, fetch the appropriate SDL2 packages and then build with `make`. This has also been reported to build and run successfully under WSL:
 
 ```
-brew install sdl2 sdl2_image                                   # OSX/Homebrew
+brew install sdl2 sdl2_image                                   # MacOS/Homebrew
 sudo apt install libsdl2-2.0-0 libsdl2-dev libsdl2-image-dev   # Debian
 nix-shell                                                      # Nix
 
 make lilt            # (optional) command-line tools
+make docs            # (optional) build documentation (requires Lilt)
 make decker          # build decker itself
 make test            # (optional) regression test suite
 sudo make install    # (optional) install lilt, decker, and lil syntax profiles
 ```
 
-Building the documentation requires Lilt:
+If SDL2 is not available, Native-Decker can also be built with [reduced functionality](c/io_sdl1.h) against SDL1.2 and a corresponding version of `SDL_image`. This compatibility shim is presently designed with the [OLPC XO-4](https://wiki.laptop.org/go/XO-4_Touch) and its default Fedora 18 OS image in mind; expect to do some tinkering with the makefile for other platforms:
+```
+sudo yum install SDL-devel SDL_image-devel
+
+make decker
+```
+
+
+Lilt
+----
+Decker's scripting language, [Lil](http://beyondloom.com/tools/trylil.html), is available as a standalone interpreter, with extended IO functionality to make it suitable for general-purpose programming and scripting: this package is called [Lilt](http://beyondloom.com/decker/lilt.html). Lilt only requires libc and `xxd` to build from source:
 ```
 make lilt
-make docs
 ```
 
-Decker offers a set of non-portable scripting APIs which are disabled by default. When building from source, you can enable them by defining `DANGER_ZONE`. See the [Decker Reference Manual](http://beyondloom.com/decker/decker.html#thedangerzone) for details:
-```
-FLAGS:=$(FLAGS) -DDANGER_ZONE
-```
-
-As a fun bonus, you can also build Lilt against [Cosmopolitan Libc](https://github.com/jart/cosmopolitan), producing a single binary that will run on most popular operating systems:
+You can build Lilt against [Cosmopolitan Libc](https://github.com/jart/cosmopolitan), producing a single binary that will run on most popular operating systems:
 ```
 $ ./apelilt.sh
 successfully compiled lilt.com
@@ -64,6 +71,28 @@ $ sh ./lilt.com
   range 10
 (0,1,2,3,4,5,6,7,8,9)
 ```
+
+There is also an alternative Lil interpreter, [Lila](tools/awk/), which only requires a compliant implementation of the AWK language:
+```
+$ awk -f tools/awk/lila.awk
+ sys.platform
+"awk"
+ 2*range 10
+(0,2,4,6,8,10,12,14,16,18)
+```
+
+
+The Danger Zone
+---------------
+Decker normally sandboxes the execution of scripts within decks to prevent low-level access to the host computer and ensure parity between the capabilities of Web-Decker and Native-Decker. Both implementations offer opt-in APIs for performing more "dangerous" or non-portable operations called [The Danger Zone](http://beyondloom.com/decker/decker.html#thedangerzone).
+
+When building Native-Decker from source, you can enable _The Danger Zone_ by defining the `DANGER_ZONE` preprocessor flag:
+```
+FLAGS:=$(FLAGS) -DDANGER_ZONE
+```
+
+A "dangerous" build of Native-Decker can export "dangerous" Web-Decker builds. You can also temporarily enable _The Danger Zone_ for Web-Decker by calling the `endanger()` function from your browser's JavaScript console or modifying the `DANGEROUS=0` constant in the .html file to `DANGEROUS=1`. [The Forbidden Library](http://beyondloom.com/decker/forbidden.html) offers a suite of bindings for useful JavaScript APIs based on this interface.
+
 
 Contributing
 ------------
