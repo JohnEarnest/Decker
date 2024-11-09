@@ -163,32 +163,6 @@ Uint32 tick_pump(Uint32 interval,void*param){
 SDL_Renderer*ren;
 SDL_Texture*gfx;
 SDL_Texture*gtool;
-#ifdef LOSPEC
-// a set of customizations intended to make Decker more portable
-// and more performant on extremely limited devices such as the OLPC XO-4.
-int parity=0;
-lv* readimage(char*path,int grayscale){return n_readgif(NULL,lml2(lmcstr(path),grayscale?lmistr("gray"):NONE));}
-int*sgfx=NULL;
-void framebuffer_alloc(pair size,int minscale){
-	gfx=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,size.x*minscale,size.y*minscale);
-	sgfx=calloc(size.x*size.y,sizeof(int));
-}
-int framebuffer_flip(pair disp,pair size,int scale,int mask,int frame,char*pal,lv*buffer){
-	parity^=1;if(!parity)return 0;
-	draw_frame(pal,buffer,sgfx,size.x*4,frame,mask);frame_count++;
-	int*p, pitch;
-	SDL_LockTexture(gfx,NULL,(void**)&p,&pitch);
-	int stride=pitch/sizeof(int);
-	// SDL's X11 software renderer is outrageously slow at texture upscaling on the OLPC, so we'll do it by hand:
-	if(scale==1)for(int y=0,i=0,o=0;y<size.y;y++,o+=stride)for(int x=0;x<size.x;x++,i++     )p[o+x]=sgfx[i];
-	if(scale==2)for(int y=0,i=0,o=0;y<size.y;y++,o+=stride)for(int x=0;x<size.x;x++,i++,o+=2)p[o]=p[o+1]=p[o+stride]=p[o+stride+1]=sgfx[i];
-	SDL_UnlockTexture(gfx);
-	SDL_Rect dst={(disp.x-scale*size.x)/2,(disp.y-scale*size.y)/2,scale*size.x,scale*size.y};
-	SDL_RenderClear(ren);
-	SDL_RenderCopy(ren,gfx,NULL,&dst);
-	return 1;
-}
-#else
 #include <SDL_image.h>
 lv* readimage(char*path,int grayscale){
 	SDL_Surface*b=IMG_Load(path);if(b==NULL)return image_empty();lv*i=lmbuff((pair){b->w,b->h});
@@ -214,7 +188,6 @@ int framebuffer_flip(pair disp,pair size,int scale,int mask,int frame,char*pal,l
 	SDL_RenderCopy(ren,gfx,&src,&dst);
 	return 1;
 }
-#endif
 
 void toolbar_flip(lv*buffer,int frame,char*pal,rect dest){
 	pair tsize=buff_size(buffer);
