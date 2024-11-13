@@ -20,6 +20,7 @@ show[
 	typeof random["ABC" 1]
 	typeof random[insert a with 11 22 33 end]
 ]
+show[random[] random[] random[]]
 
 # accessing an interface via a container
 # should work the same as if it is a global:

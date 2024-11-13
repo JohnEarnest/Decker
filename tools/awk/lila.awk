@@ -1106,7 +1106,7 @@ function readxmlrec(currtag,  r,w,tag,attr,n,an,c){
 }
 function readxml(args){xml_t=lvs(ls(l_first(args)));xml_i=1;return readxmlrec("")}
 
-BEGIN{random_seed=0x12345}
+BEGIN{random_seed=74565}
 function random_int(x,  t){
 	# xorshift RNG: crude, but straightforward.
 	# we're (ab)using the built-in awk rng for other purposes,
@@ -1159,6 +1159,7 @@ function natives(name,self,args,  z,r,prog,vars,n,t,pv,j,file){
 		r=readline();return r==0?NONE:lms(r)
 	}
 	if(name=="random"){
+		if(count(args)<1){random_int(1);return lmn(bitwise_and(unsigned_i(random_seed),2147483647)/2147483647)}
 		x=l_first(args);if(count(args)<2)return random_element(x);n=ln(lst_get(args,1))
 		if(n>=0){r=lml();for(z=0;z<n;z++)lst_add(r,random_element(x));return r}
 		x=lin(x)?l_range(x):ll(x);for(z=0;z<count(x);z++)pv[z]=z
@@ -2362,10 +2363,11 @@ function run(text,  prog){
 ###########################################################
 
 function runfile(filename){run(readtext(filename))}
-function repl(  t,p){
+function repl(  t,p,x){
 	while(1){
-		printf " ";t=readline()
-		if(length(t)){p=parse(t);print perr?(repeat_char(" ",parse_c)"^\n"perr):show(run_block(p),1)}
+		printf " ";t=readline();if(!length(t))continue;p=parse(t)
+		if(perr){print repeat_char(" ",parse_c)"^\n"perr}
+		else{x=run_block(p);env_loc(rootenv,"_",x);print show(x,1)}
 	}
 }
 BEGIN{if(ARGV[1]~/\.lil$/){runfile(ARGV[1])}else{repl()}}

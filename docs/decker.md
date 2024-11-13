@@ -468,6 +468,7 @@ If the third argument (`z`) is truthy, `eval[]` will instead execute _within_ th
 - if `y` is missing, the result will be a single random element.
 - if `y` is positive, choose a list of `y` random elements.
 - if `y` is negative, choose a list of `|y|` random elements _without repeats_, provided sufficient elements in `y`.
+- if `random[]` is called without any arguments, the result will be a single floating-point number between 0 and 1.
 
 7) Column specs are strings in which each character indicates the type of a CSV column. `readcsv[]` and `writecsv[]` will ignore excess columns if more exist in the source data than in the column spec. Missing columns are padded with an appropriate "null". If the column spec is not a string, these functions will read/write every column in the source data as strings. Any pattern type recognized by `parse` and `format` is permitted as a column spec character, but they are interpreted without flags or subsequent delimiters. Additionally, underscore (`_`) can be used in a column spec to skip a column. If a single-character delimiter `d` is provided, it is used instead of comma (`,`) between records.
 

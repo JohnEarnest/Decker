@@ -54,7 +54,7 @@ if(process.argv.length>=3){
 rl=require('readline').createInterface({input:process.stdin,output:process.stdout,prompt:'  '});rl.prompt()
 rl.on('close',_=>(console.log('\n'),process.exit(0)))
 rl.on('line',line=>{
-	try{(line.trim()!='')&&console.log(show(run(parse(line.trim())),true))}
+	try{if(line.trim()!=0){const x=run(parse(line.trim()));env.local('_',x);console.log(show(x,true))}}
 	catch(e){console.error('x' in e?`${' '.repeat(e.c+1)}^\n${e.x}\n`:e)}
 	rl.prompt()
 })
