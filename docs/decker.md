@@ -1989,6 +1989,7 @@ Native-Decker accepts several other optional CLI flags:
 - `--no-scale`: Disable upscaling the display in windowed mode. Useful for recording screenshots.
 - `--no-touch`: Disable touch input unless explicitly opted-in.
 - `--fullscreen`: Open in fullscreen mode.
+- `--unlock`: Force the deck (if any) to be "unlocked" initially.
 - `--card x`: Open the deck (if any) to a specified card name.
 
 If a file path is not specified (or you open Decker by double-clicking the application), Decker will next check for the existence of a file named `start.deck` in the same directory as the executable (or on MacOS within the `.app/Resources/` directory of the application bundle), opening it if available. This can be helpful if you wish to build a personal "home deck", or if you wish to distribute your own decks along with a Decker runtime.
