@@ -791,7 +791,10 @@ void draw_line_function(rect r,lv*func,int pattern){
 		state.e->c=1,state.t->c=0,state.p->c=0,state.pcs.c=0;issue(e,p);int quota=BRUSH_QUOTA;while(quota&&running())runop(),quota--;lv*v=running()?NONE:arg();
 		if(image_is(v)){
 			lv*mask=v->b;pair ms=buff_size(mask),mc={ms.x/2,ms.y/2};
-			for(int b=0;b<ms.y;b++)for(int a=0;a<ms.x;a++)if(mask->sv[a+b*ms.x]&&inclip(r.x+a-mc.x,r.y+b-mc.y))PIX(r.x+a-mc.x,r.y+b-mc.y)=pattern;
+			for(int b=0;b<ms.y;b++)for(int a=0;a<ms.x;a++){
+				int mp=mask->sv[a+b*ms.x];
+				if(mp&&inclip(r.x+a-mc.x,r.y+b-mc.y))PIX(r.x+a-mc.x,r.y+b-mc.y)=mp==1?pattern: mp==47?1: mp;
+			}
 		}if(r.x==r.w&&r.y==r.h)break;int e2=err*2;if(e2>=dy)err+=dy,r.x+=sx;if(e2<=dx)err+=dx,r.y+=sy;a->lv[1]=NONE;
 	}popstate();
 }

@@ -1125,7 +1125,7 @@ draw_line_function=(r,func,pattern)=>{
 		state.e=[e],state.t=[],state.pcs=[];issue(e,p);let quota=BRUSH_QUOTA;while(quota&&running())runop(),quota--;const v=running()?NONE:arg()
 		if(image_is(v)){
 			const ms=v.size, mc=rint(rdiv(ms,2))
-			for(let b=0;b<ms.y;b++)for(let a=0;a<ms.x;a++){const h=rect(r.x+a-mc.x,r.y+b-mc.y);if(v.pix[a+b*ms.x]&&inclip(h))pix(h,pattern)}
+			for(let b=0;b<ms.y;b++)for(let a=0;a<ms.x;a++){const h=rect(r.x+a-mc.x,r.y+b-mc.y), mp=v.pix[a+b*ms.x];if(mp&&inclip(h))pix(h,mp==1?pattern: mp==47?1: mp)}
 		}if(r.x==r.w&&r.y==r.h)break;let e2=err*2; if(e2>=dy)err+=dy,r.x+=sx; if(e2<=dx)err+=dx,r.y+=sy; a.v[1]=NONE
 	}popstate()
 }
