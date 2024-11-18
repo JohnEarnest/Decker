@@ -1850,6 +1850,17 @@ assert["custom brush box: diag" "%%IMG0AA8AC3/8//zADMAMwAzADMAMwAz//P/4AAA=" c.c
 
 deck.card.script:"
 	on install do
+		brush[\"color\" image[\"%%IMG1AAMAAiMoLyEnAA==\"]]
+	end
+"
+deck.card.event["install"]
+c.clear[]
+c.brush:"color"
+c.box[1,1 13,9]
+assert["custom brush box: color" "%%IMG2AA8ACyMBKAEBASMKKAEBASMBKAEBASEJIwEoAQEBIwEoAQEBAAkjASgBAQEjASgBAQEACSMBKAEBASMBKAEBAQAJIwEoAQEBIwEoAQEBAAkjASgBAQEjASgBAQEACSMBKAEBASMBKAEBAQAJIwEoAQEBIwEoAQEBIwooAQEBIQEnASELJwEAEA==" c.copy[].encoded]
+
+deck.card.script:"
+	on install do
 		i:0
 		brush[on dotted do
 			i:!i
@@ -1864,7 +1875,7 @@ c.line[1,1 13,9]
 assert["custom brush line: dotted" "%%IMG0AA8ACwAAQAAQAAAABAABAABAAAAAEAAEAAA=" c.copy[].encoded]
 
 deck.card.script:"on install do brush[] end"
-assert["custom brush enumeration" ("star","diag","dotted") (keys deck.card.event["install"])]
+assert["custom brush enumeration" ("star","diag","color","dotted") (keys deck.card.event["install"])]
 
 #######################################
 #

@@ -1115,7 +1115,7 @@ draw_line_simple=(r,brush,pattern)=>{
 }
 draw_line_custom=(r,mask,pattern)=>{
 	let dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1, ms=mask.size, mc=rint(rdiv(ms,2));while(1){
-		for(let b=0;b<ms.y;b++)for(let a=0;a<ms.x;a++){const h=rect(r.x+a-mc.x,r.y+b-mc.y);if(mask.pix[a+b*ms.x]&&inclip(h))pix(h,pattern)}
+		for(let b=0;b<ms.y;b++)for(let a=0;a<ms.x;a++){const h=rect(r.x+a-mc.x,r.y+b-mc.y), mp=mask.pix[a+b*ms.x];if(mp&&inclip(h))pix(h,mp==1?pattern: mp==47?1: mp)}
 		if(r.x==r.w&&r.y==r.h)break;let e2=err*2; if(e2>=dy)err+=dy,r.x+=sx; if(e2<=dx)err+=dx,r.y+=sy
 	}
 }

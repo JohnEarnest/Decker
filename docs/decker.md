@@ -1842,6 +1842,8 @@ brush[on Sumi delta do
 end]
 ```
 
+The mask images used for static and functional brushes will _usually_ consist of patterns 0 and 1: 0-pixels are "transparent" and left alone, and 1-pixels take on the selected drawing pattern. It is also possible to use a mask image containing other pattern indices: 47 will become pattern 1 ("always black"), and any other patterns will be kept the same.
+
 Like transition functions, brushes can be defined in any script, at any time, but it usually makes the most sense to set them up at the top level of a deck script or a [module](#modules).
 
 Playing Sound

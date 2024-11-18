@@ -778,7 +778,10 @@ void draw_line_simple(rect r,int brush,int pattern){
 }
 void draw_line_custom(rect r,lv*mask,int pattern){
 	int dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1;pair ms=buff_size(mask),mc={ms.x/2,ms.y/2};while(1){
-		for(int b=0;b<ms.y;b++)for(int a=0;a<ms.x;a++)if(mask->sv[a+b*ms.x]&&inclip(r.x+a-mc.x,r.y+b-mc.y))PIX(r.x+a-mc.x,r.y+b-mc.y)=pattern;
+		for(int b=0;b<ms.y;b++)for(int a=0;a<ms.x;a++){
+			int mp=mask->sv[a+b*ms.x];
+			if(mp&&inclip(r.x+a-mc.x,r.y+b-mc.y))PIX(r.x+a-mc.x,r.y+b-mc.y)=mp==1?pattern: mp==47?1: mp;
+		}
 		if(r.x==r.w&&r.y==r.h)break;int e2=err*2;if(e2>=dy)err+=dy,r.x+=sx;if(e2<=dx)err+=dx,r.y+=sy;
 	}
 }

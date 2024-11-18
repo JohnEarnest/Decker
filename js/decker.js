@@ -2953,7 +2953,7 @@ toolbars=_=>{
 	}
 	const cbrushbtn=(pos,dn,b,brush,bt)=>{
 		const icon=bt.v[brush-24],oc=frame.clip;frame.clip=b
-		draw_icon(rcenter(b,icon.size),icon,1),frame.clip=oc,draw_box(b,0,1)
+		image_paste(rcenter(b,icon.size),b,icon,frame.image,1),frame.clip=oc,draw_box(b,0,1)
 		if(dr.brush==brush)draw_box(inset(b,2),0,1)
 		if(!rin(b,pos))return;uicursor=cursor.point;if(!ev.mu||!rin(b,dn))return
 		setmode('draw');if(dr.tool=='select'||dr.tool=='lasso'||dr.tool=='fill')settool('pencil');dr.brush=brush

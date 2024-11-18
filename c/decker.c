@@ -3215,7 +3215,7 @@ void brushbtn(pair pos,pair dn,rect b,int brush){
 }
 void cbrushbtn(pair pos,pair dn,rect b,int brush,lv*bt){
 	lv*icon=bt->lv[brush-24];rect oc=frame.clip;frame.clip=b;
-	rect p=box_center(b,image_size(icon));draw_icon((pair){p.x,p.y},icon,1);frame.clip=oc;draw_box(b,0,1);
+	rect p=box_center(b,image_size(icon));buffer_paste(p,b,icon->b,frame.buffer,1);frame.clip=oc;draw_box(b,0,1);
 	if(dr.brush==brush)draw_box(inset(b,2),0,1);
 	if(!box_in(b,pos))return;uicursor=cursor_point;if(!ev.mu||!box_in(b,dn))return;setuimode(mode_draw);
 	if(dr.tool==tool_select||dr.tool==tool_lasso||dr.tool==tool_fill)settool(tool_pencil);
