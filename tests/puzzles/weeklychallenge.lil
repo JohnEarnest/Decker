@@ -24,6 +24,16 @@ on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 
 # the problems:
 
+problem[296.1]
+# compress the string x with run-length encoding
+on f x do
+ on run x do if 1~count x x else (count x),first x end end
+ "" fuse extract run[value] by sumscan[1,!(1 drop value)=value] from x
+end
+assert[f["abbc"   ] "a2bc" ]
+assert[f["aaabccc"] "3ab3c"]
+assert[f["abcc"   ] "ab2c" ]
+
 problem[293.1]
 # how many dominoes are isomorphic?
 on f x do
