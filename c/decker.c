@@ -3349,7 +3349,7 @@ void event_pointer_move(pair raw,pair scaled){
 void event_pointer_button(int primary,int down){
 	if(down){
 		ev.rawdpos=ev.rawpos;
-		pointer_held=ev.drag=1;pointer_start=ev.dpos=pointer;ev.md=1;ev.clicktime=10;
+		pointer_held=ev.drag=1;pointer_start=ev.dpos=pointer;ev.md=1;ev.clicktime=12;
 		ev.down_modal=ms.type,ev.down_uimode=uimode,ev.down_caps=kc.on;
 		if(!primary)ev.rdown=1;
 	}
