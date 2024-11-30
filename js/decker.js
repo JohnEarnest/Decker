@@ -3591,7 +3591,7 @@ sync=_=>{
 move=(x,y)=>{if(!msg.pending_drag)pointer.prev=pointer.pos;pointer.pos=ev.pos=rect(x,y);if(pointer.held)msg.pending_drag=1}
 down=(x,y,alt)=>{
 	ev.rawdpos=ev.rawpos,ev.down_modal=ms.type,ev.down_uimode=uimode,ev.down_caps=kc.on
-	move(x,y),pointer.held=ev.drag=1;pointer.start=ev.dpos=pointer.pos,ev.md=1,ev.clicktime=10;if(alt)ev.rdown=1;initaudio()}
+	move(x,y),pointer.held=ev.drag=1;pointer.start=ev.dpos=pointer.pos,ev.md=1,ev.clicktime=12;if(alt)ev.rdown=1;initaudio()}
 up=(x,y,alt)=>{
 	move(x,y),pointer.held=ev.drag=0,pointer.end=pointer.pos,ev.mu=1;if(alt)ev.rup=1
 	if(ev.clicktime)ev.click=1;ev.clicktime=0;if(ev.clicklast)ev.dclick=1;ev.clicklast=DOUBLE_CLICK_DELAY
