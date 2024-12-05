@@ -1029,7 +1029,7 @@ The button widget is a clickable button, possibly with a stateful checkbox.
 
 | Name                    | Description                                                                                           |
 | :---------------------- | :---------------------------------------------------------------------------------------------------- |
-| `typeof x`              | `"field"`                                                                                             |
+| `typeof x`              | `"button"`                                                                                            |
 | `x.name`                | String. The name of this widget. r/w.                                                                 |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                     |
 | `x.locked`              | Bool. If true, the user cannot modify the value of this checkbox. r/w.                                |
