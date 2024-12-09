@@ -1,0 +1,163 @@
+<html>
+<head>
+<title>{{STORY_TITLE}}</title>
+</head>
+<body>
+<div id="title" style="text-align:center;background:black;color:white;margin-bottom:10px;"></div>
+<div id="output"></div>
+<div style="display:none" id="temp"></div>
+<canvas style="display:none" id="render"></canvas>
+<div style="display:none" id="payload">
+{{STORY_DATA}}
+</div>
+<script>
+{{LIL_INTEPRETER}}
+
+const env=lmenv()
+env.local('rtext',interface_rtext)
+env.local('image',lmnat(n_image))
+env.local('eval',lmnat(n_eval))
+env.local('random',lmnat(n_random))
+go_notify=(deck,x,t)=>{}
+field_notify=(field)=>{}
+is_fullscreen=_=>0
+set_fullscreen=_=>0
+n_play =([x])=>NONE
+n_print=x=>{return NONE}
+n_exit=x=>{return NONE}
+n_alert=([x])=>ONE
+n_save =([x])=>NONE
+n_open =(   )=>lms('')
+n_panic=(   )=>NONE
+n_show =z=>{return z[0]}
+
+let twine_here=null
+const twine_data=document.querySelector("#payload>tw-storydata")
+const twine_start=twine_data.attributes.startnode.value
+const twine_passages={}
+document.querySelectorAll('#payload>tw-storydata>tw-passagedata').forEach(x=>{
+	const a=x.attributes
+	if(a.pid.value==twine_start)twine_here=a.name.value
+	twine_passages[a.name.value]={
+		name:a.name.value,
+		body:x.innerText,
+		tags:a.tags.value.split(" "),
+		meta:{position:a.position.value,size:a.size.value},
+	}
+})
+twine_passages["StoryTitle"]={
+	name:"StoryTitle",
+	body:twine_data.attributes.name.value,
+	tags:[],
+	meta:{},
+}
+twine_passages["StoryData"]={
+	name:"StoryData",
+	body:JSON.stringify({start:twine_here}),
+	tags:[],
+	meta:{},
+}
+const twine_passage_table=lmt(), pn=[], pb=[], pt=[], pm=[]
+tab_set(twine_passage_table,'name',pn)
+tab_set(twine_passage_table,'body',pb)
+tab_set(twine_passage_table,'tags',pt)
+tab_set(twine_passage_table,'meta',pm)
+Object.keys(twine_passages).map(k=>{
+	const p=twine_passages[k]
+	pn.push(lms(p.name))
+	pb.push(lms(p.body))
+	pt.push(lml(p.tags.map(lms)))
+	pm.push(lmd()) // cba
+})
+function html_text(text){
+	const t=document.querySelector('#temp')
+	t.innerText=text
+	const r=t.innerHTML
+	t.innerText=''
+	return r
+}
+function html_image(image){
+	const fb=image, deck=deck_read(''); pick_palette(deck)
+	const anim=deck.patterns.anim, pal=deck.patterns.pal.pix
+	const anim_ants   =(x,y)=>(0|((x+y+(0|(frame_count/2)))/3))%2?15:0
+	const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][(0|(frame_count/4))%max(1,anim[pix-28].length)]
+	const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
+	const draw_color  =(pix,x,y)=>pix==ANTS?anim_ants(x,y): pix>47?0: pix>31?pix-32: draw_pattern(pix,x,y)?15:0
+	const id=new ImageData(fb.size.x,fb.size.y);id.data.fill(0xFF)
+	for(let z=0,d=0,y=0;y<id.height;y++)for(let x=0;x<id.width;x++,z++,d+=4){
+		const pix=fb.pix[z], a=anim_pattern(pix,x,y), c=draw_color(a,x,y), cv=COLORS[c]
+		id.data[d  ]=0xFF&(cv>>16)
+		id.data[d+1]=0xFF&(cv>> 8)
+		id.data[d+2]=0xFF&(cv    )
+	}
+	const r=document.querySelector('#render')
+	r.width=fb.size.x,r.height=fb.size.y
+	r.getContext('2d').putImageData(id,0,0)
+	return `<image src="${r.toDataURL()}" />`
+}
+function html_rtext(tab){
+	const ts=tab_get(tab,'text')
+	const fs=tab_get(tab,'font')
+	const as=tab_get(tab,'arg' )
+	let r='';for(let z=0;z<ts.length;z++){
+		const t=html_text(ls(ts[z])),f=ls(fs[z]),a=as[z]
+		if(image_is(a))   {r+=html_image(a)}
+		else if(count(a)) {r+=`<a href='#' data-dest="${ls(a)}">${t}</a>`}
+		else if(f=='menu'){r+=`<b>${t}</b>`}
+		else if(f=='mono'){r+=`<code>${t}</code>`}
+		else              {r+=t}
+	};return r
+}
+function render_ply(text,name,tags){
+	let i=0
+	let r=''
+	while(i<text.length){
+		if(text[i]=='*'){
+			const t=i+1
+			i++;while(text[i]&&text[i]!='*')i++;i++;
+			r=r+`<b>${text.slice(t,i-1)}</b>`
+		}
+		else if(text[i]=='`'){
+			const t=i+1
+			i++;while(text[i]&&text[i]!='`')i++;i++;
+			r=r+`<code>${text.slice(t,i-1)}</code>`
+		}
+		else if(text[i]=='['&&text[i+1]=='['){
+			i+=2;const a=i;while(text[i]&&text[i]!='-'&&text[i+1]!='>')i++
+			i+=2;const b=i;while(text[i]&&text[i]!=']'&&text[i+1]!=']')i++
+			i+=3;r=r+`<a href="#" data-dest="${text.slice(b,i-2)}">${text.slice(a,b-2)}</a>`
+		}
+		else if(text[i]=='{'){
+			const t=i+1;let c=1
+			i++;while(text[i]&&c>0){
+				if(text[i]=='{')c++
+				if(text[i]=='}')c--
+				i++
+			}
+			env.local('story',twine_passage_table)
+			env.local('name',lms(name))
+			env.local('tags',lml(tags.map(lms)))
+			const prog=parse(text.slice(t,i-1))
+			pushstate(env),issue(env,prog);while(state&&running())runop()
+			const output=arg();popstate()
+			r=r+html_rtext(rtext_cast(output))
+		}
+		else if(text[i]==' ' ){i++;r=r+'&nbsp;'}
+		else if(text[i]=='\n'){i++;r=r+'<br>'}
+		else{r=r+html_text(text[i++])}
+	}
+	return r
+	return `<pre>${text}</pre>`
+}
+function render(){
+	document.querySelector('#title').innerText=twine_here
+	document.querySelector('#output').innerHTML=render_ply(twine_passages[twine_here].body,twine_here,twine_passages[twine_here].tags)
+	document.querySelectorAll('#output a').forEach(x=>x.addEventListener('click',e=>{
+		e.preventDefault()
+		twine_here=x.attributes['data-dest'].value
+		render()
+	}))
+}
+render()
+</script>
+</body>

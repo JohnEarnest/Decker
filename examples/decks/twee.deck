@@ -1,0 +1,782 @@
+{deck}
+version:1
+card:0
+size:[512,342]
+name:"twee.deck"
+
+{card:Index}
+image:"%%IMG2AgABVgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wC3AQMAAQECAAEBAQACAQUABwEBAP8A6AEDAAQBBwAEAQcAAQEBAAEBAwD/AOABBQAFAQcABQEGAAIBBwD/ANYBDAAGAQcABgEEAAMBCAABAQMA/wDNAQMABAEBAAIBBQAGAQcABgEDAAUBBQADAQcA/wDEAQcACgEEAAcBBAAHAQMABQEFAAQBBgACAQEA/wC/AQoACAEFAAcBBQAFAQQABAEFAAUBBAADAQMA/wC7AQMAAQEKAAUBCQACAQgAAwEHAAUBBAAFAQIABQEGAAsBCgD/AJ4BAQAIAQoABAEUAAMBBwADAQQABgEDAAQBBAABAQ4ABgEHAP8AlgEEAAwBJwACAQYABAEEAAQBBQADAQMAAQEJAAUBCQD/AJMBBQALAQkAAQEmAAMBBQAEAQQABQECAAEBCgAFAQcA/wCRAQgACQEKAAUBBQAFARkAAwEFAAQBBQADAQ4ABgEDAAIBAQD/AI0BHAAdAQ8AAQEHAAMBBAAFAQQAAwEGAAQBBQD/AI8BBQAEAQ4AAQEBACMBAgABAREAAgEGAAUBAwADAQgAAQECAAEBAwD/AI0BAQAMAQkAMAECAAEBEgAFAQIABQEPABABBAD/AHYBAgAMAQUAOgEQAAMBBAAEAQQAAwEJAAgBCwD/AHUBEQA+ARAAAgEFAAQBBQADAQYAAwEHAAEBCwD/AHIBEQA+ARgABQEEAAQBBQAEAQUABAEJAP8AcQERAD4BGwAEAQQABQEEAAUBAwAKAQQA/wBvAQcAAgEIAD4BBgACARYAAgEFAAUBBAAEAQUACAEGAP8AbAEBAAIBAgAFAQUASAEKAAYBDwAEAQQABgEFAAgBBAD/AHUBBQBKAQcACQEOAAQBBgAFAQQABwEFAP8AagEBAAgBBQBMAQUADQEOAAMBBgAEAQoAAgEDAP8AcQEIAD8BAgAFAQkAEwEMAAEBCAABAQ8A/wBsAQEAAQELAD8BEAAXASAA/wBtAQIAAQEKAEABDwAaARwA/wBvAQIAAgEIAEABDwAeAQQABAEOAP8AcQEBAAYB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AwAEAQMA4QEGAAIBBgADAQIAAQEEABIBAgAEAQcADgEEAAcBAgAHAQEACwEJAAMBAgARAQMABgEBAAIBBgAFAQEAEQEHAAEBBgAZAQMABAEDABABBgACAQYAGAEEAAMBAwDkAQ0ABQEFABEBAgACAQgADwEEAAUBAgAGAQMACwEHABgBBAADAQEAAQECAAEBBgAGAQIAEAEFAAMBAwACAQEAGAEDAAQBAwARAQUAAwEDAAIBAQAYAQMABAEDAOUBDQAEAQUAEQEMAA4BBgADAQMABQEDAAwBBQAGAQIAEgEDAAQBAwACAQUABQEDABABBAAGAQIAGwEDAAQBAwAQAQQABQECABwBAgAFAQQA6QELAAIBBAAQAQwADwELAAQBBAANAQQABgECAAQBAQAOAQIABAEDAAMBBAADAQYAEAECAAYBAwAdAQQAAQEEABABAgAHAQIAAQEBABoBBQABAQQA7QEMABIBBQACAQQADwENAAIBBQANAQMABgECAAMBAgAPAQIAAgEFAAMBBQACAQUAEAEDAAQBBQAcAQoADwEDAAQBBQAcAQoA8AEEAAEBAQAVAQUAAwEDAA8BEwAOAQMABAEFAAEBAwAPAQIAAgEEAAIBDgAQAQwAGwEJAAEBAQAOAQ0AGwEJAAEBAQD/AAsBBAAFAQMADgEIAAQBCAANARAAEAEHAAEBDgARAQwAGwEIABIBDAAbAQgA/wAPAQMABQEEAA0BBwAFAQIABAECAA4BEAAQAQUABAELAAIBAQAPAQoAAgEBABsBBgAEAQEADgEKAAIBAQAaAQcABAEBAP8ACwECAAYBBQANAQUABgECAAYBAQANAQgAAwEFABEBBQADAQoABAEBAA8BCAACAQEAAQEBABoBBgAFAQEADgEIAAIBAQAcAQUABgEBAP8ACwECAAUBBQAOAQUABQECABQBBwAFAQEAFQEFAAMBCAAFAQIADgEHAAUBAQAaAQUABgEBAA4BBwAEAQIAGgEGAAUBAQD/AAwBAQAGAQUADQEEAAYBAwAFAQIADQEGABwBBAAEAQcAFgEFAAYBAgAaAQMABwECAA0BBgAGAQIAGgEDAAcBAgD/AAsBAQAFAQYADwEDAAQBBgABAQMADwEFAB0BBAAEAQQACAECAA4BBQAGAQIAGgEEAAYBAgAOAQQABwEBABsBBAAFAQMA/wAMAQIAAgEIAA8BAwACAQsADwEFAAUBBgATAQMABAEEAAgBAgAPAQMABgEDABoBBgABAQUADwEDAAYBAwAaAQUAAgEFAP8ADAEMAA8BBQABAQsADwEEAAQBCAATAQMABAEEAAcBAgARAQIABgECABoBBgACAQUADwEDAAYBAgAaAQcAAQEEAP8ADgELAA4BCQACAQUAEQEDAAIBCgAUAQMABAEFAAQBBAAQAQQAAwEEAAIBAQAVAQ4AEAECAAUBBAABAQEAFgELAAEBAgD/AA4BAwADAQQADwEHAAQBAQACAQIAEAEEAAIBCQAVAQIABQEGAAMBAwARAQYAAQEIABMBCwADAQEAEAEGAAEBCAATAQsAAgEBAP8ADgEEAAUBAgAPAQUABgEBAAIBAQARAQsAAgEBABYBAgAEAQUAAQECAAEBAwASAQsAAQEEABABCAABAQMAFQELAAEBBAAQAQsAAwEBAP8ADwECAAUBBAAOAQUABgEBAAIBAgARAQgAAQECAAIBAQAXAQIAAQEFAAMBBgASAQsAAQEGAA0BBAAeAQsAAQEGAAwBBQD/ABoBAgAFAQUADgEEAAYBBQARAQgAAgEBAAEBAgAYAQcABAEFABIBDAACAQIAAgEDAAEBBAACAQYAHwEHAAQBAQABAQMAAgEDAAEBBAACAQUA/wAjAQYADgEDAAYBBAATAQcAAwEDABkBBgAFAQUAEgEMAAIBAgADAQQAAQEKAAIBAQABAQEAGgEGAAUBAQABAQMAAwEEAAEBCwACAQIA/wAbAQcADwEDAAUBBQATAQUABQEDABkBBgAFAQQAEwEMAAIBAwADAQMAAwEOAAMBAgAUAQUABQECAAIBAwADAQMAAwEMAAEBAQADAQIAFAECAPwBCQAPAQIABQEFABMBBQAEAQQAGQEHAAUBBAAQAQkAAQEFAAIBAwAEAQMABAEIAAMBBQAUAQYABQECAAIBAgAFAQIABQEJAAIBBQAUAQQA+QELAA8BAwACAQYAFAEEAAUBBAAYAQcABgEFAA0BAQADAQUABQEDAAIBAwAFAQIABQEOABUBBwADAQMAAgEDAAUBAgAFAQ4AFQEGAPUBDAAPAQYAAwEDABMBAwAHAQMAGAECAAIBBQAEAQQAAwEEAAQBGwAEAQQABQEKABYBFAAEAQQABQEDAAEBBgAWAQoA8gEFAAIBBQAPAQYA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9AEHAAEBBAD/APMBBwACAQQA/wD0AQQAAgEBAAMBAwD/APIBAgAKAQIA/wDyAQIACAEEAP8A8QEEAAMBAQABAQcA/wDxAQ8A/wDxARAA/wDvAQUABAEHAP8AzwEDAAEBAgAcAQIABwEGAP8AzwEHABoBAQAMAQMA/wDOAQEAAwECAAMBAgAWAQMACQEBAAEBAgD/ANABAQADAQIABAEDABEBEwD/ANABAQACAQQAAgEHAAIBAQAGAQIABAESAP8A0QEGAAIBDQACAQQABQEPAP8A0gEBAAEBBAAEAQQABQEIAAcBAQABAQoA/wDUAQYABAEFAAUBBwAIAQgA/wDWAQYABQEFAAgBBQAFAQEAAQEFAP8A2QEHAAQBBQAHARAA/wDbAQcABQEFAAUBDgD/AN8BBgABAQoABAEMAP8A4AEGAAEBDAACAQoA/wDkARkA/wDrAREA/wD2AQgA/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wDT"
+script:"Index.0"
+{widgets}
+index:{"type":"field","size":[292,109],"pos":[9,223],"locked":1,"volatile":1,"script":"Index.1","scrollbar":1}
+version:{"type":"field","size":[25,14],"pos":[7,22],"locked":1,"volatile":1,"border":0}
+field2:{"type":"field","size":[248,16],"pos":[11,205],"locked":1,"show":"transparent","border":0,"value":{"text":["","Index:"],"font":["","menu"],"arg":["",""]}}
+field1:{"type":"field","size":[255,16],"pos":[146,157],"locked":1,"font":"mono","show":"invert","border":0,"align":"center","value":"Twine Integration for Decker"}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.2","text":"Next","style":"rect"}
+
+{script:Index.0}
+on view do
+ bullet:image["%%IMG0AAYADQAAAAB49Pz8/HgAAAA="]
+ i:select c:key t:value..widgets.title.text where value..widgets.title from deck.cards
+ index.value:raze each row in rows i
+  rtext.make["" "" bullet],
+  rtext.make["  "],
+  rtext.make[("%s\n" format row.t) "mono" row.c]
+ end
+ version.text:"v%0.1f" format deck.modules.twee.version
+end
+{end}
+
+{script:Index.1}
+on link val do
+ go[val "BoxIn" 15]
+end
+{end}
+
+{script:Index.2}
+on click do
+ t.Prev:"SlideRight"
+ t.Next:"SlideLeft"
+ t.Index:"BoxOut"
+ go[me.text t[me.text] 15]
+end
+{end}
+
+{card:overview}
+image:"%%IMG2AgABVgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/APgBLAD/ANUBAQADAQEABAEBAAMBAQAEAQEAAwEBAAMBAQADAQEAAwEBAAMBAQADAQIA/wDVAQMAAgEDAAIBAgABAQEAAQECAAEBAQABAQIAAgECAAIBAgACAQIAAgECAAIBAgD/ANkBAgABAQEAAQECAAEBAgACAQIAAQEBAAEBAgACAQIAAQECAAEBAQABAQIAAgECAAEBAgABAQEAAQEBAP8A1QECAAIBAgACAQIAAgECAAMBAQABAQEAAgECAAIBAgACAQIAAgECAAIBAgACAQIA/wDVAQEAAgECAAEBAQACAQEAAgECAAEBAgABAQEAAgECAAIBAQACAQIAAgECAAIBAgACAQEAAQEBAP8A1gEBAAEBAgACAQIAAgECAAIBAQABAQEAAQEBAAEBAgACAQIAAQEBAAEBAQACAQIAAQEBAAIBAQABAQIA/wDXAQEAAQEBAAIBAQABAQIAAQECAAIBAQABAQEAAgECAAIBAgACAQEAAQEDAAIBAgABAQIAAgEBAAEBAQD/ANUBAQACAQIAAwECAAIBAgABAQEAAQECAAIBAgACAQIAAQEBAAIBAQACAQEAAgEBAAEBAQABAQMA/wDVAQIAAgEDAAIBAQACAQIAAQEBAAIBAgACAQIAAgEBAAEBAQACAQMAAgECAAEBAQD/ANoBAgADAQIAAgECAAIBAQABAQEAAgECAAIBAgACAQEAAQECAAIBAQABAQIAAgEDAAEBAQD/ANUBAQACAQIAAgECAAIBAQACAQEAAQECAAIBAgACAQIAAQEBAAEBAQACAQEAAgEBAAIBAQACAQEAAQEBAP8A1QEBAAIBAQABAQEAAgECAAIBAgADAQIAAgECAAIBAQACAQEAAgECAAEBAQACAQIAAgECAP8A1gECAAEBAQABAQIAAgECAAEBAQACAQIAAgEBAAIBAgACAQIAAgECAAIBAwACAQIAAgEBAP8A1gEBAAIBAQACAQEAAgEBAAIBAgACAQEAAQECAAIBAgACAQEAAQECAAIBAQACAQEAAgEBAAIBAgD/ANYBAgABAQEAAgECAAIBAQABAQEAAQEBAAEBAQACAQIAAgECAAIBAQACAQIAAgEBAAEBAgACAQIA/wDWAQEAAgEBAAEBAgACAQEAAQECAAIBAQABAQIAAgECAAIBAgABAQEAAgEBAAIBAgACAQEAAQECADcBAQADAQEA/wCbAQEAAgEBAAIBAQACAQIAAgECAAMBAgACAQIAAgEBAAIBAgACAQIAAQEBAAIBAQACAQIALgEBAAIBAQD/AKMBAgACAQEAAQECAAIBAQACAQEAAgEBAAIBAgADAQEAAgECAAIBAgADAQIAAQEBAAIBAQAnAQEAAgEBAAIBAQAGAQEABAEBAP8AnQECAAEBAQACAQIAAgECAAIBAwACAQEAAQEBAAEBAgACAQEAAgEBAAIBAgACAQEAAQECACUBAQAXAQEA/wCbAQEAAgEBAAIBAgACAQEAAQEBAAIBAgACAQIAAgECAAIBAgACAQEAAgEBAAEBAQACAQEAAQEBAB0BAQACAQEADgEBAAYBAQD/AJ4BAQACAQEAAQECAAIBAgACAQIAAwEBAAIBAQABAQEAAgECAAIBAQABAQIAAgEBAAIBAQACAQIAGQEBAAwBAQACAQEACAEBAAcBAQD/AJoBAgABAQEAAgECAAMBAQADAQIAAgECAAIBAgADAQEAAgEBAAIBAgABAQEAAQECABkBAQAMAQEACAEBAAcBAQD/AKEBAQACAQEAAwECAAEBAgACAQEAAQEBAAIBAQABAQEAAgECAAEBAgABAQEAAgEBAAIBAQACAQIAAQEBABIBAQAJAQEAAgEBAA8BAQAIAQEA/wCdAQIAAQECAAIBAQADAQIAAwECAAIBAQACAQEAAgEBAAIBAQABAQIAAgEBAAEBAQACAQEAAQEBABABAQAJAQEACwEBAAIBAQAJAQEA/wChAQEAAgEBAAIBAgACAQEAAgECAAEBAQACAQEAAQEBAAEBAgACAQEAAgEBAAIBAQABAQIAAQEBAAIBAQAPAQEABwEBAAIBAQAIAQEACwEBAAMBAQAFAQEAAwEBAP8AmQEBAAIBAQACAQEAAgECAAMBAQABAQEAAgEBAAIBAQACAQEAAgECAAEBAQACAQEAAwECAAIBAgAKAQEAEwEBAAUBAQAGAQEA/wCqAQIAAgEBAAIBAQACAQIAAwECAAIBAQABAQEAAgECAAIBAQACAQEAAQEBAAEBAQACAQIAAgEBAAgBAQAJAQEACQEBAAsBAQAHAQEABAEBAAMBAQD/AJwBAQACAQIAAQECAAIBAQABAQIAAwEBAAEBAQACAQIAAgEBAAIBAQABAQEAAgEBAAEBAQADAQEACAEBAAgBAQAHAQEACwEBAP8AsQEBAAIBAQAFAQEABAECAAIBAQACAQEABAECAAIBAQACAQEAAQEBAAEBAQABAQEAAgEBAAUBAQAQAQEABQEBAAQBAQAGAQEABQEBAAQBAQAFAQEA/wCcAQEAAQECAAIBAgACAQMAAwECAAEBAQABAQIAAQEBAAMBAgACAQIABAEBAAMBAQAMAQEABgEBABcBAQAFAQEABAEBAAUBAQD/AJ0BAgACAQEABAEBAAIBAQACAQEABAECAAQBAgACAQEAAQEBAAMBAQADAQEADgEBAAkBAQAEAQEABQEBAP8AsAECAAMBAQACAQIAAQEBAAEBAQABAQEAAgEBAAIBAgACAQEAAQECAAUBAQACAQEAAgEBAAsBAQAOAQEACgEBAAUBAQAEAQEABgEBAAMBAQD/AJ0BAgACAQEAAwEBAAMBAQADAQEAAgEBAAIBAQACAQEAAgEBAAEBAgACAQEAAgEBAAMBAgAEAQEACAEBAAUBAQAIAQEACQEBAAoBAQD/AKYBAgACAQEAAgEBAAEBAQACAQIAAgECAAIBAQACAQEAAgEBAAMBAQAEAQEAEAEBAAUBAQAOAQEACgEBAAMBAQAHAQEAAwEBAP8AmQECAAQBAgACAQEAAQEBAAIBAQACAQEAAgEBAAIBAgACAQEAAQEBAAIBAQACAQEAAwECAAUBAQAFAQEADAEBAAQBAQAJAQEADgEBAP8AogEBAAIBAQACAQEABAECAAIBAQADAQEAAgEBAAIBAQACAQEABAEBAAcBAQAHAQEAEQEBAAUBAQADAQEABQEBAAQBAQAKAQEA/wCbAQEAAgECAAMBAQABAQIABAEBAAIBAQACAQEAAwEBAAIBAQACAQEAAgEBAAIBAgADAQEADgEBAAQBAQAeAQEABAEBAP8AnQEBAAUBAQACAQEAAgEBAAIBAQACAQIAAgEBAAIBAgAFAQEABAEBAAMBAQAaAQEABAEBAAQBAQAEAQEABAEBAP8AqQECAAEBAgABAQEABAEBAAEBAgAEAQEAAgECAAMBAQABAQEAAwEBAAYBAQAEAQEABwEBAAYBAQAEAQEAGQEBAAQBAQAEAQEA/wChAQEAAgECAAQBAgACAQEABwEBAAQBAQACAQEAAQEBAAQBAQAGAQEABwEBAA0BAQADAQEABAEBAAQBAQAIAQEA/wChAQEAAQECAAIBAQACAQEAAwEBAAQBAQACAQIAAgECAAQBAQADAQEABAEBAAIBAQAUAQEABQEBABMBAQAJAQEA/wCcAQEAAwEBAAMBAgACAQEAAgEBAAIBAQAEAQEABQEBAAIBAQAEAQEAAgEBAAgBAQAEAQEABwEBAAwBAQAEAQEAAwEBAAkBAQD/AKMBAQACAQEAAgEBAAIBAQADAQIAAwECAAQBAQABAQEAAgEBAAMBAQADAQEAAwEBAAQBAQAKAQEACAEBABQBAQAJAQEAAgEBAP8AnAEBAAMBAQAEAQEAAgEBAAIBAgAEAQEAAgEBAAcBAQACAQEABwEBAAgBAQASAQEABQEBAAQBAQAHAQEABAEBAP8AogECAAIBAQABAQEAAgEBAAYBAQACAQEAAgEBAAMBAgACAQEABgECABQBAQADAQEABAEBAAUBAQAJAQEABwEBAAcBAQD/AJoBAQADAQEAAwEBAAIBAQACAQIABAEBAAUBAQAFAQEAAgEBAAEBAQAEAQIABwEBAAQBAQAYAQEACAEBAAkBAQD/AJwBAQADAQEAAgEBAAIBAQACAQEAAgECAAQBAgAEAQEAAgEBAAMBAQAFAQEABwEBAAoBAQADAQEABAEBAAQBAQAKAQEADAEBAP8AnwECAAIBAQADAQEAAgEBAAYBAQAFAQEABAEBAAIBAQAEAQEACAEBAB4BAQAKAQEAAwEBAAIBAQD/AKMBAQACAQEAAgEBAAIBAQABAQIAAwEBAAIBAQADAQIACAEBAAIBAgACAQEACgEBAAMBAQAIAQEABAEBAAgBAQACAQEAEQEBAP8AmgEBAAUBAQADAQEABgEBAAQBAQAGAQEAAgEBAAEBAQAbAQEADQEBAAsBAQADAQEABwEBAP8AnQECAAEBAQACAQIAAwECAAQBAQACAQEAAgECAAQBAQAGAQEAAwEBAAIBAQAGAQEADgEBAAQBAQAIAQEADwEBAP8ApAEBAAUBAQAEAQIAAwEBAAYBAgAEAQEAAgEBAAIBAQAIAQEABwEBAAQBAQAMAQEACQEBAAIBAQAGAQEABAEBAP8AnQEBAAQBAQACAQEAAgEBAAgBAQACAQEABwEBAAQBAQAFAQIACgEBAAoBAQAEAQEABwEBAAwBAQAKAQEA/wCcAQIAAwEBAAMBAQACAQEAAgECAAYBAQADAQEABAEBAAMBAQAUAQEAFgEBAA8BAQD/AJ8BAQAEAQEAAgEBAAQBAQAGAQIAAwEBAAUBAQAHAQIACAEBAAwBAQAEAQEABQEBAAIBAQAIAQEAAgEBAAQBAQAIAQEA/wCaAQEAAgEBAAMBAQADAQEAAwEBAAIBAQAEAQEAAwEBAAEBAQAEAQEAAQEBAAUBAQADAQEABgEBABEBAQAIAQEADwEBAAMBAQD/AJ8BAQAFAQEAEAEBAAUBAQAFAQEAEgEBAAMBAQAEAQEAEAEBAAcBAQD/AKQBAQABAQEAAwECAAQBAgABAQEAAQEBAAIBAQABAQIAAwEBAAMBAQAEAQEABAEBAAIBAQAHAQEAEgEBAAQBAQADAQEABwEBAAYBAQAEAQEA/wCgAQEABAEBAAgBAQAGAQEAAwEBAAQBAQADAQEACgEBAAcBAQAHAQEAGQEBAP8ApgEBAAUBAQADAQEAAgEBAAYBAQAKAQEABwEBAAIBAQALAQEABgEBAAYBAQAEAQEABAEBAAMBAQD/AK8BAgADAQEACAECAAUBAQACAQEAAQEBAAMBAQACAQEAAQEBAAkBAQAMAQEA/wDEAQEABAEBAAMBAQACAQEABgECAAQBAQAEAQEACAEBAAIBAQAKAQEADQEBAAQBAQAEAQEA/wC4AQEABQEBAAIBAQAHAQEABAEBAAUBAQACAQEABwEBAAYBAQAMAQEA/wDBAQEAAgEBAAIBAQAHAQEAAgEBAAUBAQAEAQEACAEBAAIBAQAHAQEABwEBAAQBAQAHAQEA/wC8AQEABgECAAIBAQAGAQEABQEBAAQBAQACAQEACAEBAP8A1QEBAAQBAQAKAQIABAEBAAUBAQAHAQEAAgEBAA4BAQAFAQEA/wDHAQEAAwEBAAMBAQACAQEABAEBAAQBAQAFAQEAAgEBAAcBAQACAQEABwEBAP8AzQEBAAcBAQALAQEABAEBAAgBAQACAQEACQEBAAkBAQD/AMoBAQACAQEABAEBAAIBAQACAQEABAEBAAQBAQACAQEACAEBAAIBAQAMAQEA/wDIAQEACQEBAAkBAQAEAQEABwEBAAIBAQARAQEA/wDMAQEAAgEBAAIBAQAEAQEAAgEBAAUBAQAEAQEAAgEBAAcBAQACAQEABAEBAAMBAQD/ANkBAQAGAQEABQEBAAcBAQACAQEABwEBAP8A1gEBAAIBAQACAQEABgEBAAUBAQAFAQEAAgEBAAcBAQACAQEADAEBAP8A1AEBAAIBAQADAQEABQEBAAgBAQACAQEABwEBAAUBAQD/ANIBAQACAQEADAEBAAUBAQACAQEACAEBAAIBAQD/AOABAQACAQEAAgEBAAYBAQAIAQEAAgEBAAgBAQADAQEABQEBAP8AzgEBAAIBAQAKAQEABgEBAAIBAQAIAQEAAgEBAAUBAQD/ANsBAQACAQEAAgEBAAQBAQAJAQEAAgEBAAgBAQAJAQEA/wDRAQEACwEBAAQBAQADAQEACAEBAAIBAQAFAQEA/wDbAQEAAgEBAAIBAQAFAQEABAEBAAMBAQACAQEACAEBAAUBAQAEAQEA/wDRAQEACgEBAAUBAQALAQEAAgEBAAUBAQD/AN4BAQADAQEABQEBAAYBAQADAQEACAEBAAUBAQAEAQEA/wDUAQEABAEBAAUBAQAFAQEABAEBAAQBAQAHAQEABQEBAP8A5gEBAAkBAQAEAQEABwEBAP8A2QEBAAMBAQAEAQEABAEBAAUBAQAMAQEAAwEBAP8A3QEBAAQBAQADAQEABgEBAAQBAQAEAQEABgEBAAYBAQD/ANsBAQAHAQEABwEBAAMBAQAEAQEACAEBAP8A2QEBAAkBAQAFAQEACgEBAAQBAQAEAQEA/wDeAQEABAEBAAkBAQAEAQEACgEBAAUBAQACAQEA/wDWAQEABAEBAAYBAQAGAQEABQEBAAMBAQAFAQEA/wDnAQEAAwEBAAYBAQAFAQEABAEBAAUBAQACAQEA/wDWAQEAAwEBAAQBAQAHAQEABwEBAAUBAQD/AOcBAQAHAQEABAEBAAkBAQAGAQEAAwEBAP8A2QEBAAYBAQADAQEACAEBAAIBAQAJAQEAAwEBAP8A3QEBAAwBAQAJAQEABAEBAAoBAQD/ANYBAQAEAQEAAwEBAAMBAQAEAQEAAwEBAAUBAQAEAQEAAwEBAP8A4gEBAAcBAQAEAQEABAEBAAQBAQAIAQEA/wDaAQEAAgEBAAYBAQAXAQEABQEBAP8A5AEBAAMBAQAEAQEAAwEBAAIBAQADAQEABAEBAP8A2gEBAAQBAQACAQEABgEBAAMBAQAEAQEACwEBAAUBAQD/ANgBAQAHAQEACgEBAAYBAQACAQEACAEBAP8A3gEBAAUBAQAEAQEACAEBAAYBAQAEAQEA/wDaAQEAAgEBAAUBAQAEAQEABQEBAAMBAQAFAQEABAEBAP8A5AEBAAgBAQALAQEACAEBAAMBAQD/ANgBAQADAQEABgEBAAYBAQACAQEAAwEBAAYBAQD/AOkBAQAEAQEACAEBAAYBAQAEAQEAAgEBAAIBAQD/ANYBAQADAQEAAwEBAAkBAQAKAQEA/wDpAQEABgEBAAIBAQAEAQEABAEBAAYBAQAEAQEA/wDbAQEACQEBAAsBAQAEAQEABgEBAAQBAQD/ANsBAQAEAQEABgEBAAMBAQAFAQEABQEBAAUBAQAEAQEA/wDWAQEABAEBAAQBAQAGAQEABAEBAAYBAQAEAQEA/wDlAQEABQEBAAYBAQAGAQEABAEBAAUBAQACAQEA/wDYAQEAAgEBAAoBAQAJAQEACgEBAP8A5gEBAAYBAQAEAQEABgEBAAQBAQAFAQEA/wDYAQEABAEBAAIBAQADAQEABgEBAAQBAQAGAQEABgEBAP8A3AEBAAsBAQAGAQEABQEBAAUBAQAIAQEA/wDcAQEABAEBAAQBAQAIAQEAAwEBAAYBAQADAQEA/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AAEBEwAmAQMA/wDEARUAJAEFAP8AxAETACUBBQD/AMwBAwAuAQMA/wDNAQMA/wD+AQMA/wD+AQMA/wD+AQMA/wD+AQMALwEBACUBAgD/AKcBAwAMAQEADAEDAAsBAgAFAQMABwECAAMBBwAOAQgA/wCkAQMACwEDAAoBBQAKAQMABAEDAAcBAgABAQsACgEMAP8AogEDAAsBAwAKAQUACQEDAAUBAwAHAQYABAEFAAgBBQAEAQUA/wChAQMADAEDAAkBAgABAQMACAEDAAUBAwAHAQQACAEDAAgBAwAIAQQA/wCgAQMADAEDAAgBAwABAQMABwEDAAYBAwAHAQQACAEEAAYBAwAKAQMA/wCgAQMADAEEAAcBAgACAQMABwEDAAYBAwAHAQMACgEDAAYBAwALAQIA/wCgAQMADQEDAAYBAwADAQIABwEDAAYBAwAHAQMACgEDAAUBAwAMAQMA/wCfAQMADQEDAAYBAwADAQMABgECAAcBAwAHAQMACgEDAAUBAwAMAQMA/wCfAQMADgEDAAUBAgAFAQIABQEDAAcBAwAHAQMACgEDAAUBEgD/AJ8BAwAOAQMABAEDAAUBAwAEAQMABwEDAAcBAwAKAQMABQERAP8AoAEDAA4BAwAEAQMABQEDAAMBAwAIAQMABwEDAAoBAwAFAQMA/wCuAQMADwECAAQBAgAHAQIAAwEDAAgBAwAHAQMACgEDAAUBAwD/AK4BAwAPAQMAAgECAAgBAwACAQIACQEDAAcBAwAKAQMABQEDAP8ArgEDABABAgACAQIACAEDAAEBAwAJAQMABwEDAAoBAwAGAQMA/wCtAQMAEAEGAAkBBgAJAQMABwEDAAoBAwAGAQQACgECAP8AoAEDABABBgAJAQUACgEDAAcBAwAKAQMABwEEAAcBBAD/AKABAwARAQQACwEEAAoBAwAHAQMACgEDAAgBDQD/AKEBAwARAQQACwEDAAsBAwAHAQMACgEDAAoBCQD/AKQBAQATAQIADQECAAwBAQAJAQEADAEBAA0BBAD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wAG"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.2","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Overview"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["","Twine"," is a tool for writing interactive stories, with a focus on choice-based, prose-focused interactive fiction.\n\nTwine represents stories with the ",".twee"," file format, which contains a series of textual \"passages\" that each have a name and other metadata.\n\nPassages within a story are processed by a \"","Story Format","\" which provides markup syntax. There are several Story Formats available for Twine which are each suited to different purposes.\n\nThe \"twee\" module for Decker allows it to manipulate and construct .twee files, so that Decker can be used in concert with Twine. Since all of Twine's prominent Story Formats include access to web browser features like CSS and JavaScript, it is not possible to embed arbitrary pre-existing Twine stories within a deck. Instead, this module provides a new Story Format called \"","Ply","\" which is Decker-compatible and similar to the most essential features of the popular ","Harlowe"," Story Format, to facilitate porting stories."],"font":["","","","","","","","","","",""],"arg":["","https://twinery.org","","https://github.com/iftechfoundation/twine-specs/blob/master/twee-3-specification.md","","https://twinery.org/cookbook/introduction/story_formats.html","","ply","","https://twine2.neocities.org",""]}}
+
+{card:tweeread}
+script:"tweeread.0"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.2","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"twee.read[]"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"The twee.read[text] function takes a string containing a story in the .twee format and returns a story table, where each row represents a passage and its metadata.\n\nThe columns of the table are:\n\n- name: the passage name.\n- body: the text content of the passage.\n- tags: a list of string \"tags\".\n- meta: a dictionary of arbitrary metadata.\n\nThe \"meta\" dictionary often contains \"size\" and \"position\" attributes, each representing a comma-separated \"x,y\" or \"width,height\" pair which are used for laying out passages as nodes within Twine's graph editor.\n\nThe \"tags\" can be used in an open-ended manner, but the tag names \"script\" and \"stylesheet\" are reserved for indicating that passages contain JavaScript or a CSS stylesheet for displaying the story."}
+input:{"type":"field","size":[232,133],"pos":[10,48],"script":"tweeread.1","border":1,"scrollbar":1,"style":"code","value":":: A Simple Story\nThere once was a [[Fairy->Lily]].\n\n:: Lily {\"position\":\"275,400\"}\nShe was at times quite [[Contrary->Irritable]].\n\n:: Irritable [inverted]\nWhomst among us?"}
+output:{"type":"grid","size":[232,115],"pos":[10,190],"locked":1,"volatile":1,"bycell":1,"format":"ssJJ"}
+
+{script:tweeread.0}
+on view do
+ output.value:twee.read[input.text]
+end
+{end}
+
+{script:tweeread.1}
+on change do
+ view[]
+end
+{end}
+
+{card:tweewrite}
+script:"tweewrite.0"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.2","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"twee.write[]"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"The twee.write[story] function takes a story table (as produced by twee.read[]) and assembles it into a string representation of the corresponding .twee file."}
+input:{"type":"grid","size":[232,115],"pos":[10,51],"script":"tweeread.1","bycell":1,"format":"ssJJ","value":{"name":["A Similar Story","Lily","Irritable"],"body":["There once was a [[Fairy->Lily]].","She was at times quite [[Contrary->Irritable]].","Whomst among us?"],"tags":[[],[],["inverted"]],"meta":[{},{"position":"275,400"},{}]},"row":0,"col":0}
+output:{"type":"field","size":[232,133],"pos":[10,172],"locked":1,"script":"tweeread.1","border":1,"scrollbar":1,"style":"code","value":":: A Similar Story\nThere once was a [[Fairy->Lily]].\n\n:: Lily {\"position\":\"275,400\"}\nShe was at times quite [[Contrary->Irritable]].\n\n:: Irritable [inverted]\nWhomst among us?\n"}
+
+{script:tweewrite.0}
+on view do
+ output.text:twee.write[input.value]
+end
+{end}
+
+{card:tweemeta}
+script:"tweemeta.0"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.2","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"twee.meta[]"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"The twee.meta[story] function makes it slightly more convenient to retrieve and set story metadata normally stored in the StoryData and StoryTitle passages of a .twee file.\n\ntwee.meta[story] returns a dictionary of metadata properties, including:\n\n- start: name of starting passage\n- title: name of story\n- ifid: internet fiction database ID\n- format: story format name\n- format-version: story format revision\n\ntwee.meta[story meta] applies the specified metadata dictionary to the story, returning a new story table."}
+meta:{"type":"grid","size":[233,115],"pos":[10,186],"volatile":1,"script":"tweemeta.1","bycell":1,"format":"sJ"}
+file:{"type":"field","size":[232,133],"pos":[11,48],"script":"tweeread.1","border":1,"scrollbar":1,"style":"code","value":":: StoryTitle\nExample Story\n\n:: StoryData\n{\n  \"ifid\": \"4CE3487C-9FD6-4BAD-ADA7-FAD6A76FA8E6\",\n  \"format\": \"Harlowe\",\n  \"format-version\": \"3.3.7\",\n  \"start\": \"West of the House\",\n  \"zoom\": 1\n}\n\n:: West of the House {\"position\":\"275,275\",\"size\":\"100,100\"}\nYou are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here."}
+
+{script:tweemeta.0}
+on view do
+ meta.value:twee.meta[twee.read[file.text]]
+end
+{end}
+
+{script:tweemeta.1}
+on change do
+ file.text:twee.write[twee.meta[twee.read[file.text] raze meta.value]]
+end
+{end}
+
+{card:tweehtml}
+script:"tweehtml.0"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.2","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"twee.html[]"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["The twee.html[story] function takes a story table and converts it into the ","Twine 2 HTML Output Spec",". This format represents similar information to a .twee file, but with a different structure. It may be useful for implementing new story formats or interacting with other Twine tooling.\n\nCalling twee.html[] with a string will instead attempt to parse that string as HTML and produce a story table."],"font":["","",""],"arg":["","https://github.com/iftechfoundation/twine-specs/blob/master/twine-2-htmloutput-spec.md",""]}}
+file:{"type":"field","size":[232,133],"pos":[11,48],"script":"tweeread.1","border":1,"scrollbar":1,"style":"code","value":":: StoryTitle\nLike Zork But Much Smaller\n\n:: StoryData\n{\n  \"ifid\": \"4CE3487C-9FD6-4BAD-ADA7-FAD6A76FA8E6\",\n  \"format\": \"Ply\",\n  \"format-version\": \"0.9\",\n  \"start\": \"West of the House\",\n  \"zoom\": 1\n  \"tag-colors\": {\n    \"bar\": \"green\",\n    \"foo\": \"red\",\n    \"qaz\": \"blue\"\n  },\n}\n\n:: West of the House {\"position\":\"275,275\",\"size\":\"100,100\"}\nYou are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here.\n\n[[Open Mailbox.->Mailbox]]\n\n:: Mailbox {\"position\":\"450,275\",\"size\":\"100,100\"}\nOpening the mailbox reveals a leaflet.\n"}
+output:{"type":"field","size":[232,114],"pos":[11,186],"volatile":1,"border":1,"scrollbar":1,"style":"code"}
+
+{script:tweehtml.0}
+on view do
+ output.text:twee.html[twee.read[file.text]]
+end
+{end}
+
+{card:tweerender}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.2","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"twee.render[]"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,257],"pos":[254,48],"locked":1,"border":0,"value":{"text":["twee.render[text] processes a string of ","Ply markup",".\n\ntwee.render[story name vars] looks up the body of a named passage in a story and processes it as a string of Ply markup.\n\n\n\n\n\n\n\nIn either case, the result is a dictionary containing the following keys:\n\n- value: a rich text table suitable for display in a field widget.\n- vars: a dictionary of variable bindings reflecting any changes made by executing Lil fragments within the Ply markup.\n\nIn its simplest applications, you can think of this function as being like \"markdown for Decker fields\". As we will see shortly, it can also be used to convert an inert parsed .twee story into an interactive game."],"font":["","",""],"arg":["","ply",""]}}
+ex1:{"type":"field","size":[232,98],"pos":[10,48],"border":1,"style":"code","value":"output.value:twee.render[\n \"*My Bedroom*\n \n Yeesh, what a mess.\n \n [[Leave->Hallway]]\n \"\n].value"}
+button4:{"type":"button","size":[60,20],"pos":[255,126],"script":"tweerender.0","text":"Try It!"}
+output:{"type":"field","size":[232,150],"pos":[10,155],"locked":1,"volatile":1,"script":"tweeread.1","border":1,"scrollbar":1}
+
+{script:tweerender.0}
+on click do
+ eval[ex1.text () 1]
+end
+{end}
+
+{card:ply}
+script:"ply.0"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.2","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Ply: The Basics"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,249],"pos":[254,48],"locked":1,"border":0,"value":{"text":["Ply is a very simple markup language designed to produce the table-based rich text format used by Field widgets:\n\n- Enclosing text in *asterisks* will make it appear\n","in the Menu font",".\n\n- Enclosing text in `backticks` will make it appear\n","in the Mono font",".\n\n- A Link [[Label Name->Target Passage]] will appear\nlike ","Label Name",". \n\n- Lil code enclosed in curly braces {\"like this\"} will be executed in the order it appears, and the resulting string, rtext, or Image will be inserted into the result at that point. Curly braces may be nested within curly braces as long as they are properly paired: {\"{a} b\"}\n\nAnything else will use the default body font of the field. There is no escape mechanism for *  ` or [[]]."],"font":["","menu","","mono","","",""],"arg":["","","","","","Target Passage",""]}}
+input:{"type":"field","size":[232,124],"pos":[10,48],"script":"tweeread.1","border":1,"style":"code","value":"*Header*\n\n`Monospaced`\n\n[[Link->Elsewhere]]\n\nLil: {2+3}\n\nPlain text."}
+output:{"type":"field","size":[232,124],"pos":[10,178],"locked":1,"volatile":1,"border":1,"scrollbar":1}
+
+{script:ply.0}
+on view do
+ output.value:twee.render[input.text].value
+end
+{end}
+
+{card:plyfragments}
+script:"ply.0"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.2","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Ply: Lil Fragments"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,249],"pos":[254,48],"locked":1,"border":0,"value":{"text":["When Lil fragments are executed within Ply markup, they have a number of variable bindings available:\n\n- story: the story table (if any)\n- name: the passage name (if any)\n- tags: the passage tags (if any)\n- meta: the passage metadata (if any)\n\n- rtext: the Lil RText interface.\n- image: the Lil Image constructor builtin.\n- eval: the Lil eval[] builtin.\n- random: the Lil random[] builtin.\n\nIf you want access to any other utility functions they can be passed in with the \"vars\" argument of ","twee.render[]",". Any variable assignments which occur within Lil fragments are available in subsequent fragments within the same passage and via the .vars field of the result of twee.render[]."],"font":["","",""],"arg":["","tweerender",""]}}
+input:{"type":"field","size":[232,124],"pos":[10,48],"script":"tweeread.1","border":1,"style":"code","value":"{random[\"Apple\",\"Banana\",\"Cherry\"]}\n\nassign first: {alfa:11}\n\nassign second: {beta:22}\n\nlookup: {alfa+beta}"}
+output:{"type":"field","size":[232,124],"pos":[10,178],"locked":1,"volatile":1,"border":1,"scrollbar":1}
+
+{card:plyfontsandimages}
+script:"ply.0"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.2","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Ply: Fonts and Images"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,249],"pos":[254,48],"locked":1,"border":0,"value":"If you want to generate formatted text on the fly, use Lil fragments to return an rtext table or an Image interface; the result will appear inline."}
+input:{"type":"field","size":[232,124],"pos":[10,48],"script":"tweeread.1","border":1,"style":"code","value":"{rtext.make[\"bold text\" \"menu\"]}\n\ninline image: {image[\"%%IMG0AB8AH/////6AIAgCgCAIAoAgCAKAIAgCgCAIAoAgCAKAIAgCgCAIAoAgCAKAP/gCgCAIAoAgCAKAIAgCgCAIAoAgCAKAIAgCgCAIAoAgCAKAIAgCgD/4AoAACAKAAAgCgAAIAoAACAKAAAgCgAAIAoAACAKAAAgCgAAIAv////4=\"]}\n"}
+output:{"type":"field","size":[232,124],"pos":[10,178],"locked":1,"volatile":1,"border":1,"scrollbar":1}
+
+{card:twineplayer}
+script:"twineplayer.0"
+{widgets}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"A Twine Player"}
+field1:{"type":"field","size":[248,55],"pos":[10,48],"locked":1,"border":0,"value":"The story below is written using Ply within a .twee file. By using twee.read[] and twee.render[] we can make it playable as an interactive game. Note that in practice most of the state-holding widgets below could be invisible:"}
+input:{"type":"field","size":[248,107],"pos":[10,110],"script":"tweeread.1","scrollbar":1,"style":"code","value":":: StoryTitle\nExample Story\n\n:: StoryData\n{\n  \"format\": \"Ply\",\n  \"format-version\": \"0.9\",\n  \"start\": \"West of the House\",\n  \"zoom\": 1\n}\n\n:: Forest {\"position\":\"275,400\",\"size\":\"100,100\"}\nYou're terribly lost in the woods.\n{\n innawoods:innawoods+1\n random[\n  \"I wonder if you'll have to eat a bug.\",\n  \"There sure are a lot of trees here.\",\n  \"Was that a common brushtail possum? Hmm. Maybe not.\",\n  \"I swear I heard clucking over to the left.\",\n  \"Your feet really hurt.\",\n  \"\",\"\",\"\",\"\",\"\"\n ]\n}\n\n[[Wander calmly.->Forest]]\n{if innawoods>3 rtext.make[\"Wander in escalating panic!\" \"\" \"Forest\"] else \"\" end}\n{if innawoods>5 rtext.make[\"Oh, the house is right over There.\" \"\" \"West of the House\"] else \"\" end}\n\n\n:: Leaflet [inverted center] {\"position\":\"450,400\",\"size\":\"100,100\"}\n*ZORK* is a game of adventure, danger, and low cunning. In it you could explore some of the most amazing territory ever seen by mortal man. Hardened adventurers have run screaming from the terrors contained within!\n\nThis isn't Zork, though; it's just a minimal proof-of-concept twine game titled \"{first extract body where name=\"StoryTitle\" from story}\".\n{readleaflet:1 \"\"}\n[[sigh.->West of the House]]\n\n\n:: Mailbox {\"position\":\"450,275\",\"size\":\"100,100\"}\nOpening the mailbox reveals a leaflet.\n\n{rtext.make[if readleaflet \"Read leaflet again.\" else \"Read leaflet.\" end \"\" \"Leaflet\"}\n\n\n:: West of the House {\"position\":\"275,275\",\"size\":\"100,100\"}\nYou are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here.\n\n[[Open Mailbox.->Mailbox]]\n[[Wander into the forest.->Forest]]\n"}
+location:{"type":"field","size":[232,13],"pos":[270,48],"locked":1,"volatile":1,"show":"invert","border":0,"align":"center"}
+output:{"type":"field","size":[232,238],"pos":[270,65],"locked":1,"volatile":1}
+vars:{"type":"field","size":[87,61],"pos":[84,242],"locked":1,"volatile":1}
+story:{"type":"grid","size":[81,61],"pos":[177,242],"locked":1,"volatile":1}
+reset:{"type":"button","size":[60,20],"pos":[10,242],"script":"twineplayer.1","text":"Reset"}
+field2:{"type":"field","size":[75,16],"pos":[84,224],"locked":1,"border":0,"value":"vars"}
+field3:{"type":"field","size":[75,16],"pos":[177,224],"locked":1,"border":0,"value":"story"}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.2","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text":"Prev","style":"rect"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
+
+{script:twineplayer.0}
+on link there do
+ location.text:there
+ r:twee.render[story.value there vars.data]
+ output.value:r.value
+ vars.data   :r.vars
+ # bonus: tag-based formatting cues:
+ p:(story.value.name dict rows story.value)[there]
+ output.show:if "inverted" in p.tags "invert" else "solid" end
+ output.align:if "center" in p.tags "center" elseif "right" in p.tags "right" else "left" end
+end
+
+on reset do
+ vars.text:"{l}{r}"
+ link[twee.meta[story.value].start]
+end
+
+on view do
+ story.value:twee.read[input.text]
+ reset[]
+end
+{end}
+
+{script:twineplayer.1}
+on click do
+ reset[]
+end
+{end}
+
+{card:card1}
+{widgets}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"The plyPlayer Contraption"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"If you don't want or need the flexibility of a setup like on the previous card, or you don't wish to do any scripting, the plyPlayer contraption is provided as a convenient alternative. Simply copy this contraption into your deck and insert the .twee story!\n\nThis contraption is resizable and respects the standard .font, .show, and .volatile attributes. It will also fire a \"passage\" event whenever the passage is changed or refreshed.\n\nThis contraption exposes access to the .twee story, the current passage name, and the current variable bindings with .story, .passage, and .vars attributes, respectively.\n\nIt also exposes a .reset[] function which can reset the story to the initial passage and clear any Ply variable bindings. The \"Reset\" button and passage heading in the example to the left are illustrative and can be omitted, replaced, or customized to suit your application."}
+location:{"type":"field","size":[201,13],"pos":[30,65],"locked":1,"volatile":1,"show":"invert","border":0,"align":"center"}
+player:{"type":"contraption","size":[201,158],"pos":[30,82],"script":"card1.0","def":"plyPlayer","widgets":{"o":{"size":[201,158],"scrollbar":1,"value":{"text":["You are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here.\n\n","Open Mailbox.","\n","Wander into the forest."],"font":["","","",""],"arg":["","Mailbox","","Forest"]}},"s":{"pos":[234,-24],"value":":: StoryTitle\nExample Story\n\n:: StoryData\n{\n  \"format\": \"Ply\",\n  \"format-version\": \"0.9\",\n  \"start\": \"West of the House\",\n  \"zoom\": 1\n}\n\n:: Forest {\"position\":\"275,400\",\"size\":\"100,100\"}\nYou're terribly lost in the woods.\n{\n innawoods:innawoods+1\n random[\n  \"I wonder if you'll have to eat a bug.\",\n  \"There sure are a lot of trees here.\",\n  \"Was that a common brushtail possum? Hmm. Maybe not.\",\n  \"I swear I heard clucking over to the left.\",\n  \"Your feet really hurt.\",\n  \"\",\"\",\"\",\"\",\"\"\n ]\n}\n\n[[Wander calmly.->Forest]]\n{if innawoods>3 rtext.make[\"Wander in escalating panic!\" \"\" \"Forest\"] else \"\" end}\n{if innawoods>5 rtext.make[\"Oh, the house is right over There.\" \"\" \"West of the House\"] else \"\" end}\n\n\n:: Leaflet [inverted center] {\"position\":\"450,400\",\"size\":\"100,100\"}\n*ZORK* is a game of adventure, danger, and low cunning. In it you could explore some of the most amazing territory ever seen by mortal man. Hardened adventurers have run screaming from the terrors contained within!\n\nThis isn't Zork, though; it's just a minimal proof-of-concept twine game titled \"{first extract body where name=\"StoryTitle\" from story}\".\n{readleaflet:1 \"\"}\n[[sigh.->West of the House]]\n\n\n:: Mailbox {\"position\":\"450,275\",\"size\":\"100,100\"}\nOpening the mailbox reveals a leaflet.\n\n{rtext.make[if readleaflet \"Read leaflet again.\" else \"Read leaflet.\" end \"\" \"Leaflet\"}\n\n\n:: West of the House {\"position\":\"275,275\",\"size\":\"100,100\"}\nYou are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here.\n\n[[Open Mailbox.->Mailbox]]\n[[Wander into the forest.->Forest]]\n"},"p":{"size":[100,32],"pos":[234,11],"value":"West of the House"},"v":{"size":[100,32],"pos":[234,58],"value":"{}"},"g":{"size":[100,70],"pos":[234,104],"value":{"name":["StoryTitle","StoryData","Forest","Leaflet","Mailbox","West of the House"],"body":["Example Story","{\n  \"format\": \"Ply\",\n  \"format-version\": \"0.9\",\n  \"start\": \"West of the House\",\n  \"zoom\": 1\n}","You're terribly lost in the woods.\n{\n innawoods:innawoods+1\n random[\n  \"I wonder if you'll have to eat a bug.\",\n  \"There sure are a lot of trees here.\",\n  \"Was that a common brushtail possum? Hmm. Maybe not.\",\n  \"I swear I heard clucking over to the left.\",\n  \"Your feet really hurt.\",\n  \"\",\"\",\"\",\"\",\"\"\n ]\n}\n\n[[Wander calmly.->Forest]]\n{if innawoods>3 rtext.make[\"Wander in escalating panic!\" \"\" \"Forest\"] else \"\" end}\n{if innawoods>5 rtext.make[\"Oh, the house is right over There.\" \"\" \"West of the House\"] else \"\" end}","*ZORK* is a game of adventure, danger, and low cunning. In it you could explore some of the most amazing territory ever seen by mortal man. Hardened adventurers have run screaming from the terrors contained within!\n\nThis isn't Zork, though; it's just a minimal proof-of-concept twine game titled \"{first extract body where name=\"StoryTitle\" from story}\".\n{readleaflet:1 \"\"}\n[[sigh.->West of the House]]","Opening the mailbox reveals a leaflet.\n\n{rtext.make[if readleaflet \"Read leaflet again.\" else \"Read leaflet.\" end \"\" \"Leaflet\"}","You are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here.\n\n[[Open Mailbox.->Mailbox]]\n[[Wander into the forest.->Forest]]"],"tags":[[],[],[],["inverted","center"],[],[]],"meta":[{},{},{"position":"275,400","size":"100,100"},{"position":"450,400","size":"100,100"},{"position":"450,275","size":"100,100"},{"position":"275,275","size":"100,100"}]}},"scr":{"pos":[234,-53],"value":1}}}
+reset:{"type":"button","size":[60,20],"pos":[102,258],"script":"card1.1","text":"Reset"}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.2","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text":"Prev","style":"rect"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
+
+{script:card1.0}
+on passage name body tags meta do
+ location.text:name
+end
+{end}
+
+{script:card1.1}
+on click do
+ player.reset[]
+end
+{end}
+
+{card:card2}
+image:"%%IMG2AgABVgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wA/IAoADCAQAP8AjiAlABsgDQEKIAwBECABAP8AjCABASUgGwE0IAEA/wCKIAEBdSABAP8AiiABAU4gCgENIA0BAyABAP8AiiABAQQgIgEcIDABAyABAP8AiiABAQYgKAEJIDsBAyABAP8AiiABAQcgJAEKID0BAyABAP8AiiABAQggIAEMID4BAyABAP8AiiABAQMgAgEEIB4BDCA/AQMgAQD/AIogAQEDIAMBDCATAQ0gQAEDIAEA/wCKIAEBAyAEASIgAgEFIEIBAyABAP8AiiABAQMgBAEgIAMBBSBDAQMgAQD/AIogAQEDIAMBBCAIARQgBAEEIEQBAyABAP8AiiABAQMgAgEEIBgBBSADAQMgRgEDIAEA/wCKIAEBCCAYAQUgBAEDIEYBAyABAP8AiiABAQcgGAEEIAEBASADAQQgRQEDIAEA/wCLIAEBBSAaAQMgAQEBIAQBAyBGAQMgAQD/AIsgAQEEIAcBFiACAQEgBAEDIEYBAyABAP8AiyABAQsgEgEDIAIBASAEAQQgRgEDIAEA/wCLIAEBByAUAQQgAwEBIAQBAyBHAQMgAQD/AIsgAQEDIAEBBCASAQUgAwEBIAQBAyBHAQMgAQD/AIsgAQEDIAIBBCAQAQUgBAEBIAQBAyBHAQMgAQD/AIsgAQEDIAMBESABAQUgBAEBIAQBAyBIAQMgAQD/AIsgAQEDIAMBFSABAQEgBAEBIAQBAyBIAQMgAQD/AIsgAQEDIAIBFCADAQEgBAEBIAQBAyBIAQMgAQD/AIsgAQEIIA0BAyADAQEgBQEBIAQBAyBIAQMgAQD/AIsgAQEHIA0BAyAEAQEgBQEBIAQBAyBIAQMgAQD/AIsgAQEFIA4BBCAEAQEgBQEBIAQBAyBIAQMgAQD/AIsgAQEFIA0BBSAEAQEgBQEBIAQBBCBHAQMgAQD/AIsgAQEVIAEBASAEAQEgAQENIEcBAyABAP8AiyABAQYgCgEEIAEBASACARIgRwEDIAEA/wCLIAEBAyABAQMgCQEDIAIBFCBIAQMgAQD/AIsgAQEDIAIBAyAHAQMgAwEIIFQBAyABAP8AiyABAQMgAwEFIAMBBCABAQUgWQEDIAEA/wCLIAEBAyAEAQogAQEFIFoBAyABAP8AiyABAQMgAwEPIFwBAyABAP8AiyABAQogAQEJIF0BAyABAP8AjCABAQYgBQEGIF8BAyABAP8AjCABAQUgBgEFIGEBAyABAP8AiyABAQ8gYgEDIAEA/wCLIAEBBSAFAQQgYwEDIAEA/wCLIAEBBiAEAQMgLQEDIDQBAyABAP8AiyABAQcgAgEDIC0BBSAzAQMgAQD/AIsgAQEDIAEBBCABAQMgLQEFIDMBAyABAP8AiyABAQMgAwEGIC0BBSAzAQMgAQD/AIsgAQEDIAMBBiAsAQYgMwEDIAEA/wCLIAEBAyABAQggLQEBIAEBAyAzAQMgAQD/AIsgAQEHIAIBAyAvAQMgMwEDIAEA/wCLIAEBBiADAQMgLwEDIDMBAyABAP8AiyABAQwgLwEDIDMBAyABAP8AiyABAQUgBAEDIC8BAyAzAQMgAQD/AIsgAQEGIAMBAyAvAQMgCAEBIAsBASAeAQMgAQD/AIsgAQEIIAEBAyAvAQMgBwEDIAkBAyAdAQQgAQD/AIogAQEDIAIBByAeAQQgDQEDIAcBAyAJAQMgHgEDIAEA/wCKIAEBAyADAQYgGwEKIAoBAyAHAQMgCQEDIB4BAyABAP8AiiABAQMgBAEFIBoBDCAJAQMgBwEDIAkBAyAeAQMgAQD/AIogAQEDIAMBBiAZAQUgBAEFIAgBAyAGAQMgCgEDIB4BAyABAP8AiiABAQMgAgEHIBgBBCAIAQQgBwEDIAcBAyAJAQMgHgEDIAEA/wCKIAEBAyABAQQgAQEDIBgBAyAKAQQgBgEDIAcBAyAJAQMgHgEDIAEA/wCKIAEBByACAQMgGAEDIAsBAyAGAQMgBwEDIAkBAyAeAQMgAQD/AIogAQEGIAMBAyAYAQMgCwEDIAYBBCAGAQMgCQEDIB4BAyABAP8AiiABAQUgBAEDIBgBAyAMAQMgBgEDIAYBAyAIAQQgHgEDIAEA/wCKIAEBBSAEAQMgGQEDIAsBAyAGAQMgBwEDIAYBBSAeAQMgAQD/AIogAQEMIBkBAyALAQMgBgEDIAcBBiACAQYgHgEDIAEA/wCKIAEBBSAEAQMgGQEDIAsBAyAGAQMgCAENIB4BAyABAP8AiiABAQYgAwEDIBkBAyAKAQQgBgEDIAoBByABAQMgHgEDIAEA/wCKIAEBByACAQMgGQEDIAoBAyAHAQQgDAEDIAIBAyAeAQMgAQD/AIogAQEDIAEBBCABAQMgGQEEIAgBBCAHAQUgEAEDIB4BAyABAP8AiiABAQMgAwEGIBkBDyAJAQMgEQEDIB4BAyABAP8AiiABAQMgAgEHIBkBDiAeAQMgHgEDIAEA/wCKIAEBAyABAQQgAQEDIBoBCyAgAQMgHgEDIAEA/wCLIAEBBiACAQMgGgEDICgBAyAeAQMgAQD/AIsgAQEFIAMBAyAaAQMgKAEDIB4BAyABAP8AiyABAQQgBAEDIBoBAyAoAQMgHQEDIAEA/wCMIAEBCyAaAQMgKAEDIB0BAyABAP8AjCABAQQgBAEDIBsBAyAnAQMgHQEDIAEA/wCMIAEBBSADAQMgGwEDICcBAyAdAQMgAQD/AI0gAQEFIAEBBCAbAQMgGQEDIAsBAyAdAQMgAQD/AI0gAQEJIBwBAyAXAQcgCQEDIB0BAyABAP8AjSABAQMgAQEFIBwBAyAWAQkgCAEDIB0BAyABAP8AjSABAQMgAgEEIBwBBCAUAQQgAwECIAkBAyAdAQMgAQD/AI0gAQEDIAIBBCAdAQMgFAEDIA8BAyAdAQMgAQD/AI0gAQEDIAIBBCAdAQMgEwEDIA8BAyAeAQMgAQD/AI0gAQEJIB0BAyATAQQgDgEDIB4BAyABAP8AjiABAQkgHAEDIBQBBCANAQMgHwEDIAEA/wCNIAEBBSABAQMgHQEBIBYBBiAJAQQgHwEDIAEA/wCNIAEBBCACAQMgNQEKIAIBBSAgAQMgAQD/AI0gAQEJIDcBDiAhAQMgAQD/AI0gAQEKIDgBCiAjAQMgAQD/AI0gAQEKID4BAyAkAQMgAQD/AI0gAQEDIAEBBiBlAQMgAQD/AI0gAQEDIAMBBCBlAQMgAQD/AI0gAQEDIAIBBSBlAQMgAQD/AI0gAQEDIAEBBiBlAQMgAQD/AI0gAQEKIGUBAyABAP8AjSABAQYgAgEDIGQBAyABAP8AjSABAQUgAwEDIGQBAyABAP8AjSABAQQgBAEDIGQBAyABAP8AjSABAQsgZAEDIAEA/wCNIAEBBCAEAQMgZAEDIAEA/wCNIAEBBSADAQMgZAEDIAEA/wCNIAEBCyBkAQMgAQD/AI0gAQEDIAEBByBkAQMgAQD/AI0gAQEDIAIBBiBkAQMgAQD/AI0gAQEDIAMBBSBkAQMgAQD/AI0gAQEDIAIBBiBkAQMgAQD/AI0gAQEDIAEBByBkAQMgAQD/AI0gAQEHIAEBAyBkAQMgAQD/AI0gAQEGIAIBAyBkAQMgAQD/AI0gAQELIGQBAyABAP8AjSABAQsgYwEDIAEA/wCOIAEBCyBjAQMgAQD/AI4gAQEDIAMBBSBjAQMgAQD/AI4gAQEDIAQBBCBjAQMgAQD/AI4gAQEDIAIBBiBjAQMgAQD/AI4gAQEDIAEBByBjAQMgAQD/AI4gAQELIDwBFCATAQMgAQD/AI4gAQEFIAMBAyAvAS8gBQEDIAEA/wCOIAEBBCAEAQMgLQE5IAEA/wCOIAEBDCAjARggEwEXIAEA/wCOIAEBEiANARsgDQATIA8BByABAP8AkCABATcgAgAvIAcA/wCSIAgBJiAJAP8A0iAJAQ0gEAD/AOQgDQD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wCf"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.2","text":"Index","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"The Ply Story Format"}
+field1:{"type":"field","size":[284,35],"pos":[122,61],"locked":1,"border":0,"value":"As an additional convenience, a Ply story format is available for use within Twine. Navigate to Twine -> Story Formats -> Add and use the URL below:\n\n"}
+field2:{"type":"field","size":[292,21],"pos":[118,101],"style":"code","align":"center","value":"https://beyondloom.com/decker/ply/format.js"}
+
+{module:twee}
+description:"manipulate and create Twine story files in the Twee 3 format"
+version:0.9
+{script}
+#######################################
+#
+#  Routines for manipulating Twee 3 story files for interoperation with Twine.
+#
+#  https://twinery.org
+#  https://github.com/iftechfoundation/twine-specs/blob/master/twee-3-specification.md
+#  https://github.com/iftechfoundation/twine-specs/blob/master/twine-2-htmloutput-spec.md
+#
+#######################################
+
+on trim x do
+ while (first x)in (" ","\n") x: 1 drop x end
+ while (last  x)in (" ","\n") x:-1 drop x end 
+ x
+end
+
+on twee_read text do
+ local r:insert name body tags meta with end
+ local n:0
+ local p:()
+ local t:()
+ local m:()dict ()
+ on add_passage do
+  if n
+   r:insert
+     name # string
+     body # string
+     tags # list-of-string
+     meta # json-compatible dict
+   with n trim["\n" fuse p] t m into r
+   p:()
+   t:()
+   m:() dict ()
+  end
+ end
+ on start_passage line do
+  add_passage[]
+  p:()
+  n:()
+  local i:0
+  while i<count line
+   if "\\"~line[i] # escaped name char
+    i:i+1
+    n:n,line[i]
+   elseif "{l}"~line[i] # JSON metadata chunk
+    m:m,"%j" parse i drop line
+    i:count line
+   elseif "["~line[i] # begin tag chunk
+    i:i+1
+    tn:()
+    while (!"]"~line[i])&i<count line
+     on add_tag do
+      if count tn t:t,trim["" fuse tn] tn:() end
+     end
+     if "\\"~line[i] # escaped tag name char
+      i:i+1
+      tn:tn,line[i]
+     elseif " "~line[i] # tag name break
+      add_tag[]
+     else
+      tn:tn,line[i]
+     end
+     i:i+1
+    end
+    add_tag[]
+   else # passage name
+    n:n,line[i]
+   end
+   i:i+1
+  end
+  n:trim["" fuse n]
+ end
+ each line in "\n" split text
+  if "::"~2 limit line
+   start_passage[2 drop line]
+  else
+   p:p,line
+  end
+ end
+ add_passage[]
+ r
+end
+
+on twee_write story do
+ on escaped_write x do
+  "" fuse each c in "" split x
+   if c in "[]{l}{r}\\" "\\",c else c end
+  end
+ end
+ on passage_write name body tags meta do
+  t:if count tags " [%s]" format " " fuse escaped_write@tags else "" end
+  m:if count meta " %j" format meta                          else "" end
+  b:if count body "\n%s\n" format body                       else "" end
+  ":: %s%s%s%s" format escaped_write[name],t,m,b
+ end
+ "\n" fuse each r in rows story
+  passage_write[r.name r.body r.tags r.meta]
+ end
+end
+
+on twee_meta story meta do
+ p:raze story
+ if meta
+  # write; returns an updated story table
+  if meta.start~"Start" meta:"start" drop meta end # (discard default)
+  if "title" in meta
+   story:if "StoryTitle" in p
+    update body:meta.title where name="StoryTitle" from story
+   else
+    insert name body tags meta with "StoryTitle" meta.title () ()dict() into story
+   end
+   meta:"title" drop meta
+  end
+  if "StoryData" in p
+   n:"%j" format ("%j" parse p.StoryData),meta
+   update body:n where name="StoryData" from story
+  else
+   insert name body tags meta with "StoryData" "%j" format meta () ()dict() into story
+  end
+ else
+  # read; returns a meta dictionary
+  # useful fields:
+  # .ifid           (IFDB id; v4 UUID string)
+  # .format         (story mode name)
+  # .format-version (story mode revision)
+  # .start          (starting passage name)
+  r:().start:"Start"
+  t:p.StoryTitle
+  d:p.StoryData
+  if t r.title:t end
+  if d r:r,"%j" parse d end
+  r
+ end
+end
+
+on twee_html_read story do
+ x:first readxml[story]
+ startname:""
+ r:raze each p in extract where value..tag="tw-passagedata" from x.children
+  if p.attr.pid~x.attr.startnode startname:p.attr.name end
+  insert name body tags meta with
+   p.attr.name
+   trim[p.children[0]]
+   if "tags" in p.attr trim @ " " split p.attr.tags else () end
+   ("position","size") take p.attr
+  end
+ end
+ c:raze select k:value..attr.name v:value..attr.color where value..tag="tw-tag" from x.children
+ m:x.attr
+ m.title:m.name
+ m.start:startname
+ m["tag-colors"]:c
+ twee_meta[r ("name","startnode") drop m]
+end
+
+on twee_html_write story do
+ pids:0
+ m:twee_meta[story]
+ startname:m.start
+ startpid:-1
+ on html_passage x do
+  pids:pids+1
+  if x.name~startname startpid:pids end
+  a.pid:"%s" format pids
+  a.name:x.name
+  if count x.tags         a.tags:" " fuse x.tags     end
+  if "position" in x.meta a.position:x.meta.position end
+  if "size"     in x.meta a.size    :x.meta.size     end
+  r.tag:"tw-passagedata"
+  r.attr:a
+  r.children:list x.body
+  r
+ end
+ p:story.name dict rows story
+ passages:html_passage @ range ("StoryTitle","StoryData") drop p
+ on html_tagcolor x do
+  r.tag:"tw-tag"
+  r.attr.name :x.key
+  r.attr.color:x.value
+  r
+ end
+ colors:if "tag-colors" in m html_tagcolor @ rows m["tag-colors"] else () end
+ td.name              :               m.title
+ td.ifid              :               m.ifid
+ td.format            :"Ply"   unless m.format
+ td["format-version" ]:"1.0.0" unless m["format-version"]
+ td.startnode         :               startpid
+ td.zoom              :1       unless m.zoom
+ td.creator           :"Decker"
+ td["creator-version"]:sys.version
+ t.tag:"tw-storydata"
+ t.attr:td 
+ t.children:passages,colors
+ writexml[t 1]
+end
+
+on twee_html story do
+ if "string"~typeof story
+  twee_html_read[story]
+ else
+  twee_html_write[story]
+ end
+end
+
+#######################################
+#
+#  Twine supports an open-ended range of "story formats"
+#  which describe the interpretation of Twee passages.
+#  the Ply story format is like a very stripped-down
+#  version of Harlowe with Lil support added:
+#
+#  *bold text*
+#  `fixed width text`
+#  [[Link Label->Passage Name]]
+#  {l}Lil Fragment{r}
+#
+#  Note that there are no escape characters for *`{l}{r}; just deal with it.
+#  Lil fragments are executed in order of appearance once per passage visit.
+#  Lil fragments may yield a string, rtext, or image.
+#  Lil fragments have the following in their closure:
+#
+#  - story    # table          (all passages)
+#  - name     # string         (current passage name)
+#  - tags     # list-of-string (current passage tags)
+#  - meta     # dict           (current passage metadata)
+#  - some builtins with limited side-effects: rtext, array[], image[], eval[], random[]
+#  - anything passed in as `vars` (updated bindings available in output)
+#
+#######################################
+
+on ply_render story name vars do
+ local tags:()
+ local meta:()dict()
+ local text:if "string"~typeof story
+  # format a raw text chunk
+  story
+ elseif "table"~typeof story
+  # format a passage of a story
+  local s:(story.name dict rows story)[name]
+  if s
+   tags:s.tags
+   meta:s.meta
+   s.body
+  else
+   "Passage not found: <%s>" format name
+  end
+ else
+  "Story must be specified as a string or table."
+ end
+ vars:(()dict())unless vars 
+ local env:raze insert k v with
+  "story"   story
+  "name"    name
+  "tags"    tags
+  "rtext"   rtext
+  "image"   image
+  "eval"    eval
+  "random"  random
+ end
+ local i:0
+ local p:rtext.make[]
+ while i<count text
+  local head:i drop text
+  p:p,if last tok:"*%s*%n" parse head
+   i:i+last tok
+   rtext.make[(first tok) "menu"]
+  elseif last tok:"`%s`%n" parse head
+   i:i+last tok
+   rtext.make[(first tok) "mono"]
+  elseif last tok:"[[%s->%s]]%n%m" parse head
+   i:i+tok[2]
+   rtext.make[trim[tok[0]] "" trim[tok[1]]]
+  elseif "{l}"~first head
+   i:i+1
+   local j:0
+   local c:1
+   while (c>0)&i<count text
+    if text[i]~"{l}" c:c+1 end
+    if text[i]~"{r}" c:c-1 end
+    j:j+1
+    i:i+1
+   end
+   local f:(j-1)take 1 drop head
+   f:eval[f env,vars]
+   vars:(keys env) drop f.vars
+   rtext.cat[f.value]
+  else
+   tok:"%-.4r*`[{l}%n" parse head
+   i:i+last tok
+   rtext.make[(first tok) ""]
+  end
+ end
+ r.vars:vars
+ r.value:rtext.cat[p]
+ r
+end
+
+module.read  :twee_read
+module.write :twee_write
+module.meta  :twee_meta
+module.html  :twee_html
+module.render:ply_render
+{end}
+
+{contraption:plyPlayer}
+size:[100,100]
+resizable:1
+margin:[2,2,2,2]
+description:"a self-contained player for Twine stories written using the Ply story format."
+version:0.9
+script:"plyPlayer.0p"
+template:"on passage name body tags meta do\n \nend"
+attributes:{"name":["story","passage","scrollbar"],"label":["Twee Story","Passage Name","Scrollbar"],"type":["code","string","bool"]}
+{widgets}
+o:{"type":"field","size":[100,100],"pos":[0,0],"locked":1}
+s:{"type":"field","size":[100,20],"pos":[133,-24],"show":"none"}
+p:{"type":"field","size":[100,20],"pos":[133,7],"show":"none"}
+v:{"type":"field","size":[100,20],"pos":[133,37],"show":"none"}
+g:{"type":"grid","size":[100,50],"pos":[133,66],"show":"none"}
+scr:{"type":"button","size":[60,20],"pos":[133,-53],"show":"none","style":"check"}
+
+{script:plyPlayer.0p}
+on get_story do s.text end
+on set_story x do if !x~s.text s.text:x g.value:table() o.animated:1 end end
+on get_passage do p.text end
+on set_passage x do if !x~p.text p.text:x o.animated:1 end end
+on get_scrollbar do scr.value end
+on set_scrollbar x do scr.value:o.scrollbar:x end
+on get_vars do v.data end
+on set_vars x do v.data:x o.animated:1 end
+on get_reset do reset end
+
+on link there do
+ p.text:there
+ r:ply_render[g.value there v.data]
+ o.value:r.value
+ v.data :r.vars
+ room:(g.value.name dict rows g.value)[there]
+ card.event["passage" there room.body room.tags room.meta]
+end
+
+on reset do
+ v.text:"{l}{r}"
+ p.text:twee_start[g.value]
+ link[p.text]
+end
+
+on view do
+ o.animated:0
+ o.show:card.show
+ o.font:card.font
+ p.volatile:card.volatile
+ v.volatile:card.volatile
+ g.volatile:card.volatile
+ if !4~count keys g.value
+  g.value:twee_read[s.text]
+  reset[]
+ else
+  link[p.text]
+ end
+end
+
+# since contraptions depending on modules is rather brittle,
+# we'll just settle for making things self-contained:
+
+on trim x do
+ while (first x)in (" ","\n") x: 1 drop x end
+ while (last  x)in (" ","\n") x:-1 drop x end 
+ x
+end
+on twee_read text do
+ local r:insert name body tags meta with end
+ local n:0
+ local p:()
+ local t:()
+ local m:()dict ()
+ on add_passage do
+  if n
+   r:insert
+     name # string
+     body # string
+     tags # list-of-string
+     meta # json-compatible dict
+   with n trim["\n" fuse p] t m into r
+   p:()
+   t:()
+   m:() dict ()
+  end
+ end
+ on start_passage line do
+  add_passage[]
+  p:()
+  n:()
+  local i:0
+  while i<count line
+   if "\\"~line[i] # escaped name char
+    i:i+1
+    n:n,line[i]
+   elseif "{l}"~line[i] # JSON metadata chunk
+    m:m,"%j" parse i drop line
+    i:count line
+   elseif "["~line[i] # begin tag chunk
+    i:i+1
+    tn:()
+    while (!"]"~line[i])&i<count line
+     on add_tag do
+      if count tn t:t,trim["" fuse tn] tn:() end
+     end
+     if "\\"~line[i] # escaped tag name char
+      i:i+1
+      tn:tn,line[i]
+     elseif " "~line[i] # tag name break
+      add_tag[]
+     else
+      tn:tn,line[i]
+     end
+     i:i+1
+    end
+    add_tag[]
+   else # passage name
+    n:n,line[i]
+   end
+   i:i+1
+  end
+  n:trim["" fuse n]
+ end
+ each line in "\n" split text
+  if "::"~2 limit line
+   start_passage[2 drop line]
+  else
+   p:p,line
+  end
+ end
+ add_passage[]
+ r
+end
+on twee_start story do
+ local p:raze story
+ local r:"Start"
+ if p.StoryData
+  local d:"%j" parse p.StoryData
+  if d.start r:d.start end
+ end
+ r
+end
+on ply_render story name vars do
+ local tags:()
+ local meta:()dict()
+ local text:if "string"~typeof story
+  story
+ elseif "table"~typeof story
+  local s:(story.name dict rows story)[name]
+  if s
+   tags:s.tags
+   meta:s.meta
+   s.body
+  else
+   "Passage not found: <%s>" format name
+  end
+ else
+  "Story must be specified as a string or table."
+ end
+ vars:(()dict())unless vars 
+ local env:raze insert k v with
+  "story"   story
+  "name"    name
+  "tags"    tags
+  "rtext"   rtext
+  "image"   image
+  "eval"    eval
+  "random"  random
+ end
+ local i:0
+ local p:rtext.make[]
+ while i<count text
+  local head:i drop text
+  p:p,if last tok:"*%s*%n" parse head
+   i:i+last tok
+   rtext.make[(first tok) "menu"]
+  elseif last tok:"`%s`%n" parse head
+   i:i+last tok
+   rtext.make[(first tok) "mono"]
+  elseif last tok:"[[%s->%s]]%n%m" parse head
+   i:i+tok[2]
+   rtext.make[trim[tok[0]] "" trim[tok[1]]]
+  elseif "{l}"~first head
+   i:i+1
+   local j:0
+   local c:1
+   while (c>0)&i<count text
+    if text[i]~"{l}" c:c+1 end
+    if text[i]~"{r}" c:c-1 end
+    j:j+1
+    i:i+1
+   end
+   local f:(j-1)take 1 drop head
+   f:eval[f env,vars]
+   vars:(keys env) drop f.vars
+   rtext.cat[f.value]
+  else
+   tok:"%-.4r*`[{l}%n" parse head
+   i:i+last tok
+   rtext.make[(first tok) ""]
+  end
+ end
+ r.vars:vars
+ r.value:rtext.cat[p]
+ r
+end
+{end}
+
