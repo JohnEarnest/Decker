@@ -51,6 +51,37 @@ title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","sh
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
 field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["","Twine"," is a tool for writing interactive stories, with a focus on choice-based, prose-focused interactive fiction.\n\nTwine represents stories with the ",".twee"," file format, which contains a series of textual \"passages\" that each have a name and other metadata.\n\nPassages within a story are processed by a \"","Story Format","\" which provides markup syntax. There are several Story Formats available for Twine which are each suited to different purposes.\n\nThe \"twee\" module for Decker allows it to manipulate and construct .twee files, so that Decker can be used in concert with Twine. Since all of Twine's prominent Story Formats include access to web browser features like CSS and JavaScript, it is not possible to embed arbitrary pre-existing Twine stories within a deck. Instead, this module provides a new Story Format called \"","Ply","\" which is Decker-compatible and similar to the most essential features of the popular ","Harlowe"," Story Format, to facilitate porting stories."],"font":["","","","","","","","","","",""],"arg":["","https://twinery.org","","https://github.com/iftechfoundation/twine-specs/blob/master/twee-3-specification.md","","https://twinery.org/cookbook/introduction/story_formats.html","","ply","","https://twine2.neocities.org",""]}}
 
+{card:intro}
+script:"intro.0"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.2","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"An Example Story"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
+field1:{"type":"field","size":[232,24],"pos":[11,111],"locked":1,"border":0,"align":"center","value":"The contents of a .twee file:"}
+input:{"type":"field","size":[232,151],"pos":[11,147],"script":"intro.1","border":1,"scrollbar":1,"style":"code","value":":: Start\nThere once was a [[Fairy->Lily]].\n\n:: Lily {\"position\":\"275,400\"}\nShe was at times quite [[Contrary->Irritable]].\n\n:: Irritable [inverted]\nWhomst among us?"}
+player:{"type":"contraption","size":[230,151],"pos":[272,147],"volatile":1,"script":"intro.2","def":"plyPlayer","widgets":{"o":{"size":[230,151],"scrollbar":0,"value":{"text":["There once was a ","Fairy","."],"font":["","",""],"arg":["","Lily",""]}},"s":{"pos":[263,-24],"value":":: Start\nThere once was a [[Fairy->Lily]].\n\n:: Lily {\"position\":\"275,400\"}\nShe was at times quite [[Contrary->Irritable]].\n\n:: Irritable [inverted]\nWhomst among us?"},"p":{"size":[100,30],"pos":[263,11],"volatile":1},"v":{"size":[100,30],"pos":[263,56],"volatile":1},"g":{"size":[100,67],"pos":[263,100],"volatile":1},"scr":{"pos":[263,-53]}}}
+field2:{"type":"field","size":[230,24],"pos":[272,111],"locked":1,"border":0,"align":"center","value":"The equivalent story in interactive form:"}
+field3:{"type":"field","size":[248,38],"pos":[134,56],"locked":1,"border":0,"align":"center","value":"Let's start with a little context,\nso that we're all clear on how Twine-style interactive narratives work:"}
+
+{script:intro.0}
+on view do
+ player.story:input.text
+end
+{end}
+
+{script:intro.1}
+on change do
+ view[]
+end
+{end}
+
+{script:intro.2}
+on passage name body tags meta do
+ location.text:name
+end
+{end}
+
 {card:tweeread}
 script:"tweeread.0"
 {widgets}
@@ -59,18 +90,12 @@ button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text"
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"twee.read[]"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
 field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"The twee.read[text] function takes a string containing a story in the .twee format and returns a story table, where each row represents a passage and its metadata.\n\nThe columns of the table are:\n\n- name: the passage name.\n- body: the text content of the passage.\n- tags: a list of string \"tags\".\n- meta: a dictionary of arbitrary metadata.\n\nThe \"meta\" dictionary often contains \"size\" and \"position\" attributes, each representing a comma-separated \"x,y\" or \"width,height\" pair which are used for laying out passages as nodes within Twine's graph editor.\n\nThe \"tags\" can be used in an open-ended manner, but the tag names \"script\" and \"stylesheet\" are reserved for indicating that passages contain JavaScript or a CSS stylesheet for displaying the story."}
-input:{"type":"field","size":[232,133],"pos":[10,48],"script":"tweeread.1","border":1,"scrollbar":1,"style":"code","value":":: A Simple Story\nThere once was a [[Fairy->Lily]].\n\n:: Lily {\"position\":\"275,400\"}\nShe was at times quite [[Contrary->Irritable]].\n\n:: Irritable [inverted]\nWhomst among us?"}
+input:{"type":"field","size":[232,133],"pos":[10,48],"script":"intro.1","border":1,"scrollbar":1,"style":"code","value":":: A Simple Story\nThere once was a [[Fairy->Lily]].\n\n:: Lily {\"position\":\"275,400\"}\nShe was at times quite [[Contrary->Irritable]].\n\n:: Irritable [inverted]\nWhomst among us?"}
 output:{"type":"grid","size":[232,115],"pos":[10,190],"locked":1,"volatile":1,"bycell":1,"format":"ssJJ"}
 
 {script:tweeread.0}
 on view do
  output.value:twee.read[input.text]
-end
-{end}
-
-{script:tweeread.1}
-on change do
- view[]
 end
 {end}
 
@@ -82,8 +107,8 @@ button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text"
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"twee.write[]"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
 field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"The twee.write[story] function takes a story table (as produced by twee.read[]) and assembles it into a string representation of the corresponding .twee file."}
-input:{"type":"grid","size":[232,115],"pos":[10,51],"script":"tweeread.1","bycell":1,"format":"ssJJ","value":{"name":["A Similar Story","Lily","Irritable"],"body":["There once was a [[Fairy->Lily]].","She was at times quite [[Contrary->Irritable]].","Whomst among us?"],"tags":[[],[],["inverted"]],"meta":[{},{"position":"275,400"},{}]},"row":0,"col":0}
-output:{"type":"field","size":[232,133],"pos":[10,172],"locked":1,"script":"tweeread.1","border":1,"scrollbar":1,"style":"code","value":":: A Similar Story\nThere once was a [[Fairy->Lily]].\n\n:: Lily {\"position\":\"275,400\"}\nShe was at times quite [[Contrary->Irritable]].\n\n:: Irritable [inverted]\nWhomst among us?\n"}
+input:{"type":"grid","size":[232,115],"pos":[10,51],"script":"intro.1","bycell":1,"format":"ssJJ","value":{"name":["A Similar Story","Lily","Irritable"],"body":["There once was a [[Fairy->Lily]].","She was at times quite [[Contrary->Irritable]].","Whomst among us?"],"tags":[[],[],["inverted"]],"meta":[{},{"position":"275,400"},{}]},"row":0,"col":0}
+output:{"type":"field","size":[232,133],"pos":[10,172],"locked":1,"script":"intro.1","border":1,"scrollbar":1,"style":"code","value":":: A Similar Story\nThere once was a [[Fairy->Lily]].\n\n:: Lily {\"position\":\"275,400\"}\nShe was at times quite [[Contrary->Irritable]].\n\n:: Irritable [inverted]\nWhomst among us?\n"}
 
 {script:tweewrite.0}
 on view do
@@ -100,7 +125,7 @@ title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","sh
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
 field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"The twee.meta[story] function makes it slightly more convenient to retrieve and set story metadata normally stored in the StoryData and StoryTitle passages of a .twee file.\n\ntwee.meta[story] returns a dictionary of metadata properties, including:\n\n- start: name of starting passage\n- title: name of story\n- ifid: internet fiction database ID\n- format: story format name\n- format-version: story format revision\n\ntwee.meta[story meta] applies the specified metadata dictionary to the story, returning a new story table."}
 meta:{"type":"grid","size":[233,115],"pos":[10,186],"volatile":1,"script":"tweemeta.1","bycell":1,"format":"sJ"}
-file:{"type":"field","size":[232,133],"pos":[11,48],"script":"tweeread.1","border":1,"scrollbar":1,"style":"code","value":":: StoryTitle\nExample Story\n\n:: StoryData\n{\n  \"ifid\": \"4CE3487C-9FD6-4BAD-ADA7-FAD6A76FA8E6\",\n  \"format\": \"Harlowe\",\n  \"format-version\": \"3.3.7\",\n  \"start\": \"West of the House\",\n  \"zoom\": 1\n}\n\n:: West of the House {\"position\":\"275,275\",\"size\":\"100,100\"}\nYou are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here."}
+file:{"type":"field","size":[232,133],"pos":[11,48],"script":"intro.1","border":1,"scrollbar":1,"style":"code","value":":: StoryTitle\nExample Story\n\n:: StoryData\n{\n  \"ifid\": \"4CE3487C-9FD6-4BAD-ADA7-FAD6A76FA8E6\",\n  \"format\": \"Harlowe\",\n  \"format-version\": \"3.3.7\",\n  \"start\": \"West of the House\",\n  \"zoom\": 1\n}\n\n:: West of the House {\"position\":\"275,275\",\"size\":\"100,100\"}\nYou are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here."}
 
 {script:tweemeta.0}
 on view do
@@ -122,7 +147,7 @@ button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text"
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"twee.html[]"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
 field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["The twee.html[story] function takes a story table and converts it into the ","Twine 2 HTML Output Spec",". This format represents similar information to a .twee file, but with a different structure. It may be useful for implementing new story formats or interacting with other Twine tooling.\n\nCalling twee.html[] with a string will instead attempt to parse that string as HTML and produce a story table."],"font":["","",""],"arg":["","https://github.com/iftechfoundation/twine-specs/blob/master/twine-2-htmloutput-spec.md",""]}}
-file:{"type":"field","size":[232,133],"pos":[11,48],"script":"tweeread.1","border":1,"scrollbar":1,"style":"code","value":":: StoryTitle\nLike Zork But Much Smaller\n\n:: StoryData\n{\n  \"ifid\": \"4CE3487C-9FD6-4BAD-ADA7-FAD6A76FA8E6\",\n  \"format\": \"Ply\",\n  \"format-version\": \"1.0.0\",\n  \"start\": \"West of the House\",\n  \"zoom\": 1\n  \"tag-colors\": {\n    \"bar\": \"green\",\n    \"foo\": \"red\",\n    \"qaz\": \"blue\"\n  },\n}\n\n:: West of the House {\"position\":\"275,275\",\"size\":\"100,100\"}\nYou are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here.\n\n[[Open Mailbox.->Mailbox]]\n\n:: Mailbox {\"position\":\"450,275\",\"size\":\"100,100\"}\nOpening the mailbox reveals a leaflet.\n"}
+file:{"type":"field","size":[232,133],"pos":[11,48],"script":"intro.1","border":1,"scrollbar":1,"style":"code","value":":: StoryTitle\nLike Zork But Much Smaller\n\n:: StoryData\n{\n  \"ifid\": \"4CE3487C-9FD6-4BAD-ADA7-FAD6A76FA8E6\",\n  \"format\": \"Ply\",\n  \"format-version\": \"1.0.0\",\n  \"start\": \"West of the House\",\n  \"zoom\": 1\n  \"tag-colors\": {\n    \"bar\": \"green\",\n    \"foo\": \"red\",\n    \"qaz\": \"blue\"\n  },\n}\n\n:: West of the House {\"position\":\"275,275\",\"size\":\"100,100\"}\nYou are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here.\n\n[[Open Mailbox.->Mailbox]]\n\n:: Mailbox {\"position\":\"450,275\",\"size\":\"100,100\"}\nOpening the mailbox reveals a leaflet.\n"}
 output:{"type":"field","size":[232,114],"pos":[11,186],"volatile":1,"border":1,"scrollbar":1,"style":"code"}
 
 {script:tweehtml.0}
@@ -140,7 +165,7 @@ button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text"
 field1:{"type":"field","size":[248,257],"pos":[254,48],"locked":1,"border":0,"value":{"text":["twee.render[text] processes a string of ","Ply markup",".\n\ntwee.render[story name vars] looks up the body of a named passage in a story and processes it as a string of Ply markup.\n\n\n\n\n\n\n\nIn either case, the result is a dictionary containing the following keys:\n\n- value: a rich text table suitable for display in a field widget.\n- vars: a dictionary of variable bindings reflecting any changes made by executing Lil fragments within the Ply markup.\n\nIn its simplest applications, you can think of this function as being like \"markdown for Decker fields\". As we will see shortly, it can also be used to convert an inert parsed .twee story into an interactive game."],"font":["","",""],"arg":["","ply",""]}}
 ex1:{"type":"field","size":[232,98],"pos":[10,48],"border":1,"style":"code","value":"output.value:twee.render[\n \"*My Bedroom*\n \n Yeesh, what a mess.\n \n [[Leave->Hallway]]\n \"\n].value"}
 button4:{"type":"button","size":[60,20],"pos":[255,126],"script":"tweerender.0","text":"Try It!"}
-output:{"type":"field","size":[232,150],"pos":[10,155],"locked":1,"volatile":1,"script":"tweeread.1","border":1,"scrollbar":1}
+output:{"type":"field","size":[232,150],"pos":[10,155],"locked":1,"volatile":1,"script":"intro.1","border":1,"scrollbar":1}
 
 {script:tweerender.0}
 on click do
@@ -156,7 +181,7 @@ button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text"
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Ply: The Basics"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
 field1:{"type":"field","size":[248,249],"pos":[254,48],"locked":1,"border":0,"value":{"text":["Ply is a very simple markup language designed to produce the table-based rich text format used by Field widgets:\n\n- Enclosing text in *asterisks* will make it appear\n","in the Menu font",".\n\n- Enclosing text in `backticks` will make it appear\n","in the Mono font",".\n\n- A Link [[Label Name->Target Passage]] will appear\nlike ","Label Name",". \n\n- Lil code enclosed in curly braces {\"like this\"} will be executed in the order it appears, and the resulting string, rtext, or Image will be inserted into the result at that point. Curly braces may be nested within curly braces as long as they are properly paired: {\"{a} b\"}\n\nAnything else will use the default body font of the field. There is no escape mechanism for *  ` or [[]]."],"font":["","menu","","mono","","",""],"arg":["","","","","","Target Passage",""]}}
-input:{"type":"field","size":[232,124],"pos":[10,48],"script":"tweeread.1","border":1,"style":"code","value":"*Header*\n\n`Monospaced`\n\n[[Link->Elsewhere]]\n\nLil: {2+3}\n\nPlain text."}
+input:{"type":"field","size":[232,124],"pos":[10,48],"script":"intro.1","border":1,"style":"code","value":"*Header*\n\n`Monospaced`\n\n[[Link->Elsewhere]]\n\nLil: {2+3}\n\nPlain text."}
 output:{"type":"field","size":[232,124],"pos":[10,178],"locked":1,"volatile":1,"border":1,"scrollbar":1}
 
 {script:ply.0}
@@ -173,7 +198,7 @@ button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text"
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Ply: Lil Fragments"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
 field1:{"type":"field","size":[248,249],"pos":[254,48],"locked":1,"border":0,"value":{"text":["When Lil fragments are executed within Ply markup, they have a number of variable bindings available:\n\n- story: the story table (if any)\n- name: the passage name (if any)\n- tags: the passage tags (if any)\n- meta: the passage metadata (if any)\n\n- rtext: the Lil RText interface.\n- image: the Lil Image constructor builtin.\n- eval: the Lil eval[] builtin.\n- random: the Lil random[] builtin.\n\nIf you want access to any other utility functions they can be passed in with the \"vars\" argument of ","twee.render[]",". Any variable assignments which occur within Lil fragments are available in subsequent fragments within the same passage and via the .vars field of the result of twee.render[]."],"font":["","",""],"arg":["","tweerender",""]}}
-input:{"type":"field","size":[232,124],"pos":[10,48],"script":"tweeread.1","border":1,"style":"code","value":"{random[\"Apple\",\"Banana\",\"Cherry\"]}\n\nassign first: {alfa:11}\n\nassign second: {beta:22}\n\nlookup: {alfa+beta}"}
+input:{"type":"field","size":[232,124],"pos":[10,48],"script":"intro.1","border":1,"style":"code","value":"{random[\"Apple\",\"Banana\",\"Cherry\"]}\n\nassign first: {alfa:11}\n\nassign second: {beta:22}\n\nlookup: {alfa+beta}"}
 output:{"type":"field","size":[232,124],"pos":[10,178],"locked":1,"volatile":1,"border":1,"scrollbar":1}
 
 {card:plyfontsandimages}
@@ -184,7 +209,7 @@ button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text"
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Ply: Fonts and Images"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
 field1:{"type":"field","size":[248,249],"pos":[254,48],"locked":1,"border":0,"value":"If you want to generate formatted text on the fly, use Lil fragments to return an rtext table or an Image interface; the result will appear inline."}
-input:{"type":"field","size":[232,124],"pos":[10,48],"script":"tweeread.1","border":1,"style":"code","value":"{rtext.make[\"bold text\" \"menu\"]}\n\ninline image: {image[\"%%IMG0AB8AH/////6AIAgCgCAIAoAgCAKAIAgCgCAIAoAgCAKAIAgCgCAIAoAgCAKAP/gCgCAIAoAgCAKAIAgCgCAIAoAgCAKAIAgCgCAIAoAgCAKAIAgCgD/4AoAACAKAAAgCgAAIAoAACAKAAAgCgAAIAoAACAKAAAgCgAAIAv////4=\"]}\n"}
+input:{"type":"field","size":[232,124],"pos":[10,48],"script":"intro.1","border":1,"style":"code","value":"{rtext.make[\"bold text\" \"menu\"]}\n\ninline image: {image[\"%%IMG0AB8AH/////6AIAgCgCAIAoAgCAKAIAgCgCAIAoAgCAKAIAgCgCAIAoAgCAKAP/gCgCAIAoAgCAKAIAgCgCAIAoAgCAKAIAgCgCAIAoAgCAKAIAgCgD/4AoAACAKAAAgCgAAIAoAACAKAAAgCgAAIAoAACAKAAAgCgAAIAv////4=\"]}\n"}
 output:{"type":"field","size":[232,124],"pos":[10,178],"locked":1,"volatile":1,"border":1,"scrollbar":1}
 
 {card:twineplayer}
@@ -192,7 +217,7 @@ script:"twineplayer.0"
 {widgets}
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"A Twine Player"}
 field1:{"type":"field","size":[248,55],"pos":[10,48],"locked":1,"border":0,"value":"The story below is written using Ply within a .twee file. By using twee.read[] and twee.render[] we can make it playable as an interactive game. Note that in practice most of the state-holding widgets below could be invisible:"}
-input:{"type":"field","size":[248,107],"pos":[10,110],"script":"tweeread.1","scrollbar":1,"style":"code","value":":: StoryTitle\nExample Story\n\n:: StoryData\n{\n  \"format\": \"Ply\",\n  \"format-version\": \"1.0.0\",\n  \"start\": \"West of the House\",\n  \"zoom\": 1\n}\n\n:: Forest {\"position\":\"275,400\",\"size\":\"100,100\"}\nYou're terribly lost in the woods.\n{\n innawoods:innawoods+1\n random[\n  \"I wonder if you'll have to eat a bug.\",\n  \"There sure are a lot of trees here.\",\n  \"Was that a common brushtail possum? Hmm. Maybe not.\",\n  \"I swear I heard clucking over to the left.\",\n  \"Your feet really hurt.\",\n  \"\",\"\",\"\",\"\",\"\"\n ]\n}\n\n[[Wander calmly.->Forest]]\n{if innawoods>3 rtext.make[\"Wander in escalating panic!\" \"\" \"Forest\"] else \"\" end}\n{if innawoods>5 rtext.make[\"Oh, the house is right over There.\" \"\" \"West of the House\"] else \"\" end}\n\n\n:: Leaflet [inverted center] {\"position\":\"450,400\",\"size\":\"100,100\"}\n*ZORK* is a game of adventure, danger, and low cunning. In it you could explore some of the most amazing territory ever seen by mortal man. Hardened adventurers have run screaming from the terrors contained within!\n\nThis isn't Zork, though; it's just a minimal proof-of-concept twine game titled \"{first extract body where name=\"StoryTitle\" from story}\".\n{readleaflet:1 \"\"}\n[[sigh.->West of the House]]\n\n\n:: Mailbox {\"position\":\"450,275\",\"size\":\"100,100\"}\nOpening the mailbox reveals a leaflet.\n\n{rtext.make[if readleaflet \"Read leaflet again.\" else \"Read leaflet.\" end \"\" \"Leaflet\"}\n\n\n:: West of the House {\"position\":\"275,275\",\"size\":\"100,100\"}\nYou are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here.\n\n[[Open Mailbox.->Mailbox]]\n[[Wander into the forest.->Forest]]\n"}
+input:{"type":"field","size":[248,107],"pos":[10,110],"script":"intro.1","scrollbar":1,"style":"code","value":":: StoryTitle\nExample Story\n\n:: StoryData\n{\n  \"format\": \"Ply\",\n  \"format-version\": \"1.0.0\",\n  \"start\": \"West of the House\",\n  \"zoom\": 1\n}\n\n:: Forest {\"position\":\"275,400\",\"size\":\"100,100\"}\nYou're terribly lost in the woods.\n{\n innawoods:innawoods+1\n random[\n  \"I wonder if you'll have to eat a bug.\",\n  \"There sure are a lot of trees here.\",\n  \"Was that a common brushtail possum? Hmm. Maybe not.\",\n  \"I swear I heard clucking over to the left.\",\n  \"Your feet really hurt.\",\n  \"\",\"\",\"\",\"\",\"\"\n ]\n}\n\n[[Wander calmly.->Forest]]\n{if innawoods>3 rtext.make[\"Wander in escalating panic!\" \"\" \"Forest\"] else \"\" end}\n{if innawoods>5 rtext.make[\"Oh, the house is right over There.\" \"\" \"West of the House\"] else \"\" end}\n\n\n:: Leaflet [inverted center] {\"position\":\"450,400\",\"size\":\"100,100\"}\n*ZORK* is a game of adventure, danger, and low cunning. In it you could explore some of the most amazing territory ever seen by mortal man. Hardened adventurers have run screaming from the terrors contained within!\n\nThis isn't Zork, though; it's just a minimal proof-of-concept twine game titled \"{first extract body where name=\"StoryTitle\" from story}\".\n{readleaflet:1 \"\"}\n[[sigh.->West of the House]]\n\n\n:: Mailbox {\"position\":\"450,275\",\"size\":\"100,100\"}\nOpening the mailbox reveals a leaflet.\n\n{rtext.make[if readleaflet \"Read leaflet again.\" else \"Read leaflet.\" end \"\" \"Leaflet\"]}\n\n\n:: West of the House {\"position\":\"275,275\",\"size\":\"100,100\"}\nYou are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here.\n\n[[Open Mailbox.->Mailbox]]\n[[Wander into the forest.->Forest]]\n"}
 location:{"type":"field","size":[232,13],"pos":[270,48],"locked":1,"volatile":1,"show":"invert","border":0,"align":"center"}
 output:{"type":"field","size":[232,238],"pos":[270,65],"locked":1,"volatile":1}
 vars:{"type":"field","size":[87,61],"pos":[84,242],"locked":1,"volatile":1}
@@ -238,19 +263,13 @@ end
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"The plyPlayer Contraption"}
 field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"If you don't want or need the flexibility of a setup like on the previous card, or you don't wish to do any scripting, the plyPlayer contraption is provided as a convenient alternative. Simply copy this contraption into your deck and insert the .twee story!\n\nThis contraption is resizable and respects the standard .font, .show, and .volatile attributes. It will also fire a \"passage\" event whenever the passage is changed or refreshed.\n\nThis contraption exposes access to the .twee story, the current passage name, and the current variable bindings with .story, .passage, and .vars attributes, respectively.\n\nIt also exposes a .reset[] function which can reset the story to the initial passage and clear any Ply variable bindings. The \"Reset\" button and passage heading in the example to the left are illustrative and can be omitted, replaced, or customized to suit your application."}
 location:{"type":"field","size":[201,13],"pos":[30,65],"locked":1,"volatile":1,"show":"invert","border":0,"align":"center"}
-player:{"type":"contraption","size":[201,158],"pos":[30,82],"script":"plyplayercontraption.0","def":"plyPlayer","widgets":{"o":{"size":[201,158],"scrollbar":1,"value":{"text":["You are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here.\n\n","Open Mailbox.","\n","Wander into the forest."],"font":["","","",""],"arg":["","Mailbox","","Forest"]}},"s":{"pos":[234,-24],"value":":: StoryTitle\nExample Story\n\n:: StoryData\n{\n  \"format\": \"Ply\",\n  \"format-version\": \"1.0.0\",\n  \"start\": \"West of the House\",\n  \"zoom\": 1\n}\n\n:: Forest {\"position\":\"275,400\",\"size\":\"100,100\"}\nYou're terribly lost in the woods.\n{\n innawoods:innawoods+1\n random[\n  \"I wonder if you'll have to eat a bug.\",\n  \"There sure are a lot of trees here.\",\n  \"Was that a common brushtail possum? Hmm. Maybe not.\",\n  \"I swear I heard clucking over to the left.\",\n  \"Your feet really hurt.\",\n  \"\",\"\",\"\",\"\",\"\"\n ]\n}\n\n[[Wander calmly.->Forest]]\n{if innawoods>3 rtext.make[\"Wander in escalating panic!\" \"\" \"Forest\"] else \"\" end}\n{if innawoods>5 rtext.make[\"Oh, the house is right over There.\" \"\" \"West of the House\"] else \"\" end}\n\n\n:: Leaflet [inverted center] {\"position\":\"450,400\",\"size\":\"100,100\"}\n*ZORK* is a game of adventure, danger, and low cunning. In it you could explore some of the most amazing territory ever seen by mortal man. Hardened adventurers have run screaming from the terrors contained within!\n\nThis isn't Zork, though; it's just a minimal proof-of-concept twine game titled \"{first extract body where name=\"StoryTitle\" from story}\".\n{readleaflet:1 \"\"}\n[[sigh.->West of the House]]\n\n\n:: Mailbox {\"position\":\"450,275\",\"size\":\"100,100\"}\nOpening the mailbox reveals a leaflet.\n\n{rtext.make[if readleaflet \"Read leaflet again.\" else \"Read leaflet.\" end \"\" \"Leaflet\"}\n\n\n:: West of the House {\"position\":\"275,275\",\"size\":\"100,100\"}\nYou are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here.\n\n[[Open Mailbox.->Mailbox]]\n[[Wander into the forest.->Forest]]\n"},"p":{"size":[100,32],"pos":[234,11],"value":"West of the House"},"v":{"size":[100,32],"pos":[234,58],"value":"{}"},"g":{"size":[100,70],"pos":[234,104],"value":{"name":["StoryTitle","StoryData","Forest","Leaflet","Mailbox","West of the House"],"body":["Example Story","{\n  \"format\": \"Ply\",\n  \"format-version\": \"1.0.0\",\n  \"start\": \"West of the House\",\n  \"zoom\": 1\n}","You're terribly lost in the woods.\n{\n innawoods:innawoods+1\n random[\n  \"I wonder if you'll have to eat a bug.\",\n  \"There sure are a lot of trees here.\",\n  \"Was that a common brushtail possum? Hmm. Maybe not.\",\n  \"I swear I heard clucking over to the left.\",\n  \"Your feet really hurt.\",\n  \"\",\"\",\"\",\"\",\"\"\n ]\n}\n\n[[Wander calmly.->Forest]]\n{if innawoods>3 rtext.make[\"Wander in escalating panic!\" \"\" \"Forest\"] else \"\" end}\n{if innawoods>5 rtext.make[\"Oh, the house is right over There.\" \"\" \"West of the House\"] else \"\" end}","*ZORK* is a game of adventure, danger, and low cunning. In it you could explore some of the most amazing territory ever seen by mortal man. Hardened adventurers have run screaming from the terrors contained within!\n\nThis isn't Zork, though; it's just a minimal proof-of-concept twine game titled \"{first extract body where name=\"StoryTitle\" from story}\".\n{readleaflet:1 \"\"}\n[[sigh.->West of the House]]","Opening the mailbox reveals a leaflet.\n\n{rtext.make[if readleaflet \"Read leaflet again.\" else \"Read leaflet.\" end \"\" \"Leaflet\"}","You are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here.\n\n[[Open Mailbox.->Mailbox]]\n[[Wander into the forest.->Forest]]"],"tags":[[],[],[],["inverted","center"],[],[]],"meta":[{},{},{"position":"275,400","size":"100,100"},{"position":"450,400","size":"100,100"},{"position":"450,275","size":"100,100"},{"position":"275,275","size":"100,100"}]}},"scr":{"pos":[234,-53],"value":1}}}
-reset:{"type":"button","size":[60,20],"pos":[102,258],"script":"plyplayercontraption.1","text":"Reset"}
+player:{"type":"contraption","size":[201,158],"pos":[30,82],"script":"intro.2","def":"plyPlayer","widgets":{"o":{"size":[201,158],"scrollbar":1,"value":{"text":["You are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here.\n\n","Open Mailbox.","\n","Wander into the forest."],"font":["","","",""],"arg":["","Mailbox","","Forest"]}},"s":{"pos":[234,-24],"value":":: StoryTitle\nExample Story\n\n:: StoryData\n{\n  \"format\": \"Ply\",\n  \"format-version\": \"1.0.0\",\n  \"start\": \"West of the House\",\n  \"zoom\": 1\n}\n\n:: Forest {\"position\":\"275,400\",\"size\":\"100,100\"}\nYou're terribly lost in the woods.\n{\n innawoods:innawoods+1\n random[\n  \"I wonder if you'll have to eat a bug.\",\n  \"There sure are a lot of trees here.\",\n  \"Was that a common brushtail possum? Hmm. Maybe not.\",\n  \"I swear I heard clucking over to the left.\",\n  \"Your feet really hurt.\",\n  \"\",\"\",\"\",\"\",\"\"\n ]\n}\n\n[[Wander calmly.->Forest]]\n{if innawoods>3 rtext.make[\"Wander in escalating panic!\" \"\" \"Forest\"] else \"\" end}\n{if innawoods>5 rtext.make[\"Oh, the house is right over There.\" \"\" \"West of the House\"] else \"\" end}\n\n\n:: Leaflet [inverted center] {\"position\":\"450,400\",\"size\":\"100,100\"}\n*ZORK* is a game of adventure, danger, and low cunning. In it you could explore some of the most amazing territory ever seen by mortal man. Hardened adventurers have run screaming from the terrors contained within!\n\nThis isn't Zork, though; it's just a minimal proof-of-concept twine game titled \"{first extract body where name=\"StoryTitle\" from story}\".\n{readleaflet:1 \"\"}\n[[sigh.->West of the House]]\n\n\n:: Mailbox {\"position\":\"450,275\",\"size\":\"100,100\"}\nOpening the mailbox reveals a leaflet.\n\n{rtext.make[if readleaflet \"Read leaflet again.\" else \"Read leaflet.\" end \"\" \"Leaflet\"}\n\n\n:: West of the House {\"position\":\"275,275\",\"size\":\"100,100\"}\nYou are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here.\n\n[[Open Mailbox.->Mailbox]]\n[[Wander into the forest.->Forest]]\n"},"p":{"size":[100,32],"pos":[234,11],"value":"West of the House"},"v":{"size":[100,32],"pos":[234,58],"value":"{}"},"g":{"size":[100,70],"pos":[234,104],"value":{"name":["StoryTitle","StoryData","Forest","Leaflet","Mailbox","West of the House"],"body":["Example Story","{\n  \"format\": \"Ply\",\n  \"format-version\": \"1.0.0\",\n  \"start\": \"West of the House\",\n  \"zoom\": 1\n}","You're terribly lost in the woods.\n{\n innawoods:innawoods+1\n random[\n  \"I wonder if you'll have to eat a bug.\",\n  \"There sure are a lot of trees here.\",\n  \"Was that a common brushtail possum? Hmm. Maybe not.\",\n  \"I swear I heard clucking over to the left.\",\n  \"Your feet really hurt.\",\n  \"\",\"\",\"\",\"\",\"\"\n ]\n}\n\n[[Wander calmly.->Forest]]\n{if innawoods>3 rtext.make[\"Wander in escalating panic!\" \"\" \"Forest\"] else \"\" end}\n{if innawoods>5 rtext.make[\"Oh, the house is right over There.\" \"\" \"West of the House\"] else \"\" end}","*ZORK* is a game of adventure, danger, and low cunning. In it you could explore some of the most amazing territory ever seen by mortal man. Hardened adventurers have run screaming from the terrors contained within!\n\nThis isn't Zork, though; it's just a minimal proof-of-concept twine game titled \"{first extract body where name=\"StoryTitle\" from story}\".\n{readleaflet:1 \"\"}\n[[sigh.->West of the House]]","Opening the mailbox reveals a leaflet.\n\n{rtext.make[if readleaflet \"Read leaflet again.\" else \"Read leaflet.\" end \"\" \"Leaflet\"}","You are standing in an open field west of a white house, with a boarded front door.\nThere is a small mailbox here.\n\n[[Open Mailbox.->Mailbox]]\n[[Wander into the forest.->Forest]]"],"tags":[[],[],[],["inverted","center"],[],[]],"meta":[{},{},{"position":"275,400","size":"100,100"},{"position":"450,400","size":"100,100"},{"position":"450,275","size":"100,100"},{"position":"275,275","size":"100,100"}]}},"scr":{"pos":[234,-53],"value":1}}}
+reset:{"type":"button","size":[60,20],"pos":[102,258],"script":"plyplayercontraption.0","text":"Reset"}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.2","text":"Next","style":"rect"}
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text":"Prev","style":"rect"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
 
 {script:plyplayercontraption.0}
-on passage name body tags meta do
- location.text:name
-end
-{end}
-
-{script:plyplayercontraption.1}
 on click do
  player.reset[]
 end
@@ -541,6 +560,9 @@ on ply_render story name vars do
   elseif last tok:"[[%s->%s]]%n%m" parse head
    i:i+tok[2]
    rtext.make[trim[tok[0]] "" trim[tok[1]]]
+  elseif "["~first head
+   i:i+1
+   rtext.make["["]
   elseif "{l}"~first head
    i:i+1
    local j:0
@@ -756,6 +778,9 @@ on ply_render story name vars do
   elseif last tok:"[[%s->%s]]%n%m" parse head
    i:i+tok[2]
    rtext.make[trim[tok[0]] "" trim[tok[1]]]
+  elseif "["~first head
+   i:i+1
+   rtext.make["["]
   elseif "{l}"~first head
    i:i+1
    local j:0
