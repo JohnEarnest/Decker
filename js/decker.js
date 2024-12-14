@@ -793,7 +793,7 @@ widget_grid=(target,x,value)=>{
 		for(let y=0;y<nrd;y++){
 			const cell=rect(hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1), v=tab_cell(value.table,tk[z],y+value.scroll)
 			const fc=x.format[z]=='L'?'s':(x.format[z]||'s'), ccol=y+value.scroll==hrow&&(x.bycell?cols==hcol :1)?bcol:fcol
-			const cf=ls(dyad.format(lms(`%${fc}`),fc=='j'||fc=='a'?monad.list(v):v)), ip=rcenter(cell,ICONS[0].size)
+			const cf=ls(dyad.format(lms(`%${fc}`),fc=='j'||fc=='J'||fc=='a'?monad.list(v):v)), ip=rcenter(cell,ICONS[0].size)
 			const oc=frame.clip; frame.clip=rclip(cell,frame.clip)
 			if     (x.format[z]=='I'){const i=clamp(0,ln(v),8);if(i<8)draw_icon(ip,ICONS[i],ccol)}
 			else if(x.format[z]=='B'){if(lb(v))draw_icon(ip,ICONS[ICON.chek],ccol)}
