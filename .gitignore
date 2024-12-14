@@ -4,3 +4,4 @@ c/resources.h
 js/build/
 docs/*.html
 *.o
+tools/twine/format.js
