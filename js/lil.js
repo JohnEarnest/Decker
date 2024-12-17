@@ -1179,7 +1179,7 @@ poly_in=(poly,pos)=>{
 }
 draw_poly=(poly,pattern)=>{
 	const r=rint(rclip(frame.clip,poly_bounds(poly)))
-	for(let a=0;a<=r.h;a++)for(let b=0;b<=r.w;b++){const h=rect(b+r.x,a+r.y);if(poly_in(poly,h))pix(h,pattern)}
+	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){const h=rect(b+r.x,a+r.y);if(poly_in(poly,h))pix(h,pattern)}
 }
 draw_fill=(r,pattern,ref)=>{
 	if(!inclip(r))return

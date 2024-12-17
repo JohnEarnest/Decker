@@ -1135,6 +1135,11 @@ c.clear[]
 c.segment[i 1,1,-5,-2.3 2,2,3,3]
 assert["canvas segment minscale" "%%IMG1AAYABgAAAAAAAAAAAQEBAAABJyEjAQABKCMjAQABKCgjAQAAAQEBAQ==" c.copy[0,0 6,6].encoded]
 
+c.clear[]
+c.size:8,8
+c.poly[8,0 8,4]
+assert["canvas edge clipping for polygons" (0 dict 64) c.copy[].hist]
+
 #######################################
 #
 #  Deck
