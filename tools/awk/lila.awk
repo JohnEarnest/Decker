@@ -1768,12 +1768,12 @@ function image_hist(img,  r,c,sx,sy,x,y,z){
 }
 function n_image_set_px(img,i,x,  w,h,t,px,py){
 	w=image_w(img);h=image_h(img)
-	t=ll(i);px=count(t)>=1?ln(lst_get(t,0)):0;py=count(t)>=2?ln(lst_get(t,1)):0
+	t=ll(i);px=int(count(t)>=1?ln(lst_get(t,0)):0);py=int(count(t)>=2?ln(lst_get(t,1)):0)
 	if(px>=0&&py>=0&&px<w&&py<h)image_set_px(img,px,py,int(ln(x)));return x
 }
 function n_image_get_px(img,i){
 	w=image_w(img);h=image_h(img)
-	t=ll(i);px=count(t)>=1?ln(lst_get(t,0)):0;py=count(t)>=2?ln(lst_get(t,1)):0
+	t=ll(i);px=int(count(t)>=1?ln(lst_get(t,0)):0);py=int(count(t)>=2?ln(lst_get(t,1)):0)
 	return (px>=0&&py>=0&&px<w&&py<h)?lmn(image_get_px(img,px,py)): NONE
 }
 function n_image_get_pixels(img,  r,t,x,y){

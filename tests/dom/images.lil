@@ -75,6 +75,11 @@ assert_image["write to image"
 	smol
 ]
 
+assert["read from image at decimal position" 37 image[1,1].map[0 dict 37][.5,.4]]
+t:image[1,1]
+t[.5,.4]:49
+assert["write to image at decimal position" 49 t[0,0]]
+
 smol.size:5,6
 assert_image["resize image larger"
 	((list 0,0,0,0,0),
