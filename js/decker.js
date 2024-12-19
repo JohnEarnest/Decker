@@ -1960,7 +1960,7 @@ modals=_=>{
 		draw_textc(rect(b.x,b.y+b.h-lh,b.w,lh),`Choose a ${ms.type=='fill'?'fill':'stroke'} ${dr.color?'color':'pattern'}.`,FONT_BODY,1)
 		for(let z=0;z<grid.x*grid.y;z++){
 			const s=rint(rect(b.x+m+2+gs*(z%grid.x),b.y+m+2+gs*(0|(z/grid.x)),ss,ss)), ci=!dr.color?z: z<2?z: 31+z
-			draw_rect(s,ci); if(ci==v)draw_box(inset(s,-2),0,1)
+			draw_rect(s,ci==0?32:ci); if(ci==v)draw_box(inset(s,-2),0,1)
 			const a=dover(s)&&over(s), cs=(ci==v&&ev.action), cl=cs||((ev.md||ev.drag)&&a), cr=cs||(ev.mu&&a)
 			if(cl)draw_invert(pal,inset(s,-1)); if(cr){setv(ci),modal_exit(ci);break}
 		}
