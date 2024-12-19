@@ -13,7 +13,7 @@
 ###########################################################
 
 BEGIN{
-	VERSION="1.52";tnames=0
+	VERSION="1.53";tnames=0
 	MATH_PI=3.141592653589793
 	for(z=0;z<256;z++){ordinal[z]=sprintf("%c",z);ascii[sprintf("%c",z)]=z;}
 	for(z=0;z<16 ;z++){hexdigits[sprintf("%x",z)]=z;hexdigits[sprintf("%X",z)]=z}
