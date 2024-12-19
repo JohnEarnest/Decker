@@ -876,7 +876,7 @@ Images are dynamically created interfaces, each representing a mutable rectangul
 | `x.transform[x]`       | Update the image in place according to one of {`"horiz"`,`"vert"`,`"flip"`,`"left"`,`"right"`,`"dither"`}.               |
 | `x.rotate[x]`          | Update the image in place, rotating it clockwise around its centerpoint by `x` radians.                                  |
 | `x.translate[pos w]`   | Update the image in place, translating it by `pos` (x,y) pixels. If `w` is truthy, wrap the image at the edges.          |
-| `x.scale[n]`           | Update the image in place, nearest-neighbor scaling it by `n`, which can be a single number or `(x,y)` pair.             |
+| `x.scale[n a]`         | Update the image in place, nearest-neighbor scaling it by `n`, which can be a single number or `(x,y)` pair.             |
 | `x.merge[...x]`        | Consistent with `canvas.merge[]`: Replace every pixel of the image by compositing together images by index.              |
 | `x.copy[pos size a]`   | Consistent with `canvas.copy[]`: grab and return a sub-image at `pos`/`size`, respecting anchor `a`.                     |
 | `x.paste[image pos t]` | Consistent with `canvas.paste[]`: composite in another image at `pos`. If `t` is truthy, treat pattern 0 as transparent. |
@@ -891,7 +891,7 @@ colors.red in i.hist                                # does this image contain an
 
 The `image.pixels` attribute is for bulk reads or writes of pixels. Reading will always produce a matrix (list-of-lists) of pattern indices. Writing will accept either a flat list of pixels, automatically wrapped to the dimensions of the image, or a matrix of pixels, which behaves as if the matrix were razed into a flat list. In either case, it is the caller's responsibility to ensure that the source data matches the dimensions of the image.
 
-The `map[]` function is useful for re-paletting an image. For example, if we have an image `i` containing patterns 0 and 1, we could map them to red and green pixels, respectively, as follows:
+The `image.map[]` function is useful for re-paletting an image. For example, if we have an image `i` containing patterns 0 and 1, we could map them to red and green pixels, respectively, as follows:
 ```lil
 i.map[(0,1) dict (colors.red,colors.green)]
 ```
@@ -906,7 +906,7 @@ i.map[1,0]                                      # replace black with white, and 
 image[i.size+4].map[() colors.red].paste[i 2,2] # add a 2 pixel red border around i
 ```
 
-The `transform[x]` function modifies the entire image in place, depending on `x`:
+The `image.transform[x]` function modifies the entire image in place, depending on `x`:
 - `"horiz"`: mirror the image horizontally, reversing the order of the pixels of each row.
 - `"vert"`: mirror the image vertically, reversing the order of the pixels in each column.
 - `"flip"`: transpose the image about the x/y axis, like the Lil `flip` operator on a list of lists.
@@ -916,7 +916,13 @@ The `transform[x]` function modifies the entire image in place, depending on `x`
 
 Any other value will leave the image unchanged.
 
-The `rotate[x]` function uses the [rotation by shearing](https://www.ocf.berkeley.edu/~fricke/projects/israel/paeth/rotation_by_shearing.html) method internally, and is therefore pixel-perfect and area-preserving. Repeated small rotations will accumulate distortion, but applying the same sequence of rotations in reverse will restore the original image.
+The `image.rotate[x]` function uses the [rotation by shearing](https://www.ocf.berkeley.edu/~fricke/projects/israel/paeth/rotation_by_shearing.html) method internally, and is therefore pixel-perfect and area-preserving. Repeated small rotations will accumulate distortion, but applying the same sequence of rotations in reverse will restore the original image.
+
+The `image.scale[n a]` function takes an optional argument `a`. If `a` is present and truthy, the source image will be scaled to _result in_ an image of size `n`; otherwise (by default), the source image's original size will be multiplied by `n` to arrive at the final size:
+```lil
+image[10,20].scale[3,5 0] # the result will be 30x100 pixels
+image[10,20].scale[3,5 1] # the result will be 3x5 pixels
+```
 
 
 Sound Interface

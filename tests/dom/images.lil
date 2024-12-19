@@ -362,6 +362,9 @@ assert["scale image exact"
 	image["%%IMG0AAYAN3iE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hHg="].scale[2].encoded
 ]
 
+assert["scale image down absolute" "%%IMG0AAcABgA4fHxsbA=="                 image[b].scale[ 7, 6 1].encoded]
+assert["scale image up absolute"   "%%IMG0AAoACgAAAAAfAD+AO4A/gD+AO4A7gAAA" image[b].scale[10,10 1].encoded]
+
 i:image[4,3]
 i.pixels:range 16
 assert_image["image write flat pixels"

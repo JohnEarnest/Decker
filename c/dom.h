@@ -487,7 +487,8 @@ lv* n_image_paste(lv*self,lv*z){
 	else{buffer_paste_scaled(getrect(pos),cl,c->b,self->b,solid);}return self;
 }
 lv* n_image_scale(lv*self,lv*z){
-	lv*o=image_clone(self);z=l_first(z);fpair n=lin(z)?(fpair){ln(z),ln(z)}: getfpair(z);pair s=image_size(self),r={MAX(0,s.x*n.x),MAX(0,s.y*n.y)};
+	lv*o=image_clone(self);int a=z->c>1&&lb(z->lv[1]);z=l_first(z);fpair n=lin(z)?(fpair){ln(z),ln(z)}: getfpair(z);pair s=image_size(self);
+	pair r={MAX(0,n.x*(a?1:s.x)),MAX(0,n.y*(a?1:s.y))};
 	image_resize(self,r);buffer_paste_scaled(rect_pair((pair){0,0},r),rect_pair((pair){0,0},r),o->b,self->b,1);return self;
 }
 lv* image_write(lv*x){

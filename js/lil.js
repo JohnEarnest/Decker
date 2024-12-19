@@ -1617,8 +1617,8 @@ image_make=size=>{
 			else {for(let y=0,z=0;y<s.y;y++)for(let x=0;x<s.x;x++,z++){const i=rect(x-o.x,y-o.y);t.pix[z]=(i.x<0||i.x>=s.x||i.y<0||i.y>=s.y)?0: self.pix[i.x+i.y*s.x]}}
 			self.pix.set(t.pix);return self
 		})
-		if(ikey(i,'scale'))return lmnat(([z])=>{
-			const o=image_copy(self), n=lin(z)?rect(ln(z),ln(z)):getpair(z), r=rmax(rect(),rint(rect(n.x*o.size.x,n.y*o.size.y))), d=rpair(rect(),r)
+		if(ikey(i,'scale'))return lmnat(([z,a])=>{
+			const o=image_copy(self), n=lin(z)?rect(ln(z),ln(z)):getpair(z), r=rmax(rect(),rint(a&&lb(a)?n:rect(n.x*o.size.x,n.y*o.size.y))), d=rpair(rect(),r)
 			image_resize(self,r),image_paste_scaled(d,d,o,self,1);return self
 		})
 		if(ikey(i,'copy'))return lmnat(z=>image_copy(self,unpack_rect(z,self.size)))

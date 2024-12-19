@@ -124,7 +124,7 @@ button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"thebrushes.0","
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Custom Brushes"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"thebrushes.0","text":"Index","style":"rect"}
 field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["It is also possible to define additional brushes with the brush[] built-in function. Calling brush[] with a string name and an Image will install a new brush that can be selected manually or chosen for canvas drawing by name. (Note that this deck adds quite a few additional brushes to the toolbar which we will examine shortly!)\n\n\n\n\n\n\nJust like the built-in brush shapes, the brush image will be automatically centered and stamped on the pointer position or the canvas drawing coordinates along every line drawn.\n\nYou can make simple brushes like this for yourself on the fly by drawing a shape, copying a tight selection to the clipboard, and then  defining it with the Listener:\n\n    ","brush[\"myThing\" image[\"...\"]]"],"font":["","mono"],"arg":["",""]}}
-target:{"type":"canvas","size":[135,76],"pos":[32,190],"volatile":1,"brush":48,"scale":1}
+target:{"type":"canvas","size":[135,76],"pos":[32,190],"volatile":1,"scale":1}
 ex1:{"type":"field","size":[232,94],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","value":"brush[\"myOval\" shape.copy[]]\ntarget.brush:\"myOval\"\ntarget.clear[]"}
 button5:{"type":"button","size":[60,20],"pos":[254,122],"script":"canvasdrawing.0","text":"Try It!"}
 field3:{"type":"field","size":[60,14],"pos":[32,174],"locked":1,"border":0,"value":"target"}
@@ -138,7 +138,7 @@ button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"thebrushes.0","
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Brush Colors"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"thebrushes.0","text":"Index","style":"rect"}
 field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"The brush image may contain pixels of any pattern index, which are interpreted as follows:\n\n0: a transparent pixel; no drawing.\n1: an opaque pixel; draws in the selected pattern.\n47: a black pixel. draws as pattern 1.\n2-46: draw as themselves.\n\n0/1 mask patterns are sufficient for most types of brush, but color brushes may occasionally be useful for fancy effects. Experiment!"}
-target:{"type":"canvas","size":[135,76],"pos":[61,216],"volatile":1,"brush":48,"scale":1}
+target:{"type":"canvas","size":[135,76],"pos":[61,216],"volatile":1,"scale":1}
 ex1:{"type":"field","size":[232,145],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","value":"brush[\"myRainbow\"\n image[\n \"%%IMG1AAQAAyIjJCUhAAAmKykoJw==\"\n ]\n]\ntarget.brush:\"myRainbow\"\ntarget.clear[]"}
 button5:{"type":"button","size":[60,20],"pos":[254,173],"script":"canvasdrawing.0","text":"Try It!"}
 field3:{"type":"field","size":[60,14],"pos":[61,200],"locked":1,"border":0,"value":"target"}
@@ -164,7 +164,7 @@ field1:{"type":"field","size":[248,258],"pos":[254,48],"locked":1,"border":0,"va
 ex1:{"type":"field","size":[232,129],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","value":"brush[on debugBrush delta f do\n if f\n  log.data:log.data,list delta\n  log.scroll:99999\n end\n image[\"%%IMG0AAMAA+Cg4A==\"]\nend]\n\ntarget.brush:\"debugBrush\"\ntarget.clear[]\nlog.data:()"}
 button5:{"type":"button","size":[60,20],"pos":[254,116],"script":"canvasdrawing.0","text":"Try It!"}
 log:{"type":"field","size":[113,93],"pos":[129,209],"volatile":1,"scrollbar":1}
-target:{"type":"canvas","size":[108,93],"pos":[10,209],"volatile":1,"script":"functionalbrushes.0","brush":48,"scale":1}
+target:{"type":"canvas","size":[108,93],"pos":[10,209],"volatile":1,"script":"functionalbrushes.0","scale":1}
 field3:{"type":"field","size":[110,14],"pos":[10,193],"locked":1,"border":0,"align":"center","value":"(click and drag to draw)"}
 field2:{"type":"field","size":[78,14],"pos":[130,193],"locked":1,"border":0,"value":"log"}
 
@@ -184,7 +184,7 @@ button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"thebrushes.0","
 field1:{"type":"field","size":[248,258],"pos":[254,48],"locked":1,"border":0,"value":"Functional brushes which select an image randomly from a list of pre-prepared images can offer a wide range of useful dithering and stippling effects."}
 ex1:{"type":"field","size":[232,129],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","value":"frames:\"%J\" parse \"[\n %%IMG0AAMAA4BgYA==,\n %%IMG0AAMAAwAgAA==,\n %%IMG0AAMAAwAAgA==,\n %%IMG0AAMAAwBgYA==,\n]\"\nbrush[on randomBrush do\n random[frames]\nend]\ntarget.brush:\"randomBrush\"\ntarget.clear[]"}
 button5:{"type":"button","size":[60,20],"pos":[254,157],"script":"canvasdrawing.0","text":"Try It!"}
-target:{"type":"canvas","size":[182,107],"pos":[38,199],"volatile":1,"script":"functionalbrushes.0","brush":48,"scale":1}
+target:{"type":"canvas","size":[182,107],"pos":[38,199],"volatile":1,"script":"functionalbrushes.0","scale":1}
 field3:{"type":"field","size":[110,14],"pos":[70,183],"locked":1,"border":0,"align":"center","value":"(click and drag to draw)"}
 
 {card:velocitysensitivity}
@@ -194,9 +194,9 @@ button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"thebrushes.0","
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Example: Velocity Sensitivity"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"thebrushes.0","text":"Index","style":"rect"}
 field1:{"type":"field","size":[248,258],"pos":[254,48],"locked":1,"border":0,"value":"By taking the magnitude of the delta argument and using it to vary the size of the image produced, it is possible to make velocity-sensitive brushes.\n\nThis style of effect helps evoke brushpens and sumi brushes."}
-ex1:{"type":"field","size":[232,129],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","scroll":106,"value":"circle:image[\"%%IMG2AGQAZAAqARAAUQEWAEgBIgBAASYAPAEqADgBLQA2ATAAMgE0AC4BOAAqATwAJwE+ACUBQAAjAUIAIQFEAB8BRgAdAUgAGwFKABkBTAAXAU4AFQFQABMBUgASAVIAEQFUABABVAAPAVYADgFWAA0BWAAMAVkACgFaAAkBXAAIAVwABwFeAAYBXgAFAWAABAFgAAQBYAAEAWAABAFgAAQBYAADAWIAAgFiAAIBYgABAf8B/wH/Af8B/wH/AUYAAQFiAAIBYgACAWIAAwFgAAQBYAAEAWAABAFgAAQBYAAEAWAABQFeAAYBXgAHAVwACAFcAAkBWgAKAVkADAFYAA0BVgAOAVYADwFUABABVAARAVIAEgFSABMBUAAVAU4AFwFMABkBSgAbAUgAHQFGAB8BRAAhAUIAIwFAACUBPgAnATwAKgE4AC4BNAAyATAANgEtADgBKgA8ASYAQAEiAEgBFgBRARAAKg==\"]\nbrush[on velocityBrush delta do\n s:(.5*mag delta)/circle.size\n circle.copy[].scale[s]\nend]\ntarget.brush:\"velocityBrush\"\ntarget.clear[]"}
+ex1:{"type":"field","size":[232,129],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","scroll":117,"value":"circle:image[\"%%IMG2AGQAZAAqARAAUQEWAEgBIgBAASYAPAEqADgBLQA2ATAAMgE0AC4BOAAqATwAJwE+ACUBQAAjAUIAIQFEAB8BRgAdAUgAGwFKABkBTAAXAU4AFQFQABMBUgASAVIAEQFUABABVAAPAVYADgFWAA0BWAAMAVkACgFaAAkBXAAIAVwABwFeAAYBXgAFAWAABAFgAAQBYAAEAWAABAFgAAQBYAADAWIAAgFiAAIBYgABAf8B/wH/Af8B/wH/AUYAAQFiAAIBYgACAWIAAwFgAAQBYAAEAWAABAFgAAQBYAAEAWAABQFeAAYBXgAHAVwACAFcAAkBWgAKAVkADAFYAA0BVgAOAVYADwFUABABVAARAVIAEgFSABMBUAAVAU4AFwFMABkBSgAbAUgAHQFGAB8BRAAhAUIAIwFAACUBPgAnATwAKgE4AC4BNAAyATAANgEtADgBKgA8ASYAQAEiAEgBFgBRARAAKg==\"]\nbrush[on velocityBrush delta do\n circle.copy[].scale[\n  2|.5*mag delta 1\n ]\nend]\ntarget.brush:\"velocityBrush\"\ntarget.clear[]"}
 button5:{"type":"button","size":[60,20],"pos":[254,157],"script":"canvasdrawing.0","text":"Try It!"}
-target:{"type":"canvas","size":[182,107],"pos":[38,199],"volatile":1,"script":"functionalbrushes.0","brush":50,"scale":1}
+target:{"type":"canvas","size":[182,107],"pos":[38,199],"volatile":1,"script":"functionalbrushes.0","scale":1}
 field3:{"type":"field","size":[110,14],"pos":[70,183],"locked":1,"border":0,"align":"center","value":"(click and drag to draw)"}
 
 {card:anglesensitivity}
@@ -208,7 +208,7 @@ button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"thebrushes.0","
 field1:{"type":"field","size":[248,258],"pos":[254,48],"locked":1,"border":0,"value":"By taking the heading of the delta argument and using it to vary the orientation of the image produced, it is possible to make angle-sensitive brushes. Angles will be less accurate (or entirely meaningless) for very short strokes, so you may want to include a threshold transitioning between a directional and non-directional result.\n\nThis style of effect helps evoke calligraphic pens and markers."}
 ex1:{"type":"field","size":[232,129],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","value":"stroke:image[\"%%IMG2ABMAEwCdAQoABgEPAAUBCwCd\"]\npoint:image[\"%%IMG0AAcABxAQePh+eBA=\"]\nbrush[on angleBrush d f do\n if 2<mag d\n  stroke.copy[].rotate[heading d]\n else\n  point\n end\nend]\n\ntarget.brush:\"angleBrush\"\ntarget.clear[]"}
 button5:{"type":"button","size":[60,20],"pos":[254,157],"script":"canvasdrawing.0","text":"Try It!"}
-target:{"type":"canvas","size":[182,107],"pos":[38,199],"volatile":1,"script":"functionalbrushes.0","brush":51,"scale":1}
+target:{"type":"canvas","size":[182,107],"pos":[38,199],"volatile":1,"script":"functionalbrushes.0","scale":1}
 field3:{"type":"field","size":[110,14],"pos":[70,183],"locked":1,"border":0,"align":"center","value":"(click and drag to draw)"}
 
 {card:playground}

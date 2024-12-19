@@ -1705,10 +1705,10 @@ function image_paste_scaled(img,src,opaque,rx,ry,rw,rh,  sx,sy,dx,dy,a,b,c,tx,ty
 		tx=rx+b;ty=ry+a;if(tx>=0&&ty>=0&&tx<dx&&ty<dy)image_set_px(img,tx,ty,c)
 	}
 }
-function n_image_scale(img,args,  r,rx,ry,src){
-	args=l_first(args)
+function n_image_scale(img,args,  r,af,rx,ry,src){
+	af=count(args)>1&&lb(lst_get(args,1));args=l_first(args)
 	if(lin(args)){rx=ln(args);ry=rx}else{args=ll(args);rx=count(args)>0?ln(lst_get(args,0)):0;ry=count(args)>1?ln(lst_get(args,1)):0}
-	rx=int(max(0,rx*image_w(img)));ry=int(max(0,ry*image_h(img)));if(rx==0||ry==0){rx=0;ry=0;}
+	rx=int(max(0,rx*(af?1:image_w(img))));ry=int(max(0,ry*(af?1:image_h(img))));if(rx==0||ry==0){rx=0;ry=0;}
 	src=image_clone(img);heap_c[img]=rx;heap_n[img]=ry;image_paste_scaled(img,src,1,0,0,rx,ry);return img
 }
 function n_image_paste(img,args,  src,pos,opaque,rx,ry,rw,rh){
