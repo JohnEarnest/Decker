@@ -2276,7 +2276,7 @@ soft_keyboard=r=>{
 		keys.forEach((k,i,arr)=>{
 			let b=rint(rect(r.x+x+1,y,i==arr.length-1?(r.w-x):(k.w*(r.w/w)),kh+1));x+=b.w-1
 			draw_box(b,0,1)
-			const e=k.v==-2&&wid.f.style=='code'&&uimode=='interact'
+			const e=k.v==-2&&wid.f&&wid.f.style=='code'&&uimode=='interact'
 			if     (k.v=='ArrowLeft' )draw_iconc(b,ARROWS[4],1)
 			else if(k.v=='ArrowDown' )draw_iconc(b,ARROWS[1],1)
 			else if(k.v=='ArrowUp'   )draw_iconc(b,ARROWS[0],1)
