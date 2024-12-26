@@ -39,6 +39,13 @@ ifeq ($(UNAME),OpenBSD)
 	FLAGS:=$(FLAGS) -Wno-misleading-indentation -Wno-unknown-warning-option
 	FLAGS:=$(FLAGS) -lm
 endif
+ifeq ($(UNAME),NetBSD)
+	# Required packages: bash, gmake, SDL2, SDL2_image, xdg-tools
+	OPEN=xdg-open
+	COMPILER=gcc
+	FLAGS=-std=c99 -lm -Wall -Wextra -O2
+	FLAGS:=$(FLAGS) -Wno-misleading-indentation -Wno-format-truncation
+endif
 ifneq ("$(EXTRA_FLAGS)","")
 	FLAGS:=$(FLAGS) $(EXTRA_FLAGS)
 endif

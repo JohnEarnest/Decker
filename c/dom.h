@@ -3043,6 +3043,9 @@ lv*n_dir(lv*self,lv*a){
 	r->kv[0]=lmistr("dir");return r;
 }
 #ifndef _WIN32
+#ifdef __NetBSD__
+#include <sys/wait.h>
+#endif
 lv*n_shell(lv*self,lv*a){
 	(void)self;lv*x=ls(l_first(a)),*r=lmd();FILE*child=popen(x->sv,"r");str o=str_new();
 	while(1){int c=fgetc(child);if(feof(child))break;str_addraw(&o,c);}int e=pclose(child);lv*os=lmstr(o);
