@@ -1563,6 +1563,11 @@ buffer_hist=(buff,sign)=>{
 	const b_extend=u=>(u)|(0-((u)&0x80)),r=lmd(),c=new Float32Array(256);for(let z=0;z<buff.length;z++)c[buff[z]]++
 	for(let z=0;z<256;z++)if(c[z]!=0)dset(r,lmn(sign?b_extend(z):z),lmn(c[z]));return r
 }
+image_bounds=i=>{
+	const s=i.size,d=rect(s.x,s.y,0,0)
+	for(let z=0;z<i.pix.length;z++)if(i.pix[z]!=0){const x=z%s.x,y=0|(z/s.x);d.x=min(d.x,x),d.y=min(d.y,y),d.w=max(d.w,x),d.h=max(d.h,y)}
+	return lmd(["pos","size"].map(lms),[d,rmin(s,rect(d.w-d.x+1,d.h-d.y+1))].map(lmpair))
+}
 image_merge_op=(target,src,op)=>{
 	const ts=target.size,bs=src.size,t=target.pix,b=src.pix;if(bs.x==0||bs.y==0)return
 	if(op=='+')for(let y=0,i=0;y<ts.y;y++)for(let x=0;x<ts.x;x++,i++)t[i]+=        b[(x%bs.x)+(y%bs.y)*bs.x]
@@ -1589,6 +1594,7 @@ image_make=size=>{
 		}
 		if(ikey(i,'encoded'))return lms(image_write(self))
 		if(ikey(i,'hist'))return buffer_hist(self.pix,0)
+		if(ikey(i,'bounds'))return image_bounds(self)
 		if(ikey(i,'size'))return x?(image_resize(self,getpair(x)),x): lmpair(self.size)
 		if(ikey(i,'map'))return lmnat(([x,fill])=>(buffer_map(self.pix,x,fill),self))
 		if(ikey(i,'merge'))return lmnat(z=>{

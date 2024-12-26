@@ -388,6 +388,12 @@ lv* buffer_hist(lv*x,int sign){
 	lv*r=lmd();double c[256]={0.0};EACH(z,x)c[0xFF&(int)(x->sv[z])]++;
 	for(int z=0;z<256;z++)if(c[z]!=0)dset(r,lmn(sign?b_extend(z):z),lmn(c[z]));return r;
 }
+lv* buffer_bounds(lv*b){
+	pair s=buff_size(b);rect d={s.x,s.y,0,0};
+	for(int z=0;z<b->c;z++)if(b->sv[z]!=0){int x=z%s.x, y=z/s.x; d.x=MIN(d.x,x), d.y=MIN(d.y,y), d.w=MAX(d.w,x), d.h=MAX(d.h,y);}
+	pair rp={d.x,d.y},rs={MIN(s.x,d.w-d.x+1),MIN(s.y,d.h-d.y+1)};
+	lv*r=lmd();dset(r,lmistr("pos"),lmpair(rp)),dset(r,lmistr("size"),lmpair(rs));return r;
+}
 int is_empty(lv*x){pair s=image_size(x);return s.x==0&&s.y==0;}
 int is_blank(lv*x){if(!image_is(x))return 0;EACH(z,x->b)if(x->b->sv[z])return 0;return 1;}
 void buff_merge_op(lv*target,lv*src,char op){
@@ -524,6 +530,7 @@ lv* interface_image(lv*self,lv*i,lv*x){
 	ikey("paste"    )return lmnat(n_image_paste,self);
 	ikey("encoded"  )return image_write(self);
 	ikey("hist"     )return buffer_hist(self->b,0);
+	ikey("bounds"   )return buffer_bounds(self->b);
 	return x?x:NONE;
 }
 lv* image_make(lv*buffer){return lmi(interface_image,lmistr("image"),buffer);}

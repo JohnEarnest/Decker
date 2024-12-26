@@ -181,7 +181,7 @@ field1:{"type":"field","size":[248,119],"pos":[254,48],"locked":1,"border":0,"va
 wc:{"type":"contraption","size":[100,100],"pos":[61,58],"def":"wigglyCanvas","widgets":{"c":{},"fr":{"value":{"text":["i","i","i"],"font":["","",""],"arg":["%%IMG2AGQAZAD/AP8A/wD/AP8A/wD/AP8AzwEBAAMBAgABAQMAAQEBAFYBDwBUARIAAQEBAEsBCAABAQMAAQECAAMBCQBIAQgADgEHAEYBCAARAQUARQEFAAIBAQAUAQQAQgEGABgBBAA+AQcAHAEDAD0BBwAdAQMAPAEGAB4BBQA7AQQAIQEFADoBAwAkAQMAOQEDACUBAwA4AQMAJgEDADgBAwAmAQMANwEEACYBAwA4AQMAJgEDADgBAwAlAQQANwEEACUBAwA4AQMAJgEEADcBBAATAQEAEQEEADgBAwASAQMAEQEEADgBAwAQAQMAEwEDADcBBAAPAQQAEgEDADcBBAAPAQUAEQEDADgBAwARAQQAEQEDADcBAwATAQMAEgEDADYBBAARAQQAEgEDADcBAwARAQQAEAEFADcBAwARAQgACwEGADcBBAARAQ8AAQEHADkBAwAUARMAOQEDABYBAgABAQ4AOQEEAB4BAQABAQYAOwEDAGIBAwBhAQMAYQEDAGEBAwBiAQMAYQEFAGABBQBhAQMAYgEEAGABBQBgAQUAYAEIACMBAgA5AQcAIQEEADgBBwAfAQcAOAEBAAIBBgAbAQcAPQEHAAgBAwAHAQMAAgEGAEEBFAABAQwARwEbAEsBCAABAQkAAgEEAE4BAgAKAQIABQECAP8A/wD/AP8A/wD/AP8A/wC+","%%IMG2AGQAZAD/AP8A/wD/AP8A/wD/AP8AbAEDAAgBAQBWAQ8AVAEQAFMBBAADAQsATgEGAAkBAgACAQQATAEGAA8BBQBIAQcAEQEFAEYBBgAUAQUARAEFABgBAwBBAQUAHAEDAD8BBQAdAQMAPAEHAB4BBAA6AQUAIgEEADoBAwAkAQMAOQEDACUBAwA5AQMAJQEDADgBAwAlAQQAOAEDACUBBAA3AQQAJgEDADgBAwAmAQMAOAEDACYBAwA4AQMAJgEDADcBBAAmAQMANwEEABEBAgATAQMAOAEEAA8BBAATAQMANwEEAA8BBAASAQQANwEDABABAwAUAQMANwEDAA8BBAATAQQANgEDABEBAwATAQQANgEDABEBBAASAQQANgEDABABBwAPAQQANgEDABIBCAANAQMAOAEDABMBCAAIAQEAAQEDADkBAwAVAQEAAQEGAAEBCwA4AQQAGAEPADkBBAAaAQoAPAEDAB0BAgADAQIAPgEDAGEBAwBhAQMAYgEDAGEBBABhAQQAYQEEAGEBBgBeAQcAXgEFAGIBAwAmAQEAOwEDACQBBQA4AQcAIAEGADgBBwAeAQYAOgEGAAEBAgAaAQUAPQEBAAIBCAAWAQQAQwENAAEBCQACAQcARQECAAEBGwBMARcAUwECAAgBAwD/AP8A/wD/AP8A/wD/AP8AwA==","%%IMG2AGQAZAD/AP8A/wD/AP8A/wD/AP8AdQEBAFkBAQADAQQAAQEDAAEBAQBUAREAUgENAAEBBgBOAQUAAQEFAAIBAQADAQcARwEIABABBgBFAQgAEgEFAEUBBwAUAQQARAEEABkBAwBCAQYAGQEDAEABBQABAQEAGwEDAD4BBQAdAQUAOgEGACABBQA4AQYAIwEDADkBBAAkAQMAOQEDACUBAwA5AQMAJQEDADgBBAAlAQMANwEEACYBAwA3AQMAJwEDADcBBAAmAQQANgEDACcBBAA3AQMAJgEDADkBAwARAQEAEwEDADkBAwAQAQMAEwEDADcBAwAQAQQAEgEDADgBAwAQAQQAEQEEADcBAwAQAQQAEgEFADYBAwARAQQAEgEEADUBBAARAQQAEgEDADYBBAARAQQAEQEDADcBAwATAQcADAEDADgBBAATAQgABgECAAIBAwA4AQMAFQEJAAEBAQABAQgAOAEEABkBDgA6AQMAGwEGAAEBAwA8AQMAHQEDAEIBAwBhAQMAYQEDAGEBAwBiAQMAYQEFAF8BBgBfAQUAYQEFAGABBQBgAQUAKAECADcBBgAkAQQANwEGACEBBQA5AQcAHgEFAD0BBwAaAQUAPwEJAAkBAwAEAQMAAQEGAEMBCQACAQEAAgERAEYBAgABARoATQEJAAIBBQABAQQAUQECAAEBAgAFAQEABQEBAP8A/wD/AP8A/wD/AP8A/wDA"]}},"sfx":{},"tb":{},"cbo":{},"cp":{},"cbr":{}}}
 reset:{"type":"button","size":[60,20],"pos":[171,81],"script":"cropping.0","text":"Reset"}
 field3:{"type":"field","size":[100,14],"pos":[61,45],"locked":1,"show":"transparent","border":0,"align":"center","value":"wc"}
-ex1:{"type":"field","size":[492,126],"pos":[10,172],"border":1,"scrollbar":1,"style":"code","value":"on crop wid do\n local f:first wid.value.frames\n local w:wid.size[0]\n local h:wid.size[1]\n local x:0\n local y:0\n while w    &(1~count f.copy[(w-1),0 1,h].hist) w:w-1 end\n while h    &(1~count f.copy[0,(h-1) w,1].hist) h:h-1 end\n while (x<w)&(1~count f.copy[x,0     1,h].hist) x:x+1 end\n while (y<h)&(1~count f.copy[0,y     w,1].hist) y:y+1 end\n f:each f in wid.value.frames f.copy[(x,y) (w,h)-(x,y)] end\n wid.size:(w,h)-(x,y)\n wid.value:().frames:f\nend\n\ncrop[wc]"}
+ex1:{"type":"field","size":[492,126],"pos":[10,172],"border":1,"scrollbar":1,"style":"code","value":"on crop wid do\n s:wid.value.frames[0].copy[]\n each frame in 1 drop wid.value.frames\n  s.paste[frame 1]\n end\n u:s.bounds \n f:each f in wid.value.frames\n  f.copy[u.pos u.size]\n end\n wid.size:u.size\n wid.value:().frames:f\nend\n\ncrop[wc]"}
 button5:{"type":"button","size":[60,20],"pos":[171,113],"script":"animationvalues.2","text":"Crop"}
 
 {script:cropping.0}
@@ -766,15 +766,8 @@ on click do
  audio.scratch
  backup[]
  local f:first af:frames[]
- local w:f.size[0]
- local h:f.size[1]
- local x:0
- local y:0
- while w    &(1~count f.copy[(w-1),0 1,h].hist) w:w-1 end
- while h    &(1~count f.copy[0,(h-1) w,1].hist) h:h-1 end
- while (x<w)&(1~count f.copy[x,0     1,h].hist) x:x+1 end
- while (y<h)&(1~count f.copy[0,y     w,1].hist) y:y+1 end
- set_value[().frames:each f in af f.copy[(x,y) (w,h)-(x,y)] end]
+ local b:f.bounds
+ set_value[().frames:each f in af f.copy[b.pos b.size] end]
 end
 {end}
 

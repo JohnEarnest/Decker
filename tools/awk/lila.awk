@@ -1301,6 +1301,7 @@ function interfaces(self,i,x,  r){
 		if(lvs(i)=="paste"    )return lmnat("paste"    ,"image_paste"    ,self)
 		if(lvs(i)=="encoded"  )return image_write(self)
 		if(lvs(i)=="hist"     )return image_hist(self)
+		if(lvs(i)=="bounds"   )return image_bounds(self)
 	}
 	else if(li_name(self)=="array"){
 		if(!lis(i))return x==-1?n_array_get(self,i):n_array_set(self,i,x)
@@ -1765,6 +1766,13 @@ function image_hist(img,  r,c,sx,sy,x,y,z){
 	sx=image_w(img);sy=image_h(img);r=lmd()
 	for(y=0;y<sy;y++)for(x=0;x<sx;x++)c[image_get_px(img,x,y)]++
 	for(z=0;z<256;z++)if(c[z]!=0)dset(r,lmn(z),lmn(c[z]));return r
+}
+function image_bounds(img,  r,sx,sy,dx,dy,dw,dh,x,y){
+	sx=image_w(img);sy=image_h(img);r=lmd();dx=sx;dy=sy;dw=0;dh=0
+	for(y=0;y<sy;y++)for(x=0;x<sx;x++)if(image_get_px(img,x,y)!=0){dx=min(dx,x);dy=min(dy,y);dw=max(dw,x);dh=max(dh,y)}
+	dset(r,lms("pos" ),lml2(lmn(dx             ),lmn(dy             )))
+	dset(r,lms("size"),lml2(lmn(min(sx,dw-dx+1)),lmn(min(sy,dh-dy+1))))
+	return r
 }
 function n_image_set_px(img,i,x,  w,h,t,px,py){
 	w=image_w(img);h=image_h(img)
