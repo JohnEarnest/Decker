@@ -200,7 +200,7 @@ pair 3 5     # wrong: this is three separate statements, not a function call!
 ```
 
 If you want to define a function that takes a variable number of arguments- a so-called _variadic_ or _ambivalent_ function- declare the function with a single named argument prefaced with `...`. When the function is called, this argument will contain a list of every argument provided to the function:
-```
+```lil
 on several ...x do 1-x end
 several[11 22 33]
 # (-10,-21,-32)
