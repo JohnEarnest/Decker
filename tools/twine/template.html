@@ -142,7 +142,6 @@ function render_ply(text,name,tags){
 			const output=arg();popstate()
 			r=r+html_rtext(rtext_cast(output))
 		}
-		else if(text[i]==' ' ){i++;r=r+'&nbsp;'}
 		else if(text[i]=='\n'){i++;r=r+'<br>'}
 		else{r=r+html_text(text[i++])}
 	}
