@@ -630,7 +630,7 @@ char*FONT_BLOCK_MONO=
 #define font_h(f)            ((f->b->sv)[1])                                        // max glyph height
 #define font_sw(f)           ((f->b->sv)[2])                                        // glyph spacing
 #define font_gs(f)           (font_h(f)*(int)ceil(font_w(f)/8.0)+1)
-#define font_gb(f,c)         (3+(c-32)*font_gs(f))
+#define font_gb(f,c)         (3+(c)*font_gs(f))
 #define font_gw(f,c)         ((f->b->sv)[font_gb(f,c)])                            // actual glyph width
 #define font_pp(f,c,x,y)     (f->b->sv)[font_gb(f,c)+1+y*((int)ceil(iw/8.0))+(x/8)]
 #define font_bit(x,v)        (v<<(7-(x%8)))
@@ -651,36 +651,72 @@ lv*font_make(pair s); // forward ref
 lv* n_font_textsize(lv*self,lv*z){return lmpair(font_textsize(self,ls(l_first(z))->sv));}
 lv* interface_font(lv*self,lv*i,lv*x){
 	if(lin(i)||(lis(i)&&i->c==1)){ // read/write glyphs
-		int ix=lin(i)?ln(i): i->sv[0]-32;char c=ix+32;
+		int ix=lin(i)?ln(i): i->sv[0];
 		if(x){
-			if(!image_is(x)||ix<0||ix>95)return x;pair s=image_size(x);
-			font_each(self,c){int col=(b>=s.x||a>=s.y)?0: x->b->sv[b+a*s.x]?1:0; font_spix(self,c,b,a,col);}
-			font_gw(self,c)=MIN(s.x,font_w(self));return x;
+			if(ix<0||ix>255)return x;if(!image_is(x))x=image_empty();pair s=image_size(x);
+			font_each(self,ix){int col=(b>=s.x||a>=s.y)?0: x->b->sv[b+a*s.x]?1:0; font_spix(self,ix,b,a,col);}
+			font_gw(self,ix)=MIN(s.x,font_w(self));return x;
 		}
-		if(ix<0||ix>95)return image_empty();
-		pair s={font_gw(self,c),font_h(self)};lv*r=lmbuff(s);
-		font_each(self,c)if(b<s.x)r->sv[b+a*s.x]=font_gpix(self,c,b,a);
+		if(ix<0||ix>255)return image_empty();
+		pair s={font_gw(self,ix),font_h(self)};lv*r=lmbuff(s);
+		font_each(self,ix)if(b<s.x)r->sv[b+a*s.x]=font_gpix(self,ix,b,a);
 		return image_make(r);
 	}
 	if(x){
 		ikey("space"){font_sw(self)=ln(x);return x;}
 		ikey("size" ){
 			lv*r=font_make(pair_max(getpair(x),(pair){1,1}));iwrite(r,lmistr("space"),ifield(self,"space"));
-			for(int z=0;z<96;z++)iindex(r,z,iindex(self,z,NULL));self->b=r->b;return x;
+			for(int z=0;z<256;z++)iindex(r,z,iindex(self,z,NULL));self->b=r->b;return x;
 		}
 	}else{
 		ikey("size"    )return lmpair((pair){font_w(self),font_h(self)});
 		ikey("space"   )return lmn(font_sw(self));
 		ikey("textsize")return lmnat(n_font_textsize,self);
+		ikey("glyphs"){lv*r=lml(0);for(int z=0;z<256;z++)if(font_gw(self,z))ll_add(r,lmn(z));return r;}
 	}return x?x:NONE;
 }
 lv* font_make(pair s){
 	s=pair_max(s,(pair){1,1});
-	lv*r=lmi(interface_font,lmistr("font"),lms(3+96*(1+s.y*(int)ceil(s.x/8.0))));
+	lv*r=lmi(interface_font,lmistr("font"),lms(3+256*(1+s.y*(int)ceil(s.x/8.0))));
 	return font_w(r)=s.x,font_h(r)=s.y,font_sw(r)=1,r;
 }
-lv* font_read(lv*x){char f=0;lv*r=data_read("FNT",&f,x);return r&&f=='0'?lmi(interface_font,lmistr("font"),r):NULL;}
-lv* font_write(lv*x){return data_write("FNT",'0',x->b);}
+lv* font_read(lv*x){
+	char f=0;lv*r=data_read("FNT",&f,x);lv*ri=NULL;
+	if(r&&f=='0'){
+		pair s=pair_max((pair){0xFF&(r->sv[0]),0xFF&(r->sv[1])},(pair){1,1});int gs=ceil(s.x/8.0)*s.y;
+		ri=font_make(s);font_sw(ri)=0xFF&(r->sv[2]);
+		for(int z=3,ci=32;(z<r->c)&&(ci<128);ci++,z+=gs){
+			int gw=0xFF&r->sv[z++];if(z+gs>r->c)break;
+			memcpy(ri->b->sv+font_gb(ri,ci)+1,r->sv+z,gs);font_gw(ri,ci)=gw;
+		}
+	}
+	if(r&&f=='1'){
+		pair s=pair_max((pair){0xFF&(r->sv[0]),0xFF&(r->sv[1])},(pair){1,1});int gs=ceil(s.x/8.0)*s.y;
+		ri=font_make(s);font_sw(ri)=0xFF&(r->sv[2]);
+		for(int z=3;z+1<r->c;z+=gs){
+			int ci=0xFF&r->sv[z++], gw=0xFF&r->sv[z++];if(z+gs>r->c)break;
+			memcpy(ri->b->sv+font_gb(ri,ci)+1,r->sv+z,gs);font_gw(ri,ci)=gw;
+		}
+	}
+	return ri;
+}
+lv* font_write(lv*x){
+	pair s={font_w(x),font_h(x)};int gs=ceil(s.x/8.0)*s.y;
+	str r=str_new();str_addraw(&r,s.x),str_addraw(&r,s.y),str_addraw(&r,font_sw(x));
+	int dense=1;for(int z=0;z<256;z++)dense&=((font_gw(x,z)!=0)==(z>=32&&z<=127));
+	if(dense){
+		for(int ci=32;ci<128;ci++){
+			str_addraw(&r,font_gw(x,ci));
+			for(int z=0;z<gs;z++)str_addraw(&r,(x->b->sv)[font_gb(x,ci)+z+1]);
+		};lv*p=lmv(1);p->c=r.c;p->sv=r.sv;return data_write("FNT",'0',p);
+	}
+	else{
+		for(int ci=0;ci<256;ci++)if(font_gw(x,ci)){
+			str_addraw(&r,ci),str_addraw(&r,font_gw(x,ci));
+			for(int z=0;z<gs;z++)str_addraw(&r,(x->b->sv)[font_gb(x,ci)+z+1]);
+		};lv*p=lmv(1);p->c=r.c;p->sv=r.sv;return data_write("FNT",'1',p);
+	}
+}
 
 // Patterns interface
 

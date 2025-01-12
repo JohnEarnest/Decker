@@ -330,6 +330,7 @@ if !sys.platform~"awk"
 
 		frame_a.size:0,0
 		assert["cannot write out a gif of dimension 0 on either axis." 0 write["temp.gif" frame_a]]
+		shell["rm temp.gif"]
 	end
 end
 

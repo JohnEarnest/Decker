@@ -1723,8 +1723,10 @@ font_w =(f,v)=>font_get(0,f,v)
 font_h =(f,v)=>font_get(1,f,v)
 font_sw=(f,v)=>font_get(2,f,v)
 font_gs=(f,v)=>font_h(f)*ceil(font_w(f)/8)+1
-font_gb=(f,c)=>3+(c.charCodeAt(0)-32)*font_gs(f)
+font_gb=(f,c)=>3+c.charCodeAt(0)*font_gs(f)
+font_gbi=(f,c)=>3+c*font_gs(f)
 font_gw=(f,c,v)=>font_get(font_gb(f,c),f,v)
+font_gwi=(f,c,v)=>font_get(font_gbi(f,c),f,v)
 font_pp=(f,c,x,y,v)=>font_get(font_gb(f,c)+1+y*ceil(font_w(f)/8)+Math.floor(x/8),f,v)
 font_bit=(x,v)=>(v<<(7-(x%8)))
 font_gpix=(f,c,x,y)=>((font_pp(f,c,x,y)&font_bit(x,1))?1:0)
@@ -1734,37 +1736,70 @@ font_textsize=(f,t)=>{
 	for(let z=0;t[z];z++){if(t[z]!='\n'){cursor.x+=font_gw(f,t[z])+font_sw(f),size.x=max(size.x,cursor.x)}else{cursor.x=0,size.y+=font_h(f)}}
 	return size
 }
-font_read=s=>{
+font_read=arg=>{
 	const ri=lmi((self,i,x)=>{
 		if(lin(i)||(lis(i)&&count(i)==1)){ // read/write glyphs
-			let ix=lin(i)?ln(i): ls(i).charCodeAt(0)-32, c=String.fromCharCode(ix+32)
+			let ix=lin(i)?ln(i): ls(i).charCodeAt(0);const ch=String.fromCharCode(ix)
 			if(x){
-				if(!image_is(x)||ix<0||ix>95)return x;font_gw(self,c,min(x.size.x,font_w(self)));const s=rect(font_gw(self,c),font_h(self))
-				for(let a=s.y-1;a>=0;a--)for(let b=s.x-1;b>=0;b--)font_spix(self,c,b,a, b>=(x.size.x||a>=x.size.y)?0:x.pix[b+a*x.size.x]?1:0)
+				if(ix<0||ix>255)return x;if(!image_is(x))x=image_make(rect());
+				font_gwi(self,ix,min(x.size.x,font_w(self)));const s=rect(font_gwi(self,ix),font_h(self))
+				for(let a=s.y-1;a>=0;a--)for(let b=s.x-1;b>=0;b--)font_spix(self,ch,b,a, b>=(x.size.x||a>=x.size.y)?0:x.pix[b+a*x.size.x]?1:0)
 				return x
 			}
-			if(ix<0||ix>95)return image_make(rect())
-			const s=rect(font_gw(self,c),font_h(self)),r=image_make(s)
-			for(let a=s.y-1;a>=0;a--)for(let b=s.x-1;b>=0;b--)r.pix[b+a*s.x]=font_gpix(self,c,b,a)
+			if(ix<0||ix>255)return image_make(rect())
+			const s=rect(font_gwi(self,ix),font_h(self)),r=image_make(s)
+			for(let a=s.y-1;a>=0;a--)for(let b=s.x-1;b>=0;b--)r.pix[b+a*s.x]=font_gpix(self,ch,b,a)
 			return r
 		}
 		if(x){
 			if(ikey(i,'space'))return font_sw(self,ln(x)),x
 			if(ikey(i,'size')){
 				const r=font_read(rmax(rint(getpair(x)),rect(1,1)));iwrite(r,lms('space'),ifield(self,'space'))
-				for(let z=0;z<96;z++)iindex(r,z,iindex(self,z));self.pix=r.pix;return x
+				for(let z=0;z<256;z++)iindex(r,z,iindex(self,z));self.pix=r.pix;return x
 			}
 		}else{
 			if(ikey(i,'size'))return lmpair(rect(font_w(self),font_h(self)))
 			if(ikey(i,'space'))return lmn(font_sw(self))
 			if(ikey(i,'textsize'))return lmnat(([x])=>lmpair(font_textsize(self,x?ls(x):'')))
+			if(ikey(i,'glyphs'))return lml(range(256).filter(x=>font_gwi(self,x)).map(lmn))
 		}return x?x:NONE
 	},'font')
-	if(typeof s=='string')ri.pix=data_read('FNT',s); s=rmax(rint(s),rect(1,1))
-	if(!ri.pix){ri.pix=new Uint8Array(3+96*(1+s.y*ceil(s.x/8.0)));font_w(ri,s.x),font_h(ri,s.y),font_sw(ri,1)}
+	const make=sz=>{ri.pix=new Uint8Array(3+256*(1+sz.y*ceil(sz.x/8.0)));font_w(ri,sz.x),font_h(ri,sz.y),font_sw(ri,1)}
+	if(typeof arg=='string'){
+		const r=data_read('FNT',arg), s=rmax(rect(r[0],r[1]),rect(1,1)), gs=ceil(s.x/8)*s.y;make(s),font_sw(ri,r[2])
+		if(arg[5]=='0'){
+			for(let z=3,ci=32;(z<r.length)&&(ci<128);ci++,z+=gs){
+				const gw=r[z++];if(z+gs>r.length)break
+				for(let zz=0;zz<gs;zz++)font_get(font_gbi(ri,ci)+1+zz,ri,r[z+zz])
+				font_gwi(ri,ci,gw)
+			}
+		}
+		if(arg[5]=='1'){
+			for(let z=3;z+1<r.length;z+=gs){
+				const ci=r[z++],gw=r[z++];if(z+gs>r.length)break
+				for(let zz=0;zz<gs;zz++)font_get(font_gbi(ri,ci)+1+zz,ri,r[z+zz])
+				font_gwi(ri,ci,gw)
+			}
+		}
+	}
+	if(!ri.pix){make(rmax(rint(arg),rect(1,1)))}
 	return ri
 }
-font_write=x=>data_write('FNT0',x.pix)
+font_write=x=>{
+	const s=rect(font_w(x),font_h(x)), gs=font_gs(x), r=[s.x,s.y,font_sw(x)]
+	const dense=range(256).every(z=>(font_gwi(x,z)!=0)==(z>=32&&z<=127))
+	if(dense){
+		for(let ci=32;ci<128;ci++){
+			r.push(font_gwi(x,ci))
+			for(let z=0;z<gs-1;z++)r.push(font_get(font_gbi(x,ci)+z+1,x))
+		};return data_write('FNT0',r)
+	}else{
+		for(let ci=0;ci<256;ci++)if(font_gwi(x,ci)){
+			r.push(ci),r.push(font_gwi(x,ci))
+			for(let z=0;z<gs-1;z++)r.push(font_get(font_gbi(x,ci)+z+1,x))
+		};return data_write('FNT1',r)
+	}
+}
 
 rtext_empty=_=>{const r=lmt();tab_set(r,'text',[]),tab_set(r,'font',[]),tab_set(r,'arg',[]);return r}
 rtext_len=tab=>tab_get(tab,'text').reduce((x,y)=>x+ls(y).length,0)

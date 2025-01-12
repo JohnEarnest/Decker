@@ -512,7 +512,7 @@ assert_image["font copy char"
 	 (list 0,0,0,0,0,0,0,0,0,0),
 	 (list 0,0,0,0,0,0,0,0,0,0),
 	 (list 0,0,0,0,0,0,0,0,0,0))
-	f[(first "%a" parse "A")-32]
+	f.A
 ]
 
 f.size:20,18
@@ -543,9 +543,17 @@ assert["font minimum size" (1,1) f.size]
 f.size:-.3,2.9
 assert["font bogus size" (1,2) f.size]
 
-# oob accesses:
-f[96]:image[]
-f[-1]:image[]
+assert["font glyph by index" f.B.encoded f[first "%a" parse "B"].encoded]
+assert["font oob read min" image[].encoded f[ -1].encoded]
+assert["font oob read max" image[].encoded f[256].encoded]
+f[ -1]:image[]
+f[256]:image[]
+
+assert["font glyph indices basic"     (               32+range 96) f.glyphs]
+f[65]:image[]
+assert["font glyph delete with empty" ((list 65) drop 32+range 96) f.glyphs]
+f[66]:0
+assert["font glyph delete with zero"  ((  66,65) drop 32+range 96) f.glyphs]
 
 #######################################
 #
@@ -1281,6 +1289,7 @@ assert_image["read a deck: custom font glyph"
 	 (list 1,0))
 	deck.fonts.dingus["A"]
 ]
+assert["read a deck: custom sparse font" (list 65) deck.fonts.dingus.glyphs]
 assert["read a deck: custom animated pattern:" (10,20,5)                 deck.patterns[28]        ]
 assert["read a deck: custom regular pattern:"  "%%IMG0AAgACAsMDQ4PEBES"  deck.patterns[ 2].encoded]
 
@@ -1513,8 +1522,9 @@ assert["copy widgets: fonts" ("body","menu","mono","alpha","beta") (keys target.
 copied:deck.copy[s]
 target.paste[copied]
 assert["copy card: fonts"    ("body","menu","mono","alpha","beta","gamma") (keys target.fonts)]
-assert["copied font integrity" deck.fonts.beta .A.encoded target.fonts.beta .A.encoded]
-assert["copied font integrity" deck.fonts.gamma.A.encoded target.fonts.gamma.A.encoded]
+assert["copied font integrity 1" deck.fonts.beta .A.encoded target.fonts.beta .A.encoded]
+assert["copied font integrity 2" deck.fonts.gamma.A.encoded target.fonts.gamma.A.encoded]
+assert["copied font integrity 3" (list@65,65) (target.fonts@("beta","gamma"))..glyphs]
 
 #######################################
 #

@@ -61,13 +61,10 @@ The data block types used by Decker are as follows:
 	- `0`: a packed 1-bit image. Each byte represents 8 horizontally adjacent pixels. Bytes are laid out in rows, left-to-right. Images with a width that is not evenly divisible by 8 will be padded with 0 bits. This format is used for most imported images.
 	- `1`: an 8-bit image, in which each byte represents the pattern which should be used to draw one pixel. (See: _Pattern Record_.) Bytes are laid out in rows, left-to-right. This format is suitable for images containing animated patterns.
 	- `2`: a run-length encoded (RLE) 8-bit image. In each pair of bytes, the first byte indicates a pattern number (See: _Pattern Record_), and the second byte indicates the number of pixels to assign with this pattern, scanning in rows, left-to-right. RLE provides a substantially more compact lossless representation of low-complexity images without requiring a complicated encoder or decoder.
-- `FNT` a _font record_. The format is always `0`. Decker fonts define glyphs corresponding to printable ASCII including the space character (32-126; 95 glyphs total), an extra glyph representing an ellipsis (for truncating text on display), as well as some metadata to permit different font sizes and variable-width glyphs. The payload has the following structure:
-	- 1 unsigned byte: the maximum width of each glyph in the font, in pixels.
-	- 1 unsigned byte: the height of glyphs, in pixels, including all vertical padding.
-	- 1 unsigned byte: the number of horizontal pixels to advance between characters.
-	- 96 glyph records, each consisting of:
-		- 1 unsigned byte giving the _true_ width of the glyph: how many pixels to advance horizontally after drawing the glyph.
-		- `(width/8)*height` bytes of packed image data, in which each byte represents 8 horizontally adjacent pixels. Glyphs with a width that is not evenly divisible by 8 will be padded with 0 bits. Note the similarity to `IMG0`.
+- `FNT` a _font record_. Decker fonts define glyphs corresponding to character indices, as well as some metadata to permit different font sizes and variable-width glyphs. All font formats always begin with 3 unsigned bytes giving the maximum width of each glyph in the font, the height of each glyph in the font, and the number of horizontal pixels to advance between characters (character spacing). Font payloads contain _glyph records_, consisting of 1 unsigned byte giving the _true_ width of the glyph (how many pixels to advance horizontally after drawing the glyph), followed by `(width/8)*height` bytes of packed image data, in which each byte represents 8 horizontally adjacent pixels. Glyphs with a width that is not evenly divisible by 8 will be padded with 0 bits. Note the similarity to `IMG0`. The supported Font formats are:
+	- `0`: Dense Font. The payload consists of the standard font header followed by exactly 96 glyph records, corresponding to character indices 32-126 (displayable ASCII) and 127 (an ellipsis), in order of appearance.
+	- `1`: Sparse Font. The payload consists of the standard font header followed by any number of glyph records, each of which is preceded by 1 unsigned byte indicating the character index. Glyph definitions may appear in any order, and in the case of duplicates Decker will only use the last definition for any given character index.
+
 - `SND`: a _sound record_. Sound records are used for audio clips in decks, as well as sound data copied to the clipboard. The format is always `0`. The payload consists of a series of 8-bit signed 8khz PCM monophonic samples.
 - `DAT`: a _data record_. Data records are the serialized representation of Lil's _Array Interface_ and can be used for representing arbitrary binary data. The format may be any of the codes described below, which specifies the datatype of values in the array. The payload consists of a series of bytes, which will always be a multiple of the _width_ of the specified format:
 
@@ -387,3 +384,6 @@ Changelog
 1.43:
 - Introduced the `volatile` property for all widgets.
 - Introduced the `version` property for the `{module:ID}` and `{contraption:ID}` sections.
+
+1.54:
+- Introduced the `FNT1` datablock format.

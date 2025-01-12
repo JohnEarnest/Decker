@@ -997,11 +997,12 @@ Fonts are dynamically created interfaces, each representing the glyphs of a bitm
 | `typeof x`       | `"font"`                                                                                      |
 | `x.size`         | A (width,height) pair giving the maximum size of any character in the font. r/w.              |
 | `x.space`        | An integer giving the character spacing of the font in pixels. r/w.                           |
-| `x[0-95]`        | Access a copy of the glyphs of the font as Image interfaces, by ordinal index. r/w.           |
+| `x.glyphs`       | A list of integers giving the ordinal indices of populated glyphs within the font.            |
+| `x[0-255]`       | Access a copy of the glyphs of the font as Image interfaces, by ordinal index. r/w.           |
 | `x["a"]` / `x.a` | Access a copy of the glyphs of the font as Image interfaces, by single-character value. r/w.  |
 | `x.textsize[x]`  | Obtain a `size` for the outer dimensions of a string `x` when drawn in the font.              |
 
-The glyph images of a font will always have the same height as the font, and represent the true width of the glyph without padding or spacing. Writing images to glyph slots will clip the image to respect the font's `size` as a maximum. Font glyphs are strictly monochrome- they may not contain patterns or colors. Accessing an invalid glyph index (or `\n`) will return an empty image. Writes to invalid glyph indices (or `\n`) are ignored.
+The glyph images of a font will always have the same height as the font, and represent the true width of the glyph without padding or spacing. Writing images to glyph slots will clip the image to respect the font's `size` as a maximum. Font glyphs are strictly monochrome- they may not contain patterns or colors. Accessing an invalid glyph index will return an empty image. Writes to invalid glyph indices are ignored. Writing the number `0` or an Image interface with width `0` to a glyph by index or character name will remove it from the font.
 
 Decker comes with three built-in fonts:
 - `body`, a variable-width body text font.
