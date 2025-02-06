@@ -61,7 +61,7 @@ The data block types used by Decker are as follows:
 	- `0`: a packed 1-bit image. Each byte represents 8 horizontally adjacent pixels. Bytes are laid out in rows, left-to-right. Images with a width that is not evenly divisible by 8 will be padded with 0 bits. This format is used for most imported images.
 	- `1`: an 8-bit image, in which each byte represents the pattern which should be used to draw one pixel. (See: _Pattern Record_.) Bytes are laid out in rows, left-to-right. This format is suitable for images containing animated patterns.
 	- `2`: a run-length encoded (RLE) 8-bit image. In each pair of bytes, the first byte indicates a pattern number (See: _Pattern Record_), and the second byte indicates the number of pixels to assign with this pattern, scanning in rows, left-to-right. RLE provides a substantially more compact lossless representation of low-complexity images without requiring a complicated encoder or decoder.
-- `FNT` a _font record_. Decker fonts define glyphs corresponding to character indices, as well as some metadata to permit different font sizes and variable-width glyphs. All font formats always begin with 3 unsigned bytes giving the maximum width of each glyph in the font, the height of each glyph in the font, and the number of horizontal pixels to advance between characters (character spacing). Font payloads contain _glyph records_, consisting of 1 unsigned byte giving the _true_ width of the glyph (how many pixels to advance horizontally after drawing the glyph), followed by `(width/8)*height` bytes of packed image data, in which each byte represents 8 horizontally adjacent pixels. Glyphs with a width that is not evenly divisible by 8 will be padded with 0 bits. Note the similarity to `IMG0`. The supported Font formats are:
+- `FNT` a _font record_. Decker fonts define glyphs corresponding to character indices, as well as some metadata to permit different font sizes and variable-width glyphs. The character indices of font glyphs correspond to the [DeckRoman Character Encoding](#deckroman) All font formats always begin with 3 unsigned bytes giving the maximum width of each glyph in the font, the height of each glyph in the font, and the number of horizontal pixels to advance between characters (character spacing). Font payloads contain _glyph records_, consisting of 1 unsigned byte giving the _true_ width of the glyph (how many pixels to advance horizontally after drawing the glyph), followed by `(width/8)*height` bytes of packed image data, in which each byte represents 8 horizontally adjacent pixels. Glyphs with a width that is not evenly divisible by 8 will be padded with 0 bits. Note the similarity to `IMG0`. The supported Font formats are:
 	- `0`: Dense Font. The payload consists of the standard font header followed by exactly 96 glyph records, corresponding to character indices 32-126 (displayable ASCII) and 127 (an ellipsis), in order of appearance.
 	- `1`: Sparse Font. The payload consists of the standard font header followed by any number of glyph records, each of which is preceded by 1 unsigned byte indicating the character index. Glyph definitions may appear in any order, and in the case of duplicates Decker will only use the last definition for any given character index.
 
@@ -124,7 +124,7 @@ Chunks permit flexible ordering within a document, but often their relative orde
 - The order of property lines within a `{widget}` chunk is likewise the drawing order of those widgets.
 - The `{widget}` chunk describes the contents of its preceding `{card:ID}` chunk.
 
-IDs and the contents of a `{script:ID}` chunk can contain nearly any printable ASCII characters. To avoid ambiguity, the following _plain_ characters can be replaced with equivalent _escaped_ sequences of characters:
+IDs and the contents of a `{script:ID}` chunk can contain nearly any characters. To avoid ambiguity, the following _plain_ characters can be replaced with equivalent _escaped_ sequences of characters:
 
 | Plain | Escaped | Notes                                                       |
 | :---- | :------ | :---------------------------------------------------------- |
@@ -357,6 +357,52 @@ bold:"%%FNT0EA0BAgAAAAA...AAAAAAAAA"
 ...
 ```
 
+DeckRoman
+---------
+Unicode, and in particular UTF-8, is a virtually ubiquitous standard for representing text on computers. Unfortunately, it is also irreducibly complex. Full support for manipulating and rendering arbitrary Unicode text in a consistent, platform-independent fashion is well outside Decker's scope. We will therefore specify a single-byte encoding for a controlled subset of Unicode called _DeckRoman_ which Decker does support. Decker implementations and Lil interpreters _may_ use this encoding internally as a convenience, and _must_ be capable of storing, manipulating, and rendering this selection of glyphs and special characters, given appropriate font definitions.
+
+The glyphs represented by DeckRoman include the union of:
+
+- Displayable 7-bit ASCII characters
+- Letters from [Windows-1252](https://en.wikipedia.org/wiki/Windows-1252), a widespread superset of [ISO-8859-1](https://en.wikipedia.org/wiki/ISO/IEC_8859-1)
+- Letters from the [Monotype Imaging Inc. Recommended Character Set](https://foundrysupport.monotype.com/hc/en-us/articles/360029280752-Recommended-Character-Set)
+- Letters from modern Spanish, German, Polish, Portuguese, French, Hungarian, Romanian, and Māori orthographies
+- An ellipsis symbol (`…`), which Decker has included in fonts since v1.0 for displaying truncated text
+- An "unknown" symbol (`�`), which Decker uses for clearly indicating characters which cannot be displayed, such as unsupported Unicode characters or characters missing from the selected font
+- A small selection of additional punctuation marks with widespread international use and applicability
+
+Bytes in a DeckRoman string are interpreted as follows (all ranges inclusive):
+
+| Range     | Glyphs                                                                                                        | Meaning              |
+| --------: | :------------------------------------------------------------------------------------------------------------ | :------------------- |
+|     `0-9` | n/a                                                                                                           | reserved             |
+|      `10` | n/a                                                                                                           | newline              |
+|   `11-31` | n/a                                                                                                           | reserved             |
+|  `32-126` | (standard ASCII)                                                                                              |                      |
+|     `127` | `…`                                                                                                           | ellipsis             |
+| `128-234` | `ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿĀāĂăĄąĆćĒēĘęĪīıŁłŃńŌōŐőŒœŚśŠšŪūŰűŸŹźŻżŽžȘșȚțẞ` | extended letters     |
+| `235-240` | `¡¿«»€°`                                                                                                      | extended punctuation |
+| `241-254` | n/a                                                                                                           | reserved             |
+|     `255` | `�`                                                                                                           | unknown              |
+
+The complete displayable "Decker-safe" character set:
+```
+ !"#$%&'()*+,-./0123456789:;<=>?
+@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_
+`abcdefghijklmnopqrstuvwxyz{|}~…
+ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßà
+áâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿĀā
+ĂăĄąĆćĒēĘęĪīıŁłŃńŌōŐőŒœŚśŠšŪūŰűŸ
+ŹźŻżŽžȘșȚțẞ¡¿«»€°
+```
+
+Capitalization rules for accented characters match the behavior of Unicode, with the exception of `ß` being treated as the lowercase form of `ẞ`.
+
+Lil will sort characters according to their order in the above listing, which does not necessarily match any specific locale's collation rules; it is arbitrary but consistent.
+
+Decker will perform a "best-effort" conversion of unlisted Unicode characters into the DeckRoman subset upon ingestion, including straightening curly single-quotes and double-quotes; if it is unable to find an equivalent, the character will be treated as "unknown" (`�`).
+
+
 Changelog
 ---------
 1.0:
@@ -387,3 +433,4 @@ Changelog
 
 1.54:
 - Introduced the `FNT1` datablock format.
+- Introduced the "DeckRoman" character encoding.

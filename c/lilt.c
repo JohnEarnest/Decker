@@ -11,7 +11,7 @@
 
 lv*n_exit(lv*self,lv*a){(void)self;exit(ln(l_first(a)));}
 lv*n_input(lv*self,lv*a){
-	(void)self;char*line=bestline((a->c<2?ls(l_first(a)): l_format(ls(l_first(a)),l_drop(ONE,a)))->sv);
+	(void)self;char*line=bestline(drom_to_utf8(a->c<2?ls(l_first(a)): l_format(ls(l_first(a)),l_drop(ONE,a)))->sv);
 	if(!line)return NONE;lv*r=lmutf8(line);free(line);return r;
 }
 lv*n_readwav(lv*self,lv*a){
@@ -39,7 +39,7 @@ lv*n_writedeck(lv*self,lv*a){
 	lv*v=deck_write(a->c<2?NONE:a->lv[1],html);if(v->c<1)return NONE;return n_write(self,lml2(path,v));
 }
 lv*runstring(char*t,lv*env){
-	lv* prog=parse(t);if(perr())return fprintf(stderr,"(%d:%d) %s\n",par.r+1,par.c+1,par.error),NONE;
+	lv* prog=parse(t);if(perr())return fprintf(stderr,"(%d:%d) %s\n",par.r+1,par.c+1,drom_to_utf8(lmcstr(par.error))->sv),NONE;
 	return run(prog,env);
 }
 lv*runfile(char*path,lv*env){
@@ -61,7 +61,7 @@ lv* n_save (lv*self,lv*z){(void)self,(void)z;return NONE;}
 lv* n_play (lv*self,lv*z){(void)self;lv*x=l_first(z);return x;}
 lv* n_show(lv*self,lv*a){
 	(void)self;str s=str_new();EACH(z,a){if(z)str_addc(&s,' ');show(&s,a->lv[z],a->c==1);}
-	printf("%s\n",lmstr(s)->sv);return l_first(a);
+	printf("%s\n",drom_to_utf8(lmstr(s))->sv);return l_first(a);
 }
 lv*interface_app(lv*self,lv*i,lv*x){
 	if(!x&&lis(i)){
@@ -136,8 +136,8 @@ int main(int argc,char**argv){
 	while(1){
 		char*line=bestlineWithHistory(" ","lilt");
 		if (!line)break;
-		lv*prog=parse(line);free(line);
-		if(perr()){for(int z=0;z<par.c+2;z++)printf(" ");printf("^\n%s\n",par.error);}
+		lv*prog=parse(lmutf8(line)->sv);free(line);
+		if(perr()){for(int z=0;z<par.c+2;z++)printf(" ");printf("^\n%s\n",drom_to_utf8(lmcstr(par.error))->sv);}
 		else{lv*x=run(prog,env);dset(env,lmistr("_"),x);debug_show(x);}
 	}
 }

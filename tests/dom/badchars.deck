@@ -4,7 +4,7 @@ script:"0"
 
 {script:0}
 text with “double” and ‘single’ curly-quotes,
-a tab:	,
+a tab:	, an accented letter: ñ
 and a horrifying abomination:☺
 
 {end}

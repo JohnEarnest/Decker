@@ -1309,7 +1309,7 @@ x,y              # {"A":0,"B":0,"C":0} (union)
 
 Appendix 3: Language Grammar
 ----------------------------
-The following is a slightly hand-waved EBNF description of Lil's syntax. The production `ALPHA` is taken as any alphabetic character (upper- or lowercase), and the production `NON_ESC` is any ASCII character between 32 and 126 (except backslash). All whitespace is interchangeable in Lil, any amount of whitespace may appear between tokens, and line comments begin with `#`.
+The following is a slightly hand-waved EBNF description of Lil's syntax. The production `ALPHA` is taken as any alphabetic character (upper- or lowercase), and the production `NON_ESC` is any [DeckRoman](format.html#deckroman) character (except backslash). All whitespace is interchangeable in Lil, any amount of whitespace may appear between tokens, and line comments begin with `#`.
 
 ```
 MONAD   := '-'|'!'|'floor'|'cos'|'sin'|'tan'|'exp'|'ln'|'sqrt'|'count'|'first'|'last'|'sum'|'min'|'max'|

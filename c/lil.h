@@ -44,21 +44,11 @@ int* idx_peek(idx*x){if(x->c<1)printf("peek empty idx stack!\n");return &x->iv[x
 int  idx_pop (idx*x){if(x->c<1)printf("pop empty idx stack!\n");return x->iv[--(x->c)];}
 void idx_push(idx*x,int n){if(x->size<x->c+1)x->iv=realloc(x->iv,(x->size*=2)*sizeof(int));x->iv[x->c++]=n;}
 str str_new(void){return(str){0,32,calloc(32,1)};}
-char cl(char x){return x=='\t'?' ':(x>=32&&x<=126)||x=='\n'?x:'?';}
 void str_provision(str*s,int size){if(s->size<size)s->sv=realloc(s->sv,s->size=size);}
 void str_addraw(str*s,int x){if(s->c+1>=s->size)s->sv=realloc(s->sv,s->size*=2);s->sv[s->c++]=x;}
 void str_term(str*s){str_addraw(s,'\0');}
-void str_addc(str*s,char x){if(x!='\r')str_addraw(s,cl(x));}
-void str_add(str*s,char*x,int n){
-	for(int z=0;z<n;z++){unsigned char c=x[z];
-		if(c==0xE2&&(unsigned char)x[z+1]==0x80&&((unsigned char)x[z+2]==0x98||(unsigned char)x[z+2]==0x99))c='\'',z+=2;
-		if(c==0xE2&&(unsigned char)x[z+1]==0x80&&((unsigned char)x[z+2]==0x9C||(unsigned char)x[z+2]==0x9D))c='"' ,z+=2;
-		if((c&0xF0)==0xF0)c=1,z+=3; // skip 4-byte codepoints
-		if((c&0xE0)==0xE0)c=1,z+=2; // skip 3-byte codepoints
-		if((c&0xC0)==0xC0)c=1,z+=1; // skip 2-byte codepoints
-		str_addc(s,c);
-	}
-}
+void str_addc(str*s,char x){if(x!='\r')str_addraw(s,x=='\t'?' ':((0xFF&x)>=32)||x=='\n'?x:255);}
+void str_add(str*s,char*x,int n){for(int z=0;z<n;z++)str_addc(s,x[z]);}
 void str_addz(str*s,char*x){str_add(s,x,strlen(x));} // null-terminated c-string
 void str_addl(str*s,lv*x){str_add(s,x->sv,x->c);}    // counted lil string
 lv*  ll_peek(lv*x){return x->c?x->lv[x->c-1]:NULL;}
@@ -115,7 +105,6 @@ lm(env,8)(lv*p)            {lv*r=lmd();r->t=8;r->env=p;                         
 lm(nat,9)(lv*(*f)(lv*,lv*),lv*c){lv*r=lmv(9);r->f=(void*)f,r->a=c;                       return r;}
 lv* lmstr(str x){lv*r=lmv(1);str_term(&x),r->c=strlen(x.sv);r->sv=x.sv;return r;}
 lv* lmcstr(char*x){lv*r=lmv(1);r->c=strlen(x),r->sv=calloc(r->c+1,1),memcpy(r->sv,x,r->c);return r;}
-lv* lmutf8(char*x){str r=str_new();str_addz(&r,x);return lmstr(r);}
 lv* lmistr(char*x){
 	for(unsigned int z=383+1;z<intern_count;z++)if(interned[z].sv==x)return &interned[z];
 	lv*r=&interned[intern_count++];r->t=1,r->c=strlen(x),r->sv=x;
@@ -230,6 +219,127 @@ lv* torect(lv*t){ // modifies t in-place to rectangularize columns!
 	int n=0;EACH(z,t)n=MAX(n,lil(t->lv[z])?t->lv[z]->c:1);
 	t->n=n; EACH(z,t)t->lv[z]=l_take(lmn(n),lil(t->lv[z])?t->lv[z]:l_list(t->lv[z]));return t;
 }
+
+// DeckRoman character encoding
+char* DROM_INKEY[]={
+	"…","À","À","Á","Á","Â","Â","Ã","Ã","Ä","Ä","Å","Å","Æ","Ç","Ç",
+	"È","È","É","É","Ê","Ê","Ë","Ë","Ì","Ì","Í","Í","Î","Î","Ï","Ï",
+	"Ð","Ñ","Ñ","Ò","Ò","Ó","Ó","Ô","Ô","Õ","Õ","Ö","Ö","Ø","Ù","Ù",
+	"Ú","Ú","Û","Û","Ü","Ü","Ý","Ý","Þ","ß","à","à","á","á","â","â",
+	"ã","ã","ä","ä","å","å","æ","ç","ç","è","è","é","é","ê","ê","ë",
+	"ë","ì","ì","í","í","î","î","ï","ï","ð","ñ","ñ","ò","ò","ó","ó",
+	"ô","ô","õ","õ","ö","ö","ø","ù","ù","ú","ú","û","û","ü","ü","ý",
+	"ý","þ","ÿ","ÿ","Ā","Ā","ā","ā","Ă","Ă","ă","ă","Ą","Ą","ą","ą",
+	"Ć","Ć","ć","ć","Ē","Ē","ē","ē","Ę","Ę","ę","ę","Ī","Ī","ī","ī",
+	"ı","Ł","ł","Ń","Ń","ń","ń","Ō","Ō","ō","ō","Ő","Ő","ő","ő","Œ",
+	"œ","Ś","Ś","ś","ś","Š","Š","š","š","Ū","Ū","ū","ū","Ű","Ű","ű",
+	"ű","Ÿ","Ÿ","Ź","Ź","ź","ź","Ż","Ż","ż","ż","Ž","Ž","ž","ž","Ș",
+	"Ș","ș","ș","Ț","Ț","ț","ț","ẞ","¡","¿","«","»","€","°","“","”",
+	"‘","’", 0
+};
+int DROM_INVAL[]={
+	127,128,128,129,129,130,130,131,131,132,132,133,133,134,135,135,
+	136,136,137,137,138,138,139,139,140,140,141,141,142,142,143,143,
+	144,145,145,146,146,147,147,148,148,149,149,150,150,151,152,152,
+	153,153,154,154,155,155,156,156,157,158,159,159,160,160,161,161,
+	162,162,163,163,164,164,165,166,166,167,167,168,168,169,169,170,
+	170,171,171,172,172,173,173,174,174,175,176,176,177,177,178,178,
+	179,179,180,180,181,181,182,183,183,184,184,185,185,186,186,187,
+	187,188,189,189,190,190,191,191,192,192,193,193,194,194,195,195,
+	196,196,197,197,198,198,199,199,200,200,201,201,202,202,203,203,
+	204,205,206,207,207,208,208,209,209,210,210,211,211,212,212,213,
+	214,215,215,216,216,217,217,218,218,219,219,220,220,221,221,222,
+	222,223,223,224,224,225,225,226,226,227,227,228,228,229,229,230,
+	230,231,231,232,232,233,233,234,235,236,237,238,239,240, 34, 34,
+	 39, 39, 0
+};
+char* DROM_OUTPUT[256]={
+	"�","�","�","�","�","�","�","�","�","�","\n","�","�","�","�","�",
+	"�","�","�","�","�","�","�","�","�","�","�","�","�","�","�","�",
+	" ","!","\"","#","$","%","&","'","(",")","*","+",",","-",".","/",
+	"0","1","2","3","4","5","6","7","8","9",":",";","<","=",">","?",
+	"@","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O",
+	"P","Q","R","S","T","U","V","W","X","Y","Z","[","\\","]","^","_",
+	"`","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o",
+	"p","q","r","s","t","u","v","w","x","y","z","{","|","}","~","…",
+	"À","Á","Â","Ã","Ä","Å","Æ","Ç","È","É","Ê","Ë","Ì","Í","Î","Ï",
+	"Ð","Ñ","Ò","Ó","Ô","Õ","Ö","Ø","Ù","Ú","Û","Ü","Ý","Þ","ß","à",
+	"á","â","ã","ä","å","æ","ç","è","é","ê","ë","ì","í","î","ï","ð",
+	"ñ","ò","ó","ô","õ","ö","ø","ù","ú","û","ü","ý","þ","ÿ","Ā","ā",
+	"Ă","ă","Ą","ą","Ć","ć","Ē","ē","Ę","ę","Ī","ī","ı","Ł","ł","Ń",
+	"ń","Ō","ō","Ő","ő","Œ","œ","Ś","ś","Š","š","Ū","ū","Ű","ű","Ÿ",
+	"Ź","ź","Ż","ż","Ž","ž","Ș","ș","Ț","ț","ẞ","¡","¿","«","»","€",
+	"°","�","�","�","�","�","�","�","�","�","�","�","�","�","�","�",
+};
+int DROM_TOUPPER[256]={
+	255,255,255,255,255,255,255,255,255,255, 10,255,255,255,255,255,
+	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+	 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+	 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
+	 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
+	 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
+	 96, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
+	 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90,123,124,125,126,127,
+	128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,
+	144,145,146,147,148,149,150,151,152,153,154,155,156,157,234,128,
+	129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,
+	145,146,147,148,149,150,151,152,153,154,155,156,157,223,190,190,
+	192,192,194,194,196,196,198,198,200,200,202,202, 73,205,205,207,
+	207,209,209,211,211,213,213,215,215,217,217,219,219,221,221,223,
+	224,224,226,226,228,228,230,230,232,232,234,235,236,237,238,239,
+	240,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+};
+int DROM_TOLOWER[256]={
+	255,255,255,255,255,255,255,255,255,255, 10,255,255,255,255,255,
+	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+	 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+	 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
+	 64, 97, 98, 99,100,101,102,103,104,105,106,107,108,109,110,111,
+	112,113,114,115,116,117,118,119,120,121,122, 91, 92, 93, 94, 95,
+	 96, 97, 98, 99,100,101,102,103,104,105,106,107,108,109,110,111,
+	112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,
+	159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,
+	175,176,177,178,179,180,181,182,183,184,185,186,187,188,158,159,
+	160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,
+	176,177,178,179,180,181,182,183,184,185,186,187,188,189,191,191,
+	193,193,195,195,197,197,199,199,201,201,203,203,204,206,206,208,
+	208,210,210,212,212,214,214,216,216,218,218,220,220,222,222,189,
+	225,225,227,227,229,229,231,231,233,233,158,235,236,237,238,239,
+	240,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+};
+lv* drom_to_utf8(lv*x){
+	str r=str_new();x=ls(x);
+	EACH(z,x){char*o=DROM_OUTPUT[0xFF&x->sv[z]];while(*o){str_addraw(&r,*o);o++;};}
+	str_term(&r);lv*p=lmv(1);p->c=r.c-1;p->sv=r.sv;return p;
+}
+void utf8_to_drom(str*s,char*x,int n){
+	for(int z=0;z<n;z++){unsigned char c=x[z];
+		int cmb=(z+1<n)&&(0xFF&x[z+1])==0xCC; // possible combining accent
+		if     (c=='\r')continue;             // suppress windows newlines
+		else if(c=='\t')c=' ';                // resolve the tabs vs. spaces debate once and for all
+		else if(c<' '&&c!='\n'){c=255;}       // unix newlines are the only control code we respect
+		else if(c>'~'||cmb){
+			int f=0;for(int i=0;DROM_INKEY[i];i++){
+				int ln=strlen(DROM_INKEY[i]);
+				if((z+ln<=n)&&!memcmp(x+z,DROM_INKEY[i],ln)){c=DROM_INVAL[i];z+=(ln-1);f=1;break;}
+			}
+			if((!f)&&(c>'~')){ // neither recognized nor in the plain ASCII range
+				// if     ((c&0xF0)==0xF0){printf("unknown unicode [%02X %02X %02X %02X]\n",c,0xFF&x[z+1],0xFF&x[z+2],0xFF&x[z+3]);}
+				// else if((c&0xE0)==0xE0){printf("unknown unicode [%02X %02X %02X]\n"     ,c,0xFF&x[z+1],0xFF&x[z+2]            );}
+				// else if((c&0xC0)==0xC0){printf("unknown unicode [%02X %02X]\n"          ,c,0xFF&x[z+1]                        );}
+
+				if     ((c&0xF0)==0xF0)z+=3; // skip 4-byte codepoints
+				else if((c&0xE0)==0xE0)z+=2; // skip 3-byte codepoints
+				else if((c&0xC0)==0xC0)z+=1; // skip 2-byte codepoints
+				c=255;                       // any unrecognized codepoint becomes UNKNOWN
+			}
+		}
+		str_addraw(s,c);
+	}
+}
+lv* lmutf8(char*x){str r=str_new();utf8_to_drom(&r,x,strlen(x));return lmstr(r);}
+char drom_toupper(char c){return DROM_TOUPPER[0xFF&c];}
+char drom_tolower(char c){return DROM_TOLOWER[0xFF&c];}
 
 // Primitives
 dyad(l_format);
@@ -449,7 +559,7 @@ dyad(l_parse){
 	if(lil(y)){MAP(r,y)l_parse(x,y->lv[z]);return r;}
 	#define hc y->sv[h]
 	#define hn m&&hc&&(n?h-si<n:1)
-	#define ulc(x) t=='l'?tolower(x):t=='u'?toupper(x):x
+	#define ulc(x) t=='l'?drom_tolower(x):t=='u'?drom_toupper(x):x
 	x=ls(x),y=ls(y);int f=0,h=0,m=1,pi=0,named=format_has_names(x);lv*r=named?lmd():lml(0);while(fc){
 		if(fc!='%'){if(m&&fc==hc){h++;}else{m=0;}f++;continue;}f++;
 		str nk={0};if(fc=='['){f++;nk=str_new();while(fc&&fc!=']')str_addc(&nk,fc),f++;if(fc==']')f++;}
@@ -462,9 +572,9 @@ dyad(l_parse){
 		else if(t=='n')v=lmn(h);
 		else if(t=='z')v=m&&h==y->c?ONE:NONE;
 		else if(t=='i'){long long r=0,s=hc=='-'?(h++,-1):1;m&=!!isdigit(hc);while(hn&&isdigit(hc))r=r*10+hc-'0',h++;v=lmn(r*s);}
-		else if(t=='h'||t=='H'){long long r=0;m&=!!isxdigit(hc);while(hn&&isxdigit(hc))r=r*16+(hc>'9'?tolower(hc)-'a'+10:hc-'0'),h++;v=lmn(r);}
+		else if(t=='h'||t=='H'){long long r=0;m&=!!isxdigit(hc);while(hn&&isxdigit(hc))r=r*16+(hc>'9'?drom_tolower(hc)-'a'+10:hc-'0'),h++;v=lmn(r);}
 		else if(strchr("slu",t)){str r=str_new();while(hn&&(n?1:hc!=fc))str_addc(&r,ulc(hc)),h++;v=lmstr(r);}
-		else if(t=='a'){v=lml(0);while(hn&&(n?1:hc!=fc))ll_add(v,lmn(hc)),h++;}
+		else if(t=='a'){v=lml(0);while(hn&&(n?1:hc!=fc))ll_add(v,lmn(0xFF&hc)),h++;}
 		else if(t=='b'){v=strchr("tTyYx1",hc)?ONE:NONE;while(hn&&n?1:hc!=fc)h++;}
 		else if(t=='j'){int f=1,c=n?n:y->c;v=m?pjson(y->sv,&h,&f,&c):NONE;}
 		else if(t=='J'){int f=1,c=n?n:y->c;v=m?plove(y->sv,&h,&f,&c):NONE;}
@@ -1135,10 +1245,10 @@ void show(str*s,lv*x,int toplevel){
 	else if(liblk(x)){char t[64];str_add(s,t,snprintf(t,sizeof(t),"<BLOCK: %d OPS, %d LOCALS>",blk_here(x),x->c));}
 	else{char t[64];str_add(s,t,snprintf(t,sizeof(t),"<INVALID: %d>",x->t));}
 }
-lv*debug_show(lv*x){str s=str_new();show(&s,x,1);printf("%s\n",lmstr(s)->sv);return x;}
+lv*debug_show(lv*x){str s=str_new();show(&s,x,1);printf("%s\n",drom_to_utf8(lmstr(s))->sv);return x;}
 lv*n_printf(lv*a,int newline,FILE*out){
-	if(a->c<2){fprintf(out,"%s",ls(l_first(a))->sv);}
-	else{a=l_format(ls(l_first(a)),l_drop(ONE,a));fprintf(out,"%s",a->sv);}
+	if(a->c<2){fprintf(out,"%s",drom_to_utf8(l_first(a))->sv);}
+	else{a=l_format(ls(l_first(a)),l_drop(ONE,a));fprintf(out,"%s",drom_to_utf8(a)->sv);}
 	if(newline)fprintf(out,"\n");return a;
 }
 #define fchar(x) (x=='I'?'i': x=='B'?'b': x=='L'?'s': x)
@@ -1215,7 +1325,7 @@ lv*readxmltext(char*t,int*i,char stop){
 	}if(strchr("'\"",stop)&&t[*i])++*i;return lmstr(r);
 }
 lv*readxmlname(char*t,int*i){
-	str r=str_new();xs;while(!strchr(">/= \n\0",t[*i]))str_addc(&r,tolower(t[(*i)++]));xs;return lmstr(r);
+	str r=str_new();xs;while(!strchr(">/= \n\0",t[*i]))str_addc(&r,drom_tolower(t[(*i)++]));xs;return lmstr(r);
 }
 lv*readxmlrec(char*t,int*i,char*currtag){
 	#define xcl   while(t[*i]&&t[*i]!='>')++*i;++*i;

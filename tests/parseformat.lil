@@ -25,13 +25,14 @@ show["%*f%n,%*f%n%m"  parse ".3,1.2"                ] # skip floats
 show["%s,%s,%s"       parse "one,two,three"         ] # basics
 show["%3s%10s"        parse "ABCDE"                 ] # fixed-width
 show["%a"             parse "ABCDE"                 ] # ascii decode
+show["%a"             parse "ñÑ!"                   ] # DeckRoman extended ascii decode
 show["%3a"            parse 97                      ] # ascii decode w/ length
 show["%1a"            parse 97                      ] # ascii decode w/ length (trunc)
 show["%b,%b,%b"       parse "true,false,yes"        ] # booleans
 show["%*s,%s,%*s"     parse "one,two,three"         ] # skip strings
 # case conversion
-show["%u,%u,%u"       parse "one,Two,THREE"         ] # to uppercase
-show["%l,%l,%l"       parse "one,Two,THREE"         ] # to lowercase
+show["%u,%u,%u,%u"    parse "one,Two,THREE,ßẞñÑ"    ] # to uppercase
+show["%l,%l,%l,%l"    parse "one,Two,THREE,ßẞñÑ"    ] # to lowercase
 # quoted
 show["%q"             parse "\"str\\n\""            ] # basics
 show["%q%m"           parse "\"str"                 ] # unterminated
@@ -79,10 +80,12 @@ show["%c,%.3c"        format 3.5,-93.99             ] # currency
 show["%C,%.3C"        format 3.5,-93.99             ] # plain currency
 show["%s [%s]"        format "one","two"            ] # strings
 show["%l:%u"          format "One","Two"            ] # case conversion
+show["%l:%u"          format "Pięćßẞ","Sześćßẞ"     ] # case conversion with accents
 show["%-2.2rAB%2r!%r!"format "one","b","anylength"  ] # char class
 show["%-2.2oAB%2o!%o!"format "one","b","anylength"  ] # char class
 show["%a"             format list 65,66,67          ] # ascii chars
-show["%a"             format list 65,10,127,-5,67   ] # invalid ascii chars become '?'
+show["%a"             format list 176,145,33        ] # DeckRoman extended ascii chars
+show["%a"             format list 65,10,250,-5,67   ] # invalid DeckRoman chars become '�'
 show["%2.2a"          format list 65,66,67          ] # fit ascii chars (trunc)
 show["%2a"            format list 65                ] # fit ascii chars (extend)
 show["%a"             format 65                     ] # widen scalar to ascii list if needed
@@ -184,6 +187,9 @@ show["%J" parse "{[11,22]:'one',[33,44]:'two'}"                     ]
 show["%J" parse "<'a':[11,33],'b':[22,44]>"                         ]
 show[("%J" parse "[%%IMG0AAMABAAAAAA=,%%IMG0AAMABAAAAAA=]")..encoded]
 
+print["deckroman:"]
+show["%a" format list range 256]
+show["%a" parse "…ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿĀāĂăĄąĆćĒēĘęĪīıŁłŃńŌōŐőŒœŚśŠšŪūŰűŸŹźŻżŽžȘșȚțẞ"]
 
 print["recursive:"]
 show[()                            format (11,"two")                     ] # identity

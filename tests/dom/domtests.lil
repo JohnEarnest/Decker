@@ -65,11 +65,15 @@ f:read["tests/dom/bom.txt"]
 assert["read text files with a UTF-8 BOM" "Some ASCII contents after the bom!" f]
 assert["correct string length given BOM" 34 (count f)]
 
-r:"text with \"double\" and 'single' curly-quotes,\na tab: ,\nand a horrifying abomination:?\n"
+r:"text with \"double\" and 'single' curly-quotes,\na tab: , an accented letter: ñ\nand a horrifying abomination:�\n"
 f:read["tests/dom/quotes.txt"]
 assert["read text files with illegal characters" r f]
 d:readdeck["tests/dom/badchars.deck"]
 assert["read deck with illegal characters in a script" r d.script]
+
+r:"%a" format list 127+range 114
+f:read["tests/dom/decomposed.txt"]
+assert["read text files with decomposed unicode accents" r f]
 
 d:readdeck["tests/dom/barenums.deck"]
 assert["read deck with non-sequential numeric card names:keys" ("0","55","2") (keys d.cards)]

@@ -14,8 +14,16 @@ lmenv=p      =>{allocs++;const r={t:'env',v:new Map(),p:p};r.local=(n,x)=>env_lo
 
 NONE=lmn(0), ONE=lmn(1), seed=0x12345, max=Math.max, min=Math.min, abs=Math.abs
 ISODATE=lms('%04i-%02i-%02iT%02i:%02i:%02iZ%n%m'), PARTS=['year','month','day','hour','minute','second'].map(lms)
-clchar=x=>{const c=x.charCodeAt(0);return x=='\t'?' ':(c>=32&&c<=126)||(x=='\n')?x:'?'}
-clchars=x=>x.replace(/\r/g,'').replace(/\t/g,' ').replace(/[\u201C\u201D]/g,'"').replace(/[\u2018\u2019]/g,"'").replace(/[^ -~\n]/g,'?')
+drom_toupper=x=>x.replace(/([ßẞ])|([^ßẞ])/g,(_,s,e)=>s?'ẞ': e.toUpperCase())
+drom_tolower=x=>x.replace(/([ßẞ])|([^ßẞ])/g,(_,s,e)=>s?'ß': e.toLowerCase())
+clchars=x=>x.normalize("NFC").replace(
+	/^(\r)|(\t)|([‘’])|([“”])|([^\x20-\x7D\n…ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿĀāĂăĄąĆćĒēĘęĪīıŁłŃńŌōŐőŒœŚśŠšŪūŰűŸŹźŻżŽžȘșȚțẞ¡¿«»€°]$)/gm,
+	(_,r,t,sq,dq)=>r?'': t?' ': sq?`'`: dq?`"`: '�'
+)
+drom_chars=`…ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿĀāĂăĄąĆćĒēĘęĪīıŁłŃńŌōŐőŒœŚśŠšŪūŰűŸŹźŻżŽžȘșȚțẞ¡¿«»€°`.split('')
+drom_idx=drom_chars.reduce((a,c,i)=>(a.set(c.charCodeAt(0),127+i),a),new Map())
+drom_to_ord=x=>{const i=x.charCodeAt(0);return i==10||(i>=32&&i<=126)?i: drom_idx.get(i)||255}
+drom_from_ord=x=>x==9?' ': x==10?'\n': x==13?'': (x>=32&&x<=126)?String.fromCharCode(x): (x>=127&&x<=240)?drom_chars[x-127]: '�'
 wnum=y=>{
 	let w='',d='',s=y<0?(y=-y,'-'):'',i=Math.floor(y);y=Math.round((y-Math.floor(y))*1000000);if(y>=1000000)i++
 	while(i>0){w=(0|i%10)+w,i=i/10}for(let z=0;z<6;z++){d=(0|y%10)+d,y=y/10}
@@ -267,8 +275,8 @@ dyad={
 			else if(t=='m'){v=m?ONE:NONE}
 			else if(t=='n'){v=lmn(h)}
 			else if(t=='z'){v=m&&h==y.length?ONE:NONE}
-			else if(t=='s'||t=='l'||t=='u'){v=lms('');while(hn()&&(n?1:y[h]!=x[f]))v.v+=y[h++];if(t=='l')v.v=v.v.toLowerCase();if(t=='u')v.v=v.v.toUpperCase()}
-			else if(t=='a'){v=lml([]);while(hn()&&(n?1:y[h]!=x[f]))v.v.push(lmn(y[h++].charCodeAt(0)))}
+			else if(t=='s'||t=='l'||t=='u'){v=lms('');while(hn()&&(n?1:y[h]!=x[f]))v.v+=y[h++];if(t=='l')v.v=drom_tolower(v.v);if(t=='u')v.v=drom_toupper(v.v)}
+			else if(t=='a'){v=lml([]);while(hn()&&(n?1:y[h]!=x[f]))v.v.push(lmn(drom_to_ord(y[h++])))}
 			else if(t=='b'){v=/[tTyYx1]/.test(y[h])?ONE:NONE;while(hn()&&(n?1:y[h]!=x[f]))h++}
 			else if(t=='i'){v=lmn(0);const s=(y[h]=='-')?(h++,-1):1;m&=id(y[h]);while(hn()&&id(y[h]))v.v=v.v*10+(+y[h++]);v.v*=s}
 			else if(t=='h'||t=='H'){v=lmn(0),                       m&=ix();    while(hn()&&ix())v.v=v.v*16+parseInt(y[h++],16)}
@@ -313,10 +321,10 @@ dyad={
 			a=t=='%'?NONE: named?(an?an:a): (!sk&&h<count(y))?y.v[h]:a;if(t!='%'&&!sk)h++
 			if     (t=='%'){o='%'}
 			else if(t=='s'||t=='v'){o=ls(a)}
-			else if(t=='l'){o=ls(a).toLowerCase()}
-			else if(t=='u'){o=ls(a).toUpperCase()}
+			else if(t=='l'){o=drom_tolower(ls(a))}
+			else if(t=='u'){o=drom_toupper(ls(a))}
 			else if(t=='r'||t=='o'){o=ls(a),lf=1;d=max(1,d);while(d&&x[f])d--,f++;d=n;}
-			else if(t=='a'){o=ll(a).map(x=>clchar(String.fromCharCode(ln(x)))).join('')}
+			else if(t=='a'){o=ll(a).map(x=>drom_from_ord(ln(x))).join('')}
 			else if(t=='b'){o=lb(a)?'true':'false'}
 			else if(t=='f'){o=d?ln(a).toFixed(min(100,d)):wnum(ln(a))}
 			else if(t=='c'){const v=ln(a);o=(v<0?'-':'')+'$'+abs(v).toFixed(min(100,d)||2)}
@@ -497,7 +505,7 @@ parse=text=>{
 		if(cc==' '||cc==undefined)er(`Invalid character '${x}'.`)
 		if(x=='-'&&w&&tcc[(text[i]||'').charCodeAt(0)-32]=='d')return nn(nc(),r,c,v,-1)
 		if(cc=='n'){let v=x; while(ncc[(text[i]||' ').charCodeAt(0)-32]=='n')v+=nc();return {t:'name',v,r:tr,c:tc}}
-		if(cc=='"'){let v='',c;while(i<text.length&&(c=nc())!='"')v+=(c=='\\'?ne():clchar(c));return{t:'string',v,r:tr,c:tc}}
+		if(cc=='"'){let v='',c;while(i<text.length&&(c=nc())!='"')v+=(c=='\\'?ne():clchars(c));return{t:'string',v,r:tr,c:tc}}
 		return cc=='s'?{t:'symbol',v:x,r:tr,c:tc}: cc=='d'?nn(x,tr,tc,v,1):{t:x,r:tr,c:tc}
 	}
 	const peek=_=>{if(!tq)tq=tok();return tq}
@@ -1409,10 +1417,10 @@ array_make=(size,cast,base,buffer)=>{
 		if(a.cast=='u32l')return u32(ur(3,23),ur(2,16),ur(1,8),ur(0,0))
 		if(a.cast=='i32b')return    (ur(0,24)|ur(1,16)|ur(2,8)|ur(3,0))
 		if(a.cast=='i32l')return    (ur(3,24)|ur(2,16)|ur(1,8)|ur(0,0))
-		return String.fromCharCode(ur(0,0))
+		return drom_from_ord(ur(0,0))
 	}
 	const set_raw=(a,index,v)=>{
-		if('string'==typeof v)v=v.charCodeAt(0)
+		if('string'==typeof v)v=drom_to_ord(v)
 		const step=casts[a.cast];if(index<0||index>=(0|(a.size/step)))return
 		const ix=a.base+step*index;if(ix<0||ix+step>a.data.length)return
 		const uw=(i,s)=>a.data[ix+i]=v>>>s
@@ -1426,8 +1434,8 @@ array_make=(size,cast,base,buffer)=>{
 		if(a.cast=='char'&&len<0)len=1
 		if(a.cast=='char'){
 			const t=a.cast;a.cast='u8';
-			const r=(new TextDecoder('utf-8')).decode(new Uint8Array(range(len).map(x=>get_raw(a,index+x))))
-			return a.cast=t,lms(clchars(r))
+			const r=range(len).map(x=>drom_from_ord(get_raw(a,index+x))).join('')
+			return a.cast=t,lms(r)
 		}
 		return len<0?lmn(get_raw(a,index)): lml(range(len).map(x=>lmn(get_raw(a,index+x))))
 	}

@@ -72,11 +72,7 @@ assert["array string read" "ABCD" a[0,4]]
 a.cast:"i8"
 a[0,4]:(0,10,65,13)
 a.cast:"char"
-assert["array read denormal chars" "?\nA" a[0,4]]
-a.cast:"u8"
-a[0,4]:(226,128,156,65)
-a.cast:"char"
-assert["array read utf-surrogate" "\"A" a[0,4]]
+assert["array read denormal chars" "�\nA" a[0,4]]
 
 a:array[2 "i16l"]
 a[0,2]:"AB"

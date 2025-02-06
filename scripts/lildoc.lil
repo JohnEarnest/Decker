@@ -319,7 +319,7 @@ if !0~args
   if (!src)|(!dst) error["usage: ./lildoc.lil INPUT.md OUTPUT.html"] exit[1] end
   file:read[src]
   if !count file error["unable to read %s!" src] exit[1] end
-  result:("<style>%s</style>\n" format styles),markdown[file]
+  result:("<meta charset=\"utf-8\"/>\n<style>%s</style>\n" format styles),markdown[file]
   r:write[dst result]
   if !r error["unable to write to %s!" dst] end
 end

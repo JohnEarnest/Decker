@@ -252,8 +252,8 @@ lv* fire_attr_sync(lv*target,char*prefix,lv*name,lv*arg){
 lv*interface_widget(lv*self,lv*i,lv*x); // forward reference
 int gcd(int x,int y){while(x!=y){if(x>y){x-=y;}else{y-=x;}}return x;}
 int lcm(int x,int y){int r=gcd(x,y);return (x*y)/(r?r:1);}
-int has_prefix(char*x,char*px){for(int z=0;px[z];z++)if(px[z]!=tolower(x[z]))return 0;return 1;}
-int has_suffix(char*x,char*sx){int a=strlen(x),b=strlen(sx);if(b>a)return 0;for(int z=0;z<b;z++)if(sx[z]!=tolower(x[a-b+z]))return 0;return 1;}
+int has_prefix(char*x,char*px){for(int z=0;px[z];z++)if(px[z]!=drom_tolower(x[z]))return 0;return 1;}
+int has_suffix(char*x,char*sx){int a=strlen(x),b=strlen(sx);if(b>a)return 0;for(int z=0;z<b;z++)if(sx[z]!=drom_tolower(x[a-b+z]))return 0;return 1;}
 int read2(char*src,int off){int a=0xFF&src[off],b=0xFF&src[off+1];return (a<<8)|b;}
 lv* lmpair(pair x){return lml2(lmn(x.x),lmn(x.y));}
 lv* lmfpair(fpair x){return lml2(lmn(x.x),lmn(x.y));}
@@ -1232,7 +1232,7 @@ lv* array_get(array a,int index,int len){
 	if(a.cast==10){
 		str r=str_new(),s=str_new();a.cast=0;str_provision(&r,len),str_provision(&s,len);
 		for(int z=0;z<len;z++)str_addraw(&r,array_get_raw(a,index+z));
-		str_add(&s,r.sv,len),lmstr(r),a.cast=10;return lmstr(s);
+		utf8_to_drom(&s,r.sv,len);lmstr(r),a.cast=10;return lmstr(s);
 	}
 	if(len<0)return lmn(array_get_raw(a,index));GEN(r,len)lmn(array_get_raw(a,index+z));return r;
 }
@@ -1569,7 +1569,7 @@ button unpack_button(lv*x){
 		ifield(x,"shortcut")->sv[0],
 	};
 }
-lv* normalize_shortcut(lv*x){char c=tolower(ls(x)->sv[0]);if((c>='0'&&c<='9')||(c>='a'&&c<='z')||c==' '){lv*r=lms(1);r->sv[0]=c;return r;}return lms(0);}
+lv* normalize_shortcut(lv*x){char c=drom_tolower(ls(x)->sv[0]);if((c>='0'&&c<='9')||(c>='a'&&c<='z')||c==' '){lv*r=lms(1);r->sv[0]=c;return r;}return lms(0);}
 lv* interface_button(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return NONE;
 	if(x){
@@ -1671,7 +1671,7 @@ lv* rtext_cast(lv*x){
 	}return torect(r);
 }
 lv* rtext_splice(lv*table,lv*font,lv*arg,char*text,pair cursor,pair*endcursor){
-	int a=MIN(cursor.x,cursor.y),b=MAX(cursor.x,cursor.y); lv*r=rtext_cast(NULL),*t=lmutf8(text);
+	int a=MIN(cursor.x,cursor.y),b=MAX(cursor.x,cursor.y); lv*r=rtext_cast(NULL),*t=lmcstr(text);
 	rtext_appendr(r,rtext_span(table,(pair){0,a}));
 	rtext_append (r,t,font,arg);
 	rtext_appendr(r,rtext_span(table,(pair){b,RTEXT_END}));
@@ -1716,8 +1716,8 @@ lv*n_rtext_replace(lv*self,lv*z){
 	pair c={0,0};while(c.y<text->c){
 		int any=0;EACH(ki,k){
 			lv*key=k->lv[ki],*val=v->lv[ki];int f=1;
-			if(nocase){EACH(i,key)if(tolower(text->sv[c.y+i])!=tolower(key->sv[i])){f=0;break;}}
-			else      {EACH(i,key)if(        text->sv[c.y+i] !=        key->sv[i] ){f=0;break;}}
+			if(nocase){EACH(i,key)if(drom_tolower(text->sv[c.y+i])!=drom_tolower(key->sv[i])){f=0;break;}}
+			else      {EACH(i,key)if(             text->sv[c.y+i] !=             key->sv[i] ){f=0;break;}}
 			if(f){if(c.x!=c.y)ll_add(r,rtext_span(t,c));ll_add(r,val);c.x=c.y=(c.y+key->c),any=1;}
 		}if(!any)c.y++;
 	}if(c.x<text->c)ll_add(r,rtext_span(t,(pair){c.x,RTEXT_END}));return n_rtext_cat(self,r);
@@ -1729,8 +1729,8 @@ lv*n_rtext_find(lv*self,lv*z){
 	for(int x=0;x<text->c;){
 		int any=0;EACH(ki,k){
 			lv*key=k->lv[ki];int f=1;
-			if(nocase){EACH(i,key)if(tolower(text->sv[x+i])!=tolower(key->sv[i])){f=0;break;}}
-			else      {EACH(i,key)if(        text->sv[x+i] !=        key->sv[i] ){f=0;break;}}
+			if(nocase){EACH(i,key)if(drom_tolower(text->sv[x+i])!=drom_tolower(key->sv[i])){f=0;break;}}
+			else      {EACH(i,key)if(             text->sv[x+i] !=             key->sv[i] ){f=0;break;}}
 			if(f){ll_add(r,lml2(lmn(x),lmn(x+key->c)));x+=MAX(1,key->c);any=1;break;}
 		}if(!any)x++;
 	}return r;
@@ -2917,7 +2917,7 @@ char* writewav(lv*data,int*len){
 #include <sys/stat.h>
 #endif
 lv* n_readgif(lv*self,lv*a){
-	(void)self;lv*name=ls(l_first(a));lv*hint=a->c>1?ls(a->lv[1]):lmistr("color");
+	(void)self;lv*name=drom_to_utf8(l_first(a));lv*hint=a->c>1?ls(a->lv[1]):lmistr("color");
 	int gray=!strcmp("gray",hint->sv)||!strcmp("gray_frames",hint->sv);
 	int frames=!strcmp("frames",hint->sv)||!strcmp("gray_frames",hint->sv);
 	struct stat st;if(stat(name->sv,&st)||st.st_size<13)return frames?empty_frames():image_empty();
@@ -2933,29 +2933,31 @@ char* n_writegif_raw(lv*a,int*len){
 	if(i->c<1)return NULL;return writegif(i,d,len);
 }
 lv* n_writegif(lv*self,lv*a){
-	(void)self;lv*name=ls(l_first(a));int len=0;char*data=n_writegif_raw(a,&len);if(!data)return NONE;
+	(void)self;lv*name=drom_to_utf8(l_first(a));int len=0;char*data=n_writegif_raw(a,&len);if(!data)return NONE;
 	FILE*f=fopen(name->sv,"wb");if(f)fwrite(data,1,len,f),fclose(f);free(data);return f?ONE:NONE;
 }
 lv* n_writewav(lv*self,lv*a){
-	(void)self;lv*name=ls(l_first(a));if(a->c<2||!sound_is(a->lv[1]))return NONE;
+	(void)self;lv*name=drom_to_utf8(l_first(a));if(a->c<2||!sound_is(a->lv[1]))return NONE;
 	int len=0;char*data=writewav(a->lv[1]->b,&len);
 	FILE*f=fopen(name->sv,"wb");if(f)fwrite(data,1,len,f),fclose(f);free(data);return f?ONE:NONE;
 }
 lv* readbin(lv*path){
-	struct stat st;if(stat(path->sv,&st))return array_make(0,0,0,lms(0));FILE*f=fopen(path->sv,"rb");
+	struct stat st;path=drom_to_utf8(path);if(stat(path->sv,&st))return array_make(0,0,0,lms(0));FILE*f=fopen(path->sv,"rb");
 	lv*r=lms(st.st_size);if(fread(r->sv,1,r->c,f)!=(unsigned)r->c){fclose(f);return array_make(0,0,0,lms(0));}
 	fclose(f);return array_make(st.st_size,0,0,r);
 }
 lv* n_read(lv*self,lv*a){
-	(void)self;a=ls(l_first(a));struct stat st;if(stat(a->sv,&st)){return lms(0);}FILE*f=fopen(a->sv,"rb");
+	(void)self;a=drom_to_utf8(l_first(a));struct stat st;if(stat(a->sv,&st)){return lms(0);}FILE*f=fopen(a->sv,"rb");
 	char head[]={0,0,0},ref[]={0xEF,0xBB,0xBF};if(fread(head,1,sizeof(head),f)!=sizeof(head)){fclose(f);return lms(0);}
 	int bom=memcmp(head,ref,sizeof(head))==0; // UTF-8 BOM
 	lv*r=lms(st.st_size-(bom?3:0));fseek(f,bom?3:0,SEEK_SET);if(fread(r->sv,1,r->c,f)!=(unsigned)r->c){fclose(f);return lms(0);}
-	fclose(f);str rr=str_new();str_addz(&rr,r->sv);return lmstr(rr); // clean invalid chars, including \r
+	fclose(f);return lmutf8(r->sv);
 }
-lv* writebin(lv*path,lv*x){array a=unpack_array(x);FILE*f=fopen(path->sv,"wb");if(f)fwrite(a.data->sv,1,a.data->c,f),fclose(f);return f?ONE:NONE;}
+lv* writebin(lv*path,lv*x){
+	array a=unpack_array(x);FILE*f=fopen(drom_to_utf8(path)->sv,"wb");if(f)fwrite(a.data->sv,1,a.data->c,f),fclose(f);return f?ONE:NONE;
+}
 lv* n_write(lv*self,lv*a){
-	(void)self;lv*x=a->c>0?ls(a->lv[0]):lms(0),*y=a->c>1?ls(a->lv[1]):lms(0);
+	(void)self;lv*x=a->c>0?drom_to_utf8(a->lv[0]):lms(0),*y=a->c>1?drom_to_utf8(a->lv[1]):lms(0);
 	FILE*f=fopen(x->sv,"w");if(f)fwrite(y->sv,1,y->c,f),fclose(f);return f?ONE:NONE;
 }
 lv* idecode(lv*x){
@@ -3052,6 +3054,7 @@ int directory_sort(const void*a,const void*b){
 	return strcmp(ia->name,ib->name); // sort alphabetically asc by name
 }
 lv* directory_enumerate(char*root,int filter,int type){
+	root=drom_to_utf8(lmcstr(root))->sv;
 	directory_fetch(root,filter);
 	qsort(directory,directory_count,sizeof(dir_item),directory_sort);
 	lv*r=lmt(),*d=lml(directory_count),*n=lml(directory_count);
@@ -3071,14 +3074,14 @@ void directory_cat(char*x,char*a,char*b){if(strlen(a)==0){snprintf(x,PATH_MAX,"%
 void directory_child(char*x,char*name){char t[PATH_MAX];directory_cat(t,x,name);snprintf(x,PATH_MAX,"%s",t);}
 int directory_has_parent(char*x){return strcmp(x,SEPARATOR)!=0&&strlen(x)>0;}
 char* directory_last(char*x){int r=strlen(x);while(r&&x[r-1]!=SEPARATOR[0])r--;return x+r;}
-int directory_exists(char*x){struct stat st;return stat(x,&st)?0:1;}
+int directory_exists(lv*x){struct stat st;return stat(drom_to_utf8(x)->sv,&st)?0:1;}
 
 // Danger : nonportable, potentially hazardous IO
 
 lv*env_enumerate(void){
 	char**env=os_env_list();lv*r=lmd();for(int z=0;env[z];z++){
 		int i=0;while(env[z][i]&&env[z][i]!='=')i++;
-		str k=str_new();str_add(&k,env[z],i);dset(r,lmstr(k),lmutf8(env[z]+i+1));
+		str k=str_new();utf8_to_drom(&k,env[z],i);dset(r,lmstr(k),lmutf8(env[z]+i+1));
 	}return r;
 }
 lv*n_dir(lv*self,lv*a){
@@ -3090,17 +3093,17 @@ lv*n_dir(lv*self,lv*a){
 #include <sys/wait.h>
 #endif
 lv*n_shell(lv*self,lv*a){
-	(void)self;lv*x=ls(l_first(a)),*r=lmd();FILE*child=popen(x->sv,"r");str o=str_new();
+	(void)self;lv*x=drom_to_utf8(l_first(a)),*r=lmd();FILE*child=popen(x->sv,"r");str o=str_new();
 	while(1){int c=fgetc(child);if(feof(child))break;str_addraw(&o,c);}int e=pclose(child);lv*os=lmstr(o);
 	return dset(r,lmistr("out"),lmutf8(os->sv)),dset(r,lmistr("exit"),lmn(WIFEXITED(e)?WEXITSTATUS(e): -1)),r;
 }
 #endif
 lv*n_path(lv*self,lv*a){
 	(void)self;char t[PATH_MAX]={0},t2[PATH_MAX]={0};
-	if     (a->c==1){directory_normalize(t2,ls(a->lv[0])->sv);}
-	else if(a->c==2&&!strcmp(ls(a->lv[1])->sv,"..")){directory_normalize(t2,ls(a->lv[0])->sv),directory_parent(t2);}
-	else if(a->c==2&&!strcmp(ls(a->lv[0])->sv,""  )){directory_normalize(t2,ls(a->lv[1])->sv);}
-	else if(a->c==2){directory_cat(t,ls(a->lv[0])->sv,ls(a->lv[1])->sv),directory_normalize(t2,t);}
+	if     (a->c==1){directory_normalize(t2,drom_to_utf8(a->lv[0])->sv);}
+	else if(a->c==2&&!strcmp(drom_to_utf8(a->lv[1])->sv,"..")){directory_normalize(t2,drom_to_utf8(a->lv[0])->sv),directory_parent(t2);}
+	else if(a->c==2&&!strcmp(drom_to_utf8(a->lv[0])->sv,""  )){directory_normalize(t2,drom_to_utf8(a->lv[1])->sv);}
+	else if(a->c==2){directory_cat(t,drom_to_utf8(a->lv[0])->sv,drom_to_utf8(a->lv[1])->sv),directory_normalize(t2,t);}
 	return lmutf8(t2);
 }
 lv*n_writefile(lv*self,lv*a){

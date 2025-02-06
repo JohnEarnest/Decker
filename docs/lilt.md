@@ -8,7 +8,7 @@ Installation
 ------------
 The source code for Lilt is available [On GitHub](https://github.com/JohnEarnest/Decker).
 
-Lilt depends upon the C standard library and some POSIX extensions. It should work on OSX or most Linux distros. To build and install Lilt, run the included `make` script. By default, a binary is installed in `/usr/local/bin`.
+Lilt depends upon the C standard library and some POSIX extensions. It should work on MacOS, BSD, or most Linux distros. To build and install Lilt, run the included `make` script. By default, a binary is installed in `/usr/local/bin`.
 ```
 make lilt && make install
 ```
@@ -109,7 +109,7 @@ Built-in Functions
 - if the `hint` argument is the string `"array"`, the file will be read as an _array interface_ with a default `cast` of `u8`.
 - `.gif` files are read as _image interfaces_ (or a dictionary containing _image interfaces_, as noted below).
 - `.wav` files are read as _sound interfaces_.
-- anything else is treated as a UTF-8 text file and read as a string. A Byte-Order Mark, if present, is skipped. ASCII `\r` (Carriage-Return) characters are removed, tabs become a single space, "smart-quotes" are straightened, and anything else outside the range of valid Lil characters becomes a question mark (`?`).
+- anything else is treated as a UTF-8 text file and read as a string. A Byte-Order Mark, if present, is skipped. ASCII `\r` (Carriage-Return) characters are removed, tabs become a single space, "smart-quotes" are straightened, and anything else outside the range of valid Lil characters becomes `�`.
 
 There are several possible `hint` arguments to control the interpretation of colors in an image:
 
