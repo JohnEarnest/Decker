@@ -140,8 +140,8 @@ pjson=(y,h,n)=>{
 		const t={null:NONE,false:NONE,true:ONE};for(let k in t)if(hnn(k.length)&&y.slice(h,h+k.length)==k)return h+=k.length,t[k]
 		if(jm('[')){const r=lml([]);while(f&&hn()){ws();if(jm(']'))break;r.v.push(rec()),ws(),jm(',')}return r}
 		if(jm('{')){const r=lmd();while(f&&hn()){ws();if(jm('}'))break;const k=rec();ws(),jm(':'),ws();if(f)dset(r,k,rec());ws(),jm(',')}return r}
-		if(jm('"')){let r='';while(f&&hn()&&!jm('"'))r+=hnn(2)&&jm('\\')?esc(y[h++]):y[h++];return lms(r)}
-		if(jm("'")){let r='';while(f&&hn()&&!jm("'"))r+=hnn(2)&&jm('\\')?esc(y[h++]):y[h++];return lms(r)}
+		if(jm('"')){let r='';while(f&&hn()&&!jm('"'))r+=hnn(2)&&jm('\\')?esc(y[h++]):y[h++];return lms(clchars(r))}
+		if(jm("'")){let r='';while(f&&hn()&&!jm("'"))r+=hnn(2)&&jm('\\')?esc(y[h++]):y[h++];return lms(clchars(r))}
 		const ns=h;jm('-'),jd(),jm('.'),jd();if(jm('e')||jm('E')){jm('-')||jm('+');jd();}return h<=ns?(f=0,NONE): lmn(+y.slice(ns,h))
 	}, r=rec();return {value:r,index:h}
 }
