@@ -2911,7 +2911,7 @@ lv* readbin(lv*path){
 	fclose(f);return array_make(st.st_size,0,0,r);
 }
 lv* n_read(lv*self,lv*a){
-	(void)self;a=ls(l_first(a));struct stat st;if(stat(a->sv,&st)){return lms(0);}FILE*f=fopen(a->sv,"rb");
+	(void)self;a=ls(l_first(a));struct stat st;if(stat(a->sv,&st)){return lms(0);}FILE*f=fopen(a->sv,"rb");if(!f)return lms(0);
 	char head[]={0,0,0},ref[]={0xEF,0xBB,0xBF};if(fread(head,1,sizeof(head),f)!=sizeof(head)){fclose(f);return lms(0);}
 	int bom=memcmp(head,ref,sizeof(head))==0; // UTF-8 BOM
 	lv*r=lms(st.st_size-(bom?3:0));fseek(f,bom?3:0,SEEK_SET);if(fread(r->sv,1,r->c,f)!=(unsigned)r->c){fclose(f);return lms(0);}
