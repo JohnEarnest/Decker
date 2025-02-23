@@ -131,6 +131,7 @@ json:
 "foob"
 "A\\nB\\C/D\""
 "DAB"
+"a b c\n1 2 3 4"
 "A B"
 "AB"
 {"a":11,"b":22}

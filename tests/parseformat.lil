@@ -160,6 +160,7 @@ show["%j%n"     parse "[12,13,@99"               ] # garbage in list
 show["%j"       parse "\"foob\""                 ] # simple string
 show["%j"       parse "\"A\\\\nB\\\\C\\/D\\\"\"" ] # simple escapes
 show["%j"       parse "\"D\\u0041B\""            ] # unicode escape
+show["%j"       parse "\"a\\u0009b\\u0009c\\n1 2\\u00093\\u00094\""] # unicode escape normalization
 show["%j"       parse "\"A\\?B\""                ] # bogus escape
 show["%j"       parse "\"AB"                     ] # unterminated string
 show["%j"       parse "{\"a\":11,\"b\":22}"      ] # simple dict
@@ -171,6 +172,7 @@ show["%j"       parse "{'foo':22,'ba\\'r':33}"   ] # escaped single-quote
 show["%j"       parse "'foobaz"                  ] # unterminated single-quote
 show["%j"       parse "{11: 22}"                 ] # whitespace tolerance
 show["%j"       parse "{11:22, 33:44"            ] # whitespace tolerance
+
 # fixed-width
 show["%1s%3j%1s" parse "AtrueB"                  ] # overlong literal
 show["%1s%3j%1s" parse "A12.34e5B"               ] # truncated number
