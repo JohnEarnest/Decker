@@ -192,6 +192,8 @@ show[("%J" parse "[%%IMG0AAMABAAAAAA=,%%IMG0AAMABAAAAAA=]")..encoded]
 print["deckroman:"]
 show["%a" format list range 256]
 show["%a" parse "…ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿĀāĂăĄąĆćĒēĘęĪīıŁłŃńŌōŐőŒœŚśŠšŪūŰűŸŹźŻżŽžȘșȚțẞ"]
+show["%j" parse "\"a\\u0170b\\u1E9Ec\""]
+show["%j" parse "\"a\\u000D\\u000Ab\""] # suppress CR even in json uncode escapes!
 
 print["recursive:"]
 show[()                            format (11,"two")                     ] # identity

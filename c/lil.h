@@ -237,6 +237,22 @@ char* DROM_INKEY[]={
 	"Ș","ș","ș","Ț","Ț","ț","ț","ẞ","¡","¿","«","»","€","°","“","”",
 	"‘","’", 0
 };
+int DROM_INPOINT[]={
+	0x2026,0x00c0,0x0041,0x00c1,0x0041,0x00c2,0x0041,0x00c3,0x0041,0x00c4,0x0041,0x00c5,0x0041,0x00c6,0x00c7,0x0043,
+	0x00c8,0x0045,0x00c9,0x0045,0x00ca,0x0045,0x00cb,0x0045,0x00cc,0x0049,0x00cd,0x0049,0x00ce,0x0049,0x00cf,0x0049,
+	0x00d0,0x00d1,0x004e,0x00d2,0x004f,0x00d3,0x004f,0x00d4,0x004f,0x00d5,0x004f,0x00d6,0x004f,0x00d8,0x00d9,0x0055,
+	0x00da,0x0055,0x00db,0x0055,0x00dc,0x0055,0x00dd,0x0059,0x00de,0x00df,0x00e0,0x0061,0x00e1,0x0061,0x00e2,0x0061,
+	0x00e3,0x0061,0x00e4,0x0061,0x00e5,0x0061,0x00e6,0x00e7,0x0063,0x00e8,0x0065,0x00e9,0x0065,0x00ea,0x0065,0x00eb,
+	0x0065,0x00ec,0x0069,0x00ed,0x0069,0x00ee,0x0069,0x00ef,0x0069,0x00f0,0x00f1,0x006e,0x00f2,0x006f,0x00f3,0x006f,
+	0x00f4,0x006f,0x00f5,0x006f,0x00f6,0x006f,0x00f8,0x00f9,0x0075,0x00fa,0x0075,0x00fb,0x0075,0x00fc,0x0075,0x00fd,
+	0x0079,0x00fe,0x00ff,0x0079,0x0100,0x0041,0x0101,0x0061,0x0102,0x0041,0x0103,0x0061,0x0104,0x0041,0x0105,0x0061,
+	0x0106,0x0043,0x0107,0x0063,0x0112,0x0045,0x0113,0x0065,0x0118,0x0045,0x0119,0x0065,0x012a,0x0049,0x012b,0x0069,
+	0x0131,0x0141,0x0142,0x0143,0x004e,0x0144,0x006e,0x014c,0x004f,0x014d,0x006f,0x0150,0x004f,0x0151,0x006f,0x0152,
+	0x0153,0x015a,0x0053,0x015b,0x0073,0x0160,0x0053,0x0161,0x0073,0x016a,0x0055,0x016b,0x0075,0x0170,0x0055,0x0171,
+	0x0075,0x0178,0x0059,0x0179,0x005a,0x017a,0x007a,0x017b,0x005a,0x017c,0x007a,0x017d,0x005a,0x017e,0x007a,0x0218,
+	0x0053,0x0219,0x0073,0x021a,0x0054,0x021b,0x0074,0x1e9e,0x00a1,0x00bf,0x00ab,0x00bb,0x20ac,0x00b0,0x201c,0x201d,
+	0x2018,0x2019, 0
+};
 int DROM_INVAL[]={
 	127,128,128,129,129,130,130,131,131,132,132,133,133,134,135,135,
 	136,136,137,137,138,138,139,139,140,140,141,141,142,142,143,143,
@@ -327,7 +343,6 @@ void utf8_to_drom(str*s,char*x,int n){
 				// if     ((c&0xF0)==0xF0){printf("unknown unicode [%02X %02X %02X %02X]\n",c,0xFF&x[z+1],0xFF&x[z+2],0xFF&x[z+3]);}
 				// else if((c&0xE0)==0xE0){printf("unknown unicode [%02X %02X %02X]\n"     ,c,0xFF&x[z+1],0xFF&x[z+2]            );}
 				// else if((c&0xC0)==0xC0){printf("unknown unicode [%02X %02X]\n"          ,c,0xFF&x[z+1]                        );}
-
 				if     ((c&0xF0)==0xF0)z+=3; // skip 4-byte codepoints
 				else if((c&0xE0)==0xE0)z+=2; // skip 3-byte codepoints
 				else if((c&0xC0)==0xC0)z+=1; // skip 2-byte codepoints
@@ -340,6 +355,11 @@ void utf8_to_drom(str*s,char*x,int n){
 lv* lmutf8(char*x){str r=str_new();utf8_to_drom(&r,x,strlen(x));return lmstr(r);}
 char drom_toupper(char c){return DROM_TOUPPER[0xFF&c];}
 char drom_tolower(char c){return DROM_TOLOWER[0xFF&c];}
+char drom_from_codepoint(int n){
+	// if we return 0, the result should be understood as 'no character'!
+	if(n=='\r')return 0;if(n=='\t')return ' ';if(n<' '&&n!='\n')return 0xFF;if(n<='~')return n;
+	for(int i=0;DROM_INPOINT[i];i++)if(n==DROM_INPOINT[i])return DROM_INVAL[i];return 0xFF;
+}
 
 // Primitives
 dyad(l_format);
@@ -514,8 +534,8 @@ monad(l_raze){if(lit(x))return l_dict(x->c?x->lv[0]:lml(0), x->c>1?x->lv[1]:lml(
 	          x=ll(x);lv*r=l_first(x);for(int z=1;z<x->c;z++)r=l_comma(r,x->lv[z]);return r;}
 
 char esc(char e,int*i,char*t,int*n){
-	char h[5]={0};return e=='n'?'\n':strchr("\\\"/'",e)?e:
-	e=='u'&&*n>=4?(memcpy(h,t+*i,4),(*i)+=4,(*n)-=4,strtol(h,NULL,16)):' ';
+	if(e=='n')return '\n';if(strchr("\\\"/'",e))return e;if(e!='u'||*n<4)return ' ';
+	char h[5]={0};memcpy(h,t+*i,4),(*i)+=4,(*n)-=4;return drom_from_codepoint(0xFFFF&strtol(h,NULL,16));
 }
 lv* pjson(char*t,int*i,int*f,int*n){
 	#define jc()    (*n&&*f?t[*i]:0)
@@ -527,8 +547,8 @@ lv* pjson(char*t,int*i,int*f,int*n){
 	jl("null",NONE);jl("false",NONE);jl("true",ONE);
 	if(jm('[')){lv*r=lml(0);while(jc()){js();if(jm(']'))break;ll_add(r,pjson(t,i,f,n));js();jm(',');}return r;}
 	if(jm('{')){lv*r=lmd( );while(jc()){js();if(jm('}'))break;lv*k=pjson(t,i,f,n);js();jm(':');js();if(*f)dset(r,k,pjson(t,i,f,n));js();jm(',');}return r;}
-	if(jm('"' )){str r=str_new();while(jc()&&!(jm('"' ))){str_addc(&r,(jm('\\'))?esc(jn(),i,t,n):jn());}return lmstr(r);}
-	if(jm('\'')){str r=str_new();while(jc()&&!(jm('\''))){str_addc(&r,(jm('\\'))?esc(jn(),i,t,n):jn());}return lmstr(r);}
+	if(jm('"' )){str r=str_new();while(jc()&&!(jm('"' ))){char tmp=(jm('\\'))?esc(jn(),i,t,n):jn();if(tmp)str_addc(&r,tmp);}return lmstr(r);}
+	if(jm('\'')){str r=str_new();while(jc()&&!(jm('\''))){char tmp=(jm('\\'))?esc(jn(),i,t,n):jn();if(tmp)str_addc(&r,tmp);}return lmstr(r);}
 	int ns=*i;jm('-');jd();jm('.');jd();if(jm('e')||jm('E')){jm('-')||jm('+');jd();}if(*i<=ns){*f=0;return NONE;}
 	char tb[NUM];snprintf(tb,MIN(*i-ns+1,NUM),"%s",t+ns);return lmn(atof(tb));
 }
