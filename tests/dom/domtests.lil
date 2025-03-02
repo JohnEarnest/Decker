@@ -553,11 +553,17 @@ assert["font oob read max" image[].encoded f[256].encoded]
 f[ -1]:image[]
 f[256]:image[]
 
-assert["font glyph indices basic"     (               32+range 96) f.glyphs]
+gi:(32+range 209),255
+assert["font glyph indices basic"                     gi  f.glyphs]
 f[65]:image[]
-assert["font glyph delete with empty" ((list 65) drop 32+range 96) f.glyphs]
+assert["font glyph delete with empty" ((list 65) drop gi) f.glyphs]
 f[66]:0
-assert["font glyph delete with zero"  ((  66,65) drop 32+range 96) f.glyphs]
+assert["font glyph delete with zero"  ((  66,65) drop gi) f.glyphs]
+
+ti:image["%%IMG0AAUAA8ioaA=="]
+f.size:ti.size
+f["ñ"]:ti
+assert["font glyph index by deckroman char" ti.encoded f["ñ"].encoded]
 
 #######################################
 #
@@ -1307,6 +1313,13 @@ assert["deck remove widget"            1 deck.remove[b]]
 assert["sanity check widget removed"  () keys deck.card.widgets]
 assert["sanity check widget inert"     0 b.name]
 assert["deck remove inert widget"      0 deck.remove[b]]
+
+deck:readdeck[]
+ti:deck.fonts.body.b
+deck.fonts.body.A:ti
+writedeck["temp.deck" deck]
+deck:readdeck["temp.deck"]
+assert["decks serialize modified builtin fonts" ti.encoded deck.fonts.body.A.encoded]
 
 #######################################
 #

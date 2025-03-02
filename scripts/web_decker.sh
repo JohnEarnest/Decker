@@ -8,7 +8,7 @@ DST=${2?"Missing destination"}
 VERSION=${3?"Missing version number"}
 DANGER=${4:-0}
 
-echo -e "<body><script language=\"decker\">\n" > $DST
+echo -e "<meta charset=\"UTF-8\"><body><script language=\"decker\">\n" > $DST
 cat $SRC >> $DST
 echo -e "</script>\n" >> $DST
 cat js/decker.html >> $DST

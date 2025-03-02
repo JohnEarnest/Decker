@@ -27,7 +27,7 @@ Wrapper
 -------
 Decks are stored in UTF-8 encoded text files (optionally with a UTF-8 [BOM](https://en.wikipedia.org/wiki/Byte_order_mark)), and have the following structure:
 ```
-<body><script language="decker">
+<meta charset="UTF-8"><body><script language="decker">
 PAYLOAD
 </script>
 RUNTIME
@@ -39,7 +39,7 @@ The `PAYLOAD` must _never_ contain the literal sequence of characters `</script`
 
 Applications must support reading documents consisting only of the `PAYLOAD` section, with no surrounding tags or `RUNTIME`, for environments where a web browser is not available/desired or when the overhead of the `RUNTIME` stub is inconvenient. Such a document should be stored with a `.deck` extension.
 
-Applications must tolerate Windows-style newlines (CR-LF), interpreting them identically to Unix-style newlines (LF only). Emitting Unix newlines when creating documents is strongly recommended.
+Applications must tolerate Windows-style newlines (CR-LF), interpreting them identically to Unix-style newlines (LF only). Emitting Unix newlines when creating documents is strongly recommended. Applications _should_ tolerate a missing `<meta charset="UTF-8">` prefix.
 
 
 Data Blocks
@@ -434,3 +434,4 @@ Changelog
 1.54:
 - Introduced the `FNT1` datablock format.
 - Introduced the "DeckRoman" character encoding.
+- `<meta charset="UTF-8">` must now appear in the preamble section of a `.html` deck.

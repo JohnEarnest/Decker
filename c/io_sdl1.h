@@ -146,8 +146,8 @@ void process_events(pair disp,pair size,int scale){
 			if(e.type==SDL_QUIT     )event_quit();
 			if(e.type==SDL_USEREVENT)can_tick=1;
 			if(e.type==SDL_KEYDOWN  ){
-				int c=e.key.keysym.unicode;
-				if(c>=32&&c<127)field_input((char[2]){(char)c,'\0'});
+				char u=e.key.keysym.unicode, c=drom_from_codepoint(u);
+				if(u>=32&&c)field_input((char[2]){c,'\0'});
 				event_key(e.key.keysym.sym,e.key.keysym.mod,1,SDL_GetKeyName(e.key.keysym.sym));
 			}
 			if(e.type==SDL_KEYUP    )event_key(e.key.keysym.sym,e.key.keysym.mod,0,SDL_GetKeyName(e.key.keysym.sym));

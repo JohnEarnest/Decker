@@ -292,7 +292,7 @@ lv*n_appexit(lv*self,lv*z){
 
 lv* print_array(lv*arr,FILE*out){array a=unpack_array(arr);for(int z=0;z<a.size;z++)fputc(0xFF&(int)array_get_raw(a,z),out);return arr;}
 lv*n_appprint(lv*self,lv*a){(void)self;return a->c==1&&array_is(a->lv[0])?print_array(l_first(a),stdout):n_printf(a,1,stdout);}
-lv*n_appshow(lv*self,lv*a){(void)self;str s=str_new();EACH(z,a){if(z)str_addc(&s,' ');show(&s,a->lv[z],a->c==1);}printf("%s\n",lmstr(s)->sv);return l_first(a);}
+lv*n_appshow(lv*self,lv*a){(void)self;str s=str_new();EACH(z,a){if(z)str_addc(&s,' ');show(&s,a->lv[z],a->c==1);}printf("%s\n",drom_to_utf8(lmstr(s))->sv);return l_first(a);}
 lv* draw_widget(lv*w);lv* draw_con(lv*card,int active); // forward refs
 lv*n_apprender(lv*self,lv*a){(void)self;a=l_first(a);return widget_is(a)?draw_widget(a): card_is(a)?draw_con(a,1): image_empty();}
 lv*interface_app(lv*self,lv*i,lv*x){
@@ -1181,7 +1181,7 @@ rect modal_rtext(pair extra){
 char title_buffer[4096];
 char* title_caps(char*name,char*suffix){
 	unsigned int i=0,j=0,w=1;
-	while(i+1<sizeof(title_buffer)&&name  [i]){char c=name[i];if(w)c=toupper(c);w=isspace(c);title_buffer[i++]=c;}
+	while(i+1<sizeof(title_buffer)&&name  [i]){char c=name[i];if(w)c=drom_toupper(c);w=isspace(c);title_buffer[i++]=c;}
 	while(i+1<sizeof(title_buffer)&&suffix[j])title_buffer[i++]=suffix[j++];return title_buffer[i]='\0',title_buffer;
 }
 void do_transition(float tween,int errors){
@@ -1472,12 +1472,12 @@ void modal_exit(int value){
 	if(ms.type==modal_confirm&&ms.subtype==modal_save_lil     &&!value){modal_enter(ms.subtype);return;}
 	if(ms.subtype==modal_export_script&&value){
 		lv*path=modal_save_path(".lil");
-		if(directory_exists(path->sv)&&ms.type!=modal_confirm){modal_save_replace(modal_export_script,"Lil script",path);return;}
+		if(directory_exists(path)&&ms.type!=modal_confirm){modal_save_replace(modal_export_script,"Lil script",path);return;}
 		n_write(NULL,lml2(path,rtext_all(sc.f.table)));
 	}
 	if(ms.subtype==modal_export_image&&value){
 		lv*path=modal_save_path(".gif");
-		if(directory_exists(path->sv)&&ms.type!=modal_confirm){modal_save_replace(modal_export_image,"GIF file",path);return;}
+		if(directory_exists(path)&&ms.type!=modal_confirm){modal_save_replace(modal_export_image,"GIF file",path);return;}
 		if(bg_has_sel()){rect s=dr.sel_here;bg_end_selection();dr.sel_here=s;}
 		lv*i=draw_con(con(),1);pair off={0,0};char*pal=patterns_pal(ifield(deck,"patterns"));
 		if(bg_has_sel()||bg_has_lasso()){rect r=box_intersect(dr.sel_here,con_dim());i=image_make(buffer_copy(i->b,r));off=(pair){r.x,r.y};}
@@ -1494,7 +1494,7 @@ void modal_exit(int value){
 	}
 	if((ms.subtype==modal_save_deck||ms.subtype==modal_save_locked)&&value){
 		lv*path=modal_save_path("");
-		if(directory_exists(path->sv)&&ms.type!=modal_confirm){modal_save_replace(ms.subtype,"deck",path);return;}
+		if(directory_exists(path)&&ms.type!=modal_confirm){modal_save_replace(ms.subtype,"deck",path);return;}
 		if(ms.subtype==modal_save_locked)iwrite(deck,lmistr("locked"),ONE);
 		save_deck(path);
 		if(ms.subtype==modal_save_locked)iwrite(deck,lmistr("locked"),NONE);
@@ -1505,7 +1505,7 @@ void modal_exit(int value){
 	if(ms.subtype==modal_save_lil){
 		if(ms.type==modal_save&&!value){arg();ret(NONE);ms.type=modal_none;return;}
 		lv*path=modal_save_path(ms.filter==filter_sound?".wav":ms.filter==filter_gif?".gif": ms.path_suffix);
-		if(directory_exists(path->sv)&&ms.type!=modal_confirm){modal_save_replace(modal_save_lil,"file",path);return;}
+		if(directory_exists(path)&&ms.type!=modal_confirm){modal_save_replace(modal_save_lil,"file",path);return;}
 		lv*value=arg();ret(!value?NONE:
 			(image_is(value)||lil(value)||lid(value))?n_writegif(NULL,lml2(path,value)):
 			sound_is(value)?n_writewav(NULL,lml2(path,value)):
@@ -1731,9 +1731,9 @@ void modals(void){
 		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_pop(0);
 	}
 	else if(ms.type==modal_resources){
-		rect b=draw_modalbox((pair){320,190});
+		rect b=draw_modalbox((pair){380,190});
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Font/Deck Accessory Mover",FONT_MENU,1);
-		rect lgrid={b.x            ,b.y+15 ,100    ,b.h-(15+15+5+20)};
+		rect lgrid={b.x            ,b.y+15 ,120    ,b.h-(15+15+5+20)};
 		rect rgrid={b.x+b.w-lgrid.w,lgrid.y,lgrid.w,lgrid.h         };
 		if(ui_button((rect){rgrid.x+(rgrid.w-80)/2,b.y+b.h-20,80,20},"OK",1)||ev.exit)modal_exit(0);
 		ui_table(lgrid,2,16,lgrid.w-38,"Is",&ms.grid );if(ms.grid .row>-1)ms.grid2.row=-1;
@@ -1766,7 +1766,10 @@ void modals(void){
 			else{n_deck_remove(deck,l_list(rvalue(grid2,"value")));}ms.grid2=(grid_val){res_enumerate(deck),0,-1,-1},mark_dirty();sel=NULL;
 		}cb.y+=25;
 		rect pre={cb.x,cb.y,cb.w,b.h-(cb.y-b.y)};
-		if(sel&&font_is(sel)){layout_plaintext(pangram,sel,align_center,(pair){pre.w,pre.h}),draw_text_wrap(pre,1);}
+		if(sel&&font_is(sel)){
+			draw_textc((rect){pre.x,pre.y+pre.h-18,pre.w,18},l_format(lmistr("%i glyphs"),l_count(ifield(sel,"glyphs")))->sv,FONT_BODY,1);pre.h-=20;
+			layout_plaintext(pangram,sel,align_center,(pair){pre.w,pre.h}),draw_text_wrap(pre,1);
+		}
 		if(sel&&(module_is(sel)||prototype_is(sel))){
 			draw_textc((rect){pre.x,pre.y+pre.h-18,pre.w,18},l_format(lmistr("version %f"),ifield(sel,"version"))->sv,FONT_BODY,1);pre.h-=20;
 			layout_plaintext(ifield(sel,"description")->sv,FONT_BODY,align_center,(pair){pre.w,pre.h}),draw_text_wrap(pre,1);
@@ -3280,7 +3283,7 @@ void event_key(int c,int m,int down,const char*name){
 		if(c==KEY_RIGHT)ev.dir=dir_right;
 		if(cmd){
 			ev.alt=1;
-			if(strlen(name)==1){char i=ev.shift?toupper(name[0]):tolower(name[0]);ev.shortcuts[0xFF&i]=1;}
+			if(strlen(name)==1){char i=ev.shift?drom_toupper(name[0]):drom_tolower(name[0]);ev.shortcuts[0xFF&i]=1;}
 		}
 		else if(uimode==mode_draw&&ms.type==modal_none){
 			if(c==KEY_1)modal_enter(modal_pattern);

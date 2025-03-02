@@ -1999,7 +1999,7 @@ Startup
 =======
 If you start Native-Decker from the commandline, you can specify a path to a deck to open:
 ```
-% ./decker examples/decks/fontedit.deck
+% ./decker examples/decks/fonts.deck
 ```
 Native-Decker accepts several other optional CLI flags:
 - `--no-sound`: Disable sound playback and recording entirely.

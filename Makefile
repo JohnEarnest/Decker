@@ -16,6 +16,8 @@ ifeq ($(UNAME),Darwin)
 	FLAGS=-Wall -Werror -Wextra -Wpedantic -Os -Wstrict-prototypes
 	# -Wno-misleading-indentation silences warnings which are entirely spurious.
 	FLAGS:=$(FLAGS) -Wno-misleading-indentation -Wno-unknown-warning-option
+	# -Wno-overlength-strings works around a standards limitation which in practice is still portable.
+	FLAGS:=$(FLAGS) -Wno-overlength-strings
 	# FLAGS:=$(FLAGS) -fsanitize=undefined
 	# FLAGS:=$(FLAGS) -fsanitize=address
 endif

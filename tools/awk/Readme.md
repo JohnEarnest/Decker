@@ -2,6 +2,8 @@ Lila: A Lil interpreter in Awk
 ==============================
 Lila is an interpreter for the [Lil](http://beyondloom.com/tools/trylil.html) programming language implemented (mostly) in POSIX Awk. To learn more, see [the blog post](http://beyondloom.com/blog/lila.html) describing this project.
 
+*Note: As of Decker v1.54, Lila is no longer actively maintained and kept in sync with newer revisions of Lil; if there's demand, I may resume work on this sub-project.*
+
 Invoked with a `.lil` filename, Lila will execute the script and exit. If no filename is provided, it will instead run in an interactive "[REPL](https://en.wikipedia.org/wiki/Read–eval–print_loop_)" mode which can be terminated with Ctrl+C. Using the optional `rlwrap` utility as an intermediary provides a much nicer REPL experience, with line-editing and command history:
 ```
 % rlwrap awk -f lila.awk

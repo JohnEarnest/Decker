@@ -1306,7 +1306,7 @@ res_enumerate=(source)=>{
 	defs.v.map((def,i)=>{iv.push(lmn(ICON.app)),nv.push(defs.k[i]),vv.push(def)})
 	return r
 }
-title_caps=x=>{let w=1;return x.split('').map(c=>{if(w)c=c.toUpperCase();w=c==' '||c=='\n';return c}).join('')}
+title_caps=x=>{let w=1;return x.split('').map(c=>{if(w)c=drom_toupper(c);w=c==' '||c=='\n';return c}).join('')}
 do_transition=(tween,dest,errors)=>{
 	let f=frame;ms.canvas.image.size=dest.size,ms.canvas.image.pix=dest.pix,ms.canvas.image.pix.fill(0),canvas_clip(ms.canvas)
 	const a=lml([ms.canvas,ms.carda,ms.cardb,lmn(tween)]), p=lmblk();blk_lit(p,ms.trans),blk_lit(p,a),blk_op(p,op.CALL)
@@ -1743,9 +1743,9 @@ modals=_=>{
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit){iwrite(def,lms('attributes'),ms.grid.table),mark_dirty(),modal_exit(1)}
 	}
 	else if(ms.type=='resources'){
-		const b=draw_modalbox(rect(320,190))
+		const b=draw_modalbox(rect(380,190))
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Font/Deck Accessory Mover',FONT_MENU,1)
-		const lgrid=rect(b.x            ,b.y+15 ,100    ,b.h-(15+15+5+20))
+		const lgrid=rect(b.x            ,b.y+15 ,120    ,b.h-(15+15+5+20))
 		const rgrid=rect(b.x+b.w-lgrid.w,lgrid.y,lgrid.w,lgrid.h         )
 		if(ui_button(rect(rgrid.x+(rgrid.w-80)/2,b.y+b.h-20,80,20),'OK',1)||ev.exit)modal_exit(0)
 		ui_table(lgrid,[16,lgrid.w-38],'Is',ms.grid );if(ms.grid .row>-1)ms.grid2.row=-1
@@ -1777,7 +1777,10 @@ modals=_=>{
 			ms.grid2=gridtab(res_enumerate(deck)),mark_dirty(),sel=null
 		}cb.y+=25
 		const pre=rect(cb.x,cb.y,cb.w,b.h-(cb.y-b.y))
-		if(sel&&font_is(sel)){const l=layout_plaintext(PANGRAM,sel,ALIGN.center,rect(pre.w,pre.h));draw_text_wrap(pre,l,1)}
+		if(sel&&font_is(sel)){
+			draw_textc(rect(pre.x,pre.y+pre.h-18,pre.w,18),count(ifield(sel,'glyphs'))+' glyphs',FONT_BODY,1);pre.h-=20
+			const l=layout_plaintext(PANGRAM,sel,ALIGN.center,rect(pre.w,pre.h));draw_text_wrap(pre,l,1)
+		}
 		if(sel&&(module_is(sel)||prototype_is(sel))){
 			draw_textc(rect(pre.x,pre.y+pre.h-18,pre.w,18),ls(dyad.format(lms('version %f'),ifield(sel,'version'))),FONT_BODY,1);pre.h-=20
 			const l=layout_plaintext(ls(ifield(sel,'description')),FONT_BODY,ALIGN.center,rect(pre.w,pre.h));draw_text_wrap(pre,l,1)
@@ -3641,7 +3644,7 @@ q('body').onkeydown=e=>{
 	if(e.key=='ArrowLeft' )ev.dir='left'
 	if(e.key=='ArrowRight')ev.dir='right'
 	if(e.metaKey||e.ctrlKey)ev.alt=1,ev.shortcuts[e.shiftKey?(e.key.toUpperCase()):e.key]=1
-	else if(e.key.length==1&&wid.infield)field_input(e.key)
+	else if(e.key.length==1&&wid.infield)field_input(clchars(e.key))
 	else if(uimode=='draw'&&ms.type==null){if(e.key=='Backspace'||e.key=='Delete')bg_delete_selection()}
 	else if(uimode=='object'&&ms.type==null){
 		if(e.key=='[')ob_move_dn()
@@ -3724,6 +3727,7 @@ docopy=_=>{
 	return null
 }
 dopaste=x=>{
+	x=clchars(x)
 	if((ms.type==null||(ms.type=='contraption_props'&&wid.fv))&&/^%%IMG[012]/.test(x)){
 		const i=image_read(x);if(i.size.x==0||i.size.y==0)return
 		if(wid.fv){

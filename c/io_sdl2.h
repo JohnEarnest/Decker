@@ -84,8 +84,8 @@ void open_url(char*x){
 
 // clipboard
 
-lv* get_clip(void){char*t=SDL_GetClipboardText();lv*r=lmcstr(t);SDL_free(t);return r;}
-void set_clip(lv*x){SDL_SetClipboardText(ls(x)->sv);}
+lv* get_clip(void){char*t=SDL_GetClipboardText();lv*r=lmutf8(t);SDL_free(t);return r;}
+void set_clip(lv*x){SDL_SetClipboardText(drom_to_utf8(x)->sv);}
 
 // audio
 
@@ -133,7 +133,7 @@ void process_events(pair disp,pair size,int scale){
 	while(SDL_WaitEvent(&e)){
 		if(e.type==SDL_QUIT     )event_quit();
 		if(e.type==SDL_USEREVENT)break;
-		if(e.type==SDL_TEXTINPUT)field_input(e.text.text);
+		if(e.type==SDL_TEXTINPUT)field_input(lmutf8(e.text.text)->sv);
 		if(e.type==SDL_KEYDOWN  )event_key(e.key.keysym.sym,e.key.keysym.mod,1,SDL_GetKeyName(e.key.keysym.sym));
 		if(e.type==SDL_KEYUP    )event_key(e.key.keysym.sym,e.key.keysym.mod,0,SDL_GetKeyName(e.key.keysym.sym));
 		if(e.type==SDL_MOUSEMOTION){
