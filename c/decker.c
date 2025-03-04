@@ -2304,7 +2304,7 @@ void go_notify(lv*deck,lv*args,int dest){
 	}
 	if(moved&&uimode==mode_interact)msg.pending_loop=1;
 	if(moved||args->c>1){
-		grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel->c=0,wid.active=ms.type==modal_listen?0:-1;mark_dirty();
+		grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel->c=0,wid.active=ms.type==modal_listen?0:-1;
 	}
 	if(uimode==mode_interact)msg.next_view=1;
 }
@@ -3492,7 +3492,7 @@ int interpret(void){
 	int quota=FRAME_QUOTA;
 	while(1){
 		#define nomodal (ms.type==modal_none||ms.type==modal_query||ms.type==modal_listen)
-		while(nomodal&&running()&&sleep_frames==0&&sleep_play==0&&quota>0&&!should_exit){runop();quota--;mark_dirty();}frame=context;
+		while(nomodal&&running()&&sleep_frames==0&&sleep_play==0&&quota>0&&!should_exit){runop();quota--;}frame=context;
 		if(should_exit)break;
 		if(quota<=0&&running())msg.overshoot=1;
 		if(!nomodal||quota<=0||sleep_frames||sleep_play){if(sleep_frames)sleep_frames--;break;}
