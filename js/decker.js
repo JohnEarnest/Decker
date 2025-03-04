@@ -2238,7 +2238,7 @@ go_notify=(deck,x,t,url,delay)=>{
 	}
 	if(moved&&uimode=='interact')msg.pending_loop=1
 	if(moved||t){
-		grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel=[],wid.active=ms.type=='listen'?0:-1,mark_dirty()
+		grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel=[],wid.active=ms.type=='listen'?0:-1
 	}
 	if(uimode=='interact')msg.next_view=1
 }
@@ -3082,7 +3082,7 @@ interpret=_=>{
 	if(sleep_frames){sleep_frames--;return 0}
 	const nomodal=_=>(ms.type==null||ms.type=='query'||ms.type=='listen')
 	let quota=FRAME_QUOTA;while(1){
-		while(nomodal()&&running()&&sleep_frames==0&&sleep_play==0&&quota>0){runop(),quota--,mark_dirty()}frame=context
+		while(nomodal()&&running()&&sleep_frames==0&&sleep_play==0&&quota>0){runop(),quota--}frame=context
 		if(quota<=0&&running())msg.overshoot=1
 		if(!nomodal()||quota<=0||sleep_frames||sleep_play){if(sleep_frames)sleep_frames--;break}
 		if(!running()&&pending_popstate)popstate(),pending_popstate=0
