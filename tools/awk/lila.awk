@@ -1162,7 +1162,7 @@ function natives(name,self,args,  z,r,prog,vars,n,t,pv,j,file){
 		if(count(args)<1){random_int(1);return lmn(bitwise_and(unsigned_i(random_seed),2147483647)/2147483647)}
 		x=l_first(args);if(count(args)<2)return random_element(x);n=ln(lst_get(args,1))
 		if(n>=0){r=lml();for(z=0;z<n;z++)lst_add(r,random_element(x));return r}
-		x=lin(x)?l_range(x):ll(x);for(z=0;z<count(x);z++)pv[z]=z
+		x=lin(x)?l_range(x):ll(x);if(count(x)<1)x=l_list(NONE);for(z=0;z<count(x);z++)pv[z]=z
 		for(z=count(x)-1;z>0;z--){j=random_int(z+1);t=pv[j];pv[j]=pv[z];pv[z]=t}
 		r=lml();for(z=0;z<abs(n);z++){lst_add(r,lst_get(x,pv[z%count(x)]))};return r
 	}
