@@ -791,7 +791,7 @@ n_random=z=>{
 	if(z.length==0){randint(1);return lmn((seed&0x7FFFFFFF)/0x7FFFFFFF)}
 	let x=z[0]||NONE;if(lid(x))x=monad.range(x);if(z.length<2)return randelt(x)
 	const y=ln(z[1]);if(y>=0){const r=[];for(let z=0;z<y;z++)r.push(randelt(x));return lml(r);}
-	x=lin(x)?monad.range(x).v:ll(x);const p=range(x.length),r=[]
+	x=lin(x)?monad.range(x).v:ll(x);if(x.length<1)x=[NONE];const p=range(x.length),r=[]
 	for(let i=x.length-1;i>0;i--){const j=randint(i+1),t=p[j];p[j]=p[i],p[i]=t}
 	for(let z=0;z<abs(y);z++)r.push(x[p[z%x.length]]);return lml(r)
 }

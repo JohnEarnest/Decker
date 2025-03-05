@@ -1396,7 +1396,7 @@ lv* n_random(lv*self,lv*z){
 	if(z->c==0){randint(1);return lmn(((float)(seed&0x7FFFFFFF))/0x7FFFFFFF);}
 	(void)self;lv*x=l_first(z);if(z->c<2)return rand_elt;
 	int y=ln(z->lv[1]);if(y>=0){GEN(r,y)rand_elt;return r;}
-	x=lin(x)?l_range(x):ll(x);idx pv=idx_new(x->c);EACH(z,x)pv.iv[z]=z;
+	x=lin(x)?l_range(x):ll(x);if(x->c<1)x=l_list(NONE);idx pv=idx_new(x->c);EACH(z,x)pv.iv[z]=z;
 	for(int i=x->c-1;i>0;i--){int j=randint(i+1);int t=pv.iv[j];pv.iv[j]=pv.iv[i],pv.iv[i]=t;}
 	GEN(r,abs(y))x->lv[pv.iv[z%x->c]];idx_free(&pv);return r;
 }

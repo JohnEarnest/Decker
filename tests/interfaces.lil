@@ -21,6 +21,8 @@ show[
 	typeof random[insert a with 11 22 33 end]
 ]
 show[random[] random[] random[]]
+show[random[0  -5] random[0   5]]
+show[random[() -2] random[()  2]]
 
 # accessing an interface via a container
 # should work the same as if it is a global:
