@@ -359,21 +359,23 @@ bold:"%%FNT0EA0BAgAAAAA...AAAAAAAAA"
 
 DeckRoman
 ---------
-Unicode, and in particular UTF-8, is a virtually ubiquitous standard for representing text on computers. Unfortunately, it is also irreducibly complex. Full support for manipulating and rendering arbitrary Unicode text in a consistent, platform-independent fashion is well outside Decker's scope. We will therefore specify a single-byte encoding for a controlled subset of Unicode called _DeckRoman_ which Decker does support. Decker implementations and Lil interpreters _may_ use this encoding internally as a convenience, and _must_ be capable of storing, manipulating, and rendering this selection of glyphs and special characters, given appropriate font definitions.
+Unicode, and in particular UTF-8, is a virtually ubiquitous standard for representing text on computers. Unfortunately, it is also irreducibly complex. Full support for manipulating and rendering arbitrary Unicode text in a consistent, platform-independent fashion is well outside Decker's scope. We will therefore specify a single-byte encoding for a controlled subset of Unicode called _DeckRoman_ which Decker does support. Decker implementations and Lil interpreters _may_ use this encoding internally as a convenience, and _must_ be capable of storing, manipulating, and rendering this selection of characters, given appropriate font definitions.
 
-The glyphs represented by DeckRoman include the union of:
+The characters represented by DeckRoman include the union of:
 
 - Displayable 7-bit ASCII characters
 - Letters from [Windows-1252](https://en.wikipedia.org/wiki/Windows-1252), a widespread superset of [ISO-8859-1](https://en.wikipedia.org/wiki/ISO/IEC_8859-1)
 - Letters from the [Monotype Imaging Inc. Recommended Character Set](https://foundrysupport.monotype.com/hc/en-us/articles/360029280752-Recommended-Character-Set)
 - Letters from modern Spanish, German, Polish, Portuguese, French, Hungarian, Romanian, and Māori orthographies
 - An ellipsis symbol (`…`), which Decker has included in fonts since v1.0 for displaying truncated text
-- An "unknown" symbol (`�`), which Decker uses for clearly indicating characters which cannot be displayed, such as unsupported Unicode characters or characters missing from the selected font
+- An "unknown" symbol (`�`), which Decker uses for clearly indicating characters which cannot be represented, such as unsupported Unicode characters
 - A small selection of additional punctuation marks with widespread international use and applicability
+
+While it is unfortunate that DeckRoman introduces "yet another standard" instead of leveraging some existing byte encoding as-is, none of the existing alternatives can cover as many relevant languages and the special symbols Decker needs.
 
 Bytes in a DeckRoman string are interpreted as follows (all ranges inclusive):
 
-| Range     | Glyphs                                                                                                        | Meaning              |
+| Range     | Characters                                                                                                    | Meaning              |
 | --------: | :------------------------------------------------------------------------------------------------------------ | :------------------- |
 |     `0-9` | n/a                                                                                                           | reserved             |
 |      `10` | n/a                                                                                                           | newline              |
@@ -400,7 +402,7 @@ Capitalization rules for accented characters match the behavior of Unicode, with
 
 Lil will sort characters according to their order in the above listing, which does not necessarily match any specific locale's collation rules; it is arbitrary but consistent.
 
-Decker will perform a "best-effort" conversion of unlisted Unicode characters into the DeckRoman subset upon ingestion, including straightening curly single-quotes and double-quotes; if it is unable to find an equivalent, the character will be treated as "unknown" (`�`).
+Decker will perform a "best-effort" conversion of unlisted Unicode characters into the DeckRoman subset upon ingestion, including straightening curly-quotes and condensing decomposed accent marks into their combined characters; if Decker is unable to find an equivalent, the character will be treated as "unknown" (`�`).
 
 
 Changelog
