@@ -239,7 +239,7 @@ dyad={
                  lis(y)&&lin(x)&&ln(x)<0 ?lms(y.v.slice(0,max(0,count(y)+ln(x)))):
 	             lin(x)?splice((x,y)=>x<0?y.slice(0,x):y.slice(x),ln(x),y):filter(0,x,y),
 	limit:(x,y)=>count(y)>ln(x)?dyad.take(lmn(ln(x)),y):y,
-	in:   (x,y)=>lil(x)?lml(x.v.map(x=>dyad.in(x,y))):ina(x,y),
+	in:   (x,y)=>lil(x)?lml(x.v.map(x=>ina(x,y))):ina(x,y),
 	',':  (x,y)=>lit(x)&&lit(y)?tcat(x,y): lid(x)?union(x,ld(y)):
                  lis(x)?dyad[','](lml([x]),y): lis(y)?dyad[','](x,lml([y])): lml(ll(x).concat(ll(y))),
 	'~':  (x,y)=>match(x,y)?ONE:NONE,

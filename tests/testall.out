@@ -143,6 +143,9 @@ dyads:
 (on header name do ... end,on header name do ... end)
 (0,1,1,1)
 (0,1,0,1)
+(1,0,1,0,1)
+(1,0,1,0,1)
+(1,0,1)
 (0)
 "untitled"
 "title"

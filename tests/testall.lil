@@ -132,6 +132,9 @@ show[d,"AB"]
 show[header,header]
 show[("needle" in "haystack"),("needle" in "needles"),(3 in 4,3,15),("cherry" in d)]
 show[("Apple","Banana","Peach","Beef")in("Banana","Beef")]
+show[(.5*range 5)        in (         .2*range 40   )] # source list is hashable and distinct
+show[(.5*range 5)        in (120 take .2*range 40   )] # source list is hashable and contains many collisions
+show[(show,random,print) in (50 take show,print,eval)] # source list is hashable and contains natives
 show[random[() 1]]
 show["untitled" unless 0]
 show["untitled" unless "title"]

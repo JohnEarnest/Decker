@@ -449,7 +449,25 @@ dyad(l_ina){
 	if(lil(y))EACH(z,y)if(matchr(y->lv[z],x))return ONE;
 	return lis(y)?(strstr(y->sv,ls(x)->sv)?ONE:NONE): (lid(y)||lit(y))&&dget(y,x)?ONE: NONE;
 }
-dyad(l_in){if(lil(x)){MAP(r,x)l_in(x->lv[z],y);return r;}return l_ina(x,y);}
+size_t hash_n=0;lv**hash_v=NULL;
+#define hash_t long long unsigned int
+hash_t hash_key(lv*x){
+	if(lin(x)){union{double f;hash_t u;}fu={.f=ln(x)};return fu.u;}
+	else if(lis(x)        ){hash_t r=1;EACH(z,x)r=(31*r)+(0xFF&x->sv[z]);return r;}
+	else if(lil(x)        ){hash_t r=1;EACH(z,x)r=(31*r)+hash_key(x->lv[z]);return r;}
+	else if(lid(x)||lit(x)){hash_t r=1;EACH(z,x)r=(31*((31*r)+hash_key(x->lv[z])))+hash_key(x->kv[z]);return r;}
+	else{return (hash_t)x;}
+}
+void hash_add(lv*x){hash_t i=hash_key(x)%hash_n;while(hash_v[i])i=(i+1)%hash_n;hash_v[i]=x;}
+int hash_in(lv*x){hash_t i=hash_key(x)%hash_n;while(hash_v[i]){if(matchr(hash_v[i],x))return 1;i=(i+1)%hash_n;}return 0;}
+dyad(l_in){
+	if(lil(x)&&(lil(y)||lid(y))&&y->c>32){
+		hash_n=ceil(1.3*y->c),hash_v=calloc(hash_n,sizeof(lv*));
+		if(lid(y)){EACH(z,y)hash_add(y->kv[z]);}else{EACH(z,y)hash_add(y->lv[z]);}
+		MAP(r,x)lmn(hash_in(x->lv[z]));return free(hash_v),r;
+	}
+	if(lil(x)){MAP(r,x)l_ina(x->lv[z],y);return r;}return l_ina(x,y);
+}
 lv*filter(int in,lv*x,lv*y){
 	x=lis(x)?l_list(x):ll(x);int n=1;EACH(z,x)if(!lin(x->lv[z]))n=0;
 	if(lid(y)){lv*r=lmd();EACH(z,y)if(in==lb(l_ina(y->kv[z],x)))dset(r,y->kv[z],y->lv[z]);return r;}
