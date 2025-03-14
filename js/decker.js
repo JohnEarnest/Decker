@@ -492,8 +492,8 @@ modal_pop=value=>{
 	modal_exit(value);if(ms_stack.length){const c=ms_stack.pop();ms=c.ms,wid=c.wid}
 	if(l){const c=rcopy(wid.cursor);field_stylespan(lms(''),l),wid.cursor=c}
 }
-let kc={shift:0,lock:0,on:0,heading:null}, keydown={},keyup={}
-keycaps_enter=_=>{if(!enable_touch||kc.on)return;kc.shift=0,kc.lock=0,kc.on=1,ev.mu=ev.md=0}
+let kc={shift:0,lock:0,alt:0,comb:0,on:0,heading:null}, keydown={},keyup={}
+keycaps_enter=_=>{if(!enable_touch||kc.on)return;kc.shift=0,kc.lock=0,kc.alt=0,kc.comb=0,kc.on=1,ev.mu=ev.md=0}
 
 let msg={ // interpreter event messages
 	pending_drag:0,pending_halt:0,pending_view:0,pending_loop:0,next_view:0,overshoot:0,
@@ -2257,44 +2257,91 @@ field_notify=(field)=>{
 
 // Keycaps
 
-KS=(v,l,w)=>({v,l,w}), K=v=>KS(v,v,1)
+KS=(v,l,w)=>({v,l,w}), K=v=>KS(v,v,1), KCOMB=i=>KS(i,'',1), KSP=i=>K(drom_from_ord(i)), KBL=KS(null,'',1)
 const LCAPS=[
 	[K('`'),K('1'),K('2'),K('3'),K('4'),K('5'),K('6'),K('7'),K('8'),K('9'),K('0'),K('-'),K('='),KS('Backspace','delete',1.5)],
 	[KS('Tab','tab',1.5),K('q'),K('w'),K('e'),K('r'),K('t'),K('y'),K('u'),K('i'),K('o'),K('p'),K('['),K(']'),K('\\')],
 	[KS('CapsLock','capslock',2),K('a'),K('s'),K('d'),K('f'),K('g'),K('h'),K('j'),K('k'),K('l'),K(';'),K('\''),KS('Enter','return',2)],
 	[KS('Shift','shift',2.5),K('z'),K('x'),K('c'),K('v'),K('b'),K('n'),K('m'),K(','),K('.'),K('/'),KS('Shift','shift',2.5)],
-	[KS('ArrowLeft','',1),KS('ArrowDown','',1),KS('ArrowUp','',1),KS('ArrowRight','',1),KS(null,'',1),KS(' ',' ',5),KS(null,'',1),KS(-2,'',2),KS(-1,'OK',2)],
+	[KS('ArrowLeft','',1),KS('ArrowDown','',1),KS('ArrowUp','',1),KS('ArrowRight','',1),KS('alt','alt',1),KS(' ',' ',5),KS('alt','alt',1),KS(-2,'',2),KS(-1,'OK',2)],
 ]
 const UCAPS=[
 	[K('~'),K('!'),K('@'),K('#'),K('$'),K('%'),K('^'),K('&'),K('*'),K('('),K(')'),K('_'),K('+'),KS('Backspace','delete',1.5)],
 	[KS('Tab','tab',1.5),K('Q'),K('W'),K('E'),K('R'),K('T'),K('Y'),K('U'),K('I'),K('O'),K('P'),K('{'),K('}'),K('|')],
 	[KS('CapsLock','capslock',2),K('A'),K('S'),K('D'),K('F'),K('G'),K('H'),K('J'),K('K'),K('L'),K(':'),K('"'),KS('Enter','return',2)],
 	[KS('Shift','shift',2.5),K('Z'),K('X'),K('C'),K('V'),K('B'),K('N'),K('M'),K('<'),K('>'),K('?'),KS('Shift','shift',2.5)],
-	[KS('ArrowLeft','',1),KS('ArrowDown','',1),KS('ArrowUp','',1),KS('ArrowRight','',1),KS(null,'',1),KS(' ',' ',5),KS(null,'',1),KS(-2,'',2),KS(-1,'OK',2)],
+	[KS('ArrowLeft','',1),KS('ArrowDown','',1),KS('ArrowUp','',1),KS('ArrowRight','',1),KS('alt','alt',1),KS(' ',' ',5),KS('alt','alt',1),KS(-2,'',2),KS(-1,'OK',2)],
 ]
+const ALCAPS=[
+	[KBL,KSP(0xeb),KBL,KBL,KSP(0xef),KBL,KBL,KBL,KSP(0xf0),KBL,KBL,KCOMB('MACRON'),KSP(0xff),KS(0,'',1.5)],
+	[KS(0,'',1.5),KSP(0xd6),KSP(0xc1),KCOMB('ACUTE'),KBL,KSP(0xbc),KBL,KCOMB('UMLAUT'),KCOMB('CIRCUM'),KSP(0xb6),KBL,KSP(0xed),KSP(0xee),KBL],
+	[KS('CapsLock','capslock',2),KSP(0xa4),KSP(0x9e),KSP(0xaf),KBL,KCOMB('GRAVE'),KCOMB('HUNGRA'),KBL,KCOMB('OGONEK'),KSP(0xce),KSP(0x7f),KSP(0xa5),KS(0,'',2)],
+	[KS('Shift','shift',2.5),KBL,KBL,KSP(0xa6),KCOMB('CARON'),KSP(0xcc),KCOMB('TILDE'),KBL,KCOMB('COMMA'),KSP(0xe3),KSP(0xec),KS('Shift','shift',2.5)],
+	[KBL,KBL,KBL,KBL,KS('alt','alt',1),KS(' ',' ',5),KS('alt','alt',1),KS(0,'',2),KS(0,'',2)],
+]
+const AUCAPS=[
+	[KBL,KSP(0xeb),KBL,KBL,KSP(0xef),KBL,KBL,KBL,KSP(0xf0),KBL,KBL,KCOMB('MACRON'),KSP(0xff),KS(0,'',1.5)],
+	[KS(0,'',1.5),KSP(0xd5),KSP(0xc0),KCOMB('ACUTE'),KBL,KSP(0x9d),KBL,KCOMB('UMLAUT'),KCOMB('CIRCUM'),KSP(0x97),KBL,KSP(0xed),KSP(0xee),KBL],
+	[KS('CapsLock','capslock',2),KSP(0x85),KSP(0xea),KSP(0x90),KBL,KCOMB('GRAVE'),KCOMB('HUNGRA'),KBL,KCOMB('OGONEK'),KSP(0xcd),KSP(0x7f),KSP(0x86),KS(0,'',2)],
+	[KS('Shift','shift',2.5),KBL,KBL,KSP(0x87),KCOMB('CARON'),KSP(0xcc),KCOMB('TILDE'),KBL,KCOMB('COMMA'),KSP(0xe2),KSP(0xec),KS('Shift','shift',2.5)],
+	[KBL,KBL,KBL,KBL,KS('alt','alt',1),KS(' ',' ',5),KS('alt','alt',1),KS(0,'',2),KS(0,'',2)],
+]
+const ACCENTS={
+	MACRON:image_read('%%IMG2AAYADQAHAQQAQw=='),
+	ACUTE :image_read('%%IMG0AAYADRAgAAAAAAAAAAAAAAA='),
+	UMLAUT:image_read('%%IMG0AAYADQBIAAAAAAAAAAAAAAA='),
+	CIRCUM:image_read('%%IMG0AAYADTBIAAAAAAAAAAAAAAA='),
+	GRAVE :image_read('%%IMG0AAYADSAQAAAAAAAAAAAAAAA='),
+	HUNGRA:image_read('%%IMG0AAYADQBEiAAAAAAAAAAAAAA='),
+	OGONEK:image_read('%%IMG0AAYADQAAAAAAAAAAAAAYDAA='),
+	CARON :image_read('%%IMG0AAUADVAgAAAAAAAAAAAAAAA='),
+	TILDE :image_read('%%IMG0AAYADTRYAAAAAAAAAAAAAAA='),
+	COMMA :image_read('%%IMG0AAUADQAAAAAAAAAAAAAAIEA='),
+}
+const ACCENT={
+	//      abcdefghijklmnopqrstuvwxyz
+	MACRON:'ā   ē   ī     ō     ū     ',
+	ACUTE :'á ć é   í    ńó   ś ú   ýź',
+	UMLAUT:'ä   ë   ï     ö     ü   ÿ ',
+	CIRCUM:'â   ê   î     ô     û     ',
+	GRAVE :'à   è   ì     ò     ù     ',
+	HUNGRA:'              ő     ű     ',
+	OGONEK:'ą   ę                     ',
+	CARON :'                  š      ž',
+	TILDE :'ã            ñõ           ',
+	COMMA :'                  șț      ',
+}
 soft_keyboard=r=>{
-	let ex=0, el=0, y=r.y, kh=0|(r.h/LCAPS.length), sh=ev.shift^kc.lock^kc.shift, pal=deck.patterns.pal.pix
+	let ex=0, el=0, y=r.y, kh=0|(r.h/LCAPS.length), sh=ev.shift^kc.lock^kc.shift, combiner=kc.comb, pal=deck.patterns.pal.pix
 	for(let row=0;row<LCAPS.length;row++){
-		const w=LCAPS[row].reduce((a,x)=>a+x.w,0), keys=(sh?UCAPS:LCAPS)[row]; let x=0
+		const w=LCAPS[row].reduce((a,x)=>a+x.w,0), keys=(kc.alt?(sh?AUCAPS:ALCAPS): sh?UCAPS:LCAPS)[row]; let x=0
 		keys.forEach((k,i,arr)=>{
 			let b=rint(rect(r.x+x+1,y,i==arr.length-1?(r.w-x):(k.w*(r.w/w)),kh+1));x+=b.w-1
 			draw_box(b,0,1)
 			const e=k.v==-2&&wid.f&&wid.f.style=='code'&&uimode=='interact'
-			if     (k.v=='ArrowLeft' )draw_iconc(b,ARROWS[4],1)
+			const letter=k.v&&/^[a-zA-Z]$/.test(k.v)?k.v.toLowerCase().charCodeAt(0)-97: -1
+			const accented=letter!=-1&&ACCENT[combiner]?ACCENT[combiner][letter]: ' '
+			const temp=ACCENT[combiner]?(sh?drom_toupper(accented):accented): ''
+			const special=k.v=='Shift'||k.v=='CapsLock'
+			if(combiner&&!special){if(accented!=' ')draw_textc(b,temp,FONT_MENU,1)}
+			else if(k.v=='ArrowLeft' )draw_iconc(b,ARROWS[4],1)
 			else if(k.v=='ArrowDown' )draw_iconc(b,ARROWS[1],1)
 			else if(k.v=='ArrowUp'   )draw_iconc(b,ARROWS[0],1)
 			else if(k.v=='ArrowRight')draw_iconc(b,ARROWS[5],1)
 			else                      draw_textc(b,e?'run':k.l,FONT_MENU,1)
 			let kd=keydown[k.v];b=inset(b,2)
 			const a=dover(b)&&over(inset(b,-4))&&ev.down_modal==ms.type&&ev.down_uimode==uimode&&ev.down_caps==1;if(k.v&&a&&(ev.md||ev.drag))kd=1
-			if(k.v==-1){draw_box(b,0,13);if(ev.mu&&a)ex=1}
+			if(combiner&&!special){if(ev.mu&&a&&accented!=' '){field_input(temp);kc.shift=0,kc.alt=0,kc.comb=0}kd=accented!=' '&&a}
+			else if(k.v==-1){draw_box(b,0,13);if(ev.mu&&a)ex=1}
+			else if(k.v=='alt'){if(ev.mu&&a)kc.alt^=1;if(kc.alt)kd=1}
 			else if(e){if(ev.mu&a)el=1}
 			else if(k.v=='Shift'   ){if(ev.mu&&a)kc.shift^=1;if(kc.shift)kd=1}
 			else if(k.v=='CapsLock'){if(ev.mu&&a)kc.lock^=1;if(kc.lock)kd=1}
-			else if(ev.mu&&a&&k.v){if(k.v.length==1){field_input(k.v)}else{field_keys(k.v,sh)};kc.shift=0}
+			else if(ACCENT[k.v]){draw_box(b,0,1),draw_iconc(b,ACCENTS[k.v],1);if(ev.mu&&a)kc.comb=k.v,kc.alt=0}
+			else if(ev.mu&&a&&k.v){if(k.v.length==1){field_input(k.v)}else{field_keys(k.v,sh)};kc.shift=0,kc.alt=0}
 			if(kd)draw_invert(pal,b)
 		});y+=kh
-	}return {exit:ex,eval:el}
+	};return {exit:ex,eval:el}
 }
 keycaps=_=>{
 	if(!enable_touch||!wid.fv)kc.on=0;if(!kc.on)return

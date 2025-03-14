@@ -17,7 +17,7 @@ void quit(void);
 
 // Assets
 
-lv*CHECK,*LOCK,*ANIM,*ZOOM,*CHECKS[4],*CORNERS[4],*RADIOS[4],*ICONS[8],*GESTURES[4],*HANDLES[2];
+lv*CHECK,*LOCK,*ANIM,*ZOOM,*CHECKS[4],*CORNERS[4],*RADIOS[4],*ICONS[8],*GESTURES[4],*HANDLES[2],*ACCENTS[10];
 lv*FONT_BODY,*FONT_MENU,*FONT_MONO,*TOOLS,*ARROWS,*TOOLB,*PLAYING,*ATTRS;
 enum mini_icons {icon_dir,icon_doc,icon_sound,icon_font,icon_app,icon_lil,icon_pat,icon_chek,icon_none};
 enum cursor_styles {cursor_default,cursor_point,cursor_ibeam,cursor_drag};
@@ -276,9 +276,9 @@ int no_menu(void){return menu.active==-1&&menu.stick==-1;}
 int in_layer(void){return no_menu()&&(ms.type?ms.in_modal:1)&&((!running()&&!msg.overshoot)||ms.type!=modal_none);}
 int in_widgets(void){return ms.type!=modal_none?ms.in_modal:1;}
 
-typedef struct {int shift,lock,on;char*heading;} keycaps_state;keycaps_state kc={0};
+typedef struct {int shift,alt,comb,lock,on;char*heading;} keycaps_state;keycaps_state kc={0};
 int keydown[4096]={0},keyup[4096]={0};
-void keycaps_enter(void){if(!enable_touch||kc.on)return;kc.shift=0,kc.lock=0,kc.on=1,ev.mu=ev.md=0;}
+void keycaps_enter(void){if(!enable_touch||kc.on)return;kc.shift=0,kc.alt=0,kc.comb=0,kc.lock=0,kc.on=1,ev.mu=ev.md=0;}
 
 // App Interface
 
@@ -2362,46 +2362,111 @@ void script_editor(rect r){
 typedef struct {int v;char*l;float w;} keycap;
 typedef struct {int c;keycap caps[16];} keyrow;
 #define K(x,l) {(x-' ')+KEY_SPACE,l,1.0}
+#define KBL       {0      ,"",1.0}
+#define KCOMB(x)  {COMB_##x,"",1.0}
 #define KS(x,l,w) {x,l,w}
 #define KROWS 5
+#define KEY_OK  -1
+#define KEY_RUN -2
+#define KEY_ALT -3
+#define COMB_MACRON -10
+#define COMB_ACUTE  -11
+#define COMB_UMLAUT -12
+#define COMB_CIRCUM -13
+#define COMB_GRAVE  -14
+#define COMB_HUNGRA -15
+#define COMB_OGONEK -16
+#define COMB_CARON  -17
+#define COMB_TILDE  -18
+#define COMB_COMMA  -19
+
 keyrow LCAPS[KROWS]={
 	{14,{K('`',"`"),K('1',"1"),K('2',"2"),K('3',"3"),K('4',"4"),K('5',"5"),K('6',"6"),K('7',"7"),K('8',"8"),K('9',"9"),K('0',"0"),K('-',"-"),K('=',"="),KS(KEY_BACKSPACE,"delete",1.5)}},
 	{14,{KS(KEY_TAB,"tab",1.5),K('q',"q"),K('w',"w"),K('e',"e"),K('r',"r"),K('t',"t"),K('y',"y"),K('u',"u"),K('i',"i"),K('o',"o"),K('p',"p"),K('[',"["),K(']',"]"),K('\\',"\\")}},
 	{13,{KS(KEY_CAPSLOCK,"capslock",2),K('a',"a"),K('s',"s"),K('d',"d"),K('f',"f"),K('g',"g"),K('h',"h"),K('j',"j"),K('k',"k"),K('l',"l"),K(';',";"),K('\'',"'"),KS(KEY_RETURN,"return",2)}},
 	{12,{KS(KEY_LSHIFT,"shift",2.5),K('z',"z"),K('x',"x"),K('c',"c"),K('v',"v"),K('b',"b"),K('n',"n"),K('m',"m"),K(',',","),K('.',"."),K('/',"/"),KS(KEY_RSHIFT,"shift",2.5)}},
-	{9,{KS(KEY_LEFT,"",1),KS(KEY_DOWN,"",1),KS(KEY_UP,"",1),KS(KEY_RIGHT,"",1),KS(0,"",1),KS(KEY_SPACE," ",5),KS(0,"",1),KS(-2,"",2),KS(-1,"OK",2)}},
+	{9,{KS(KEY_LEFT,"",1),KS(KEY_DOWN,"",1),KS(KEY_UP,"",1),KS(KEY_RIGHT,"",1),KS(KEY_ALT,"alt",1),KS(KEY_SPACE," ",5),KS(KEY_ALT,"alt",1),KS(KEY_RUN,"",2),KS(KEY_OK,"OK",2)}},
 };
 keyrow UCAPS[KROWS]={
 	{14,{K('~',"~"),K('!',"!"),K('@',"@"),K('#',"#"),K('$',"$"),K('%',"%"),K('^',"^"),K('&',"&"),K('*',"*"),K('(',"("),K(')',")"),K('_',"_"),K('+',"+"),KS(KEY_BACKSPACE,"delete",1.5)}},
 	{14,{KS(KEY_TAB,"tab",1.5),K('Q',"Q"),K('W',"W"),K('E',"E"),K('R',"R"),K('T',"T"),K('Y',"Y"),K('U',"U"),K('I',"I"),K('O',"O"),K('P',"P"),K('{',"{"),K('}',"}"),K('|',"|")}},
 	{13,{KS(KEY_CAPSLOCK,"capslock",2.0),K('A',"A"),K('S',"S"),K('D',"D"),K('F',"F"),K('G',"G"),K('H',"H"),K('J',"J"),K('K',"K"),K('L',"L"),K(':',":"),K('"',"\""),KS(KEY_RETURN,"return",2)}},
 	{12,{KS(KEY_LSHIFT,"shift",2.5),K('Z',"Z"),K('X',"X"),K('C',"C"),K('V',"V"),K('B',"B"),K('N',"N"),K('M',"M"),K('<',"<"),K('>',">"),K('?',"?"),KS(KEY_RSHIFT,"shift",2.5)}},
-	{9,{KS(KEY_LEFT,"",1),KS(KEY_DOWN,"",1),KS(KEY_UP,"",1),KS(KEY_RIGHT,"",1),KS(0,"",1),KS(KEY_SPACE," ",5),KS(0,"",1),KS(-2,"",2),KS(-1,"OK",2)}},
+	{9,{KS(KEY_LEFT,"",1),KS(KEY_DOWN,"",1),KS(KEY_UP,"",1),KS(KEY_RIGHT,"",1),KS(KEY_ALT,"alt",1),KS(KEY_SPACE," ",5),KS(KEY_ALT,"alt",1),KS(KEY_RUN,"",2),KS(KEY_OK,"OK",2)}},
 };
+keyrow ALCAPS[KROWS]={
+	{14,{KBL,{0xeb,"\xeb",1},KBL,KBL,{0xef,"\xef",1},KBL,KBL,KBL,{0xf0,"\xf0",1},KBL,KBL,KCOMB(MACRON),{0xff,"\xff",1},KS(0,"",1.5)}},
+	{14,{KS(0,"",1.5),{0xd6,"\xd6",1},{0xc1,"\xc1",1},KCOMB(ACUTE),KBL,{0xbc,"\xbc",1},KBL,KCOMB(UMLAUT),KCOMB(CIRCUM),{0xb6,"\xb6",1},KBL,{0xed,"\xed",1},{0xee,"\xee",1},KBL}},
+	{13,{KS(KEY_CAPSLOCK,"capslock",2),{0xa4,"\xa4",1},{0x9e,"\x9e",1},{0xaf,"\xaf",1},KBL,KCOMB(GRAVE),KCOMB(HUNGRA),KBL,KCOMB(OGONEK),{0xce,"\xce",1},{0x7f,"\x7f",1},{0xa5,"\xa5",1},KS(0,"",2)}},
+	{12,{KS(KEY_LSHIFT,"shift",2.5),KBL,KBL,{0xa6,"\xa6",1},KCOMB(CARON),{0xcc,"\xcc",1},KCOMB(TILDE),KBL,KCOMB(COMMA),{0xe3,"\xe3",1},{0xec,"\xec",1},KS(KEY_RSHIFT,"shift",2.5)}},
+	{9,{KBL,KBL,KBL,KBL,KS(KEY_ALT,"alt",1),KS(KEY_SPACE," ",5),KS(KEY_ALT,"alt",1),KS(0,"",2),KS(0,"",2)}},
+};
+keyrow AUCAPS[KROWS]={
+	{14,{KBL,{0xeb,"\xeb",1},KBL,KBL,{0xef,"\xef",1},KBL,KBL,KBL,{0xf0,"\xf0",1},KBL,KBL,KCOMB(MACRON),{0xff,"\xff",1},KS(0,"",1.5)}},
+	{14,{KS(0,"",1.5),{0xd5,"\xd5",1},{0xc0,"\xc0",1},KCOMB(ACUTE),KBL,{0x9d,"\x9d",1},KBL,KCOMB(UMLAUT),KCOMB(CIRCUM),{0x97,"\x97",1},KBL,{0xed,"\xed",1},{0xee,"\xee",1},KBL}},
+	{13,{KS(KEY_CAPSLOCK,"capslock",2),{0x85,"\x85",1},{0xea,"\xea",1},{0x90,"\x90",1},KBL,KCOMB(GRAVE),KCOMB(HUNGRA),KBL,KCOMB(OGONEK),{0xcd,"\xcd",1},{0x7f,"\x7f",1},{0x86,"\x86",1},KS(0,"",2)}},
+	{12,{KS(KEY_LSHIFT,"shift",2.5),KBL,KBL,{0x87,"\x87",1},KCOMB(CARON),{0xcc,"\xcc",1},KCOMB(TILDE),KBL,KCOMB(COMMA),{0xe2,"\xe2",1},{0xec,"\xec",1},KS(KEY_RSHIFT,"shift",2.5)}},
+	{9,{KBL,KBL,KBL,KBL,KS(KEY_ALT,"alt",1),KS(KEY_SPACE," ",5),KS(KEY_ALT,"alt",1),KS(0,"",2),KS(0,"",2)}},
+};
+int ACCENT[10][26]={
+	// a   b   c   d   e   f   g   h   i   j   k   l   m   n   o   p   q   r   s   t   u   v   w   x   y   z
+	{191,  0,  0,  0,199,  0,  0,  0,203,  0,  0,  0,  0,  0,210,  0,  0,  0,  0,  0,220,  0,  0,  0,  0,  0}, // macrons
+	{160,  0,197,  0,168,  0,  0,  0,172,  0,  0,  0,  0,208,178,  0,  0,  0,216,  0,184,  0,  0,  0,187,225}, // acutes
+	{163,  0,  0,  0,170,  0,  0,  0,174,  0,  0,  0,  0,  0,181,  0,  0,  0,  0,  0,186,  0,  0,  0,189,  0}, // umlauts
+	{161,  0,  0,  0,169,  0,  0,  0,173,  0,  0,  0,  0,  0,179,  0,  0,  0,  0,  0,185,  0,  0,  0,  0,  0}, // circumflexes
+	{159,  0,  0,  0,167,  0,  0,  0,171,  0,  0,  0,  0,  0,177,  0,  0,  0,  0,  0,183,  0,  0,  0,  0,  0}, // graves
+	{  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,212,  0,  0,  0,  0,  0,222,  0,  0,  0,  0,  0}, // hungarumlauts
+	{195,  0,  0,  0,201,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, // ogoneks
+	{  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,218,  0,  0,  0,  0,  0,  0,229}, // carons
+	{162,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,176,180,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, // tildes
+	{  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,231,233,  0,  0,  0,  0,  0,  0}, // commas
+};
+lv* isolate_accent(int id,lv*f){
+	int i=-1;for(int z=0;z<26;z++)if(ACCENT[id][z]){i=z;break;}
+	lv* a=iindex(f,(i+97         ),NULL); // simple char
+	lv* b=iindex(f,(ACCENT[id][i]),NULL); // accented exemplar
+	n_image_merge(b,lml2(lmistr("-"),a)); // pixels added for the accent
+	return b;
+}
 void soft_keyboard(rect r,int*exit,int*eval){
-	int y=r.y, kh=r.h/KROWS, sh=ev.shift^kc.lock^kc.shift;char*pal=patterns_pal(ifield(deck,"patterns"));
+	int y=r.y, kh=r.h/KROWS, sh=ev.shift^kc.lock^kc.shift, combiner=kc.comb;char*pal=patterns_pal(ifield(deck,"patterns"));
 	for(int row=0;row<KROWS;row++){
 		float w=0;for(int z=0;z<LCAPS[row].c;z++)w+=LCAPS[row].caps[z].w;
 		for(int z=0,x=0;z<LCAPS[row].c;z++){
-			keycap k=(sh?UCAPS:LCAPS)[row].caps[z];
+			keycap k=(kc.alt?(sh?AUCAPS:ALCAPS): (sh?UCAPS:LCAPS))[row].caps[z];
 			rect b={r.x+x+1,y,z==LCAPS[row].c-1?(r.w-x):(k.w*(r.w/w)),kh+1};x+=b.w-1;
 			draw_box(b,0,1);
-			int e=k.v==-2&&wid.f.style==field_code&&uimode==mode_interact;
-			if     (k.v==KEY_LEFT )draw_iconc(b,ARROWS->lv[4],1);
+			int e=k.v==KEY_RUN&&wid.f.style==field_code&&uimode==mode_interact;
+			int letter=(k.v>='a'&&k.v<='z')?k.v-'a': (k.v>='A'&&k.v<='Z')?k.v-'A': -1;
+			int accent=(-combiner)-10, accented=(letter!=-1&&accent>=0&&accent<=9)?ACCENT[accent][letter]: 0;
+			char temp[4]={0};if(accented)snprintf(temp,4,"%c",sh?drom_toupper(accented): accented);
+			int special=k.v==KEY_LSHIFT||k.v==KEY_RSHIFT||k.v==KEY_CAPSLOCK;
+			if(combiner&&!special){if(accented)draw_textc(b,temp,FONT_MENU,1);}
+			else if(k.v==KEY_LEFT )draw_iconc(b,ARROWS->lv[4],1);
 			else if(k.v==KEY_DOWN )draw_iconc(b,ARROWS->lv[1],1);
 			else if(k.v==KEY_UP   )draw_iconc(b,ARROWS->lv[0],1);
 			else if(k.v==KEY_RIGHT)draw_iconc(b,ARROWS->lv[5],1);
 			else                    draw_textc(b,e?"run":k.l,FONT_MENU,1);
 			int kd=k.v>0&&k.v<4096&&keydown[k.v];b=inset(b,2);
 			int a=dover(b)&&over(inset(b,-4))&&ev.down_modal==ms.type&&ev.down_uimode==uimode&&ev.down_caps==1;if(k.v&&a&&(ev.md||ev.drag))kd=1;
-			if(k.v==-1){draw_box(b,0,13);if(ev.mu&&a)*exit=1;}
+			if(combiner&&!special){
+				if(ev.mu&&a&&accented){field_input(temp);kc.shift=0,kc.alt=0,kc.comb=0;}
+				kd=accented&&a;
+			}
+			else if(k.v==KEY_OK ){draw_box(b,0,13);if(ev.mu&&a)*exit=1;}
+			else if(k.v==KEY_ALT){if(ev.mu&&a)kc.alt^=1;if(kc.alt)kd=1;}
 			else if(e){if(ev.mu&a)*eval=1;}
-			else if(k.v==KEY_LSHIFT||k.v==KEY_RSHIFT){if(ev.mu&&a)kc.shift^=1;if(kc.shift)kd=1;}
+			else if(k.v==KEY_LSHIFT||k.v==KEY_RSHIFT){if(ev.mu&&a)kc.shift^=1;if(kc.shift||ev.shift)kd=1;}
 			else if(k.v==KEY_CAPSLOCK){if(ev.mu&&a)kc.lock^=1;if(kc.lock)kd=1;}
+			else if(k.v<=COMB_MACRON){
+				int acc=(-k.v)-10;
+				draw_box(b,0,1);draw_iconc(b,ACCENTS[acc],1);
+				if(ev.mu&&a)kc.comb=k.v,kc.alt=0;
+			}
 			else if(ev.mu&&a&&k.v){
-				if((k.v>=' '&&k.v<='~')||k.v=='\n'){char t[4]={0};snprintf(t,4,"%c",k.v);field_input(t);}
+				if((k.v>=' '&&k.v<=255)||k.v=='\n'){char t[4]={0};snprintf(t,4,"%c",k.v);field_input(t);}
 				else{field_keys(k.v,sh);}
-				kc.shift=0;
+				kc.shift=0,kc.alt=0;
 			}
 			if(kd)draw_invert(pal,b);
 		}y+=kh;
@@ -4201,6 +4266,17 @@ int main(int argc,char**argv){
 	FONT_BODY=font_read(lmistr(FONT_BLOCK_BODY));
 	FONT_MENU=font_read(lmistr(FONT_BLOCK_MENU));
 	FONT_MONO=font_read(lmistr(FONT_BLOCK_MONO));
+	dset(env,lmistr("acc m" ),ACCENTS[0]=isolate_accent(0,FONT_MENU));
+	dset(env,lmistr("acc a" ),ACCENTS[1]=isolate_accent(1,FONT_MENU));
+	dset(env,lmistr("acc u" ),ACCENTS[2]=isolate_accent(2,FONT_MENU));
+	dset(env,lmistr("acc ci"),ACCENTS[3]=isolate_accent(3,FONT_MENU));
+	dset(env,lmistr("acc g" ),ACCENTS[4]=isolate_accent(4,FONT_MENU));
+	dset(env,lmistr("acc h" ),ACCENTS[5]=image_read(lmistr("%%IMG0AAYADQBEiAAAAAAAAAAAAAA=")));
+	dset(env,lmistr("acc o" ),ACCENTS[6]=isolate_accent(6,FONT_MENU));
+	dset(env,lmistr("acc ca"),ACCENTS[7]=isolate_accent(7,FONT_MENU));
+	dset(env,lmistr("acc t" ),ACCENTS[8]=isolate_accent(8,FONT_MENU));
+	dset(env,lmistr("acc co"),ACCENTS[9]=isolate_accent(9,FONT_MENU));
+
 	context=draw_buffer(lmbuff((pair){512,342}));
 	dset(env,lmistr("buff"),context.buffer);
 
