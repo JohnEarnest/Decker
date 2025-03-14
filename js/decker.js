@@ -1772,8 +1772,7 @@ modals=_=>{
 			ms.grid2=gridtab(res_enumerate(deck)),mark_dirty();if(module_is(sel))validate_modules()
 		}cb.y+=25
 		if(ui_button(cb,'Remove',ms.grid2.row>-1)){
-			if(patterns_is(sel)){deck.patterns=patterns_read(lmd())}
-			else{deck_remove(deck,rvalue(ms.grid2,'value'))}
+			deck_remove(deck,rvalue(ms.grid2,'value'))
 			ms.grid2=gridtab(res_enumerate(deck)),mark_dirty(),sel=null
 		}cb.y+=25
 		const pre=rect(cb.x,cb.y,cb.w,b.h-(cb.y-b.y))

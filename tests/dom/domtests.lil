@@ -672,6 +672,11 @@ assert["pattern tolerate bogus write" 420 p[3]:420]
 op:readdeck[].patterns
 assert["pattern color isolation" 202 op[38]]
 
+deck:readdeck[]
+deck.patterns[36]:999
+deck.remove[deck.patterns]
+assert["reset patterns by removing the interface from the deck" 16711831 deck.patterns[36]]
+
 #######################################
 #
 #  Canvas

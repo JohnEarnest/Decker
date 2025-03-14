@@ -2623,6 +2623,7 @@ void remove_font(lv*w,lv*t){
 }
 lv* n_deck_remove(lv*self,lv*z){
 	lv*data=self->b,*t=l_first(z),*cards=ivalue(self,"cards"),*defs=ivalue(self,"contraptions");
+	if(patterns_is(t)){t->b=patterns_read(lmd())->b;return ONE;}
 	if(widget_is(t)&&is_rooted(t))return n_card_remove(ivalue(t,"card"),t);
 	if(module_is(t)){
 		lv*k=lmistr("modules"),*m=dget(data,k);

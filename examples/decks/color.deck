@@ -7,17 +7,8 @@ name:"color.deck"
 
 {script:0}
 on reset_pal do
- local default_pal:"%J" parse "[
-  16777215,16776960,16737536,14417920,
-  16711831, 3539095,     202,   38911,
-     43008,   25856, 6632960, 9921846,
-  12171705, 8816262, 4539717,       0,
- ]"
- each c i in default_pal
-  patterns[32+i]:c
- end
+ deck.remove[patterns]
 end
-
 {end}
 
 {card:Index}

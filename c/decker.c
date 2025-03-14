@@ -1762,8 +1762,7 @@ void modals(void){
 			if(module_is(sel))validate_modules();
 		}cb.y+=25;
 		if(ui_button(cb,"Remove",ms.grid2.row>-1)){
-			if(patterns_is(sel)){dset(deck->b,lmistr("patterns"),patterns_read(lmd()));}
-			else{n_deck_remove(deck,l_list(rvalue(grid2,"value")));}ms.grid2=(grid_val){res_enumerate(deck),0,-1,-1},mark_dirty();sel=NULL;
+			n_deck_remove(deck,l_list(rvalue(grid2,"value")));ms.grid2=(grid_val){res_enumerate(deck),0,-1,-1},mark_dirty();sel=NULL;
 		}cb.y+=25;
 		rect pre={cb.x,cb.y,cb.w,b.h-(cb.y-b.y)};
 		if(sel&&font_is(sel)){
