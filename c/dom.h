@@ -2854,7 +2854,7 @@ lv* deck_write(lv*x,int html){
 	str_addz(&r,"\n");
 	if(html){
 		str_addz(&r,"</script>\n");
-		str_add(&r,(char*)js_decker_html,js_decker_html_len);
+		str_addz(&r,lmiutf8(js_decker_html,js_decker_html_len));
 		str_addz(&r,"<script>\n");
 		str_addz(&r,"VERSION=\""),str_addz(&r,VERSION),str_addz(&r,"\"\n");
 		#ifdef DANGER_ZONE
@@ -2863,9 +2863,9 @@ lv* deck_write(lv*x,int html){
 			char*df="DANGEROUS=0\n";
 		#endif
 		str_addz(&r,df);
-		str_add(&r,(char*)js_lil_js,js_lil_js_len);
-		str_add(&r,(char*)js_danger_js,js_danger_js_len);
-		str_add(&r,(char*)js_decker_js,js_decker_js_len);
+		str_addz(&r,lmiutf8(js_lil_js,js_lil_js_len));
+		str_addz(&r,lmiutf8(js_danger_js,js_danger_js_len));
+		str_addz(&r,lmiutf8(js_decker_js,js_decker_js_len));
 		str_addz(&r,"</script></body>\n");
 	}
 	return lmstr(r);

@@ -353,6 +353,7 @@ void utf8_to_drom(str*s,char*x,int n){
 	}
 }
 lv* lmutf8(char*x){str r=str_new();utf8_to_drom(&r,x,strlen(x));return lmstr(r);}
+char* lmiutf8(void*x,int n){str r=str_new();utf8_to_drom(&r,(char*)x,n);return lmstr(r)->sv;}
 char drom_toupper(char c){return DROM_TOUPPER[0xFF&c];}
 char drom_tolower(char c){return DROM_TOLOWER[0xFF&c];}
 char drom_from_codepoint(int n){

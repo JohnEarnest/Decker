@@ -1858,7 +1858,7 @@ modals=_=>{
 			const name=ls(rtext_string(ms.text.table))
 			const savedeck=_=>{
 				let d=deck_write(deck)
-				if(/\.html$/i.test(name)){q('script[language="decker"]').innerHTML='\n'+d,d=`<body>${q('body').innerHTML}</body>`}
+				if(/\.html$/i.test(name)){q('script[language="decker"]').innerHTML='\n'+d,d=`<meta charset="UTF-8"><body>${q('body').innerHTML}</body>`}
 				dirty=0,save_text(name,d)
 			}
 			const save_image=_=>{
