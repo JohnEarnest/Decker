@@ -70,7 +70,7 @@ A format is `%[name]*-0N.DX`: `*` skip, `0` pad, `N` width.
 | :-------- | :------- | :--------------------------------------------------------------------------------------------- |
 | `%nmz`    | Parsing  | literal `%`, number of chars read, matches? matches to end?                                    |
 | `ro`      | Matching | repeat (0 or more in char class), optional (0 or 1 in char class)                              |
-| `sula`    | String   | string, uppercase string, lowercase string, ASCII chars                                        |
+| `sula`    | String   | string, uppercase string, lowercase string, ASCII/DeckRoman chars                              |
 | `bficChH` | Number   | bool, float, int, currency (`-$1.23`), plain currency (`-1.23`), hex lowercase, hex uppercase  |
 | `jJep`    | Misc.    | JSON, Lil data, unix epoch, time-parts {`year`, `month`, `day`, `hour`, `minute`, `second`}    |
 | `qv`      | Lil      | quoted Lil string literal, Lil variable name                                                   |

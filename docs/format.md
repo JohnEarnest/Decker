@@ -80,7 +80,7 @@ The data block types used by Decker are as follows:
 | `DAT7` | 4     | `"u32l"` | 0...4294967295            | unsigned 32-bit int, little-endian |
 | `DAT8` | 4     | `"i32b"` | -2147483648...2147483647  | signed 32-bit int, big-endian      |
 | `DAT9` | 4     | `"i32l"` | -2147483648...2147483647  | signed 32-bit int, little-endian   |
-| `DAT:` | 1     | `"char"` | n/a                       | ASCII character                    |
+| `DAT:` | 1     | `"char"` | n/a                       | ASCII/DeckRoman character          |
 
 Payload
 -------
@@ -395,7 +395,7 @@ The complete displayable "Decker-safe" character set:
 ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßà
 áâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿĀā
 ĂăĄąĆćĒēĘęĪīıŁłŃńŌōŐőŒœŚśŠšŪūŰűŸ
-ŹźŻżŽžȘșȚțẞ¡¿«»€°
+ŹźŻżŽžȘșȚțẞ¡¿«»€°�
 ```
 
 Capitalization rules for accented characters match the behavior of Unicode, with the exception of `ß` being treated as the lowercase form of `ẞ`.

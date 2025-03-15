@@ -788,7 +788,7 @@ Pattern types are as follows:
 | `l`  | `""`   | lowercase string. just like `s`, but converts to lowercase.    | any string, up to `D` chars, converted to lowercase. |
 | `r`  | `""`   | repeat. 0 or more (or `N`) characters within a valid set.      | any string, exactly `N` chars if specified.          |
 | `o`  | `""`   | optional. 0 or 1 (or `N`) characters within a valid set.       | any string, exactly `N` chars if specified.          |
-| `a`  | `()`   | ASCII. reads like `s`; value is list of ASCII ordinals.        | list of ASCII ordinals converted to a string.        |
+| `a`  | `()`   | ASCII. reads like `s`; value is list of DeckRoman ordinals.    | list of DeckRoman ordinals converted to a string.    |
 | `b`  | `0`    | reads like `s`; value is `1` iff first char is in `tTyYx1`.    | any value to `true` or `false` based on truthiness.  |
 | `f`  | `0.0`  | Lil float. allows any number of decimals.                      | show `D` decimal places or however many are needed.  |
 | `c`  | `0.0`  | currency. parses values like `-$1.23` to Lil floats.           | show `D` or 2 decimal places, like `-$1.23`.         |

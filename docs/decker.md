@@ -499,7 +499,7 @@ If the third argument (`z`) is truthy, `eval[]` will instead execute _within_ th
 
 - Image files (`.gif`, `.png`, `.bmp`, `.jpg`, `.jpeg`) are read as _image interfaces_.
 - Sound files (`.wav`) are read as _sound interfaces_.
-- anything else is treated as a UTF-8 text file and read as a string. A Byte-Order Mark, if present, is skipped. ASCII `\r` (Carriage-Return) characters are removed, tabs become a single space, "smart-quotes" are straightened, and anything else outside the range of valid Lil characters becomes a question mark (`?`).
+- anything else is treated as a UTF-8 text file and read as a string. A Byte-Order Mark, if present, is skipped. ASCII `\r` (Carriage-Return) characters are removed, tabs become a single space, "smart-quotes" are straightened, and anything else outside the range of valid DeckRoman characters becomes "unknown" (`�`).
 
 The `type` argument allows you to specify the type of file(s) the user should be allowed to choose:
 
@@ -790,7 +790,7 @@ Every array has a _cast_ which controls how it is interpreted: signed or unsigne
 | `"u32l"` | 0...4294967295            | unsigned 32-bit int, little-endian |
 | `"i32b"` | -2147483648...2147483647  | signed 32-bit int, big-endian      |
 | `"i32l"` | -2147483648...2147483647  | signed 32-bit int, little-endian   |
-| `"char"` | n/a                       | ASCII character                    |
+| `"char"` | n/a                       | ASCII/DeckRoman character          |
 
 While arrays do not benefit from the full range of operators Lil can bring to bear on lists and numbers, the array interface provides a number of useful methods for reading and writing data, including ways to perform efficient fills and copies.
 

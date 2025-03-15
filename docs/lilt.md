@@ -109,7 +109,7 @@ Built-in Functions
 - if the `hint` argument is the string `"array"`, the file will be read as an _array interface_ with a default `cast` of `u8`.
 - `.gif` files are read as _image interfaces_ (or a dictionary containing _image interfaces_, as noted below).
 - `.wav` files are read as _sound interfaces_.
-- anything else is treated as a UTF-8 text file and read as a string. A Byte-Order Mark, if present, is skipped. ASCII `\r` (Carriage-Return) characters are removed, tabs become a single space, "smart-quotes" are straightened, and anything else outside the range of valid Lil characters becomes `�`.
+- anything else is treated as a UTF-8 text file and read as a string. A Byte-Order Mark, if present, is skipped. ASCII `\r` (Carriage-Return) characters are removed, tabs become a single space, "smart-quotes" are straightened, and anything else outside the range of valid Lil characters becomes "unknown" (`�`).
 
 There are several possible `hint` arguments to control the interpretation of colors in an image:
 
