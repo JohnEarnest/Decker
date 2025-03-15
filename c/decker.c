@@ -2450,7 +2450,7 @@ void soft_keyboard(rect r,int*exit,int*eval){
 			int a=dover(b)&&over(inset(b,-4))&&ev.down_modal==ms.type&&ev.down_uimode==uimode&&ev.down_caps==1;if(k.v&&a&&(ev.md||ev.drag))kd=1;
 			if(combiner&&!special){
 				if(ev.mu&&a&&accented){field_input(temp);kc.shift=0,kc.alt=0,kc.comb=0;}
-				kd=accented&&a;
+				kd=kd&&accented&&a;
 			}
 			else if(k.v==KEY_OK ){draw_box(b,0,13);if(ev.mu&&a)*exit=1;}
 			else if(k.v==KEY_ALT){if(ev.mu&&a)kc.alt^=1;if(kc.alt)kd=1;}
