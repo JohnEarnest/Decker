@@ -493,7 +493,8 @@ modal_pop=value=>{
 	if(l){const c=rcopy(wid.cursor);field_stylespan(lms(''),l),wid.cursor=c}
 }
 let kc={shift:0,lock:0,alt:0,comb:0,on:0,heading:null}, keydown={},keyup={}
-keycaps_enter=_=>{if(!enable_touch||kc.on)return;kc.shift=0,kc.lock=0,kc.alt=0,kc.comb=0,kc.on=1,ev.mu=ev.md=0}
+keycaps_force_enter=_=>{kc.shift=0,kc.lock=0,kc.alt=0,kc.comb=0,kc.on=1,ev.mu=ev.md=0}
+keycaps_enter=_=>{if(!enable_touch||kc.on)return;keycaps_force_enter()}
 
 let msg={ // interpreter event messages
 	pending_drag:0,pending_halt:0,pending_view:0,pending_loop:0,next_view:0,overshoot:0,
@@ -2343,7 +2344,7 @@ soft_keyboard=r=>{
 	};return {exit:ex,eval:el}
 }
 keycaps=_=>{
-	if(!enable_touch||!wid.fv)kc.on=0;if(!kc.on)return
+	if(!wid.fv)kc.on=0;if(!kc.on)return
 	frame.image.pix.fill(32)
 	const mh=3+font_h(FONT_MENU)
 	const r=rect(0,mh,frame.size.x+1,0|((frame.size.y/2)-mh))
@@ -3167,6 +3168,7 @@ text_edit_menu=_=>{
 	if(rich&&menu_item('Copy Rich Text',selection,0,menucopyrich)){}
 	if(menu_item('Paste',wid.fv!=null,'v',menupaste)){}
 	if(menu_item('Clear',wid.fv!=null))wid.cursor=rect(0,RTEXT_END),field_keys('Delete',0)
+	if(!enable_touch&&!kc.on){menu_separator();if(menu_item('Keycaps...',wid.fv!=null))keycaps_force_enter()}
 	menu_separator()
 	if(menu_item('Select All',wid.fv!=null,'a'))wid.cursor=rect(0,RTEXT_END)
 }
@@ -3178,7 +3180,7 @@ all_menus=_=>{
 	if(menu_check('Listener',canlisten,ms.type=='listen','l')){if(ms.type!='listen'){modal_enter('listen')}else{modal_exit(0)}}
 	menu_separator()
 	menu_check('Fullscreen',1,is_fullscreen(),null,toggle_fullscreen)
-	if(menu_check('Touch Input',1,enable_touch))enable_touch^=1,set_touch=1
+	if(menu_check('Touch Input',1,enable_touch)){enable_touch^=1,set_touch=1;if(!enable_touch)kc.on=0}
 	if(menu_check('Script Profiler',1,profiler))profiler^=1
 	if(menu_check('Toolbars',tzoom>0,toolbars_enable))toolbars_enable^=1,resize()
 	if(blocked){

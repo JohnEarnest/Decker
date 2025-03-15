@@ -278,7 +278,8 @@ int in_widgets(void){return ms.type!=modal_none?ms.in_modal:1;}
 
 typedef struct {int shift,alt,comb,lock,on;char*heading;} keycaps_state;keycaps_state kc={0};
 int keydown[4096]={0},keyup[4096]={0};
-void keycaps_enter(void){if(!enable_touch||kc.on)return;kc.shift=0,kc.alt=0,kc.comb=0,kc.lock=0,kc.on=1,ev.mu=ev.md=0;}
+void keycaps_force_enter(void){kc.shift=0,kc.alt=0,kc.comb=0,kc.lock=0,kc.on=1,ev.mu=ev.md=0;}
+void keycaps_enter(void){if(!enable_touch||kc.on)return;keycaps_force_enter();}
 
 // App Interface
 
@@ -2472,7 +2473,7 @@ void soft_keyboard(rect r,int*exit,int*eval){
 	}
 }
 void keycaps(void){
-	if(!enable_touch||!wid.fv)kc.on=0;if(!kc.on)return;
+	if(!wid.fv)kc.on=0;if(!kc.on)return;
 	memset(frame.buffer->sv,0,frame.buffer->c);
 	int mh=3+font_h(FONT_MENU);
 	rect r={0,mh,frame.size.x+1,(frame.size.y/2)-mh};
@@ -3629,6 +3630,10 @@ void text_edit_menu(void){
 		field_input(has_clip("%%RTX")?rtext_all(rtext_decode(get_clip()))->sv:get_clip()->sv);
 	}
 	if(menu_item("Clear",wid.fv!=NULL,0)){wid.cursor=(pair){0,RTEXT_END};field_keys(KEY_DELETE,0);}
+	if(!enable_touch&&!kc.on){
+		menu_separator();
+		if(menu_item("Keycaps...",wid.fv!=NULL,'k'))keycaps_force_enter();
+	}
 	menu_separator();
 	if(menu_item("Select All",wid.fv!=NULL,'a')){wid.cursor=(pair){0,RTEXT_END};}
 }
@@ -3643,7 +3648,7 @@ void all_menus(void){
 	#ifndef NO_FULLSCREEN
 		if(menu_check("Fullscreen",1,!windowed,'f' ))toggle_fullscreen=1;
 	#endif
-	if(menu_check("Touch Input"    ,1                    ,enable_touch   ,'\0'))enable_touch^=1,set_touch=1;
+	if(menu_check("Touch Input"    ,1                    ,enable_touch   ,'\0')){enable_touch^=1,set_touch=1;if(!enable_touch)kc.on=0;}
 	if(menu_check("Script Profiler",1                    ,profiler       ,'\0'))profiler^=1;
 	if(menu_check("Toolbars"       ,1                    ,toolbars_enable,'\0'))toolbars_enable^=1,resize_window(deck);
 	if(menu_check("Auto-Save"      ,strlen(document_path),autosave       ,'\0'))autosave^=1;
