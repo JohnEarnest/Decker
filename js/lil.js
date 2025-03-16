@@ -1306,6 +1306,7 @@ draw_text=(pos,text,font,pattern)=>{
 		else{cursor.x=pos.x,cursor.y+=font_h(font)}
 	}
 }
+const ELLIPSIS='…'
 layout_plaintext=(text,font,align,mx)=>{
 	let layout=[],lines=[],cursor=rect(0,0), lnl=_=>(cursor.x=0,cursor.y+=1), ws=x=>x=='\n'||x==' '
 	const fh=font_h(font),fs=font_sw(font)

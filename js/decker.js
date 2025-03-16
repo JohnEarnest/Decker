@@ -3,7 +3,6 @@
 let zoom=1, deck=null, fb=null, context=null, dirty=0
 let FONT_BODY=null,FONT_MENU=null,FONT_MONO=null
 
-const ELLIPSIS=String.fromCharCode(95+32)
 const DOUBLE_CLICK_DELAY=20
 const FIELD_CURSOR_DUTY =20
 const FIELD_CHANGE_DELAY=15
