@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:3
+card:7
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -179,6 +179,34 @@ on click do
   x:read["image" "gray"]
   preview.paste[x (0,0),preview.size]
   preview.paste[preview.copy[].transform["dither"]]
+end
+{end}
+
+{card:deckio}
+{widgets}
+f:{"type":"field","size":[283,175],"pos":[117,44],"volatile":1,"scrollbar":1,"style":"code"}
+field1:{"type":"field","size":[100,16],"pos":[204,24],"locked":1,"border":0,"style":"plain","align":"center","value":"encoded deck:"}
+button1:{"type":"button","size":[96,48],"pos":[10,151],"script":"deckio.0","text":"Read Deck ->"}
+button2:{"type":"button","size":[96,48],"pos":[407,151],"script":"deckio.1","text":"-> Write Deck"}
+g:{"type":"grid","size":[147,104],"pos":[180,229],"volatile":1}
+
+{script:deckio.0}
+on click do
+ d:read["deck"]
+ f.text:d.encoded
+ 
+ attrs.name:d.name
+ attrs.version:d.version
+ attrs.cards:count d.cards
+ attrs.fonts:count d.fonts
+ attrs.size:count f.text
+ g.value:attrs
+end
+{end}
+
+{script:deckio.1}
+on click do
+ write[newdeck[f.text]]
 end
 {end}
 

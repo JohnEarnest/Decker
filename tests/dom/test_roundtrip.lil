@@ -3,8 +3,8 @@
 basedir:"examples/decks/"
 
 on roundtrip path do
-	d:readdeck[path]
-	writedeck["temp.deck" d]
+	d:read[path]
+	write["temp.deck" d]
 	s:shell["cmp -s temp.deck %s" format path] # exit code { 0:matched, 1:differed, 2:error }
 	if s.exit
 		print["round trip for %s failed:" path]

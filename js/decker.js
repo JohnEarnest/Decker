@@ -54,6 +54,11 @@ save_bin=(n,x)=>{
 	const u=URL.createObjectURL(new Blob([Uint8Array.from(x)])), t=q('#target')
 	t.download=n,t.href=u,t.click(),setTimeout(_=>URL.revokeObjectURL(u),200)
 }
+save_deck=(n,x)=>{
+	let d=deck_write(x)
+	if(/\.html$/i.test(n)){q('script[language="decker"]').innerHTML='\n'+d,d=`<meta charset="UTF-8"><body>${q('body').innerHTML}</body>`}
+	save_text(n,d)
+}
 makelzww=(lw,bw)=>{
 	let w=1+lw,hi=(1<<lw)+1,ov=1<<(lw+1),sc=-1,b=0,nb=0,t={}
 	wb=c=>{b|=c<<nb;nb+=w;while(nb>=8){bw(b&0xff),b>>=8,nb-=8}}
@@ -1857,11 +1862,7 @@ modals=_=>{
 		const c=rect(b.x+b.w-60,b.y+b.h-20),subtype=ms.subtype
 		if(ui_button(rect(c.x,c.y,60,20),'Save',1,_=>{
 			const name=ls(rtext_string(ms.text.table))
-			const savedeck=_=>{
-				let d=deck_write(deck)
-				if(/\.html$/i.test(name)){q('script[language="decker"]').innerHTML='\n'+d,d=`<meta charset="UTF-8"><body>${q('body').innerHTML}</body>`}
-				dirty=0,save_text(name,d)
-			}
+			const savedeck=_=>{save_deck(name,deck);dirty=0}
 			const save_image=_=>{
 				if(bg_has_sel()){const s=rcopy(dr.sel_here);bg_end_selection(),dr.sel_here=s}
 				let i=draw_con(con(),1),off=rect(),f=1,a=0, bg=dr.trans?0:32, frames=[]
@@ -1891,6 +1892,7 @@ modals=_=>{
 				if((lil(x)||lid(x)||image_is(x))&&f.length){save_bin(name,writegif(ff,fd))}
 				else if(sound_is(x))                       {save_bin(name,writewav(x))}
 				else if(array_is(x))                       {save_bin(name,writearray(x))}
+				else if(deck_is(x))                        {save_deck(name,x)}
 				else                                       {save_text(name,ls(x))}
 			}
 		}))modal_exit(1);c.x-=65;
@@ -1921,11 +1923,12 @@ modals=_=>{
 		draw_textc(rect(b.x,b.y,b.w,16),'Click to open a file:',FONT_BODY,1)
 		const c=rect(b.x+b.w-60,b.y+b.h-20)
 		ui_button(rect(c.x,c.y,60,20),'Open',1,_=>{
-			if     (ls(ms.verb)=='array'  )open_file(ms.filter,file=>{load_array(file,        array=>{arg(),ret(array)    ,modal_exit(1)})})
-			else if(ms.filter=='image/*'  )open_file(ms.filter,file=>{load_image(file,ms.verb,image=>{arg(),ret(image)    ,modal_exit(1)})})
-			else if(ms.filter=='audio/*'  )open_file(ms.filter,file=>{load_sound(file,        sound=>{arg(),ret(sound)    ,modal_exit(1)})})
-			else if(ms.filter=='.csv,.txt')open_text(ms.filter,                               text =>{arg(),ret(lms(text)),modal_exit(1)  })
-			else                           open_text(''       ,                               text =>{arg(),ret(lms(text)),modal_exit(1)  })
+			if     (ls(ms.verb)=='array'    )open_file(ms.filter,file=>{load_array(file,        array=>{arg(),ret(array)          ,modal_exit(1)})})
+			else if(ms.filter=='image/*'    )open_file(ms.filter,file=>{load_image(file,ms.verb,image=>{arg(),ret(image)          ,modal_exit(1)})})
+			else if(ms.filter=='audio/*'    )open_file(ms.filter,file=>{load_sound(file,        sound=>{arg(),ret(sound)          ,modal_exit(1)})})
+			else if(ms.filter=='.csv,.txt'  )open_text(ms.filter,                               text =>{arg(),ret(lms(text))      ,modal_exit(1)  })
+			else if(ms.filter=='.html,.deck')open_text(ms.filter,                               text =>{arg(),ret(deck_read(text)),modal_exit(1)  })
+			else                             open_text(''       ,                               text =>{arg(),ret(lms(text))      ,modal_exit(1)  })
 		}),c.x-=65
 		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_exit(0)
 	}
@@ -2198,15 +2201,17 @@ n_open=([type,hint])=>{
 	if(t=='array')r=array_make(0,'u8',0)
 	if(t=='sound')ms.filter='audio/*',r=sound_make(new Uint8Array(0))
 	if(t=='image')ms.filter='image/*',r=image_make(rect())
+	if(t=='deck')ms.filter='.html,.deck',r=deck_read('')
 	if(t=='text')ms.filter='.csv,.txt'
 	if(image_is(r)&&hint&&(ls(hint)=='frames'||ls(hint)=='gray_frames'))r=readgif([],ls(hint))
 	ms.verb=t=='array'?lms(t): hint?ls(hint):'';return r
 }
 n_save=([x,s])=>{
 	modal_enter('save_lil');x=x||NONE;ms.path_suffix=array_is(x)&&s?ls(s):''
-	if(array_is(x)                                      )ms.desc='Save a binary file.'    ,ms.text=fieldstr(lms('untitled'+ms.path_suffix))
-	if(sound_is(x)                                      )ms.desc='Save a .wav sound file.',ms.text=fieldstr(lms('sound.wav'))
-	if(image_is(x)||lid(x)||(lil(x)&&x.v.some(image_is)))ms.desc='Save a .gif image file.',ms.text=fieldstr(lms('image.gif'))
+	if(array_is(x)                                      )ms.desc='Save a binary file.'        ,ms.text=fieldstr(lms('untitled'+ms.path_suffix))
+	if(sound_is(x)                                      )ms.desc='Save a .wav sound file.'    ,ms.text=fieldstr(lms('sound.wav'))
+	if(deck_is(x)                                       )ms.desc='Save a .deck or .html file.',ms.text=fieldstr(lms('untitled.deck'))
+	if(image_is(x)||lid(x)||(lil(x)&&x.v.some(image_is)))ms.desc='Save a .gif image file.'    ,ms.text=fieldstr(lms('image.gif'))
 	ms.verb=x;return NONE
 }
 n_alert=([t,p,x,y])=>{

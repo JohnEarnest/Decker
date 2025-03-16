@@ -419,6 +419,7 @@ Decker provides a number of useful pre-defined functions:
 | `array[x y]`           | Create a new [Array Interface](#arrayinterface) with size `x` and cast string `y`, or decode an array string `x`.         | System     |
 | `image[x]`             | Create a new [Image Interface](#imageinterface) with size `x` (`(width,height)`), or decode an image string.              | System     |
 | `sound[x]`             | Create a new [Sound Interface](#soundinterface) with a size or list of samples `x`, or decode a sound string.             | System     |
+| `newdeck[x]`           | Create a new [Deck Interface](#deckinterface) from scratch, or decode an encoded deck string.                             | System     |
 | `eval[x y z]`          | Parse and execute a string `x` as a Lil program, using any variable bindings in dictionary `y`. (5)                       | System     |
 | `random[x y]`          | Choose `y` random elements from `x`. (6)                                                                                  | System     |
 | `readcsv[x y d]`       | Turn a [RFC-4180](https://datatracker.ietf.org/doc/html/rfc4180) CSV string `x` into a Lil table with column spec `y`.(7) | Data       |
@@ -499,6 +500,7 @@ If the third argument (`z`) is truthy, `eval[]` will instead execute _within_ th
 
 - Image files (`.gif`, `.png`, `.bmp`, `.jpg`, `.jpeg`) are read as _image interfaces_.
 - Sound files (`.wav`) are read as _sound interfaces_.
+- Deck files (`.deck`) are read as _deck interfaces_.
 - anything else is treated as a UTF-8 text file and read as a string. A Byte-Order Mark, if present, is skipped. ASCII `\r` (Carriage-Return) characters are removed, tabs become a single space, "smart-quotes" are straightened, and anything else outside the range of valid DeckRoman characters becomes "unknown" (`�`).
 
 The `type` argument allows you to specify the type of file(s) the user should be allowed to choose:
@@ -506,6 +508,7 @@ The `type` argument allows you to specify the type of file(s) the user should be
 - `"array"`: any file. The result will be an _array_ interface with a default `cast` of `u8`.
 - `"image"`: files with a `.gif`, `.png`, `.bmp`, `.jpg`, or `.jpeg` extension. The result will always be an _image interface_.
 - `"sound"`: files with a `.wav` extension. The result will always be a _sound interface_.
+- `"deck"`: files with a `.deck` or `.html` extension. The result will aways be a _deck interface_.
 - `"text"`: files with a `.txt` or `.csv` extension. The result will always be a string.
 - `"any"`: any file. The result may be an image, sound, or string.
 
@@ -528,6 +531,7 @@ If an image contains transparent pixels, they will be read as pattern 0.
 - _array interfaces_ are written as binary files. If `hint` is provided, use it as the file extension (for example `".png"`).
 - _sound interfaces_ are written as a .WAV audio file, and a `.wav` extension will be appended to any filename without it.
 - _image interfaces_ are written as GIF89a images, and a `.gif` extension will be appended to any filename without it.
+- _deck interfaces_ are written as decks.
 - A list of _image interfaces_ is written as an animated gif.
 - A dictionary is written as an animated gif. The dictionary should contain the keys `frames` (a list of _image interfaces_) and `delays` (a list of integers representing interframe delays in 1/100ths of a second).
 - anything else is converted to a string and written as a text file, using exactly the filename provided.
@@ -713,6 +717,7 @@ The deck interface represents the global attributes of a Decker document. The op
 | Name              | Description                                                                                 |
 | :---------------- | :------------------------------------------------------------------------------------------ |
 | `typeof x`        | `"deck"`                                                                                    |
+| `x.encoded`       | The content of this deck encoded as a string, suitable for decoding with `newdeck[]`.       |
 | `x.version`       | Number. The version of the deck file format.                                                |
 | `x.locked`        | Bool. Is this deck _locked_ (editing and drawing mode disabled)? r/w.                       |
 | `x.name`          | String. A descriptive title for the deck. r/w.                                              |
@@ -1517,7 +1522,7 @@ The script in a module is only executed _once_, when a deck is loaded. For large
 It's a great idea to provide documentation and examples for your new module in the deck it's packaged within. You might also want to perform automated tests of your module while developing it. That's where the "Lilt" command-line utility comes in. Using Lilt, you can read and write decks "headlessly", and interact with them as if you were using Decker's listener:
 ```
 % lilt
-  d:readdeck["logger.deck"]
+  d:read["logger.deck"]
 <deck>
   d.modules
 {"logger":<module>}

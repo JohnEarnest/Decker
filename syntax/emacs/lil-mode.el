@@ -25,11 +25,10 @@
              parse format))
      . 'font-lock-builtin-face)
     (,(wds '(show panic print play go transition brush
-                  sleep array image sound eval random
+                  sleep array image sound newdeck eval random
                   readcsv writecsv readxml writexml
                   alert read write input error dir
-                  path exit shell import
-                  readdeck writedeck))
+                  path exit shell import))
      . 'font-lock-function-name-face)
     ("\\<[0-9]+\\>" . 'font-lock-constant-face))
   '("\\.lil$")             ; which files

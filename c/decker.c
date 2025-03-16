@@ -1116,6 +1116,7 @@ lv*n_readfile(lv*self,lv*a){
 	if(has_suffix(name->sv,".jpeg"))return readimage(name->sv,!strcmp(hint->sv,"gray"));
 	if(has_suffix(name->sv,".gif" ))return n_readgif(self,a);
 	if(has_suffix(name->sv,".wav" ))return n_readwav(self,a);
+	if(has_suffix(name->sv,".deck"))return n_readdeck(self,a);
 	return n_read(self,a);
 }
 
@@ -1510,6 +1511,7 @@ void modal_exit(int value){
 		lv*value=arg();ret(!value?NONE:
 			(image_is(value)||lil(value)||lid(value))?n_writegif(NULL,lml2(path,value)):
 			sound_is(value)?n_writewav(NULL,lml2(path,value)):
+			deck_is(value)?n_writedeck(NULL,lml2(path,value)):
 			array_is(value)?writebin(path,value):
 			n_write(NULL,lml2(path,ls(value)))
 		);
@@ -2272,6 +2274,7 @@ lv*n_open(lv*self,lv*z){
 	if(!strcmp(type,"image"))ms.filter=filter_image,ms.desc="Open an image file.",r=image_empty();
 	if(!strcmp(type,"sound"))ms.filter=filter_sound,ms.desc="Open a .wav sound file.",r=sound_make(lms(0));
 	if(!strcmp(type,"text" ))ms.filter=filter_data ,ms.desc="Open any .csv or .txt file.";
+	if(!strcmp(type,"deck" ))ms.filter=filter_deck ,ms.desc="Open .deck or .html file.";r=deck_read(lmistr(""));
 	if(image_is(r)&&(matchr(hint,lmistr("frames"))||matchr(hint,lmistr("gray_frames"))))r=empty_frames();
 	ms.grid=(grid_val){directory_enumerate(ms.path,ms.filter,0),0,0,-1},ms.verb=hint;
 	return r;
@@ -2281,6 +2284,7 @@ lv*n_save(lv*self,lv*z){
 	if(array_is(value)){ms.desc="Save a binary file.";if(z->c>1)snprintf(ms.path_suffix,sizeof(ms.path_suffix),"%s",ls(z->lv[1])->sv);}
 	if(sound_is(value))ms.filter=filter_sound,ms.desc="Save a .wav sound file.";
 	if(image_is(value)||lid(value))ms.filter=filter_gif,ms.desc="Save a .gif image file.";
+	if(deck_is(value))ms.filter=filter_deck,ms.desc="Save a .deck or .html file.";
 	if(lil(value)){EACH(z,value)if(image_is(value->lv[z]))ms.filter=filter_gif,ms.desc="Save a .gif image file.";}
 	ms.grid=(grid_val){directory_enumerate(ms.path,ms.filter,0),0,0,-1};
 	return value;

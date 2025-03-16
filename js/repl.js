@@ -16,8 +16,18 @@ n_panic  =(   )=>NONE
 is_fullscreen=_=>0
 set_fullscreen=_=>0
 run      =prog=>{pushstate(env),issue(env,prog);while(running())runop();const r=arg();return popstate(),r}
-env.local('read',lmnat(([x,y])=>y&&ls(y)=='array'?readBinaryFile(ls(x)):ls(x).toLowerCase().endsWith('.gif')?readgif(readBinaryFile(ls(x)).data,ls(y)):lms(readTextFile(ls(x)))))
-env.local('write',lmnat(([x,y])=>array_is(y)?writeBinaryFile(ls(x),y):writeTextFile(ls(x),ls(y))))
+env.local('read',lmnat(([x,y])=>
+	y&&ls(y)=='array'?readBinaryFile(ls(x)):
+	ls(x).toLowerCase().endsWith('.gif')?readgif(readBinaryFile(ls(x)).data,ls(y)):
+	ls(x).toLowerCase().endsWith('.deck')?deck_read(readTextFile(ls(x))):
+	lms(readTextFile(ls(x)))
+))
+env.local('newdeck',lmnat(([x])=>deck_read(lis(x)?ls(x):'')))
+env.local('write',lmnat(([x,y])=>
+	array_is(y)?writeBinaryFile(ls(x),y):
+	deck_is(y)?writeTextFile(ls(x),deck_write(y,/\.html$/i.test(ls(x)))):
+	writeTextFile(ls(x),ls(y))
+))
 env.local('exit',lmnat(([x])=>process.exit(ln(x))))
 env.local('print',lmnat(n_print))
 env.local('show',lmnat(n_show))
@@ -42,8 +52,6 @@ env.local('writecsv',lmnat(n_writecsv))
 env.local('readcsv',lmnat(n_readcsv))
 env.local('writexml',lmnat(n_writexml))
 env.local('readxml',lmnat(n_readxml))
-env.local('readdeck',lmnat((([filename])=>deck_read(filename?readTextFile(ls(filename)):''))))
-env.local('writedeck',lmnat(([filename,deck])=>writeTextFile(ls(filename),deck_write(deck,/\.html$/i.test(ls(filename))))))
 env.local('args',lml(process.argv.slice(1).map(lms)))
 constants(env)
 if(process.argv.length>=3){

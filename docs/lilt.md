@@ -91,11 +91,10 @@ Built-in Functions
 | `writecsv[x y d]`| Turn a Lil table `x` into a CSV string with column spec `y`.(5)                                                             | Data    |
 | `readxml[x]`     | Turn a useful subset of XML/HTML into a Lil structure.(5)                                                                   | Data    |
 | `writexml[x fmt]`| Turn a Lil structure `x` into an XML string, formatted with whitespace if `fmt` is truthy.(5)                               | Data    |
-| `readdeck[x]`    | Produce a _deck_ interface from a file at path `x`. If no path is given, produce a new _deck_ from scratch.                 | Decker  |
-| `writedeck[x y]` | Serialize a _deck_ interface `y` to a file at path `x`. Returns `1` on success.(7)                                          | Decker  |
 | `array[x y]`     | Create a new _array_ with size `x` and cast string `y`, or decode an encoded array string `x`.                              | Decker  |
 | `image[x]`       | Create a new _image_ interface with size `x` (`(width,height)`) or decode an encoded image string.                          | Decker  |
 | `sound[x]`       | Create a new _sound_ interface with size `x` (sample count) or decode an encoded sound string.                              | Decker  |
+| `newdeck[x]`     | Create a new _deck_ interface from scratch, or decode an encoded deck string.                                               | Decker  |
 
 0) If `print[]` or `error[]` are given a single _array interface_ as an argument, the raw bytes of that array will be sent to _stdout_ or _stderr_, respectively, with no trailing newline added. In this way it is possible to print characters which do not have a valid representation as Lil strings, like Unicode block characters.
 
@@ -109,6 +108,7 @@ Built-in Functions
 - if the `hint` argument is the string `"array"`, the file will be read as an _array interface_ with a default `cast` of `u8`.
 - `.gif` files are read as _image interfaces_ (or a dictionary containing _image interfaces_, as noted below).
 - `.wav` files are read as _sound interfaces_.
+- `.deck` files are read as _deck interfaces_. If you want to read a `.html` deck export, you can read it as a text file (below) and then use `newdeck[]` to decode it.
 - anything else is treated as a UTF-8 text file and read as a string. A Byte-Order Mark, if present, is skipped. ASCII `\r` (Carriage-Return) characters are removed, tabs become a single space, "smart-quotes" are straightened, and anything else outside the range of valid Lil characters becomes "unknown" (`�`).
 
 There are several possible `hint` arguments to control the interpretation of colors in an image:
@@ -129,10 +129,11 @@ The [WAV file format](https://en.wikipedia.org/wiki/WAV) is much more complex th
 ffmpeg -i input.mp3 -bitexact -map_metadata -1 -ac 1 -ar 8000 -acodec pcm_u8 output.wav
 ```
 
-3) `write[]` recognizes several types of Lil value and will serialize each appropriately:
+3) `write[path x]` recognizes several types of Lil value and will serialize each appropriately:
 - _array interfaces_ are written as binary files.
 - _sound interfaces_ are written as a .WAV audio file.
 - _image interfaces_ are written as GIF89a images.
+- _deck interfaces_ are written as a "standalone" deck with a bundled HTML+JS runtime if the path ends in a `.html` suffix; otherwise the deck will be written as a "bare" deck, which is smaller.
 - a list of _image interfaces_ is written as an animated GIF89a image, with each image in the list written as one frame.
 - A dictionary is written as an animated GIF89a image. The dictionary should contain the keys `frames` (a list of _image interfaces_) and `delays` (a list of integers representing interframe delays in 1/100ths of a second).
 - anything else is converted to a string and written as a text file.
@@ -145,16 +146,15 @@ ffmpeg -i input.mp3 -bitexact -map_metadata -1 -ac 1 -ar 8000 -acodec pcm_u8 out
 
 6) Scripts loaded with `import[]` will not have access to `args` or `env`. Scripts may use `args~0` as an idiom to detect when they have been imported as a library.
 
-7) If the path given to `writedeck[]` ends in a `.html` suffix, the deck will be written as a "standalone" deck with a bundled HTML+JS runtime. Otherwise, the deck will be written as a "bare" deck, which is smaller.
 
 Working With Decks
 ------------------
-The `readdeck[]` and `writedeck[]` functions allow Lilt to operate on Decker documents. Lilt can load, create, and manipulate multiple decks simultaneously, providing options for automated testing, data import/export, accessibility, and interacting with other technology from outside the Decker ecosystem.
+The `newdeck[]`, `read[]` and `write[]` functions allow Lilt to operate on Decker documents. Lilt can load, create, and manipulate multiple decks simultaneously, providing options for automated testing, data import/export, accessibility, and interacting with other technology from outside the Decker ecosystem.
 
 Just as in Decker, you can simulate "injecting" events into widgets, cards, or the deck with the `x.event[name ...args]` function they provide, running the appropriate scripts to completion and producing any appropriate side-effects on the deck. For example, clicking on the first widget on the active card:
 
 ```lil
-d:readdeck["demo.deck"]
+d:read["demo.deck"]
 (first d.card.widgets).event["click"]
 ```
 
@@ -178,3 +178,8 @@ v1.18:
 v1.22:
 - introduced `import[]` to simplify building multi-file scripts.
 
+v1.54:
+- introduced `newdeck[]` as a way of decoding decks from a string representation.
+- generalized `read[]` to recognize `.deck` files and decode them as deck interfaces.
+- generalized `write[]` to accept deck interfaces and write them as `.deck` or `.html` files.
+- deprecated the specialized `readdeck[]` and `writedeck[]` functions in favor of the above.

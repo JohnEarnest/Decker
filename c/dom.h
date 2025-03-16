@@ -101,6 +101,7 @@ void constants(lv*env){
 	dset(env,lmistr("colors"),colors);
 }
 lv*n_play(lv*self,lv*z); // forward ref
+lv*n_newdeck(lv*self,lv*z); // forward ref
 void primitives(lv*env,lv*deck){
 	dset(env,lmistr("show"      ),lmnat(n_show      ,NULL));
 	dset(env,lmistr("print"     ),lmnat(n_print     ,NULL));
@@ -115,6 +116,7 @@ void primitives(lv*env,lv*deck){
 	dset(env,lmistr("array"     ),lmnat(n_array     ,NULL));
 	dset(env,lmistr("image"     ),lmnat(n_image     ,NULL));
 	dset(env,lmistr("sound"     ),lmnat(n_sound     ,NULL));
+	dset(env,lmistr("newdeck"   ),lmnat(n_newdeck   ,NULL));
 	dset(env,lmistr("readcsv"   ),lmnat(n_readcsv   ,NULL));
 	dset(env,lmistr("writecsv"  ),lmnat(n_writecsv  ,NULL));
 	dset(env,lmistr("readxml"   ),lmnat(n_readxml   ,NULL));
@@ -2674,6 +2676,7 @@ lv* n_deck_purge(lv*self,lv*z){
 	EACH(c,cards){lv*wids=ivalue(cards->lv[c],"widgets");EACH(w,wids)widget_purge(wids->lv[w]);}
 	(void)z;return NONE;
 }
+lv* deck_write(lv*x,int html); // forward ref
 lv* interface_deck(lv*self,lv*i,lv*x){
 	lv*data=self->b,*cards=ivalue(self,"cards");
 	if(x){
@@ -2701,6 +2704,7 @@ lv* interface_deck(lv*self,lv*i,lv*x){
 		ikey("copy"    )return lmnat(n_deck_copy,self);
 		ikey("paste"   )return lmnat(n_deck_paste,self);
 		ikey("purge"   )return lmnat(n_deck_purge,self);
+		ikey("encoded" )return deck_write(self,0);
 	}return x?x:NONE;
 }
 lv* deck_read(lv*x){
@@ -3055,6 +3059,7 @@ lv* n_write(lv*self,lv*a){
 	(void)self;lv*x=a->c>0?drom_to_utf8(a->lv[0]):lms(0),*y=a->c>1?drom_to_utf8(a->lv[1]):lms(0);
 	FILE*f=fopen(x->sv,"w");if(f)fwrite(y->sv,1,y->c,f),fclose(f);return f?ONE:NONE;
 }
+lv* n_newdeck(lv*self,lv*a){(void)self;a=l_first(a);return deck_read(lin(a)?lmistr(""): ls(a));}
 lv* idecode(lv*x){
 	return has_prefix(x->sv,"%%img")?image_read(x):
 	       has_prefix(x->sv,"%%snd")?sound_read(x):
@@ -3201,14 +3206,20 @@ lv*n_path(lv*self,lv*a){
 	else if(a->c==2){directory_cat(t,drom_to_utf8(a->lv[0])->sv,drom_to_utf8(a->lv[1])->sv),directory_normalize(t2,t);}
 	return lmutf8(t2);
 }
+lv*n_writedeck(lv*self,lv*a){
+	lv*path=ls(l_first(a));int html=0;if(has_suffix(path->sv,".html")){html=1;}
+	lv*v=deck_write(a->c<2?NONE:a->lv[1],html);if(v->c<1)return NONE;return n_write(self,lml2(path,v));
+}
 lv*n_writefile(lv*self,lv*a){
 	lv*value=a->c>1?a->lv[1]:lms(0);
 	if(array_is(value))return writebin(l_first(a),value);
 	if(sound_is(value))return n_writewav(self,a);
 	if(image_is(value)||lid(value))return n_writegif(self,a);
+	if(deck_is(value))return n_writedeck(self,a);
 	if(lil(value)){EACH(z,value)if(image_is(value->lv[z]))return n_writegif(self,a);}
 	return n_write(self,a);
 }
+lv*n_readdeck(lv*self,lv*a){return deck_read(lin(l_first(a))?lmistr(""):n_read(self,a));}
 lv*n_readfile(lv*self,lv*a);// forward ref
 lv* interface_danger(lv*self,lv*i,lv*x){
 	ikey("homepath"){char t[PATH_MAX];directory_home(t);return lmcstr(t);}

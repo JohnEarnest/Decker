@@ -29,14 +29,10 @@ lv*n_readwav(lv*self,lv*a){
 lv*n_readfile(lv*self,lv*a){
 	lv*name=ls(l_first(a));
 	if(a->c>1&&matchr(lmistr("array"),a->lv[1]))return readbin(name);
-	if(has_suffix(name->sv,".gif"))return n_readgif(self,a);
-	if(has_suffix(name->sv,".wav"))return n_readwav(self,a);
+	if(has_suffix(name->sv,".gif" ))return n_readgif(self,a);
+	if(has_suffix(name->sv,".wav" ))return n_readwav(self,a);
+	if(has_suffix(name->sv,".deck"))return n_readdeck(self,a);
 	return n_read(self,a);
-}
-lv*n_readdeck(lv*self,lv*a){return deck_read(lin(l_first(a))?lmistr(""):n_read(self,a));}
-lv*n_writedeck(lv*self,lv*a){
-	lv*path=ls(l_first(a));int html=0;if(has_suffix(path->sv,".html")){html=1;}
-	lv*v=deck_write(a->c<2?NONE:a->lv[1],html);if(v->c<1)return NONE;return n_write(self,lml2(path,v));
 }
 lv*runstring(char*t,lv*env){
 	lv* prog=parse(t);if(perr())return fprintf(stderr,"(%d:%d) %s\n",par.r+1,par.c+1,drom_to_utf8(lmcstr(par.error))->sv),NONE;
@@ -91,12 +87,11 @@ lv* globals(void){
 	dset(env,lmistr("array"    ),lmnat(n_array,NULL));
 	dset(env,lmistr("image"    ),lmnat(n_image,NULL));
 	dset(env,lmistr("sound"    ),lmnat(n_sound,NULL));
+	dset(env,lmistr("newdeck"  ),lmnat(n_newdeck,NULL));
 	dset(env,lmistr("readcsv"  ),lmnat(n_readcsv,NULL));
 	dset(env,lmistr("writecsv" ),lmnat(n_writecsv,NULL));
 	dset(env,lmistr("readxml"  ),lmnat(n_readxml,NULL));
 	dset(env,lmistr("writexml" ),lmnat(n_writexml,NULL));
-	dset(env,lmistr("readdeck" ),lmnat(n_readdeck,NULL));
-	dset(env,lmistr("writedeck"),lmnat(n_writedeck,NULL));
 	constants(env);
 	return env;
 }

@@ -2823,6 +2823,7 @@ deck_read=x=>{
 			if(ikey(i,'copy'    ))return lmnat(([x])=>deck_copy(self,x))
 			if(ikey(i,'paste'   ))return lmnat(([x])=>deck_paste(self,x))
 			if(ikey(i,'purge'   ))return lmnat(()=>{deck_purge(self);return NONE})
+			if(ikey(i,'encoded' ))return lms(deck_write(self))
 		}return x?x:NONE
 	},'deck')
 	ri.fonts       =fonts
@@ -2965,6 +2966,7 @@ primitives=(env,deck)=>{
 	env.local('array'     ,lmnat(n_array   ))
 	env.local('image'     ,lmnat(n_image   ))
 	env.local('sound'     ,lmnat(n_sound   ))
+	env.local('newdeck'   ,lmnat(([x])=>deck_read(lis(x)?ls(x):'')))
 	env.local('readcsv'   ,lmnat(n_readcsv ))
 	env.local('writecsv'  ,lmnat(n_writecsv))
 	env.local('readxml'   ,lmnat(n_readxml ))

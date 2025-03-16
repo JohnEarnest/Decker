@@ -61,7 +61,7 @@ make lilt
 Lilt can be used to programmatically create, inspect, and manipulate decks, as well as package them as Web-Decker self-executing documents:
 ```
 $ lilt
- d:readdeck["examples/decks/color.deck"]
+ d:read["examples/decks/color.deck"]
 <deck>
  d.card:d.cards.colhex
 <card>
@@ -71,7 +71,7 @@ $ lilt
 0
  d.card.widgets.rgb.text
 "16755200"
- writedeck["color.html" d]
+ write["color.html" d]
 1
 ```
 
