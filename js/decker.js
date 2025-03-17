@@ -2733,9 +2733,8 @@ bg_tighten=_=>{
 	}
 	bg_regenerate_lasso_outline()
 	const d=find_occupied(dr.mask,0);if(d.w<1||d.h<1||(d.w==r.w&&d.h==r.h))return // trim excess?
-	dr.limbo=image_copy(dr.limbo,d);if(dr.mask)dr.mask=image_copy(dr.mask,d);if(dr.omask)dr.omask=image_copy(dr.omask,d)
+	dr.limbo=image_copy(dr.limbo,d);if(dr.mask)dr.mask=image_copy(dr.mask,d)
 	dr.sel_here .x+=d.x,dr.sel_here .y+=d.y,dr.sel_here .w=d.w,dr.sel_here .h=d.h
-	dr.sel_start.x+=d.x,dr.sel_start.y+=d.y,dr.sel_start.w=d.w,dr.sel_start.h=d.h
 }
 bg_outline=_=>{
 	const r=dr.sel_here;bg_box_to_lasso()
