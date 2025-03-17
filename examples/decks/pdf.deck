@@ -119,9 +119,19 @@ field2:{"type":"field","size":[100,14],"pos":[78,198],"locked":1,"show":"transpa
 {widgets}
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"integration"}
-button3:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Index","style":"rect"}
+button3:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
 field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":"Using everything we've discussed, here's an example script that turns the current deck into a printable PDF of thumbnail images.\n\n(This takes a little while; be patient.)"}
 ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"images:each card in range deck.cards\n pdf.flatten[app.render[card] deck]\nend\n\nr:pdf.build[\n raze each p in 2 window images\n  pdf.page_vertical[p 10]\n end\n]\n\nwrite[r \".pdf\"]"}
+button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"build.0","text":"Try It!"}
+button1:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+
+{card:thumbnailer}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Index","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"a thumbnail tool"}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["We could also take the previous example further and generate thumbnail compilations for other decks. With appropriate conventions in place, you could imagine selectively hiding interactive parts of cards before rendering them.\n\nThe PDF module can be used to generate any kind of material you might want to print: static versions of zines, play aids for board games, ","greeting cards",", and more; use your imagination!"],"font":["","",""],"arg":["","https://internet-janitor.itch.io/valentine-er",""]}}
+ex1:{"type":"field","size":[232,238],"pos":[10,48],"border":1,"style":"code","value":"d:read[\"deck\"]\n\nimages:each card in range d.cards\n pdf.flatten[app.render[card] d]\nend\n\nr:pdf.build[\n raze each p in 2 window images\n  pdf.page_vertical[p 10]\n end\n]\n\nalert[\"rendering complete!\"]\nwrite[r \".pdf\"]"}
 button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"build.0","text":"Try It!"}
 
 {module:pdf}
