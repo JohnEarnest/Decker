@@ -688,10 +688,8 @@ void format_type(str*r,lv*a,char t,int n,int d,int lf,int pz,int*f,char*c){
 	else if(t=='q'){str v=str_new();fjson(&v,ls(a));op=lmstr(v)->sv;}
 	else if(t=='e'){time_t v=ln(a);strftime(o,NUM,"%FT%TZ",gmtime(&v));}
 	else if(t=='p'){
-		struct tm v={0};lv*d=ld(a);
-		#define pg(x,f,o) {lv*p=dget(d,lmcstr(x));v.tm_##f=p?ln(p)-o:0;}
-		pg("year",year,1900)pg("month",mon,1)pg("day",mday,0)pg("hour",hour,0)pg("minute",min,0)pg("second",sec,0)
-		strftime(o,NUM,"%FT%TZ",&v);
+		lv*isodate=lmistr("%[year]04i-%[month]02i-%[day]02iT%[hour]02i:%[minute]02i:%[second]02iZ%n%m");
+		snprintf(o,NUM,"%s",l_format(isodate,ld(a))->sv);
 	}
 	int vn=strlen(op); if(d&&strchr("fcC",t))d=0; if(d&&lf)vn=MIN(d,vn);
 	if(n&&!lf)for(int z=0;z<n-vn;z++)str_addc(r,pz?'0':' ');
