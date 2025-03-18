@@ -89,16 +89,6 @@ $ sh ./lilt.com
 (0,1,2,3,4,5,6,7,8,9)
 ```
 
-There is also an alternative Lil interpreter, [Lila](tools/awk/), which only requires a compliant implementation of the AWK language:
-```
-$ awk -f tools/awk/lila.awk
- sys.platform
-"awk"
- 2*range 10
-(0,2,4,6,8,10,12,14,16,18)
-```
-
-
 The Danger Zone
 ---------------
 Decker normally sandboxes the execution of scripts within decks to prevent low-level access to the host computer and ensure parity between the capabilities of Web-Decker and Native-Decker. Both implementations offer opt-in APIs for performing more "dangerous" or non-portable operations called [The Danger Zone](http://beyondloom.com/decker/decker.html#thedangerzone).
