@@ -2295,19 +2295,20 @@ void close_script(lv*next){
 	char t[4096];snprintf(t,sizeof(t),"The current script contains errors:\n\n%s\n\nDo you wish to discard your changes?",par.error);
 	modal_enter(modal_confirm_script);ms.message=lmcstr(t),ms.verb=lmcstr("Discard");
 }
-void go_notify(lv*deck,lv*args,int dest){
+void go_notify(lv*target_deck,lv*args,int dest){
+	if(target_deck!=deck)return;
 	if(args->c&&lis(args->lv[0])){
 		char*s=l_first(args)->sv;char*p[]={"http://","https://","ftp://","gopher://","gemini://",NULL};
 		int f=0;for(int z=0;p[z];z++)if(has_prefix(s,p[z])){f=1;break;}
 		if(f){modal_enter(modal_url);ms.text=(field_val){rtext_cast(l_first(args)),0};return;}
 	}
-	lv*tfun=args->c<2?NULL: lion(args->lv[1])?args->lv[1]: dget(dget(deck->b,lmistr("transit")),args->lv[1]);
-	int moved=dest!=ln(ifield(ifield(deck,"card"),"index"));
+	lv*tfun=args->c<2?NULL: lion(args->lv[1])?args->lv[1]: dget(dget(target_deck->b,lmistr("transit")),args->lv[1]);
+	int moved=dest!=ln(ifield(ifield(target_deck,"card"),"index"));
 	if(moved){con_set(NULL);if(uimode==mode_script)close_script(NULL);}
 	if(dest>=0&&tfun!=NULL&&ms.type!=modal_trans){
 		modal_enter(modal_trans);ms.time_curr=0,ms.time_end=args->c<3?30: MAX(1,ln(args->lv[2]));
-		ms.trans=tfun, ms.canvas=free_canvas(deck);
-		ms.carda=draw_con(ifield(deck,"card"),0), ms.cardb=draw_con(ifield(deck,"cards")->lv[dest],0);
+		ms.trans=tfun, ms.canvas=free_canvas(target_deck);
+		ms.carda=draw_con(ifield(target_deck,"card"),0), ms.cardb=draw_con(ifield(target_deck,"cards")->lv[dest],0);
 	}
 	if(moved&&uimode==mode_interact)msg.pending_loop=1;
 	if(moved||args->c>1){

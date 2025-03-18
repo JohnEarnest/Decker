@@ -2229,19 +2229,20 @@ free_canvas=deck=>{ // make a drawing surface that isn't attached to the parent 
 	iwrite(r,lms('size'),lmpair(deck.size)),d.fonts=deck.fonts,d.patterns=deck.patterns,r.free=1
 	container_image(r,1);return r
 }
-go_notify=(deck,x,t,url,delay)=>{
+go_notify=(target_deck,x,t,url,delay)=>{
+	if(target_deck!=deck)return
 	if(url&&/^(http|https|ftp|gopher|gemini):\/\//.test(url)){modal_enter('url'),ms.text=fieldstr(lms(url));return}
-	const moved=x!=ln(ifield(ifield(deck,'card'),'index'))
+	const moved=x!=ln(ifield(ifield(target_deck,'card'),'index'))
 	if(moved){con_set(null);if(uimode=='script')close_script()}
-	if(moved&&!deck.locked&&x>=0){try{
-		const name=ls(ifield(deck.cards.v[x],'name'))
+	if(moved&&!target_deck.locked&&x>=0){try{
+		const name=ls(ifield(target_deck.cards.v[x],'name'))
 		history.replaceState(undefined,undefined,'#'+name)
 	}catch(e){}}
-	const tfun=t==null?null: lion(t)?t: dget(deck.transit,t)
+	const tfun=t==null?null: lion(t)?t: dget(target_deck.transit,t)
 	if(ms.type!='trans'&&x>=0&&tfun){
 		modal_enter('trans'),ms.time_curr=0,ms.time_end=delay==null?30:0|max(1,ln(delay)),ms.time_start=-1;
-		ms.trans=tfun, ms.canvas=free_canvas(deck)
-		ms.carda=draw_con(ifield(deck,'card')), ms.cardb=draw_con(ifield(deck,'cards').v[x])
+		ms.trans=tfun, ms.canvas=free_canvas(target_deck)
+		ms.carda=draw_con(ifield(target_deck,'card')), ms.cardb=draw_con(ifield(target_deck,'cards').v[x])
 	}
 	if(moved&&uimode=='interact')msg.pending_loop=1
 	if(moved||t){
