@@ -1840,7 +1840,7 @@ font_textsize=(f,t)=>{
 font_read=arg=>{
 	const ri=lmi((self,i,x)=>{
 		if(lin(i)||(lis(i)&&count(i)==1)){ // read/write glyphs
-			let ix=lin(i)?ln(i): drom_to_ord(ls(i));const ch=String.fromCharCode(ix)
+			let ix=lin(i)?ln(i): drom_to_ord(ls(i));const ch=drom_from_ord(ix)
 			if(x){
 				if(ix<0||ix>255)return x;if(!image_is(x))x=image_make(rect());
 				font_gwi(self,ix,min(x.size.x,font_w(self)));const s=rect(font_gwi(self,ix),font_h(self))
