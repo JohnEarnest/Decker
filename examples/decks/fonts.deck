@@ -379,20 +379,20 @@ to_glyph:{"type":"button","size":[93,20],"pos":[114,322],"locked":1,"script":"fo
 to_sheet:{"type":"button","size":[93,20],"pos":[210,322],"script":"font.1","text":"Sheet","style":"invisible"}
 to_diacritics:{"type":"button","size":[93,20],"pos":[306,322],"script":"font.1","text":"Diacritics","style":"invisible"}
 sample:{"type":"field","size":[121,117],"pos":[387,199],"scrollbar":1,"style":"plain","value":"!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~…ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿĀāĂăĄąĆćĒēĘęĪīıŁłŃńŌōŐőŒœŚśŠšŪūŰűŸŹźŻżŽžȘșȚțẞ¡¿«»€°�\n\nHow razorback jumping-frogs can level six piqued gymnasts.\n\nJackdaws love my black sphinx of quartz.\n"}
-editor:{"type":"canvas","size":[40,50],"pos":[177,141],"volatile":1,"script":"glyph.1","pattern":0,"scale":5}
+editor:{"type":"canvas","size":[72,90],"pos":[161,121],"volatile":1,"script":"glyph.1","pattern":0,"scale":9}
 char:{"type":"slider","size":[110,20],"pos":[392,63],"script":"glyph.2","interval":[32,255],"value":65,"format":"character: %a","style":"compact"}
 charwidth:{"type":"slider","size":[110,20],"pos":[392,88],"script":"glyph.3","interval":[0,8],"value":5,"format":"width: %i","style":"compact"}
 copyBtn:{"type":"button","size":[53,20],"pos":[392,113],"script":"glyph.4","text":"Copy","shortcut":"c"}
 pasteBtn:{"type":"button","size":[53,20],"pos":[449,113],"script":"glyph.5","text":"Paste","shortcut":"v"}
-up:{"type":"button","size":[52,24],"pos":[171,112],"script":"glyph.6","font":"symbols","text":"^","style":"rect","shortcut":"w"}
-dn:{"type":"button","size":[52,24],"pos":[171,196],"script":"glyph.6","font":"symbols","text":"v","style":"rect","shortcut":"s"}
-lf:{"type":"button","size":[24,52],"pos":[148,140],"script":"glyph.6","font":"symbols","text":"<","style":"rect","shortcut":"a"}
-rt:{"type":"button","size":[24,52],"pos":[222,140],"script":"glyph.6","font":"symbols","text":">","style":"rect","shortcut":"d"}
-scale:{"type":"slider","size":[68,26],"pos":[438,24],"script":"glyph.7","interval":[1,16],"value":5,"format":"scale: %i","style":"compact"}
+up:{"type":"button","size":[52,24],"pos":[171,92],"script":"glyph.6","font":"symbols","text":"^","style":"rect","shortcut":"w"}
+dn:{"type":"button","size":[52,24],"pos":[171,216],"script":"glyph.6","font":"symbols","text":"v","style":"rect","shortcut":"s"}
+lf:{"type":"button","size":[24,52],"pos":[132,140],"script":"glyph.6","font":"symbols","text":"<","style":"rect","shortcut":"a"}
+rt:{"type":"button","size":[24,52],"pos":[238,140],"script":"glyph.6","font":"symbols","text":">","style":"rect","shortcut":"d"}
+scale:{"type":"slider","size":[71,26],"pos":[435,24],"script":"glyph.7","interval":[1,16],"value":9,"format":"scale: %i","style":"compact"}
 copyzone:{"type":"button","size":[110,53],"pos":[392,138],"show":"none","style":"invisible"}
-clipboard:{"type":"canvas","size":[16,16],"pos":[439,156],"locked":1,"border":0,"image":"%%IMG0ABAAEAAAAAAAAAOABEAIIBAQEBAQEAggBEADgAAAAAAAAAAA","scale":1}
-button1:{"type":"button","size":[44,26],"pos":[389,24],"script":"glyph.8","font":"body","text":"Go To\nChar...","shortcut":"g"}
+button1:{"type":"button","size":[44,26],"pos":[387,24],"script":"glyph.8","font":"body","text":"Go To\nChar...","shortcut":"g"}
 homeBtn:{"type":"button","size":[40,20],"pos":[468,319],"script":"font.8","font":"symbols","text":"h"}
+clipboard:{"type":"canvas","size":[16,16],"pos":[439,156],"locked":1,"border":0,"image":"%%IMG0ABAAEAAAAAAAAAOABEAIIBAQEBAQEAggBEADgAAAAAAAAAAA","scale":1}
 
 {script:glyph.0}
 on view do
