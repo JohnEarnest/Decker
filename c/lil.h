@@ -838,8 +838,8 @@ primitive triads[]={
 
 int findop(char*n,primitive*p){if(n)for(int z=0;p[z].name[0];z++)if(!strcmp(n,p[z].name))return z;return -1;}
 int tnames=0;lv* tempname(void){char t[64];snprintf(t,sizeof(t),"@t%d",tnames++);return lmcstr(t);}
-enum opcodes {JUMP,JUMPF,LIT,DUP,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,IPRE,IPOST,FIDX,FMAP};
-int oplens[]={3   ,3    ,3  ,1  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3   ,3    ,3   ,3   };
+enum opcodes {JUMP,JUMPF,LIT,DUP,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,IPRE,IPOST,FIDX,FMAP,LINE};
+int oplens[]={3   ,3    ,3  ,1  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3   ,3    ,3   ,3   ,3   };
 void blk_addb(lv*x,int n){
 	if(x->ns<x->n+1)x->sv=realloc(x->sv,(x->ns*=2)*sizeof(int));x->sv[x->n++]=n;
 	if(x->n>=65536||x->c>=65536)printf("TOO MUCH BYTECODE!\n"),exit(1);
@@ -1110,7 +1110,23 @@ void expr(lv*b){
 }
 lv* parse(char*text){
 	par=(parser){0,0,0,strlen(text),text,{0},{0},"\0"};
-	lv*b=lmblk();if(hasnext())expr(b);while(hasnext())blk_op(b,DROP),expr(b);
+	lv*b=lmblk();
+	int last_line = 0;
+	if(hasnext()) {
+		// Add initial LINE bytecode
+		blk_opa(b, LINE, par.r);
+		last_line = par.r;
+		expr(b);
+	}
+	while(hasnext()) {
+		// Add LINE bytecode if line number changed
+		if(par.r != last_line) {
+			blk_opa(b, LINE, par.r);
+			last_line = par.r;
+		}
+		blk_op(b, DROP);
+		expr(b);
+	}
 	if(blk_here(b)==0)blk_lit(b,NONE);return b;
 }
 
@@ -1188,6 +1204,7 @@ void runop(void){
 			GEN(n,t->c)t->kv[z];GEN(v,t->c)t->lv[z];ll_add(n,lmistr("column")),ll_add(v,t);
 			issue(env_bind(ev(),n,v),ex);break;
 		}
+		case LINE: break; // No-op, just skip it
 	}while(running()&&*getpc()>=blk_here(getblock()))descope;
 }
 lv*n_uplevel(lv*self,lv*a){
