@@ -1,0 +1,16 @@
+# Tables and queries example
+people: insert name age job with
+  "Alice"  25 "Developer"
+  "Sam"    28 "Sales"
+  "Thomas" 40 "Developer"
+  "Sara"   34 "Developer"
+  "Walter" 43 "Accounting"
+end
+
+# Simple select
+result1: select name job where age > 30 from people
+show[result1]
+
+# Group by
+result2: select count:count name job:(first job) by job from people
+show[result2]

@@ -1,0 +1,20 @@
+# Control flow example
+x: 15
+
+# Conditional
+result: if x > 10
+  "large"
+else
+  "small"
+end
+
+show[result]
+
+# Loop using a different approach
+total: 0
+nums: (1,2,3,4,5)
+each i in nums
+  total: total + i
+end
+
+show[total]

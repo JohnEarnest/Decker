@@ -110,6 +110,54 @@ void write_bytecode_to_assembly(lv* prog, const char* filename) {
                 fprintf(file, " %g", val->nv);
             } else if (lis(val)) {
                 fprintf(file, " \"%s\"", val->sv);
+            } else if (lion(val)) {
+                // Handle function literals
+                fprintf(file, " \"function:%s\"", val->sv);
+                
+                // Add function body with curly braces
+                fprintf(file, " {\n");
+                
+                // Write the function arguments as a comment
+                fprintf(file, "      // Arguments: ");
+                for (int i = 0; i < val->c; i++) {
+                    fprintf(file, "%s ", val->lv[i]->sv);
+                }
+                fprintf(file, "\n");
+                
+                // Write the function body
+                if (val->b && liblk(val->b)) {
+                    int func_pc = 0;
+                    while (func_pc < blk_here(val->b)) {
+                        int func_op = blk_getb(val->b, func_pc);
+                        fprintf(file, "      %s", opcode_names[func_op]);
+                        
+                        if (func_op == JUMP || func_op == JUMPF || func_op == EACH || func_op == NEXT || func_op == FIDX) {
+                            int func_target = blk_gets(val->b, func_pc + 1);
+                            fprintf(file, " %d", func_target);
+                        } else if (func_op == LIT || func_op == GET || func_op == SET || func_op == LOC || func_op == AMEND) {
+                            int func_imm = blk_gets(val->b, func_pc + 1);
+                            lv* func_val = blk_getimm(val->b, func_imm);
+                            
+                            if (lin(func_val)) {
+                                fprintf(file, " %g", func_val->nv);
+                            } else if (lis(func_val)) {
+                                fprintf(file, " \"%s\"", func_val->sv);
+                            } else {
+                                fprintf(file, " %d", func_imm);
+                            }
+                        } else if (func_op == BUND) {
+                            fprintf(file, " %d", blk_gets(val->b, func_pc + 1));
+                        }
+                        
+                        fprintf(file, "\n");
+                        func_pc += oplens[func_op];
+                    }
+                } else {
+                    fprintf(file, "      // (Function body not available)\n");
+                }
+                
+                // Close the function body
+                fprintf(file, "    }");
             } else {
                 fprintf(file, " %d", imm);
             }
@@ -264,22 +312,16 @@ int main(int argc,char**argv){
 			char output_file[4096];
 			snprintf(output_file, sizeof(output_file), "%s%s", input_file, "s");
 			
-			struct stat st;
-			if(stat(input_file, &st)){
-				fprintf(stderr, "unable to open '%s'\n", input_file);
-				exit(1);
-			}
-			
+			repl=0;
 			lv* prog = parse(n_read(NULL, l_list(lmcstr(input_file)))->sv);
 			if(perr()){
 				fprintf(stderr, "(%d:%d) %s\n", par.r+1, par.c+1, drom_to_utf8(lmcstr(par.error))->sv);
 				exit(1);
 			}
 			
-			printf("Writing bytecode to %s...\n", output_file);
+			printf("Writing bytecode to %s\n", output_file);
 			write_bytecode_to_assembly(prog, output_file);
 			z++;
-			repl=0;
 		}
 		else if(has_suffix(argv[z],".lil")){repl=0;runfile(argv[z],env),z++;}
 	}if(!repl){exit(0);}

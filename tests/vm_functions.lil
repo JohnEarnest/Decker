@@ -1,0 +1,14 @@
+# Function definition and closure example
+on add x y do
+  x + y
+end
+
+on counter start do
+  on increment do
+    start: start + 1
+  end
+end
+
+c: counter[10]
+show[c[]]  # 11
+show[c[]]  # 12

@@ -1,0 +1,22 @@
+# Recursion and tail call optimization example
+
+# Standard recursion (not tail-optimized)
+on factorial n do
+  if n < 2
+    1
+  else
+    n * factorial[n-1]
+  end
+end
+
+# Tail-recursive version
+on factorial_tail n acc do
+  if n < 2
+    acc
+  else
+    factorial_tail[n-1 n*acc]
+  end
+end
+
+show[factorial[5]]       # 120
+show[factorial_tail[5 1]] # 120

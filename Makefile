@@ -132,3 +132,4 @@ docs:
 	@./c/build/lilt scripts/lildoc.lil docs/format.md      docs/format.html
 	@./c/build/lilt scripts/lildoc.lil docs/lilquickref.md docs/lilquickref.html
 	@./c/build/lilt scripts/lildoc.lil docs/learn.md       docs/learn.html
+	@./c/build/lilt scripts/lildoc.lil docs/vm.md          docs/vm.html

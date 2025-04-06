@@ -1,0 +1,4 @@
+# Basic operations example
+x: 42
+y: x + 10
+show[x, y]
