@@ -1,20 +1,20 @@
 title:The Lil Virtual Machine
 
-# The Lil Virtual Machine
-
+The Lil Virtual Machine
+=======================
 Lil is implemented as a stack-based virtual machine. This document describes the virtual machine's architecture, opcodes, and how various language features are implemented.
 
-## Stack-Based Architecture
-
+Stack-Based Architecture
+------------------------
 The Lil VM is a stack-based virtual machine, meaning that operations primarily manipulate values on a stack. The VM maintains several stacks:
 
-- **Parameter stack**: Holds values that are being operated on
-- **Environment stack**: Holds lexical environments for variable lookup
-- **Task stack**: Holds blocks of code to be executed
-- **Program counter stack**: Holds the current execution position in each task
+- _Parameter stack_: Holds values that are being operated on
+- _Environment stack_: Holds lexical environments for variable lookup
+- _Task stack_: Holds blocks of code to be executed
+- _Program counter stack_: Holds the current execution position in each task
 
-## Opcodes
-
+Opcodes
+-------
 The VM supports the following opcodes:
 
 | Opcode | Description |
@@ -47,8 +47,8 @@ The VM supports the following opcodes:
 | `FMAP` | Map a function over a collection |
 | `LINE` | Source code line number (for debugging) |
 
-## Handling Literals
-
+Handling Literals
+-----------------
 Literals in Lil are handled using the `LIT` opcode. When the compiler encounters a literal value (number, string, etc.), it adds the value to a literal table in the bytecode block and emits a `LIT` instruction with an index into this table.
 
 For example, the Lil code:
@@ -75,10 +75,8 @@ Compiles to:
 LIT "hello"
 ```
 
-## Function Calls and Closures
-
-### Function Calls
-
+Function Calls
+--------------
 Function calls in Lil are implemented using the `CALL` opcode. When a function is called:
 
 1. The function and its arguments are pushed onto the stack
@@ -102,8 +100,8 @@ BUND 1        # Bundle the arguments into a list
 CALL          # Call the function
 ```
 
-### Tail Call Optimization
-
+Tail Call Optimization
+----------------------
 Lil supports tail call optimization through the `TAIL` opcode. When a function call is the last operation in a function, the `TAIL` opcode is used instead of `CALL`. This avoids growing the call stack for recursive functions.
 
 For example, the Lil code:
@@ -132,8 +130,8 @@ end
 
 The call to `factorial_tail` is in tail position and will be compiled using the `TAIL` opcode.
 
-### Closures
-
+Closures
+--------
 Closures in Lil are implemented using the `BIND` opcode. A closure captures the current lexical environment, allowing functions to access variables from their defining scope.
 
 For example, the Lil code:
@@ -148,12 +146,10 @@ end
 
 The `increment` function captures the `start` variable from its enclosing scope. When `counter` is called, it returns a closure that has access to its own private `start` variable.
 
-## Examples
-
 Let's look at some examples of Lil code and their corresponding VM assembly.
 
-### Simple Assignment
-
+Simple Assignment
+-----------------
 ```lil
 x: 42
 ```
@@ -165,8 +161,8 @@ LIT 42
 SET "x"
 ```
 
-### Function Definition
-
+Function Definition
+-------------------
 ```lil
 on add x y do
   x + y
@@ -185,8 +181,8 @@ LIT "function:add" {
 BIND
 ```
 
-### Conditional
-
+Conditional
+-----------
 ```lil
 if x > 10
   "large"
@@ -209,8 +205,8 @@ LIT "small"
 L1:
 ```
 
-### Loop
-
+Loop
+----
 ```lil
 each x in 1,2,3
   x * 2
@@ -235,6 +231,6 @@ NEXT L0
 L1:
 ```
 
-## Conclusion
-
+Conclusion
+----------
 The Lil virtual machine is a simple yet powerful stack-based VM that efficiently implements the Lil language. Its design allows for features like closures, tail call optimization, and a clean separation between the compiler and the runtime.
