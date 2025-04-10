@@ -55,15 +55,18 @@ endif
 # include potentially unsafe/nonportable scripting APIs
 # FLAGS:=$(FLAGS) -DDANGER_ZONE
 
-decker: resources
+decker: c/build/decker
+lilt: c/build/lilt
+
+c/build/decker: c/resources.h c/decker.c
 	@mkdir -p c/build
 	@$(COMPILER) ./c/decker.c -o ./c/build/decker $(SDL) $(FLAGS) -DVERSION="\"$(VERSION)\""
 
-resources:
+c/resources.h: examples/decks/tour.deck
 	@chmod +x ./scripts/resources.sh
 	@./scripts/resources.sh examples/decks/tour.deck
 
-lilt: resources
+c/build/lilt: c/resources.h c/lilt.c
 	@mkdir -p c/build
 	@$(COMPILER) ./c/lilt.c -o ./c/build/lilt $(FLAGS) -DVERSION="\"$(VERSION)\""
 
