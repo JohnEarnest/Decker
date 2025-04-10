@@ -51,6 +51,9 @@ endif
 ifneq ("$(EXTRA_FLAGS)","")
 	FLAGS:=$(FLAGS) $(EXTRA_FLAGS)
 endif
+ifneq ($(V),1)
+	Q:=@
+endif
 
 # include potentially unsafe/nonportable scripting APIs
 # FLAGS:=$(FLAGS) -DDANGER_ZONE
@@ -60,15 +63,15 @@ lilt: c/build/lilt
 
 c/build/decker: c/resources.h c/decker.c
 	@mkdir -p c/build
-	@$(COMPILER) ./c/decker.c -o ./c/build/decker $(SDL) $(FLAGS) -DVERSION="\"$(VERSION)\""
+	$(Q)$(COMPILER) ./c/decker.c -o ./c/build/decker $(SDL) $(FLAGS) -DVERSION="\"$(VERSION)\""
 
 c/resources.h: examples/decks/tour.deck
 	@chmod +x ./scripts/resources.sh
-	@./scripts/resources.sh examples/decks/tour.deck
+	$(Q)./scripts/resources.sh examples/decks/tour.deck
 
 c/build/lilt: c/resources.h c/lilt.c
 	@mkdir -p c/build
-	@$(COMPILER) ./c/lilt.c -o ./c/build/lilt $(FLAGS) -DVERSION="\"$(VERSION)\""
+	$(Q)$(COMPILER) ./c/lilt.c -o ./c/build/lilt $(FLAGS) -DVERSION="\"$(VERSION)\""
 
 clean:
 	@rm -rf ./c/build/
