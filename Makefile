@@ -51,84 +51,88 @@ endif
 ifneq ("$(EXTRA_FLAGS)","")
 	FLAGS:=$(FLAGS) $(EXTRA_FLAGS)
 endif
+# give the user the option for a verbose build by doing make V=1
+ifneq ($(V),1)
+	Q=@
+endif
 
 # include potentially unsafe/nonportable scripting APIs
 # FLAGS:=$(FLAGS) -DDANGER_ZONE
 
 resources:
-	@chmod +x ./scripts/resources.sh
-	@./scripts/resources.sh examples/decks/tour.deck
+	$(Q)chmod +x ./scripts/resources.sh
+	$(Q)./scripts/resources.sh examples/decks/tour.deck
 
 lilt: resources
-	@mkdir -p c/build
-	@$(COMPILER) ./c/lilt.c -o ./c/build/lilt $(FLAGS) -DVERSION="\"$(VERSION)\""
+	$(Q)mkdir -p c/build
+	$(Q)$(COMPILER) ./c/lilt.c -o ./c/build/lilt $(FLAGS) -DVERSION="\"$(VERSION)\""
 
 decker: resources
-	@mkdir -p c/build
-	@$(COMPILER) ./c/decker.c -o ./c/build/decker $(SDL) $(FLAGS) -DVERSION="\"$(VERSION)\""
+	$(Q)mkdir -p c/build
+	$(Q)$(COMPILER) ./c/decker.c -o ./c/build/decker $(SDL) $(FLAGS) -DVERSION="\"$(VERSION)\""
 
 clean:
-	@rm -rf ./c/build/
-	@rm -rf ./js/build/
-	@rm -f docs/*.html
+	$(Q)rm -rf ./c/build/
+	$(Q)rm -rf ./js/build/
+	$(Q)rm -f docs/*.html
 
 install:
-	@chmod +x ./scripts/install.sh
-	@./scripts/install.sh
+	$(Q)chmod +x ./scripts/install.sh
+	$(Q)./scripts/install.sh
 
 uninstall:
-	@chmod +x ./scripts/uninstall.sh
-	@./scripts/uninstall.sh
+	$(Q)chmod +x ./scripts/uninstall.sh
+	$(Q)./scripts/uninstall.sh
 
 test: lilt
-	@chmod +x ./scripts/test_interpreter.sh
-	@./scripts/test_interpreter.sh "./c/build/lilt "
-	@./c/build/lilt tests/dom/arrays.lil
-	@./c/build/lilt tests/dom/images.lil
-	@./c/build/lilt tests/dom/domtests.lil
-	@./c/build/lilt tests/dom/test_roundtrip.lil
-	@./c/build/lilt tests/puzzles/weeklychallenge.lil
+	$(Q)chmod +x ./scripts/test_interpreter.sh
+	$(Q)./scripts/test_interpreter.sh "./c/build/lilt "
+	$(Q)./c/build/lilt tests/dom/arrays.lil
+	$(Q)./c/build/lilt tests/dom/images.lil
+	$(Q)./c/build/lilt tests/dom/domtests.lil
+	$(Q)./c/build/lilt tests/dom/test_roundtrip.lil
+	$(Q)./c/build/lilt tests/puzzles/weeklychallenge.lil
 
 run: lilt
-	@./c/build/lilt
+	$(Q)./c/build/lilt
 
 rundecker: decker
 	./c/build/decker
 
 .PHONY: jsres
 js: jsres
-	@mkdir -p js/build/
-	@echo "VERSION=\"${VERSION}\"" > js/build/lilt.js
-	@cat js/lil.js js/repl.js >> js/build/lilt.js
+	$(Q)mkdir -p js/build/
+	$(Q)echo "VERSION=\"${VERSION}\"" > js/build/lilt.js
+	$(Q)cat js/lil.js js/repl.js >> js/build/lilt.js
 
 testjs: js
-	@chmod +x ./scripts/test_interpreter.sh
-	@./scripts/test_interpreter.sh "node js/build/lilt.js"
-	@node js/build/lilt.js tests/dom/arrays.lil
-	@node js/build/lilt.js tests/dom/images.lil
-	@node js/build/lilt.js tests/dom/domtests.lil
-	@node js/build/lilt.js tests/dom/test_roundtrip.lil
-	@node js/build/lilt.js tests/puzzles/weeklychallenge.lil
+	$(Q)chmod +x ./scripts/test_interpreter.sh
+	$(Q)./scripts/test_interpreter.sh "node js/build/lilt.js"
+	$(Q)node js/build/lilt.js tests/dom/arrays.lil
+	$(Q)node js/build/lilt.js tests/dom/images.lil
+	$(Q)node js/build/lilt.js tests/dom/domtests.lil
+	$(Q)node js/build/lilt.js tests/dom/test_roundtrip.lil
+	$(Q)node js/build/lilt.js tests/puzzles/weeklychallenge.lil
 
 testawk:
-	@chmod +x ./scripts/test_interpreter.sh
-	@./scripts/test_interpreter.sh "awk -f tools/awk/lila.awk"
-	@awk -f tools/awk/lila.awk tests/dom/arrays.lil
-	@awk -f tools/awk/lila.awk tests/dom/images.lil
-	@awk -f tools/awk/lila.awk tests/puzzles/weeklychallenge.lil
+	$(Q)chmod +x ./scripts/test_interpreter.sh
+	$(Q)./scripts/test_interpreter.sh "awk -f tools/awk/lila.awk"
+	$(Q)awk -f tools/awk/lila.awk tests/dom/arrays.lil
+	$(Q)awk -f tools/awk/lila.awk tests/dom/images.lil
+	$(Q)awk -f tools/awk/lila.awk tests/puzzles/weeklychallenge.lil
 
 web-decker: js
-	@chmod +x ./scripts/web_decker.sh
-	@./scripts/web_decker.sh examples/decks/tour.deck js/build/decker.html $(VERSION)
+	$(Q)chmod +x ./scripts/web_decker.sh
+	$(Q)./scripts/web_decker.sh examples/decks/tour.deck js/build/decker.html $(VERSION)
 
 runweb: web-decker
 	$(OPEN) js/build/decker.html
 
 .PHONY: docs
 docs:
-	@./c/build/lilt scripts/lildoc.lil docs/lil.md         docs/lil.html
-	@./c/build/lilt scripts/lildoc.lil docs/lilt.md        docs/lilt.html
-	@./c/build/lilt scripts/lildoc.lil docs/decker.md      docs/decker.html
-	@./c/build/lilt scripts/lildoc.lil docs/format.md      docs/format.html
-	@./c/build/lilt scripts/lildoc.lil docs/lilquickref.md docs/lilquickref.html
-	@./c/build/lilt scripts/lildoc.lil docs/learn.md       docs/learn.html
+	$(Q)./c/build/lilt scripts/lildoc.lil docs/lil.md         docs/lil.html
+	$(Q)./c/build/lilt scripts/lildoc.lil docs/lilt.md        docs/lilt.html
+	$(Q)./c/build/lilt scripts/lildoc.lil docs/decker.md      docs/decker.html
+	$(Q)./c/build/lilt scripts/lildoc.lil docs/format.md      docs/format.html
+	$(Q)./c/build/lilt scripts/lildoc.lil docs/lilquickref.md docs/lilquickref.html
+	$(Q)./c/build/lilt scripts/lildoc.lil docs/learn.md       docs/learn.html
