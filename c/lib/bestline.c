@@ -1318,6 +1318,7 @@ static char HasPendingInput(int fd) {
     return poll(p, 1, 0) == 1;
 }
 
+ssize_t getdelim(char ** restrict lineptr, size_t * restrict n, int delimiter, FILE *stream);
 static char *GetLineBlock(FILE *f) {
     ssize_t rc;
     char *p = 0;
