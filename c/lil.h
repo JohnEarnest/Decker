@@ -2,6 +2,7 @@
 #ifndef __COSMOPOLITAN__
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <math.h>
 #include <string.h>
 #include <ctype.h>
@@ -457,7 +458,7 @@ hash_t hash_key(lv*x){
 	else if(lis(x)        ){hash_t r=1;EACH(z,x)r=(31*r)+(0xFF&x->sv[z]);return r;}
 	else if(lil(x)        ){hash_t r=1;EACH(z,x)r=(31*r)+hash_key(x->lv[z]);return r;}
 	else if(lid(x)||lit(x)){hash_t r=1;EACH(z,x)r=(31*((31*r)+hash_key(x->lv[z])))+hash_key(x->kv[z]);return r;}
-	else{return (hash_t)x;}
+	else{return (hash_t)((uintptr_t)x);}
 }
 void hash_add(lv*x){hash_t i=hash_key(x)%hash_n;while(hash_v[i])i=(i+1)%hash_n;hash_v[i]=x;}
 int hash_in(lv*x){hash_t i=hash_key(x)%hash_n;while(hash_v[i]){if(matchr(hash_v[i],x))return 1;i=(i+1)%hash_n;}return 0;}
