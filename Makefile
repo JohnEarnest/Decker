@@ -61,7 +61,7 @@ endif
 decker: c/build/decker
 lilt: c/build/lilt
 
-c/build/decker: c/resources.h c/decker.c
+c/build/decker: c/resources.h c/decker.c c/dom.h c/lil.h
 	@mkdir -p c/build
 	$(Q)$(COMPILER) ./c/decker.c -o ./c/build/decker $(SDL) $(FLAGS) -DVERSION="\"$(VERSION)\""
 
@@ -69,7 +69,7 @@ c/resources.h: examples/decks/tour.deck
 	@chmod +x ./scripts/resources.sh
 	$(Q)./scripts/resources.sh examples/decks/tour.deck
 
-c/build/lilt: c/resources.h c/lilt.c
+c/build/lilt: c/resources.h c/lilt.c c/lil.h
 	@mkdir -p c/build
 	$(Q)$(COMPILER) ./c/lilt.c -o ./c/build/lilt $(FLAGS) -DVERSION="\"$(VERSION)\""
 

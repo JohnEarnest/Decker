@@ -2718,7 +2718,7 @@ lv* deck_read(lv*x){
 	#define dend      (!x->sv[i]||has_prefix(x->sv+i,"</script>"))
 	#define descs(n)  {str_addc(&n,dmatch("{l}")?'{': dmatch("{r}")?'}': dmatch("{c}")?':': dmatch("{s}")?'/': x->sv[i++]);}
 	#define did(n,e)  str _##n=str_new();while(!dend&&!dmatch(e))descs(_##n);lv*n=lmstr(_##n);
-	dmatch("<meta charset=\"UTF-8\">");
+	dmatch("<meta charset=\"utf-8\">");
 	dmatch("<body><script language=\"decker\">");while(!dend){
 		if(x->sv[i]=='\n'){i++;}
 		else if(x->sv[i]=='#'){while(!dend&&x->sv[i]!='\n')i++;}
