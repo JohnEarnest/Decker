@@ -2986,6 +2986,9 @@ int can_coalesce(int move){
 	if(has_redo()||doc_hist->c==0)return 0; // must be at the leading edge, must be a preceding operation
 	lv*prev=doc_hist->lv[doc_hist_cursor-1];
 	if(ln(dget(prev,lmistr("type")))!=edit_ob_props)return 0; // preceding op must be the same type
+	lv*c=con(); // preceding op must target widgets in the same container(!)
+	{lv*v=dget(prev,lmistr("def" ));if(v){if(!prototype_is(c)||!matchr(ifield(c,"name" ),v))return 0;}}
+	{lv*v=dget(prev,lmistr("card"));if(v){if(!card_is(c)     ||!matchr(ifield(c,"index"),v))return 0;}}
 	lv*after=dget(prev,lmistr("after"));
 	if(after->c!=ob.sel->c)return 0; // item count must match
 	EACH(z,ob.sel){
