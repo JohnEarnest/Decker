@@ -69,7 +69,7 @@ c/resources.h: examples/decks/tour.deck
 	@chmod +x ./scripts/resources.sh
 	$(Q)./scripts/resources.sh examples/decks/tour.deck
 
-c/build/lilt: c/resources.h c/lilt.c c/lil.h
+c/build/lilt: c/resources.h c/lilt.c c/dom.h c/lil.h
 	@mkdir -p c/build
 	$(Q)$(COMPILER) ./c/lilt.c -o ./c/build/lilt $(FLAGS) -DVERSION="\"$(VERSION)\""
 
