@@ -323,3 +323,5 @@ if !0~args
   r:write[dst result]
   if !r error["unable to write to %s!" dst] end
 end
+exit[0]
+
