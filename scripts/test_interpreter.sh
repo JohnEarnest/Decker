@@ -30,7 +30,7 @@ positive_test() {
 negative_test() {
 	rm -rf temp.out
 	rm -rf temp.err
-	$INTERPRETER "$1" temp.ch8 >> temp.out 2>> temp.err
+	$INTERPRETER "$1" >> temp.out 2>> temp.err
 	ec=$?
 	if ! diff -q --strip-trailing-cr temp.err $2; then
 		echo "reference error doesn't match for ${1}:"

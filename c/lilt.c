@@ -117,17 +117,18 @@ int main(int argc,char**argv){
 			if(has_suffix(path,".lil"))runfile(path,env);
 		}}closedir(dir);
 	}
-	int repl=1;for(int z=1;z<argc;z++){
-		if(!strcmp(argv[z],"-h")){repl=0;
+	for(int z=1;z<argc;z++){
+		if(!strcmp(argv[z],"-h")){
 			printf("usage: %s [FILE.lil...] [-e EXPR...]\nif present, execute a FILE and exit\n",argv[0]);
 			printf("-e : evaluate STRING and exit\n-h : display this information\n");
 		}
-		else if(!strcmp(argv[z],"-e")){repl=0;
+		else if(!strcmp(argv[z],"-e")){
 			if(z+1>=argc)fprintf(stderr,"no expression specified.\n"),exit(1);
 			runstring(argv[z+1],env),z++;
 		}
-		else if(has_suffix(argv[z],".lil")){repl=0;runfile(argv[z],env),z++;}
-	}if(!repl){exit(0);}
+		else{runfile(argv[z],env);}
+		if(z==argc-1)exit(0);
+	}
 	while(1){
 		char*line=bestlineWithHistory(" ","lilt");
 		if (!line)break;

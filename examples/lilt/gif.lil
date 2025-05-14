@@ -1,6 +1,6 @@
 # export an animated GIF image.
 
-deck:readdeck[]
+deck:newdeck[]
 canvas:deck.card.add["canvas"]
 canvas.size:160,160
 

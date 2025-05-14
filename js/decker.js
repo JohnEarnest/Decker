@@ -2770,7 +2770,9 @@ ob_destroy=_=>{
 }
 can_coalesce=move=>{
 	if(has_redo()||doc_hist.length==0)return false
-	const prev=doc_hist[doc_hist_cursor-1];if(prev.type!='ob_props')return false
+	const prev=doc_hist[doc_hist_cursor-1],c=con();if(prev.type!='ob_props')return false
+	if('def'  in prev&&(!prototype_is(c)||ls(prev.def)!=ls(ifield(c,'name' ))))return false
+	if('card' in prev&&(!card_is     (c)||prev.card   !=ln(ifield(c,'index'))))return false
 	if(Object.keys(prev.after).length!=ob.sel.length)return false
 	for(let z=0;z<ob.sel.length;z++){
 		const key=Object.keys(prev.after)[z], val=prev.after[key]

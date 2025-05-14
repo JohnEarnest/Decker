@@ -18,7 +18,7 @@ on step do
 	board.paste[new]
 end
 
-deck:readdeck[]
+deck:newdeck[]
 board:deck.card.add["canvas"]
 board.size:80,40
 randomize[]
