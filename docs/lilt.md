@@ -74,7 +74,7 @@ Built-in Functions
 ------------------
 | Name             | Description                                                                                                                 | Purpose |
 | :--------------- | :-------------------------------------------------------------------------------------------------------------------------- | :------ |
-| `input[x]`       | Read a line from _stdin_ as a string, optionally displaying `x` as if with `print[]`, without the newline. Gets `0` on EOF. | Console |
+| `input[x]`       | Read a line from _stdin_ as a string, optionally displaying `x` as if with `print[]`, without the newline. Gets nil on EOF. | Console |
 | `show[...x]`     | Print a human-comprehensible representation of the value `x` to _stdout_ followed by a newline, and return `x`.             | Console |
 | `print[...x]`    | Print a string `x` to _stdout_ followed by a newline. If more args are provided, `format` all but the first using `x`.(0)   | Console |
 | `error[...x]`    | Print a string `x` to _stderr_ followed by a newline. If more args are provided, `format` all but the first using `x`.(0)   | Console |

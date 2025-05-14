@@ -452,7 +452,7 @@ If specified, the transition time `z` is the number of frames (at 60 frames/seco
 5) `eval[x y z]` returns a dictionary which may contain:
 - `error`: a string giving any error message produced during parsing.
 - `errorpos`: a pair giving a `(line,column)` position (both counting from 0) in `x` where any errors were encountered.
-- `value`: the value of the last expression in the program. On a parse error, `value` will be the number `0`.
+- `value`: the value of the last expression in the program. On a parse error, `value` will be nil.
 - `vars`: a dictionary containing any variable bindings made while executing the program. (This also includes bindings from argument `y`.)
 
 By default, code executed within `eval[]` does not have access to any variables from the caller that are not explicitly passed in via the second argument (`y`), including global functions and constants, nor can it modify variables of the caller; the code is executed in its own isolated scope. In the following example, we provide our `eval[]`ed code with the `show[]` function and a constant:
@@ -471,7 +471,7 @@ If the third argument (`z`) is truthy, `eval[]` will instead execute _within_ th
 - if `y` is negative, choose a list of `|y|` random elements _without repeats_, provided sufficient elements in `y`.
 - if `random[]` is called without any arguments, the result will be a single floating-point number between 0 and 1.
 
-7) Column specs are strings in which each character indicates the type of a CSV column. `readcsv[]` and `writecsv[]` will ignore excess columns if more exist in the source data than in the column spec. Missing columns are padded with an appropriate "null". If the column spec is not a string, these functions will read/write every column in the source data as strings. Any pattern type recognized by `parse` and `format` is permitted as a column spec character, but they are interpreted without flags or subsequent delimiters. Additionally, underscore (`_`) can be used in a column spec to skip a column. If a single-character delimiter `d` is provided, it is used instead of comma (`,`) between records.
+7) Column specs are strings in which each character indicates the type of a CSV column. `readcsv[]` and `writecsv[]` will ignore excess columns if more exist in the source data than in the column spec. Missing columns are padded with nil. If the column spec is not a string, these functions will read/write every column in the source data as strings. Any pattern type recognized by `parse` and `format` is permitted as a column spec character, but they are interpreted without flags or subsequent delimiters. Additionally, underscore (`_`) can be used in a column spec to skip a column. If a single-character delimiter `d` is provided, it is used instead of comma (`,`) between records.
 
 8) `writexml[]` will convert anything which is not a dictionary, list, or _Array Interface_ into a string with the special characters (`"`,`'`,`<`,`>` and `&`) encoded as [XML entities](https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references#Predefined_entities_in_XML). Lists will be recursively converted and concatenated without inserting extra whitespace. Any _Array Interfaces_ will be interpreted as having cast `char` and embedded directly _without_ escaping XML entities; Arrays can thus be used as a way to produce arbitrary XML/HTML entities or insert text fragments that are already valid XML. Dictionaries will be interpreted as XML tags with the following keys:
 - `tag`: the name of the XML tag.
@@ -877,7 +877,7 @@ Images are dynamically created interfaces, each representing a mutable rectangul
 | `x.bounds`             | A dictionary containing the `pos` and `size` of a rectangle bounding the non-zero pixels (if any) of the image.          |
 | `x.pixels`             | A list of lists of pattern indices of every pixel of the image. r/w.                                                     |
 | `x.size`               | The `size` of the image in pixels. Resizing pads with `0` or truncates, as needed. r/w.                                  |
-| `x[pos]`               | The pattern index of an (x,y) pixel of the image. Reads `0` out of bounds, ignores out of bounds writes. r/w.            |
+| `x[pos]`               | The pattern index of an (x,y) pixel of the image. Reads nil out of bounds, ignores out of bounds writes. r/w.            |
 | `x.map[x y]`           | Replace every pixel of the image by indexing the dictionary `x`, using `y` as a default if provided.                     |
 | `x.transform[x]`       | Update the image in place according to one of {`"horiz"`,`"vert"`,`"flip"`,`"left"`,`"right"`,`"dither"`}.               |
 | `x.rotate[x]`          | Update the image in place, rotating it clockwise around its centerpoint by `x` radians.                                  |
@@ -896,7 +896,7 @@ colors.red in i.hist                                # does this image contain an
 ```
 
 The `image.bounds` attribute can be used to identify and trim empty areas from the edges of an image:
-```
+```lil
 b:i.bounds
 i.copy[b.pos b.size]
 ```
@@ -949,7 +949,7 @@ Sounds are dynamically created interfaces, each representing a mutable buffer of
 | `x.hist`     | A dictionary mapping the distinct sample values in this sound to how many times they appear.               |
 | `x.size`     | An integer giving the number of samples in the sound. Resizing pads with `0` or truncates, as needed. r/w. |
 | `x.duration` | A float giving the play time of the sound in seconds.                                                      |
-| `x[y]`       | The value of sample `y`. Reads `0` out of bounds, ignores out of bounds writes. r/w.                       |
+| `x[y]`       | The value of sample `y`. Reads nil out of bounds, ignores out of bounds writes. r/w.                       |
 | `x.map[x y]` | Replace every sample of the sound by indexing the dictionary `x`, using `y` as a default if provided.      |
 
 The following example creates a new sound and then writes a 1 second long A-4 (440hz) sine wave to it:
@@ -1007,7 +1007,7 @@ Fonts are dynamically created interfaces, each representing the glyphs of a bitm
 | `x["a"]` / `x.a` | Access a copy of the glyphs of the font as Image interfaces, by single-character value. r/w.  |
 | `x.textsize[x]`  | Obtain a `size` for the outer dimensions of a string `x` when drawn in the font.              |
 
-The glyph images of a font will always have the same height as the font, and represent the true width of the glyph without padding or spacing. Writing images to glyph slots will clip the image to respect the font's `size` as a maximum. Font glyphs are strictly monochrome- they may not contain patterns or colors. Accessing an invalid glyph index will return an empty image. Writes to invalid glyph indices are ignored. Writing the number `0` or an Image interface with width `0` to a glyph by index or character name will remove it from the font.
+The glyph images of a font will always have the same height as the font, and represent the true width of the glyph without padding or spacing. Writing images to glyph slots will clip the image to respect the font's `size` as a maximum. Font glyphs are strictly monochrome- they may not contain patterns or colors. Accessing an invalid glyph index will return an empty image. Writes to invalid glyph indices are ignored. Writing nil, the number `0`, or an Image interface with width `0` to a glyph by index or character name will remove it from the font.
 
 Decker comes with three built-in fonts:
 - `body`, a variable-width body text font.
@@ -1183,10 +1183,10 @@ The grid widget represents an interactive spreadsheet-style view of a table.
 | `x.scroll`              | Int. The first row of the table to display. r/w.                                                      |
 | `x.row`                 | Int. The index of the selected row of the table, or -1 for no selection. r/w.                         |
 | `x.col`                 | Int. The index of the selected column of the table, or -1 for no selection. r/w.                      |
-| `x.colname`             | String. The name of the selected column of the table, or `0` for no selection. r/w.                   |
+| `x.colname`             | String. The name of the selected column of the table, or nil for no selection. r/w.                   |
 | `x.cell`                | Access `(x.col,x.row)` as a pair. r/w.                                                                |
 | `x.rowvalue`            | Dict. The selected row of the table, or an empty dictionary for no selection. r/w.                    |
-| `x.cellvalue`           | Anything. The selected cell value of the table, or `0` for no selection. r/w.                         |
+| `x.cellvalue`           | Anything. The selected cell value of the table, or nil for no selection. r/w.                         |
 | `x.format`              | String. A column spec for formatting columns of the table. See `writecsv[]`. r/w.                     |
 | `x.scrollto[r]`         | Scroll as needed to ensure that row `r` of the grid is visible.                                       |
 | `x.event[n ...x]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
@@ -1290,7 +1290,7 @@ Contraptions are custom widgets, defined in a [Prototype](#prototypeinterface). 
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
-| `x.parent`              | The Card, Contraption or Prototype containing this widget.                                            |
+| `x.parent`              | The Card containing this widget.                                                                      |
 | `x.def`                 | The Prototype of this contraption.                                                                    |
 | `x.event[n ...x]`       | Issue an event named `n` at this widget with argument(s) `x`.                                         |
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
@@ -1334,8 +1334,8 @@ A keystore is subject to several constraints:
 
 - Keys are coerced to strings.
 - Since it has a special meaning (above), the key `"keys"` cannot be used for storing data.
-- Values must be recursively composed of JSON-compatible data: numbers, strings, lists, and dictionaries with string keys. Other values will be converted to `0`.
-- Setting a value to 0 will remove the key-value binding from storage.
+- Values must be recursively composed of JSON-compatible data: numbers, strings, lists, and dictionaries with string keys. Other values will be converted to nil.
+- Setting a value to nil will remove the key-value binding from storage.
 
 Prototype Interface
 -------------------
@@ -1425,7 +1425,7 @@ Events are as follows:
 | card        | `view`       | None.                                        | The card is navigated to, or the user enters interaction mode. |
 | contraption | `view`       | None.                                        | The surrounding card is sent a `view` event (see above).       |
 | widget      | `view`       | None.                                        | The surrounding card is active, repeatedly at 60hz.            |
-| card        | `loop`       | Previous _sound interface_ or `0`.           | The card is navigated to, or the background loop completes.    |
+| card        | `loop`       | Previous _sound interface_ or nil.           | The card is navigated to, or the background loop completes.    |
 
 Editing a cell in a grid produces a `changecell` event, which provides an opportunity to parse/validate input, produce side-effects, or cancel applying the change entirely. The `row`, `col`, and `colname` attributes of the target grid (`me`) can be referenced to identify the cell being altered.
 
@@ -1671,8 +1671,8 @@ Contraptions and prototypes have a few important limitations to keep in mind:
 - Prototypes cannot contain contraptions. In other words, contraptions are non-recursive.
 - Unlike a card, contraption instances cannot add or remove "child" widgets dynamically.
 - The [Contraption Interface](#contraptioninterface) does not have a `.widgets` attribute: using `card.widgets` to enumerate and search inner widgets by name will work in the Prototype editor, but will _not_ work in actual contraption instances!
-- Custom attribute reads and writes (from the outside) run in a brief quota, just like transition functions and module startup. If they take too long to execute, they halt and return `0`.
-- Custom attributes cannot be invoked recursively or directly call other custom attributes. If this is attempted, they halt and return `0`. For example, a script inside a prototype should use `get_value[]` instead of `card.value` to access the `value` attribute.
+- Custom attribute reads and writes (from the outside) run in a brief quota, just like transition functions and module startup. If they take too long to execute, they halt and return nil.
+- Custom attributes cannot be invoked recursively or directly call other custom attributes. If this is attempted, they halt and return nil. For example, a script inside a prototype should use `get_value[]` instead of `card.value` to access the `value` attribute.
 
 
 Volatility
@@ -1978,9 +1978,9 @@ Web-Decker also offers its own _danger_ interface which exposes a low-level brid
 | `typeof danger`          | `"danger"`                                                                                  |
 | `danger.js[x args...]`   | Evaluate a string `x` as JavaScript, optionally called with arguments `args`                |
 
-If `danger.js[x]` is called with a single argument, it will evaluate `x` as JavaScript and return the result. If the result of evaluating `x` is a JS function and additional arguments are supplied, those arguments will be passed to the function and it will be called. Lil values are automatically translated to JS values and vice-versa. Numbers, strings, lists, and dictionaries are recursively converted as copies, with appropriate coercion between the respective type systems. Array interfaces are converted into `Uint8Array` objects and vice-versa (irrespective of `cast`) using a shared underlying data store, allowing both Lil and JS to observe future mutations to such a data structure. Array _slices_ are not converted. Resizing Array interfaces from Lil may reallocate the internal buffer, breaking any shared references. Deck, Card, or Widget interfaces are passed unmodified, but should be treated as opaque values from the JS side. Functions are wrapped in thunks: Lil functions are exposed to JS as JS functions accepting and returning JS values, and JS functions are exposed to Lil as Lil functions accepting and returning Lil values. Any other values- including arbitrary JS objects and Lil tables or otherinterfaces- are converted to a JS `null` or a Lil `0`, respectively.
+If `danger.js[x]` is called with a single argument, it will evaluate `x` as JavaScript and return the result. If the result of evaluating `x` is a JS function and additional arguments are supplied, those arguments will be passed to the function and it will be called. Lil values are automatically translated to JS values and vice-versa. Numbers, strings, lists, and dictionaries are recursively converted as copies, with appropriate coercion between the respective type systems. Array interfaces are converted into `Uint8Array` objects and vice-versa (irrespective of `cast`) using a shared underlying data store, allowing both Lil and JS to observe future mutations to such a data structure. Array _slices_ are not converted. Resizing Array interfaces from Lil may reallocate the internal buffer, breaking any shared references. Deck, Card, or Widget interfaces are passed unmodified, but should be treated as opaque values from the JS side. Functions are wrapped in thunks: Lil functions are exposed to JS as JS functions accepting and returning JS values, and JS functions are exposed to Lil as Lil functions accepting and returning Lil values. Any other values- including arbitrary JS objects and Lil tables or otherinterfaces- are converted to a JS `null` or a Lil `nil`, respectively.
 
-Thunked Lil functions called from JS do not include any execution quota limits, and can therefore lock up Decker if used improperly. If any errors are thrown when evaluating `x`, it will return `0` and print error messages to the JS console; if more elaborate error handling is desired, implement it JS-side. Directly calling internal Decker functions is not advised, as these do not necessarily represent a stable API; prefer passing Lil functions into JS to allow it to manipulate the Decker environment whenever possible. Decker reserves a global JavaScript Object named `ext` where injected JS may attach functions or data without risk of colliding with Decker's global definitions. Decker also offers a function named `ext_add_constant(k,v)` which can be used to install functions or data in Lil's global scope, binding a JS string `k` with a JS value (which will be converted as described above). When feasible it is _recommended_ that users package their JS extensions as Lil modules and expose thunked JS functions in the module dictionary instead of installing new global functions with `ext_add_constant()`.
+Thunked Lil functions called from JS do not include any execution quota limits, and can therefore lock up Decker if used improperly. If any errors are thrown when evaluating `x`, it will return nil and print error messages to the JS console; if more elaborate error handling is desired, implement it JS-side. Directly calling internal Decker functions is not advised, as these do not necessarily represent a stable API; prefer passing Lil functions into JS to allow it to manipulate the Decker environment whenever possible. Decker reserves a global JavaScript Object named `ext` where injected JS may attach functions or data without risk of colliding with Decker's global definitions. Decker also offers a function named `ext_add_constant(k,v)` which can be used to install functions or data in Lil's global scope, binding a JS string `k` with a JS value (which will be converted as described above). When feasible it is _recommended_ that users package their JS extensions as Lil modules and expose thunked JS functions in the module dictionary instead of installing new global functions with `ext_add_constant()`.
 
 A few examples:
 ```lil

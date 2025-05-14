@@ -1857,7 +1857,7 @@ if !sys.platform~"web"
 	assert["import keys" ("triple","alpha","beta") (keys i)]
 	assert["import apply" ("A","A","A") i.triple["A"]]
 	assert["import isolated" 999 alpha]
-	assert["import nonexistent file" 0 import["does_not_exist.lil"]]
+	assert["import nonexistent file" nil import["does_not_exist.lil"]]
 end
 
 #######################################

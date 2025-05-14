@@ -253,7 +253,7 @@ draw_lil=(size,align,bare,x)=>{
 	if(lit(x)){
 		const tk=tab_cols(x), tc=tk.length, tr=tab_rowcount(x)
 		const hh=tc?3+font_h(FONT_BODY):3, ch=font_h(FONT_MONO), fh=font_h(FONT_BODY), rows=0|min((size.y-(hh+fh))/ch,tr)
-		const f=dyad.take(NONE,x), cw=range(256).map(x=>0)
+		const f=dyad.take(ZERO,x), cw=range(256).map(x=>0)
 		for(let c=0;c<tc&&c<256;c++){
 			const dr=rows<tr?rows-1:rows;cw[c]=0;for(let r=0;r<dr;r++){
 				const s=show(tab_cell(x,tk[c],r));tab_get(f,tk[c]).push(lms(s))
@@ -455,7 +455,7 @@ set_fullscreen=x=>{
 	else if(!i&&x){modal_enter('fullscreen_lil')}
 }
 setmode=mode=>{
-	n_play([NONE,lms('loop')])
+	n_play([NIL,lms('loop')])
 	grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel=[],wid.active=-1,sc.others=[],dr.poly=[]
 	msg.next_view   =(uimode!=mode)&&mode=='interact'
 	msg.pending_loop=(uimode!=mode)&&mode=='interact'
@@ -847,8 +847,8 @@ grid_insertrow=_=>{
 	const f=ls(grid_format()), x=wid.gv.table, r=lmt(), s=wid.gv.row+1
 	tab_cols(x).map((k,col)=>{
 		const o=tab_get(x,k)
-		tab_set(r,k,range(o.length+1).map(i=>(i==s)?('sluro'.indexOf(f[col])>=0?lms(''):NONE): o[i-(i>=s?1:0)]))
-	});grid_edit(r),iwrite(wid.gt,lms('col'),NONE),iwrite(wid.gt,lms('row'),lmn(s))
+		tab_set(r,k,range(o.length+1).map(i=>(i==s)?('sluro'.indexOf(f[col])>=0?lms(''):ZERO): o[i-(i>=s?1:0)]))
+	});grid_edit(r),iwrite(wid.gt,lms('col'),ZERO),iwrite(wid.gt,lms('row'),lmn(s))
 	const os=wid.gv.scroll,ns=grid_scrollto(x,wid.g,os,s);if(os!=ns){wid.gv.scroll=ns,iwrite(wid.gt,lms('scroll'),lmn(ns))}
 }
 grid_edit_cell=(cell,v)=>{
@@ -886,7 +886,7 @@ layout_index=(x,p)=>{
 		return z==x.lines.length-1?x.layout.length: r.y
 	}return x.layout.length
 }
-layout_last=(x,font)=>x.layout.length>0?last(x.layout): {pos:rect(0,0,1,font_h(font)),line:0,char:'\0',font,arg:NONE}
+layout_last=(x,font)=>x.layout.length>0?last(x.layout): {pos:rect(0,0,1,font_h(font)),line:0,char:'\0',font,arg:ZERO}
 layout_cursor=(x,index,font,f)=>{
 	const bw=f.size.w-5-(f.scrollbar?ARROWS[0].size.x+3:0), bx=f.align=='center'?0|(bw/2): f.align==ALIGN.right?bw: 0
 	const r=x.layout.length>0?rcopy(x.layout[min(index,x.layout.length-1)].pos):rect(bx,0,1,font_h(font))
@@ -1098,8 +1098,8 @@ listen_show_image=(x,v)=>{
 	li.hist.push([x,v]),li.scroll=RTEXT_END
 }
 listen_show=(align,bare,x)=>listen_show_image(draw_lil(rsub(LISTEN_SIZE(),rect(18,5)),align,bare,x),x)
-n_show=(a)=>{a[0]=a[0]||NONE;if(a.length<2){listen_show(ALIGN.right,0,a[0])}else{listen_show(ALIGN.right,1,lms(a.map(show).join(' ')))};return a[0]}
-n_print=(a)=>{a[0]=a[0]||NONE;if(a.length<2){listen_show(ALIGN.right,1,lms(ls(a[0])))}else{listen_show(ALIGN.right,1,a[0]=dyad.format(a[0],lml(a.slice(1))))}return a[0]}
+n_show=(a)=>{a[0]=a[0]||NIL;if(a.length<2){listen_show(ALIGN.right,0,a[0])}else{listen_show(ALIGN.right,1,lms(a.map(show).join(' ')))};return a[0]}
+n_print=(a)=>{a[0]=a[0]||NIL;if(a.length<2){listen_show(ALIGN.right,1,lms(ls(a[0])))}else{listen_show(ALIGN.right,1,a[0]=dyad.format(a[0],lml(a.slice(1))))}return a[0]}
 n_pre_listen=([a])=>{
 	const ev=getev();
 	for(let name of li.vars.keys()){if(!ev.v.get(name))ev.v.set(name,li.vars.get(name))}
@@ -1116,7 +1116,7 @@ listener_eval=_=>{
 	try{
 		const prog=parse(ls(str)), b=lmblk(); ms.text=fieldstr(lms('')),listen_show(ALIGN.left,1,str)
 		const target=uimode=='script'?sc.target: ob.sel.length==1?ob.sel[0]: con()
-		blk_opa(b,op.BUND,1),blk_lit(b,lmnat(n_pre_listen )),blk_lit(b,NONE   ),blk_op(b,op.CALL),blk_op(b,op.DROP),blk_cat(b,prog)
+		blk_opa(b,op.BUND,1),blk_lit(b,lmnat(n_pre_listen )),blk_lit(b,NIL    ),blk_op(b,op.CALL),blk_op(b,op.DROP),blk_cat(b,prog)
 		blk_opa(b,op.BUND,1),blk_lit(b,lmnat(n_post_listen)),blk_op (b,op.SWAP),blk_op(b,op.CALL),blk_op(b,op.DROP),fire_hunk_async(target,b)
 	}catch(e){listen_show(ALIGN.right,1,lms(`error: ${e.x}`));return}
 }
@@ -1139,8 +1139,8 @@ listener=r=>{
 n_panic=z=>{
 	do_panic=1,halt(),states.map(x=>x.t=[]),modal_enter('listen')
 	const s=rect((512-22)-18,16),b=rpair(rect(0,0),s),r=image_make(s),t=frame;frame=draw_frame(r)
-	draw_box(b,0,35),draw_textc(inset(b,2),'PANIC',FONT_MONO,35),frame=t,listen_show_image(r,NONE)
-	n_show(z),li.vars.set('_',z[0]||NONE);return NONE
+	draw_box(b,0,35),draw_textc(inset(b,2),'PANIC',FONT_MONO,35),frame=t,listen_show_image(r,NIL)
+	n_show(z),li.vars.set('_',z[0]||NIL);return NIL
 }
 
 // Audio
@@ -1166,7 +1166,7 @@ load_sound=(file,after)=>{
 }
 sfx_stoploop=_=>{audio_loop_playing.onended=null,audio_loop_playing.stop(),audio_loop=audio_loop_playing=null}
 sfx_doloop=clear=>{
-	const a=audio_loop||NONE,b=lmblk(),pp=pending_popstate;let r=NONE, quota=LOOP_QUOTA
+	const a=audio_loop||NIL,b=lmblk(),pp=pending_popstate;let r=NIL, quota=LOOP_QUOTA
 	blk_get(b,lms('loop')),blk_lit(b,lml([a])),blk_op(b,op.CALL)
 	fire_hunk_async(ifield(deck,'card'),b)
 	while(quota>0&&running()){runop(),quota--}
@@ -1190,11 +1190,11 @@ n_play=([x,hint])=>{
 			audio_loop_playing.start()
 		}
 		else if(audio_loop){sfx_stoploop()}
-		return NONE
+		return NIL
 	}
-	const sfx=!x?x: sound_is(x)?x: dget(deck.sounds,lms(ls(x)));if(!sfx||ln(ifield(sfx,'size'))<1)return NONE;initaudio();if(!audio)return
+	const sfx=!x?x: sound_is(x)?x: dget(deck.sounds,lms(ls(x)));if(!sfx||ln(ifield(sfx,'size'))<1)return NIL;initaudio();if(!audio)return
 	const playing=prepare(sfx);playing.addEventListener('ended',_=>{samples_playing--,audio_playing=samples_playing>0})
-	playing.start(),samples_playing++,audio_playing=1;return NONE
+	playing.start(),samples_playing++,audio_playing=1;return NIL
 }
 stop_sound_pump=_=>{
 	if(au.clip)au.clip.stop();au.clip=null,clearInterval(au.tick),au.mode='stopped'
@@ -1880,7 +1880,7 @@ modals=_=>{
 				}save_bin(name,writegif(a?frames:[frames[0]], a?frames.map(x=>10):[10]))
 			}
 			if(subtype=='save_deck'    )savedeck()
-			if(subtype=='save_locked'  )iwrite(deck,lms('locked'),ONE),savedeck(),iwrite(deck,lms('locked'),NONE)
+			if(subtype=='save_locked'  )iwrite(deck,lms('locked'),ONE),savedeck(),iwrite(deck,lms('locked'),ZERO)
 			if(subtype=='export_script')save_text(name,ls(rtext_string(sc.f.table)))
 			if(subtype=='export_image' )save_image()
 			if(subtype=='save_lil'){
@@ -2206,22 +2206,22 @@ n_open=([type,hint])=>{
 	ms.verb=t=='array'?lms(t): hint?ls(hint):'';return r
 }
 n_save=([x,s])=>{
-	modal_enter('save_lil');x=x||NONE;ms.path_suffix=array_is(x)&&s?ls(s):''
+	modal_enter('save_lil');x=x||NIL;ms.path_suffix=array_is(x)&&s?ls(s):''
 	if(array_is(x)                                      )ms.desc='Save a binary file.'        ,ms.text=fieldstr(lms('untitled'+ms.path_suffix))
 	if(sound_is(x)                                      )ms.desc='Save a .wav sound file.'    ,ms.text=fieldstr(lms('sound.wav'))
 	if(deck_is(x)                                       )ms.desc='Save a .deck or .html file.',ms.text=fieldstr(lms('untitled.deck'))
 	if(image_is(x)||lid(x)||(lil(x)&&x.v.some(image_is)))ms.desc='Save a .gif image file.'    ,ms.text=fieldstr(lms('image.gif'))
-	ms.verb=x;return NONE
+	ms.verb=x;return NIL
 }
 n_alert=([t,p,x,y])=>{
 	if(ls(p)=='bool'){modal_enter('confirm_lil'),ms.verb=x?lms(ls(x)):null}
 	else if(ls(p)=='string'){modal_enter('input_lil');if(x)ms.text=fieldstr(x)}
 	else if(ls(p)=='choose'){
 		modal_enter('choose_lil')
-		ms.verb=!x?ld(NONE): lil(x)?dyad.dict(x,x): ld(x); if(count(ms.verb)<1)ms.verb=ld(monad.list(NONE))
+		ms.verb=!x?ld(NIL): lil(x)?dyad.dict(x,x): ld(x); if(count(ms.verb)<1)ms.verb=ld(monad.list(NIL))
 		ms.grid=gridtab(lt(monad.keys(ms.verb)), y?dvix(ms.verb,y):-1)
 	}else{modal_enter('alert_lil')}
-	ms.message=plain_or_rich(t);return NONE
+	ms.message=plain_or_rich(t);return NIL
 }
 free_canvas=deck=>{ // make a drawing surface that isn't attached to the parent deck, but is aware of its resources:
 	const d=deck_read('{deck}\n{card:home}\n{widgets}\nc:{"type":"canvas"}')
@@ -3115,19 +3115,19 @@ let viewed=lmd()
 find_animated=_=>{
 	const r=lmd();if(uimode!='interact')return r
 	con_wids().v.map(wid=>{
-		if(lb(ifield(wid,'animated'))&&!dget(viewed,wid))dset(r,wid,NONE)
+		if(lb(ifield(wid,'animated'))&&!dget(viewed,wid))dset(r,wid,ZERO)
 		if(contraption_is(wid))ivalue(wid,'widgets').v.map(cwid=>{if(lb(ifield(cwid,'animated'))&&!dget(viewed,cwid))dset(r,cwid,ONE)})
 	});return r
 }
 fire_animate=targets=>{
 	const root=lmenv(),block=lmblk();primitives(root,deck),constants(root)
-	targets.k.map(w=>{blk_cat(block,event_invoke(w,'view',lml([NONE]),null)),dset(viewed,w,ONE)})
+	targets.k.map(w=>{blk_cat(block,event_invoke(w,'view',lml([NIL]),null)),dset(viewed,w,ONE)})
 	pushstate(root),pending_popstate=1,issue(root,block)
 }
 fire_view=target=>{
 	const root=lmenv();primitives(root,deck),constants(root)
-	const block=event_invoke(target,'view',lml([NONE]),null)
-	ifield(target,'widgets').v.filter(w=>contraption_is(w)&&!dget(viewed,w)).map(w=>{blk_cat(block,event_invoke(w.viewproxy,'view',lml([NONE]),null)),dset(viewed,w,ONE)})
+	const block=event_invoke(target,'view',lml([NIL]),null)
+	ifield(target,'widgets').v.filter(w=>contraption_is(w)&&!dget(viewed,w)).map(w=>{blk_cat(block,event_invoke(w.viewproxy,'view',lml([NIL]),null)),dset(viewed,w,ONE)})
 	pushstate(root),pending_popstate=1,issue(root,block)
 }
 interpret=_=>{
@@ -3146,7 +3146,7 @@ interpret=_=>{
 		if(msg.pending_halt||pending_popstate){/*suppress other new events until this one finishes*/}
 		else if(msg.pending_view){fire_view(con()),msg.pending_view=0}
 		else if(msg.target_click){
-			const arg=grid_is(msg.target_click)?lmn(msg.arg_click.y): canvas_is(msg.target_click)?lmpair(msg.arg_click): NONE
+			const arg=grid_is(msg.target_click)?lmn(msg.arg_click.y): canvas_is(msg.target_click)?lmpair(msg.arg_click): NIL
 			fire_event_async(msg.target_click,'click',arg),msg.target_click=null
 		}
 		else if(msg.target_drag    ){fire_event_async(msg.target_drag    ,'drag'      ,lmpair(msg.arg_drag   )),msg.target_drag    =null}
@@ -3329,7 +3329,7 @@ all_menus=_=>{
 			if(menu_item('Move to Front',ob.sel.length))ob_order(),ob.sel                   .map(w=>iwrite(w,lms('index'),lmn(RTEXT_END))),mark_dirty()
 			if(menu_item('Move Up'      ,ob.sel.length))ob_move_up()
 			if(menu_item('Move Down'    ,ob.sel.length))ob_move_dn()
-			if(menu_item('Move to Back' ,ob.sel.length))ob_order(),ob.sel.slice(0).reverse().map(w=>iwrite(w,lms('index'),NONE          )),mark_dirty()
+			if(menu_item('Move to Back' ,ob.sel.length))ob_order(),ob.sel.slice(0).reverse().map(w=>iwrite(w,lms('index'),ZERO          )),mark_dirty()
 		}
 		if(wid.fv&&wid.f){
 			const selection=wid.fv!=null&&wid.cursor.x!=wid.cursor.y
@@ -3582,7 +3582,7 @@ load_deck=d=>{
 	deck=d, dirty=0, wid.active=-1, wid.hist=[], au.hist=[], doc_hist=[], doc_hist_cursor=0, dr=draw_state(), con_set(null)
 	FONT_BODY=dget(deck.fonts,lms('body')),FONT_MENU=dget(deck.fonts,lms('menu')),FONT_MONO=dget(deck.fonts,lms('mono'))
 	fb=image_make(getpair(ifield(ifield(deck,'card'),'size'))),context=frame=draw_frame(fb),validate_modules(),setmode('interact'),msg.next_view=1
-	seed=0|(new Date().getTime()/1000),n_play([NONE,lms('loop')])
+	seed=0|(new Date().getTime()/1000),n_play([NIL,lms('loop')])
 }
 tick=_=>{
 	pointer.up=ev.mu,pointer.down=ev.md,toolbars()
@@ -3811,7 +3811,7 @@ dopaste=x=>{
 cutcard=_=>{const c=ifield(deck,'card');setclipboard(ls(deck_copy(deck,c))),deck_remove(deck,c),mark_dirty()}
 copycard=_=>{const c=ifield(deck,'card');setclipboard(ls(deck_copy(deck,c)))}
 copywidgetimg=_=>{setclipboard(image_write(draw_widget(ob.sel[0]))),frame=context}
-pasteascanvas=_=>getclipboard(t=>{ob_create([lmd(['type','locked','image','border'].map(lms),[lms('canvas'),ONE,lms(t),NONE])]),frame=context})
+pasteascanvas=_=>getclipboard(t=>{ob_create([lmd(['type','locked','image','border'].map(lms),[lms('canvas'),ONE,lms(t),ZERO])]),frame=context})
 pasteintocanvas=_=>getclipboard(t=>{const i=image_read(t),c=ob.sel[0];iwrite(c,lms('size'),ifield(i,'size')),c.image=i})
 menucut=_=>{const r=docut();if(r)setclipboard(r)}
 menucopy=_=>{const r=docopy();if(r)setclipboard(r)}
@@ -3833,7 +3833,7 @@ q('body').ondrop=e=>{
 	e.preventDefault();const file=e.dataTransfer.files.item(0);if((!file)||lb(ifield(deck,'locked')))return
 	if(/\.(psv|csv)$/i.test(file.name)){
 		file.text().then(t=>{
-			const data=n_readcsv([lms(t),NONE,lms(file.type=='text/csv'?',':'|')])
+			const data=n_readcsv([lms(t),NIL,lms(file.type=='text/csv'?',':'|')])
 			setmode('object'),ob_create([lmd([lms('type'),lms('value')],[lms('grid'),monad.cols(data)])])
 		})
 	}
@@ -3850,7 +3850,7 @@ q('body').ondrop=e=>{
 				const db=(0xFF&(a    ))-(0xFF&(b    ))
 				return (dr*dr)+(dg*dg)+(db*db)
 			}
-			iwrite(deck.patterns,lmn(32),lmn(0xFFFFFF)),iwrite(deck.patterns,lmn(47),NONE)
+			iwrite(deck.patterns,lmn(32),lmn(0xFFFFFF)),iwrite(deck.patterns,lmn(47),ZERO)
 			let pal=ll(dyad.parse(lms('%h'),lml(t.split('\n').slice(0,-1).map(lms))))
 			if(pal.length>14){
 				let a=0,b=0;pal.map((v,i)=>{

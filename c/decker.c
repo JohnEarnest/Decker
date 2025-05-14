@@ -128,7 +128,7 @@ int uimode=mode_interact;lv*ui_container=NULL;
 void setuimode(int mode);// forward ref
 void con_set(lv*x){
 	if(x!=ui_container)setuimode(uimode),msg.next_view=1;
-	if(x!=ui_container&&prototype_is(ui_container))n_prototype_update(ui_container,NONE);ui_container=x;
+	if(x!=ui_container&&prototype_is(ui_container))n_prototype_update(ui_container,NIL);ui_container=x;
 }
 lv* con(void){return ui_container?ui_container:ifield(deck,"card");}
 lv* con_wids(void){return ivalue(con(),"widgets");}
@@ -283,12 +283,12 @@ void keycaps_enter(void){if(!enable_touch||kc.on)return;keycaps_force_enter();}
 
 // App Interface
 
-lv*n_appsave(lv*self,lv*z){if(strlen(document_path)){save_deck(lmcstr(document_path));}else{modal_enter(modal_save_deck);}return NONE;(void)self;(void)z;}
+lv*n_appsave(lv*self,lv*z){if(strlen(document_path)){save_deck(lmcstr(document_path));}else{modal_enter(modal_save_deck);}return NIL;(void)self;(void)z;}
 lv*n_appexit(lv*self,lv*z){
 	#ifndef __ANDROID__
 		should_exit=1;
 	#endif
-	return NONE;(void)self;(void)z;
+	return NIL;(void)self;(void)z;
 }
 
 lv* print_array(lv*arr,FILE*out){array a=unpack_array(arr);for(int z=0;z<a.size;z++)fputc(0xFF&(int)array_get_raw(a,z),out);return arr;}
@@ -307,7 +307,7 @@ lv*interface_app(lv*self,lv*i,lv*x){
 		ikey("show"      )return lmnat(n_appshow,NULL);
 		ikey("print"     )return lmnat(n_appprint,NULL);
 		ikey("render"    )return lmnat(n_apprender,NULL);
-	}return x?x:NONE;(void)self;
+	}return x?x:NIL;(void)self;
 }
 
 // Menus
@@ -389,7 +389,7 @@ void field_exit(void){
 }
 void bg_end_selection(void);void bg_end_lasso(void); // forward-ref
 void setuimode(int mode){
-	n_play(deck,lml2(NONE,lmistr("loop")));
+	n_play(deck,lml2(NIL,lmistr("loop")));
 	grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel->c=0,wid.active=-1;poly_count=0;sc.others=NULL;
 	msg.next_view   =(uimode!=mode)&&mode==mode_interact;
 	msg.pending_loop=(uimode!=mode)&&mode==mode_interact;
@@ -700,8 +700,8 @@ void grid_edit(lv*v){wid.hist->c=wid.hist_cursor,ll_add(wid.hist,lml2(wid.gv->ta
 void grid_deleterow(void){grid_edit(l_drop(l_list(lmn(wid.gv->row)),wid.gv->table));}
 void grid_insertrow(void){
 	lv*f=grid_format(),*x=wid.gv->table,*r=lmt();int s=wid.gv->row+1;EACH(z,x){
-		lv*c=lml(x->n+1);dset(r,x->kv[z],c);EACH(i,c)c->lv[i]=(i==s)?(strchr("sluro",f->sv[z])?lmistr(""):NONE): x->lv[z]->lv[i-(i>=s?1:0)];
-	}grid_edit(torect(r));iwrite(wid.gt,lmistr("col"),NONE),iwrite(wid.gt,lmistr("row"),lmn(s));
+		lv*c=lml(x->n+1);dset(r,x->kv[z],c);EACH(i,c)c->lv[i]=(i==s)?(strchr("sluro",f->sv[z])?lmistr(""):ZERO): x->lv[z]->lv[i-(i>=s?1:0)];
+	}grid_edit(torect(r));iwrite(wid.gt,lmistr("col"),ZERO),iwrite(wid.gt,lmistr("row"),lmn(s));
 	int os=wid.gv->scroll,ns=grid_scrollto(x,wid.g,os,s);if(os!=ns){wid.gv->scroll=ns,iwrite(wid.gt,lmistr("scroll"),lmn(ns));}
 }
 void grid_edit_cell(pair cell,lv*v){
@@ -961,7 +961,7 @@ lv* draw_lil(pair size,int align,int bare,lv*x){
 	lv*r=lmbuff(size);cstate t=frame;frame=draw_buffer(r);
 	if(lit(x)){
 		int hh=x->c?3+font_h(FONT_BODY):3, ch=font_h(FONT_MONO), fh=font_h(FONT_BODY), rows=MIN((size.y-(hh+fh))/ch,x->n);
-		lv* f=l_take(NONE,x);int cw[256];
+		lv* f=l_take(ZERO,x);int cw[256];
 		for(int c=0;c<x->c&&c<256;c++){
 			int dr=rows<x->n?rows-1:rows;cw[c]=0;for(int r=0;r<dr;r++){
 				str t=str_new();show(&t,x->lv[c]->lv[r],0);lv*s=lmstr(t);ll_add(f->lv[c],s);
@@ -1017,7 +1017,7 @@ lv* n_print(lv*self,lv*a){
 }
 lv* n_pre_listen(lv*self,lv*a){
 	(void)self;EACH(z,li.vars)if(!dget(ev(),li.vars->kv[z]))dset(ev(),li.vars->kv[z],li.vars->lv[z]);
-	if(ob.sel->c&&uimode==mode_object)dset(ev(),lmistr("selected"),l_drop(NONE,ob.sel));
+	if(ob.sel->c&&uimode==mode_object)dset(ev(),lmistr("selected"),l_drop(ZERO,ob.sel));
 	return a;
 }
 lv* n_post_listen(lv*self,lv*a){
@@ -1032,7 +1032,7 @@ void listener_eval(void){
 	lv*prog=parse(str->sv);if(perr()){char e[4096];snprintf(e,sizeof(e),"error: %s",par.error);listen_show(align_right,1,lmcstr(e));return;}
 	ms.text=(field_val){rtext_cast(lmistr("")),0};listen_show(align_left,1,str);lv*b=lmblk();
 	lv*target=uimode==mode_script?sc.target: ob.sel->c==1?ob.sel->lv[0]: con();
-	blk_lit(b,lmnat(n_pre_listen ,NULL)),blk_lit(b,NONE),blk_op(b,CALL),blk_op(b,DROP);blk_cat(b,prog);
+	blk_lit(b,lmnat(n_pre_listen ,NULL)),blk_lit(b,NIL ),blk_op(b,CALL),blk_op(b,DROP);blk_cat(b,prog);
 	blk_lit(b,lmnat(n_post_listen,NULL)),blk_op (b,SWAP),blk_op(b,CALL),blk_op(b,DROP);fire_hunk_async(target,b);
 }
 void listener(rect r){
@@ -1062,7 +1062,7 @@ lv* n_panic(lv*self,lv*z){
 	modal_enter(modal_listen);
 	pair s={(512-22)-18,16};rect b=rect_pair((pair){0,0},s);lv*r=lmbuff(s);cstate t=frame;frame=draw_buffer(r);
 	draw_box(b,0,35),draw_textc(inset(b,2),"PANIC",FONT_MONO,35),frame=t,listen_show_image(r,z);
-	n_show(self,z),dset(li.vars,lmistr("_"),l_first(z));return NONE;
+	n_show(self,z),dset(li.vars,lmistr("_"),l_first(z));return NIL;
 }
 
 // Audio Editor
@@ -1441,7 +1441,7 @@ void modal_exit(int value){
 	if(ms.type==modal_contraption_props){
 		lv*w=ob.sel->lv[0],*a=ifield(ifield(w,"def"),"attributes");;
 		for(int z=0;z<a->n;z++){
-			int t=attrs[z].type;lv*v=attrs[z].bval?ONE:NONE;
+			int t=attrs[z].type;lv*v=lmbool(attrs[z].bval);
 			if(t==attr_number)v=lmn(ln(rtext_all(attrs[z].value.table)));
 			if(t==attr_string)v=rtext_all(attrs[z].value.table);
 			if(t==attr_code  )v=rtext_all(attrs[z].value.table);
@@ -1499,16 +1499,16 @@ void modal_exit(int value){
 		if(directory_exists(path)&&ms.type!=modal_confirm){modal_save_replace(ms.subtype,"deck",path);return;}
 		if(ms.subtype==modal_save_locked)iwrite(deck,lmistr("locked"),ONE);
 		save_deck(path);
-		if(ms.subtype==modal_save_locked)iwrite(deck,lmistr("locked"),NONE);
+		if(ms.subtype==modal_save_locked)iwrite(deck,lmistr("locked"),ZERO);
 	}
 	if(ms.subtype==modal_open_lil&&value){
 		lv*hint=ms.verb,*name=modal_open_path();lv*type=arg();ret(array_is(type)?readbin(name):n_readfile(NULL,lml2(name,hint)));
 	}
 	if(ms.subtype==modal_save_lil){
-		if(ms.type==modal_save&&!value){arg();ret(NONE);ms.type=modal_none;return;}
+		if(ms.type==modal_save&&!value){arg();ret(ZERO);ms.type=modal_none;return;}
 		lv*path=modal_save_path(ms.filter==filter_sound?".wav":ms.filter==filter_gif?".gif": ms.path_suffix);
 		if(directory_exists(path)&&ms.type!=modal_confirm){modal_save_replace(modal_save_lil,"file",path);return;}
-		lv*value=arg();ret(!value?NONE:
+		lv*value=arg();ret(!value?ZERO:
 			(image_is(value)||lil(value)||lid(value))?n_writegif(NULL,lml2(path,value)):
 			sound_is(value)?n_writewav(NULL,lml2(path,value)):
 			deck_is(value)?n_writedeck(NULL,lml2(path,value)):
@@ -1519,7 +1519,7 @@ void modal_exit(int value){
 	if(ms.subtype==modal_confirm_quit&&value)should_exit=1;
 	if(ms.subtype==modal_confirm_new&&value)load_deck(deck_get(lmistr(""))),set_path("");
 	if(ms.subtype==modal_confirm_script&&value)finish_script();
-	if(ms.subtype==modal_multiscript&&value)setscript(l_drop(NONE,ob.sel));
+	if(ms.subtype==modal_multiscript&&value)setscript(l_drop(ZERO,ob.sel));
 	if(ms.subtype==modal_alert_lil  ){arg();ret(ONE);}
 	if(ms.subtype==modal_confirm_lil){arg();ret(lmn(value));}
 	if(ms.subtype==modal_input_lil  ){arg();ret(rtext_all(ms.text.table));}
@@ -2261,15 +2261,15 @@ lv*n_alert(lv*self,lv*z){
 	else if(!strcmp(type,"string")){modal_enter(modal_input_lil);if(z->c>2)ms.text.table=rtext_cast(z->lv[2]);}
 	else if(!strcmp(type,"choose")){
 		modal_enter(modal_choose_lil);
-		ms.verb=z->c<=2?ld(NONE): lil(z->lv[2])?l_dict(z->lv[2],z->lv[2]): ld(z->lv[2]);if(ms.verb->c<1)ms.verb=ld(l_list(NONE));
+		ms.verb=z->c<=2?ld(NIL): lil(z->lv[2])?l_dict(z->lv[2],z->lv[2]): ld(z->lv[2]);if(ms.verb->c<1)ms.verb=ld(l_list(ZERO));
 		ms.grid=(grid_val){lt(l_keys(ms.verb)), 0, z->c<=3?-1:dgeti(ms.verb,z->lv[3]),-1};
 	}
 	else{modal_enter(modal_alert_lil);}
-	ms.message=plain_or_rich(z);return NONE;
+	ms.message=plain_or_rich(z);return NIL;
 }
 lv*n_open(lv*self,lv*z){
 	(void)self,(void)z;modal_enter(modal_open_lil);
-	char*type=ls(l_first(z))->sv;lv*r=lms(0),*hint=z->c>1?z->lv[1]:NONE;
+	char*type=ls(l_first(z))->sv;lv*r=lms(0),*hint=z->c>1?z->lv[1]:ZERO;
 	if(!strcmp(type,"array"))ms.desc="Open a binary file.",r=array_make(0,0,0,r);
 	if(!strcmp(type,"image"))ms.filter=filter_image,ms.desc="Open an image file.",r=image_empty();
 	if(!strcmp(type,"sound"))ms.filter=filter_sound,ms.desc="Open a .wav sound file.",r=sound_make(lms(0));
@@ -3209,12 +3209,12 @@ void sfx_install(lv*sfx,clip_state*target){
 }
 void sfx_doloop(int clear){
 	interpreter_lock();
-	lv*a=orig_loop?orig_loop:NONE,*b=lmblk(),*r=NONE;
+	lv*a=orig_loop?orig_loop:NIL,*b=lmblk(),*r=NIL;
 	blk_get(b,lmistr("loop")),blk_lit(b,l_list(a)),blk_op(b,CALL);
 	int pp=pending_popstate;fire_hunk_async(ifield(deck,"card"),b);
 	int quota=LOOP_QUOTA;while(quota>0&&running()){runop(),quota--;}
 	if(!running())r=arg();popstate();pending_popstate=pp;
-	if(clear)n_play(deck,lml2(NONE,lmistr("loop")));
+	if(clear)n_play(deck,lml2(NIL,lmistr("loop")));
 	n_play(deck,lml2(r,lmistr("loop"))),msg.pending_loop=0;
 	lv*loop=audio_loop.clip;if(loop&&audio_loop.sample>=((Uint32)loop->c))audio_loop.sample=0;
 	interpreter_unlock();
@@ -3252,16 +3252,16 @@ lv* n_play(lv*deck,lv*z){
 		if(orig_loop&&orig_loop==x){} // don't re-trigger!
 		else if(sound_is(x)&&ln(ifield(x,"size"))>0){sfx_install(x,&audio_loop),orig_loop=x;} // play
 		else{audio_loop.clip=orig_loop=NULL;} // stop the loop
-		return NONE;
+		return NIL;
 	}
-	lv*x=l_first(z),*sfx=sound_is(x)?x: dget(ifield(deck,"sounds"),ls(x));if(!sfx)return NONE;
-	if(!sound_is(sfx)||ln(ifield(sfx,"size"))<1)return NONE;
+	lv*x=l_first(z),*sfx=sound_is(x)?x: dget(ifield(deck,"sounds"),ls(x));if(!sfx)return NIL;
+	if(!sound_is(sfx)||ln(ifield(sfx,"size"))<1)return NIL;
 	int max_sample=0;int avail=-1;for(int z=0;z<SFX_SLOTS;z++){
 		if(!audio_slots[z].clip){avail=z;break;}
 		if(audio_slots[z].sample>audio_slots[max_sample].sample)max_sample=z;
 	}
 	sfx_install(sfx,&audio_slots[avail!=-1?avail:max_sample]),audio_playing=1;
-	return NONE;
+	return NIL;
 }
 
 // Toolbars
@@ -3381,7 +3381,7 @@ void event_key(int c,int m,int down,const char*name){
 		if(c==KEY_j&&ms.type==modal_none&&!cmd&&dr.limbo_dither&&dither_threshold>-2.0)dither_threshold-=.1;
 		if(c==KEY_k&&ms.type==modal_none&&!cmd&&dr.limbo_dither&&dither_threshold< 2.0)dither_threshold+=.1;
 		if(ev.alt&&keydown['u']&&keydown['l']&&keydown['d']&&deck&&lb(ifield(deck,"locked"))){
-			iwrite(deck,lmistr("locked"),NONE);ev.alt=0,keydown['u']=0,keydown['l']=0,keydown['d']=0;
+			iwrite(deck,lmistr("locked"),ZERO);ev.alt=0,keydown['u']=0,keydown['l']=0,keydown['d']=0;
 		}
 	}
 	else{
@@ -3460,13 +3460,13 @@ void event_file(char*p){
 		setuimode(mode_object);lv*a=lmd();
 		lv* dat=n_read(NULL,l_list(lmcstr(p)));
 		lv* sep=lmistr(has_suffix(p,".csv")?",": "|");
-		lv* arg=lml(3);arg->lv[0]=dat,arg->lv[1]=NONE,arg->lv[2]=sep;
+		lv* arg=lml(3);arg->lv[0]=dat,arg->lv[1]=NIL,arg->lv[2]=sep;
 		dset(a,lmistr("type"),lmistr("grid"));
 		dset(a,lmistr("value"),l_cols(n_readcsv(NULL,arg)));
 		ob_create(l_list(a));
 	}
 	if(has_suffix(p,".hex")){
-		lv*pat=ifield(deck,"patterns");iwrite(pat,lmn(32),lmn(0xFFFFFF));iwrite(pat,lmn(47),NONE);
+		lv*pat=ifield(deck,"patterns");iwrite(pat,lmn(32),lmn(0xFFFFFF));iwrite(pat,lmn(47),ZERO);
 		lv*t=l_parse(lmistr("%h"),l_split(lmistr("\n"),ls(n_read(NULL,l_list(lmcstr(p))))));
 		if(t->c&&ln(t->lv[t->c-1])==0)t->c--; // trailing newline?
 		if(t->c>14){
@@ -3535,7 +3535,7 @@ lv* find_animated(void){
 	lv*r=lmd();if(uimode!=mode_interact)return r;
 	lv*wids=con_wids();EACH(z,wids){
 		lv*wid=wids->lv[z];
-		if(lb(ifield(wid,"animated"))&&dget(viewed,wid)==NULL)dset(r,wid,NONE);
+		if(lb(ifield(wid,"animated"))&&dget(viewed,wid)==NULL)dset(r,wid,ZERO);
 		if(!contraption_is(wid))continue;
 		lv*cwids=ivalue(wid,"widgets");EACH(c,cwids){
 			lv*cwid=cwids->lv[c];
@@ -3547,15 +3547,15 @@ void fire_animate(lv*targets){
 	lv*name=lmistr("view"),*root=lmenv(NULL);primitives(root,deck),constants(root);
 	lv*block=lmblk();EACH(z,targets){
 		lv*w=targets->kv[z];
-		blk_cat(block,event_invoke(w,name,NONE,NULL)),dset(viewed,w,ONE);
+		blk_cat(block,event_invoke(w,name,NIL,NULL)),dset(viewed,w,ONE);
 	}pushstate(root),pending_popstate=1,issue(root,block);
 }
 void fire_view(lv*target){
 	lv*name=lmistr("view"),*root=lmenv(NULL);primitives(root,deck),constants(root);
-	lv*block=event_invoke(target,name,NONE,NULL);
+	lv*block=event_invoke(target,name,NIL,NULL);
 	lv*wids=ifield(target,"widgets");EACH(z,wids){
 		lv*w=wids->lv[z];if(!contraption_is(w)||dget(viewed,w)!=NULL)continue;
-		blk_cat(block,event_invoke(ivalue(w,"viewproxy"),name,NONE,NULL)),dset(viewed,w,ONE);
+		blk_cat(block,event_invoke(ivalue(w,"viewproxy"),name,NIL,NULL)),dset(viewed,w,ONE);
 	}pushstate(root),pending_popstate=1,issue(root,block);
 }
 int interpret(void){
@@ -3576,7 +3576,7 @@ int interpret(void){
 		if(msg.pending_halt||pending_popstate){/*suppress other new events until this one finishes*/}
 		else if(msg.pending_view){fire_view(con()),msg.pending_view=0;}
 		else if(msg.target_click){
-			lv*arg=grid_is(msg.target_click)?lmn(msg.arg_click.y): canvas_is(msg.target_click)?lmfpair(msg.arg_click): NONE;
+			lv*arg=grid_is(msg.target_click)?lmn(msg.arg_click.y): canvas_is(msg.target_click)?lmfpair(msg.arg_click): NIL;
 			fire_event_async(msg.target_click,lmistr("click"),arg);msg.target_click=NULL;
 		}
 		else if(msg.target_drag    ){fire_event_async(msg.target_drag    ,lmistr("drag"      ),lmfpair(msg.arg_drag   ));msg.target_drag    =NULL;}
@@ -3717,7 +3717,7 @@ void all_menus(void){
 		if(menu_item("Import Image..."   ,1,'\0'))modal_enter(modal_import_image);
 		if(menu_item("Export Image..."   ,1,'\0'))modal_enter(modal_export_image);
 		menu_separator();
-		if(menu_item("Purge Volatiles",1,'\0')){n_deck_purge(deck,NONE);msg.next_view=1;}
+		if(menu_item("Purge Volatiles",1,'\0')){n_deck_purge(deck,NIL);msg.next_view=1;}
 		menu_separator();
 		if(menu_item("Cards..."     ,1,'C' ))modal_enter(modal_cards);
 		if(menu_item("Sounds..."    ,1,'S' ))modal_enter(modal_sounds);
@@ -3821,7 +3821,7 @@ void all_menus(void){
 			paste_any();
 			menu_separator();
 			if(menu_item("Paste as new Canvas",has_clip("%%IMG"),'\0')){
-				lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas")),dset(p,lmistr("locked"),ONE),dset(p,lmistr("border"),NONE);
+				lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas")),dset(p,lmistr("locked"),ONE),dset(p,lmistr("border"),ZERO);
 				dset(p,lmistr("image"),get_clip()),ob_create(l_list(p));frame=context;
 			}
 			if(menu_item("Paste into Canvas",has_clip("%%IMG")&&ob.sel->c==1&&canvas_is(ob.sel->lv[0]),'\0')){
@@ -3833,7 +3833,7 @@ void all_menus(void){
 			if(menu_item("Move to Front",ob.sel->c,'\0')){ob_order();EACH(z,ob.sel){iwrite(ob.sel->lv[z],lmistr("index"),lmn(RTEXT_END));}mark_dirty();}
 			if(menu_item("Move Up"      ,ob.sel->c,'\0')){ob_move_up();}
 			if(menu_item("Move Down"    ,ob.sel->c,'\0')){ob_move_dn();}
-			if(menu_item("Move to Back" ,ob.sel->c,'\0')){ob_order();EACHR(z,ob.sel){iwrite(ob.sel->lv[z],lmistr("index"),NONE);};mark_dirty();}
+			if(menu_item("Move to Back" ,ob.sel->c,'\0')){ob_order();EACHR(z,ob.sel){iwrite(ob.sel->lv[z],lmistr("index"),ZERO);};mark_dirty();}
 		}
 		if(wid.fv){
 			int selection=wid.fv!=NULL&&wid.cursor.x!=wid.cursor.y;
@@ -3979,7 +3979,7 @@ void all_menus(void){
 		if(menu_item("Font..."      ,ob.sel->c   ,'\0'))modal_enter(modal_fonts);
 		if(menu_item("Script..."    ,ob.sel->c   ,'r')){
 			int m=1;for(int z=1;z<ob.sel->c;z++)if(!matchr(ifield(ob.sel->lv[0],"script"),ifield(ob.sel->lv[z],"script"))){m=0;break;}
-			if(m){setscript(l_drop(NONE,ob.sel));}else{
+			if(m){setscript(l_drop(ZERO,ob.sel));}else{
 				modal_enter(modal_multiscript);
 				ms.message=lmcstr("Not all of the selected widgets\nhave the same script.\nEdit them all together anyway?");
 				ms.verb=lmcstr("Edit");
@@ -4142,7 +4142,7 @@ void tick(lv*env){
 		draw_textr(b,ls(ifield(con(),"name"))->sv,FONT_BODY,1);
 	}
 	if(ui_container&&ivalue(ui_container,"dead"))ui_container=NULL;
-	#define track(v) dset(env,lmistr(#v),v?v:NONE);
+	#define track(v) dset(env,lmistr(#v),v?v:NIL);
 	track(msg.target_click)
 	track(msg.target_drag)
 	track(msg.target_release)
@@ -4170,7 +4170,7 @@ void tick(lv*env){
 	dset(env,lmistr("wid"),wid_track(&wid));
 	dset(env,lmistr("ms"),modal_track(&ms));
 	if(ms_index){lv*r=lml(0);for(int z=0;z<ms_index;z++)ll_add(r,modal_track(&ms_stack[z].ms)),ll_add(r,wid_track(&ms_stack[z].wid));dset(env,lmistr("ms-stack"),r);}
-	EACH(z,PLAYING)PLAYING->lv[z]=audio_slots[z].clip?audio_slots[z].clip:NONE;
+	EACH(z,PLAYING)PLAYING->lv[z]=audio_slots[z].clip?audio_slots[z].clip:NIL;
 	ATTRS->c=0;for(int z=0;z<attrs_count;z++)if(attrs[z].value.table)ll_add(ATTRS,attrs[z].value.table);
 	track(audio_loop.clip)
 	track(orig_loop)
@@ -4216,7 +4216,7 @@ void load_deck(lv*d){
 	resize_window(deck);
 	time_t now;time(&now);seed=0xFFFFFFFF&now;
 	validate_modules();
-	setuimode(mode_interact);n_play(deck,lml2(NONE,lmistr("loop")));msg.next_view=1;
+	setuimode(mode_interact);n_play(deck,lml2(NIL,lmistr("loop")));msg.next_view=1;
 }
 int main(int argc,char**argv){
 	char*file=NULL,*startcard=NULL;int ul=0;
@@ -4267,7 +4267,7 @@ int main(int argc,char**argv){
 	dset(env,lmistr("tools"    ),TOOLS);
 	dset(env,lmistr("arrows"   ),ARROWS);
 	dset(env,lmistr("ltools"   ),TOOLB     =lmbuff((pair){tcellw*2+1,tcellh*18+tgap+1}));
-	dset(env,lmistr("playing"  ),PLAYING   =l_take(lmn(SFX_SLOTS),NONE));
+	dset(env,lmistr("playing"  ),PLAYING   =l_take(lmn(SFX_SLOTS),NIL));
 	dset(env,lmistr("attribs"  ),ATTRS     =lml(0));
 	dset(env,lmistr("li hist"  ),li.hist   =lml(0));
 	dset(env,lmistr("li vars"  ),li.vars   =lmd());
@@ -4301,7 +4301,7 @@ int main(int argc,char**argv){
 	}
 	if(!deck){str doc=str_new();str_add(&doc,(char*)examples_decks_tour_deck,examples_decks_tour_deck_len);load_deck(deck_get(lmstr(doc)));}
 	if(startcard){iwrite(deck,lmistr("card"),lmcstr(startcard));}
-	if(ul){iwrite(deck,lmistr("locked"),NONE);}
+	if(ul){iwrite(deck,lmistr("locked"),ZERO);}
 	io_run(env);
 	return 0;
 }

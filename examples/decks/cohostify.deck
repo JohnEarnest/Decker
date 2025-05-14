@@ -33,7 +33,7 @@ inlines.funcname:"color:#a6e22e;"
 
 keywords:"|"split"while|each|send|on|if|elseif|else|end|do|with|local|select|extract|update|insert|into|from|where|by|orderby|asc|desc"
 monads:"|"split"floor|cos|sin|tan|exp|ln|sqrt|unit|mag|heading|sum|prod|raze|max|min|count|first|last|keys|range|list|typeof|flip|rows|cols|table"
-dyads:"|"split"split|fuse|dict|take|drop|limit|in|unless|join|cross|parse|format|like|window"
+dyads:"|"split"split|fuse|dict|take|drop|limit|in|unless|join|cross|parse|format|like|window|fill"
 verbs:monads,dyads
 escapes:"\\n","\\\"","\\\\"
 

@@ -6,13 +6,13 @@ writeTextFile=(path,text)=>require('fs').writeFileSync(path,text,{encoding:'utf8
 go_notify=(deck,x,t)=>{/*console.log('go notify',x,t)*/}
 field_notify=(field)=>{/*console.log('field notify',x,t)*/}
 const env=lmenv()
-n_play=([x])=>NONE
+n_play=([x])=>NIL
 n_show=z=>{console.log(z.map(x=>show(x,z.length==1)).join(' '));return z[0]}
-n_print=x=>{console.log(ls(x.length>1?dyad.format(x[0],lml(x.slice(1))):x[0]));return NONE}
+n_print=x=>{console.log(ls(x.length>1?dyad.format(x[0],lml(x.slice(1))):x[0]));return NIL}
 n_alert  =([x])=>ONE
-n_save   =([x])=>NONE
+n_save   =([x])=>NIL
 n_open   =(   )=>lms('')
-n_panic  =(   )=>NONE
+n_panic  =(   )=>NIL
 is_fullscreen=_=>0
 set_fullscreen=_=>0
 run      =prog=>{pushstate(env),issue(env,prog);while(running())runop();const r=arg();return popstate(),r}

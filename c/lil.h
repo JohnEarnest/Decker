@@ -25,7 +25,6 @@ lv nilvalue={-1,0,0,0,0,0,0.0,NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 int linil(lv*x){return x==&nilvalue;}
 #define NIL          (&nilvalue)
 #define NUM          512 // number parsing/formatting buffer size
-#define NONE         lmn(0)
 #define ONE          lmn(1)
 #define ZERO         lmn(0)
 #define lmbool(x)    ((x)?ONE:ZERO)

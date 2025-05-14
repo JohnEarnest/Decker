@@ -2,7 +2,7 @@
 // potentially unsafe/nonportable scripting APIs
 
 function js_to_lil(x){
-	if(x==null||x==undefined)return NONE
+	if(x==null||x==undefined)return NIL
 	if(deck_is(x)||card_is(x)||widget_is(x))return x
 	if('number'==typeof x)return lmn(x)
 	if('string'==typeof x)return lms(clchars(x))
@@ -12,7 +12,7 @@ function js_to_lil(x){
 		return lmd(Object.keys(x).map(js_to_lil),Object.values(x).map(js_to_lil))
 	}
 	if('function'==typeof x)return lmnat(args=>js_to_lil(x.apply(null,args.map(lil_to_js))))
-	return NONE
+	return NIL
 }
 function lil_to_js(x){
 	if(deck_is(x)||card_is(x)||widget_is(x))return x
@@ -35,9 +35,9 @@ interface_danger=lmi((self,i,x)=>{
 			let r=args[0]==undefined?null:eval(ls(args[0]))
 			if(('function'==typeof r)&&(args.length>1)){r=r.apply(null,args.slice(1).map(lil_to_js))}
 			return js_to_lil(r)
-		}catch(e){console.log('danger.js[] error',e);return NONE}
+		}catch(e){console.log('danger.js[] error',e);return NIL}
 	})
-	return x?x:NONE
+	return x?x:NIL
 },'danger')
 ext_add_constant=(k,v)=>{ext_constants[k]=js_to_lil(v)}
 endanger=_=>{ext_constants.danger=interface_danger}
