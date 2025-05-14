@@ -336,19 +336,15 @@ lv* drom_to_utf8(lv*x){
 }
 void utf8_to_drom(str*s,char*x,int n){
 	for(int z=0;z<n;z++){unsigned char c=x[z];
-		int cmb=(z+1<n)&&(0xFF&x[z+1])==0xCC; // possible combining accent
 		if     (c=='\r')continue;             // suppress windows newlines
 		else if(c=='\t')c=' ';                // resolve the tabs vs. spaces debate once and for all
 		else if(c<' '&&c!='\n'){c=255;}       // unix newlines are the only control code we respect
-		else if(c>'~'||cmb){
+		else if(c>'~'||((z+1<n)&&(0xFF&x[z+1])==0xCC)){ // possible combining accent
 			int f=0;for(int i=0;DROM_INKEY[i];i++){
 				int ln=strlen(DROM_INKEY[i]);
 				if((z+ln<=n)&&!memcmp(x+z,DROM_INKEY[i],ln)){c=DROM_INVAL[i];z+=(ln-1);f=1;break;}
 			}
 			if((!f)&&(c>'~')){ // neither recognized nor in the plain ASCII range
-				// if     ((c&0xF0)==0xF0){printf("unknown unicode [%02X %02X %02X %02X]\n",c,0xFF&x[z+1],0xFF&x[z+2],0xFF&x[z+3]);}
-				// else if((c&0xE0)==0xE0){printf("unknown unicode [%02X %02X %02X]\n"     ,c,0xFF&x[z+1],0xFF&x[z+2]            );}
-				// else if((c&0xC0)==0xC0){printf("unknown unicode [%02X %02X]\n"          ,c,0xFF&x[z+1]                        );}
 				if     ((c&0xF0)==0xF0)z+=3; // skip 4-byte codepoints
 				else if((c&0xE0)==0xE0)z+=2; // skip 3-byte codepoints
 				else if((c&0xC0)==0xC0)z+=1; // skip 2-byte codepoints
