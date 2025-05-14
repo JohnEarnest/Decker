@@ -24,9 +24,55 @@ The language therefore tries to thread the needle between a design which is simp
 
 {{TOC}}
 
+Lil, A Primer
+-------------
+Let's begin by looking at a few practical examples of Lil scripts you might encounter or compose while using Decker, to give you a loose impression of the language. Consider the following script on a button widget:
+
+```lil
+on click do
+ # adventure awaits!
+ go["DungeonEntrance" "BoxIn" 15]
+end
+```
+
+The `on NAME do ... end` structure is how you define a function. Buttons in Decker call a function named "click" when they're clicked. The octothorpe (`#`) indicates a line-comment: the remainder of the line `# adventure awaits!` is a hint for human readers, but has no significance to Lil. The function `go` is built into Decker; it moves to a different card. The square brackets (`[]`) indicate that we're calling `go` and providing arguments. The arguments to `go` are the name of a destination card represented as a string, a second string indicating a transition animation, and a number indicating how many frames the transition lasts. Lil strings are enclosed in double-quotes (`""`). The arguments within the brackets are separated by whitespace, not commas!
+
+In another button script, clicking the button is only meant to navigate to another card if the user has previously found a "key", represented as a checkbox widget named `haskey` on a card named `inventory`:
+```lil
+on click do
+ if inventory.widgets.haskey.value
+  play["DoorSqueak"]
+  go["TheCrypt"]
+ else
+  alert["The door is locked!"]
+ end
+end
+```
+The `if CONDITION ... else ... end` structure is how Lil handles conditional logic. You can omit the `else` or add extra clauses with `elseif`. The "dot-notation" sequence (`inventory.widgets.haskey.value`) is how we access the hierarchical parts of a deck: the value of the `haskey` checkbox of the `widgets` contained in the `inventory`.
+
+For more elaborate conditions you can form expressions using `&` (logical AND), `|` (logical OR), `!` (logical NOT) and the familiar arithmetic comparison operators `=`, `<` and `>`. Note that Lil _does not_ have "combined" operators like `!=`, `>=` or `<=`. Expressions in Lil are always carried out with uniform right-to-left operator precedence; use parentheses to group subexpressions:
+```lil
+on click do
+ i:inventory.widgets
+ goldCoins:i.money
+ hasPass:i.trollPass.value
+ if hasPass & (goldCoins.value>5)
+  alert["The troll charges you 5 gold coins."]
+  goldCoins.value:goldCoins.value-1
+  go["TrollTavern"]
+ else
+  alert["The troll gruffly refuses you entry."]
+ end
+end
+```
+The colon `:` is Lil's assignment operator. You can stash numbers, strings, or even references to widgets in variables like `i`, `goldCoins` and `hasPass` to avoid repeating yourself. You can also modify the fields of widgets, like `inventory.widgets.money`, using assignments.
+
+If you're looking to add simple interactive behaviors to your decks, you may already know enough to get started. The rest of this reference manual will focus on Lil itself, separately from its usage within Decker. You can find more practical examples and scripting tutorials among the `.deck` files packaged with Decker.
+
+
 Types and Conversions
 ---------------------
-There are 7 types of value in Lil: numbers, strings, lists, dictionaries, tables, functions, and interfaces.
+There are 8 types of value in Lil: numbers, strings, lists, dictionaries, tables, functions, interfaces, and the nil value.
 
 - _Numbers_ are floating-point values, possibly with a sign: `42 37.5 -29999`.
 - _Strings_ are a sequence of characters, written enclosed in double-quotes. The special characters backslash, double-quote, and the newline character (`\n`) are preceded with a backslash escape: `"apple" "foo\nbar"`. The binary `fuse` and `format` operators can both be used for concatenating strings.
@@ -35,14 +81,15 @@ There are 7 types of value in Lil: numbers, strings, lists, dictionaries, tables
 - _Tables_ are a rectangular array of values for which every column has a string as its _key_. Tables can be made with the unary operator `table` or with the `insert` statement. The binary operators `,` (append), `join` (natural join), and `cross` (cartesian join) offer a selection of tabular joins.
 - _Functions_ have a name, take arguments, and return a result. They are declared with `on`, and may be freely passed around or stored in variables. `first` of a function gives its name, and `keys` of a function gives a list of its named arguments.
 - _Interfaces_ are opaque dictionary-like values used to represent system resources or Input/Output devices. Accessing or writing to an interface may produce side-effects.
+- `nil` represents the _absence_ of a value: an undefined variable, an out-of-bounds index (_outdex_), a failed attempt at parsing a value. The `unless` and `fill` operators can be used to substitue a default value for a _nil_. Otherwise, _nil_ will happily coerce to contextual "empty" values.
 
 Lil has a soft, spongy, dynamic type system in which values do their best to convert to a more relevant type as the need arises.
 
-- When a number is required, strings are parsed, and lists or dictionaries attempt to convert their first _element_. Otherwise, the number 0 is used.
-- When a string is required, numbers are formatted, and lists are recursively converted to strings and joined. Otherwise, the empty string is used.
-- When a list is required, strings are treated as a list of their characters (each a length-1 string), dictionaries are treated as their value list, tables are treated as the list of their rows (each a dictionary), and anything else (number, function, interface) is enclosed in a length-1 list.
+- When a number is required, nil becomes `0`, strings are parsed, and lists or dictionaries attempt to convert their first _element_. Otherwise, the number 0 is used.
+- When a string is required, nil becomes `""`, numbers are formatted, and lists are recursively converted to strings and joined. Otherwise, the empty string is used.
+- When a list is required, nil becomes `()`, strings are treated as a list of their characters (each a length-1 string), dictionaries are treated as their value list, tables are treated as the list of their rows (each a dictionary), and anything else (number, function, interface) is enclosed in a length-1 list.
 - When a dictionary is required, strings and lists become dictionaries from their indices to their _elements_, tables become dictionaries of their columns, and otherwise an empty dictionary is used.
-- When a table is required, lists become a single-column "value" table, and dictionaries become two-column "key" and "value" tables. Anything else is interpreted as if it were a list.
+- When a table is required, nil becomes the empty table, lists become a single-column "value" table, and dictionaries become two-column "key" and "value" tables. Anything else is interpreted as if it were a list.
 
 When indexing into values, we will uniformly refer to _elements_:
 
@@ -53,7 +100,7 @@ When indexing into values, we will uniformly refer to _elements_:
 - An _element_ of a table is one of its rows, as a dictionary.
 - An _element_ of an _empty_ string, list, dictionary, or table is the number 0.
 
-The number zero (`0`) and the empty string (`""`), list (`()`), or dictionary are all _falsey_, and any other value (including _any_ table, function, or interface) is _truthy_.
+The number zero (`0`), nil, and the empty string (`""`), list (`()`), or dictionary are all _falsey_, and any other value (including _any_ table, function, or interface) is _truthy_.
 
 
 Lil, the Imperative Language
@@ -66,7 +113,7 @@ a: 23
 longer_name: "a string"
 ```
 
-If a value has never been explicitly placed in a variable, it contains the number 0. You can access or assign to elements of a list or dictionary by subscripting with brackets:
+If a value has never been explicitly placed in a variable, it contains _nil_. You can access or assign to elements of a list or dictionary by subscripting with brackets:
 ```lil
 (11,22,33)[1]
 "String"[2]
@@ -84,7 +131,7 @@ If you index a list with integers within range of its `count` it will act like a
 ```lil
 b: 5              # b contains the number 5
 b[0]: 5           # b becomes a length-1 list containing the number 5
-c                 # c contains the number 0
+c                 # c contains nil
 c.fruit: "yes"    # c now contains a dictionary with the key "fruit" and the value "yes"
 ```
 
@@ -185,14 +232,14 @@ while a>3
 end
 ```
 
-To declare a function, use the keyword `on` followed by a name, zero or more argument names, the keyword `do`, one or more statements comprising the "body" of the function, and finally the keyword `end`. To call a function, use its name and a set of bracketed expressions corresponding to the arguments it takes. Extra arguments are ignored, and missing arguments are bound as 0:
+To declare a function, use the keyword `on` followed by a name, zero or more argument names, the keyword `do`, one or more statements comprising the "body" of the function, and finally the keyword `end`. To call a function, use its name and a set of bracketed expressions corresponding to the arguments it takes. Extra arguments are ignored, and missing arguments are bound as nil:
 ```lil
 on pair x y do
 	x,y
 end
 
 pair[3 5]    # returns a list of 3 and 5
-pair[3]      # returns a list of 3 and 0
+pair[3]      # returns a list of 3 and nil
 pair[3 5 7]  # returns a list of 3 and 5
 
 pair[3,5]    # careful: ',' joins items into lists- it is not an argument separator!
@@ -220,7 +267,7 @@ show[a]  # 1,2,3
 show[b]  # 1,5,3
 ```
 
-Statements in Lil are always _expressions_. That is, they always return a value and can be composed within larger expressions. Assignments evaluate to the value being assigned. `if` returns the value of the last statement in its taken half. (A missing `else` just means the falsey half evaluates to 0.) `while` likewise evaluates to the last statement on the last iteration of its body:
+Statements in Lil are always _expressions_. That is, they always return a value and can be composed within larger expressions. Assignments evaluate to the value being assigned. `if` returns the value of the last statement in its taken half. (A missing `else` just means the falsey half evaluates to nil.) `while` likewise evaluates to the last statement on the last iteration of its body:
 ```lil
 x:y:z                       # assign both x and y the value of z
 a: if x>5 99 else 33 end    # assign a to either 99 or 33
@@ -286,7 +333,7 @@ print[a[]]        # 101
 print[a[]]        # 102
 print[b[]]        # 201
 print[a[]]        # 103
-print[x  ]        # 0
+show[list x]      # (nil)
 ```
 Whenever an assignment is carried out, if the variable name in question has been assigned to in any surrounding lexical scope, the assignment will update the _closest_ definition. If the name has never been assigned to before, a new local variable will be created at the current scope. The `on`, `each`, and query (`select`, `update`, `extract`) statements always create new local variables for their arguments, loop variables, or columns, and can thus _shadow_ (take precedence over) outer local variables of the same name. When in doubt, use unique names; it's much less confusing!
 
@@ -484,18 +531,44 @@ update job:"Engineer" where job="Developer" from people
 # | "Walter" | 43  | "Accounting" |
 # +----------+-----+--------------+
 ```
-As with `select` you can compute new named columns- values will be filled in with 0 for rows masked off by a `where` clause.
+As with `select` you can compute new named columns- values will be filled in with nil for rows masked off by a `where` clause.
 ```lil
 update manager:random[name] where job="Developer" from people
 # +----------+-----+--------------+---------+
 # | name     | age | job          | manager |
 # +----------+-----+--------------+---------+
 # | "Alice"  | 25  | "Developer"  | "Sara"  |
-# | "Sam"    | 28  | "Sales"      | 0       |
+# | "Sam"    | 28  | "Sales"      | nil     |
 # | "Thomas" | 40  | "Developer"  | "Sara"  |
 # | "Sara"   | 34  | "Developer"  | "Sara"  |
-# | "Walter" | 43  | "Accounting" | 0       |
+# | "Walter" | 43  | "Accounting" | nil     |
 # +----------+-----+--------------+---------+
+```
+The `fill` primitive can be useful for substituting default values into the nil elements of columns or entire tables at once:
+```lil
+t:update manager:random[name] where job="Developer" from people
+
+select name "manager":"Julia" fill manager from t
+# +----------+----------+
+# | name     | manager  |
+# +----------+----------+
+# | "Alice"  | "Thomas" |
+# | "Sam"    | "Julia"  |
+# | "Thomas" | "Thomas" |
+# | "Sara"   | "Thomas" |
+# | "Walter" | "Julia"  |
+# +----------+----------+
+
+"n/a" fill t
+# +----------+-----+--------------+----------+
+# | name     | age | job          | manager  |
+# +----------+-----+--------------+----------+
+# | "Alice"  | 25  | "Developer"  | "Thomas" |
+# | "Sam"    | 28  | "Sales"      | "n/a"    |
+# | "Thomas" | 40  | "Developer"  | "Thomas" |
+# | "Sara"   | 34  | "Developer"  | "Thomas" |
+# | "Walter" | 43  | "Accounting" | "n/a"    |
+# +----------+-----+--------------+----------+
 ```
 
 ---
@@ -528,7 +601,7 @@ extract first value by value from "ABBAAC"             # distinct items in a lis
 ```
 If names are specified, all results are collected into a dictionary:
 ```lil
-extract a:first age b:last age orderby age asc from people 
+extract a:first age b:last age orderby age asc from people
 # {"a":(25),"b":(43)}
 ```
 If no columns are specified, the result will be the first column of the table:
@@ -769,7 +842,7 @@ f parse "0x007b"  # 123
 Format strings consist of a sequence of _patterns_ and _literals_. Patterns always begin with a `%` character, may contain several optional _flags_, and end in an alphabetic character. Pattern _flags_ configure the details of how each pattern behaves, and may appear in the structure `%[name]*-0N.DX`, where `N` and `D` may be 1 or more digits 0-9, and `X` is a pattern type. All flags are optional. If present, their meanings are as follows:
 
 - `name` may contain any number of non-`]` characters. If any pattern in a format string has an explicit name, any other patterns without an explicit name are assigned a default name corresponding to their index, starting from `0`.
-- `*` this pattern will be validated, but will not produce output values. When formatting, instead of consuming an input value, these patterns will use the appropriate null value.
+- `*` this pattern will be validated, but will not produce output values. When formatting, instead of consuming an input value, these patterns will use nil.
 - `-` specifies left-justification for `N`, as decribed below. The default is right-justification. The `%r`/`%o` patterns use `-` to invert the set of valid characters.
 - `0` specifies padding with `0` for `N`, as described below. The default is padding with spaces.
 - `N` indicates that the value will be padded to at least `N` characters, using the justification and padding character selected with `-` and `0`.
@@ -777,35 +850,35 @@ Format strings consist of a sequence of _patterns_ and _literals_. Patterns alwa
 
 Pattern types are as follows:
 
-| Type | Null   | Parsed                                                         | Formatted                                            |
-| :--- | :----- | :------------------------------------------------------------- | :--------------------------------------------------- |
-| `%`  | n/a    | literal `%` character. `*` is implied.                         | `%`                                                  |
-| `n`  | n/a    | number of chars that have been read.                           | nothing.                                             |
-| `m`  | n/a    | matched? value is `1` iff the format has matched so far.       | nothing.                                             |
-| `z`  | n/a    | value is `1` iff the format matches and read the whole input.  | nothing.                                             |
-| `s`  | `""`   | string. read N chars or until next literal.                    | any string, up to `D` chars.                         |
-| `u`  | `""`   | uppercase string. just like `s`, but converts to uppercase.    | any string, up to `D` chars, converted to uppercase. |
-| `l`  | `""`   | lowercase string. just like `s`, but converts to lowercase.    | any string, up to `D` chars, converted to lowercase. |
-| `r`  | `""`   | repeat. 0 or more (or `N`) characters within a valid set.      | any string, exactly `N` chars if specified.          |
-| `o`  | `""`   | optional. 0 or 1 (or `N`) characters within a valid set.       | any string, exactly `N` chars if specified.          |
-| `a`  | `()`   | ASCII. reads like `s`; value is list of DeckRoman ordinals.    | list of DeckRoman ordinals converted to a string.    |
-| `b`  | `0`    | reads like `s`; value is `1` iff first char is in `tTyYx1`.    | any value to `true` or `false` based on truthiness.  |
-| `f`  | `0.0`  | Lil float. allows any number of decimals.                      | show `D` decimal places or however many are needed.  |
-| `c`  | `0.0`  | currency. parses values like `-$1.23` to Lil floats.           | show `D` or 2 decimal places, like `-$1.23`.         |
-| `C`  | `0.0`  | plain currency. parses values like `-1.23` to Lil floats.      | show `D` or 2 decimal places, like `-1.23`.          |
-| `i`  | `0`    | signed integer.                                                | signed integer.                                      |
-| `h`  | `0`    | hexadecimal integer. parses lower- or uppercase.               | format int as hexadecimal in lowercase.              |
-| `H`  | `0`    | hexadecimal integer. parses lower- or uppercase.               | format int as hexadecimal in uppercase.              |
-| `j`  | `0`    | a [JSON](https://www.json.org) value.                          | any value to a JSON string.                          |
-| `J`  | `0`    | a superset of JSON that supports any Lil value.                | any value to a string.                               |
-| `q`  | `""`   | quoted. a Lil string literal, like `"foo\nbar"`.               | any string to a Lil string literal.                  |
-| `v`  | `""`   | variable. a Lil variable name, like `ice_9`.                   | any string.                                          |
-| `e`  | `0`    | read ISO-8601 date-time into a unix epoch int.                 | format unix epoch int as ISO-8601 date-time.         |
-| `p`  | `()`   | read ISO-8601 date-time as a dictionary of time parts.         | format dict as ISO-8601.                             |
+| Type | Parsed                                                         | Formatted                                            |
+| :--- | :------------------------------------------------------------- | :--------------------------------------------------- |
+| `%`  | literal `%` character. `*` is implied.                         | `%`                                                  |
+| `n`  | number of chars that have been read.                           | nothing.                                             |
+| `m`  | matched? value is `1` iff the format has matched so far.       | nothing.                                             |
+| `z`  | value is `1` iff the format matches and read the whole input.  | nothing.                                             |
+| `s`  | string. read N chars or until next literal.                    | any string, up to `D` chars.                         |
+| `u`  | uppercase string. just like `s`, but converts to uppercase.    | any string, up to `D` chars, converted to uppercase. |
+| `l`  | lowercase string. just like `s`, but converts to lowercase.    | any string, up to `D` chars, converted to lowercase. |
+| `r`  | repeat. 0 or more (or `N`) characters within a valid set.      | any string, exactly `N` chars if specified.          |
+| `o`  | optional. 0 or 1 (or `N`) characters within a valid set.       | any string, exactly `N` chars if specified.          |
+| `a`  | ASCII. reads like `s`; value is list of DeckRoman ordinals.    | list of DeckRoman ordinals converted to a string.    |
+| `b`  | reads like `s`; value is `1` iff first char is in `tTyYx1`.    | any value to `true` or `false` based on truthiness.  |
+| `f`  | Lil float. allows any number of decimals.                      | show `D` decimal places or however many are needed.  |
+| `c`  | currency. parses values like `-$1.23` to Lil floats.           | show `D` or 2 decimal places, like `-$1.23`.         |
+| `C`  | plain currency. parses values like `-1.23` to Lil floats.      | show `D` or 2 decimal places, like `-1.23`.          |
+| `i`  | signed integer.                                                | signed integer.                                      |
+| `h`  | hexadecimal integer. parses lower- or uppercase.               | format int as hexadecimal in lowercase.              |
+| `H`  | hexadecimal integer. parses lower- or uppercase.               | format int as hexadecimal in uppercase.              |
+| `j`  | a [JSON](https://www.json.org) value.                          | any value to a JSON string.                          |
+| `J`  | a superset of JSON (LOVE) that supports any Lil value.         | any value to a LOVE string.                          |
+| `q`  | quoted. a Lil string literal, like `"foo\nbar"`.               | any string to a Lil string literal.                  |
+| `v`  | variable. a Lil variable name, like `ice_9`.                   | any string.                                          |
+| `e`  | read ISO-8601 date-time into a unix epoch int.                 | format unix epoch int as ISO-8601 date-time.         |
+| `p`  | read ISO-8601 date-time as a dictionary of time parts.         | format dict as ISO-8601.                             |
 
-When parsing, each pattern will be matched against input in sequence, consuming some number of input characters and producing output values, and literals will be expected; if at any point a pattern or literal fails to match against input, parsing will cease, and any subsequent patterns in the format string will yield appropriate "null" values. Thus, a given format string will always yield a fixed number of results, no matter the input. In the case where there is _exactly one_ value-yielding pattern in the format string, `parse` output will simply be that value instead of a list.
+When parsing, each pattern will be matched against input in sequence, consuming some number of input characters and producing output values, and literals will be expected; if at any point a pattern or literal fails to match against input, parsing will cease, and any subsequent patterns in the format string will yield nil. Thus, a given format string will always yield a fixed number of results, no matter the input. In the case where there is _exactly one_ value-yielding pattern in the format string, `parse` output will simply be that value instead of a list.
 ```lil
-"%f %s %i" parse "12 apples"                        # (12,"apples",0)
+"%f %s %i" parse "12 apples"                        # (12,"apples",nil)
 "%f %ss" parse "12 apples"                          # (12,"apple")
 ("amount","noun") dict "%f %ss" parse "12 apples"   # {"amount":12,"noun":"apple"}
 "[%s]" parse "[something]"                          # "something"
@@ -844,7 +917,7 @@ t: table ("name","price","amt") dict flip r
 #"apple  $1.00 1\ncherry $0.3515\nbanana $0.75 2"
 ```
 
-When formatting, literals will be included in the output string and each pattern will control conversion of one value from the input list, with a few exceptions as explained below. Missing arguments will be interpreted as appropriate "null" values.
+When formatting, literals will be included in the output string and each pattern will control conversion of one value from the input list, with a few exceptions as explained below. Missing arguments will be interpreted as nil.
 ```lil
 "%i,%a,%i" format 1,(list 65,66,67)  # "1,ABC,0"
 ```
@@ -877,7 +950,7 @@ If `N` is specified, the `%s`,`%a` and `%b` patterns will read up to `N` charact
 The `%p` pattern operates on a dictionary with numeric fields for `year`, `month`, `day`, `hour`, `minute`, `second`:
 ```lil
 "%p" parse  "2021-02-03T04:05:58Z"  # {"year":2021,"month":2,"day":3,"hour":4,"minute":5,"second":58}
-"%p" format ().year:1984            # "1984-01-00T00:00:00Z"
+"%p" format ().year:1984            # "1984-00-00T00:00:00Z"
 ```
 
 The `%n` pattern can be used for progressive parsing. It also offers a way of finding the first index of a given character in a string:
@@ -889,14 +962,11 @@ data: "one,two,three"
 "%*sA%n" parse "BBCABA"    # the index of the first 'A' is 4
 ```
 
-The `%m` and `%z` patterns can be used to disambiguate between failing to match and successfully parsing a null-equivalent value. You can also do some kinds of pattern matching:
+The `%m` and `%z` patterns can be used to identify the success or failure of an entire pattern.
 ```lil
-"%i%m" parse "23"                      # (23,1) # successful parse
-"%i%m" parse "0"                       # (0,1)  # successful parse of 0
-"%i%m" parse "orange"                  # (0,0)  # mismatch, defaulted to 0
-
-"exe%m" parse "foo.exe","execute"      # (0,1)  # prefix match
-"exe%z" parse "execute","exe"          # (0,1)  # full match
+"%i%m" parse "23"                      # (23,1)  # successful parse
+"%i%m" parse "0"                       # (0,1)   # successful parse of 0
+"%i%m" parse "orange"                  # (nil,0) # mismatch
 ```
 
 The `%r` pattern is followed by one or more "valid" characters, the count given by `D` (or 1 by default). This pattern matches and collects input if and only if the input characters are within this set of valid characters. The `-` flag inverts this behavior, such that the pattern matches and collects only characters which are _not_ in the valid set. If `N` is specified, exactly N characters must be matched; otherwise `%r` will accept zero or more valid characters. The `%o` pattern is exactly like `%r`, but if `N` is unspecified it will accept zero or _one_ valid characters:
@@ -922,14 +992,14 @@ The `%j` pattern can be used to format or parse data as JSON. When formatting JS
 "%j" format table 11,22             # "[{\"value\":11},{\"value\":22}]"
 "%j" format on x do 2+x end         # "null"
 ```
-When parsing JSON, the value `true` will become the number `1`, and `false` or `null` will become the number `0`. This JSON parser is highly tolerant and will among other things accept non-string JSON values as dictionary keys, single-quoted strings, missing `,` and `:` delimiters, and some missing trailing delimiters. [Postel's Law](https://en.wikipedia.org/wiki/Robustness_principle), baby!
+When parsing JSON, the value `true` will become the number `1`, `false` will become the number `0`, and `null` will become nil. This JSON parser is highly tolerant and will among other things accept non-string JSON values as dictionary keys, single-quoted strings, missing `,` and `:` delimiters, and some missing trailing delimiters. [Postel's Law](https://en.wikipedia.org/wiki/Robustness_principle), baby!
 ```lil
-"%j" parse "[true,false,null,1]"   # (1,0,0,1)
+"%j" parse "[true,false,null,1]"   # (1,0,nil,1)
 "%j" parse "{11:22,33:44"          # {11:22,33:44}
 "%j" parse "{'foo':22}"            # {"foo":22}
 ```
 
-The `%J` pattern handles a _superset_ of JSON that can represent all of Lil's basic datatypes and certain Interface types losslessly. Beyond the behavior of `%j`, `%J` supports dictionaries with keys of any Lil type, represents tables in `<>` (otherwise like a string-keyed dictionary of columns), and recognizes "Data Block" encodings for _Images_, _Sounds_, and _Arrays_, as described in _The Decker File Format_:
+The `%J` pattern handles a _superset_ of JSON called Lil Object-Value Encoding (LOVE) which can represent all of Lil's basic datatypes and certain Interface types losslessly. Beyond the behavior of `%j`, `%J` supports dictionaries with keys of any Lil type, represents tables in `<>` (otherwise like a string-keyed dictionary of columns), and recognizes "Data Block" encodings for _Images_, _Sounds_, and _Arrays_, as described in _The Decker File Format_:
 ```lil
 "%J" format ((list 11,22),(list 33,44)) dict "one","two" # "{[11,22]:\"one\",[33,44]:\"two\"}"
 "%J" format insert a b with 11 22 33 44 end              # "<\"a\":[11,33],\"b\":[22,44]>"
@@ -1076,7 +1146,7 @@ Yet another useful consequence of this behavior is that enlisting the right argu
 sum @ (100,200) cross 11,22,33        # (111,211,122,222,133,233)
 ```
 
-You can also conform dictionaries. Lil takes the union of keys in the dictionaries and applies the operator between dictionary elements (or `0` if the entry is missing). As when taking the union of dictionaries with `,`, conforming "prefers" the order of keys in the left argument:
+You can also conform dictionaries. Lil takes the union of keys in the dictionaries and applies the operator between dictionary elements (or nil if the entry is missing). As when taking the union of dictionaries with `,`, conforming "prefers" the order of keys in the left argument:
 ```lil
 x:("White","Brown","Speckled") dict 10,34,27
 y:("Brown","White","Blue"    ) dict  9,13,35
@@ -1183,7 +1253,9 @@ sys                  # <system>
 time:sys             # <system>
 time.now             # 1636682495
 ```
-Interfaces cannot be defined from Lil programs- they are furnished by a host application like Decker. Consult Decker's manual for a description of the interfaces you can use in your scripts. It is also not possible to enumerate the keys of an interface; they may have infinitely many keys, populated on the fly. Thus, the `in` operator will always return `0` when an interface is its right argument, and the `keys` operator will always return `()`.
+Interfaces cannot be defined from Lil programs- they are furnished by a host application like Decker. Consult Decker's manual for a description of the interfaces you can use in your scripts. Many "utility" interfaces offer considerably more efficient ways of performing operations than with raw Lil alone: of particular note are the `Array` interface, which provides a mutable data structure for manipulating and parsing binary data, the `Bits` interface, which provides functions for performing bitwise arithmetic, and the `Image` interface, which offers a variety of ways to manipulate two-dimensional arrays of bytes in bulk.
+
+It is not possible to enumerate the keys of an interface; they may have infinitely many keys, populated on the fly. Thus, the `in` operator will always return `0` when an interface is its right argument, and the `keys` operator will always return `()`.
 
 Interfaces can be compared with `~` and `=` using _reference equality_ and concatenated into lists using `,` like any other datatype:
 ```lil
@@ -1197,9 +1269,9 @@ sys.type             # "system"
 (sys,sys,sys)..type  # ("system","system","system")
 ```
 
-Accessing an invalid index will return `0`, and attempting to write to an invalid (or read-only) index will return the expression to the right, like any other indexed assignment:
+Accessing an invalid index will return nil, and attempting to write to an invalid (or read-only) index will return the expression to the right, like any other indexed assignment:
 ```lil
-sys.bogus            # 0
+sys.bogus            # nil
 sys.bogus:123        # 123
 ```
 
@@ -1211,9 +1283,9 @@ The unary aggregation primitives `sum`, `prod`, `raze`, `min`, and `max` take a 
 
 The `raze` of a table `x` will convert it into a dictionary as if by `x[(keys x)[0]] dict x[(keys x)[1]]`.
 
-`typeof` gives the name of the type of the argument; one of the strings { `"number"`, `"string"`, `"list"`, `"dict"`, `"table"`, `"function"` }, or, in the case of an _interface_, the name of that interface type.
+`typeof` gives the name of the type of the argument; one of the strings { `"number"`, `"string"`, `"list"`, `"dict"`, `"table"`, `"function"`, `"nil"` }, or, in the case of an _interface_, the name of that interface type.
 
-`count` gives the number of elements in a value. The `count` of a number is always 1.
+`count` gives the number of elements in a value. The `count` of a number is always 1. The `count` of nil (per its listy interpretation) is always 0.
 
 `first` and `last` pick the first or last elements of a value. The `first` of a function is the function's name.
 
@@ -1223,13 +1295,13 @@ The `raze` of a table `x` will convert it into a dictionary as if by `x[(keys x)
 
 `list` of anything produces a list of length 1 containing that value.
 
-`flip` will _transpose_ the elements of a list of lists- swap the x and y axes. For example, `flip (list 1,2,3),(list 4,5,6)` is `((1,4),(2,5),(3,6))`. The result will always be rectangular: sublists that are too short will be padded with `0`, and any non-list values will be _spread_ to take up an entire column in the result. Applied to a table `x`, `flip` will produce a new table using a column named `key` (or the first column) as new column keys, and all other columns will become rows. The original keys will become a column named `key` in the resulting table. This operation can be useful for "pivoting" categorical data.
+`flip` will _transpose_ the elements of a list of lists- swap the x and y axes. For example, `flip (list 1,2,3),(list 4,5,6)` is `((1,4),(2,5),(3,6))`. The result will always be rectangular: sublists that are too short will be padded with nil, and any non-list values will be _spread_ to take up an entire column in the result. Applied to a table `x`, `flip` will produce a new table using a column named `key` (or the first column) as new column keys, and all other columns will become rows. The original keys will become a column named `key` in the resulting table. This operation can be useful for "pivoting" categorical data.
 
 `rows` converts a table into a list of dictionaries, each representing a row of the table.
 
 `cols` converts a table into a dictionary of uniform-length lists, each representing a column of the table.
 
-`table` constructs a table. Given a list-of-dictionaries (as produced by `rows`) or a dictionary, it will reconstitute a table, taking the union of any dictionary keys as columns and extending any short columns as with `take`. A list of lists will be interpreted as a list of _rows_, padded to rectangularity with 0 if needed, using default column names {`c0`, `c1`... `cn`}. A list containing non-dictionary and non-list values will be converted into a table with a single `value` column.
+`table` constructs a table. Given a list-of-dictionaries (as produced by `rows`) or a dictionary, it will reconstitute a table, taking the union of any dictionary keys as columns and extending any short columns as with `take`. A list of lists will be interpreted as a list of _rows_, padded to rectangularity with nil if needed, using default column names {`c0`, `c1`... `cn`}. A list containing non-dictionary and non-list values will be converted into a table with a single `value` column.
 
 `mag` computes the magnitude of a vector, or the euclidean distance between a point and the origin. If its argument is anything except a number or list of numbers it will descend recursively through the argument before computing a magnitude, similar to how other unary primitives conform. For example, `mag ((list 9,0),(list 3,4),(list 0,7))` is `(9,5,7)`. The magnitude of a single number is its absolute value.
 
@@ -1244,13 +1316,13 @@ The binary arithmetic and comparison primitives `+`, `-`, `*`, `/`, `%` (modulus
 
 The modulus operator `%` takes its arguments in the opposite order of common notation- the divisor is the left argument. Thus, `5 % 3,4,5,6,7` is `(3,4,0,1,2)`. In common usage, this order will require fewer parentheses given Lil's right-to-left precedence rule.
 
-The `<`, `>` and `=` comparison operators always produce the number 1 or 0 as a result. If both operands are a number, they are compared numerically. If either is an interface, they are equal only if both are identical. Otherwise, the arguments are treated as strings and compared lexicographically.
+The `<`, `>` and `=` comparison operators always produce the number 1 or 0 as a result. If both operands are a number, they are compared numerically. If either is an interface or a nil value, they are equal only if both are identical. Otherwise, the arguments are treated as strings and compared lexicographically.
 
 The `&` and `|` operator calculate the minimum or maximum of their arguments. As a consequence, for the numbers 0 and 1 they are equivalent to logical "AND" and logical "OR"- thus their notation. Applied to strings, they compare values lexicographically in the same fashion as `<` and `>`.
 
 `x ~ y` is the match operator. It produces the number 1 if `x` and `y` are identical values. Unlike `=`, match does _not_ convert arguments or automatically "spread" to list elements; `x` and `y` must have identical types to begin with. This is particularly important if you want to e.g. check whether an item is the empty list: `()=1,2` yields `()`, but `()~1,2` yields `0`.
 
-`x , y` is the concatenation operator. It is used for joining items together into lists. If `x` is a dictionary, `y` will be converted to a dictionary, and the operator will take the union of their key-value mappings, preferring any bindings in `y` over `x` when both are present. If applied to two tables, their rows will be concatenated, with any missing columns supplied as 0. Note that using `,` on two strings will result in a list of two strings, whereas `"" fuse x,y` will concatenate the strings together.
+`x , y` is the concatenation operator. It is used for joining items together into lists. If `x` is a dictionary, `y` will be converted to a dictionary, and the operator will take the union of their key-value mappings, preferring any bindings in `y` over `x` when both are present. If applied to two tables, their rows will be concatenated, with any missing columns supplied as nil. Note that using `,` on two strings will result in a list of two strings, whereas `"" fuse x,y` will concatenate the strings together.
 
 `x @ y` is spread-indexing: `x` is indexed with each element of `y`. For example, `(11,22,33) @ 0,1,0,1,0` is `(11,22,11,22,11)`. With an appropriate index `y`, this operator can be used to reorder, duplicate, or filter elements of a list `x`. The expression `x @ y` is essentially equivalent to `each v in y x[v] end`, and so it can also be used as shorthand for any `each` loop that would otherwise simply be applying a function to each element of its source. This also works if `x` is a unary primitive: `count @ "one","two","three","four"` is `(3,3,5,4)`.
 
@@ -1260,7 +1332,7 @@ The `&` and `|` operator calculate the minimum or maximum of their arguments. As
 
 `x like y` returns a truthy result if a string `x` matches a glob pattern `y`. If `y` is a list of patterns, the result will be truthy if any of the patterns match. If `x` is a list, the pattern or patterns will be applied to each string of `x` and return a list of `0` or `1` values.
 
-`x dict y` constructs a dictionary from a list of keys `x` and a list of values `y`.
+`x dict y` constructs a dictionary from a list of keys `x` and a list of values `y`. If `y` isn't long enough, trailing keys will be associated with nil: `"ABC" dict 11,22"` is `{"A":11,"B":22,"C":nil}`.
 
 `x take y` and `x drop y` are very general operators for filtering and reshaping data. Their behaviors depend on the type of the left and right arguments, as summarized in the table below. When `x` is a number, `take` will repeat elements from `y` if it isn't long enough. For non-numeric `x` values, `take` can be thought of as _set intersection_, while `drop` can be thought of as _set difference_.
 
@@ -1284,12 +1356,12 @@ The `&` and `|` operator calculate the minimum or maximum of their arguments. As
 Note that if you represent sets as dictionaries, the `take`, `drop` and `,` operators can provide set intersection, disjunction, and union, respectively:
 
 ```lil
-x:"AB" dict 0    # {"A":0,"B":0}
-y:"BC" dict 0    # {"B":0,"C":0}
+x:"AB" dict ()    # {"A":nil,"B":nil}
+y:"BC" dict ()    # {"B":nil,"C":nil}
 
-(keys x) take y  # {"B":0}             (intersection)
-(keys x) drop y  # {"C":0}             (disjunction)
-x,y              # {"A":0,"B":0,"C":0} (union)
+(keys x) take y  # {"B":nil}                 (intersection)
+(keys x) drop y  # {"C":nil}                 (disjunction)
+x,y              # {"A":nil,"B":nil,"C":nil} (union)
 ```
 
 `x limit y` returns up to `x` items from `y`. Equivalent to `if x<count y x take y else y end`.
@@ -1298,7 +1370,9 @@ x,y              # {"A":0,"B":0,"C":0} (union)
 
 `x in y` returns the number 1 or 0 depending upon whether `y` appears in `x`. If `y` is a string, look for the string `x` anywhere in `y`. If `y` is a list, look for `x` as an element of `y`. If `y` is a dictionary, `x` must be a _key_ of that dictionary. If `y` is a table, it must likewise be a _key_ (column name) of that table. In all other cases, `in` returns 0. If `x` is a list, consider each element of x and return a list of 1 or 0.
 
-`x unless y` returns `x` unless `y` is not the number 0; otherwise it returns `y`. This "null-coalescing operator" is handy for providing default values when indexing into dictionaries or lists. For example, `() unless foo[x]` will evaluate to the empty list if `foo` contains no value with the key `x`.
+`x unless y` returns `x` unless `y` is not _nil_; otherwise it returns `y`. This "nil-coalescing operator" is handy for providing default values when indexing into dictionaries or lists. For example, `() unless foo[x]` will evaluate to the empty list if `foo` contains no value with the key `x`.
+
+`x fill y` recursively replaces _nil_ elements within `y` with `x`. You can think of this as a more general version of `unless` in many cases; bulk-replacing missing or invalid elements from a list, dictionary, or table with an appropriate default value.
 
 `x join y` performs a _natural join_ upon the tables `x` and `y`. The intersection between column names in `x` and `y` are used as the _matching key_. For any combination of rows in `x` and `y` where the matching key is identical, the result will contain a row containing the union of the values in that row. The resulting table's column names will be the union of the names in `x` and `y`. Natural joins neatly capture foreign-key relationships between tables, provided that column names are consistent. If `join` is applied to non-table arguments, it produces a list by pairing adjacent elements from `x` and `y`. If either argument is a number, it is considered `range` of that argument, and otherwise it is interpreted as a list. For example, `"ABC" join 3` gives `(("A",0),("B",1),("C",2))`.
 
@@ -1315,7 +1389,7 @@ The following is a slightly hand-waved EBNF description of Lil's syntax. The pro
 MONAD   := '-'|'!'|'floor'|'cos'|'sin'|'tan'|'exp'|'ln'|'sqrt'|'count'|'first'|'last'|'sum'|'min'|'max'|
            'raze'|'prod'|'range'|'keys'|'list'|'rows'|'cols'|'table'|'typeof'|'flip'|'mag'|'unit'|'heading'
 DYAD    := '+'|'-'|'*'|'/'|'%'|'^'|'<'|'>'|'='|'&'|'|'|','|'~'|'@'|'split'|'fuse'|'dict'|'take'|'drop'|
-           'in'|'join'|'cross'|'parse'|'format'|'unless'|'limit'|'like'|'window'
+           'in'|'join'|'cross'|'parse'|'format'|'unless'|'limit'|'like'|'window'|'fill'
 DIGIT   := '0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'
 NUMBER  := '-'? DIGIT+ '.'? | DIGIT* '.' DIGIT+
 STRING  := '"' (NON_ESC|'\\'|'\"'|'\n')* '"'

@@ -73,8 +73,8 @@ amending tables:
 | "apple"      | 1     | 1      | 11   |
 | "cherry"     | 0.35  | 15     | 22   |
 | "banana"     | 0.75  | 2      | 33   |
-| "durian"     | 2.99  | 5      | 0    |
-| "elderberry" | 0.92  | 1      | 0    |
+| "durian"     | 2.99  | 5      | nil  |
+| "elderberry" | 0.92  | 1      | nil  |
 +--------------+-------+--------+------+
 +--------------+-------+--------+------+
 | fruit        | price | amount | zoot |

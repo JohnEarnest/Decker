@@ -19,7 +19,7 @@ description:"a utility module for logging"
 {data}
 version:1.01
 log:{"time":[0,1],"message":["zeroth","first"]}
-zero:0
+zero:null
 
 {script}
 log:table data.log

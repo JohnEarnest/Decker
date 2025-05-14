@@ -43,7 +43,7 @@ show[sys.seed]
 show[(sys~sys),(sys~0),(sys~"")]
 show[sys=(sys,22,0,sys,"")]
 
-# in general, bogus indexing produces 0
+# in general, bogus indexing produces nil
 show[sys.foobarf]
 
 # assigning through a bogus index returns the arg

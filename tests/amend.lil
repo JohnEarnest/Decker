@@ -78,7 +78,7 @@ d:t
 d.zoot:11,22,33,44,55       # amend in novel column: creates a new column!
 show[d]
 d:t
-d.zoot:11,22,33             # amend in short column: extends with 0s
+d.zoot:11,22,33             # amend in short column: extends with nils
 show[d]
 d:t
 d.zoot:11,22,33,44,55,66,77 # amend in long column: truncate to current rowcount

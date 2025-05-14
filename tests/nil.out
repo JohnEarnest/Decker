@@ -1,0 +1,60 @@
+identity:
+"type" "nil"
+"falsiness" "falsey"
+"unlessiness" "" 0 "replace"
+"match self" 1
+"spread (right)" (0,1,0,1,0)
+"spread (left)" (0,0,1,0,1)
+"uninitialized var is" nil
+"default body of func" nil
+"default body of each" (nil,nil,nil)
+"default body of while" nil
+"default body of eval" nil
+"filter in list" (nil,nil)
+"filter out list" (11,22,33)
+"filter in dict" {nil:22}
+"filter out dict" {"A":11,"B":nil,"C":44}
+"filter in multi dict" {"A":11,nil:22}
+"filter out multi dict" {"B":nil,"C":44}
+
+coercion:
+"to num" 0
+"to str" "fuse"
+++
+||
+++
+
+outdexing:
+"firsts" nil nil nil
+"lasts" nil nil nil
+"outdex str" "A" "" "" ""
+"outdex list" 11 nil nil nil
+"outdex dict" 11 nil nil nil
+"outdex tab" nil nil nil
+"outdex image" 0 nil nil nil
+"outdex sound" 0 nil nil nil (nil,nil,0) (0,nil,nil,nil)
+"nindex str" "A"
+"nindex lst" 11
+"nindex dic" nil
+"nindex set str" {0:"A",1:"B",2:"C",nil:55}
+"nindex set lst" {0:11,1:22,2:33,nil:55}
+"nindex set dic" {"A":11,"B":22,nil:55}
+
+padding:
+"amend column" insert a b c with 11 22 55 33 44 nil end
+"flip list pad" ((11,44),(22,55),(nil,66))
+"dict pad" {"A":11,"B":22,"C":nil}
+"take pad" (0,0,0) (nil,nil,nil) ""
+
+parseformat:
+"parse null" (nil,23)
+"format null" "null23"
+"parse invalid" nil
+"parse missing csv col" insert one two three with "A" 11 98.6 "B" 22 nil "C" 33 nil end
+
+fill:
+"fill empties" () "" {} insert with end
+"fill scalars" 33 0 "a"
+"fill lists" (12,36,13,36) ((11,37,33),(44,55),37,(66,37))
+"fill dicts" {"A":11,"B":22,"C":38}
+"fill tabs" insert a b with 11 22 33 39 39 39 end

@@ -1,12 +1,12 @@
-{"value":0,"vars":{},"error":"Invalid character '`'.","errorpos":(1,3)}
+{"value":nil,"vars":{},"error":"Invalid character '`'.","errorpos":(1,3)}
 "'do' is a keyword, and cannot be used for a variable name."
-{"value":0,"vars":{"__proto__":0}}
-{"value":0,"vars":{}}
+{"value":nil,"vars":{"__proto__":nil}}
+{"value":nil,"vars":{}}
 {"value":3,"vars":{}}
 5
 {"value":300,"vars":{"a":100,"b":200}}
 {"value":69,"vars":{"foo":69}}
-{"value":0,"vars":{}}
+{"value":nil,"vars":{}}
 {"value":33,"vars":{"c":42}}
 444
 {"value":999,"vars":{"a":100,"b":200,"c":999}}
@@ -14,4 +14,4 @@
 {"value":on foo do ... end,"vars":{"foo":on foo do ... end}}
 1500
 2100
-{"value":777,"vars":{"localish":10008}} 0 777
+{"value":777,"vars":{"localish":10008}} nil 777

@@ -142,6 +142,7 @@ show["%[banana]i %[apple]i"  format "not a dictionary"                     ] # i
 
 print["json:"]
 # formatting
+show["%j" format nil                             ]
 show["%j" format 42                              ]
 show["%j" format list 11,22,33                   ]
 show["%j" format "string\n with\"/escapes\\!"    ]

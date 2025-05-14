@@ -26,3 +26,6 @@ show[if 0 11 else if 0 22 else 33 end end]
 show[if 1 if 1 11 else 22 end else 33 end]
 show[if 1 if 0 11 else 22 end else 33 end]
 show[if 0 if 1 11 else 22 end else 33 end]
+
+show[if  nil "yes" else "nope" end] # nil is falsey
+show[if !nil "yes" else "nope" end]

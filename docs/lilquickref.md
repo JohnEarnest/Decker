@@ -6,6 +6,7 @@ Types
 -----
 | `typeof`     | False      | Examples                              |
 | :----------- | :--------- | :------------------------------------ |
+| `"nil"`      | `nil`      | `nil`                                 |
 | `"number"`   | `0`        | `42` `37.5` `-29999`                  |
 | `"string"`   | `""`       | `"foo\nbar"`                          |
 | `"list"`     | `()`       | `11,22,33` `list 3`                   |
@@ -15,16 +16,16 @@ Types
 
 Primitives
 ----------
-| Valence | Purpose    |                                                                                |
-| :------ | :--------- | :----------------------------------------------------------------------------- |
-| monad   | arithmetic | `-` `!` `floor` `cos` `sin` `tan` `exp` `ln` `sqrt` `mag` `unit` `heading`     |
-| monad   | reducers   | `count` `first` `last` `sum` `prod` `min` `max` `raze`                         |
-| monad   | data       | `range` `keys` `list` (enlist) `rows` `cols` `table` `typeof` `flip`           |
-| dyad    | arithmetic | `+` `-` `*` `/` `%` (y mod x) `^` (pow) `&` (min) `|` (max)                    |
-| dyad    | logical    | `<` `>` `=` (conforming equal) `~` (match) `unless` (x if y is `0`)            |
-| dyad    | string     | `fuse` `split` `parse` `format` `like`                                         |
-| dyad    | data       | `,` (concat) `@` (index each right) `dict` `take` `drop` `limit` `window` `in` |
-| dyad    | joins      | `join` (natural join/zip) `cross` (cross join/cartesian product)               |
+| Valence | Purpose    |                                                                                       |
+| :------ | :--------- | :------------------------------------------------------------------------------------ |
+| monad   | arithmetic | `-` `!` `floor` `cos` `sin` `tan` `exp` `ln` `sqrt` `mag` `unit` `heading`            |
+| monad   | reducers   | `count` `first` `last` `sum` `prod` `min` `max` `raze`                                |
+| monad   | data       | `range` `keys` `list` (enlist) `rows` `cols` `table` `typeof` `flip`                  |
+| dyad    | arithmetic | `+` `-` `*` `/` `%` (y mod x) `^` (pow) `&` (min) `|` (max)                           |
+| dyad    | logical    | `<` `>` `=` (conforming equal) `~` (match) `unless` (x if y is `0`)                   |
+| dyad    | string     | `fuse` `split` `parse` `format` `like`                                                |
+| dyad    | data       | `,` (concat) `@` (index each right) `dict` `take` `drop` `limit` `window` `in` `fill` |
+| dyad    | joins      | `join` (natural join/zip) `cross` (cross join/cartesian product)                      |
 
 Flow
 ----

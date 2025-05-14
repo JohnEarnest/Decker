@@ -54,6 +54,7 @@ show[max (list 1,3),(list 4,2)]
 show[max max (list 1,3),(list 4,2)]
 show[min () max  () raze () sum () prod ()]
 show[min 42 max -42 raze 42 sum 42 prod 42]
+show[typeof nil]
 show[typeof 42]
 show[typeof "foobarf"]
 show[typeof 45,99]
@@ -137,6 +138,7 @@ show[(.5*range 5)        in (120 take .2*range 40   )] # source list is hashable
 show[(show,random,print) in (50 take show,print,eval)] # source list is hashable and contains natives
 show[random[() 1]]
 show["untitled" unless 0]
+show["untitled" unless nil]
 show["untitled" unless "title"]
 show[ 1 window "ABCD"]
 show[ 2 window "ABCD"]
@@ -247,8 +249,8 @@ show[plam             ]  # but it will not modify the original in place(!)
 show[(22,33,44)[1]    ]  # index an ephemeral expression
 show[(22,33,44)[1]:999]  # amend an entirely ephemeral expression
 
-show["foo".bar        ]  # nonexistent dict index: 0
-show[(1,2).bar        ]  # likewise, 0
+show["foo".bar        ]  # nonexistent dict index: nil
+show[(1,2).bar        ]  # likewise, nil
 show["foo".bar:99     ]  # widen to a dict and assign
 show[(1,2).bar:99     ]  # likewise, widen to a dict and assign
 
@@ -447,9 +449,9 @@ show[scale[10 -5 5]]
 on test x y z do
 	x,y,z
 end
-show[test[1-1] ] # (0,0,0)
-show[test[1- 1]] # (0,0,0)
-show[test[1 -1]] # (1,-1,0)
+show[test[1-1] ] # (0,nil,nil)
+show[test[1- 1]] # (0,nil,nil)
+show[test[1 -1]] # (1,-1,nil)
 
 temp:()
 temp[1,2]:5

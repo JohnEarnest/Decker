@@ -7,7 +7,7 @@ on foo do
 	show[y] # 22
 end
 foo[]
-show[y] # 0
+show[y~nil] # nil
 
 # but if you've declared a variable outside,
 # it can be written from inside:
@@ -41,7 +41,7 @@ on quux x do
 end
 on zami x do
 	z:23
-	show[z,w,g,x] # 23,0,333,77
+	show[z,w,g,x] # 23,nil,333,77
 end
 quux[zami]
 

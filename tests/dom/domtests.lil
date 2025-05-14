@@ -116,7 +116,7 @@ assert["card removed" 1 r]
 
 w1.index:3
 assert["removed widgets are inert" (().zoot:w2) card.widgets]
-assert["removed widgets are inert" 0 w1.name]
+assert["removed widgets are inert" nil w1.name]
 
 r:card.remove[card]
 assert["card remove bogus value" (().zoot:w2) card.widgets]
@@ -439,7 +439,7 @@ assert["grid default colindex" -1 g.col]
 g.col:1
 assert["grid write colindex" ("b",1) g.colname,g.col]
 g.colname:"zorch"
-assert["grid write invalid colname" (0,-1) g.colname,g.col]
+assert["grid write invalid colname" (nil,-1) g.colname,g.col]
 g.colname:"a"
 assert["grid write valid colname" ("a",0) g.colname,g.col]
 g.row:2
@@ -448,7 +448,7 @@ assert["grid cellvalue" 33 g.cellvalue]
 g.cell:("b",1)
 assert["grid write cellvalue" (1,1) g.cell]
 g.colname:"bogus"
-assert["grid cellvalue when no column set" 0 g.cellvalue]
+assert["grid cellvalue when no column set" nil g.cellvalue]
 
 g.row:1
 g.value:insert a with end
@@ -582,8 +582,8 @@ snd.size:50
 assert["sound grow"     50 snd.size]
 snd[49]:126
 assert["sound write"    126 snd[49]]
-assert["sound oob 1"    0 snd[-5]]
-assert["sound oob 2"    0 snd[9999]]
+assert["sound oob 1"    nil snd[-5]]
+assert["sound oob 2"    nil snd[9999]]
 
 snd.size:8000
 each x in range snd.size
@@ -1235,7 +1235,7 @@ assert["deck removed card" (("home","three")dict c1,c3) deck.cards]
 assert["deck removed card success" 1 r]
 c2.index:3
 assert["removed cards are inert" (("home","three")dict c1,c3) deck.cards]
-assert["removed cards are inert" 0 c2.name]
+assert["removed cards are inert" nil c2.name]
 
 builtins:deck.fonts,()
 f1:deck.add["font"]
@@ -1316,7 +1316,7 @@ deck:newdeck[]
 b:deck.card.add["button"]
 assert["deck remove widget"            1 deck.remove[b]]
 assert["sanity check widget removed"  () keys deck.card.widgets]
-assert["sanity check widget inert"     0 b.name]
+assert["sanity check widget inert"   nil b.name]
 assert["deck remove inert widget"      0 deck.remove[b]]
 
 deck:newdeck[]
@@ -1587,7 +1587,7 @@ ld:read["tests/dom/logger.deck"]
 assert["module data store" "keystore" (typeof ld.modules.logger.data)]
 assert["module data, external" 1.01              ld.modules.logger.data.version]
 assert["module data, keys"     ("version","log") ld.modules.logger.data.keys   ]
-ld.modules.logger.data.version:0
+ld.modules.logger.data.version:nil
 assert["module data, delete zero"   (list "log") ld.modules.logger.data.keys   ]
 ld.card.widgets.push.event["click"]
 assert["module logger demo"
@@ -1672,7 +1672,7 @@ step.show:"none"
 a:deck.card.add["contraption" "spinner" "a"]
 b:deck.card.add[a "b"]
 c:deck.card.add["contraption" "bogus" "ishouldnotexist"]
-assert["contraption add bogus type" 0 c]
+assert["contraption add bogus type" nil c]
 defaults:b @ "type","name","index","locked"
 assert["contraption default attributes" ("contraption","b",1,0) defaults]
 assert["contraption def" def b.def]
@@ -1703,7 +1703,7 @@ assert["proto update instances preserve instance state" (35,37) deck.card.widget
 assert["proto update instances preserve name"               "a" deck.card.widgets.a.name]
 
 def.script:"won't parse"
-assert["read contraption instance attr with broken script" 0 deck.card.widgets.b.value]
+assert["read contraption instance attr with broken script" nil deck.card.widgets.b.value]
 def.script:"on get_value do 34567 end"
 assert["read contraption instance attr with fixed script" 34567 deck.card.widgets.b.value]
 
@@ -1769,7 +1769,7 @@ on thing6 do card end"
 assert["prototype member event can access other inner widgets"                                  f         b.event["thing1"]]
 assert["contraption can expose member widgets"                                                  "button"  e.w.type]
 assert["contraption exposed member event can access other inner widgets"                        "field"   e.w.event["thing1"].type]
-assert["contraption exposed member event CANNOT access widgets on the container card"           0         e.w.event["thing2"]]
+assert["contraption exposed member event CANNOT access widgets on the container card"           nil       e.w.event["thing2"]]
 assert["contraption instance event handlers CAN access widgets on the container card"           s         e.event["thing3"]]
 assert["contraption instances CAN fire events at the container card"                            s         e.w.event["thing4"]]
 assert["prototype scripts observe 'card' as the prototype"                                      def       b.event["thing7"]]
@@ -1807,15 +1807,15 @@ fc:d3.card.add["field" "cindy"]
 fa.val:"Alice's Value"
 fb.val:"Betty's Value"
 fc.text:"Cindy Is Not a Contraption"
-assert["transplanted prototype attrs" (("alice","betty","cindy")dict "Alice's Value","Betty's Value",0) (d3.card.widgets..val)]
+assert["transplanted prototype attrs" (("alice","betty","cindy")dict "Alice's Value","Betty's Value",nil) (d3.card.widgets..val)]
 assert["transplanted prototype funcs" (10) (fa.foof[5])]
 d3.add[p2]
 assert["upgraded prototype"   (1.5,"port") (d3.contraptions.port.version,keys d3.contraptions)]
-assert["upgraded prototype attrs"     (("alice","betty","cindy")dict "Alice's Value","Betty's Value",0) (d3.card.widgets..val)]
+assert["upgraded prototype attrs"     (("alice","betty","cindy")dict "Alice's Value","Betty's Value",nil) (d3.card.widgets..val)]
 assert["upgraded prototype funcs"     (16) (fa.foof[5])]
 d3.add[p1]
 assert["downgraded prototype" (1.3,"port") (d3.contraptions.port.version,keys d3.contraptions)]
-assert["downgraded prototype attrs"   (("alice","betty","cindy")dict "Alice's Value","Betty's Value",0) (d3.card.widgets..val)]
+assert["downgraded prototype attrs"   (("alice","betty","cindy")dict "Alice's Value","Betty's Value",nil) (d3.card.widgets..val)]
 assert["downgraded prototype funcs"   (10) (fa.foof[5])]
 d4:newdeck[]
 copied:d3.card.copy[fa,fb]

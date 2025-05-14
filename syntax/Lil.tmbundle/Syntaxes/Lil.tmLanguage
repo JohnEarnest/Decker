@@ -30,7 +30,7 @@
 			<key>comment</key>
 			<string>Primitive operators</string>
 			<key>match</key>
-			<string>(?&lt;=^|[^a-zA-Z_?\d.])(?:floor|cos|sin|tan|exp|ln|sqrt|sum|prod|min|max|raze|count|first|last|range|keys|list|table|rows|cols|split|fuse|cat|dict|take|drop|in|at|join|cross|parse|format|typeof|unless|flip|limit|mag|unit|heading|like|window)(?=$|[^a-zA-Z_?\d])</string>
+			<string>(?&lt;=^|[^a-zA-Z_?\d.])(?:floor|cos|sin|tan|exp|ln|sqrt|sum|prod|min|max|raze|count|first|last|range|keys|list|table|rows|cols|split|fuse|cat|dict|take|drop|in|at|join|cross|parse|format|typeof|unless|flip|limit|mag|unit|heading|like|window|fill)(?=$|[^a-zA-Z_?\d])</string>
 			<key>name</key>
 			<string>support.function.lil</string>
 		</dict>

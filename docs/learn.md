@@ -16,29 +16,34 @@ Feel free to try examples as you work through this guide in Lil's [online sandbo
 #
 ###################################################
 
-"one"                      # strings are enclosed in double-quotes,
-"two\nthree\"four"         # and may include the escapes \n \" \\.
+"one"                          # strings are enclosed in double-quotes,
+"two\nthree\"four"             # and may include the escapes \n \" \\.
 
--23.84                     # numbers are floating point values.
+-23.84                         # numbers are floating point values.
 
-2*3+5      # -> 16         # expressions evaluate right-to-left,
-(2*3)+5    # -> 11         # ...unless overridden by parentheses.
+2*3+5          # -> 16         # expressions evaluate right-to-left,
+(2*3)+5        # -> 11         # ...unless overridden by parentheses.
 
-()         # -> ()         # the empty list
-11,22      # -> (11,22)    # "," joins values to form lists.
-list 42    # -> (42)       # "list" makes a list of count 1.
+()             # -> ()         # the empty list
+11,22          # -> (11,22)    # "," joins values to form lists.
+list 42        # -> (42)       # "list" makes a list of count 1.
 
-a:42       # -> 42         # the symbol ":" ("becomes") performs assignment.
-z          # -> 0          # referencing unbound variables returns 0.
+a:42           # -> 42         # the symbol ":" ("becomes") performs assignment.
+z              # -> nil        # referencing unbound variables returns nil.
 
-d:("a","b") dict 11,22     # "dict" makes a dictionary from lists of keys and values.
-keys  d    # -> ("a","b")  # "keys" extracts the keys of a dict.
-range d    # -> (11,22)    # "range" extracts the elements of a dict.
-range 4    # -> (0,1,2,3)  # ...or generates a sequence of integers [0,n).
+d:("a","b") dict 11,22         # "dict" makes a dictionary from lists of keys and values.
+keys  d        # -> ("a","b")  # "keys" extracts the keys of a dict.
+range d        # -> (11,22)    # "range" extracts the elements of a dict.
+range 4        # -> (0,1,2,3)  # ...or generates a sequence of integers [0,n).
 
-(3,5,7)[1] # -> 5          # lists can be indexed with [], and count from 0.
-d.a        # -> 11         # dicts can be indexed with a dot and a name,
-d["b"]     # -> 22         # ...or equivalently, with []; required for non-string keys.
+(3,5,7)[1]     # -> 5          # lists can be indexed with [], and count from 0.
+d.a            # -> 11         # dicts can be indexed with a dot and a name,
+d["b"]         # -> 22         # ...or equivalently, with []; required for non-string keys.
+
+nil+2          # -> 2          # nil will coerce to identity values- 0, "", ()- as needed.
+5 unless nil   # -> 5          # 'unless' will replace nil with another value.
+5 unless 0     # -> 0          # ...but leave falsey values intact.
+5 fill 2,nil,3 # -> (2,5,3)    # replace nils in bulk with 'fill'.
 
 # collection operators:
 count    11,22,33    # -> 3
@@ -87,10 +92,10 @@ else
  "just a regular slob"
 end
 
-# "if" and "while" treat 0, or the empty string, list, or dict as "falsey".
+# "if" and "while" treat 0, nil, or the empty string, list, or dict as "falsey".
 # any other value is considered "truthy".
 if 3  "yes" end  # -> "yes"
-if () "no"  end  # -> 0
+if () "no"  end  # -> nil
 
 ###################################################
 #
@@ -129,7 +134,7 @@ on outer x do        # function argument defines local x.
  end
  inner[x]
  show[x]             # -> 5
- show[z]             # -> 0   # z is not defined in this scope.
+ show[z]             # -> nil # z is not defined in this scope.
 end
 outer[5]
 
@@ -256,6 +261,12 @@ flip x      # transpose a table's rows and columns.
 d:("a","b") dict 11,22
 "%j" format list d           # JSON.
 # -> "{\"a\":11,\"b\":22}"
+
+# Lil Object-Value Encoding (LOVE) is a JSON superset
+# which supports non-string dict keys, tables,
+# and serializing image, array, and sound interfaces:
+"%J" format (11,22) dict 33,44
+"{11:33,22:44}"
 
 # the "parse" operator tokenizes a string into values.
 # "parse" and "format" use the same pattern syntax:
