@@ -1094,6 +1094,7 @@ void term(lv*b){
 	if(match("insert")){
 		lv*n=lml(0);while(!perr()&&!match("with")){ll_add(n,lmstr(peek()->type=='s'?literal_str(next()):name("column")));}
 		int v=0,i=0;while(!perr()){if(match("into")){i=1;break;}if(match("end")){i=0;break;}expr(b),v++;}
+		if(n->c==0&&v==0&&i==0){blk_lit(b,lmt());return;}
 		if(n->c<1)ll_add(n,lmistr("value"));blk_opa(b,BUND,v),blk_lit(b,n);if(i){expr(b);}else{blk_lit(b,ZERO);}blk_op3(b,"@ins");return;
 	}
 	if(matchsp('(')){if(matchsp(')')){blk_lit(b,lml(0));return;}expr(b);expect(')',0);return;}

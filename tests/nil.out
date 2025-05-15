@@ -20,9 +20,7 @@ identity:
 coercion:
 "to num" 0
 "to str" "fuse"
-++
-||
-++
+"to tab" insert with end
 
 outdexing:
 "firsts" nil nil nil

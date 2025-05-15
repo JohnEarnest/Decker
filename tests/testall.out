@@ -59,7 +59,7 @@ nil nil nil 0 1
 +-----+
 | key |
 +-----+
-insert value with end insert key with end
+insert with end insert key with end
 +-------+-----+-----+-------+------+
 | key   | tax | gas | power | food |
 +-------+-----+-----+-------+------+

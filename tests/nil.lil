@@ -23,7 +23,7 @@ show["filter out multi dict" (nil,"A") drop ("A",nil,"B","C") dict (11,22,nil,44
 print["\ncoercion:"]
 show["to num" 0+nil]
 show["to str" "fuse" format "[",nil,"]"]
-show[select from nil]
+show["to tab" select from nil]
 
 print["\noutdexing:"]
 show["firsts" (first nil) (first ()) (first "")]

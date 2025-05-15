@@ -626,6 +626,7 @@ parse=text=>{
 		if(match('insert')){
 			const n=lml([]);while(!match('with')){n.v.push(lms(peek().t=='string'?next().v:name('column')))}
 			let v=0,i=0;while(1){if(match('into')){i=1;break}if(match('end')){i=0;break}expr(b),v++}
+			if(n.v.length==0&&v==0&&i==0){blk_lit(b,lmt());return}
 			if(n.v.length<1)n.v.push(lms('value'));blk_opa(b,op.BUND,v),blk_lit(b,n);if(i){expr(b)}else{blk_lit(b,ZERO)}
 			blk_op3(b,'@ins');return
 		}
