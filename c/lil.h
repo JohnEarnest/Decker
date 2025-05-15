@@ -23,7 +23,7 @@ lv*debug_show(lv*x);      // version of l_show() which _always_ goes to stdout, 
 lv*idecode(lv*x);         // decode datablock representation of interfaces into an instance or 0.
 lv nilvalue={-1,0,0,0,0,0,0.0,NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 int linil(lv*x){return x==&nilvalue;}
-#define NIL          (&nilvalue)
+#define LNIL         (&nilvalue)
 #define NUM          512 // number parsing/formatting buffer size
 #define ONE          lmn(1)
 #define ZERO         lmn(0)
@@ -168,9 +168,9 @@ void dsetuq(lv*d,lv*k,lv*x){
 }
 void dset(lv*d,lv*k,lv*x){FIND(z,d,k){d->lv[z]=x;return;}ld_add(d,k,x);}
 lv* dget(lv*d,lv*k){FIND(z,d,k)return d->lv[z];return NULL;}
-lv* dgetv(lv*d,lv*k){FIND(z,d,k)return d->lv[z];return NIL;}
+lv* dgetv(lv*d,lv*k){FIND(z,d,k)return d->lv[z];return LNIL;}
 int dgeti(lv*d,lv*k){EACH(z,d)if(matchr(d->kv[z],k))return z;return -1;}
-lv* dkey(lv*d,lv*v){EACH(z,d)if(matchr(d->lv[z],v))return d->kv[z];return NIL;}
+lv* dkey(lv*d,lv*v){EACH(z,d)if(matchr(d->lv[z],v))return d->kv[z];return LNIL;}
 lv* amend(lv*x,lv*i,lv*y){
 	if(lii(x))return ((lv*(*)(lv*,lv*,lv*))x->f)(x,i,y);
 	if(lit(x)&&lin(i)){
@@ -179,7 +179,7 @@ lv* amend(lv*x,lv*i,lv*y){
 	}
 	if(lit(x)&&lis(i)){
 		lv*rn=lmn(x->n), *r=l_take(rn,x), *c=lil(y)?l_take(lmn(MIN(y->c,x->n)),ll(y)): l_take(rn,l_list(y));
-		while(c->c<x->n)ll_add(c,NIL);dset(r,ls(i),c);return r;
+		while(c->c<x->n)ll_add(c,LNIL);dset(r,ls(i),c);return r;
 	}
 	if(!lis(x)&&!lil(x)&&!lid(x))return amend(lml(0),i,y);
 	if((lil(x)||lis(x))&&(!lin(i)||(i->nv<0||i->nv>x->c)))return amend(ld(x),i,y);
@@ -192,12 +192,12 @@ lv* amend(lv*x,lv*i,lv*y){
 }
 lv* l_ati(lv*x,lv*y){return lis(y)&&!strcmp(y->sv,"type")?x->a: ((lv*(*)(lv*,lv*,lv*))x->f)(x,y,NULL);}
 lv* l_at(lv*x,lv*y){
-	if(linil(x))return NIL;
+	if(linil(x))return LNIL;
 	if(lii(x))return l_ati(x,y);
 	if(lit(x)&&lin(y))x=l_rows(x); if((lis(x)||lil(x))&&linil(y))y=ZERO; if((lis(x)||lil(x))&&!lin(y))x=ld(x);
 	if(lis(x)){int n=ln(y);lv*r=lms(1);r->sv[0]=(n<0||n>=x->c)?(r->c=0,'\0'):x->sv[n];return r;}
-	if(lil(x)){int n=ln(y);return n<0||n>=x->c?NIL:x->lv[n];}
-	return lid(x)||(lit(x)&&lis(y))?dgetv(x,y):NIL;
+	if(lil(x)){int n=ln(y);return n<0||n>=x->c?LNIL:x->lv[n];}
+	return lid(x)||(lit(x)&&lis(y))?dgetv(x,y):LNIL;
 }
 lv* amendv(lv*x,lv*i,lv*y,int n,int*tla){
 	if(lii(x)){*tla=0;}if(!*tla&&n+1<i->c)return amendv(l_at(x,l_first(i->lv[n])),i,y,n+1,tla);
@@ -212,11 +212,11 @@ lv* nlperfuse(lv*x,lv*(f(lv*))){if(!lil(x))return f(ll(x));int n=1;EACH(z,x)if(!
 lv* conform(lv*x,lv*y,lv*(f(lv*,lv*))){
 	if(lid(x)&&lid(y)){ // union keys, zero-fill unmatched elements.
 		DMAP(r,x,conform(x->lv[z],dgetv(y,x->kv[z]),f));
-		EACH(z,y)if(!dget(x,y->kv[z]))dset(r,y->kv[z],conform(NIL,y->lv[z],f));return r;
+		EACH(z,y)if(!dget(x,y->kv[z]))dset(r,y->kv[z],conform(LNIL,y->lv[z],f));return r;
 	}
 	if( lid(x)&&!lid(y)){DMAP(r,x,conform(x->lv[z],y,f));return r;}
 	if(!lid(x)&& lid(y)){DMAP(r,y,conform(x,y->lv[z],f));return r;}
-	if( lil(x)&& lil(y)){MAP(r,x)conform(x->lv[z],y->c==0?NIL:y->lv[z%y->c],f);return r;}
+	if( lil(x)&& lil(y)){MAP(r,x)conform(x->lv[z],y->c==0?LNIL:y->lv[z%y->c],f);return r;}
 	if( lil(x)&&!lil(y)){MAP(r,x)conform(x->lv[z],y,f);return r;}
 	if(!lil(x)&& lil(y)){MAP(r,y)conform(x,y->lv[z],f);return r;} return f(x,y);
 }
@@ -373,18 +373,18 @@ vm(sin,sin,ln) vm(tan   ,tan,ln) vm(exp  ,exp  ,ln) vm(ln ,log,ln) vm(sqrt,sqrt,
 monad(l_count){return lmn(lin(x)||lis(x)||lil(x)||lid(x)?x->c:lit(x)?x->n:0);}
 monad(l_list ){lv*r=lml(1);r->lv[0]=x;return r;}
 monad(l_first){
-	if(linil(x))return NIL;
+	if(linil(x))return LNIL;
 	if(lit(x))return l_first(l_rows(x));
 	if(linat(x))return lmistr("native");
 	if(lion(x))return lmcstr(x->sv);
-	if(lis(x))return !x->c?NIL:l_at(x,ZERO);
-	lv*l=ll(x);return!l->c?NIL:l->lv[0];
+	if(lis(x))return !x->c?LNIL:l_at(x,ZERO);
+	lv*l=ll(x);return!l->c?LNIL:l->lv[0];
 }
 monad(l_last ){
-	if(linil(x))return NIL;
+	if(linil(x))return LNIL;
 	if(lit(x))return l_last(l_rows(x));
-	if(lis(x))return !x->c?NIL:l_at(x,lmn(x->c-1));
-	lv*l=ll(x);return!l->c?NIL:l->lv[l->c-1];
+	if(lis(x))return !x->c?LNIL:l_at(x,lmn(x->c-1));
+	lv*l=ll(x);return!l->c?LNIL:l->lv[l->c-1];
 }
 monad(l_typeof){
 	if(linat(x))return lmistr("function");if(linil(x))return lmistr("nil");if(lii(x))return x->a;
@@ -402,7 +402,7 @@ monad(l_ltable){
 	}
 	int m=0;c=1;EACH(z,x)c&=lil(x->lv[z]),m=MAX(m,x->lv[z]->c);if(c){ // list-of-lists
 		lv*t=lmt();t->n=x->c;for(int c=0;c<m;c++)dset(t,l_format(lmistr("c%i"),lmn(c)),lml(0));
-		EACH(z,x)for(int c=0;c<m;c++)ll_add(t->lv[c],c>=x->lv[z]->c?NIL:x->lv[z]->lv[c]);return t;
+		EACH(z,x)for(int c=0;c<m;c++)ll_add(t->lv[c],c>=x->lv[z]->c?LNIL:x->lv[z]->lv[c]);return t;
 	}return lt(x);
 }
 monad(l_table){if(lid(x)){TMAP(t,x,x->lv[z]);return torect(t);}return lil(x)?l_ltable(x):lt(x);}
@@ -414,7 +414,7 @@ monad(l_tflip){
 }
 monad(l_flip){
 	if(lit(x))return l_tflip(x);x=ll(x);lv*r=lml(0);int w=0;EACH(z,x)w=MAX(w,lil(x->lv[z])?x->lv[z]->c:1);
-	for(int i=0;i<w;i++){MAP(c,x)!lil(x->lv[z])?x->lv[z]:i<x->lv[z]->c?x->lv[z]->lv[i]:NIL;ll_add(r,c);}
+	for(int i=0;i<w;i++){MAP(c,x)!lil(x->lv[z])?x->lv[z]:i<x->lv[z]->c?x->lv[z]->lv[i]:LNIL;ll_add(r,c);}
 	return r;
 }
 monad(a_mag    ){double s=0;EACH(z,x){double v=ln(x->lv[z]);s+=v*v;};return lmn(sqrt(s));}
@@ -438,7 +438,7 @@ dyad(a_smax){lv*a=ls(x),*b=ls(y);return strcmp(a->sv,b->sv)>0?x:y;}
 dyad(a_max ){if(lin(x)||lin(y)){double a=ln(x),b=ln(y);return lmn(a>b?a:b);}return a_smax(x,y);}vd(max)
 dyad(l_unless){return linil(y)?x:y;}
 dyad(l_match){return lmbool(matchr(x,y));}
-dyad(l_dict){x=ll(x);lv*r=lmd();y=ll(y);EACH(z,x)dset(r,x->lv[z],z>=y->c?NIL:y->lv[z]);return r;}
+dyad(l_dict){x=ll(x);lv*r=lmd();y=ll(y);EACH(z,x)dset(r,x->lv[z],z>=y->c?LNIL:y->lv[z]);return r;}
 dyad(l_split){
 	x=ls(x),y=ls(y);if(x->c==0)return ll(y);lv*r=lml(0);int n=0;EACH(z,y){
 		int m=1;EACH(w,x)if(x->sv[w]!=y->sv[z+w]){m=0;break;}if(!m)continue;
@@ -489,7 +489,7 @@ dyad(l_take){
 	if(lis(y))return l_fuse(lmistr(""),l_take(x,ll(y)));
 	if(lit(y)){TMAP(r,y,l_take(x,y->lv[z]));r->n=fabs(ln(x));return r;}
 	y=ll(y);int n=y->c,m=ln(x),s=m<0?mod(m,n):0;lv*r=lml(m<0?-m:m);
-	EACH(z,r)r->lv[z]=n?y->lv[mod(z+s,n)]:NIL;return r;
+	EACH(z,r)r->lv[z]=n?y->lv[mod(z+s,n)]:LNIL;return r;
 }
 dyad(l_drop){
 	if(!lin(x))return filter(0,x,y);
@@ -507,8 +507,8 @@ dyad(l_drop){
 dyad(l_limit){int n=ln(x);return ln(l_count(y))<=n?y:l_take(lmn(n),y);}
 dyad(l_tcomma){
 	lv*r=lmt();
-	EACH(i,x){MAP(c,x->lv[i])x->lv[i]->lv[z];if(!dget(y,x->kv[i]))for(int z=0;z<y->n;z++)ll_add(c,NIL);dset(r,x->kv[i],c);}
-	EACH(i,y){lv*c=dget(r,y->kv[i]);if(!c){GEN(nc,x->n)NIL;dset(r,y->kv[i],nc);c=nc;}EACH(z,y->lv[i])ll_add(c,y->lv[i]->lv[z]);}
+	EACH(i,x){MAP(c,x->lv[i])x->lv[i]->lv[z];if(!dget(y,x->kv[i]))for(int z=0;z<y->n;z++)ll_add(c,LNIL);dset(r,x->kv[i],c);}
+	EACH(i,y){lv*c=dget(r,y->kv[i]);if(!c){GEN(nc,x->n)LNIL;dset(r,y->kv[i],nc);c=nc;}EACH(z,y->lv[i])ll_add(c,y->lv[i]->lv[z]);}
 	return torect(r);
 }
 dyad(l_comma){
@@ -531,7 +531,7 @@ dyad(l_cross){
 dyad(l_join){
 	if(!lit(x)||!lit(y)){
 		x=lin(x)?l_range(x):ll(x),y=lin(y)?l_range(y):ll(y);
-		MAP(r,x)l_comma(x->lv[z],y->c==0?NIL:y->lv[z%y->c]);return r;
+		MAP(r,x)l_comma(x->lv[z],y->c==0?LNIL:y->lv[z%y->c]);return r;
 	}
 	lv*ik=lml(0),*dk=lml(0);TMAP(r,x,lml(0));EACH(z,y){
 		int i=-1;FIND(w,x,y->kv[z]){i=w;break;}
@@ -566,12 +566,12 @@ lv* pjson(char*t,int*i,int*f,int*n){
 	#define js()    while(isspace(jc()))jn();
 	#define jd()    while(isdigit(jc()))jn();
 	#define jl(x,y) if((*n)>=(int)strlen(x)&&memcmp(t+*i,x,strlen(x))==0)return(*i)+=strlen(x),(*n)-=strlen(x),y;
-	jl("null",NIL);jl("false",ZERO);jl("true",ONE);
+	jl("null",LNIL);jl("false",ZERO);jl("true",ONE);
 	if(jm('[')){lv*r=lml(0);while(jc()){js();if(jm(']'))break;ll_add(r,pjson(t,i,f,n));js();jm(',');}return r;}
 	if(jm('{')){lv*r=lmd( );while(jc()){js();if(jm('}'))break;lv*k=pjson(t,i,f,n);js();jm(':');js();if(*f)dset(r,k,pjson(t,i,f,n));js();jm(',');}return r;}
 	if(jm('"' )){str r=str_new();while(jc()&&!(jm('"' ))){char tmp=(jm('\\'))?esc(jn(),i,t,n):jn();if(tmp)str_addc(&r,tmp);}return lmstr(r);}
 	if(jm('\'')){str r=str_new();while(jc()&&!(jm('\''))){char tmp=(jm('\\'))?esc(jn(),i,t,n):jn();if(tmp)str_addc(&r,tmp);}return lmstr(r);}
-	int ns=*i;jm('-');jd();jm('.');jd();if(jm('e')||jm('E')){jm('-')||jm('+');jd();}if(*i<=ns){*f=0;return NIL;}
+	int ns=*i;jm('-');jd();jm('.');jd();if(jm('e')||jm('E')){jm('-')||jm('+');jd();}if(*i<=ns){*f=0;return LNIL;}
 	char tb[NUM];snprintf(tb,MIN(*i-ns+1,NUM),"%s",t+ns);return lmn(atof(tb));
 }
 lv* plove(char*t,int*i,int*f,int*n){
@@ -618,13 +618,13 @@ dyad(l_parse){
 		else if(strchr("slu",t)){str r=str_new();while(hn&&(n?1:hc!=fc))str_addc(&r,ulc(hc)),h++;v=lmstr(r);}
 		else if(t=='a'){v=lml(0);while(hn&&(n?1:hc!=fc))ll_add(v,lmn(0xFF&hc)),h++;}
 		else if(t=='b'){v=lmbool(strchr("tTyYx1",hc));while(hn&&n?1:hc!=fc)h++;}
-		else if(t=='j'){int f=1,c=n?n:y->c;v=m?pjson(y->sv,&h,&f,&c):NIL;}
-		else if(t=='J'){int f=1,c=n?n:y->c;v=m?plove(y->sv,&h,&f,&c):NIL;}
+		else if(t=='j'){int f=1,c=n?n:y->c;v=m?pjson(y->sv,&h,&f,&c):LNIL;}
+		else if(t=='J'){int f=1,c=n?n:y->c;v=m?plove(y->sv,&h,&f,&c):LNIL;}
 		else if(t=='v'){str r=str_new();m&=!isdigit(hc);while(hn&&hc!='\n'&&ncc[hc-32]=='n')str_addc(&r,hc),h++;v=lmstr(r);}
 		else if(t=='q'){
 			str r=str_new();m&=hc=='"';if(m)h++;while(hn&&hc!='"'){
 				if(hc=='\\'){h++;if(m&=!!strchr("\\\"n",hc)){str_addc(&r,hc=='n'?'\n':hc);}}else{str_addc(&r,hc);}h++;
-			}if(m&=hc=='"')h++;v=lmstr(r);if(!m)v=NIL;
+			}if(m&=hc=='"')h++;v=lmstr(r);if(!m)v=LNIL;
 		}
 		else if(t=='r'||t=='o'){
 			str r=str_new();d=MAX(1,d);
@@ -651,8 +651,8 @@ dyad(l_parse){
 		}
 		else{m=0;}while(n&&hc&&h-si<n)h++,m=0;
 		if(!sk&&v){
-			if     (!im&&!strchr("%mnz",t))v=NIL;             // some previous pattern failed
-			else if((h-si)==0&&strchr("fcCihHv",t))v=NIL,m=0; // no characters consumed
+			if     (!im&&!strchr("%mnz",t))v=LNIL;             // some previous pattern failed
+			else if((h-si)==0&&strchr("fcCihHv",t))v=LNIL,m=0; // no characters consumed
 			named?dset(r,nk.sv?lmstr(nk):lmn(pi),v):ll_add(r,v);pi++;
 		}
 	}return named?r: r->c==1?r->lv[0]:r;
@@ -720,7 +720,7 @@ dyad(l_format){
 		while(isdigit(fc))n=n*10+fc-'0',f++;if(fc=='.')f++;
 		while(isdigit(fc))d=d*10+fc-'0',f++;if(!fc)break;char t=fc;f++;
 		lv*an=named?dget(y,nk.sv?lmstr(nk):lmn(h)): NULL;
-		lv*a=t=='%'?NIL: named?(an?an:NIL): (!sk&&h<y->c)?y->lv[h]: NIL;
+		lv*a=t=='%'?LNIL: named?(an?an:LNIL): (!sk&&h<y->c)?y->lv[h]: LNIL;
 		format_type(&r,a,t,n,d,lf,pz,&f,x->sv);if(t!='%'&&!sk)h++;
 	}return lmstr(r);
 }
@@ -763,7 +763,7 @@ dyad(l_fill){
 }
 lv* l_ins(lv*v,lv*n,lv*x){
 	int rc=ceil((1.0*v->c)/n->c);lv*c=lml(n->c);
-	EACH(z,c){c->lv[z]=lml(rc);for(int r=0;r<rc;r++){int x=(n->c*r)+z;c->lv[z]->lv[r]=x>=v->c?NIL:v->lv[x];}}
+	EACH(z,c){c->lv[z]=lml(rc);for(int r=0;r<rc;r++){int x=(n->c*r)+z;c->lv[z]->lv[r]=x>=v->c?LNIL:v->lv[x];}}
 	lv*r=l_table(l_dict(n,c));return lin(x)?r:l_comma(lt(x),r);
 }
 lv* l_tab(lv*t){
@@ -788,7 +788,7 @@ lv* l_extract(lv*orig,lv*vals,lv*keys){
 lv* l_update(lv*orig,lv*vals,lv*keys){
 	orig=disclose(orig);lv*ix=NULL,*r=merge(vals,keys,1,&ix);EACH(c,r){
 		if(r->lv[c]==ix)continue;lv*k=r->kv[c];
-		int ci=dgeti(orig,k);GEN(col,orig->n)ci==-1?NIL:orig->lv[ci]->lv[z];dset(orig,k,col);
+		int ci=dgeti(orig,k);GEN(col,orig->n)ci==-1?LNIL:orig->lv[ci]->lv[z];dset(orig,k,col);
 		EACH(row,ix){col->lv[(int)ln(ix->lv[row])]=r->lv[c]->lv[row];}
 	}return orig;
 }
@@ -807,7 +807,7 @@ lv* l_by(lv*col,lv*tab){
 lv*order_vec=NULL;int order_dir=0; // this is gross. qsort() is badly designed, and qsort_r is unportable.
 int lex_less(lv*a,lv*b);int lex_more(lv*a,lv*b);// forward refs
 int lex_list(lv*x,lv*y,int a,int ix){
-	if(x->c<ix&&y->c<ix)return 0;lv*xv=x->c>ix?x->lv[ix]:NIL,*yv=y->c>ix?y->lv[ix]:NIL;
+	if(x->c<ix&&y->c<ix)return 0;lv*xv=x->c>ix?x->lv[ix]:LNIL,*yv=y->c>ix?y->lv[ix]:LNIL;
 	return lex_less(xv,yv)?a: lex_more(xv,yv)?!a: lex_list(x,y,a,ix+1);
 }
 int lex_less(lv*a,lv*b){return lil(a)&&lil(b)? lex_list(a,b,1,0): lb(l_less(a,b));}
@@ -992,7 +992,7 @@ void expr(lv*b);lv*n_uplevel(lv*self,lv*a); // forward refs
 lv* quote(void){lv*r=lmblk();expr(r);blk_end(r);return r;}
 void iblock(lv*r){
 	int c=0;while(hasnext()){
-		if(match("end")){if(!c)blk_lit(r,NIL);return;}if(c)blk_op(r,DROP);expr(r),c++;
+		if(match("end")){if(!c)blk_lit(r,LNIL);return;}if(c)blk_op(r,DROP);expr(r),c++;
 	}if(!perr())snprintf(par.error,sizeof(par.error),"Expected 'end' for block.");
 }
 lv* block(void){lv*r=lmblk();iblock(r);return r;}
@@ -1059,21 +1059,21 @@ void term(lv*b){
 			if(fi>=4096){snprintf(par.error,sizeof(par.error),"Too many elseif clauses.");return;}
 			if(match("elseif")){
 				if(e){snprintf(par.error,sizeof(par.error),"Expected 'end'.");return;}
-				if(!c)blk_lit(b,NIL);c=0;fin[fi++]=blk_opa(b,JUMP,0);blk_sets(b,next,blk_here(b));expr(b);next=blk_opa(b,JUMPF,0);continue;
+				if(!c)blk_lit(b,LNIL);c=0;fin[fi++]=blk_opa(b,JUMP,0);blk_sets(b,next,blk_here(b));expr(b);next=blk_opa(b,JUMPF,0);continue;
 			}
 			if(match("else")){
 				if(e){snprintf(par.error,sizeof(par.error),"Expected 'end'.");return;}
-				if(!c)blk_lit(b,NIL);c=0,e=1;fin[fi++]=blk_opa(b,JUMP,0);blk_sets(b,next,blk_here(b)),next=-1;continue;
+				if(!c)blk_lit(b,LNIL);c=0,e=1;fin[fi++]=blk_opa(b,JUMP,0);blk_sets(b,next,blk_here(b)),next=-1;continue;
 			}
 			if(match("end")){
-				if(!c)blk_lit(b,NIL);c=0;if(!e)fin[fi++]=blk_opa(b,JUMP,0);if(next!=-1)blk_sets(b,next,blk_here(b));if(!e)blk_lit(b,NIL);
+				if(!c)blk_lit(b,LNIL);c=0;if(!e)fin[fi++]=blk_opa(b,JUMP,0);if(next!=-1)blk_sets(b,next,blk_here(b));if(!e)blk_lit(b,LNIL);
 				for(int z=0;z<fi;z++)blk_sets(b,fin[z],blk_here(b));return;
 			}
 			if(c)blk_op(b,DROP);expr(b),c++;
 		}
 	}
 	if(match("while")){
-		blk_lit(b,NIL);int head=blk_here(b);expr(b);int cond=blk_opa(b,JUMPF,0);
+		blk_lit(b,LNIL);int head=blk_here(b);expr(b);int cond=blk_opa(b,JUMPF,0);
 		blk_op(b,DROP);iblock(b);blk_opa(b,JUMP,head);blk_sets(b,cond,blk_here(b));return;
 	}
 	if(match("each")){lv*n=names("in","variable");expr(b),blk_loop(b,n,block());return;}
@@ -1127,7 +1127,7 @@ void expr(lv*b){
 lv* parse(char*text){
 	par=(parser){0,0,0,strlen(text),text,{0},{0},"\0"};
 	lv*b=lmblk();if(hasnext())expr(b);while(hasnext())blk_op(b,DROP),expr(b);
-	if(blk_here(b)==0)blk_lit(b,NIL);return b;
+	if(blk_here(b)==0)blk_lit(b,LNIL);return b;
 }
 
 // Interpreter
@@ -1135,9 +1135,9 @@ lv* parse(char*text){
 void env_local(lv*e,lv*n,lv*x){SFIND(z,e,n->sv){e->lv[z]=x;return;}ld_add(e,n,x);}
 lv* env_getr(lv*e,lv*n){SFIND(z,e,n->sv)return e->lv[z];return e->env?env_getr(e->env,n): NULL;}
 void env_setr(lv*e,lv*n,lv*x){SFIND(z,e,n->sv){e->lv[z]=x;return;}if(e->env)env_setr(e->env,n,x);}
-lv* env_get(lv*e,lv*n){lv*r=env_getr(e,n);return r?r:NIL;}
+lv* env_get(lv*e,lv*n){lv*r=env_getr(e,n);return r?r:LNIL;}
 void env_set(lv*e,lv*n,lv*x){lv*r=env_getr(e,n);r?env_setr(e,n,x):env_local(e,n,x);}
-lv* env_bind(lv*e,lv*k,lv*v){lv*r=lmenv(e);EACH(z,k)env_local(r,k->lv[z],z<v->c?v->lv[z]:NIL);return r;}
+lv* env_bind(lv*e,lv*k,lv*v){lv*r=lmenv(e);EACH(z,k)env_local(r,k->lv[z],z<v->c?v->lv[z]:LNIL);return r;}
 #define running()      (state.t->c)
 #define ev()           (state.e->lv[state.e->c-1])
 #define issue(env,blk) ll_add(state.e,env),ll_add(state.t,blk),idx_push(&state.pcs,0)
@@ -1208,7 +1208,7 @@ void runop(void){
 }
 lv*n_uplevel(lv*self,lv*a){
 	(void)self;int i=2;lv*e=ev(),*r=NULL,*name=ls(a);
-	while(e&&i){r=NULL;SFIND(z,e,name->sv)r=e->lv[z];if(r)i--;e=e->env;}return r?r:NIL;
+	while(e&&i){r=NULL;SFIND(z,e,name->sv)r=e->lv[z];if(r)i--;e=e->env;}return r?r:LNIL;
 }
 lv*n_feval(lv*self,lv*a){
 	(void)self;lv*r=a->lv[0],*x=a->lv[1];dset(r,lmistr("value"),x);
@@ -1216,7 +1216,7 @@ lv*n_feval(lv*self,lv*a){
 }
 lv*n_eval(lv*self,lv*a){
 	(void)self;lv*y=a->c>1?ld(a->lv[1]):lmd(),*r=lmd();DMAP(yy,y,y->lv[z]);
-	dset(r,lmistr("value"),NIL),dset(r,lmistr("vars"),yy);
+	dset(r,lmistr("value"),LNIL),dset(r,lmistr("vars"),yy);
 	lv* prog=parse(ls(l_first(a))->sv);
 	if(perr()){dset(r,lmistr("error"),lmcstr(par.error)),dset(r,lmistr("errorpos"),lml2(lmn(par.r),lmn(par.c)));return r;}
 	GEN(k,yy->c)yy->kv[z];GEN(v,yy->c)yy->lv[z];
@@ -1240,7 +1240,7 @@ void runfunc(lv*env,lv*f,lv*args){
 void halt(void){state.e->c=0,state.t->c=0,state.p->c=0,state.pcs.c=0;}
 lv*run(lv*x,lv*rootenv){
 	init(rootenv),issue(rootenv,x);int c=0;while(running()){runop(),c++;if(c%100==0)lv_collect();}
-	if(state.p->c<1)return NIL;lv*r=arg();
+	if(state.p->c<1)return LNIL;lv*r=arg();
 	while(state.p->c)printf("STACK JUNK: "),debug_show(arg());return r;
 }
 
@@ -1325,7 +1325,7 @@ lv*n_readcsv(lv*self,lv*a){
 		if(n<s->c&&s->sv[n]!='_'){ll_add(r->lv[slot++],s->sv[n]=='s'?lmstr(val): l_parse(fmts->lv[n],lmstr(val)));}
 		else{free(val.sv);}n++;
 		if(i>=t->c||t->sv[i]=='\n'){
-			while(n<s->c){char u=s->sv[n++];if(u!='_'&&slot<slots)ll_add(r->lv[slot++],NIL);}
+			while(n<s->c){char u=s->sv[n++];if(u!='_'&&slot<slots)ll_add(r->lv[slot++],LNIL);}
 			if(t->sv[i]=='\n'&&i==t->c-1)break;i++,n=0,slot=0;
 		}else{css;cm(delim);}
 	}return torect(r);
@@ -1425,11 +1425,11 @@ lv* time_ms(void){
 
 int randint(int x){unsigned int y=seed;y^=(y<<13),y^=(y>>17),(y^=(y<<15));return mod(seed=y,x);}
 lv* n_random(lv*self,lv*z){
-	#define rand_elt lin(x)?lmn(randint(ln(x))): x->c<1?NIL: lis(x)?l_at(x,lmn(randint(x->c))): lit(x)?l_at(x,lmn(randint(x->n))): x->lv[randint(x->c)]
+	#define rand_elt lin(x)?lmn(randint(ln(x))): x->c<1?LNIL: lis(x)?l_at(x,lmn(randint(x->c))): lit(x)?l_at(x,lmn(randint(x->n))): x->lv[randint(x->c)]
 	if(z->c==0){randint(1);return lmn(((float)(seed&0x7FFFFFFF))/0x7FFFFFFF);}
 	(void)self;lv*x=l_first(z);if(z->c<2)return rand_elt;
 	int y=ln(z->lv[1]);if(y>=0){GEN(r,y)rand_elt;return r;}
-	x=lin(x)?l_range(x):ll(x);if(x->c<1)x=l_list(NIL);idx pv=idx_new(x->c);EACH(z,x)pv.iv[z]=z;
+	x=lin(x)?l_range(x):ll(x);if(x->c<1)x=l_list(LNIL);idx pv=idx_new(x->c);EACH(z,x)pv.iv[z]=z;
 	for(int i=x->c-1;i>0;i--){int j=randint(i+1);int t=pv.iv[j];pv.iv[j]=pv.iv[i],pv.iv[i]=t;}
 	GEN(r,abs(y))x->lv[pv.iv[z%x->c]];idx_free(&pv);return r;
 }
@@ -1464,5 +1464,5 @@ lv*interface_sys(lv*self,lv*i,lv*x){
 			dset(r,lmistr("depth"   ),lmn(gc.depth ));
 			return r;
 		}
-	}return x?x:NIL;(void)self;
+	}return x?x:LNIL;(void)self;
 }

@@ -12,7 +12,7 @@
 lv*n_exit(lv*self,lv*a){(void)self;exit(ln(l_first(a)));}
 lv*n_input(lv*self,lv*a){
 	(void)self;char*line=bestline(drom_to_utf8(a->c<2?ls(l_first(a)): l_format(ls(l_first(a)),l_drop(ONE,a)))->sv);
-	if(!line)return NIL;lv*r=lmutf8(line);free(line);return r;
+	if(!line)return LNIL;lv*r=lmutf8(line);free(line);return r;
 }
 lv*n_readwav(lv*self,lv*a){
 	// this polyfill is limited compared to the version in decker, but avoids SDL dependencies:
@@ -35,11 +35,11 @@ lv*n_readfile(lv*self,lv*a){
 	return n_read(self,a);
 }
 lv*runstring(char*t,lv*env){
-	lv* prog=parse(t);if(perr())return fprintf(stderr,"(%d:%d) %s\n",par.r+1,par.c+1,drom_to_utf8(lmcstr(par.error))->sv),NIL;
+	lv* prog=parse(t);if(perr())return fprintf(stderr,"(%d:%d) %s\n",par.r+1,par.c+1,drom_to_utf8(lmcstr(par.error))->sv),LNIL;
 	return run(prog,env);
 }
 lv*runfile(char*path,lv*env){
-	struct stat st;if(stat(path,&st)){fprintf(stderr,"unable to open '%s'\n",path);return NIL;}
+	struct stat st;if(stat(path,&st)){fprintf(stderr,"unable to open '%s'\n",path);return LNIL;}
 	return runstring(n_read(NULL,l_list(lmcstr(path)))->sv,env);
 }
 lv* print_array(lv*arr,FILE*out){array a=unpack_array(arr);for(int z=0;z<a.size;z++)fputc(0xFF&(int)array_get_raw(a,z),out);return arr;}
@@ -50,10 +50,10 @@ extern char **environ;
 
 void go_notify(lv*deck,lv*args,int dest){(void)deck,(void)args,(void)dest;}
 void field_notify(lv*field){(void)field;}
-lv* n_panic(lv*self,lv*z){(void)self,(void)z;return NIL;}
+lv* n_panic(lv*self,lv*z){(void)self,(void)z;return LNIL;}
 lv* n_alert(lv*self,lv*z){(void)self,(void)z;return ONE;}
 lv* n_open (lv*self,lv*z){(void)self,(void)z;return lmistr("");}
-lv* n_save (lv*self,lv*z){(void)self,(void)z;return NIL;}
+lv* n_save (lv*self,lv*z){(void)self,(void)z;return LNIL;}
 lv* n_play (lv*self,lv*z){(void)self;lv*x=l_first(z);return x;}
 lv* n_show(lv*self,lv*a){
 	(void)self;str s=str_new();EACH(z,a){if(z)str_addc(&s,' ');show(&s,a->lv[z],a->c==1);}
@@ -63,7 +63,7 @@ lv*interface_app(lv*self,lv*i,lv*x){
 	if(!x&&lis(i)){
 		ikey("show"      )return lmnat(n_show,NULL);
 		ikey("print"     )return lmnat(n_print,NULL);
-	}return x?x:NIL;(void)self;
+	}return x?x:LNIL;(void)self;
 }
 
 // Environment
@@ -100,8 +100,8 @@ lv*n_import(lv*self,lv*a){
 		lv*d=n_readdeck(self,a),*m=ifield(d,"modules"),*r=lmd();
 		EACH(z,m){dset(r,m->kv[z],ifield(m->lv[z],"value"));}return r;
 	}
-	lv*file=n_read(self,a);if(!file->c)return NIL;
-	lv*prog=parse(ls(file)->sv);if(perr())return NIL;
+	lv*file=n_read(self,a);if(!file->c)return LNIL;
+	lv*prog=parse(ls(file)->sv);if(perr())return LNIL;
 	lv*root=lmenv(globals());pushstate(root),issue(root,prog);
 	int c=0;while(running()){runop(),c++;if(c%100==0)lv_collect();}
 	DMAP(r,root,root->lv[z]);return popstate(),r;

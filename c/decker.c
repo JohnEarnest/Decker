@@ -128,7 +128,7 @@ int uimode=mode_interact;lv*ui_container=NULL;
 void setuimode(int mode);// forward ref
 void con_set(lv*x){
 	if(x!=ui_container)setuimode(uimode),msg.next_view=1;
-	if(x!=ui_container&&prototype_is(ui_container))n_prototype_update(ui_container,NIL);ui_container=x;
+	if(x!=ui_container&&prototype_is(ui_container))n_prototype_update(ui_container,LNIL);ui_container=x;
 }
 lv* con(void){return ui_container?ui_container:ifield(deck,"card");}
 lv* con_wids(void){return ivalue(con(),"widgets");}
@@ -283,12 +283,12 @@ void keycaps_enter(void){if(!enable_touch||kc.on)return;keycaps_force_enter();}
 
 // App Interface
 
-lv*n_appsave(lv*self,lv*z){if(strlen(document_path)){save_deck(lmcstr(document_path));}else{modal_enter(modal_save_deck);}return NIL;(void)self;(void)z;}
+lv*n_appsave(lv*self,lv*z){if(strlen(document_path)){save_deck(lmcstr(document_path));}else{modal_enter(modal_save_deck);}return LNIL;(void)self;(void)z;}
 lv*n_appexit(lv*self,lv*z){
 	#ifndef __ANDROID__
 		should_exit=1;
 	#endif
-	return NIL;(void)self;(void)z;
+	return LNIL;(void)self;(void)z;
 }
 
 lv* print_array(lv*arr,FILE*out){array a=unpack_array(arr);for(int z=0;z<a.size;z++)fputc(0xFF&(int)array_get_raw(a,z),out);return arr;}
@@ -307,7 +307,7 @@ lv*interface_app(lv*self,lv*i,lv*x){
 		ikey("show"      )return lmnat(n_appshow,NULL);
 		ikey("print"     )return lmnat(n_appprint,NULL);
 		ikey("render"    )return lmnat(n_apprender,NULL);
-	}return x?x:NIL;(void)self;
+	}return x?x:LNIL;(void)self;
 }
 
 // Menus
@@ -389,7 +389,7 @@ void field_exit(void){
 }
 void bg_end_selection(void);void bg_end_lasso(void); // forward-ref
 void setuimode(int mode){
-	n_play(deck,lml2(NIL,lmistr("loop")));
+	n_play(deck,lml2(LNIL,lmistr("loop")));
 	grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel->c=0,wid.active=-1;poly_count=0;sc.others=NULL;
 	msg.next_view   =(uimode!=mode)&&mode==mode_interact;
 	msg.pending_loop=(uimode!=mode)&&mode==mode_interact;
@@ -1032,7 +1032,7 @@ void listener_eval(void){
 	lv*prog=parse(str->sv);if(perr()){char e[4096];snprintf(e,sizeof(e),"error: %s",par.error);listen_show(align_right,1,lmcstr(e));return;}
 	ms.text=(field_val){rtext_cast(lmistr("")),0};listen_show(align_left,1,str);lv*b=lmblk();
 	lv*target=uimode==mode_script?sc.target: ob.sel->c==1?ob.sel->lv[0]: con();
-	blk_lit(b,lmnat(n_pre_listen ,NULL)),blk_lit(b,NIL ),blk_op(b,CALL),blk_op(b,DROP);blk_cat(b,prog);
+	blk_lit(b,lmnat(n_pre_listen ,NULL)),blk_lit(b,LNIL),blk_op(b,CALL),blk_op(b,DROP);blk_cat(b,prog);
 	blk_lit(b,lmnat(n_post_listen,NULL)),blk_op (b,SWAP),blk_op(b,CALL),blk_op(b,DROP);fire_hunk_async(target,b);
 }
 void listener(rect r){
@@ -1062,7 +1062,7 @@ lv* n_panic(lv*self,lv*z){
 	modal_enter(modal_listen);
 	pair s={(512-22)-18,16};rect b=rect_pair((pair){0,0},s);lv*r=lmbuff(s);cstate t=frame;frame=draw_buffer(r);
 	draw_box(b,0,35),draw_textc(inset(b,2),"PANIC",FONT_MONO,35),frame=t,listen_show_image(r,z);
-	n_show(self,z),dset(li.vars,lmistr("_"),l_first(z));return NIL;
+	n_show(self,z),dset(li.vars,lmistr("_"),l_first(z));return LNIL;
 }
 
 // Audio Editor
@@ -2261,11 +2261,11 @@ lv*n_alert(lv*self,lv*z){
 	else if(!strcmp(type,"string")){modal_enter(modal_input_lil);if(z->c>2)ms.text.table=rtext_cast(z->lv[2]);}
 	else if(!strcmp(type,"choose")){
 		modal_enter(modal_choose_lil);
-		ms.verb=z->c<=2?ld(NIL): lil(z->lv[2])?l_dict(z->lv[2],z->lv[2]): ld(z->lv[2]);if(ms.verb->c<1)ms.verb=ld(l_list(ZERO));
+		ms.verb=z->c<=2?ld(LNIL): lil(z->lv[2])?l_dict(z->lv[2],z->lv[2]): ld(z->lv[2]);if(ms.verb->c<1)ms.verb=ld(l_list(ZERO));
 		ms.grid=(grid_val){lt(l_keys(ms.verb)), 0, z->c<=3?-1:dgeti(ms.verb,z->lv[3]),-1};
 	}
 	else{modal_enter(modal_alert_lil);}
-	ms.message=plain_or_rich(z);return NIL;
+	ms.message=plain_or_rich(z);return LNIL;
 }
 lv*n_open(lv*self,lv*z){
 	(void)self,(void)z;modal_enter(modal_open_lil);
@@ -3210,12 +3210,12 @@ void sfx_install(lv*sfx,clip_state*target){
 }
 void sfx_doloop(int clear){
 	interpreter_lock();
-	lv*a=orig_loop?orig_loop:NIL,*b=lmblk(),*r=NIL;
+	lv*a=orig_loop?orig_loop:LNIL,*b=lmblk(),*r=LNIL;
 	blk_get(b,lmistr("loop")),blk_lit(b,l_list(a)),blk_op(b,CALL);
 	int pp=pending_popstate;fire_hunk_async(ifield(deck,"card"),b);
 	int quota=LOOP_QUOTA;while(quota>0&&running()){runop(),quota--;}
 	if(!running())r=arg();popstate();pending_popstate=pp;
-	if(clear)n_play(deck,lml2(NIL,lmistr("loop")));
+	if(clear)n_play(deck,lml2(LNIL,lmistr("loop")));
 	n_play(deck,lml2(r,lmistr("loop"))),msg.pending_loop=0;
 	lv*loop=audio_loop.clip;if(loop&&audio_loop.sample>=((Uint32)loop->c))audio_loop.sample=0;
 	interpreter_unlock();
@@ -3253,16 +3253,16 @@ lv* n_play(lv*deck,lv*z){
 		if(orig_loop&&orig_loop==x){} // don't re-trigger!
 		else if(sound_is(x)&&ln(ifield(x,"size"))>0){sfx_install(x,&audio_loop),orig_loop=x;} // play
 		else{audio_loop.clip=orig_loop=NULL;} // stop the loop
-		return NIL;
+		return LNIL;
 	}
-	lv*x=l_first(z),*sfx=sound_is(x)?x: dget(ifield(deck,"sounds"),ls(x));if(!sfx)return NIL;
-	if(!sound_is(sfx)||ln(ifield(sfx,"size"))<1)return NIL;
+	lv*x=l_first(z),*sfx=sound_is(x)?x: dget(ifield(deck,"sounds"),ls(x));if(!sfx)return LNIL;
+	if(!sound_is(sfx)||ln(ifield(sfx,"size"))<1)return LNIL;
 	int max_sample=0;int avail=-1;for(int z=0;z<SFX_SLOTS;z++){
 		if(!audio_slots[z].clip){avail=z;break;}
 		if(audio_slots[z].sample>audio_slots[max_sample].sample)max_sample=z;
 	}
 	sfx_install(sfx,&audio_slots[avail!=-1?avail:max_sample]),audio_playing=1;
-	return NIL;
+	return LNIL;
 }
 
 // Toolbars
@@ -3462,7 +3462,7 @@ void event_file(char*p){
 		setuimode(mode_object);lv*a=lmd();
 		lv* dat=n_read(NULL,l_list(lmcstr(p)));
 		lv* sep=lmistr(has_suffix(p,".csv")?",": "|");
-		lv* arg=lml(3);arg->lv[0]=dat,arg->lv[1]=NIL,arg->lv[2]=sep;
+		lv* arg=lml(3);arg->lv[0]=dat,arg->lv[1]=LNIL,arg->lv[2]=sep;
 		dset(a,lmistr("type"),lmistr("grid"));
 		dset(a,lmistr("value"),l_cols(n_readcsv(NULL,arg)));
 		ob_create(l_list(a));
@@ -3549,15 +3549,15 @@ void fire_animate(lv*targets){
 	lv*name=lmistr("view"),*root=lmenv(NULL);primitives(root,deck),constants(root);
 	lv*block=lmblk();EACH(z,targets){
 		lv*w=targets->kv[z];
-		blk_cat(block,event_invoke(w,name,NIL,NULL)),dset(viewed,w,ONE);
+		blk_cat(block,event_invoke(w,name,LNIL,NULL)),dset(viewed,w,ONE);
 	}pushstate(root),pending_popstate=1,issue(root,block);
 }
 void fire_view(lv*target){
 	lv*name=lmistr("view"),*root=lmenv(NULL);primitives(root,deck),constants(root);
-	lv*block=event_invoke(target,name,NIL,NULL);
+	lv*block=event_invoke(target,name,LNIL,NULL);
 	lv*wids=ifield(target,"widgets");EACH(z,wids){
 		lv*w=wids->lv[z];if(!contraption_is(w)||dget(viewed,w)!=NULL)continue;
-		blk_cat(block,event_invoke(ivalue(w,"viewproxy"),name,NIL,NULL)),dset(viewed,w,ONE);
+		blk_cat(block,event_invoke(ivalue(w,"viewproxy"),name,LNIL,NULL)),dset(viewed,w,ONE);
 	}pushstate(root),pending_popstate=1,issue(root,block);
 }
 int interpret(void){
@@ -3578,7 +3578,7 @@ int interpret(void){
 		if(msg.pending_halt||pending_popstate){/*suppress other new events until this one finishes*/}
 		else if(msg.pending_view){fire_view(con()),msg.pending_view=0;}
 		else if(msg.target_click){
-			lv*arg=grid_is(msg.target_click)?lmn(msg.arg_click.y): canvas_is(msg.target_click)?lmfpair(msg.arg_click): NIL;
+			lv*arg=grid_is(msg.target_click)?lmn(msg.arg_click.y): canvas_is(msg.target_click)?lmfpair(msg.arg_click): LNIL;
 			fire_event_async(msg.target_click,lmistr("click"),arg);msg.target_click=NULL;
 		}
 		else if(msg.target_drag    ){fire_event_async(msg.target_drag    ,lmistr("drag"      ),lmfpair(msg.arg_drag   ));msg.target_drag    =NULL;}
@@ -3719,7 +3719,7 @@ void all_menus(void){
 		if(menu_item("Import Image..."   ,1,'\0'))modal_enter(modal_import_image);
 		if(menu_item("Export Image..."   ,1,'\0'))modal_enter(modal_export_image);
 		menu_separator();
-		if(menu_item("Purge Volatiles",1,'\0')){n_deck_purge(deck,NIL);msg.next_view=1;}
+		if(menu_item("Purge Volatiles",1,'\0')){n_deck_purge(deck,LNIL);msg.next_view=1;}
 		menu_separator();
 		if(menu_item("Cards..."     ,1,'C' ))modal_enter(modal_cards);
 		if(menu_item("Sounds..."    ,1,'S' ))modal_enter(modal_sounds);
@@ -4144,7 +4144,7 @@ void tick(lv*env){
 		draw_textr(b,ls(ifield(con(),"name"))->sv,FONT_BODY,1);
 	}
 	if(ui_container&&ivalue(ui_container,"dead"))ui_container=NULL;
-	#define track(v) dset(env,lmistr(#v),v?v:NIL);
+	#define track(v) dset(env,lmistr(#v),v?v:LNIL);
 	track(msg.target_click)
 	track(msg.target_drag)
 	track(msg.target_release)
@@ -4172,7 +4172,7 @@ void tick(lv*env){
 	dset(env,lmistr("wid"),wid_track(&wid));
 	dset(env,lmistr("ms"),modal_track(&ms));
 	if(ms_index){lv*r=lml(0);for(int z=0;z<ms_index;z++)ll_add(r,modal_track(&ms_stack[z].ms)),ll_add(r,wid_track(&ms_stack[z].wid));dset(env,lmistr("ms-stack"),r);}
-	EACH(z,PLAYING)PLAYING->lv[z]=audio_slots[z].clip?audio_slots[z].clip:NIL;
+	EACH(z,PLAYING)PLAYING->lv[z]=audio_slots[z].clip?audio_slots[z].clip:LNIL;
 	ATTRS->c=0;for(int z=0;z<attrs_count;z++)if(attrs[z].value.table)ll_add(ATTRS,attrs[z].value.table);
 	track(audio_loop.clip)
 	track(orig_loop)
@@ -4218,7 +4218,7 @@ void load_deck(lv*d){
 	resize_window(deck);
 	time_t now;time(&now);seed=0xFFFFFFFF&now;
 	validate_modules();
-	setuimode(mode_interact);n_play(deck,lml2(NIL,lmistr("loop")));msg.next_view=1;
+	setuimode(mode_interact);n_play(deck,lml2(LNIL,lmistr("loop")));msg.next_view=1;
 }
 int main(int argc,char**argv){
 	char*file=NULL,*startcard=NULL;int ul=0;
@@ -4269,7 +4269,7 @@ int main(int argc,char**argv){
 	dset(env,lmistr("tools"    ),TOOLS);
 	dset(env,lmistr("arrows"   ),ARROWS);
 	dset(env,lmistr("ltools"   ),TOOLB     =lmbuff((pair){tcellw*2+1,tcellh*18+tgap+1}));
-	dset(env,lmistr("playing"  ),PLAYING   =l_take(lmn(SFX_SLOTS),NIL));
+	dset(env,lmistr("playing"  ),PLAYING   =l_take(lmn(SFX_SLOTS),LNIL));
 	dset(env,lmistr("attribs"  ),ATTRS     =lml(0));
 	dset(env,lmistr("li hist"  ),li.hist   =lml(0));
 	dset(env,lmistr("li vars"  ),li.vars   =lmd());
