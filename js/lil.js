@@ -230,7 +230,7 @@ dyad={
 	'^':  vd((x,y)=>lmn(Math.pow(ln(x),ln(y)))),
 	'<':  vd((x,y)=>lmn(lin(x)&&lin(y)?ln(x)< ln(y): ls(x)< ls(y))),
 	'>':  vd((x,y)=>lmn(lin(x)&&lin(y)?ln(x)> ln(y): ls(x)> ls(y))),
-	'=':  vd((x,y)=>lmn(lii(x)||lii(y)?x==y: lin(x)&&lin(y)?ln(x)==ln(y): ls(x)==ls(y))),
+	'=':  vd((x,y)=>lmn(lii(x)||lii(y)?x==y: linil(x)||linil(y)?x==y: lin(x)&&lin(y)?ln(x)==ln(y): ls(x)==ls(y))),
 	'&':  vd((x,y)=>lin(x)||lin(y)?lmn(min(ln(x),ln(y))): lms(ls(x)<ls(y)?ls(x):ls(y))),
 	'|':  vd((x,y)=>lin(x)||lin(y)?lmn(max(ln(x),ln(y))): lms(ls(x)>ls(y)?ls(x):ls(y))),
 	split:(x,y)=>lml(ls(y).split(ls(x)).map(lms)),

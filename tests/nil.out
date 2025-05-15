@@ -5,6 +5,7 @@ identity:
 "match self" 1
 "spread (right)" (0,1,0,1,0)
 "spread (left)" (0,0,1,0,1)
+"nil vs nothing" (1,1,0,0,())
 "uninitialized var is" nil
 "default body of func" nil
 "default body of each" (nil,nil,nil)
