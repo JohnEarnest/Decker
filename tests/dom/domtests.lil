@@ -881,6 +881,9 @@ assert_image["canvas clipped boxes"
 	c.copy[]
 ]
 
+c.clear[].box[3,8 5,5].box[9,3 5,5].box[2,2 1,5].box[5,2 -2,5]
+assert["canvas clipped and chained boxes" "%%IMG0AA0ACwAAAAAsACxwLEAsQCxAAHAfABEAAAA=" c.copy[].encoded]
+
 c.clear[]
 c.rect[3,8 5,5]
 c.rect[9,3 5,5]
