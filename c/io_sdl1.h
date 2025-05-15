@@ -134,7 +134,7 @@ void event_touch(void);
 void event_key(int c,int m,int down,const char*name);
 void event_scroll(pair s);
 void event_pointer_move(pair raw,pair scaled);
-void event_pointer_button(int primary,int down);
+void event_pointer_button(int primary,int middle,int down);
 void event_file(char*p);
 void field_input(char*text);
 
@@ -155,11 +155,11 @@ void process_events(pair disp,pair size,int scale){
 				pair b={(disp.x-(size.x*scale))/2,(disp.y-(size.y*scale))/2};
 				event_pointer_move((pair){e.motion.x,e.motion.y},(pair){(e.motion.x-b.x)/scale,(e.motion.y-b.y)/scale});
 			}
-			if(e.type==SDL_MOUSEBUTTONUP){event_pointer_button(e.button.button==SDL_BUTTON_LEFT,0);}
+			if(e.type==SDL_MOUSEBUTTONUP){event_pointer_button(e.button.button==SDL_BUTTON_LEFT,e.button.button==SDL_BUTTON_MIDDLE,0);}
 			if(e.type==SDL_MOUSEBUTTONDOWN){
 				if     (e.button.button==SDL_BUTTON_WHEELUP  ){event_scroll((pair){0, 1});}
 				else if(e.button.button==SDL_BUTTON_WHEELDOWN){event_scroll((pair){0,-1});}
-				else                                          {event_pointer_button(e.button.button==SDL_BUTTON_LEFT,1);}
+				else                                          {event_pointer_button(e.button.button==SDL_BUTTON_LEFT,e.button.button==SDL_BUTTON_MIDDLE,1);}
 			}
 		}
 		if(can_tick)return;

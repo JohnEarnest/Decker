@@ -103,6 +103,7 @@ A number of shortcuts are available with any of the drawing tools selected:
 - Pressing `9` or `0` will decrement or increment the current brush shape, respectively.
 - Holding control or command while clicking will enter Fat Bits mode centered on the position you click, or exit Fat Bits mode.
 - Right-clicking with any tool or holding shift before beginning a stroke will _erase_: this behaves like the pencil tool, but always draws using pattern 0.
+- Middle-clicking (where available) with any tool will act like a pipette/eyedropper tool: set the stroke pattern to match the clicked pixel.
 
 You can drag and drop files directly onto the Decker window, and it will take an appropriate action depending on the type of the file:
 

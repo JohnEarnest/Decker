@@ -124,7 +124,7 @@ void event_touch(void);
 void event_key(int c,int m,int down,const char*name);
 void event_scroll(pair s);
 void event_pointer_move(pair raw,pair scaled);
-void event_pointer_button(int primary,int down);
+void event_pointer_button(int primary,int middle,int down);
 void event_file(char*p);
 void field_input(char*text);
 
@@ -141,8 +141,8 @@ void process_events(pair disp,pair size,int scale){
 			event_pointer_move((pair){e.motion.x,e.motion.y},(pair){(e.motion.x-b.x)/scale,(e.motion.y-b.y)/scale});
 		}
 		if(e.type==SDL_MOUSEWHEEL     )event_scroll((pair){e.wheel.x,e.wheel.y});
-		if(e.type==SDL_MOUSEBUTTONDOWN)event_pointer_button(e.button.button==SDL_BUTTON_LEFT,1);
-		if(e.type==SDL_MOUSEBUTTONUP  )event_pointer_button(e.button.button==SDL_BUTTON_LEFT,0);
+		if(e.type==SDL_MOUSEBUTTONDOWN)event_pointer_button(e.button.button==SDL_BUTTON_LEFT,e.button.button==SDL_BUTTON_MIDDLE,1);
+		if(e.type==SDL_MOUSEBUTTONUP  )event_pointer_button(e.button.button==SDL_BUTTON_LEFT,e.button.button==SDL_BUTTON_MIDDLE,0);
 		if(e.type==SDL_FINGERDOWN     )event_touch();
 		if(e.type==SDL_DROPFILE       )event_file(e.drop.file),SDL_free(e.drop.file);
 	}

@@ -89,7 +89,7 @@ typedef struct {
 enum dirs{dir_none,dir_left,dir_right,dir_up,dir_down};
 typedef struct {
 	int mu,md, clicktime, down_modal, down_uimode, down_caps;
-	int click, rdown, rup; pair pos, rawpos, opos;
+	int click, rdown, rup, mdown; pair pos, rawpos, opos;
 	int dclick, clicklast;
 	int drag;  pair dpos, rawdpos, odpos;
 	int tab, shift, alt, action, dir, exit, eval;
@@ -2677,7 +2677,8 @@ void bg_tools(void){
 	if(!dover(con_view_dim()))ev.md=ev.mu=ev.drag=0;
 	if(dr.tool==tool_pencil||dr.tool==tool_line||dr.tool==tool_rect||dr.tool==tool_fillrect||dr.tool==tool_ellipse||dr.tool==tool_fillellipse){
 		int clear=0;if(!dr.scratch)bg_scratch();
-		if(ev.md){bg_scratch();dr.erasing=ev.rdown||ev.shift;}
+		if(ev.mdown){dr.pattern=ln(iwrite(con_image(),lmpair(ev.pos),NULL));} // pipette
+		else if(ev.md){bg_scratch();dr.erasing=ev.rdown||ev.shift;}
 		else if(ev.mu||ev.drag){
 			cstate t=frame;frame=draw_buffer(dr.scratch);
 			if(dr.tool==tool_pencil||dr.erasing){
@@ -3421,7 +3422,8 @@ void event_pointer_move(pair raw,pair scaled){
 	ev.rawpos=raw;pointer=ev.pos=scaled;
 	if(pointer_held)msg.pending_drag=1;
 }
-void event_pointer_button(int primary,int down){
+void event_pointer_button(int primary,int middle,int down){
+	if(middle){if(down)ev.mdown=1;return;}
 	if(down){
 		ev.rawdpos=ev.rawpos;
 		pointer_held=ev.drag=1;pointer_start=ev.dpos=pointer;ev.md=1;ev.clicktime=12;
@@ -3485,7 +3487,7 @@ void sync(void){
 	pair disp=window_get_size();
 	pair size=buff_size(context.buffer);
 	int scale=noscale?1: MIN(disp.x/size.x,disp.y/size.y);
-	ev.mu=ev.md=ev.click=ev.dclick=ev.tab=ev.action=ev.dir=ev.exit=ev.eval=ev.scroll=ev.rdown=ev.rup=0;
+	ev.mu=ev.md=ev.click=ev.dclick=ev.tab=ev.action=ev.dir=ev.exit=ev.eval=ev.scroll=ev.rdown=ev.mdown=ev.rup=0;
 	if(ev.clicktime)ev.clicktime--;
 	if(ev.clicklast)ev.clicklast--;
 	if(ev.pos.x!=ev.dpos.x||ev.pos.y!=ev.dpos.y)ev.clicklast=0;

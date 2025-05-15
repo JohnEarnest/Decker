@@ -463,7 +463,7 @@ setmode=mode=>{
 }
 
 event_state=_=>({ // event state
-	mu:0,md:0, clicktime:0,click:0,rdown:0,rup:0, dclick:0, clicklast:0, down_modal:0, down_uimode:0, down_caps:0,
+	mu:0,md:0, clicktime:0,click:0,rdown:0,rup:0,mdown:0, dclick:0, clicklast:0, down_modal:0, down_uimode:0, down_caps:0,
 	drag:0, tab:0, shift:0, alt:0, action:0, dir:0, exit:0, eval:0, scroll:0, hidemenu:0,
 	pos:rect(), dpos:rect(), rawpos:rect(), rawdpos:rect(), shortcuts:{}, opos:rect(),odpos:rect(),
 	callback:null, callback_rect:null, callback_drag:0
@@ -2525,7 +2525,8 @@ bg_tools=_=>{
 	if(!dover(con_view_dim()))ev.md=ev.mu=ev.drag=0
 	if(dr.tool=='pencil'||dr.tool=='line'||dr.tool=='rect'||dr.tool=='fillrect'||dr.tool=='ellipse'||dr.tool=='fillellipse'){
 		let clear=0;if(!dr.scratch)bg_scratch()
-		if(ev.md){bg_scratch(),dr.erasing=ev.rdown||ev.shift}
+		if(ev.mdown){dr.pattern=ln(iwrite(con_image(),lmpair(ev.pos)))} // pipette
+		else if(ev.md){bg_scratch(),dr.erasing=ev.rdown||ev.shift}
 		else if(ev.mu||ev.drag){
 			const t=frame;frame=draw_frame(dr.scratch)
 			if(dr.tool=='pencil'||dr.erasing){
@@ -3618,7 +3619,7 @@ tick=_=>{
 	if(msg.pending_loop)sfx_doloop()
 	if(ui_container&&ui_container.dead)ui_container=null
 	ev.shortcuts={}
-	ev.mu=ev.md=ev.click=ev.dclick=ev.tab=ev.action=ev.dir=ev.exit=ev.eval=ev.scroll=ev.rdown=ev.rup=0
+	ev.mu=ev.md=ev.click=ev.dclick=ev.tab=ev.action=ev.dir=ev.exit=ev.eval=ev.scroll=ev.rdown=ev.mdown=ev.rup=0
 	if(ev.clicktime)ev.clicktime--;if(ev.clicklast)ev.clicklast--
 	if(ev.pos.x!=ev.dpos.x||ev.pos.y!=ev.dpos.y)ev.clicklast=0
 	wid.cursor_timer=(wid.cursor_timer+1)%(2*FIELD_CURSOR_DUTY)
@@ -3657,6 +3658,7 @@ up=(x,y,alt)=>{
 }
 mouse=(e,f)=>{
 	ev.rawpos=rect(e.pageX,e.pageY);const c=q('#display').getBoundingClientRect()
+	if(e.button==1){if(f==down)ev.mdown=1;return}
 	f(0|((e.pageX-c.x)/zoom),0|((e.pageY-c.y)/zoom),e.button!=0)
 }
 touch=(e,f)=>{const t=e.targetTouches[0]||{}; mouse({pageX:t.clientX, pageY:t.clientY, button:0},f);if(!set_touch)enable_touch=1}
