@@ -1858,6 +1858,13 @@ if !sys.platform~"web"
 	assert["import apply" ("A","A","A") i.triple["A"]]
 	assert["import isolated" 999 alpha]
 	assert["import nonexistent file" nil import["does_not_exist.lil"]]
+
+	i:import["examples/decks/bignums.deck"]
+	assert["import deck keys" (list "bn") (keys i)]
+	assert["import deck module keys" ("make","equal","more","less","add","sub","mul","divmod","div","mod","sumall","prodall","minall","maxall","format_plain","format_commas","format_name") (keys i.bn)]
+	bn:i.bn
+	assert["bignum make" (1,2,3,4,5,6,7) bn.make["-1,234,567"]]
+	assert["bignum div"  (3,6,2) bn.div["80087" "221"]]
 end
 
 #######################################

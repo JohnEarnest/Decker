@@ -96,6 +96,10 @@ lv* globals(void){
 	return env;
 }
 lv*n_import(lv*self,lv*a){
+	lv*filename=ls(l_first(a));if(has_suffix(filename->sv,".deck")||has_suffix(filename->sv,".html")){
+		lv*d=n_readdeck(self,a),*m=ifield(d,"modules"),*r=lmd();
+		EACH(z,m){dset(r,m->kv[z],ifield(m->lv[z],"value"));}return r;
+	}
 	lv*file=n_read(self,a);if(!file->c)return NIL;
 	lv*prog=parse(ls(file)->sv);if(perr())return NIL;
 	lv*root=lmenv(globals());pushstate(root),issue(root,prog);
