@@ -2249,7 +2249,7 @@ lv* widget_write(lv*x){
 lv* interface_keystore(lv*self,lv*i,lv*x){
 	i=ls(i);ikey("keys")return l_keys(self->b);
 	if(x){
-		lv*f=lmistr("%j");x=l_parse(f,l_format(f,x));
+		lv*f=lmistr("%J");x=l_parse(f,l_format(f,x));
 		if(linil(x)){self->b=l_drop(i,self->b);}else{dset(self->b,i,x);}return x;
 	}else{return dgetv(self->b,i);}
 }
@@ -2738,7 +2738,7 @@ lv* deck_read(lv*x){
 			did(k,"}");lv*v=lmd();dset(v,lmistr("name"),k),dset(v,lmistr("script"),lmistr("")),dset(v,lmistr("data"),lmd());dset(modules,k,v);m=6,md=0;}
 		else if(dmatch("{contraption:")){did(k,"}");lv*v=lmd();dset(v,lmistr("name"),k),dset(v,lmistr("widgets"),lml(0));dset(defs,k,v);m=7,lc=1;}
 		else{
-			did(k,":");int f=1,n=x->c-i;lv*v=pjson(x->sv,&i,&f,&n);
+			did(k,":");int f=1,n=x->c-i;lv*v=plove(x->sv,&i,&f,&n);
 			if(m==1)dset(deck,k,v);
 			if(m==2){v=font_read (v);if(v)dset(fonts ,k,v);}
 			if(m==3){v=sound_read(v);if(v)dset(sounds,k,v);}
@@ -2802,7 +2802,7 @@ void scripts_write(lv*scripts,str*r,int*index){
 	}
 }
 lv* deck_write(lv*x,int html){
-	#define write_dict(k,x,f) if(x->c)str_addz(&r,k);EACH(z,x)esc_write(&r,1,x->kv[z]),str_addc(&r,':'),fjson(&r,f(x->lv[z])),str_addc(&r,'\n');
+	#define write_dict(k,x,f) if(x->c)str_addz(&r,k);EACH(z,x)esc_write(&r,1,x->kv[z]),str_addc(&r,':'),flove(&r,f(x->lv[z])),str_addc(&r,'\n');
 	#define write_line(k,p,f) {lv*v=dget(data,lmistr(k));(void)v;if(p)str_addz(&r,k),str_addc(&r,':'),fjson(&r,f),str_addc(&r,'\n');}
 	if(!deck_is(x))return lmistr("");lv*data=x->b;str r=str_new();lv*scripts=lmd();int si=0,sci=0;
 	if(html)str_addz(&r,"<meta charset=\"UTF-8\"><body><script language=\"decker\">\n");

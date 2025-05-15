@@ -1334,7 +1334,7 @@ A keystore is subject to several constraints:
 
 - Keys are coerced to strings.
 - Since it has a special meaning (above), the key `"keys"` cannot be used for storing data.
-- Values must be recursively composed of JSON-compatible data: numbers, strings, lists, and dictionaries with string keys. Other values will be converted to nil.
+- Values must be recursively composed of LOVE-compatible data: numbers, strings, lists, dictionaries, tables, or _Image_, _Sound_, or _Array_ interfaces. Other values will be converted to nil.
 - Setting a value to nil will remove the key-value binding from storage.
 
 Prototype Interface
@@ -1499,11 +1499,11 @@ version:1.01
 log:{time:[],message:[]}
 
 {script}
-log:table data.log
+log:data.log
 
 mod.put:on _ x do
 	log:insert time message with sys.now x into log
-	data.log: cols log
+	data.log:log
 	log
 end
 

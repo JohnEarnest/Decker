@@ -82,6 +82,17 @@ The data block types used by Decker are as follows:
 | `DAT9` | 4     | `"i32l"` | -2147483648...2147483647  | signed 32-bit int, little-endian   |
 | `DAT:` | 1     | `"char"` | n/a                       | ASCII/DeckRoman character          |
 
+Lil Object-Value Encoding (LOVE)
+--------------------------------
+Lil's collection of primitive types is similar to that of JSON, but more general. Constraining Lil data to a JSON representation  produces an unpleasant bottleneck which loses information. We therefore introduce a superset of JSON, "_LOVE_", which offers the following generalizations to better handle round-tripping of Lil data:
+
+- LOVE object keys may be recursively composed of any LOVE value, rather than JSON's restriction to strings. This reflects the nature of Lil dictionaries.
+- LOVE strings may be enclosed in single-quotes as an alternative to double-quotes. This offers convenience for representing LOVE inside of Lil string literals without excessive escaping.
+- LOVE values may be a _table_, which is represented like a LOVE object mapping string column names to LOVE arrays of values for each column. Instead of being enclosed by `{`/`}` as in an object, a LOVE table is enclosed by `<`/`>`. This avoids the need for situationally ambiguous encodings of tables as objects or arrays.
+- LOVE values may be an `IMG`, `SND`, or `DAT` datablock literal, beginning with `%%`; these are decoded directly into or encoded from Lil _Image_, _Sound_, or _Array_ interfaces, respectively. This avoids the need to explicitly marshal between these datatypes and a string encoding, or invoke their constructors.
+
+Lil itself includes support for encoding or decoding LOVE via the `%J` (note the capital) format pattern symbol.
+
 Payload
 -------
 The `PAYLOAD` consists of a series of lines. Except in `{script:ID}` chunks, empty lines and lines beginning with a `#` are ignored as comments, giving users flexibility in annotating documents as they wish. Applications are not required to preserve comments.
@@ -99,7 +110,7 @@ A _Chunk_ begins with a line that begins and ends with curly braces `{}`, indica
 - `{data}`: contains a Lil module's key-value store.
 - `{end}`: terminates a `{script}` chunk.
 
-Except in `{script:ID}` chunks, non-comment lines within a chunk are _Property Lines_ consisting of an _ID_ followed by a colon (`:`). The remainder of the line is interpreted as JSON data. JSON data _must_ escape all forward-slash characters (`/` as `\/`). For example:
+Except in `{script:ID}` chunks, non-comment lines within a chunk are _Property Lines_ consisting of an _ID_ followed by a colon (`:`). The remainder of the line is interpreted as LOVE data. LOVE data _must_ escape all forward-slash characters (`/` as `\/`). For example:
 ```
 {deck}
 version:1
@@ -165,7 +176,7 @@ two:{"type":"button",text:"Check Me Out","style":"check","value":1}
 
 The `{widgets}` Chunk
 ---------------------
-The `{widgets}` chunk is a dictionary of widgets belonging to the preceding `{card:ID}` or `{contraption:ID}` chunk, in their drawing order, back-to-front. Each widget is a JSON object with one or more properties.
+The `{widgets}` chunk is a dictionary of widgets belonging to the preceding `{card:ID}` or `{contraption:ID}` chunk, in their drawing order, back-to-front. Each widget is a LOVE object with one or more properties.
 
 Some properties are common to all widgets:
 
@@ -227,7 +238,7 @@ Each `type` of widget has its own additional optional fields:
 	- `col`: an integer; the selected column index, or -1.
 - `"contraption"`:
 	- `def`: a string; the ID of a contraption definition (Prototype).
-	- `widgets`: a dictionary of JSON objects representing the widgets contained in this contraption instance. The properties given here override any properties from the corresponding `widgets` of the contraption's definition. Note that the `pos` of any "inner" widget is relative to the `pos` of the contraption which contains it.
+	- `widgets`: a dictionary of LOVE objects representing the widgets contained in this contraption instance. The properties given here override any properties from the corresponding `widgets` of the contraption's definition. Note that the `pos` of any "inner" widget is relative to the `pos` of the contraption which contains it.
 
 The `{module:ID}` Chunk
 -----------------------
@@ -236,7 +247,7 @@ Module chunks always have an ID, which serves as the `name` of the module. They 
 - `description`: a string giving a human-readable description of the purpose of the module.
 - `version`: a number used to distinguish subsequent revisions of a module. The default is `0`.
 
-Modules may contain a `{data}` chunk containing a dictionary of names associated with JSON values, in the same structure as `{widgets}` or `{fonts}`.
+Modules may contain a `{data}` chunk containing a dictionary of names associated with LOVE values, in the same structure as `{widgets}` or `{fonts}`.
 
 Module properties and/or data are always followed immediately by a `{script}` chunk (with no ID) representing the module body.
 
@@ -437,3 +448,6 @@ Changelog
 - Introduced the `FNT1` datablock format.
 - Introduced the "DeckRoman" character encoding.
 - `<meta charset="UTF-8">` must now appear in the preamble section of a `.html` deck.
+
+1.55:
+- Added a description of LOVE data, and revised several parts of the document format to use LOVE payloads instead of JSON.

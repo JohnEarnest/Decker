@@ -17,16 +17,16 @@ pull.value:logger.get[]
 {module:logger}
 description:"a utility module for logging"
 {data}
-log:{"time":[0,1,2,3],"message":["zeroth","first","second","third"]}
+log:<"time":[0,1,2,3],"message":["zeroth","first","second","third"]>
 {script}
-log:table data.log
+log:data.log
 
 mod.put:on _ x do
  log:insert time message with
   count log # would be sys.now, but that's a PITA for testing
   x
  into log
- data.log:cols log
+ data.log:log
  log
 end
 

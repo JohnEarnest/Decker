@@ -1443,7 +1443,7 @@ keystore_read=x=>{
 	return {f:(self,i,x)=>{
 		i=ls(i);if(i=='keys')return monad.keys(self.data)
 		if(x){
-			const f=lms('%j'),val=dyad.parse(f,dyad.format(f,x))
+			const f=lms('%J'),val=dyad.parse(f,dyad.format(f,x))
 			if(linil(val)){self.data=dyad.drop(lms(i),self.data)}else{dset(self.data,lms(i),val)}
 			return x
 		}else{return dget(self.data,lms(i))||NIL}
@@ -2803,7 +2803,7 @@ deck_read=x=>{
 		else if(m==6&&match('{data}\n')){md=1}
 		else if(m==6&&match('{script}\n')){dset(last(modules),lms('script'),lms(str('\n{end}'))),m=1}
 		else{
-			const k=str(':'),j=pjson(x,i,x.length-i),v=j.value;i=j.index
+			const k=str(':'),j=plove(x,i,x.length-i),v=j.value;i=j.index
 			if(m==1)deck[k]=v
 			if(m==2)dset(fonts,lms(k),font_read(ls(v)))
 			if(m==3)dset(sounds,lms(k),sound_read(ls(v)))
@@ -2886,7 +2886,7 @@ deck_write=(x,html)=>{
 	const write_scripts=_=>{while(si<scripts.v.length)r+=`\n{script:${esc_write(1,ls(scripts.k[si]))}}\n${esc_write(0,ls(scripts.v[si++]))}\n{end}\n`}
 	const write_line=(s,k,p,f)=>{const v=s[k];if(p(v))r+=`${k}:${fjson(f(v))}\n`}
 	const write_key =(s,k,p,f)=>{const v=dget(s,lms(k));if(p(v))r+=`${k}:${fjson(f(v))}\n`}
-	const write_dict=(k,x,f)=>r+=`${count(x)?k:''}${x.k.map((k,i)=>`${esc_write(1,ls(k))}:${fjson(f(x.v[i]))}\n`).join('')}`
+	const write_dict=(k,x,f)=>r+=`${count(x)?k:''}${x.k.map((k,i)=>`${esc_write(1,ls(k))}:${flove(f(x.v[i]))}\n`).join('')}`
 	const pp=patterns_write(x.patterns),pa=anims_write(x.patterns),da=dyad.parse(lms('%j'),lms(DEFAULT_ANIMS))
 	let f=deck.fonts;const strip_fnt=n=>{const k=lms(n),v=dget(f,k);if(font_write(v)==FONTS[n])f=dyad.drop(lml([k]),f)}
 	strip_fnt('body'),strip_fnt('menu'),strip_fnt('mono')

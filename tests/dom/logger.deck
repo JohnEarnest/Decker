@@ -18,18 +18,18 @@ pull.value:logger.get[]
 description:"a utility module for logging"
 {data}
 version:1.01
-log:{"time":[0,1],"message":["zeroth","first"]}
+log:<"time":[0,1],"message":["zeroth","first"]>
 zero:null
 
 {script}
-log:table data.log
+log:data.log
 
 mod.put:on _ x do
 	log:insert time message with
 		count log # would be sys.now, but that's a PITA for testing
 		x
 	into log
-	data.log:cols log
+	data.log:log
 	log
 end
 
