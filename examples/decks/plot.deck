@@ -369,7 +369,7 @@ try:{"type":"button","size":[60,20],"pos":[252,287],"script":"scatterplot.1","te
 
 {module:plot}
 description:"draw graphs and plots to canvases"
-version:2
+version:2.1
 {script}
 local grays:(1,13,12,9,8,5)
 
@@ -401,8 +401,8 @@ on plot_series c data draw etc do
  local bg    :if "bg"     in etc etc.bg     else      0 end
  local bgdata:if "bgdata" in etc etc.bgdata else      0 end
  local stroke:if "stroke" in etc etc.stroke else      1 end
- local fill  :if "fill"   in etc etc.fill   else  grays end
- if "number"~typeof fill fill:list fill end
+ local fillp :if "fill"   in etc etc.fill   else  grays end
+ if "number"~typeof fillp fillp:list fillp end
 
  if !"table"~typeof data
   data:select x:keys data y:value from data
@@ -451,7 +451,7 @@ on plot_series c data draw etc do
  end
  c.clip[ppos-0,1 psize+1]
  extract
-  (c.pattern:fill[(count fill)%first g]),
+  (c.pattern:fillp[(count fillp)%first g]),
   draw[each v i in x map[v,y[i]] end]
  by g from data
  c.clip[]
@@ -463,8 +463,8 @@ on plot_category c data line draw etc do
  local bg    :if "bg"     in etc etc.bg     else       0 end
  local bgdata:if "bgdata" in etc etc.bgdata else       0 end
  local stroke:if "stroke" in etc etc.stroke else       1 end
- local fill  :if "fill"   in etc etc.fill   else list 13 end
- if "number"~typeof fill fill:list fill end
+ local fillp :if "fill"   in etc etc.fill   else list 13 end
+ if "number"~typeof fillp fillp:list fillp end
 
  xaxis:label[
   if "xmin" in etc etc.xmin else min 0,min data end
@@ -500,7 +500,7 @@ on plot_category c data line draw etc do
   p:ppos+(0,1)*(bh*i)+bh/2
   c.pattern:stroke
   c.text[k p-5,0 "center_right"]
-  c.pattern:fill[(count fill)%i]
+  c.pattern:fillp[(count fillp)%i]
   c.clip[ppos-0,1 psize+1]
   draw[origin,p[1] each x in (),v mapx[x] end bh]
   c.clip[]
@@ -531,8 +531,8 @@ on plot_hist c data etc do
  local bg    :if "bg"     in etc etc.bg     else       0 end
  local bgdata:if "bgdata" in etc etc.bgdata else       0 end
  local stroke:if "stroke" in etc etc.stroke else       1 end
- local fill  :if "fill"   in etc etc.fill   else list 13 end
- if "number"~typeof fill fill:list fill end
+ local fillp :if "fill"   in etc etc.fill   else list 13 end
+ if "number"~typeof fillp fillp:list fillp end
 
  xdata:range count data
  xaxis:label[min xdata max xdata]
@@ -562,7 +562,7 @@ on plot_hist c data etc do
  each v i in data
   v:map[i,v bwid/2]
   s:1+psize[1]-v[1]-ppos[1]
-  c.pattern:fill[(count fill)%i]
+  c.pattern:fillp[(count fillp)%i]
   c.rect[v 1+bwid,s "top_center"]
  end
  c.clip[]
@@ -625,8 +625,8 @@ on plot_pie c data etc do
  local bg        :if "bg"     in etc etc.bg     else     0 end
  local data_brush:if "brush"  in etc etc.brush  else     1 end
  local stroke    :if "stroke" in etc etc.stroke else     1 end
- local fill      :if "fill"   in etc etc.fill   else grays end
- if "number"~typeof fill fill:list fill end
+ local fillp     :if "fill"   in etc etc.fill   else grays end
+ if "number"~typeof fillp fillp:list fillp end
  
  local vals:(range data)/sum range data
  local psize:c.lsize-2*margin
@@ -644,7 +644,7 @@ on plot_pie c data etc do
  end
  each v i in vals
   local w:wedge[v]
-  c.pattern:fill[(count fill)%i]
+  c.pattern:fillp[(count fillp)%i]
   c.poly[w]
   c.pattern:stroke
   c.line[w]

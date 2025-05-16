@@ -434,7 +434,7 @@ image:"%%IMG0AgABVr/7/9v//v//3/9///9v///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 {module:pt}
 description:"Display and animate sprites for visual novels."
-version:1.1
+version:1.2
 {script}
 
 local FRONT:999999  # foremost (reasonable) widget index
@@ -722,7 +722,7 @@ end
 commands.move:on cmd_move x do
  if count x
   dest:x[1]
-  delay:DELAY unless 0+x[2]
+  delay:DELAY unless x[2]
   state:get_puppet[first x]
   state.gpos:dest
   state.delay:delay
@@ -846,7 +846,7 @@ end
 
 {module:dd}
 description:"Display sequential, styled modal dialogs for visual novels."
-version:1.4
+version:1.5
 {script}
 # state/constants:
 local host:0
@@ -873,7 +873,7 @@ local osound:"" # open box
 local nsound:"" # advance to next box
 local asound:"" # make a choice
 local tsound:"" # talk
-local dsize:(0,0)
+local dsize:()
 local dpos:0
 
 on ifmt x do x format names end
@@ -947,12 +947,14 @@ module.style:on style etc do
  nsound:if "nsound" in etc etc.nsound else ""       end
  asound:if "asound" in etc etc.asound else ""       end
  tsound:if "tsound" in etc etc.tsound else ""       end
- dsize: if "size"   in etc etc.size   else (0,0)    end
+ dsize: if "size"   in etc etc.size   else ()       end
  dpos:  if "pos"    in etc etc.pos    else 0        end
+ if !dsize[0] dsize[0]:nil end
+ if !dsize[1] dsize[1]:nil end
  border:etc.border.image.copy[]
- pad:"ltrb" dict 4 take if !0~etc.border.margin etc.border.margin else padding end
+ pad:"ltrb" dict 4 take padding unless etc.border.margin
  bborder:etc.bborder.image.copy[]
- bpad:"ltrb" dict 4 take if !0~etc.bborder.margin etc.bborder.margin else (2,10,2,10) end
+ bpad:"ltrb" dict 4 take (2,10,2,10) unless etc.bborder.margin
  if balign~"left"  balign:"center_left"  end
  if balign~"right" balign:"center_right" end
 end
@@ -1045,7 +1047,7 @@ module.ask:on ask text choices do
  seg:fmt[text]
  canvas.font:tfont
  dim:canvas.textsize[seg (canvas.size[0] unless dsize[0])-(pad.l+pad.r)]
- if (1>count choices)|0~choices choices:list "error: empty choice list for dd.ask!" end
+ if 1>count choices choices:list "error: empty choice list for dd.ask!" end
  segs:fmt @ choices
  canvas.font:bfont
  dims:each choice in segs

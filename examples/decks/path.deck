@@ -270,7 +270,7 @@ field11:{"type":"field","size":[74,14],"pos":[162,38],"locked":1,"border":0,"sty
 on click pos do
  log.text:""
  p:path.find[f pos grid]
- if p~0 log.text:"thud."
+ if p~nil log.text:"thud."
  else f.path:p
  end
 end
@@ -389,7 +389,7 @@ end
 
 {module:path}
 description:"generic grid-based pathfinding routines"
-version:1.1
+version:1.2
 {script}
 local default_cell:16,16
 local minusone:0|-1+range 256
@@ -451,7 +451,7 @@ module.find_cell:on find_cell start goal mask etc do
  start:floor start                                # pair | list-of-pair
  goal :floor goal                                 # pair
  local tmove:deltas["orthodiag" unless etc.move]  # str | list-of-pair
- if tmove~0 tmove:etc.move end
+ if tmove~nil tmove:etc.move end
  local move :flip tmove                           # str
  local p:testall[mask etc]
  # parallel flood-fill maximum scent:
@@ -543,7 +543,7 @@ size:[100,100]
 resizable:1
 margin:[1,1,1,1]
 description:"A semi-autonomous \"agent\" that can animate itself along a provided path of waypoints."
-version:1.1
+version:1.2
 script:"follower.0p"
 template:"on finish do end\non step do end\non tween t a b do end\non click do end\non release do end"
 attributes:{"name":["sprite","speed","draggable"],"label":["Sprite","Frames per step","Draggable"],"type":["rich","number","bool"]}
@@ -624,7 +624,8 @@ on view do
    tb:s.path[s.s+1]
    s.i:s.i+1
    sp.data:s
-   t:(ta+tt*tb-ta) unless card.event["tween" tt ta tb]
+   ct:card.event["tween" tt ta tb]
+   t:if (ct~nil)|(ct~0) (ta+tt*tb-ta) else ct end
    card.pos:t-.5*card.size
   end
   if stp card.event.step   end

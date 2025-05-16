@@ -211,7 +211,7 @@ on fullname do
 end
 
 on selname do
- "" unless first L.rowvalue
+ first L.rowvalue
 end
 
 on view do
