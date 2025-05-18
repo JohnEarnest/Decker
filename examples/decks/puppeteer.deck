@@ -1187,7 +1187,7 @@ on set_emote x do emote.text:x end
 on view do
  lwing.paste[lw.copy[].rotate[-(pi/14)*sin 0.1*sys.frame]]
  rwing.paste[rw.copy[].rotate[ (pi/12)*sin 0.1*sys.frame]] 
- lf:lg.value@(0,0,0,0,0,1,2,3)
+ lf:lg.images@(0,0,0,0,0,1,2,3)
  legs.paste[lf[(count lf)%floor sys.frame/10]]
  ff:(faces.value.name dict faces.value.value)
  face.clear[]
