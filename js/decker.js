@@ -258,7 +258,7 @@ draw_lil=(size,align,bare,x)=>{
 			const dr=rows<tr?rows-1:rows;cw[c]=0;for(let r=0;r<dr;r++){
 				const s=show(tab_cell(x,tk[c],r));tab_get(f,tk[c]).push(lms(s))
 				cw[c]=max(cw[c],font_textsize(FONT_MONO,s).x+10)
-			}if(rows<tr)tab_get(f,tk[c]).push(lms(' \x7f'))
+			}if(rows<tr)tab_get(f,tk[c]).push(lms(ELLIPSIS))
 			cw[c]=min(100,max(cw[c],font_textsize(FONT_BODY,tk[c]).x+10))
 		}
 		let cols=0,tw=0,ve=0;for(let c=0;c<tc&&c<256;c++){if(tw+cw[c]>=w){ve=1;break};cols++;if(c+1<=tc&&c+1<=256)tw+=cw[c]}
