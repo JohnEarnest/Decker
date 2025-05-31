@@ -65,7 +65,7 @@ c/build/decker: c/resources.h c/decker.c c/dom.h c/lil.h
 	@mkdir -p c/build
 	$(Q)$(COMPILER) ./c/decker.c -o ./c/build/decker $(SDL) $(FLAGS) -DVERSION="\"$(VERSION)\""
 
-c/resources.h: examples/decks/tour.deck
+c/resources.h: examples/decks/tour.deck js/lil.js js/danger.js js/decker.html js/decker.html
 	@chmod +x ./scripts/resources.sh
 	$(Q)./scripts/resources.sh examples/decks/tour.deck
 
@@ -74,6 +74,7 @@ c/build/lilt: c/resources.h c/lilt.c c/dom.h c/lil.h
 	$(Q)$(COMPILER) ./c/lilt.c -o ./c/build/lilt $(FLAGS) -DVERSION="\"$(VERSION)\""
 
 clean:
+	@rm -rf ./c/resources.h
 	@rm -rf ./c/build/
 	@rm -rf ./js/build/
 	@rm -f docs/*.html
