@@ -1669,12 +1669,12 @@ void modals(void){
 		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"OK",1)||ev.exit){modal_exit(0);}
 		if(ui_button((rect){b.x,b.y+b.h-45,60,20},"New...",1)){modal_exit(1);con_set(n_deck_add(deck,l_list(lmistr("contraption"))));mark_dirty();}
 		if(ui_button((rect){b.x,b.y+b.h-20,60,20},"Edit...",ms.grid.row>=0)||choose){modal_exit(2);con_set(ifield(deck,"contraptions")->lv[ms.grid.row]);}
-		if(ui_button((rect){b.x+65,b.y+b.h-45,60,20},"Clone",ms.grid.row>=0)||choose){
+		if(ui_button((rect){b.x+65,b.y+b.h-45,60,20},"Clone",ms.grid.row>=0)){
 			lv*s=ifield(deck,"contraptions")->lv[ms.grid.row];
 			n_deck_add(deck,lml2(s,l_format(lmistr("%s_clone"),ifield(s,"name"))));
 			ms.grid=(grid_val){contraptions_enumerate(),0,-1,-1};
 		}
-		if(ui_button((rect){b.x+65,b.y+b.h-20,60,20},"Delete",ms.grid.row>=0||choose)){
+		if(ui_button((rect){b.x+65,b.y+b.h-20,60,20},"Delete",ms.grid.row>=0)){
 			n_deck_remove(deck,l_list(ifield(deck,"contraptions")->lv[ms.grid.row]));
 			ms.grid=(grid_val){contraptions_enumerate(),0,-1,-1};
 		}

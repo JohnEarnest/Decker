@@ -1662,12 +1662,12 @@ modals=_=>{
 			if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'OK',1)||ev.exit){modal_exit(0)}
 			if(ui_button(rect(b.x,b.y+b.h-45,60,20),'New...',1)){modal_exit(1),con_set(deck_add(deck,lms('contraption'))),mark_dirty()}
 			if(ui_button(rect(b.x,b.y+b.h-20,60,20),'Edit...',ms.grid.row>=0)||choose){modal_exit(2),con_set(deck.contraptions.v[ms.grid.row])}
-			if(ui_button(rect(b.x+65,b.y+b.h-45,60,20),'Clone',ms.grid.row>=0)||choose){
+			if(ui_button(rect(b.x+65,b.y+b.h-45,60,20),'Clone',ms.grid.row>=0)){
 				const s=ifield(deck,'contraptions').v[ms.grid.row]
 				deck_add(deck,s,lms(ls(ifield(s,'name'))+'_clone'))
 				ms.grid=gridtab(contraptions_enumerate())
 			}
-			if(ui_button(rect(b.x+65,b.y+b.h-20,60,20),'Delete',ms.grid.row>=0||choose)){
+			if(ui_button(rect(b.x+65,b.y+b.h-20,60,20),'Delete',ms.grid.row>=0)){
 				deck_remove(deck,ifield(deck,'contraptions').v[ms.grid.row])
 				ms.grid=gridtab(contraptions_enumerate())
 			}
