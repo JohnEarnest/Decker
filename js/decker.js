@@ -534,6 +534,7 @@ sample_to_byte=s=>0xFF&clamp(-127,s*128,127)
 // Menus
 
 const menu={heads:[],items:[],x:0,active:-1,stick:-1,lw:-1,sz:rect()}
+menu_label=_=>rect(menu.x,1,context.size.x-menu.x-2,1+font_h(FONT_MENU))
 no_menu=_=>menu.active==-1&&menu.stick==-1
 in_layer=_=>no_menu()&&(ms.type?ms.in_modal:1)&&((!running()&&!msg.overshoot)||ms.type!=null)
 in_widgets=_=>ms.type!=null?ms.in_modal:1
@@ -2013,8 +2014,8 @@ modals=_=>{
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Card Properties',FONT_MENU,1)
 		draw_text(rect(b.x,b.y+22,42,20),'Name',FONT_MENU,1),ui_field(rect(b.x+42,b.y+20,b.w-42,18),ms.name)
 		const c=rect(b.x,b.y+b.h-20)
-		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(card),modal_exit(0)
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
+		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(card),modal_exit(0)
 	}
 	else if(ms.type=='button_props'){
 		const b=draw_modalbox(rect(220,170)),button=ob.sel[0]
@@ -3600,7 +3601,6 @@ tick=_=>{
 		const c=ob.sel[0].card, off=(contraption_is(c)||prototype_is(c))?getpair(ifield(c,'pos')):rect(0,0)
 		iwrite(ob.sel[0],lms('pos'),lmpair(rsub(rsub(ev.pos,ob.prev),off))),mark_dirty()
 	}
-	q('#display').style.cursor=uicursor||'default'
 	document.title=ls(ifield(deck,'name')) || 'Untitled Deck'
 	for(let x=0;x<=1;x++)for(let y=0;y<=1;y++)draw_icon(rect(x*(context.size.x-5),y*(context.size.y-5)),CORNERS[x+y*2],1)
 	const used=interpret()
@@ -3613,9 +3613,14 @@ tick=_=>{
 		}profiler_hist[profiler_ix]=(r.h-2)*used/FRAME_QUOTA,profiler_ix=(profiler_ix+1)%profiler_hist.length
 	}
 	if((uimode=='object'||(uimode=='draw'&&!dr.fatbits))&&!ev.hidemenu){
-		const b=rect(menu.x,1,context.size.x-menu.x-2,1+font_h(FONT_MENU))
-		draw_textr(b,ls(ifield(con(),"name")),FONT_BODY,1)
+		const b=menu_label()
+		draw_textr(b,ls(ifield(con(),'name')),FONT_BODY,1)
+		if(ms.type==null){
+			if(over(b))uicursor=cursor.point
+			if(ev.mu&&over(b)&&dover(b))modal_enter(card_is(con())?'card_props':'prototype_props')
+		}
 	}
+	q('#display').style.cursor=uicursor||'default'
 	if(msg.pending_loop)sfx_doloop()
 	if(ui_container&&ui_container.dead)ui_container=null
 	ev.shortcuts={}

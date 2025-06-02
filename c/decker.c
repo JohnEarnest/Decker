@@ -220,6 +220,7 @@ typedef struct {
 	menu_entry items[32]; int item_count;
 	int x, active, stick, lw; rect sz;
 } menu_state; menu_state menu={{{0}},0,{{0}},0, -1,-1,-1,0, {0,0,0,0}};
+rect menu_label(void){return (rect){menu.x,1,context.size.x-menu.x-2,1+font_h(FONT_MENU)};}
 
 enum modal_type{
 	modal_none,modal_about,modal_query,modal_listen,modal_link,modal_gridcell,modal_open,modal_save,
@@ -1984,8 +1985,8 @@ void modals(void){
 		draw_text((rect){b.x,b.y+22,42,20},"Name",FONT_MENU,1);
 		ui_field((rect){b.x+42,b.y+20,b.w-42,18},&ms.name);
 		pair c={b.x,b.y+b.h-20};
-		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))setscript(card),modal_exit(0);
 		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
+		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))setscript(card),modal_exit(0);
 	}
 	else if(ms.type==modal_button_props){
 		rect b=draw_modalbox((pair){220,170});lv*button=ob.sel->lv[0];
@@ -4140,8 +4141,12 @@ void tick(lv*env){
 		}profiler_hist[profiler_ix]=(r.h-2)*(1.0*used)/FRAME_QUOTA;profiler_ix=(profiler_ix+1)%PROFILE_HIST_SZ;
 	}
 	if((uimode==mode_object||(uimode==mode_draw&&!dr.fatbits))&&!ev.hidemenu){
-		rect b={menu.x,1,context.size.x-menu.x-2,1+font_h(FONT_MENU)};
+		rect b=menu_label();
 		draw_textr(b,ls(ifield(con(),"name"))->sv,FONT_BODY,1);
+		if(ms.type==modal_none){
+			if(over(b))uicursor=cursor_point;
+			if(ev.mu&&over(b)&&dover(b))modal_enter(card_is(con())?modal_card_props:modal_prototype_props);
+		}
 	}
 	if(ui_container&&ivalue(ui_container,"dead"))ui_container=NULL;
 	#define track(v) dset(env,lmistr(#v),v?v:LNIL);
