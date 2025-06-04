@@ -829,11 +829,12 @@ char*DEFAULT_PATTERNS=
 	"AKoAqgD/Vf9V/1X/Vf8A/wD/AP8AqqqqqqqqqqpEiBEiRIgRIt27d+7du3fuQIABAgQIECC/f/79+/fv3wgAqgAIAIgAj"
 	"493mPj4d4mqAIgUIkGIALCwsL8Av7+w";
 
-#define anim_count(pal,p)    pal[p]
-#define anim_frame(pal,p,f)  pal[4+8*(p)+(f)]
-#define pal_pat(pal,p,x,y)   pal[(x%8)+(8*(y%8))+(8*8*p)]
-#define pal_col_get(pal,c)   (0xFF000000|((0xFF&pal[(8*224)+(3*(c))])<<16)|((0xFF&pal[(8*224)+(3*(c))+1])<<8)|(0xFF&pal[(8*224)+(3*(c))+2]))
-#define pal_col_set(pal,c,x) (pal[(8*224)+(3*(c))]=0xFF&(x>>16),pal[(8*224)+(3*(c)+1)]=0xFF&(x>>8),pal[(8*224)+(3*(c)+2)]=0xFF&x)
+typedef struct {char pats[28][8][8];unsigned int colors[16];int anim_counts[4];char anims[4][256];} palette;
+#define anim_count(pal,p)    ((palette*)pal)->anim_counts[p]
+#define anim_frame(pal,p,f)  ((palette*)pal)->anims[p][f]
+#define pal_pat(pal,p,x,y)   ((palette*)pal)->pats[p][y%8][x%8]
+#define pal_col_get(pal,c)   (0xFF000000|((palette*)pal)->colors[c])
+#define pal_col_set(pal,c,x) ((palette*)pal)->colors[c]=(0xFFFFFF&(x))
 
 char* patterns_pal(lv*patterns){return patterns->b->b->sv;} // patterns -> image -> buffer -> pixels
 lv* interface_patterns(lv*self,lv*i,lv*x){
@@ -841,35 +842,38 @@ lv* interface_patterns(lv*self,lv*i,lv*x){
 	lv*r=NULL;int t=i&&ln(i)?ln(i):0;
 	if(x){
 		if(t>= 2&&t<=27&&image_is(x)){for(int a=0;a<8;a++)for(int b=0;b<8;b++)pal_pat(pal,t,b,a)=lb(iwrite(x,lmpair((pair){b,a}),NULL));}
-		if(t>=28&&t<=31){r=ll(x);int c=anim_count(pal,t-28)=MIN(8,r->c);for(int z=0;z<c;z++){int f=CLAMP(0,ln(r->lv[z]),47);anim_frame(pal,t-28,z)=f>=28&&f<=31?0:f;}}
+		if(t>=28&&t<=31){r=ll(x);int c=anim_count(pal,t-28)=MIN(256,r->c);for(int z=0;z<c;z++){int f=CLAMP(0,ln(r->lv[z]),47);anim_frame(pal,t-28,z)=f>=28&&f<=31?0:f;}}
 		if(t>=32&&t<=47){int n=ln(x);pal_col_set(pal,t-32,n);r=x;}
 	}
 	else{
 		if(t== 0       ){r=image_make(lmbuff((pair){8,8}));}
-		if(t>= 1&&t<=27){r=image_make(buffer_copy(self->b->b,(rect){0,8*t,8,8}));}
+		if(t>= 1&&t<=27){r=image_make(lmbuff((pair){8,8}));for(int a=0;a<8;a++)for(int b=0;b<8;b++)r->b->sv[b+(a*8)]=pal_pat(pal,t,b,a);}
 		if(t>=28&&t<=31){r=lml(anim_count(pal,t-28));for(int z=0;z<r->c;z++)r->lv[z]=lmn(anim_frame(pal,t-28,z));}
 		if(t>=32&&t<=47){r=lmn(0xFFFFFF&pal_col_get(pal,t-32));}
 	}return r?r:x?x:LNIL;
 }
 
 lv* anims_write(char*pal){lv*r=lml(4);for(int ai=0;ai<4;ai++){GEN(a,anim_count(pal,ai))lmn(anim_frame(pal,ai,z));r->lv[ai]=a;}return r;}
-void anims_clear(char*pal){for(int ai=0;ai<4;ai++){anim_count(pal,ai)=0;for(int z=0;z<8;z++)anim_frame(pal,ai,z)=0;}}
 void anims_read(char*pal,lv*f){
 	if(!f||!lil(f))f=l_parse(lmistr("%j"),lmistr(DEFAULT_ANIMS));
 	for(int ai=0;ai<4&&ai<f->c;ai++){
-		lv*a=f->lv[ai];if(lil(a)){anim_count(pal,ai)=a->c;for(int z=0;z<8&&z<a->c;z++)anim_frame(pal,ai,z)=CLAMP(0,ln(a->lv[z]),48);}
+		lv*a=f->lv[ai];if(lil(a)){anim_count(pal,ai)=a->c;for(int z=0;z<256&&z<a->c;z++)anim_frame(pal,ai,z)=CLAMP(0,ln(a->lv[z]),48);}
 	}
 }
 void pick_palette(lv*deck){char*pal=patterns_pal(ifield(deck,"patterns"));for(int z=0;z<16;z++)COLORS[z]=pal_col_get(pal,z);}
 lv* patterns_write(lv*x){
 	char*pal=patterns_pal(x);int c=0;for(int z=0;z<16;z++)if(pal_col_get(pal,z)!=DEFAULT_COLORS[z]){c=1;break;}
-	lv*i=image_resize(image_clone(x->b),(pair){8,224+(6*c)});anims_clear(i->b->sv);return image_write(i);
+	lv*b=lmbuff((pair){8,(28*8)+(6*c)});for(int z=0;z<28*8*8;z++)b->sv[z]=pal[z];
+	if(c){char*o=b->sv+(28*8*8);for(int z=0;z<16;z++,o+=3){int v=pal_col_get(pal,z);o[0]=0xFF&(v>>16);o[1]=0xFF&(v>>8);o[2]=0xFF&(v);}}
+	return image_write(image_make(b));
 }
 lv* patterns_read(lv*x){
 	lv*d=dget(x,lmistr("patterns"));
-	lv*i=image_read(d?ls(d):lmistr(DEFAULT_PATTERNS));pair s=image_size(i);
-	if(s.x!=8||s.y!=224+6){i=image_resize(i,(pair){8,224+6});for(int z=0;z<16;z++)pal_col_set(i->b->sv,z,DEFAULT_COLORS[z]);}
-	lv*r=lmi(interface_patterns,lmistr("patterns"),i);anims_read(patterns_pal(r),dget(x,lmistr("animations")));return r;
+	lv*i=image_read(d?ls(d):lmistr(DEFAULT_PATTERNS));pair s=image_size(i);i=image_resize(i,(pair){8,(28*8)+6});
+	lv*b=lmbuff((pair){8,((int)sizeof(palette))/8});char*pal=b->sv;for(int z=0;z<28*8*8;z++)pal[z]=i->b->sv[z];
+	if(s.y<=(28*8)){for(int z=0;z<16;z++)pal_col_set(pal,z,DEFAULT_COLORS[z]);}
+	else{char*o=i->b->sv+(28*8*8);for(int z=0;z<16;z++,o+=3)pal_col_set(pal,z,((0xFF&o[0])<<16)|((0xFF&o[1])<<8)|(0xFF&o[2]));}
+	lv*r=lmi(interface_patterns,lmistr("patterns"),image_make(b));anims_read(patterns_pal(r),dget(x,lmistr("animations")));return r;
 }
 
 #define anim_ants(x,y)                (((x+y+(frame_count/2))/3)%2?15:0)

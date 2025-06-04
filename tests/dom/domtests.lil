@@ -659,8 +659,30 @@ assert_image["custom pattern fill"
 ]
 
 assert["pattern anim default" (13,9,5,1,5,9) p[28]]
-p[28]:range 20
-assert["pattern anim write" (0,1,2,3,4,5,6,7) p[28]]
+p[28]:range 300
+# note: don't allow references to animated colors,
+# cap indices within valid range, and cap sequence length at 256:
+big_pattern_ref:"%j" parse "[
+	  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
+	 16,17,18,19,20,21,22,23,24,25,26,27, 0, 0, 0, 0,
+	 32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,
+	 47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,
+	 47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,
+	 47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,
+	 47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,
+	 47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,
+	 47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,
+	 47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,
+	 47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,
+	 47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,
+	 47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,
+	 47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,
+	 47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,
+	 47,47,47,47,47,47,47,47,47,47,47,47,47,47,47,47
+]"
+assert["pattern anim write" big_pattern_ref p[28]]
+p[28]:()
+assert["pattern anim write empty" () p[28]]
 p[29]:27,28,31,32
 assert["pattern anim may not include animated colors" (27,0,0,32) p[29]]
 
@@ -1284,6 +1306,7 @@ glyph:image[2,3]
 glyph[0,0]:1 glyph[1,1]:1 glyph[0,2]:1
 f["A"]:glyph
 deck.patterns[28]:10,20,5
+deck.patterns[29]:range 300
 deck.patterns[2]:image["%%IMG0AAgACAsMDQ4PEBES"]
 write["temp.deck" deck]
 assert_file["write a basic kitchen sink." "tests/dom/sink1.deck" "temp.deck"]
@@ -1309,6 +1332,7 @@ assert_image["read a deck: custom font glyph"
 ]
 assert["read a deck: custom sparse font" (list 65) deck.fonts.dingus.glyphs]
 assert["read a deck: custom animated pattern:" (10,20,5)                 deck.patterns[28]        ]
+assert["read a deck: custom animated pattern (big):" big_pattern_ref     deck.patterns[29]        ]
 assert["read a deck: custom regular pattern:"  "%%IMG0AAgACAsMDQ4PEBES"  deck.patterns[ 2].encoded]
 
 deck:read["tests/dom/bare.deck"]

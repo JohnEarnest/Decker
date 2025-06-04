@@ -752,12 +752,12 @@ Patterns Interface
 ------------------
 The patterns interface stores a global palette and set of 1-bit textures used by Decker itself, as well as the canvas widget. The open deck's patterns interface is available to Decker as a global constant named `patterns`. Any pattern aside from 0 (transparent) and 1 (solid black) may be altered on the fly. There are names for each of the default color slots starting at 32 in the global `colors` constant. The animated patterns (28, 29, 30 and 31) automatically cycle between their indices at 15hz.
 
-| Name       | Description                                                   |
-| :--------- | :------------------------------------------------------------ |
-| `typeof x` | `"patterns"`                                                  |
-| `x[2-27]`  | An 8x8 _image interface_ comprised of patterns 0 and 1. r/w.  |
-| `x[28-31]` | A list of up to 8 pattern indices for animated patterns. r/w. |
-| `x[32-47]` | A 24-bit `RRGGBB` color represented as an int. r/w.           |
+| Name       | Description                                                     |
+| :--------- | :-------------------------------------------------------------- |
+| `typeof x` | `"patterns"`                                                    |
+| `x[2-27]`  | An 8x8 _image interface_ comprised of patterns 0 and 1. r/w.    |
+| `x[28-31]` | A list of up to 256 pattern indices for animated patterns. r/w. |
+| `x[32-47]` | A 24-bit `RRGGBB` color represented as an int. r/w.             |
 
 The default patterns and colors are as follows:
 

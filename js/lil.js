@@ -1817,7 +1817,7 @@ patterns_read=x=>{
 		let r=null, t=i&&ln(i)?ln(i):0
 		if(x){
 			if(t>= 2&&t<=27&&image_is(x)){for(let a=0;a<8;a++)for(let b=0;b<8;b++)set(self.pal.pix,t,b,a,lb(iwrite(x,lmpair(rect(b,a)))))}
-			if(t>=28&&t<=31){r=ll(x);if(r.length>8)r=r.slice(0,8);self.anim[t-28]=r.map(x=>{const f=clamp(0,ln(x),47);return f>=28&&f<=31?0:f});r=lml(r)}
+			if(t>=28&&t<=31){r=ll(x);if(r.length>256)r=r.slice(0,256);self.anim[t-28]=r.map(x=>{const f=clamp(0,ln(x),47);return f>=28&&f<=31?0:f});r=lml(r)}
 			if(t>=32&&t<=47){pal_col_set(self.pal.pix,t-32,0xFF000000|ln(x));r=x}
 		}else{
 			if(t>= 0&&t<=27){r=image_copy(self.pal,rect(0,t*8,8,8))}
