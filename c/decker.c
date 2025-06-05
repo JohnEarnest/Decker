@@ -3395,7 +3395,7 @@ void event_key(int c,int m,int down,const char*name){
 		if(c==KEY_m&&uimode==mode_draw&&in_layer())ev.hidemenu^=1;
 		if(c==KEY_t&&uimode==mode_draw&&in_layer())dr.trans^=1;
 		if(c==KEY_u&&uimode==mode_draw&&in_layer())dr.under^=1;
-		if(c==KEY_y&&uimode==mode_draw&&in_layer())set_tracing=!tracing;
+		if(c==KEY_y&&uimode==mode_draw&&in_layer()&&!cmd)set_tracing=!tracing;
 		if(c==KEY_ESCAPE)ev.exit=1;
 		if(!wid.infield&&!wid.ingrid&&ms.type==modal_none&&uimode==mode_interact&&card_is(con())){
 			if(c==KEY_UP   )msg.target_navigate=ifield(deck,"card"),msg.arg_navigate=lmistr("up");
