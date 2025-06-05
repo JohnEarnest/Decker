@@ -2353,7 +2353,7 @@ void find_fonts(lv*deck,lv*target,lv*widgets){
 		}
 		if(field_is(wid)&&matchr(ifield(wid,"style"),lmistr("rich"))){ // inside rtext field values
 			lv*v=ifield(wid,"value"),*f=dget(v,lmistr("font"));
-			EACH(z,f){lv*n=f->lv[z];if(n->c&&!dget(fonts,n))dset(fonts,n,dget(defs,n));}
+			EACH(z,f){lv*n=f->lv[z];if(n->c&&!dget(fonts,n)&&dget(defs,n))dset(fonts,n,dget(defs,n));}
 		}
 	}
 	fonts=l_drop(lml3(lmistr("mono"),lmistr("menu"),lmistr("body")),fonts);

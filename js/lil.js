@@ -2506,7 +2506,7 @@ find_fonts=(deck,target,widgets)=>{
 			wid.widgets.v.map(w=>ifield(w,'font')).map(f=>dset(fonts,dkey(deck.fonts,f),f))
 		}
 		if(field_is(wid)&&match(ifield(wid,'style'),lms('rich'))){ // inside rtext field values
-			tab_get(ifield(wid,'value'),'font').filter(n=>count(n)&&!dget(fonts,n)).map(n=>dset(fonts,n,dget(deck.fonts,n)))
+			tab_get(ifield(wid,'value'),'font').filter(n=>count(n)&&!dget(fonts,n)&&dget(deck.fonts,n)).map(n=>dset(fonts,n,dget(deck.fonts,n)))
 		}
 	})
 	fonts=dyad.drop(lml(['body','menu','mono'].map(lms)),fonts),fonts.v.map((x,i)=>{fonts.v[i]=lms(font_write(x))})
