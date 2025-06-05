@@ -3358,6 +3358,7 @@ void event_key(int c,int m,int down,const char*name){
 		if(cmd){
 			ev.alt=1;
 			if(strlen(name)==1){char i=ev.shift?drom_toupper(name[0]):drom_tolower(name[0]);ev.shortcuts[0xFF&i]=1;}
+			if(c==KEY_y&&!ev.shift)ev.shortcuts['Z']=1; // alias for 'redo'
 		}
 		else if(uimode==mode_draw&&ms.type==modal_none){
 			if(c==KEY_1)modal_enter(modal_pattern);
