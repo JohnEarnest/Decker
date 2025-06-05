@@ -846,7 +846,7 @@ end
 
 {module:dd}
 description:"Display sequential, styled modal dialogs for visual novels."
-version:1.5
+version:1.6
 {script}
 # state/constants:
 local host:0
@@ -854,6 +854,7 @@ local canvas:0
 local padding:10
 local margin:20
 local arrow:image["%%IMG0AAsABv/gf8A/gB8ADgAEAA=="]
+local arrow_anim:arrow,image[arrow.size]
 
 # config:
 local tfont:"body"
@@ -862,7 +863,8 @@ local align:"left"
 local balign:"center"
 local fcolor:32
 local bcolor:1
-local next:arrow
+local next:arrow_anim
+local nextd:10
 local speed:0
 local names:() dict ()
 local border:0
@@ -934,21 +936,22 @@ module.open:on open deck etc do
 end
 
 module.style:on style etc do
- fcolor:if "fcolor" in etc etc.fcolor else 32       end
- bcolor:if "bcolor" in etc etc.bcolor else 1        end
- tfont :if "tfont"  in etc etc.tfont  else "body"   end
- bfont :if "bfont"  in etc etc.bfont  else "body"   end
- align :if "align"  in etc etc.align  else "left"   end
- balign:if "balign" in etc etc.balign else "center" end
- names :if "names"  in etc etc.names  else ()dict() end
- next  :if "next"   in etc etc.next   else arrow    end
- speed :if "speed"  in etc etc.speed  else 0        end
- osound:if "osound" in etc etc.osound else ""       end
- nsound:if "nsound" in etc etc.nsound else ""       end
- asound:if "asound" in etc etc.asound else ""       end
- tsound:if "tsound" in etc etc.tsound else ""       end
- dsize: if "size"   in etc etc.size   else ()       end
- dpos:  if "pos"    in etc etc.pos    else 0        end
+ fcolor:if "fcolor" in etc etc.fcolor else 32         end
+ bcolor:if "bcolor" in etc etc.bcolor else 1          end
+ tfont :if "tfont"  in etc etc.tfont  else "body"     end
+ bfont :if "bfont"  in etc etc.bfont  else "body"     end
+ align :if "align"  in etc etc.align  else "left"     end
+ balign:if "balign" in etc etc.balign else "center"   end
+ names :if "names"  in etc etc.names  else ()dict()   end
+ next  :if "next"   in etc etc.next   else arrow_anim end
+ nextd :if "nextd"  in etc etc.nextd  else 10         end
+ speed :if "speed"  in etc etc.speed  else 0          end
+ osound:if "osound" in etc etc.osound else ""         end
+ nsound:if "nsound" in etc etc.nsound else ""         end
+ asound:if "asound" in etc etc.asound else ""         end
+ tsound:if "tsound" in etc etc.tsound else ""         end
+ dsize: if "size"   in etc etc.size   else ()         end
+ dpos:  if "pos"    in etc etc.pos    else 0          end
  if !dsize[0] dsize[0]:nil end
  if !dsize[1] dsize[1]:nil end
  border:etc.border.image.copy[]
@@ -957,6 +960,10 @@ module.style:on style etc do
  bpad:"ltrb" dict 4 take (2,10,2,10) unless etc.bborder.margin
  if balign~"left"  balign:"center_left"  end
  if balign~"right" balign:"center_right" end
+ if "image"~typeof next next:next,image[next.size] end
+ if (()~next)|(!"list"~typeof next) next:arrow_anim end
+ if 1~count next next:next,image[next.size] end
+ nextd:1|nextd
 end
 
 module.getstyle:on getstyle do
@@ -969,6 +976,7 @@ module.getstyle:on getstyle do
   "balign"  (("center_left","center_right","center") dict ("left","right","center"))[balign]
   "names"   names
   "next"    next
+  "nextd"   nextd
   "speed"   speed
   "osound"  osound
   "nsound"  nsound
@@ -1025,15 +1033,10 @@ module.say:on say text do
    else
     canvas.text[seg pad.l,pad.t,dim ("top_%s" format align)]
    end
-   a:next.copy[].map[1 dict fcolor]
-   p:canvas.size-(pad.r,pad.b)+next.size
+   ns:next..copy[].map[(0,1) dict bcolor,fcolor]
    on wait do
-    if 2%floor sys.frame/10
-     canvas.paste[a p 1]
-    else
-     canvas.pattern:bcolor
-     canvas.rect[p a.size]
-    end
+    a:ns[(count ns)%floor sys.frame/nextd]
+    canvas.paste[a canvas.size-(pad.r,pad.b)+a.size]
     tick[]
    end
    while !pointer.held|pointer.down wait[] end
