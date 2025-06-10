@@ -2619,7 +2619,7 @@ bg_tools=_=>{
 }
 bg_end_lasso=_=>{
 	if(uimode!='draw'||dr.tool!='lasso')return
-	const data=dr.mask&&dr.limbo, diffrect=!requ(dr.sel_here,dr.sel_start);let diffmask=dr.omask==null||dr.omask.pix.length!=dr.mask.pix.length;
+	const data=dr.mask&&dr.limbo, diffrect=!requ(dr.sel_here,dr.sel_start);let diffmask=dr.omask==null||(dr.mask&&dr.omask.pix.length!=dr.mask.pix.length);
 	if(dr.omask&&!diffmask)for(let z=0;data&&z<dr.mask.pix.length;z++)if((dr.mask.pix[z]>0)!=(dr.omask.pix[z]>0)){diffmask=1;break}
 	if(data&&(diffrect||diffmask||dr.lasso_dirty)){
 		bg_scratch();const t=frame;frame=draw_frame(dr.scratch),bg_draw_lasso(dr.sel_here,dr.sel_start,0,dr.fill),frame=t,bg_edit(),bg_scratch_clear()
