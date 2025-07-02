@@ -1497,7 +1497,7 @@ description:"a utility module for logging"
 
 {data}
 version:1.01
-log:{time:[],message:[]}
+log:<"time":[],"message":[]>
 
 {script}
 log:data.log
