@@ -1253,7 +1253,8 @@ void modal_enter(int type){
 		ms.grid2=(grid_val){res_enumerate(deck),0,-1,-1};
 	}
 	if(type==modal_link){
-		lv*t=ms.old_wid.fv->table,*ol=dget(t,lmistr("arg"))->lv[rtext_get(t,ms.old_wid.cursor.y)];
+		lv*t=ms.old_wid.fv->table;int i=rtext_get(t,ms.old_wid.cursor.y);
+		lv*ol=dget(t,lmistr("arg"))->lv[i<0?0:i];
 		ms.text=(field_val){rtext_cast(ol),0};if(ol->c)ms.old_wid.cursor=rtext_getr(t,ms.old_wid.cursor.y);
 	}
 	if(type==modal_grid){
