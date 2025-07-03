@@ -1745,6 +1745,17 @@ image_make=size=>{
 			const o=image_copy(self), n=lin(z)?rect(ln(z),ln(z)):getpair(z), r=rmax(rect(),rint(a&&lb(a)?n:rect(n.x*o.size.x,n.y*o.size.y))), d=rpair(rect(),r)
 			image_resize(self,r),image_paste_scaled(d,d,o,self,1);return self
 		})
+		if(ikey(i,'outline'))return lmnat(([pat])=>{
+			const p=ln(pat),s=self.size;if(p<1||p>47)return self;const t=image_copy(self)
+			for(let a=0,i=0;a<s.y;a++)for(let b=0;b<s.x;b++,i++){
+				if(t.pix[i])continue;let n=0
+				if(b>0    )n|=t.pix[(b-1)+(a  )*s.x]
+				if(b<s.x-1)n|=t.pix[(b+1)+(a  )*s.x]
+				if(a>0    )n|=t.pix[(b  )+(a-1)*s.x]
+				if(a<s.y-1)n|=t.pix[(b  )+(a+1)*s.x]
+				if(n)self.pix[i]=p
+			}return self
+		})
 		if(ikey(i,'copy'))return lmnat(z=>image_copy(self,unpack_rect(z,self.size)))
 		if(ikey(i,'paste'))return lmnat(([img,pos,t])=>{
 			img=getimage(img), pos=(pos?ll(pos):[]).map(ln); let solid=t?!lb(t):1, cl=rect(0,0,self.size.x,self.size.y); if(img==self)img=image_copy(img)

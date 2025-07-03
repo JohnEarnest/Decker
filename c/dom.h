@@ -499,6 +499,17 @@ lv* n_image_scale(lv*self,lv*z){
 	pair r={MAX(0,n.x*(a?1:s.x)),MAX(0,n.y*(a?1:s.y))};
 	image_resize(self,r);buffer_paste_scaled(rect_pair((pair){0,0},r),rect_pair((pair){0,0},r),o->b,self->b,1);return self;
 }
+lv* n_image_outline(lv*self,lv*z){
+	int p=ln(l_first(z));if(p<1||p>47)return self;pair s=image_size(self);lv*target=self->b, *t=buffer_clone(target);
+	for(int a=0,i=0;a<s.y;a++)for(int b=0;b<s.x;b++,i++){
+		if(t->sv[i])continue;int n=0;
+		if(b>0    )n|=t->sv[(b-1)+(a  )*s.x];
+		if(b<s.x-1)n|=t->sv[(b+1)+(a  )*s.x];
+		if(a>0    )n|=t->sv[(b  )+(a-1)*s.x];
+		if(a<s.y-1)n|=t->sv[(b  )+(a+1)*s.x];
+		if(n)target->sv[i]=p;
+	}return self;
+}
 lv* image_write(lv*x){
 	x=image_is(x)?x:image_empty();pair s=image_size(x);str t=str_new();char f;int colors=0;for(int z=0;z<s.x*s.y;z++)if(x->b->sv[z]>1)colors=1;
 	str_addraw(&t,(s.x>>8)&0xFF),str_addraw(&t,s.x&0xFF);str_addraw(&t,(s.y>>8)&0xFF),str_addraw(&t,s.y&0xFF);
@@ -528,6 +539,7 @@ lv* interface_image(lv*self,lv*i,lv*x){
 	ikey("rotate"   )return lmnat(n_image_rotate,self);
 	ikey("translate")return lmnat(n_image_translate,self);
 	ikey("scale"    )return lmnat(n_image_scale,self);
+	ikey("outline"  )return lmnat(n_image_outline,self);
 	ikey("copy"     )return lmnat(n_image_copy,self);
 	ikey("paste"    )return lmnat(n_image_paste,self);
 	ikey("encoded"  )return image_write(self);

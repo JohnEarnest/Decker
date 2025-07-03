@@ -255,6 +255,14 @@ b:image[2,1] b[0,0]:200 b[1,0]:5
 assert["image merge overflow"  (list  44,  6) image_matrix[a.copy[].merge["+" b]]]
 assert["image merge underflow" (list 156,252) image_matrix[a.copy[].merge["-" b]]]
 
+assert["image outline zero"   "%%IMG2AAAAAA=="                                 image[0,0                 ].outline[34].encoded]
+assert["image outline one"    "%%IMG0AAEAAYA="                                 image["%%IMG0AAEAAYA="    ].outline[34].encoded]
+assert["image outline empty"  "%%IMG0AAMAAwAAAA=="                             image["%%IMG0AAMAAwAAAA=="].outline[ 1].encoded]
+assert["image outline ident"  "%%IMG0AAMAA0DgQA=="                             image["%%IMG0AAMAA0DgQA=="].outline[  ].encoded]
+assert["image outline corner" "%%IMG1AAMAAyMBIwEBASMBIw=="                     image["%%IMG0AAMAA0DgQA=="].outline[35].encoded]
+assert["image outline full"   "%%IMG1AAUABQAAJAAAACQBJAAkAQEBJAAkASQAAAAkAAA=" image["%%IMG0AAUABQAgcCAA"].outline[36].encoded]
+assert["image outline iter"   "%%IMG1AAYABiYlJSYAACUBASUmACUBJQElJiUBAQEBJSYlJQEBJQAmJiUlJg==" image["%%IMG0AAYABgBgUHgYAA=="].outline[37].outline[38].encoded]
+
 if !sys.platform~"awk"
 	assert_image["read nonexistent gif"
 		list ()
