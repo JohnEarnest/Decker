@@ -2524,10 +2524,10 @@ bg_tools=_=>{
 	else if( dr.fatbits&&ev.mu&&ev.alt){dr.fatbits=0,bg_cancel();return}if(ev.alt)return
 	if(ev.md)pointer.prev=ev.pos
 	if(!dover(con_view_dim()))ev.md=ev.mu=ev.drag=0
+	if(ev.mdown){dr.pattern=ln(iwrite(con_image(),lmpair(ev.pos)))} // pipette
 	if(dr.tool=='pencil'||dr.tool=='line'||dr.tool=='rect'||dr.tool=='fillrect'||dr.tool=='ellipse'||dr.tool=='fillellipse'){
 		let clear=0;if(!dr.scratch)bg_scratch()
-		if(ev.mdown){dr.pattern=ln(iwrite(con_image(),lmpair(ev.pos)))} // pipette
-		else if(ev.md){bg_scratch(),dr.erasing=ev.rdown||ev.shift}
+		if(ev.md){bg_scratch(),dr.erasing=ev.rdown||ev.shift}
 		else if(ev.mu||ev.drag){
 			const t=frame;frame=draw_frame(dr.scratch)
 			if(dr.tool=='pencil'||dr.erasing){
