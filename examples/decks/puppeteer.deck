@@ -231,11 +231,11 @@ button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"!anim"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
-field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["The !anim command assigns puppets an idle animation, which will loop continuously until altered.\n\n","!anim NAME none\n!anim NAME bob\n!anim NAME shake\n!anim NAME breathe","\n\n\"bob\" slowly oscillates vertically.\n\n\"shake\" oscillates horizontally.\n\n\"breathe\" slowly stretches and squashes the puppet's image horizontally.\n\nBreathing uses the same nearest-neighbor image scaling as is typical in Decker. For best results, use images with simple lineart. Note how boxy's overall form is preserved well, but the fine details on his face are mangled."],"font":["","mono",""],"arg":["","",""]}}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["The !anim command assigns puppets an idle animation, which will loop continuously until altered.\n\n","!anim NAME TYPE","\n\nTYPE can be any of:\n\n- \"bob\": slowly oscillate vertically.\n- \"shake\": oscillate horizontally.\n- \"breathe\": stretch and squash horizontally.\n- \"backforth\": continuously flip horizontally.\n- \"spin\": rotate the puppet image around its center.\n\nBreathing uses the same nearest-neighbor image scaling as is typical in Decker. For best results, use images with simple lineart. Note how boxy's overall form is preserved well, but the fine details on his face are mangled.\n\nSpinning requires an image that is padded to be approximately square."],"font":["","mono",""],"arg":["","",""]}}
 ex1:{"type":"field","size":[232,147],"pos":[10,48],"border":1,"style":"code","value":"pt.command[deck\n \"!show boxy smile centerleft\",\n \"!anim boxy %s\" format mode.value\n]\n"}
 button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"commandandclear.0","text":"Try It!"}
 button6:{"type":"button","size":[108,20],"pos":[214,312],"script":"showhide.0","text":"Clear Puppets","style":"rect"}
-mode:{"type":"contraption","size":[140,26],"pos":[56,244],"script":"anim.0","def":"enum","widgets":{"s":{"size":[140,26],"interval":[0,3],"value":2,"format":"shake"},"o":{"size":[140,20],"value":"none\nbob\nshake\nbreathe"}}}
+mode:{"type":"contraption","size":[140,26],"pos":[56,244],"script":"anim.0","def":"enum","widgets":{"s":{"size":[140,26],"interval":[0,5],"format":"none"},"o":{"size":[140,20],"value":"none\nbob\nshake\nbreathe\nbackforth\nspin"}}}
 field3:{"type":"field","size":[57,13],"pos":[56,229],"locked":1,"border":0,"value":"mode"}
 
 {script:anim.0}
@@ -450,7 +450,7 @@ image:"%%IMG0AgABVr/7/9v//v//3/9///9v///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 {module:pt}
 description:"Display and animate sprites for visual novels."
-version:1.2
+version:1.3
 {script}
 
 local FRONT:999999  # foremost (reasonable) widget index
@@ -623,6 +623,7 @@ on paint_puppet state do
   canv.size:face.size
   if !"none"~canv.show
    img:if state.hflip face.copy[].transform["horiz"] else face.copy[] end
+   if (state.anim~"backforth")&2%floor sys.frame/15 img.transform["horiz"] end
    canv.clear[]
    if state.anim~"breathe"
     skew:skews[state.pos]
@@ -631,6 +632,11 @@ on paint_puppet state do
     p:(n+2*m*skew[0]),0
     s:(canv.size[0]-2*n),canv.size[1]
     canv.paste[img p,s]
+   elseif state.anim~"spin"
+    tmp:image[img.size*2]
+    tmp.paste[img .5*tmp.size-img.size]
+    tmp.rotate[sys.frame/120]
+    canv.paste[tmp .5*canv.size-tmp.size]
    else
     canv.paste[img]
    end
@@ -679,7 +685,7 @@ on exec_anim state do
   pending_move:1
  end
  # idle animations
- if state.anim~"breathe" pending_paint:1 end
+ if state.anim in "breathe","spin","backforth" pending_paint:1 end
  if state.anim in "bob","shake" pending_move:1 end
  # wrap up
  if "contraption"~typeof state.wid pending_paint:1 end
