@@ -962,7 +962,8 @@ end
 module.open:on open deck etc do
  if canvas & canvas.show~"transparent" close[] end
  host:deck
- canvas:host.card.add["canvas" "dd_overlay"]
+ canvas:host.card.widgets.dd_overlay
+ if !canvas canvas:host.card.add["canvas" "dd_overlay"] end
  style[etc]
  canvas.size:((host.card.size[0]-2*margin) unless dsize[0]),0
  canvas.pos:repos[(.5*host.card.size[0]-canvas.size[0]),host.card.size[1]-margin canvas.size]
