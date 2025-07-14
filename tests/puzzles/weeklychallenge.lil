@@ -24,6 +24,20 @@ on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 
 # the problems:
 
+problem[321.2]
+# are x and y equal if # is backspace?
+on f x y do
+ on n x do
+  r:() each c in x
+   r:if c~"#" 1 drop r else c,r end
+  end r
+ end
+ n[x]~n[y]
+end
+assert[f["ab#c" "ad#c"] 1]
+assert[f["ab##" "a#b#"] 1]
+assert[f["a#b"  "c"   ] 0]
+
 problem[296.1]
 # compress the string x with run-length encoding
 on f x do
