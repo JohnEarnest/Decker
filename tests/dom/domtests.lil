@@ -1188,6 +1188,13 @@ c.size:8,8
 c.poly[8,0 8,4]
 assert["canvas edge clipping for polygons" (0 dict 64) c.copy[].hist]
 
+c:deck.card.add["canvas"]
+i:image["%%IMG0AAYABgBgUHgYAA=="]
+c.size:i.size
+c.paste[i]
+c.outline[37].outline[38]
+assert["canvas outline" "%%IMG1AAYABiYlJSYAACUBASUmACUBJQElJiUBAQEBJSYlJQEBJQAmJiUlJg==" c.copy[].encoded]
+
 #######################################
 #
 #  Deck

@@ -1240,6 +1240,7 @@ The canvas will scale _up_ logical pixels to display them on the card (resulting
 | `x.copy[pos size a]`    | Grab an _image_ at `pos`/`size`.                                                                                  |
 | `x.paste[img pos t]`    | Draw an _image_ at `pos`. If `t` is truthy, treat pattern 0 as transparent.                                       |
 | `x.segment[img rect m]` | Draw an _image_ scaled to fit `rect`, based on margins `m`. Treat pattern 0 as transparent.                       |
+| `x.outline[p]`          | Set pattern-0 pixels to pattern `p` when orthogonally adjacent to nonzero pixels.                                 |
 | `x.event[n ...x]`       | Issue an event named `n` at this widget with argument(s) `x`.                                                     |
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
 

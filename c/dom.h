@@ -499,8 +499,8 @@ lv* n_image_scale(lv*self,lv*z){
 	pair r={MAX(0,n.x*(a?1:s.x)),MAX(0,n.y*(a?1:s.y))};
 	image_resize(self,r);buffer_paste_scaled(rect_pair((pair){0,0},r),rect_pair((pair){0,0},r),o->b,self->b,1);return self;
 }
-lv* n_image_outline(lv*self,lv*z){
-	int p=ln(l_first(z));if(p<1||p>47)return self;pair s=image_size(self);lv*target=self->b, *t=buffer_clone(target);
+void buffer_outline(lv*target,int p){
+	if(p<1||p>47)return;pair s=buff_size(target);lv*t=buffer_clone(target);
 	for(int a=0,i=0;a<s.y;a++)for(int b=0;b<s.x;b++,i++){
 		if(t->sv[i])continue;int n=0;
 		if(b>0    )n|=t->sv[(b-1)+(a  )*s.x];
@@ -508,8 +508,9 @@ lv* n_image_outline(lv*self,lv*z){
 		if(a>0    )n|=t->sv[(b  )+(a-1)*s.x];
 		if(a<s.y-1)n|=t->sv[(b  )+(a+1)*s.x];
 		if(n)target->sv[i]=p;
-	}return self;
+	}
 }
+lv* n_image_outline(lv*self,lv*z){buffer_outline(self->b,ln(l_first(z)));return self;}
 lv* image_write(lv*x){
 	x=image_is(x)?x:image_empty();pair s=image_size(x);str t=str_new();char f;int colors=0;for(int z=0;z<s.x*s.y;z++)if(x->b->sv[z]>1)colors=1;
 	str_addraw(&t,(s.x>>8)&0xFF),str_addraw(&t,s.x&0xFF);str_addraw(&t,(s.y>>8)&0xFF),str_addraw(&t,s.y&0xFF);
@@ -1599,6 +1600,7 @@ lv* n_canvas_segment(lv*self,lv*z){
 	rect r=getrect(z->c>1?z->lv[1]:NULL),m=getrect(normalize_margin(z->c>2?z->lv[2]:NULL,buff_size(i)));
 	r.w=MAX(r.w,m.x+m.w),r.h=MAX(r.h,m.y+m.h);draw_9seg(r,frame.buffer,i,m,frame.clip,0,NULL);return self;
 }
+lv* n_canvas_outline(lv*self,lv*z){pick_canvas(self);buffer_outline(frame.buffer,ln(l_first(z)));return self;}
 lv* interface_canvas(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return LNIL;
 	lv*data=self->b;lv*card=dget(data,lmistr("card")),*deck=dget(card->b,lmistr("deck")),*fonts=dget(deck->b,lmistr("fonts"));
@@ -1635,6 +1637,7 @@ lv* interface_canvas(lv*self,lv*i,lv*x){
 		ikey("copy"     )return lmnat(n_canvas_copy,  self);
 		ikey("paste"    )return lmnat(n_canvas_paste, self);
 		ikey("segment"  )return lmnat(n_canvas_segment,self);
+		ikey("outline"  )return lmnat(n_canvas_outline,self);
 		ikey("textsize" )return lmnat(n_canvas_textsize,self);
 	}return interface_widget(self,i,x);
 }
