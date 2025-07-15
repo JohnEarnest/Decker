@@ -1570,6 +1570,8 @@ void modals(void){
 				{rect g={c.x,c.y-3+c.h,c.w,7};if(over(g)){draw_hline(c.x,c.x+c.w,c.y+c.h-1,13);gutter=z+1;}}
 			}
 		}frame.clip=oc;
+		char tmp[200];snprintf(tmp,200,"Card %d of %d",(int)(ln(ifield(curr,"index"))+1),cards->c);
+		draw_textc((rect){b.x+65,b.y+b.h-20,b.w-2*65,20},tmp,FONT_BODY,1);
 		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"OK",1)||ev.exit||ev.action)modal_exit(0);
 		pair c={b.x,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,60,20},"New",1)){
