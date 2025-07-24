@@ -882,7 +882,7 @@ end
 
 {module:dd}
 description:"Display sequential, styled modal dialogs for visual novels."
-version:1.6
+version:1.7
 {script}
 # state/constants:
 local host:0
