@@ -1467,6 +1467,7 @@ void modal_exit(int value){
 		}str_addz(&r,"end");script_save(lmstr(r));
 	}
 	if(ms.type==modal_recording){
+		if(au.mode==record_recording)sound_finish();
 		lv*name=rtext_all(ms.name.table);rename_sound(deck,au.target,name);mark_dirty();
 		au.mode=record_stopped;modal_enter(modal_sounds);ms.grid.row=dgeti(ifield(deck,"sounds"),name);return;
 	}
