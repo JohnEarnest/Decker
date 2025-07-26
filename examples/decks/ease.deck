@@ -13,7 +13,7 @@ script:"home.0"
 field1:{"type":"field","size":[241,36],"pos":[148,23],"locked":1,"font":"deckbuilder","border":0,"style":"plain","align":"center","value":"Easing Functions"}
 c:{"type":"canvas","size":[188,170],"pos":[66,150],"border":0,"image":"%%IMG2ALwAqgD/AP8AuQ0EALMNDgCsDRMAqA0WAKQNGgChDR0Ang0gAJsNIwCYDQsACg0QAJYNCgAPDQ8AlA0JABINDwCRDQgAFg0QAI0NCQAYDRAAig0JABsNFACEDQgAHg0TAIINCAAgDRMAgA0JACINEQAlAQEAWg0IACUNDwAlAQEAWQ0IACkNCwAmAQEAWQ0IACsNCAAnAQEAWA0IAFsBAQBYDQgAWwEBAFcNCABcAQEAVw0IAFwBAQBWDQgAXQEBAFYNCABdAQEAVQ0IAF4BAQBVDQgAXgEBAFUNBwBfAQEAVA0IAF8BAQBUDQgAXwEBAFMNCABgAQEAUw0IAGABAQBTDQcAYQEBAFINCABhAQEAUg0IAGEBAQBSDQcAYgEBAFENCABiAQEAUQ0IAGIBAQBRDQcAYwEBAFANCABjAQEAUA0IAGMBAQBQDQcAZAEBAE8NCABkAQEATw0IAGQBAQBPDQcAZQEBAE4NCABlAQEATg0IAGUBAQBODQcAZgEBAE4NBwBmAQEATQ0IAGYBAQBNDQgAZgEBAE0NBwBnAQEATA0IAGcBAQBMDQgAZwEBAEwNBwBoAQEATA0HAGgBAQBLDQgAaAEBAEsNCABoAQEASw0HAGkBAQBLDQcAaQEBAEoNCABpAQEASg0IAGkBAQBKDQcAagEBAEoNBwBqAQEASQ0IAGoBAQBJDQgAagEBAEkNBwBrAQEASQ0HAGsBAQBJDQcAawEBAEgNCABrAQEASA0IAGsBAQBIDQcAbAEBAEgNBwBsAQEARw0IAGwBAQBHDQgAbAEBAEcNBwBtAQEARw0HAG0BAQBHDQcAbQEBAEYNCABtAQEARg0IAG0BAQBGDQcAbgEBAEYNBwBuAQEARg0HAG4BAQBFDQgAbgEBAEUNCABuAQEARQ0HAG8BAQBFDQcAbwEBAEQNCABvAQEARA0IAG8BAQBEDQcAcAEBAEQNBwBwAQEARA0HAHABAQBDDQgAcAEBAEMNCABwAQEAQw0HAHEBAQBDDQcAcQEBAEINCABxAQEAQg0IAHEBAQBCDQcAcgEBAEINBwByAQEAQg0HAHIBAQBBDQgAcgEBAEENCAByAQEAQQ0HAHMBAQBBDQcAcwEBAEANCABzAQEAQA0IAHMBAQBADQcAdAEBAD8NCAB0AQEAPw0IAHQBAQA/DQcAdQEBAD8NBwB1AQEAPg0IAHUBAQA+DQgAdQEBAD4NBwB2AQEAPQ0IAHYBAQA9DQgAdgEBAD0NBwB3AQEAPA0IAHcBAQA8DQgAdwEBADwNBwB4AQEAPA0HAHgBAQA7DQgAeAEBADsNCAB4AQEAOw0HAHkBAQA6DQgAeQEBADoNCAB5AQEAOQ0IAHoBAQA5DQgAegEBADkNBwB7AQEAOA0IAHsBAQA4DQgAewEBADgNBwB8AQEANw0IAHwBAQA3DQgAfAEBADYNCAB9AQEANg0IAH0BAQA2DQcAfgEBADUNCAB+AQEANQ0IAH4BAQA0DQgAfwEBADQNCAB/AQEAMw0IAH8NAQEBDQcALA0IAH4NAgEBDQkAKQ0IAH4NAwEBDQwAJQ0JAH4NAwGVACQNFAAgDQgAgQ0UAB4NCQCCDRUAGw0JAIoNEAAZDQgAjQ0QABYNCACRDQ8AEg0KAJMNDwAPDQoAlg0QAAoNCwCYDSMAmw0gAJ4NHQChDRoApA0WAKgNEwCsDQ4Asw0EAP8A/wC4","scale":1}
 names:{"type":"grid","size":[180,136],"pos":[278,134],"locked":1,"script":"home.1","scrollbar":1,"headers":1,"lines":0,"value":{"Function Name":["lerp","inSine","outSine","inOutSine","inQuad","outQuad","inOutQuad","inCubic","outCubic","inOutCubic","inQuart","outQuart","inOutQuart","inQuint","outQuint","inOutQuint","inExpo","outExpo","inOutExpo","inCirc","outCirc","inOutCirc","inBack","outBack","inOutBack","inElastic","outElastic","inOutElastic","inBounce","outBounce","inOutBounce"]},"scroll":18,"row":24}
-usage:{"type":"field","size":[180,40],"pos":[278,280],"locked":1,"value":{"text":["usage:\n\n  ","ease.inOutBack[time a b]"],"font":["","mono"],"arg":["",""]}}
+usageLabel:{"type":"field","size":[180,40],"pos":[278,280],"locked":1,"value":"usage:"}
 field2:{"type":"field","size":[392,57],"pos":[66,65],"locked":1,"value":" Easing functions smoothly interpolate from one value to another. They're essential building-blocks of scripted animation! This deck contains an \"ease\" module with a wide variety of easing functions that each take a time (from 0 to 1, inclusive) and numeric values \"a\" and \"b\" to interpolate between. So long as \"a\" and \"b\" conform, they may be scalars, points, or entire polylines."}
 field3:{"type":"field","size":[101,34],"pos":[405,22],"locked":1,"border":0,"value":{"text":["(based on ","easings.net",", by Andrey Sitnik and Ivan Solovev!)"],"font":["","",""],"arg":["","https://easings.net",""]}}
 field4:{"type":"field","size":[64,14],"pos":[132,314],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"time"}
@@ -22,16 +22,13 @@ field6:{"type":"field","size":[18,14],"pos":[228,308],"locked":1,"border":0,"sty
 field7:{"type":"field","size":[40,14],"pos":[41,227],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"output"}
 field8:{"type":"field","size":[18,14],"pos":[62,291],"locked":1,"border":0,"style":"plain","align":"center","value":"a"}
 field9:{"type":"field","size":[18,14],"pos":[62,164],"locked":1,"border":0,"style":"plain","align":"center","value":"b"}
+usage:{"type":"field","size":[158,17],"pos":[290,296],"volatile":1,"font":"mono","border":0}
 
 {script:home.0}
 on view do
  names.value:select "Function Name":key from ease
  name:first names.rowvalue
- 
- usage.value:rtext.cat[
-  rtext.make["usage:\n\n  "]
-  rtext.make["ease.%s[time a b]" format name "mono"]
- ]
+ usage.text:"ease.%s[time a b]" format name
  
  m:20
  i:c.size-2*m

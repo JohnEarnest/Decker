@@ -31,6 +31,20 @@ assert[f[("--x","x++","x++"      )] 1]
 assert[f[("x++","++x","x++"      )] 3]
 assert[f[("x++","++x","--x","x--")] 0]
 
+problem[321.2]
+# are x and y equal if # is backspace?
+on f x y do
+ on n x do
+  r:() each c in x
+   r:if c~"#" 1 drop r else c,r end
+  end r
+ end
+ n[x]~n[y]
+end
+assert[f["ab#c" "ad#c"] 1]
+assert[f["ab##" "a#b#"] 1]
+assert[f["a#b"  "c"   ] 0]
+
 problem[322.1]
 # format letters in x in groups of size i
 on f x i do
