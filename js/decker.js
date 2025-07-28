@@ -726,7 +726,7 @@ widget_slider=(target,x)=>{
 		};comp_btn(0,-1,4,13,x.value!=x.min),comp_btn(b.w-14,1,5,0,x.value!=x.max)
 	}
 	if(sel&&ev.dir=='up')x.value-=x.step;if(sel&&ev.dir=='down')x.value+=x.step
-	if(in_layer()&&over(frame.clip)&&ev.scroll)x.value+=x.step*ev.scroll; x.value=slider_normalize(target,x.value)
+	if(!x.locked&&in_layer()&&over(frame.clip)&&ev.scroll)x.value+=x.step*ev.scroll; x.value=slider_normalize(target,x.value)
 	if(target&&Math.abs(ov-x.value)>(x.step/2)){msg.target_change=target,msg.arg_change=lmn(x.value);iwrite(target,lms('value'),msg.arg_change),mark_dirty()}
 	if(!x.locked&&in_widgets())wid.count++
 	frame.clip=oc

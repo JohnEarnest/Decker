@@ -568,7 +568,7 @@ void widget_slider(lv*target,slider x){
 		comp_btn(0,-1,4,13,x.min!=x.value);comp_btn(b.w-14,1,5,0,x.max!=x.value);
 	}
 	if(sel&&ev.dir==dir_up)x.value-=x.step;if(sel&&ev.dir==dir_down)x.value+=x.step;
-	if(in_layer()&&over(frame.clip)&&ev.scroll)x.value+=x.step*ev.scroll; x.value=slider_normalize((fpair){x.min,x.max},x.step,x.value);
+	if(!x.locked&&in_layer()&&over(frame.clip)&&ev.scroll)x.value+=x.step*ev.scroll; x.value=slider_normalize((fpair){x.min,x.max},x.step,x.value);
 	if(target&&fabs(ov-x.value)>(x.step/2)){msg.target_change=target,msg.arg_change=lmn(x.value);iwrite(target,lmistr("value"),msg.arg_change),mark_dirty();}
 	frame.clip=oc;
 	if(!x.locked&&in_widgets())wid.count++;
