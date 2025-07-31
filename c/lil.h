@@ -1426,7 +1426,7 @@ lv* time_ms(void){
 int randint(int x){unsigned int y=seed;y^=(y<<13),y^=(y>>17),(y^=(y<<15));return mod(seed=y,x);}
 lv* n_random(lv*self,lv*z){
 	#define rand_elt lin(x)?lmn(randint(ln(x))): x->c<1?LNIL: lis(x)?l_at(x,lmn(randint(x->c))): lit(x)?l_at(x,lmn(randint(x->n))): x->lv[randint(x->c)]
-	if(z->c==0){randint(1);return lmn(((float)(seed&0x7FFFFFFF))/0x7FFFFFFF);}
+	if(z->c==0){randint(1);return lmn(((float)(seed&0x7FFFFFFF))/(float)0x7FFFFFFF);}
 	(void)self;lv*x=l_first(z);if(z->c<2)return rand_elt;
 	int y=ln(z->lv[1]);if(y>=0){GEN(r,y)rand_elt;return r;}
 	x=lin(x)?l_range(x):ll(x);if(x->c<1)x=l_list(LNIL);idx pv=idx_new(x->c);EACH(z,x)pv.iv[z]=z;
