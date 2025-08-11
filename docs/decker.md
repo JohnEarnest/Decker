@@ -1827,10 +1827,11 @@ It is also possible to install new brushes using the `brush[]` function. This ca
 - `brush[function]`: define a _functional brush_, with a name corresponding to the name of the supplied function.
 - `brush[]`: retrieve a dictionary of custom brushes, keyed by name.
 
-Static brushes work like the built-in brushes: as a line is drawn, the mask is continuously "stamped" along it. Functional brushes call the supplied function repeatedly, and each time it should return a mask image. Functional brushes _must_ complete their work _very quickly_: if they exceed a brief quota, they will be halted prematurely, and nothing will be drawn. Likewise, if the function returns anything that is not an image, nothing will be drawn at that step. A brush function is called with two arguments:
+Static brushes work like the built-in brushes: as a line is drawn, the mask is continuously "stamped" along it. Functional brushes call the supplied function repeatedly, and each time it should return a mask image. Functional brushes _must_ complete their work _very quickly_: if they exceed a brief quota, they will be halted prematurely, and nothing will be drawn. Likewise, if the function returns anything that is not an image, nothing will be drawn at that step. A brush function is called with three arguments:
 
 - `delta`: a pair of numbers indicating the `(x,y)` offset of the current line's end from its origin. This can be used to determine the magnitude of the line, its direction, or both. 
 - `newLine`: a boolean; `1` for the first call of a new line, otherwise `0`.
+- `pos`: a pair of numbers indicating the `(x,y)` offset of the current "stamp" relative to the target card or canvas.
 
 An example static brush:
 ```lil

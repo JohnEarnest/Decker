@@ -941,8 +941,9 @@ void draw_line_custom(rect r,lv*mask,int pattern){
 	}
 }
 void draw_line_function(rect r,lv*func,int pattern){
-	lv*a=lml2(lmpair((pair){r.w-r.x,r.h-r.y}),ONE),*p=lmblk(),*e=lmenv(NULL);blk_lit(p,func),blk_lit(p,a),blk_op(p,CALL),pushstate(e);
+	lv*a=lml3(lmpair((pair){r.w-r.x,r.h-r.y}),ONE,LNIL),*p=lmblk(),*e=lmenv(NULL);blk_lit(p,func),blk_lit(p,a),blk_op(p,CALL),pushstate(e);
 	int dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1;while(!do_panic){
+		if(func->c>2)a->lv[2]=lmpair((pair){r.x,r.y});
 		state.e->c=1,state.t->c=0,state.p->c=0,state.pcs.c=0;issue(e,p);int quota=BRUSH_QUOTA;while(quota&&running())runop(),quota--;lv*v=running()?ZERO:arg();
 		if(image_is(v)){
 			lv*mask=v->b;pair ms=buff_size(mask),mc={ms.x/2,ms.y/2};

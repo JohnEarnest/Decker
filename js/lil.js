@@ -1237,8 +1237,9 @@ draw_line_custom=(r,mask,pattern)=>{
 	}
 }
 draw_line_function=(r,func,pattern)=>{
-	const a=lml([lmpair(rect(r.w-r.x,r.h-r.y)),ONE]),p=lmblk(),e=lmenv();blk_lit(p,func),blk_lit(p,a),blk_op(p,op.CALL),pushstate(e)
+	const a=lml([lmpair(rect(r.w-r.x,r.h-r.y)),ONE,NIL]),p=lmblk(),e=lmenv();blk_lit(p,func),blk_lit(p,a),blk_op(p,op.CALL),pushstate(e)
 	let dx=abs(r.w-r.x), dy=-abs(r.h-r.y), err=dx+dy, sx=r.x<r.w ?1:-1, sy=r.y<r.h?1:-1;while(!do_panic){
+		if(func.a.length>2)a.v[2]=lmpair(r)
 		state.e=[e],state.t=[],state.pcs=[];issue(e,p);let quota=BRUSH_QUOTA;while(quota&&running())runop(),quota--;const v=running()?ZERO:arg()
 		if(image_is(v)){
 			const ms=v.size, mc=rint(rdiv(ms,2))
