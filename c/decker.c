@@ -249,7 +249,7 @@ typedef struct {
 } modal_state; modal_state ms={0};
 typedef struct {modal_state ms;widget_state wid;} modal_context;
 modal_context ms_stack[8]={{{0},{0}}};int ms_index=0;
-void modal_enter(int type);void modal_exit(int value);void field_stylespan(lv*font,lv*arg); // forward refs
+void modal_enter(int type);void modal_exit(int value);void field_linkspan(lv*arg); // forward refs
 void modal_push(int type){
 	if(ms.type!=modal_none){
 		ms_stack[ms_index]=(modal_context){ms,wid};
@@ -271,7 +271,7 @@ void modal_pop(int value){
 		unswizzle_slot(ms.old_wid.gv,ms.old_wid.gv_slot)
 		unswizzle_slot(ms.old_wid.fv,ms.old_wid.fv_slot)
 	}
-	if(l){pair c=wid.cursor;field_stylespan(lmistr(""),l);wid.cursor=c;}
+	if(l){pair c=wid.cursor;field_linkspan(l);wid.cursor=c;}
 }
 int no_menu(void){return menu.active==-1&&menu.stick==-1;}
 int in_layer(void){return no_menu()&&(ms.type?ms.in_modal:1)&&((!running()&&!msg.overshoot)||ms.type!=modal_none);}
@@ -858,8 +858,13 @@ void field_indent(int add){
 		if(z<p.y&&layout[z].c=='\n')str_addc(&r,'\n'),z++;
 	}field_edit(lmistr(""),lmistr(""),lmstr(r)->sv,p);wid.cursor=(pair){p.x,wid.cursor.y};
 }
-void field_stylespan(lv*font,lv*arg){
-	field_edit(font,arg,rtext_string(wid.fv->table,wid.cursor)->sv,wid.cursor);
+void field_fontspan(lv*font){
+	lv*s=rtext_span(wid.fv->table,wid.cursor),*c=dget(s,lmistr("font"));
+	EACH(z,c)c->lv[z]=font;field_editr(n_rtext_cat(NULL,l_list(s)),wid.cursor);
+}
+void field_linkspan(lv*link){
+	lv*s=rtext_span(wid.fv->table,wid.cursor),*c=dget(s,lmistr("arg"));
+	EACH(z,c)c->lv[z]=link;field_editr(n_rtext_cat(NULL,l_list(s)),wid.cursor);
 }
 void field_input(char*text){
 	if(!wid.infield)return;
@@ -1733,7 +1738,7 @@ void modals(void){
 		if(ui_button((rect){c.x,c.y,60,20},"OK",ms.grid.row>=0)||choose){
 			lv*nf=ms.grid.table->lv[1]->lv[ms.grid.row];int nested=ms_index>0;modal_pop(1);
 			if(uimode==mode_object&&!nested){ob_edit_prop("font",nf);}
-			else if(wid.fv&&wid.cursor.x!=wid.cursor.y){pair c=wid.cursor;field_stylespan(nf,lmistr(""));wid.cursor=c;mark_dirty();}
+			else if(wid.fv&&wid.cursor.x!=wid.cursor.y){pair c=wid.cursor;field_fontspan(nf);wid.cursor=c;mark_dirty();}
 			else if(wid.ft){iwrite(wid.ft,lmistr("font"),nf),wid.f=unpack_field(ms.old_wid.ft,&ms.old_wid.fv_slot),mark_dirty();}
 		};c.x-=65;
 		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_pop(0);
@@ -3847,9 +3852,9 @@ void all_menus(void){
 			int selection=wid.fv!=NULL&&wid.cursor.x!=wid.cursor.y;
 			menu_bar("Text",selection&&wid.f.style!=field_plain);
 			if(wid.f.style==field_rich){
-				if(menu_item("Heading"    ,selection,'\0'))field_stylespan(lmistr("menu"),lmistr(""));
-				if(menu_item("Body"       ,selection,'\0'))field_stylespan(lmistr(""    ),lmistr(""));
-				if(menu_item("Fixed Width",selection,'\0'))field_stylespan(lmistr("mono"),lmistr(""));
+				if(menu_item("Heading"    ,selection,'\0'))field_fontspan(lmistr("menu"));
+				if(menu_item("Body"       ,selection,'\0'))field_fontspan(lmistr(""    ));
+				if(menu_item("Fixed Width",selection,'\0'))field_fontspan(lmistr("mono"));
 				if(menu_item("Link..."    ,selection,'\0'))modal_push(modal_link);
 			}
 			else if(wid.f.style==field_code){

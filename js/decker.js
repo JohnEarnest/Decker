@@ -494,7 +494,7 @@ modal_push=type=>{if(ms.type){ms_stack.push({ms:modal_state_clone(ms),wid:wid_st
 modal_pop=value=>{
 	const l=ms.type=='link'&&value?rtext_string(ms.text.table):null
 	modal_exit(value);if(ms_stack.length){const c=ms_stack.pop();ms=c.ms,wid=c.wid}
-	if(l){const c=rcopy(wid.cursor);field_stylespan(lms(''),l),wid.cursor=c}
+	if(l){const c=rcopy(wid.cursor);field_linkspan(l),wid.cursor=c}
 }
 let kc={shift:0,lock:0,alt:0,comb:0,on:0,heading:null}, keydown={},keyup={}
 keycaps_force_enter=_=>{kc.shift=0,kc.lock=0,kc.alt=0,kc.comb=0,kc.on=1,ev.mu=ev.md=0}
@@ -1002,7 +1002,8 @@ field_indent=add=>{
 		if(z<p.y&&layout[z].char=='\n')r+='\n',z++
 	}field_edit(lms(''),lms(''),r,p);wid.cursor=rect(p.x,wid.cursor.y)
 }
-field_stylespan=(font,arg)=>field_edit(font,arg,ls(rtext_string(wid.fv.table,wid.cursor)),wid.cursor)
+field_fontspan=font=>{const s=rtext_span(wid.fv.table,wid.cursor);tab_get(s,'font').fill(font),field_editr(rtext_cat([s]),wid.cursor)}
+field_linkspan=link=>{const s=rtext_span(wid.fv.table,wid.cursor);tab_get(s,'arg' ).fill(link),field_editr(rtext_cat([s]),wid.cursor)}
 field_input=text=>{
 	if(text=='\n'){if(ms.type=='save')ev.action=1;if(ms.type=='save'||ev.shift)return}
 	const rtext_font=(table,x)=>{const i=rtext_get(table,x);return i<0?lms(''):tab_cell(table,'font',i)}
@@ -1643,7 +1644,7 @@ modals=_=>{
 		if(ui_button(rect(c.x,c.y,60,20),'OK',ms.grid.row>=0)||choose){
 			const nf=tab_cell(ms.grid.table,'name',ms.grid.row),nested=ms_stack.length>0;modal_pop(1)
 			if(uimode=='object'&&!nested){ob_edit_prop('font',nf)}
-			else if(wid.fv&&wid.cursor.x!=wid.cursor.y){const c=wid.cursor;field_stylespan(nf,lms('')),wid.cursor=c,mark_dirty()}
+			else if(wid.fv&&wid.cursor.x!=wid.cursor.y){const c=wid.cursor;field_fontspan(nf),wid.cursor=c,mark_dirty()}
 			else if(wid.ft){iwrite(wid.ft,lms('font'),nf),wid.f=unpack_field(ms.old_wid.ft),wid.fv=unpack_field_value(ms.old_wid.ft),mark_dirty()}
 		};c.x-=65
 		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_pop(0)
@@ -3338,9 +3339,9 @@ all_menus=_=>{
 			const selection=wid.fv!=null&&wid.cursor.x!=wid.cursor.y
 			menu_bar('Text',selection&&wid.f.style!='plain')
 			if(wid.f.style=='rich'){
-				if(menu_item('Heading'    ,selection))field_stylespan(lms('menu'),lms(''))
-				if(menu_item('Body'       ,selection))field_stylespan(lms(''    ),lms(''))
-				if(menu_item('Fixed Width',selection))field_stylespan(lms('mono'),lms(''))
+				if(menu_item('Heading'    ,selection))field_fontspan(lms('menu'))
+				if(menu_item('Body'       ,selection))field_fontspan(lms(''    ))
+				if(menu_item('Fixed Width',selection))field_fontspan(lms('mono'))
 				if(menu_item('Link...'    ,selection))modal_push('link')
 			}
 			else if(wid.f.style=='code'){
