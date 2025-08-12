@@ -1794,7 +1794,7 @@ sound_make=data=>{
 			return x?((self.data[ln(i)]=0xFF&ln(x)),x): fetch(ln(i))
 		}
 		if(i&&lil(i)){ // read/write ranges
-			const n=getpair(i);n.y=max(0,n.y);if(x){
+			const n=getpair(i);n.x=min(n.x,self.data.length),n.y=max(0,n.y);if(x){
 				const s=ll(x),dc=self.data.length,sc=s.length, r=new Uint8Array(clamp(0,(dc-n.y)+sc,10*SFX_RATE))
 				for(let z=0;z<n.x         ;z++)r[z]=self.data[z]
 				for(let z=0;z<sc          ;z++)r[n.x+z   ]=0xFF&ln(s[z])

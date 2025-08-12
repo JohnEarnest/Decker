@@ -627,6 +627,17 @@ assert["sound map signed" (77,-37,-120,77,77) snd[0,5]]
 
 assert["sound histogram" ("%j" parse "{77:3,-120:1,-37:1}") snd.hist]
 
+s:sound[5]
+s[7,0]:()
+assert["sound delete OOB size" 5 s.size]
+assert["sound delete OOB data" (0,0,0,0,0) s[0,5]]
+s[5,0]:()
+assert["sound delete EOB size" 5 s.size]
+assert["sound delete EOB data" (0,0,0,0,0) s[0,5]]
+s[5,0]:11,22
+assert["sound insert EOB size" 7 s.size]
+assert["sound insert EOB data" (0,0,0,0,0,11,22) s[0,7]]
+
 #######################################
 #
 #  Patterns

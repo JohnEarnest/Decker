@@ -1271,7 +1271,7 @@ lv* interface_sound(lv*self,lv*i,lv*x){
 		else{return ib?lmn((signed char)data->sv[n]):LNIL;}
 	}
 	if(i&&lil(i)){ // read/write ranges
-		pair n=getpair(i);n.y=MAX(0,n.y);if(x){
+		pair n=getpair(i);n.x=MIN(n.x,data->c),n.y=MAX(0,n.y);if(x){
 			lv*s=ll(x),*r=lms(CLAMP(0,(data->c-n.y)+s->c,10*SFX_RATE));
 			for(int z=0;z<n.x;z++)r->sv[z]=z>=data->c?0:data->sv[z]; // before splice
 			EACH(z,s)if(n.x+z>=0&&n.x+z<r->c)r->sv[n.x+z]=0xFF&(int)ln(s->lv[z]); // splice
