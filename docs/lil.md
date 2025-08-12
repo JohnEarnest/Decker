@@ -98,9 +98,9 @@ When indexing into values, we will uniformly refer to _elements_:
 - An _element_ of a list is one of its items.
 - An _element_ of a dictionary is one of its values.
 - An _element_ of a table is one of its rows, as a dictionary.
-- An _element_ of an _empty_ string, list, dictionary, or table is the number 0.
+- An _element_ of an _empty_ string, list, dictionary, or table is nil.
 
-The number zero (`0`), nil, and the empty string (`""`), list (`()`), or dictionary are all _falsey_, and any other value (including _any_ table, function, or interface) is _truthy_.
+The number zero (`0`), nil, and the empty string (`""`), empty list (`()`), or empty dictionary are all _falsey_, and any other value (including _any_ table, function, or interface) is _truthy_.
 
 
 Lil, the Imperative Language
