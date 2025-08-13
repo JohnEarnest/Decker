@@ -1961,24 +1961,22 @@ modals=_=>{
 		dr.brush=clamp(0,dr.brush,(6*4)+count(br)-1)
 	}
 	else if(ms.type=='pattern'||ms.type=='fill'){
-		const grid=rect(8,dr.color?2:4), ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY)
+		const grid=rect(8,dr.color?6:4), ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY)
 		const getv=_=>ms.type=='pattern'?dr.pattern  :dr.fill
 		const setv=x=>ms.type=='pattern'?dr.pattern=x:dr.fill=x
 		const b=draw_modalbox(rect(m+(grid.x*gs)+m,m+(grid.y*gs)+lh+m)); let v=getv()
 		draw_textc(rect(b.x,b.y+b.h-lh,b.w,lh),`Choose a ${ms.type=='fill'?'fill':'stroke'} ${dr.color?'color':'pattern'}.`,FONT_BODY,1)
 		for(let z=0;z<grid.x*grid.y;z++){
-			const s=rint(rect(b.x+m+2+gs*(z%grid.x),b.y+m+2+gs*(0|(z/grid.x)),ss,ss)), ci=!dr.color?z: z<2?z: 31+z
+			const s=rint(rect(b.x+m+2+gs*(z%grid.x),b.y+m+2+gs*(0|(z/grid.x)),ss,ss)), ci=z
 			draw_rect(s,ci==0?32:ci); if(ci==v)draw_box(inset(s,-2),0,1)
 			const a=dover(s)&&over(s), cs=(ci==v&&ev.action), cl=cs||((ev.md||ev.drag)&&a), cr=cs||(ev.mu&&a)
 			if(cl)draw_invert(pal,inset(s,-1)); if(cr){setv(ci),modal_exit(ci);break}
 		}
 		if(ev.exit||(ev.mu&&!dover(b)&&!over(b)))modal_exit(-1),ev.mu=0
-		if(ev.dir&&dr.color&&v>=2)v=v-31
 		if(ev.dir=='left' )setv(((0|(v/grid.x))*grid.x)+((v+grid.x-1)%grid.x))
 		if(ev.dir=='right')setv(((0|(v/grid.x))*grid.x)+((v+       1)%grid.x))
 		if(ev.dir=='up'   )setv((v+(grid.x*(grid.y-1)))%(grid.x*grid.y))
 		if(ev.dir=='down' )setv((v+grid.x             )%(grid.x*grid.y))
-		if(ev.dir&&dr.color&&getv()>=2)setv(getv()+31)
 	}
 	else if(ms.type=='grid'){
 		const b=draw_modalbox(rect(120,160))
