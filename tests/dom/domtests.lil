@@ -278,27 +278,27 @@ end
 assert["field default attributes" dattr fieldattrs[f]]
 
 assert["field empty value"
-	insert text font arg with "" "" "" end
+	insert text font arg pat with "" "" "" 1 end
 	f.value
 ]
 
 f.text:v:"just some\nplain text?"
 assert["field write text, read text" v f.text]
 assert["field write text, read value"
-	insert text font arg with v "" "" end
+	insert text font arg pat with v "" "" 1 end
 	f.value
 ]
 
 f.value:v:insert text font with "information\n" "menu" "highly relevant stuff." "" end
 assert["field write table, read text" "information\nhighly relevant stuff." f.text]
-assert["field write table, read value" (update arg:"" from v) f.value]
+assert["field write table, read value" (update arg:"" pat:1 from v) f.value]
 
 cf:card.add["field"]
 cf.style:"code"
 assert["code fields default to a monospaced font" deck.fonts.mono cf.font]
 cf.value:f.value
 assert["non-rich text fields coalesce values into plain text"
-	insert text font arg with "information\nhighly relevant stuff." "" "" end
+	insert text font arg pat with "information\nhighly relevant stuff." "" "" 1 end
 	cf.value
 ]
 
@@ -306,7 +306,7 @@ cf:card.add["field"]
 cf.value:v
 cf.style:"plain"
 assert["non-rich text fields even coalesce existing values"
-	insert text font arg with "information\nhighly relevant stuff." "" "" end
+	insert text font arg pat with "information\nhighly relevant stuff." "" "" 1 end
 	cf.value
 ]
 
@@ -1076,6 +1076,19 @@ assert_image["canvas rich text"
 	 (list  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,19,19,19,19,19),
 	 (list  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
 	c.copy[]
+]
+
+c.size:20,13
+c.clear[]
+rt:rtext.cat[
+	rtext.make["A" "menu" "" 13]
+	rtext.make["a" "menu" ""]
+	rtext.make["A" "body" "" 36]
+]
+c.text[rt 1,1]
+assert["canvas rich text color"
+	"%%IMG2ABQADQAqDQQADw0CAAINAgAKJAEAAw0CAAINAgACAQQABCQBAAMNAgACDQIAAQEBAAMBAgACJAEAASQBAAINBgACAQUAAiQBAAEkAQACDQIAAg0CAAEBAgACAQIAASQFAAENAgACDQIAAQECAAIBAgABJAEAAyQBAAENAgACDQIAAQECAAIBAgABJAEAAyQBAAENAgACDQIAAgEFAC4="
+	c.copy[].encoded
 ]
 
 c.size:5,5

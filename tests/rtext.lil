@@ -1,11 +1,11 @@
 
 # test suite for the rtext interface
 
-rt1:insert font arg text with
- "menu" "" "Hello"
- ""     "" "how about "
- "mono" "" "some"
- ""     "" " salsa?"
+rt1:insert font arg text pat with
+ "menu" "" "Hello"       1
+ ""     "" "how about "  1
+ "mono" "" "some"        1
+ ""     "" " salsa?"     1
 end
 rt2:insert text arg font with
  " never " ""               ""
@@ -17,6 +17,7 @@ show[rtext.len[rt1]]
 show[rtext.len[table ()]]
 show[rtext.make["simple"]]
 show[rtext.make["more" "menu" 23]]
+show[rtext.make["pink" "" "" 36]]
 
 show[rtext.get[rt1  6]]
 show[rtext.get[rt1 18]]
@@ -36,6 +37,7 @@ show[rtext.cat[insert text with "single" end]]# cast
 show[rtext.cat[rt1 rt2]]                      # catenate
 show[rtext.cat["one" rt2 "another"]]          # catenate w/ strings
 show[rtext.cat[image[3,4]]]                   # cast to inline image
+show[rtext.cat[insert text pat with "a" -1 "b" 5 "c" 256 end]] # clamp bogus patterns
 
 show[rtext.string[rt1 4,19]]
 show[rtext.span[rt1 8,12]]                   # onechunk
@@ -60,7 +62,7 @@ show[first rtext.split["not present" d1]]
 print["--d1--"] each v in rtext.split["|" d1] show[v] end
 print["--d2--"] each v in rtext.split["\n\n" d2] show[v] end
 
-norm:select text font arg from rt1
+norm:select text font arg pat from rt1
 show[rt1~rtext.replace[rt1]]                             # bogus args
 show[rtext.cat[rt1]~rtext.replace[rt1 "" "NEVER"]]       # empty key
 show[norm~rtext.replace[rt1 "bogus" "AAAAAAAA"]]         # no matches

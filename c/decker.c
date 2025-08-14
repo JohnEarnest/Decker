@@ -232,7 +232,7 @@ enum modal_type{
 	modal_import_sound,
 	modal_import_deck,
 	modal_open_deck,modal_save_deck,modal_save_locked,modal_confirm_quit,modal_confirm_new,modal_confirm_script,modal_multiscript,
-	modal_brush,modal_pattern,modal_fill,modal_widpattern,
+	modal_brush,modal_pattern,modal_fill,modal_widpattern,modal_spanpattern,
 	modal_deck_props,modal_card_props,modal_button_props,modal_field_props,modal_slider_props,modal_canvas_props,modal_grid_props,modal_contraption_props,
 	modal_cards,modal_sounds,modal_recording,modal_fonts,modal_contraptions,modal_resources,modal_orderwids,
 	modal_action,modal_pick_card,modal_pick_contraption,modal_trans,modal_grid,modal_prototype_props,modal_prototype_attrs,
@@ -250,7 +250,7 @@ typedef struct {
 } modal_state; modal_state ms={0};
 typedef struct {modal_state ms;widget_state wid;} modal_context;
 modal_context ms_stack[8]={{{0},{0}}};int ms_index=0;
-void modal_enter(int type);void modal_exit(int value);void field_linkspan(lv*arg); // forward refs
+void modal_enter(int type);void modal_exit(int value);void field_linkspan(lv*arg);void field_patspan(int pat); // forward refs
 void modal_push(int type){
 	if(ms.type!=modal_none){
 		ms_stack[ms_index]=(modal_context){ms,wid};
@@ -264,6 +264,7 @@ void modal_push(int type){
 }
 void modal_pop(int value){
 	lv*l=(ms.type==modal_link&&value)?rtext_all(ms.text.table):NULL;
+	int p=value!=-1&&ms.type==modal_spanpattern;
 	modal_exit(value);if(ms_index>0){
 		ms_index--,ms=ms_stack[ms_index].ms,wid=ms_stack[ms_index].wid;
 		#define unswizzle_slot(x,slot) if(x==&ms_stack[ms_index].slot)x=&slot;
@@ -273,6 +274,7 @@ void modal_pop(int value){
 		unswizzle_slot(ms.old_wid.fv,ms.old_wid.fv_slot)
 	}
 	if(l){pair c=wid.cursor;field_linkspan(l);wid.cursor=c;}
+	if(p){pair c=wid.cursor;field_patspan(value);wid.cursor=c;}
 }
 int no_menu(void){return menu.active==-1&&menu.stick==-1;}
 int in_layer(void){return no_menu()&&(ms.type?ms.in_modal:1)&&((!running()&&!msg.overshoot)||ms.type!=modal_none);}
@@ -740,7 +742,7 @@ int layout_index(pair p){
 		return z==lines_count-1?layout_count: r.y;
 	}return layout_count;
 }
-glyph_box layout_last(lv*font){return layout_count>0?layout[layout_count-1]:(glyph_box){{0,0,1,font_h(font)},0,'\0',font,NULL};}
+glyph_box layout_last(lv*font){return layout_count>0?layout[layout_count-1]:(glyph_box){{0,0,1,font_h(font)},0,'\0',font,NULL,1};}
 rect layout_cursor(int index,lv*font,field f){
 	int bw=f.size.w-5-(f.scrollbar?image_size(ARROWS->lv[0]).x+3:0), bx=f.align==align_center?bw/2: f.align==align_right?bw: 0;
 	rect r=layout_count>0?layout[MIN(index,layout_count-1)].pos:(rect){bx,0,1,font_h(font)};
@@ -790,9 +792,10 @@ void widget_field(lv*target,field x,field_val*value){
 			if(a&&ev.mu&&dover(g.pos)){msg.target_link=target,msg.arg_link=g.arg;}
 		}
 		int csel=sel&&wid.cursor.x!=wid.cursor.y&&z>=MIN(wid.cursor.x,wid.cursor.y)&&z<MAX(wid.cursor.x,wid.cursor.y);
+		int ccol=g.pat==1?tfcol:g.pat;
 		if(csel)draw_rect(box_intersect(g.pos,frame.clip),tfcol);
 		if(image_is(g.arg)){buffer_paste(g.pos,frame.clip,g.arg->b,frame.buffer,x.show!=show_transparent);if(csel)draw_invert(pal,g.pos);}
-		else{font_each(g.font,g.c)if(font_gpix(g.font,g.c,b,a)&&inclip(g.pos.x+b,g.pos.y+a))PIX(g.pos.x+b,g.pos.y+a)=csel?bcol:tfcol;}
+		else{font_each(g.font,g.c)if(font_gpix(g.font,g.c,b,a)&&inclip(g.pos.x+b,g.pos.y+a))PIX(g.pos.x+b,g.pos.y+a)=csel?bcol:ccol;}
 	}
 	if(sel&&wid.cursor_timer<FIELD_CURSOR_DUTY){
 		rect c=layout_cursor(wid.cursor.y,fnt,x);c.y-=value->scroll;c.y+=bi.y,c.x+=bi.x;
@@ -818,8 +821,8 @@ void field_undo(void){lv*x=wid.hist->lv[--(wid.hist_cursor)];field_apply(x->lv[0
 void field_redo(void){lv*x=wid.hist->lv[(wid.hist_cursor)++];field_apply(x->lv[2],getpair(x->lv[3]));}
 void field_edit(lv*font,lv*arg,char*text,pair pos){
 	wid.hist->c=wid.hist_cursor; lv*o=lml(4);ll_add(wid.hist,o); pair c={0,0};
-	o->lv[0]=wid.fv->table                                   ,o->lv[1]=lmpair(wid.cursor); // before
-	o->lv[2]=rtext_splice(wid.fv->table,font,arg,text,pos,&c),o->lv[3]=lmpair(c         ); // after
+	o->lv[0]=wid.fv->table                                     ,o->lv[1]=lmpair(wid.cursor); // before
+	o->lv[2]=rtext_splice(wid.fv->table,font,arg,1,text,pos,&c),o->lv[3]=lmpair(c         ); // after
 	field_redo();
 }
 void field_editr(lv*rtext,pair pos){
@@ -867,6 +870,10 @@ void field_fontspan(lv*font){
 void field_linkspan(lv*link){
 	lv*s=rtext_span(wid.fv->table,wid.cursor),*c=dget(s,lmistr("arg"));
 	EACH(z,c)c->lv[z]=link;field_editr(n_rtext_cat(NULL,l_list(s)),wid.cursor);
+}
+void field_patspan(int pat){
+	lv*s=rtext_span(wid.fv->table,wid.cursor),*c=dget(s,lmistr("pat"));
+	EACH(z,c)c->lv[z]=lmn(pat);field_editr(n_rtext_cat(NULL,l_list(s)),wid.cursor);
 }
 void field_input(char*text){
 	if(!wid.infield)return;
@@ -1939,11 +1946,11 @@ void modals(void){
 		if(ev.dir==dir_down )dr.brush=(dr.brush+grid.x             )%(grid.x*grid.y);
 		dr.brush=CLAMP(0,dr.brush,(6*4)+br->c-1);
 	}
-	else if(ms.type==modal_pattern||ms.type==modal_fill||ms.type==modal_widpattern){
+	else if(ms.type==modal_pattern||ms.type==modal_fill||ms.type==modal_widpattern||ms.type==modal_spanpattern){
 		pair grid={8,dr.color?6:4};int ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY);
-		int*v=ms.type==modal_widpattern?&ob.pending_pattern: modal_pattern?&dr.pattern: &dr.fill;
+		int*v=ms.type==modal_widpattern||ms.type==modal_spanpattern?&ob.pending_pattern: modal_pattern?&dr.pattern: &dr.fill;
 		rect b=draw_modalbox((pair){m+(grid.x*gs)+m,m+(grid.y*gs)+lh+m});
-		char*label=ms.type==modal_widpattern?"Choose a pattern.":
+		char*label=ms.type==modal_widpattern||ms.type==modal_spanpattern?"Choose a pattern.":
 		           dr.color?(ms.type==modal_fill?"Choose a fill color."  :"Choose a stroke color."  ):
 		                    (ms.type==modal_fill?"Choose a fill pattern.":"Choose a stroke pattern.");
 		draw_textc((rect){b.x,b.y+b.h-lh,b.w,lh},label,FONT_BODY,1);
@@ -3867,6 +3874,10 @@ void all_menus(void){
 			}
 			if(wid.f.style!=field_code){
 				if(menu_item("Font...",wid.f.style!=field_plain,'\0'))modal_push(modal_fonts);
+				if(menu_item("Pattern...",wid.f.style!=field_plain,'\0')){
+					ob.pending_pattern=ln(l_first(dget(rtext_span(wid.fv->table,wid.cursor),lmistr("pat"))));
+					modal_push(modal_spanpattern);
+				}
 			}
 		}
 	}

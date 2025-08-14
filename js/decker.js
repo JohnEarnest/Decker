@@ -494,8 +494,10 @@ let ms=modal_state(), ms_stack=[]
 modal_push=type=>{if(ms.type){ms_stack.push({ms:modal_state_clone(ms),wid:wid_state_clone(wid)})}modal_enter(type)}
 modal_pop=value=>{
 	const l=ms.type=='link'&&value?rtext_string(ms.text.table):null
+	const p=value!=-1&&ms.type=='spanpattern'
 	modal_exit(value);if(ms_stack.length){const c=ms_stack.pop();ms=c.ms,wid=c.wid}
 	if(l){const c=rcopy(wid.cursor);field_linkspan(l),wid.cursor=c}
+	if(p){const c=rcopy(wid.cursor);field_patspan(value);wid.cursor=c}
 }
 let kc={shift:0,lock:0,alt:0,comb:0,on:0,heading:null}, keydown={},keyup={}
 keycaps_force_enter=_=>{kc.shift=0,kc.lock=0,kc.alt=0,kc.comb=0,kc.on=1,ev.mu=ev.md=0}
@@ -888,7 +890,7 @@ layout_index=(x,p)=>{
 		return z==x.lines.length-1?x.layout.length: r.y
 	}return x.layout.length
 }
-layout_last=(x,font)=>x.layout.length>0?last(x.layout): {pos:rect(0,0,1,font_h(font)),line:0,char:'\0',font,arg:ZERO}
+layout_last=(x,font)=>x.layout.length>0?last(x.layout): {pos:rect(0,0,1,font_h(font)),line:0,char:'\0',font,arg:ZERO,pat:1}
 layout_cursor=(x,index,font,f)=>{
 	const bw=f.size.w-5-(f.scrollbar?ARROWS[0].size.x+3:0), bx=f.align=='center'?0|(bw/2): f.align==ALIGN.right?bw: 0
 	const r=x.layout.length>0?rcopy(x.layout[min(index,x.layout.length-1)].pos):rect(bx,0,1,font_h(font))
@@ -945,7 +947,7 @@ widget_field=(target,x,value)=>{
 		const csel=sel&&wid.cursor.x!=wid.cursor.y&&z>=min(wid.cursor.x,wid.cursor.y)&&z<max(wid.cursor.x,wid.cursor.y)
 		if(csel)draw_rect(rclip(pos,frame.clip),tfcol)
 		if(image_is(g.arg)){image_paste(pos,frame.clip,g.arg,frame.image,x.show!='transparent');if(csel)draw_invert(pal,pos)}
-		else{draw_char(pos,g.font,g.char,csel?bcol:tfcol)}
+		else{draw_char(pos,g.font,g.char,csel?bcol: g.pat==1?tfcol:g.pat)}
 	}
 	if(sel&&wid.cursor_timer<FIELD_CURSOR_DUTY){
 		const c=layout_cursor(layout,wid.cursor.y,fnt,x);c.y-=value.scroll;c.y+=bi.y,c.x+=bi.x
@@ -970,7 +972,7 @@ field_apply=(v,c)=>{
 field_undo=_=>{const x=wid.hist[--(wid.hist_cursor)];field_apply(x[0],x[1])}
 field_redo=_=>{const x=wid.hist[(wid.hist_cursor)++];field_apply(x[2],x[3])}
 field_edit=(font,arg,text,pos)=>{
-	const c=rect(), spliced=rtext_splice(wid.fv.table,font,arg,text,pos,c); wid.hist=wid.hist.slice(0,wid.hist_cursor)
+	const c=rect(), spliced=rtext_splice(wid.fv.table,font,arg,1,text,pos,c); wid.hist=wid.hist.slice(0,wid.hist_cursor)
 	wid.hist.push([wid.fv.table,rect(wid.cursor.x,wid.cursor.y), spliced,c]),field_redo()
 }
 field_editr=(rtext,pos)=>{
@@ -1004,8 +1006,9 @@ field_indent=add=>{
 		if(z<p.y&&layout[z].char=='\n')r+='\n',z++
 	}field_edit(lms(''),lms(''),r,p);wid.cursor=rect(p.x,wid.cursor.y)
 }
-field_fontspan=font=>{const s=rtext_span(wid.fv.table,wid.cursor);tab_get(s,'font').fill(font),field_editr(rtext_cat([s]),wid.cursor)}
-field_linkspan=link=>{const s=rtext_span(wid.fv.table,wid.cursor);tab_get(s,'arg' ).fill(link),field_editr(rtext_cat([s]),wid.cursor)}
+field_fontspan=font=>{const s=rtext_span(wid.fv.table,wid.cursor);tab_get(s,'font').fill(font    ),field_editr(rtext_cat([s]),wid.cursor)}
+field_linkspan=link=>{const s=rtext_span(wid.fv.table,wid.cursor);tab_get(s,'arg' ).fill(link    ),field_editr(rtext_cat([s]),wid.cursor)}
+field_patspan =pat =>{const s=rtext_span(wid.fv.table,wid.cursor);tab_get(s,'pat' ).fill(lmn(pat)),field_editr(rtext_cat([s]),wid.cursor)}
 field_input=text=>{
 	if(text=='\n'){if(ms.type=='save')ev.action=1;if(ms.type=='save'||ev.shift)return}
 	const rtext_font=(table,x)=>{const i=rtext_get(table,x);return i<0?lms(''):tab_cell(table,'font',i)}
@@ -1963,13 +1966,14 @@ modals=_=>{
 		if(ev.dir=='down' )dr.brush=(dr.brush+grid.x             )%(grid.x*grid.y)
 		dr.brush=clamp(0,dr.brush,(6*4)+count(br)-1)
 	}
-	else if(ms.type=='pattern'||ms.type=='fill'||ms.type=='widpattern'){
+	else if(ms.type=='pattern'||ms.type=='fill'||ms.type=='widpattern'||ms.type=='spanpattern'){
 		const grid=rect(8,dr.color?6:4), ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY)
-		const getv=_=>ms.type=='widpattern'?ob.pending_pattern  :ms.type=='pattern'?dr.pattern  :dr.fill
-		const setv=x=>ms.type=='widpattern'?ob.pending_pattern=x:ms.type=='pattern'?dr.pattern=x:dr.fill=x
+		const getv=_=>ms.type=='widpattern'||ms.type=='spanpattern'?ob.pending_pattern  :ms.type=='pattern'?dr.pattern  :dr.fill
+		const setv=x=>ms.type=='widpattern'||ms.type=='spanpattern'?ob.pending_pattern=x:ms.type=='pattern'?dr.pattern=x:dr.fill=x
 		const b=draw_modalbox(rect(m+(grid.x*gs)+m,m+(grid.y*gs)+lh+m)); let v=getv()
 		draw_textc(rect(b.x,b.y+b.h-lh,b.w,lh),
-			ms.type=='widpattern'?'Choose a pattern.':`Choose a ${ms.type=='fill'?'fill':'stroke'} ${dr.color?'color':'pattern'}.`,FONT_BODY,1)
+			ms.type=='widpattern'||ms.type=='spanpattern'?'Choose a pattern.':
+			`Choose a ${ms.type=='fill'?'fill':'stroke'} ${dr.color?'color':'pattern'}.`,FONT_BODY,1)
 		for(let z=0;z<grid.x*grid.y;z++){
 			const s=rint(rect(b.x+m+2+gs*(z%grid.x),b.y+m+2+gs*(0|(z/grid.x)),ss,ss)), ci=z
 			draw_rect(s,ci==0?32:ci); if(ci==v)draw_box(inset(s,-2),0,1)
@@ -3354,6 +3358,10 @@ all_menus=_=>{
 			}
 			if(wid.f&&wid.f.style!='code'){
 				if(menu_item('Font...',wid.f.style!='plain'))modal_push('fonts')
+				if(menu_item("Pattern...",wid.f.style!='plain')){
+					ob.pending_pattern=ln(tab_get(rtext_span(wid.fv.table,wid.cursor),'pat')[0])
+					modal_push('spanpattern')
+				}
 			}
 		}
 	}

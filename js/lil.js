@@ -1337,7 +1337,7 @@ layout_plaintext=(text,font,align,mx)=>{
 			const c=text[i], size=rect(c=='\n'?0:font_gw(font,c)+fs,fh)
 			if(c==' '&&cursor.x==0&&layout.length>0&&!ws(last(layout).char))size.x=0 // squish lead space after a soft-wrap
 			if(cursor.x+size.x>=mx.x)lnl() // hard-break overlong words
-			layout.push({pos:rpair(cursor,size),line:cursor.y,char:c,font,arg:NIL})
+			layout.push({pos:rpair(cursor,size),line:cursor.y,char:c,font,arg:NIL,pat:1})
 			if(c=='\n'){lnl()}else{cursor.x+=size.x}
 			if(cursor.y>=(mx.y/fh)){
 				layout=layout.slice(0,max(1,layout.length-3))
@@ -1357,12 +1357,12 @@ layout_plaintext=(text,font,align,mx)=>{
 }
 layout_richtext=(deck,table,font,align,width)=>{
 	const layout=[],lines=[],cursor=rect(0,0), lnl=_=>(cursor.x=0,cursor.y+=1), ws=x=>x=='\n'||x==' '
-	const texts=tab_get(table,'text'), fonts=tab_get(table,'font'), args=tab_get(table,'arg')
+	const texts=tab_get(table,'text'), fonts=tab_get(table,'font'), args=tab_get(table,'arg'), pats=tab_get(table,'pat')
 	for(let chunk=0;chunk<texts.length;chunk++){
 		const f=dget(deck.fonts,fonts[chunk])||font, fh=font_h(f), fs=font_sw(f)
 		if(image_is(args[chunk])){
 			const size=args[chunk].size;if(cursor.x+size.x>=width&&cursor.x>0)lnl()
-			layout.push({pos:rpair(cursor,size),line:cursor.y,char:'i',font:f,arg:args[chunk]})
+			layout.push({pos:rpair(cursor,size),line:cursor.y,char:'i',font:f,arg:args[chunk],pat:ln(pats[chunk])})
 			cursor.x+=size.x;continue
 		}
 		const t=ls(texts[chunk]);for(let z=0;z<t.length;z++){
@@ -1373,7 +1373,7 @@ layout_richtext=(deck,table,font,align,width)=>{
 				const c=t[i], size=rect(c=='\n'?0:font_gw(f,c)+fs,fh)
 				if(c==' '&&cursor.x==0&&layout.length>0&&!ws(last(layout).char))size.x=0
 				if(cursor.x+size.x>=width)lnl()
-				layout.push({pos:rpair(cursor,size),line:cursor.y,char:c,font:f,arg:args[chunk]})
+				layout.push({pos:rpair(cursor,size),line:cursor.y,char:c,font:f,arg:args[chunk],pat:ln(pats[chunk])})
 				if(c=='\n'){lnl()}else{cursor.x+=size.x}
 			}
 		}
@@ -1390,7 +1390,7 @@ layout_richtext=(deck,table,font,align,width)=>{
 draw_text_wrap=(r,l,pattern)=>{
 	r=rint(r);const oc=frame.clip;frame.clip=r;for(let z=0;z<l.layout.length;z++){
 		const g=l.layout[z];if(g.pos.w<1)continue
-		draw_char(radd(g.pos,r),g.font,g.char,pattern)
+		draw_char(radd(g.pos,r),g.font,g.char,g.pat==1?pattern:g.pat)
 	}frame.clip=oc;
 }
 draw_text_rich=(r,l,pattern,opaque)=>{
@@ -1399,7 +1399,7 @@ draw_text_rich=(r,l,pattern,opaque)=>{
 		if(g.pos.y+g.pos.h<0||g.pos.y>r.h)continue; g.pos.x+=r.x, g.pos.y+=r.y
 		if(lis(g.arg)&&count(g.arg))draw_hline(g.pos.x,g.pos.x+g.pos.w,g.pos.y+g.pos.h-1,19)
 		if(image_is(g.arg)){image_paste(g.pos,frame.clip,g.arg,frame.image,opaque)}
-		else{draw_char(g.pos,g.font,g.char,pattern)}
+		else{draw_char(g.pos,g.font,g.char,g.pat==1?pattern:g.pat)}
 	}frame.clip=oc
 }
 draw_9seg=(r,dst,src,m,clip,opaque,pal)=>{
@@ -1933,37 +1933,37 @@ font_write=x=>{
 	}
 }
 
-rtext_empty=_=>{const r=lmt();tab_set(r,'text',[]),tab_set(r,'font',[]),tab_set(r,'arg',[]);return r}
+rtext_empty=_=>{const r=lmt();tab_set(r,'text',[]),tab_set(r,'font',[]),tab_set(r,'arg',[]),tab_set(r,'pat',[]);return r}
 rtext_len=tab=>tab_get(tab,'text').reduce((x,y)=>x+ls(y).length,0)
 rtext_get=(tab,n)=>{const t=tab_get(tab,'text');let i=0;for(let z=0;z<t.length;z++){i+=count(t[z]);if(i>=n)return z}return -1}
 rtext_getr=(tab,x)=>{const t=tab_get(tab,'text');let i=0;for(let z=0;z<t.length;z++){const c=count(t[z]);if(i+c>=x)return rect(i,i+c);i+=c}return rect(x,x)}
-rtext_make=(t,f,a)=>{
-	a=!a?'':image_is(a)?a:ls(a), f=!f?'':ls(f), t=image_is(a)?'i':!t?'':count(t)?ls(t):''
-	const r=lmt();tab_set(r,'text',[lms(t)]),tab_set(r,'font',[lms(f)]),tab_set(r,'arg',[image_is(a)?a:lms(a)]);return r
+rtext_make=(t,f,a,p)=>{
+	a=!a?'':image_is(a)?a:ls(a), f=!f?'':ls(f), t=image_is(a)?'i':!t?'':count(t)?ls(t):'', p=!p?1:clamp(0,ln(p),255)
+	const r=lmt();tab_set(r,'text',[lms(t)]),tab_set(r,'font',[lms(f)]),tab_set(r,'arg',[image_is(a)?a:lms(a)]),tab_set(r,'pat',[lmn(p)]);return r
 }
 rtext_cast=x=>{
 	if(!x)x=lms('');if(image_is(x))return rtext_make('','',x);if(lid(x))x=monad.table(x);if(!lit(x))return rtext_make(x)
-	const tv=tab_get(x,'text'),fv=tab_get(x,'font'),av=tab_get(x,'arg')
-	if(tv&&fv&&av&&tv.every((t,i)=>lis(t)&&lis(fv[i])&&(image_is(av[i])||lis(av[i]))))return x
-	const r=lmt();tab_set(r,'text',tv||[lms('')]),tab_set(r,'font',fv||[lms('')]),tab_set(r,'arg',av||[lms('')])
-	const tr=tab_get(r,'text'),fr=tab_get(r,'font'),ar=tab_get(r,'arg')
-	tr.map((_,z)=>{const i=image_is(ar[z]);tr[z]=i?lms('i'):lms(ls(tr[z]));fr[z]=lms(ls(fr[z]));ar[z]=i?ar[z]:lms(ls(ar[z]))});return r
+	const tv=tab_get(x,'text'),fv=tab_get(x,'font'),av=tab_get(x,'arg'),pv=tab_get(x,'pat')
+	if(tv&&fv&&av&&pv&&tv.every((t,i)=>lis(t)&&lis(fv[i])&&(image_is(av[i])||lis(av[i]))&&lin(pv[i])&&ln(pv[i])>=0&&ln(pv[i])<=255))return x
+	const r=lmt();tab_set(r,'text',tv||[lms('')]),tab_set(r,'font',fv||[lms('')]),tab_set(r,'arg',av||[lms('')]),tab_set(r,'pat',pv||[ONE])
+	const tr=tab_get(r,'text'),fr=tab_get(r,'font'),ar=tab_get(r,'arg'),pr=tab_get(r,'pat')
+	tr.map((_,z)=>{const i=image_is(ar[z]);tr[z]=i?lms('i'):lms(ls(tr[z]));fr[z]=lms(ls(fr[z]));ar[z]=i?ar[z]:lms(ls(ar[z]));pr[z]=lin(pr[z])?lmn(clamp(0,ln(pr[z]),255)):ONE});return r
 }
-rtext_append=(tab,t,f,a)=>{
+rtext_append=(tab,t,f,a,p)=>{
 	if(image_is(a)){if(count(t)>1)t=lms('i');if(count(t)<1)return 0;}if(!count(t))return 0;
-	const tv=tab_get(tab,'text'),fv=tab_get(tab,'font'),av=tab_get(tab,'arg')
-	if(tv.length&&match(f,last(fv))&&!image_is(a)&&match(a,last(av))){tv[tv.length-1]=lms(ls(last(tv))+ls(t))}
-	else{tv.push(t),fv.push(f),av.push(a)}return count(t)
+	const tv=tab_get(tab,'text'),fv=tab_get(tab,'font'),av=tab_get(tab,'arg'),pv=tab_get(tab,'pat')
+	if(tv.length&&match(f,last(fv))&&!image_is(a)&&match(a,last(av))&&match(p,last(pv))){tv[tv.length-1]=lms(ls(last(tv))+ls(t))}
+	else{tv.push(t),fv.push(f),av.push(a),pv.push(p)}return count(t)
 }
-rtext_appendr=(tab,row)=>{fv=tab_get(row,'font'),av=tab_get(row,'arg');tab_get(row,'text').map((t,i)=>rtext_append(tab,t,fv[i],av[i]))}
+rtext_appendr=(tab,row)=>{fv=tab_get(row,'font'),av=tab_get(row,'arg'),pv=tab_get(row,'pat');tab_get(row,'text').map((t,i)=>rtext_append(tab,t,fv[i],av[i],pv[i]))}
 rtext_string=(tab,pos)=>{
 	pos=pos||rect(0,RTEXT_END);let r='',i=0,a=min(pos.x,pos.y),b=max(pos.x,pos.y)
 	tab_get(tab,'text').map(s=>{for(let z=0;z<s.v.length;z++,i++)if(i>=a&&i<b)r+=s.v[z]});return lms(r)
 }
 rtext_is_plain=x=>{
-	if(!lit(x))return 0;const tv=tab_get(x,'text'),fv=tab_get(x,'font'),av=tab_get(x,'arg');
-	if(!tv||!fv||!av||tv.length>1)return 0;if(tv.length==0)return 1
-	return ls(fv[0])==''&&!image_is(av[0])&&ls(av[0])==''
+	if(!lit(x))return 0;const tv=tab_get(x,'text'),fv=tab_get(x,'font'),av=tab_get(x,'arg'),pv=tab_get(x,'pat');
+	if(!tv||!fv||!av||!pv||tv.length>1)return 0;if(tv.length==0)return 1
+	return ls(fv[0])==''&&!image_is(av[0])&&ls(av[0])==''&&ln(pv[0])==1
 }
 rtext_is_image=x=>{
 	let r=null,t=tab_get(x,'text'),a=tab_get(x,'arg'); // look for at least one image, and other spans must be only whitespace.
@@ -1973,19 +1973,19 @@ rtext_is_image=x=>{
 rtext_read_images=x=>lml((tab_get(x,'arg')||[]).filter(image_is))
 rtext_write_images=x=>rtext_cat(ll(x))
 rtext_span=(tab,pos)=>{
-	const tv=tab_get(tab,'text'),fv=tab_get(tab,'font'),av=tab_get(tab,'arg')
+	const tv=tab_get(tab,'text'),fv=tab_get(tab,'font'),av=tab_get(tab,'arg'),pv=tab_get(tab,'pat')
 	let r=dyad.take(ZERO,tab), i=0,c=0,a=min(pos.x,pos.y),b=max(pos.x,pos.y), partial=_=>{
 		let rr='';for(let z=0;z<count(tv[c]);z++,i++)if(i>=a&&i<b)rr+=tv[c].v[z]
-		rtext_append(r,lms(rr),fv[c],av[c]),c++
+		rtext_append(r,lms(rr),fv[c],av[c],pv[c]),c++
 	}
-	while(c<tv.length&&(i+count(tv[c]))<a)i+=count(tv[c++])                       ;if(c<tv.length&&i<=a)partial()
-	while(c<tv.length&&(i+count(tv[c]))<b)i+=rtext_append(r,tv[c],fv[c],av[c]),c++;if(c<tv.length&&i< b)partial()
+	while(c<tv.length&&(i+count(tv[c]))<a)i+=count(tv[c++])                             ;if(c<tv.length&&i<=a)partial()
+	while(c<tv.length&&(i+count(tv[c]))<b)i+=rtext_append(r,tv[c],fv[c],av[c],pv[c]),c++;if(c<tv.length&&i< b)partial()
 	return r
 }
-rtext_splice=(tab,font,arg,text,cursor,endcursor)=>{
+rtext_splice=(tab,font,arg,pat,text,cursor,endcursor)=>{
 	const a=min(cursor.x,cursor.y),b=max(cursor.x,cursor.y),r=rtext_cast()
 	rtext_appendr(r,rtext_span(tab,rect(0,a)))
-	rtext_append (r,lms(text),font,arg)
+	rtext_append (r,lms(text),font,arg,lmn(pat))
 	rtext_appendr(r,rtext_span(tab,rect(b,RTEXT_END)))
 	endcursor.x=endcursor.y=a+text.length;return r
 }
@@ -1996,7 +1996,12 @@ rtext_splicer=(tab,insert,cursor,endcursor)=>{
 	rtext_appendr(r,rtext_span(tab,rect(b,RTEXT_END)))
 	endcursor.x=endcursor.y=a+rtext_len(insert);return r
 }
-rtext_write=x=>{const r=monad.cols(x),arg=dget(r,lms('arg'));if(arg){arg.v=arg.v.map(x=>image_is(x)?lms(image_write(x)):x)};return r}
+rtext_write=x=>{
+	let r=monad.cols(x),arg=dget(r,lms('arg')),pat=dget(r,lms('pat'))
+	if(arg){arg.v=arg.v.map(x=>image_is(x)?lms(image_write(x)):x)};
+	if(pat){if(pat.v.every(x=>ln(x)==1))r=dyad.drop(lms('pat'),r)}
+	return r
+}
 rtext_read=x=>{
 	if(lis(x))return x;x=ld(x)
 	const a=dget(x,lms('arg'));if(a){dset(x,lms('arg'),lml(ll(a).map(a=>ls(a).startsWith('%%IMG')?image_read(ls(a)):lms(ls(a)))))}
@@ -2007,7 +2012,7 @@ rtext_decode=x=>rtext_read(pjson(x,6,x.length-6).value)
 rtext_cat=x=>{let r=rtext_empty();x.map(x=>rtext_appendr(r,rtext_cast(x)));return r}
 interface_rtext=lmi((self,i,x)=>{
 	if(ikey(i,'end'   ))return lmn(RTEXT_END)
-	if(ikey(i,'make'  ))return lmnat(([t,f,a])=>rtext_make(t,f,a))
+	if(ikey(i,'make'  ))return lmnat(([t,f,a,p])=>rtext_make(t,f,a,p))
 	if(ikey(i,'len'   ))return lmnat(([t])=>lmn(rtext_len(rtext_cast(t))))
 	if(ikey(i,'get'   ))return lmnat(([t,n])=>lmn(rtext_get(rtext_cast(t),n?ln(n):0)))
 	if(ikey(i,'string'))return lmnat(([t,i])=>rtext_string(rtext_cast(t),i?getpair(i):undefined))

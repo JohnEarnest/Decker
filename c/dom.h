@@ -1172,12 +1172,12 @@ rect draw_modalbox(pair s){
 }
 
 enum field_align{align_left,align_center,align_right};
-typedef struct {rect pos;int line;char c;lv*font,*arg;} glyph_box;
+typedef struct {rect pos;int line;char c;lv*font,*arg;int pat;} glyph_box;
 typedef struct {rect pos;pair range;} line_box;
 glyph_box*layout;int layout_count=0,layout_size=0;
 line_box*lines;int lines_count=0,lines_size=0;
-void layout_push(rect pos,int line,char c,lv*font,lv*arg){grower(layout,glyph_box);layout[layout_count++]=(glyph_box){pos,line,c,font,arg};}
-void lines_push (rect pos,pair range                    ){grower(lines ,line_box );lines [lines_count++]=(line_box){pos,range};}
+void layout_push(rect pos,int line,char c,lv*font,lv*arg,int pat){grower(layout,glyph_box);layout[layout_count++]=(glyph_box){pos,line,c,font,arg,pat};}
+void lines_push (rect pos,pair range                            ){grower(lines ,line_box );lines [lines_count++]=(line_box){pos,range};}
 pair layout_plaintext(char*text,lv*font,int align,pair max){
 	#define lnl() cursor=(pair){0,cursor.y+1}
 	layout_count=lines_count=0; pair cursor={0,0}; int fh=font_h(font),fs=font_sw(font);
@@ -1189,7 +1189,7 @@ pair layout_plaintext(char*text,lv*font,int align,pair max){
 			char c=text[i]; pair size={c=='\n'?0:font_gw(font,c)+fs,fh};
 			if(c==' '&&cursor.x==0&&layout_count>0&&!strchr("\n ",layout[layout_count-1].c))size.x=0; // squish lead space after a soft-wrap
 			if(cursor.x+size.x>=max.x)lnl(); // hard-break overlong words
-			layout_push((rect){cursor.x,cursor.y,size.x,size.y},cursor.y,c,font,LNIL);
+			layout_push((rect){cursor.x,cursor.y,size.x,size.y},cursor.y,c,font,LNIL,1);
 			if(c=='\n'){lnl();}else{cursor.x+=size.x;}
 			if(cursor.y>=(max.y/fh)){
 				layout_count=MAX(1,layout_count-3);
@@ -1209,12 +1209,12 @@ pair layout_plaintext(char*text,lv*font,int align,pair max){
 }
 pair layout_richtext(lv*deck,lv*table,lv*font,int align,int width){
 	layout_count=lines_count=0; pair cursor={0,0};
-	lv*texts=dget(table,lmistr("text")),*fonts=dget(table,lmistr("font")),*args=dget(table,lmistr("arg")),*dfonts=ifield(deck,"fonts");
+	lv*texts=dget(table,lmistr("text")),*fonts=dget(table,lmistr("font")),*args=dget(table,lmistr("arg")),*pats=dget(table,lmistr("pat")),*dfonts=ifield(deck,"fonts");
 	int fh=0;for(int chunk=0;chunk<table->n;chunk++){
 		lv*f=dget(dfonts,fonts->lv[chunk]);if(!f)f=font; fh=font_h(f); int fs=font_sw(f);
 		if(image_is(args->lv[chunk])){
 			pair size=image_size(args->lv[chunk]);if(cursor.x+size.x>=width&&cursor.x>0)lnl(); // image won't fit this line
-			layout_push((rect){cursor.x,cursor.y,size.x,size.y},cursor.y,'i',f,args->lv[chunk]);cursor.x+=size.x;continue;
+			layout_push((rect){cursor.x,cursor.y,size.x,size.y},cursor.y,'i',f,args->lv[chunk],ln(pats->lv[chunk]));cursor.x+=size.x;continue;
 		}
 		lv*t=texts->lv[chunk];for(int z=0;z<t->c;z++){
 			int a=z,w=t->sv[z]=='\n'?0:(font_gw(f,t->sv[z])+fs);
@@ -1224,7 +1224,7 @@ pair layout_richtext(lv*deck,lv*table,lv*font,int align,int width){
 				char c=t->sv[i]; pair size={c=='\n'?0:font_gw(f,c)+fs,fh};
 				if(c==' '&&cursor.x==0&&layout_count>0&&!strchr("\n ",layout[layout_count-1].c))size.x=0; // squish lead space after a soft-wrap
 				if(cursor.x+size.x>=width)lnl(); // hard-break overlong words
-				layout_push((rect){cursor.x,cursor.y,size.x,size.y},cursor.y,c,f,args->lv[chunk]);
+				layout_push((rect){cursor.x,cursor.y,size.x,size.y},cursor.y,c,f,args->lv[chunk],ln(pats->lv[chunk]));
 				if(c=='\n'){lnl();}else{cursor.x+=size.x;}
 			}
 		}
@@ -1242,16 +1242,18 @@ void draw_text_wrap(rect r,int pattern){
 	rect oc=frame.clip;frame.clip=r;for(int z=0;z<layout_count;z++){
 		glyph_box g=layout[z];if(g.pos.w<1)continue; // skip squashed spaces/newlines
 		g.pos.x+=r.x, g.pos.y+=r.y;
-		font_each(g.font,g.c)if(font_gpix(g.font,g.c,b,a)&&inclip(g.pos.x+b,g.pos.y+a))PIX(g.pos.x+b,g.pos.y+a)=pattern;
+		int gc=g.pat==1?pattern:g.pat;
+		font_each(g.font,g.c)if(font_gpix(g.font,g.c,b,a)&&inclip(g.pos.x+b,g.pos.y+a))PIX(g.pos.x+b,g.pos.y+a)=gc;
 	}frame.clip=oc;
 }
 void draw_text_rich(rect r,int pattern,int opaque){
 	rect oc=frame.clip;frame.clip=r;for(int z=0;z<layout_count;z++){
 		glyph_box g=layout[z];if(g.pos.w<1)continue; // skip squashed spaces/newlines
 		if(g.pos.y+g.pos.h<0||g.pos.y>r.h)continue; g.pos.x+=r.x, g.pos.y+=r.y; // coarse clip
+		int gc=g.pat==1?pattern:g.pat;
 		if(lis(g.arg)&&g.arg->c){draw_hline(g.pos.x,g.pos.x+g.pos.w,g.pos.y+g.pos.h-1,19);}
 		if(image_is(g.arg)){buffer_paste(g.pos,frame.clip,g.arg->b,frame.buffer,opaque);}
-		else{font_each(g.font,g.c)if(font_gpix(g.font,g.c,b,a)&&inclip(g.pos.x+b,g.pos.y+a))PIX(g.pos.x+b,g.pos.y+a)=pattern;}
+		else{font_each(g.font,g.c)if(font_gpix(g.font,g.c,b,a)&&inclip(g.pos.x+b,g.pos.y+a))PIX(g.pos.x+b,g.pos.y+a)=gc;}
 	}frame.clip=oc;
 }
 
@@ -1723,22 +1725,22 @@ int rtext_get(lv*table,int x){lv*t=dget(table,lmistr("text"));int i=0;EACH(z,t){
 pair rtext_getr(lv*table,int x){lv*t=dget(table,lmistr("text"));int i=0;EACH(z,t){int c=t->lv[z]->c;if(i+c>=x)return (pair){i,i+c};i+=c;}return(pair){x,x};}
 lv* rtext_font(lv*table,int x){int i=rtext_get(table,x);return i<0?lmistr(""):dget(table,lmistr("font"))->lv[i];}
 int rtext_is_plain(lv*x){
-	if(!lit(x)||!dget(x,lmistr("text"))||!dget(x,lmistr("font"))||!dget(x,lmistr("arg"))||x->n>1)return 0;if(x->n==0)return 1;
-	lv*f=dget(x,lmistr("font"))->lv[0],*a=dget(x,lmistr("arg"))->lv[0];return !strcmp(f->sv,"")&&!image_is(a)&&!strcmp(ls(a)->sv,"");
+	if(!lit(x)||!dget(x,lmistr("text"))||!dget(x,lmistr("font"))||!dget(x,lmistr("arg"))||!dget(x,lmistr("pat"))||x->n>1)return 0;if(x->n==0)return 1;
+	lv*f=dget(x,lmistr("font"))->lv[0],*a=dget(x,lmistr("arg"))->lv[0],*p=dget(x,lmistr("pat"))->lv[0];return !strcmp(f->sv,"")&&!image_is(a)&&!strcmp(ls(a)->sv,"")&&ln(p)==1;
 }
 lv* rtext_is_image(lv*x){
 	lv*r=NULL,*t=dget(x,lmistr("text")),*a=dget(x,lmistr("arg")); // look for at least one image, and other spans must be only whitespace.
 	for(int z=0;z<x->n;z++){if(image_is(a->lv[z])){if(!r)r=a->lv[z];}else if((int)strspn(t->lv[z]->sv," \n")!=t->lv[z]->c){return NULL;}}return r;
 }
-int rtext_append(lv*table,lv*text,lv*font,lv*arg){
+int rtext_append(lv*table,lv*text,lv*font,lv*arg,lv*pat){
 	if(image_is(arg)){if(text->c>1)text=lmistr("i");if(text->c<1)return 0;}if(!text->c)return 0; // NOTE: this routine modifies <table> in place!
-	lv*t=dget(table,lmistr("text")),*f=dget(table,lmistr("font")),*a=dget(table,lmistr("arg"));
-	if(t->c&&matchr(font,l_last(f))&&!image_is(arg)&&matchr(arg,l_last(a))){str u=str_new();str_addl(&u,t->lv[t->c-1]),str_addl(&u,text),t->lv[t->c-1]=lmstr(u);}
-	else{ll_add(t,text),ll_add(f,font),ll_add(a,arg);}torect(table);return text->c;
+	lv*t=dget(table,lmistr("text")),*f=dget(table,lmistr("font")),*a=dget(table,lmistr("arg")),*p=dget(table,lmistr("pat"));
+	if(t->c&&matchr(font,l_last(f))&&!image_is(arg)&&matchr(arg,l_last(a))&&matchr(pat,l_last(p))){str u=str_new();str_addl(&u,t->lv[t->c-1]),str_addl(&u,text),t->lv[t->c-1]=lmstr(u);}
+	else{ll_add(t,text),ll_add(f,font),ll_add(a,arg),ll_add(p,pat);}torect(table);return text->c;
 }
 void rtext_appendr(lv*table,lv*suffix){
-	lv*t=dget(suffix,lmistr("text")),*f=dget(suffix,lmistr("font")),*a=dget(suffix,lmistr("arg"));
-	EACH(z,t)rtext_append(table,t->lv[z],f->lv[z],a->lv[z]);
+	lv*t=dget(suffix,lmistr("text")),*f=dget(suffix,lmistr("font")),*a=dget(suffix,lmistr("arg")),*p=dget(suffix,lmistr("pat"));
+	EACH(z,t)rtext_append(table,t->lv[z],f->lv[z],a->lv[z],p->lv[z]);
 }
 lv* rtext_string(lv*table,pair cursor){
 	str r=str_new(); int i=0,a=MIN(cursor.x,cursor.y),b=MAX(cursor.x,cursor.y); lv*t=dget(table,lmistr("text"));
@@ -1748,46 +1750,49 @@ lv* rtext_string(lv*table,pair cursor){
 lv* rtext_all(lv*table){return rtext_string(table,(pair){0,RTEXT_END});}
 lv* rtext_span(lv*table,pair cursor){
 	lv*r=l_take(ZERO,table); int i=0,c=0, a=MIN(cursor.x,cursor.y),b=MAX(cursor.x,cursor.y);
-	lv*t=dget(table,lmistr("text")),*f=dget(table,lmistr("font")),*g=dget(table,lmistr("arg"));
+	lv*t=dget(table,lmistr("text")),*f=dget(table,lmistr("font")),*g=dget(table,lmistr("arg")),*p=dget(table,lmistr("pat"));
 	while(c<t->c&&(i+t->lv[c]->c)<a)i+=t->lv[c++]->c; // skip whole preceding chunks
 	if(c<t->c&&i<=a){ // copy lead-in
 		str rr=str_new();for(int z=0;z<t->lv[c]->c;z++,i++)if(i>=a&&i<b)str_addc(&rr,t->lv[c]->sv[z]);
-		rtext_append(r,lmstr(rr),f->lv[c],g->lv[c]);c++;
+		rtext_append(r,lmstr(rr),f->lv[c],g->lv[c],p->lv[c]);c++;
 	}
-	while(c<t->c&&(i+t->lv[c]->c)<b)i+=rtext_append(r,t->lv[c],f->lv[c],g->lv[c]),c++; // copy whole chunks
+	while(c<t->c&&(i+t->lv[c]->c)<b)i+=rtext_append(r,t->lv[c],f->lv[c],g->lv[c],p->lv[c]),c++; // copy whole chunks
 	if(c<t->c&&i<b){ // copy lead-out
 		str rr=str_new();for(int z=0;z<t->lv[c]->c;z++,i++)if(i>=a&&i<b)str_addc(&rr,t->lv[c]->sv[z]);
-		rtext_append(r,lmstr(rr),f->lv[c],g->lv[c]);
+		rtext_append(r,lmstr(rr),f->lv[c],g->lv[c],p->lv[c]);
 	}return r;
 }
 lv* n_rtext_make(lv*self,lv*z){
 	(void)self;lv*r=lmt();
+	lv*p=z->c<4?ONE: lmn(CLAMP(0,ln(z->lv[3]),255));
 	lv*a=z->c<3?lmistr(""): image_is(z->lv[2])?z->lv[2]: ls(z->lv[2]);
 	lv*f=z->c<2?lmistr(""): ls(z->lv[1]);
 	lv*t=image_is(a)?lmistr("i"): z->c<1?lmistr(""): ls(z->lv[0]);
-	dset(r,lmistr("text"),l_list(t)),dset(r,lmistr("font"),l_list(f)),dset(r,lmistr("arg"),l_list(a));
+	dset(r,lmistr("text"),l_list(t)),dset(r,lmistr("font"),l_list(f)),dset(r,lmistr("arg"),l_list(a)),dset(r,lmistr("pat"),p);
 	return torect(r);
 }
 lv* rtext_cast(lv*x){
 	if(!x)x=lmistr("");
 	if(image_is(x))return n_rtext_make(NULL,lml3(lmistr(""),lmistr(""),x));
 	if(lid(x))x=l_table(x);if(!lit(x))return n_rtext_make(NULL,l_list(ls(x)));
-	lv*t=lmistr("text"),*f=lmistr("font"),*a=lmistr("arg"),*tv=dget(x,t),*fv=dget(x,f),*av=dget(x,a);
-	if(x->c==3&&tv&&fv&&av){int v=1;EACH(z,tv){if(!lis(tv->lv[z])||!lis(fv->lv[z])||(!lis(av->lv[z])&&!image_is(av->lv[z])))v=0;break;}if(v)return x;}lv*r=lmt();
+	lv*t=lmistr("text"),*f=lmistr("font"),*a=lmistr("arg"),*p=lmistr("pat"),*tv=dget(x,t),*fv=dget(x,f),*av=dget(x,a),*pv=dget(x,p);
+	if(x->c==4&&tv&&fv&&av&&pv){int v=1;EACH(z,tv){if(!lis(tv->lv[z])||!lis(fv->lv[z])||(!lis(av->lv[z])&&!image_is(av->lv[z]))||!lin(pv->lv[z])||ln(pv->lv[z])<0||ln(pv->lv[z])>255)v=0;break;}if(v)return x;}lv*r=lmt();
 	{lv*v=dget(x,t);dset(r,t,v?v:l_list(lmistr("")));}
 	{lv*v=dget(x,f);dset(r,f,v?v:l_list(lmistr("")));}
 	{lv*v=dget(x,a);dset(r,a,v?v:l_list(lmistr("")));}
+	{lv*v=dget(x,p);dset(r,p,v?v:l_list(ONE));}
 	torect(r);for(int z=0;z<r->n;z++){
 		int i=image_is(r->lv[2]->lv[z]);
 		r->lv[0]->lv[z]=i?lmistr("i"):ls(r->lv[0]->lv[z]);
 		r->lv[1]->lv[z]=ls(r->lv[1]->lv[z]);
 		r->lv[2]->lv[z]=i?r->lv[2]->lv[z]:ls(r->lv[2]->lv[z]);
+		r->lv[3]->lv[z]=lin(r->lv[3]->lv[z])?lmn(CLAMP(0,ln(r->lv[3]->lv[z]),255)):ONE;
 	}return torect(r);
 }
-lv* rtext_splice(lv*table,lv*font,lv*arg,char*text,pair cursor,pair*endcursor){
+lv* rtext_splice(lv*table,lv*font,lv*arg,int pat,char*text,pair cursor,pair*endcursor){
 	int a=MIN(cursor.x,cursor.y),b=MAX(cursor.x,cursor.y); lv*r=rtext_cast(NULL),*t=lmcstr(text);
 	rtext_appendr(r,rtext_span(table,(pair){0,a}));
-	rtext_append (r,t,font,arg);
+	rtext_append (r,t,font,arg,lmn(pat));
 	rtext_appendr(r,rtext_span(table,(pair){b,RTEXT_END}));
 	endcursor->x=endcursor->y=a+t->c; return r;
 }
@@ -1806,6 +1811,7 @@ lv* rtext_read(lv*x){
 lv* rtext_write(lv*x){
 	x=l_cols(x);
 	lv*a=dget(x,lmistr("arg"));if(a){MAP(n,a)image_is(a->lv[z])?image_write(a->lv[z]):a->lv[z];dset(x,lmistr("arg"),n);}
+	lv*p=dget(x,lmistr("pat"));int mp=1;EACH(z,p)if(ln(p->lv[z])!=1){mp=0;break;}if(mp)x=l_drop(lmistr("pat"),x);
 	return x;
 }
 lv* rtext_encode(lv*x){str r=str_new();str_addz(&r,"%%RTX0");fjson(&r,rtext_write(x));return lmstr(r);}

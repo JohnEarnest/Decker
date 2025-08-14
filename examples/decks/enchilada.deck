@@ -80,6 +80,8 @@ but:{"type":"button","size":[70,30],"pos":[200,200],"text":"Click Me!"}
 field1:{"type":"field","size":[100,20],"pos":[369,64],"pattern":36,"value":"some text inna field"}
 field2:{"type":"field","size":[100,20],"pos":[369,90],"show":"transparent","pattern":36,"value":"some text inna field"}
 field3:{"type":"field","size":[100,20],"pos":[369,115],"show":"invert","pattern":36,"value":"some text inna field"}
+field4:{"type":"field","size":[131,28],"pos":[347,158],"pattern":41,"value":{"text":["multicolored ","text"," in a ","colored"," field? madness!"],"font":["","","","",""],"arg":["","","","",""],"pat":[1,39,1,34,1]}}
+field5:{"type":"field","size":[131,28],"pos":[347,192],"show":"invert","pattern":41,"value":{"text":["multicolored ","text"," in a ","colored"," field? madness!"],"font":["","","","",""],"arg":["","","","",""],"pat":[1,39,1,34,1]}}
 
 {script:fields.0}
 on run x do

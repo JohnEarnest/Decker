@@ -211,6 +211,7 @@ Each `type` of widget has its own additional optional fields:
 		- `text`: an array of strings.
 		- `font`: an array of strings referencing _font records_. An invalid or empty name indicates using the field's `font` property.
 		- `arg`:  an array of strings. Each is either an _image record_ (an inline image), an ordinary string (making this span a hyperlink), or an empty string (ordinary text).
+		- `pat`: an array of integers specifying a pattern for each span. If this column is absent, treat it as filled with pattern `1`.
 	- `scroll`: an integer; the scroll offset in rendered pixels.
 - `"slider"`: Sliders represent a single number constrained within a specified numeric interval.
 	- `style`: one of { `"horiz"` (default), `"vert"`, `"bar"`, `"compact"` }. A `"horiz"` or `"vert"` slider resembles a horizontal or vertical scrollbar, respectively. A `"bar"` has a much simpler appearance, and resembles a horizontal progress bar. A `"compact"` slider moves only in discrete ticks in response to left/right button presses, more like what some UI toolkits call a "spinner".
@@ -458,3 +459,4 @@ Changelog
 
 1.58:
 - Introduced the `field.pattern` field.
+- Rich text now includes a `pat` column specifying a pattern for text runs.
