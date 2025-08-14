@@ -1874,7 +1874,7 @@ lv* interface_rtext(lv*self,lv*i,lv*x){
 
 enum field_types{text_body,text_heading,text_fixed,text_link};
 enum field_style{field_rich,field_plain,field_code};
-typedef struct {rect size;lv*font;int show,scrollbar,border,style,align,locked;} field;
+typedef struct {rect size;lv*font;int show,scrollbar,border,style,align,locked,pattern;} field;
 typedef struct {lv*table;int scroll;} field_val;
 char*field_styles[]={"rich","plain","code",NULL};
 char*field_aligns[]={"left","center","right",NULL};
@@ -1889,6 +1889,7 @@ field unpack_field(lv*x,field_val*value){
 		ordinal_enum(ifield(x,"style"),field_styles),
 		ordinal_enum(ifield(x,"align"),field_aligns),
 		lb(ifield(x,"locked")),
+		(int)(ln(ifield(x,"pattern"))),
 	};
 }
 lv* n_field_scrollto(lv*self,lv*x){
@@ -1912,6 +1913,7 @@ lv* interface_field(lv*self,lv*i,lv*x){
 			dset(data,i,rtext_cast(x));field_notify(self);return x;
 		}
 		ikey("border"   ){dset(data,i,lmn(lb(x)));return x;}
+		ikey("pattern"  ){int n=CLAMP(0,ln(x),255);dset(data,i,lmn(n));return x;}
 		ikey("scrollbar"){dset(data,i,lmn(lb(x)));return x;}
 		ikey("style"    ){dset(data,i,normalize_enum(x,field_styles));iwrite(self,lmistr("value"),dget(data,lmistr("value")));return x;}
 		ikey("align"    ){dset(data,i,normalize_enum(x,field_aligns));return x;}
@@ -1923,6 +1925,7 @@ lv* interface_field(lv*self,lv*i,lv*x){
 		ikey("scroll"   ){lv*r=value_inherit(self,i);return r?r:ZERO;}
 		ikey("scrollbar"){lv*r=dget(data,i);return r?r:ZERO;}
 		ikey("border"   ){lv*r=dget(data,i);return r?r:ONE;}
+		ikey("pattern"  ){lv*r=dget(data,i);return r?r:ONE;}
 		ikey("style"    ){lv*r=dget(data,i);return r?r:lmistr(field_styles[0]);}
 		ikey("align"    ){lv*r=dget(data,i);return r?r:lmistr(field_aligns[0]);}
 		ikey("size"     ){lv*r=dget(data,i);return r?r:lmpair((pair){100,20});}
@@ -1938,6 +1941,7 @@ lv* field_read(lv*x,lv*r){
 	x=ld(x),r=lmi(interface_field,lmistr("field"),r);
 	{lv*k=lmistr("value"),*v=dget(x,k);if(v)iwrite(r,k,rtext_read(v));}
 	init_field(r,"border"   ,x);
+	init_field(r,"pattern"  ,x);
 	init_field(r,"scrollbar",x);
 	init_field(r,"style"    ,x);
 	init_field(r,"align"    ,x);
@@ -1947,6 +1951,7 @@ lv* field_read(lv*x,lv*r){
 lv* field_write(lv*x){
 	lv*data=x->b,*r=lmd();dset(r,lmistr("type"),lmistr("field"));int vol=lb(ifield(x,"volatile"));
 	{lv*k=lmistr("border"   ),*v=dget(data,k);if(v)dset(r,k,v);}
+	{lv*k=lmistr("pattern"  ),*v=dget(data,k);if(v&&ln(v)!=1)dset(r,k,v);}
 	{lv*k=lmistr("scrollbar"),*v=dget(data,k);if(v)dset(r,k,v);}
 	{lv*k=lmistr("style"    ),*v=dget(data,k);if(v&&strcmp(field_styles[0],v->sv))dset(r,k,v);}
 	{lv*k=lmistr("align"    ),*v=dget(data,k);if(v&&strcmp(field_aligns[0],v->sv))dset(r,k,v);}

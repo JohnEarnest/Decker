@@ -1107,6 +1107,7 @@ The field widget displays and possibly allows the editing of text.
 | `x.value`               | Table. The rtext content of this field. r/w.                                                          |
 | `x.scroll`              | Int. The number of pixels the viewport of the field is scrolled down. r/w.                            |
 | `x.border`              | Bool. Draw an outline around this widget? r/w.                                                        |
+| `x.pattern`             | Int. Pattern used for displaying text. r/w.                                                           |
 | `x.scrollbar`           | Bool. Draw a scrollbar for this widget? r/w.                                                          |
 | `x.style`               | The style of field; one of {`"rich"`, `"plain"`, `"code"`}. r/w.                                      |
 | `x.align`               | The text alignment of the field; one of {`"left"`, `"center"`, `"right"`}. r/w.                       |

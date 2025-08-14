@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:7
+card:4
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -77,6 +77,9 @@ two:{"type":"field","size":[110,100],"pos":[150,20],"locked":1,"border":1,"scrol
 three:{"type":"field","size":[110,100],"pos":[20,130],"border":1,"scrollbar":1,"value":"nuffing much."}
 four:{"type":"field","size":[160,60],"pos":[150,130],"script":"fields.0","border":1,"scrollbar":1,"style":"code","value":"on click\n  # a line comment\n  show 3+2\n  foo.text:\"one\"\nend"}
 but:{"type":"button","size":[70,30],"pos":[200,200],"text":"Click Me!"}
+field1:{"type":"field","size":[100,20],"pos":[369,64],"pattern":36,"value":"some text inna field"}
+field2:{"type":"field","size":[100,20],"pos":[369,90],"show":"transparent","pattern":36,"value":"some text inna field"}
+field3:{"type":"field","size":[100,20],"pos":[369,115],"show":"invert","pattern":36,"value":"some text inna field"}
 
 {script:fields.0}
 on run x do

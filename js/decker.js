@@ -321,6 +321,7 @@ unpack_field=x=>({
 	show     :ls(ifield(x,'show'     )),
 	scrollbar:lb(ifield(x,'scrollbar')),
 	border   :lb(ifield(x,'border'   )),
+	pattern  :ln(ifield(x,'pattern'  )),
 	style    :ls(ifield(x,'style'    )),
 	locked   :lb(ifield(x,'locked'   )),
 	align    :ALIGN[ls(ifield(x,'align'))],
@@ -506,7 +507,7 @@ let msg={ // interpreter event messages
 	arg_click:rect(),arg_drag:rect(),lastdrag:rect(),arg_release:rect(),arg_order:null,arg_run:null,arg_link:null,arg_ccell:null,arg_change:null,arg_navigate:null,
 }
 let li={hist:[],vars:new Map(),scroll:0} // listener state
-let ob={sel:[],show_bounds:1,show_names:0,show_cursor:0,show_margins:0,show_guides:1,move:0,move_first:0,resize:0,resize_first:0,handle:-1,prev:rect(),orig:rect()} // object editor state
+let ob={sel:[],show_bounds:1,show_names:0,show_cursor:0,show_margins:0,show_guides:1,move:0,move_first:0,resize:0,resize_first:0,handle:-1,prev:rect(),orig:rect(),pending_pattern:0} // object editor state
 let sc={target:null,others:[],next:null, f:null,prev_mode:null,xray:0,status:''} // script editor state
 script_save=x=>{const k=lms('script');mark_dirty();if(sc.target)iwrite(sc.target,k,x);if(sc.others)sc.others.map(o=>iwrite(o,k,x))}
 
@@ -903,7 +904,8 @@ field_exit=_=>{field_change(),kc.on=0;wid.infield=0,wid.fv=null,wid.ft=null,wid.
 widget_field=(target,x,value)=>{
 	if(x.show=='none')return; if(x.size.h<=50||x.size.w<16)x.scrollbar=0
 	const l=!in_layer(), fnt=x.font?x.font: x.style=='code'?FONT_MONO: FONT_BODY, b=x.size, pal=deck.patterns.pal.pix
-	const fcol=(l&&!x.locked)?13:x.show=='invert'?32:1, bcol=x.show=='invert'?1:32, os=value.scroll
+	const fcol=(l&&!x.locked)?13:x.show=='invert'?32:1, bcol=x.show=='invert'?x.pattern:32, os=value.scroll
+	const tfcol=(l&&!x.locked&&x.pattern==1)?13:x.show=='invert'?32:x.pattern
 	if(x.show!='transparent')draw_rect(rclip(b,frame.clip),bcol); if(x.border)draw_box(b,0,fcol)
 	let bi=inset(b,2);if(x.scrollbar)bi.w-=ARROWS[0].size.x+3
 	if(!l&&!x.locked&&over(bi)&&(ev.drag?dover(bi):1))uicursor=cursor.ibeam
@@ -941,9 +943,9 @@ widget_field=(target,x,value)=>{
 			if(a&&ev.mu&&dover(pos))msg.target_link=target,msg.arg_link=g.arg
 		}
 		const csel=sel&&wid.cursor.x!=wid.cursor.y&&z>=min(wid.cursor.x,wid.cursor.y)&&z<max(wid.cursor.x,wid.cursor.y)
-		if(csel)draw_rect(rclip(pos,frame.clip),fcol)
+		if(csel)draw_rect(rclip(pos,frame.clip),tfcol)
 		if(image_is(g.arg)){image_paste(pos,frame.clip,g.arg,frame.image,x.show!='transparent');if(csel)draw_invert(pal,pos)}
-		else{draw_char(pos,g.font,g.char,csel?bcol:fcol)}
+		else{draw_char(pos,g.font,g.char,csel?bcol:tfcol)}
 	}
 	if(sel&&wid.cursor_timer<FIELD_CURSOR_DUTY){
 		const c=layout_cursor(layout,wid.cursor.y,fnt,x);c.y-=value.scroll;c.y+=bi.y,c.x+=bi.x
@@ -1085,11 +1087,11 @@ ui_button  =(r,label,    enable,func )=>widget_button(null,{text:label,size:r,fo
 ui_toggle  =(r,label,inv,enable,func )=>widget_button(null,{text:label,size:r,font:FONT_MENU,style:'round',show:inv?'invert':'solid',locked:!enable},0,func)
 ui_radio   =(r,label,    enable,value)=>widget_button(null,{text:label,size:r,font:FONT_BODY,style:'radio',show:             'solid',locked:!enable},value)
 ui_checkbox=(r,label,    enable,value)=>widget_button(null,{text:label,size:r,font:FONT_BODY,style:'check',show:             'solid',locked:!enable},value)
-ui_field   =(r,       value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:0,border:1,style:'plain',align:ALIGN.left,locked:0},value)
-ui_dfield  =(r,enable,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:0,border:1,style:'plain',align:ALIGN.left,locked:!enable},value)
-ui_textedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:1,border  ,style:'plain',align:ALIGN.left,locked:0},value)
-ui_codeedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_MONO,show:'transparent',scrollbar:1,border  ,style:'code' ,align:ALIGN.left,locked:running()},value)
-ui_richedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:1,border  ,style:'rich' ,align:ALIGN.left,locked:0},value)
+ui_field   =(r,       value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:0,border:1,style:'plain',align:ALIGN.left,locked:0,pattern:1},value)
+ui_dfield  =(r,enable,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:0,border:1,style:'plain',align:ALIGN.left,locked:!enable,pattern:1},value)
+ui_textedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:1,border  ,style:'plain',align:ALIGN.left,locked:0,pattern:1},value)
+ui_codeedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_MONO,show:'transparent',scrollbar:1,border  ,style:'code' ,align:ALIGN.left,locked:running(),pattern:1},value)
+ui_richedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:1,border  ,style:'rich' ,align:ALIGN.left,locked:0,pattern:1},value)
 ui_table   =(r,widths,format,value)=>widget_grid(null,{size:r,font:FONT_BODY,widths   ,format   ,headers:2,scrollbar:1,lines:0,bycell:0,show:'solid',locked:1},value)
 ui_list    =(r,              value)=>widget_grid(null,{size:r,font:FONT_BODY,widths:[],format:'',headers:0,scrollbar:1,lines:0,bycell:0,show:'solid',locked:1},value)
 
@@ -1466,6 +1468,7 @@ modal_exit=value=>{
 		const name=rtext_string(ms.name.table);rename_sound(deck,au.target,name)
 		au.mode='stopped',modal_enter('sounds'),ms.grid.row=dkix(deck.sounds,name);return
 	}
+	if(ms.type=='widpattern'&&value!=-1)ob.sel.map(w=>iwrite(w,lms('pattern'),lmn(value)))
 	if(ms.subtype=='confirm_new'   &&value)load_deck(deck_read(''))
 	if(ms.subtype=='confirm_script'&&value)finish_script()
 	if(ms.subtype=='multiscript'   &&value)setscript(ob.sel)
@@ -1960,17 +1963,18 @@ modals=_=>{
 		if(ev.dir=='down' )dr.brush=(dr.brush+grid.x             )%(grid.x*grid.y)
 		dr.brush=clamp(0,dr.brush,(6*4)+count(br)-1)
 	}
-	else if(ms.type=='pattern'||ms.type=='fill'){
+	else if(ms.type=='pattern'||ms.type=='fill'||ms.type=='widpattern'){
 		const grid=rect(8,dr.color?6:4), ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY)
-		const getv=_=>ms.type=='pattern'?dr.pattern  :dr.fill
-		const setv=x=>ms.type=='pattern'?dr.pattern=x:dr.fill=x
+		const getv=_=>ms.type=='widpattern'?ob.pending_pattern  :ms.type=='pattern'?dr.pattern  :dr.fill
+		const setv=x=>ms.type=='widpattern'?ob.pending_pattern=x:ms.type=='pattern'?dr.pattern=x:dr.fill=x
 		const b=draw_modalbox(rect(m+(grid.x*gs)+m,m+(grid.y*gs)+lh+m)); let v=getv()
-		draw_textc(rect(b.x,b.y+b.h-lh,b.w,lh),`Choose a ${ms.type=='fill'?'fill':'stroke'} ${dr.color?'color':'pattern'}.`,FONT_BODY,1)
+		draw_textc(rect(b.x,b.y+b.h-lh,b.w,lh),
+			ms.type=='widpattern'?'Choose a pattern.':`Choose a ${ms.type=='fill'?'fill':'stroke'} ${dr.color?'color':'pattern'}.`,FONT_BODY,1)
 		for(let z=0;z<grid.x*grid.y;z++){
 			const s=rint(rect(b.x+m+2+gs*(z%grid.x),b.y+m+2+gs*(0|(z/grid.x)),ss,ss)), ci=z
 			draw_rect(s,ci==0?32:ci); if(ci==v)draw_box(inset(s,-2),0,1)
 			const a=dover(s)&&over(s), cs=(ci==v&&ev.action), cl=cs||((ev.md||ev.drag)&&a), cr=cs||(ev.mu&&a)
-			if(cl)draw_invert(pal,inset(s,-1)); if(cr){setv(ci),modal_exit(ci);break}
+			if(cl)draw_invert(pal,inset(s,-1)); if(cr){setv(ci),modal_pop(ci);break}
 		}
 		if(ev.exit||(ev.mu&&!dover(b)&&!over(b)))modal_exit(-1),ev.mu=0
 		if(ev.dir=='left' )setv(((0|(v/grid.x))*grid.x)+((v+grid.x-1)%grid.x))
@@ -2049,7 +2053,7 @@ modals=_=>{
 		draw_text(rect(b.x,b.y+42,42,60),'Text',FONT_MENU,1)
 		ui_field(rect(b.x+42,b.y+20,b.w-42,18),ms.name)
 		const style=ls(ifield(f,'style'))
-		widget_field(null,{size:rect(b.x+42,b.y+40,b.w-42,88),font:p.font,show:'solid',scrollbar:1,border:1,style,align:p.align,locked:0},ms.text)
+		widget_field(null,{size:rect(b.x+42,b.y+40,b.w-42,88),font:p.font,show:'solid',scrollbar:1,border:1,style,align:p.align,locked:0,pattern:p.pattern},ms.text)
 		iwrite(f,lms('name' ),rtext_string(ms.name.table))
 		iwrite(f,lms('value'),ms.text.table),mark_dirty()
 		let border=lb(ifield(f,'border')), scrollbar=lb(ifield(f,"scrollbar")), cb=rect(b.x,b.y+80+60)
@@ -2065,7 +2069,8 @@ modals=_=>{
 		if(ui_radio(rint(rect(ab.x,ab.y,b.w/2,16)),'Center'     ,1,align=='center')){iwrite(f,lms('align'),lms('center')),mark_dirty()}ab.y+=16
 		if(ui_radio(rint(rect(ab.x,ab.y,b.w/2,16)),'Align Right',1,align=='right' )){iwrite(f,lms('align'),lms('right' )),mark_dirty()}ab.y+=16
 		const c=rect(b.x,b.y+b.h-20)
-		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(f),modal_exit(0)
+		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(f),modal_exit(0);c.x+=65
+		if(ui_button(rect(c.x,c.y,65,20),'Pattern...',1))ob.pending_pattern=p.pattern,modal_push('widpattern')
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='slider_props'){
@@ -2360,7 +2365,7 @@ keycaps=_=>{
 	else if(ms.type=='listen'){const c=frame.clip;frame.clip=rect(r.x,r.y,r.w,r.h+6);wid.count=0,listener(r),frame.clip=c}
 	else{
 		wid.count=wid.active
-		widget_field(wid.ft,{size:inset(r,5),font:wid.f.font,show:'solid',scrollbar:1,border:1,style:wid.f.style,align:wid.f.align,locked:0},wid.fv)
+		widget_field(wid.ft,{size:inset(r,5),font:wid.f.font,show:'solid',scrollbar:1,border:1,style:wid.f.style,align:wid.f.align,locked:0,pattern:wid.f.pattern},wid.fv)
 		ms.in_modal=0
 	}
 	const modes=soft_keyboard(inset(rect(r.x,r.y+r.h+1,r.w-2,frame.size.y-(r.y+r.h)),5))

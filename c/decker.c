@@ -193,7 +193,8 @@ typedef struct {
 	int move, move_first;
 	int resize, resize_first, handle; pair prev;
 	rect orig;
-} obj_state; obj_state ob={NULL,1,0,0,0,1, 0,0,0,0,-1,{0,0},{0,0,0,0}};
+	int pending_pattern;
+} obj_state; obj_state ob={NULL,1,0,0,0,1, 0,0,0,0,-1,{0,0},{0,0,0,0},0};
 
 typedef struct {
 	lv* target, *others, *next; field_val f;
@@ -231,7 +232,7 @@ enum modal_type{
 	modal_import_sound,
 	modal_import_deck,
 	modal_open_deck,modal_save_deck,modal_save_locked,modal_confirm_quit,modal_confirm_new,modal_confirm_script,modal_multiscript,
-	modal_brush,modal_pattern,modal_fill,
+	modal_brush,modal_pattern,modal_fill,modal_widpattern,
 	modal_deck_props,modal_card_props,modal_button_props,modal_field_props,modal_slider_props,modal_canvas_props,modal_grid_props,modal_contraption_props,
 	modal_cards,modal_sounds,modal_recording,modal_fonts,modal_contraptions,modal_resources,modal_orderwids,
 	modal_action,modal_pick_card,modal_pick_contraption,modal_trans,modal_grid,modal_prototype_props,modal_prototype_attrs,
@@ -749,7 +750,8 @@ rect layout_cursor(int index,lv*font,field f){
 void widget_field(lv*target,field x,field_val*value){
 	if(x.show==show_none)return; if(x.size.h<=50||x.size.w<16)x.scrollbar=0;
 	int l=!in_layer(); lv*fnt=x.font?x.font: x.style==field_code?FONT_MONO: FONT_BODY; rect b=x.size;
-	int fcol=(l&&!x.locked)?13:x.show==show_invert?32:1, bcol=x.show==show_invert?1:32, os=value->scroll;
+	int fcol=(l&&!x.locked)?13:x.show==show_invert?32:1, bcol=x.show==show_invert?x.pattern:32, os=value->scroll;
+	int tfcol=(l&&!x.locked&&x.pattern==1)?13:x.show==show_invert?32:x.pattern;
 	if(x.show!=show_transparent)draw_rect(box_intersect(b,frame.clip),bcol); if(x.border)draw_box(b,0,fcol);
 	rect bi=inset(b,2);if(x.scrollbar)bi.w-=image_size(ARROWS->lv[0]).x+3;
 	if(!l&&!x.locked&&over(bi)&&(ev.drag?dover(bi):1))uicursor=cursor_ibeam;
@@ -788,9 +790,9 @@ void widget_field(lv*target,field x,field_val*value){
 			if(a&&ev.mu&&dover(g.pos)){msg.target_link=target,msg.arg_link=g.arg;}
 		}
 		int csel=sel&&wid.cursor.x!=wid.cursor.y&&z>=MIN(wid.cursor.x,wid.cursor.y)&&z<MAX(wid.cursor.x,wid.cursor.y);
-		if(csel)draw_rect(box_intersect(g.pos,frame.clip),fcol);
+		if(csel)draw_rect(box_intersect(g.pos,frame.clip),tfcol);
 		if(image_is(g.arg)){buffer_paste(g.pos,frame.clip,g.arg->b,frame.buffer,x.show!=show_transparent);if(csel)draw_invert(pal,g.pos);}
-		else{font_each(g.font,g.c)if(font_gpix(g.font,g.c,b,a)&&inclip(g.pos.x+b,g.pos.y+a))PIX(g.pos.x+b,g.pos.y+a)=csel?bcol:fcol;}
+		else{font_each(g.font,g.c)if(font_gpix(g.font,g.c,b,a)&&inclip(g.pos.x+b,g.pos.y+a))PIX(g.pos.x+b,g.pos.y+a)=csel?bcol:tfcol;}
 	}
 	if(sel&&wid.cursor_timer<FIELD_CURSOR_DUTY){
 		rect c=layout_cursor(wid.cursor.y,fnt,x);c.y-=value->scroll;c.y+=bi.y,c.x+=bi.x;
@@ -935,11 +937,11 @@ int  ui_button  (rect r,char*label,int enable          ){return widget_button(NU
 int  ui_toggle  (rect r,char*label,int inv,int enable  ){return widget_button(NULL,(button){label,r,FONT_MENU,button_round,inv?show_invert:show_solid,!enable,0},0);}
 int  ui_radio   (rect r,char*label,int enable,int value){return widget_button(NULL,(button){label,r,FONT_BODY,button_radio,show_solid,!enable,0},value);}
 int  ui_checkbox(rect r,char*label,int enable,int value){return widget_button(NULL,(button){label,r,FONT_BODY,button_check,show_solid,!enable,0},value);}
-void ui_field   (rect r,           field_val*value){widget_field(NULL,(field){r,FONT_BODY,show_solid,0,1     ,field_plain,align_left,0},value);}
-void ui_dfield  (rect r,int enable,field_val*value){widget_field(NULL,(field){r,FONT_BODY,show_solid,0,1     ,field_plain,align_left,!enable},value);}
-void ui_textedit(rect r,int border,field_val*value){widget_field(NULL,(field){r,FONT_BODY,show_solid,1,border,field_plain,align_left,0},value);}
-void ui_codeedit(rect r,int border,field_val*value){widget_field(NULL,(field){r,FONT_MONO,show_transparent,1,border,field_code ,align_left,running()},value);}
-void ui_richedit(rect r,int border,field_val*value){widget_field(NULL,(field){r,FONT_BODY,show_solid,1,border,field_rich ,align_left,0},value);}
+void ui_field   (rect r,           field_val*value){widget_field(NULL,(field){r,FONT_BODY,show_solid,0,1     ,field_plain,align_left,0,1},value);}
+void ui_dfield  (rect r,int enable,field_val*value){widget_field(NULL,(field){r,FONT_BODY,show_solid,0,1     ,field_plain,align_left,!enable,1},value);}
+void ui_textedit(rect r,int border,field_val*value){widget_field(NULL,(field){r,FONT_BODY,show_solid,1,border,field_plain,align_left,0,1},value);}
+void ui_codeedit(rect r,int border,field_val*value){widget_field(NULL,(field){r,FONT_MONO,show_transparent,1,border,field_code ,align_left,running(),1},value);}
+void ui_richedit(rect r,int border,field_val*value){widget_field(NULL,(field){r,FONT_BODY,show_solid,1,border,field_rich ,align_left,0,1},value);}
 int  ui_table   (rect r,int w0,int w1,int w2,char*fmt,grid_val*value){return widget_grid(NULL,(grid){r,FONT_BODY,{w0,w1,w2,0,0},fmt,2,1,0,0,show_solid,1},value);}
 int  ui_list    (rect r,                              grid_val*value){return widget_grid(NULL,(grid){r,FONT_BODY,{0 },"" ,0,1,0,0,show_solid,1},value);}
 
@@ -1476,6 +1478,7 @@ void modal_exit(int value){
 		lv*name=rtext_all(ms.name.table);rename_sound(deck,au.target,name);mark_dirty();
 		au.mode=record_stopped;modal_enter(modal_sounds);ms.grid.row=dgeti(ifield(deck,"sounds"),name);return;
 	}
+	if(ms.type==modal_widpattern&&value!=-1){EACH(z,ob.sel)iwrite(ob.sel->lv[z],lmistr("pattern"),lmn(value));}
 	if(ms.type==modal_confirm&&ms.subtype==modal_export_script&&!value){modal_enter(ms.subtype);return;}
 	if(ms.type==modal_confirm&&ms.subtype==modal_save_deck    &&!value){modal_enter(ms.subtype);return;}
 	if(ms.type==modal_confirm&&ms.subtype==modal_save_locked  &&!value){modal_enter(ms.subtype);return;}
@@ -1936,17 +1939,19 @@ void modals(void){
 		if(ev.dir==dir_down )dr.brush=(dr.brush+grid.x             )%(grid.x*grid.y);
 		dr.brush=CLAMP(0,dr.brush,(6*4)+br->c-1);
 	}
-	else if(ms.type==modal_pattern||ms.type==modal_fill){
-		pair grid={8,dr.color?6:4};int ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY); int*v=ms.type==modal_pattern?&dr.pattern:&dr.fill;
+	else if(ms.type==modal_pattern||ms.type==modal_fill||ms.type==modal_widpattern){
+		pair grid={8,dr.color?6:4};int ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY);
+		int*v=ms.type==modal_widpattern?&ob.pending_pattern: modal_pattern?&dr.pattern: &dr.fill;
 		rect b=draw_modalbox((pair){m+(grid.x*gs)+m,m+(grid.y*gs)+lh+m});
-		char*label=dr.color?(ms.type==modal_fill?"Choose a fill color."  :"Choose a stroke color."  ):
+		char*label=ms.type==modal_widpattern?"Choose a pattern.":
+		           dr.color?(ms.type==modal_fill?"Choose a fill color."  :"Choose a stroke color."  ):
 		                    (ms.type==modal_fill?"Choose a fill pattern.":"Choose a stroke pattern.");
 		draw_textc((rect){b.x,b.y+b.h-lh,b.w,lh},label,FONT_BODY,1);
 		for(int z=0;z<grid.x*grid.y;z++){
 			rect s={b.x+m+2+gs*(z%grid.x),b.y+m+2+gs*(z/grid.x),ss,ss};int ci=z;
 			draw_rect(s,ci==0?32:ci); if(ci==*v)draw_box(inset(s,-2),0,1);
 			int a=dover(s)&&over(s), cs=(ci==*v&&ev.action), cl=cs||((ev.md||ev.drag)&&a), cr=cs||(ev.mu&&a);
-			if(cl)draw_invert(pal,inset(s,-1)); if(cr){*v=ci;modal_exit(ci);break;}
+			if(cl)draw_invert(pal,inset(s,-1)); if(cr){*v=ci;modal_pop(ci);break;}
 		}
 		if(ev.exit||(ev.mu&&!dover(b)&&!over(b)))modal_exit(-1),ev.mu=0;
 		if(ev.dir==dir_left )*v=((*v/grid.x)*grid.x)+((*v+grid.x-1)%grid.x);
@@ -2026,7 +2031,7 @@ void modals(void){
 		draw_text((rect){b.x,b.y+42,42,60},"Text",FONT_MENU,1);
 		ui_field((rect){b.x+42,b.y+20,b.w-42,18},&ms.name);
 		int style=ordinal_enum(ifield(f,"style"),field_styles);
-		widget_field(NULL,(field){{b.x+42,b.y+40,b.w-42,88},p.font,show_solid,1,1,style,p.align,0},&ms.text);
+		widget_field(NULL,(field){{b.x+42,b.y+40,b.w-42,88},p.font,show_solid,1,1,style,p.align,0,p.pattern},&ms.text);
 		iwrite(f,lmistr("name"),rtext_all(ms.name.table));
 		iwrite(f,lmistr("value"),ms.text.table);mark_dirty();
 		int border=lb(ifield(f,"border")), scrollbar=lb(ifield(f,"scrollbar")); pair cb={b.x,b.y+80+60};
@@ -2042,7 +2047,8 @@ void modals(void){
 		if(ui_radio((rect){ab.x,ab.y,b.w/2,16},"Center"     ,1,align==align_center)){iwrite(f,lmistr("align"),lmistr("center")),mark_dirty();}ab.y+=16;
 		if(ui_radio((rect){ab.x,ab.y,b.w/2,16},"Align Right",1,align==align_right )){iwrite(f,lmistr("align"),lmistr("right" )),mark_dirty();}ab.y+=16;
 		pair c={b.x,b.y+b.h-20};
-		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))setscript(f),modal_exit(0);
+		if(ui_button((rect){c.x,c.y,60,20},"Script...",1))setscript(f),modal_exit(0);c.x+=65;
+		if(ui_button((rect){c.x,c.y,65,20},"Pattern...",1))ob.pending_pattern=p.pattern,modal_push(modal_widpattern);
 		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(1);
 	}
 	else if(ms.type==modal_slider_props){
@@ -2493,7 +2499,7 @@ void keycaps(void){
 	if(ms.type)ms.in_modal=1;
 	if(uimode==mode_script){script_editor(r);}
 	else if(ms.type==modal_listen){rect c=frame.clip;frame.clip=(rect){r.x,r.y,r.w,r.h+6};wid.count=0,listener(r);frame.clip=c;}
-	else{wid.count=wid.active;widget_field(wid.ft,(field){inset(r,5),wid.f.font,show_solid,1,1,wid.f.style,wid.f.align,0},wid.fv),ms.in_modal=0;}
+	else{wid.count=wid.active;widget_field(wid.ft,(field){inset(r,5),wid.f.font,show_solid,1,1,wid.f.style,wid.f.align,0,wid.f.pattern},wid.fv),ms.in_modal=0;}
 	int exit=0, eval=0;
 	soft_keyboard(inset((rect){r.x,r.y+r.h+1,r.w-2,frame.size.y-(r.y+r.h)},5),&exit,&eval);
 	if(ms.type==modal_listen&&(eval||ev.eval))listener_eval();

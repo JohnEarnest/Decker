@@ -2094,6 +2094,7 @@ field_read=(x,card)=>{
 				return self.value=rtext_cast(x),field_notify(self),x
 			}
 			if(ikey(i,'border'   ))return self.border=lb(x),x
+			if(ikey(i,'pattern'  ))return self.pattern=0|clamp(0,ln(x),255),x
 			if(ikey(i,'scrollbar'))return self.scrollbar=lb(x),x
 			if(ikey(i,'style'    ))return self.style=normalize_enum(field_styles,ls(x)),iwrite(self,lms('value'),ifield(self,'value')),x
 			if(ikey(i,'align'    ))return self.align=normalize_enum(field_aligns,ls(x)),x
@@ -2102,6 +2103,7 @@ field_read=(x,card)=>{
 			if(ikey(i,'images'   )){const v=value_inherit(self,'value');return v!=undefined?rtext_read_images(v):lml([])}
 			if(ikey(i,'data'     )){const v=value_inherit(self,'value');return v!=undefined?dyad.parse(lms('%J'),rtext_string(v)):NIL}
 			if(ikey(i,'border'   ))return lmn(ivalue(self,ls(i),1))
+			if(ikey(i,'pattern'  ))return lmn(ivalue(self,ls(i),1))
 			if(ikey(i,'value'    ))return value_inherit(self,ls(i))||rtext_cast()
 			if(ikey(i,'scroll'   ))return value_inherit(self,ls(i))||ZERO
 			if(ikey(i,'scrollbar'))return lmn(ivalue(self,ls(i),0))
@@ -2120,6 +2122,7 @@ field_read=(x,card)=>{
 	},'field');ri.card=card
 	{const k=lms('value'),v=dget(x,k);if(v)iwrite(ri,k,rtext_read(v))}
 	init_field(ri,'border'   ,x)
+	init_field(ri,'pattern'  ,x)
 	init_field(ri,'scrollbar',x)
 	init_field(ri,'style'    ,x)
 	init_field(ri,'align'    ,x)
@@ -2129,6 +2132,7 @@ field_read=(x,card)=>{
 field_write=x=>{
 	const r=lmd([lms('type')],[lms('field')])
 	if(x.border!=undefined)dset(r,lms('border'),lmn(x.border))
+	if(x.pattern!=undefined&&x.pattern!=1)dset(r,lms('pattern'),lmn(x.pattern))
 	if(x.scrollbar!=undefined)dset(r,lms('scrollbar'),lmn(x.scrollbar))
 	if(x.style&&x.style!='rich')dset(r,lms('style'),lms(x.style))
 	if(x.align&&x.align!='left')dset(r,lms('align'),lms(x.align))

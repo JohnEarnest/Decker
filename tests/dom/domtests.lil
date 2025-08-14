@@ -261,6 +261,7 @@ dattr:()
 dattr.text:      ""
 dattr.scroll:    0
 dattr.border:    1
+dattr.pattern:   1
 dattr.scrollbar: 0
 dattr.style:     "rich"
 dattr.align:     "left"
@@ -269,6 +270,7 @@ on fieldattrs x do
 	r.text:      x.text
 	r.scroll:    x.scroll
 	r.border:    x.border
+	r.pattern:   x.pattern
 	r.scrollbar: x.scrollbar
 	r.style:     x.style
 	r.align:     x.align

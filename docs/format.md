@@ -203,6 +203,7 @@ Each `type` of widget has its own additional optional fields:
 	- `shortcut`: a 0- or 1-character string; a keyboard key which can be used as an alternative to clicking this button to activate it. Shortcuts must be a lowercase letter (`a-z`), a digit (`0-9`), or a space character (` `).
 - `"field"`: Fields are the basic widget for storing information. They can contain "formatted" text or plain user-entered text, and may have a vertical scrollbar. Locked fields may also be useful for labels, headings, or displaying information computed by a script.
 	- `border`: an integer; draw an outline for the field? Default is `1`.
+	- `pattern`: an integer pattern index used for drawing text. Default is `1`.
 	- `scrollbar`: an integer; does this field have a scrollbar? Default is `0`. Note that without a visible scrollbar, it is still possible to scroll a field programmatically, or by dragging a selection.
 	- `style`: one of { `"rich"` (default), `"plain"`, `"code"` }. A `"rich"` field permits entry and editing of formatted text. A `"plain"` field is text-only, with a single font. A `"code"` field is likewise text-only, with some changes in behavior making the field more suitable as a code editor: tabbing does not leave the field, shift+`/` toggles Lil block comments, etc.
 	- `align`: one of { `"left"` (default), `"center"`, `"right"` }.
@@ -454,3 +455,6 @@ Changelog
 
 1.56:
 - Raised the maximum length of the `animations` sequences in the `{deck}` Chunk from 8 to 256.
+
+1.58:
+- Introduced the `field.pattern` field.
