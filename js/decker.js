@@ -1967,13 +1967,13 @@ modals=_=>{
 		dr.brush=clamp(0,dr.brush,(6*4)+count(br)-1)
 	}
 	else if(ms.type=='pattern'||ms.type=='fill'||ms.type=='widpattern'||ms.type=='spanpattern'){
-		const grid=rect(8,dr.color?6:4), ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY)
+		const grid=rect(8,6), ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY)
 		const getv=_=>ms.type=='widpattern'||ms.type=='spanpattern'?ob.pending_pattern  :ms.type=='pattern'?dr.pattern  :dr.fill
 		const setv=x=>ms.type=='widpattern'||ms.type=='spanpattern'?ob.pending_pattern=x:ms.type=='pattern'?dr.pattern=x:dr.fill=x
 		const b=draw_modalbox(rect(m+(grid.x*gs)+m,m+(grid.y*gs)+lh+m)); let v=getv()
 		draw_textc(rect(b.x,b.y+b.h-lh,b.w,lh),
 			ms.type=='widpattern'||ms.type=='spanpattern'?'Choose a pattern.':
-			`Choose a ${ms.type=='fill'?'fill':'stroke'} ${dr.color?'color':'pattern'}.`,FONT_BODY,1)
+			`Choose a ${ms.type=='fill'?'fill':'stroke'} pattern.`,FONT_BODY,1)
 		for(let z=0;z<grid.x*grid.y;z++){
 			const s=rint(rect(b.x+m+2+gs*(z%grid.x),b.y+m+2+gs*(0|(z/grid.x)),ss,ss)), ci=z
 			draw_rect(s,ci==0?32:ci); if(ci==v)draw_box(inset(s,-2),0,1)
