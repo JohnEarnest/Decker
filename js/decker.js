@@ -3358,7 +3358,7 @@ all_menus=_=>{
 			}
 			if(wid.f&&wid.f.style!='code'){
 				if(menu_item('Font...',wid.f.style!='plain'))modal_push('fonts')
-				if(menu_item("Pattern...",wid.f.style!='plain')){
+				if(menu_item("Pattern...",wid.f&&wid.f.style!='plain')){
 					ob.pending_pattern=ln(tab_get(rtext_span(wid.fv.table,wid.cursor),'pat')[0])
 					modal_push('spanpattern')
 				}
