@@ -3620,7 +3620,8 @@ tick=_=>{
 		iwrite(ob.sel[0],lms('pos'),lmpair(rsub(rsub(ev.pos,ob.prev),off))),mark_dirty()
 	}
 	document.title=ls(ifield(deck,'name')) || 'Untitled Deck'
-	for(let x=0;x<=1;x++)for(let y=0;y<=1;y++)draw_icon(rect(x*(context.size.x-5),y*(context.size.y-5)),CORNERS[x+y*2],1)
+	const ccolor=ln(ifield(deck,'corners'))
+	for(let x=0;x<=1;x++)for(let y=0;y<=1;y++)draw_icon(rect(x*(context.size.x-5),y*(context.size.y-5)),CORNERS[x+y*2],ccolor)
 	const used=interpret()
 	if(uimode=='interact'&&profiler){
 		const r=rect(frame.size.x-60,2,50,12), pal=deck.patterns.pal.pix

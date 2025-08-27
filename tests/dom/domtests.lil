@@ -1319,6 +1319,7 @@ deck:newdeck[]
 deck.name:"everything but the sink"
 deck.author:"just some guy"
 deck.locked:1
+deck.corners:36
 o:deck.add["card" "other"]
 deck.script:"show[\"</script> is a perfectly valid string in Lil.\"]"
 deck.card.add["field" "output"].text:"A Sentence"

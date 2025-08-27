@@ -157,6 +157,7 @@ The Deck chunk contains a number of optional properties with metadata pertaining
 - `card`: an integer giving the index of the card which will be shown when the deck is opened. If this index is invalid, reset it to `0`.
 - `patterns`: an _Image Record_ representing a vertical strip of 28 8x8 patterns. Pattern 0 will always be overruled as "all white" and pattern 1 will always be overruled as "all black". If any of these patterns are modified, they will alter the appearance of Decker's UI pervasively. If this property is not provided, Decker will supply a default palette. Normally this will be a 8x224 image; if it is instead 8x230, the last 6 rows of the image contain a sequence of 16 records comprising a supplementary _color_ palette, each record consisting of a byte for a red channel, a byte for a green channel, and a byte for a blue channel.
 - `animations`: an array of four arrays, each of which may contain up to 256 integers. Each integer is an index to a pattern. These four sequences represent the animated patterns 28, 29, 30, and 31. Animation sequences may not themselves reference indices 28, 29, 30, or 31. If this property is not provided, Decker will supply default animation sequences: `[[13,9,5,1,5,9],[4,4,8,14,14,8],[18,18,20,19,19,20],[0,0,0,0,1,1,1,1]]`.
+- `corners`: an integer between 0 and 47 indicating the pattern index to use for drawing the rounded "corners" of a deck, when applicable. Default is `0` and a value of `1` suppresses drawing the corners entirely.
 
 The `{card:ID}` Chunk
 ---------------------
@@ -463,3 +464,4 @@ Changelog
 
 1.59:
 - Relaxed the constraints on `grid.value` to permit any LOVE data in cells, including rich text.
+- Introduced the `corners` property to the `{deck}` section.

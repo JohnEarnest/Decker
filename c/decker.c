@@ -370,7 +370,8 @@ void menu_finish(void){
 			if(o)draw_invert(pal,inset(x.b,1));
 		}if(ev.mu)menu.stick=-1;
 	}
-	if(!windowed)for(int x=0;x<=1;x++)for(int y=0;y<=1;y++)draw_icon((pair){x*(context.size.x-5),y*(context.size.y-5)},CORNERS[x+y*2],1);
+	int ccolor=ln(ifield(deck,"corners"));
+	if(!windowed)for(int x=0;x<=1;x++)for(int y=0;y<=1;y++)draw_icon((pair){x*(context.size.x-5),y*(context.size.y-5)},CORNERS[x+y*2],ccolor);
 }
 
 // Widgets

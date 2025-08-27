@@ -2842,16 +2842,18 @@ deck_read=x=>{
 	Object.values(defs ).map(c=>{dscript(c),dget(c,lms('widgets')).v.map(dscript)})
 	const ri=lmi((self,i,x)=>{
 		if(x){
-			if(ikey(i,'locked'))return self.locked=lb(x),x
-			if(ikey(i,'name'  ))return self.name=ls(x),x
-			if(ikey(i,'author'))return self.author=ls(x),x
-			if(ikey(i,'script'))return self.script=ls(x),x
-			if(ikey(i,'card'  ))return n_go([x],self),x
+			if(ikey(i,'locked' ))return self.locked=lb(x),x
+			if(ikey(i,'name'   ))return self.name=ls(x),x
+			if(ikey(i,'author' ))return self.author=ls(x),x
+			if(ikey(i,'corners'))return self.corners=clamp(0,ln(x),47),x
+			if(ikey(i,'script' ))return self.script=ls(x),x
+			if(ikey(i,'card'   ))return n_go([x],self),x
 		}else{
 			if(ikey(i,'version' ))return lmn(self.version)
 			if(ikey(i,'locked'  ))return lmn(self.locked)
 			if(ikey(i,'name'    ))return lms(self.name)
 			if(ikey(i,'author'  ))return lms(self.author)
+			if(ikey(i,'corners' ))return lmn(self.corners)
 			if(ikey(i,'script'  ))return lms(self.script)
 			if(ikey(i,'patterns'))return self.patterns
 			if(ikey(i,'sounds'  ))return dyad.drop(ZERO,self.sounds)
@@ -2882,6 +2884,7 @@ deck_read=x=>{
 	ri.locked      =deck.hasOwnProperty('locked' )?lb(deck.locked ):0
 	ri.name        =deck.hasOwnProperty('name'   )?ls(deck.name   ):''
 	ri.author      =deck.hasOwnProperty('author' )?ls(deck.author ):''
+	ri.corners     =deck.hasOwnProperty('corners')?clamp(0,ln(deck.corners),47):1
 	ri.script      =deck.hasOwnProperty('script' )?scripts.get(ls(deck.script)):''
 	ri.card        =deck.hasOwnProperty('card'   )?clamp(0,ln(deck.card),Object.keys(cards).length-1):0
 	ri.size        =deck.hasOwnProperty('size'   )?rclamp(rect(8,8),getpair(deck.size),rect(4096,4096)):rect(512,342)
@@ -2919,6 +2922,7 @@ deck_write=(x,html)=>{
 	write_line(x,'script'    ,x=>x.length                           ,x=>script_ref(null,lms(x)))
 	write_line(x,'name'      ,x=>x.length                           ,lms                       )
 	write_line(x,'author'    ,x=>x.length                           ,lms                       )
+	write_line(x,'corners'   ,x=>x!=1                               ,lmn                       )
 	write_line(x,'patterns'  ,x=>pp!=DEFAULT_PATTERNS               ,x=>lms(pp)                )
 	write_line(x,'animations',x=>!match(pa,da)                      ,x=>pa                     )
 	write_scripts()

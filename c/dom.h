@@ -2713,16 +2713,18 @@ lv* deck_write(lv*x,int html); // forward ref
 lv* interface_deck(lv*self,lv*i,lv*x){
 	lv*data=self->b,*cards=ivalue(self,"cards");
 	if(x){
-		ikey("locked"){dset(data,i,lmn(lb(x)));return x;}
-		ikey("name"  ){dset(data,i,ls(x));return x;}
-		ikey("author"){dset(data,i,ls(x));return x;}
-		ikey("script"){dset(data,i,ls(x));return x;}
-		ikey("card"  ){n_go(self,l_list(x));return x;}
+		ikey("locked" ){dset(data,i,lmn(lb(x)));return x;}
+		ikey("name"   ){dset(data,i,ls(x));return x;}
+		ikey("author" ){dset(data,i,ls(x));return x;}
+		ikey("corners"){dset(data,i,lmn(CLAMP(0,ln(x),47)));return x;}
+		ikey("script" ){dset(data,i,ls(x));return x;}
+		ikey("card"   ){n_go(self,l_list(x));return x;}
 	}else{
 		ikey("version" )return dget(data,i);
 		ikey("locked"  )return dget(data,i);
 		ikey("name"    )return dget(data,i);
 		ikey("author"  )return dget(data,i);
+		ikey("corners" ){lv*r=dget(data,i);return r?r:ONE;}
 		ikey("script"  )return dget(data,i);
 		ikey("patterns")return dget(data,i);
 		ikey("sounds"  )return l_drop(ZERO,dget(data,i)); // expose a shallow copy
@@ -2795,6 +2797,7 @@ lv* deck_read(lv*x){
 	{lv*k=lmistr("name"    ),*f=dget(deck,k);dset(r,k,str_read(f,""));}
 	{lv*k=lmistr("author"  ),*f=dget(deck,k);dset(r,k,str_read(f,""));}
 	{lv*k=lmistr("script"  ),*f=dget(deck,k);dset(r,k,str_read(f,""));}
+	{lv*k=lmistr("corners" ),*f=dget(deck,k);dset(r,k,f?lmn(CLAMP(0,ln(f),47)):ONE);}
 	{lv*k=lmistr("card"    ),*f=dget(deck,k);int n=f?ln(f):0;dset(r,k,lmn(CLAMP(0,n,cards->c-1)));}
 	dset(r,lmistr("brushes"),lmd()),dset(r,lmistr("brusht"),lmd());
 	lv*trans=lmd();dset(r,lmistr("transit"),trans);lv*root=lmenv(NULL);constants(root);dset(root,lmistr("transition"),lmnat(n_transition,ri));
@@ -2850,6 +2853,7 @@ lv* deck_write(lv*x,int html){
 	write_line("script"    ,v->c                                          ,script_ref(scripts,NULL,&sci,v,0))
 	write_line("name"      ,v->c                                          ,v                                )
 	write_line("author"    ,v->c                                          ,v                                )
+	write_line("corners"   ,ln(v)!=1                                      ,v                                )
 	write_line("patterns"  ,strcmp(patterns_write(v)->sv,DEFAULT_PATTERNS),patterns_write(v)                )
 	write_line("animations",!matchr(pa,da)                                ,pa                               )
 	scripts_write(scripts,&r,&si);

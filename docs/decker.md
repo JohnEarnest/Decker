@@ -725,6 +725,7 @@ The deck interface represents the global attributes of a Decker document. The op
 | `x.locked`        | Bool. Is this deck _locked_ (editing and drawing mode disabled)? r/w.                       |
 | `x.name`          | String. A descriptive title for the deck. r/w.                                              |
 | `x.author`        | String. The name of the author of the deck. r/w.                                            |
+| `x.corners`       | Number. The pattern index for drawing the "corners" of the deck, when applicable. r/w.      |
 | `x.script`        | String. The Lil source code of the deck's script, or `""`. r/w.                             |
 | `x.patterns`      | An instance of the _patterns_ interface.                                                    |
 | `x.sounds`        | A dictionary of _sound_ interfaces stored in this deck, keyed by name.                      |
