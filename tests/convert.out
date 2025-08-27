@@ -92,6 +92,15 @@
 | 2      | "Banana" | 0    |
 +--------+----------+------+
 "number,fruit,bool\n1,Apple,true\n2,Banana,false"
++---------+------------------------------------------+
+| name    | rich                                     |
++---------+------------------------------------------+
+| "one"   | insert text font arg pat with "Red" "men |
+| "two"   | insert text font arg pat with "Blue" "me |
+| "three" | insert text font arg pat with "Green" "m |
++---------+------------------------------------------+
+"name,rich\none,\"<\"\"text\"\":[\"\"Red\"\"],\"\"font\"\":[\"\"menu\"\"],\"\"arg\"\":[\"\"\"\"],\"\"pat\"\":[35]>\"\ntwo,\"<\"\"text\"\":[\"\"Blue\"\"],\"\"font\"\":[\"\"menu\"\"],\"\"arg\"\":[\"\"\"\"],\"\"pat\"\":[38]>\"\nthree,\"<\"\"text\"\":[\"\"Green\"\"],\"\"font\"\":[\"\"menu\"\"],\"\"arg\"\":[\"\"\"\"],\"\"pat\"\":[41]>\""
+1
 +------------+-----------------+
 | Multi Word | another         |
 +------------+-----------------+

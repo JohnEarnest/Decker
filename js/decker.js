@@ -487,7 +487,7 @@ modal_state=_=>({ // modal state
 	filter:0, grid:null,grid2:null, text:null,name:null,form0:null,form1:null,form2:null,
 	desc:'',path:'',path_suffix:'',filter:'', message:null,verb:null, cell:rect(),
 	from_listener:0,from_action:0,from_keycaps:0, act_go:0,act_card:0,act_gomode:0,act_trans:0,act_transo:0,act_sound:0,
-	time_curr:0,time_end:0,time_start:0, carda:null,cardb:null,trans:null,canvas:null,pending_grid_cell:rect(),
+	time_curr:0,time_end:0,time_start:0, carda:null,cardb:null,trans:null,canvas:null,pending_grid_cell:rect(),pending_grid_cell_rich:0,
 })
 modal_state_clone=x=>{const r=Object.assign({},x);r.cell=rcopy(r.cell);return r}
 let ms=modal_state(), ms_stack=[]
@@ -806,16 +806,21 @@ widget_grid=(target,x,value)=>{
 			const oc=frame.clip; frame.clip=rclip(cell,frame.clip)
 			if     (x.format[z]=='I'){const i=clamp(0,ln(v),8);if(i<8)draw_icon(ip,ICONS[i],ccol)}
 			else if(x.format[z]=='B'){if(lb(v))draw_icon(ip,ICONS[ICON.chek],ccol)}
+			else if(x.format[z]=='t'||x.format[z]=='T'){
+				const r=rect(hs.x+1,bb.y+rh*y,hs.w-2,rh), l=layout_richtext(deck,rtext_cast(v),fnt,ALIGN.left,r.w), t=l.size
+				draw_text_rich(rect(r.x,r.y+ceil(t.y<r.h?(r.h-t.y)/2.0:0),r.w,r.h),l,ccol,0)
+			}
 			else{('fcCihH'.indexOf(x.format[z])>=0?draw_textr:draw_text_fit)(rect(hs.x+1,bb.y+rh*y,hs.w-2,rh),cf,fnt,ccol)} // right-align numeric
 			frame.clip=oc
 			if(!x.locked&&sel&& ((ev.dclick&&over(cell)) || (ev.action&&x.bycell&&z==value.col&&y+value.scroll==value.row))){
 				const f=x.format[z]||'s', tc=rect(z,y+value.scroll)
-				if     (f=='I'||f=='L'){} // no editing allowed
-				else if(f=='B'||f=='b'){grid_edit_cell(tc,lmn(!lb(v)))} // toggle
+				if     (f=='I'||f=='L'||f=='T'){} // no editing allowed
+				else if(f=='B'||f=='b'){grid_edit_cell(tc,lms(0+(!lb(v))))} // toggle
 				else{
+					ms.pending_grid_cell_rich=f=='t'
 					wid.pending_grid_edit=1,ms.pending_grid_cell=grid_cell(rect(tc.x,tc.y-value.scroll))
 					ms.pending_grid_cell.y-=1,ms.pending_grid_cell.w+=1,ms.pending_grid_cell.h+=2
-					ms.cell=tc,ms.text=fieldstr(lms(cf))
+					ms.cell=tc,ms.text=fieldstr(f=='t'?v:lms(cf))
 				}
 			}
 		}
@@ -851,14 +856,14 @@ grid_insertrow=_=>{
 	const f=ls(grid_format()), x=wid.gv.table, r=lmt(), s=wid.gv.row+1
 	tab_cols(x).map((k,col)=>{
 		const o=tab_get(x,k)
-		tab_set(r,k,range(o.length+1).map(i=>(i==s)?('sluro'.indexOf(f[col])>=0?lms(''):ZERO): o[i-(i>=s?1:0)]))
+		tab_set(r,k,range(o.length+1).map(i=>(i==s)?('slurotT'.indexOf(f[col])>=0?lms(''):ZERO): o[i-(i>=s?1:0)]))
 	});grid_edit(r),iwrite(wid.gt,lms('col'),ZERO),iwrite(wid.gt,lms('row'),lmn(s))
 	const os=wid.gv.scroll,ns=grid_scrollto(x,wid.g,os,s);if(os!=ns){wid.gv.scroll=ns,iwrite(wid.gt,lms('scroll'),lmn(ns))}
 }
 grid_edit_cell=(cell,v)=>{
 	wid.gv.col=cell.x,iwrite(wid.gt,lms('col'),lmn(cell.x))
 	wid.gv.row=cell.y,iwrite(wid.gt,lms('row'),lmn(cell.y))
-	msg.target_ccell=wid.gt,msg.arg_ccell=lms(ls(v))
+	msg.target_ccell=wid.gt,msg.arg_ccell=v
 }
 grid_keys=(code,shift)=>{
 	const fnt=wid.g.font?wid.g.font:FONT_MONO, hfnt=FONT_BODY, nr=count(wid.gv.table), nc=tab_cols(wid.gv.table).length
@@ -1282,7 +1287,7 @@ sound_record=_=>{
 
 // Modal Helpers
 
-table_decode=(text,format)=>ms.edit_json?monad.table(dyad.parse(lms('%j'),text)): n_readcsv(count(format)?[text,format]:[text])
+table_decode=(text,format)=>ms.edit_json?monad.table(dyad.parse(lms('%J'),text)): n_readcsv(count(format)?[text,format]:[text])
 transit_enumerate=_=>monad.table(monad.keys(deck.transit))
 sounds_enumerate=_=>{
 	const r=lmt(),iv=[],nv=[],bv=[],sv=[];tab_set(r,'icon',iv),tab_set(r,'name',nv),tab_set(r,'bytes',bv),tab_set(r,'secs',sv)
@@ -1364,7 +1369,7 @@ modal_enter=type=>{
 	if(type=='button_props')ms.name=fieldstr(ifield(ob.sel[0],'name')),ms.text=fieldstr(ifield(ob.sel[0],'text'  )),ms.form0=fieldstr(ifield(ob.sel[0],'shortcut'))
 	if(type=='field_props' )ms.name=fieldstr(ifield(ob.sel[0],'name')),ms.text=fieldstr(ifield(ob.sel[0],'value' ))
 	if(type=='grid_props'  )ms.name=fieldstr(ifield(ob.sel[0],'name')),ms.text=fieldstr(ifield(ob.sel[0],'format'))
-	if(type=='grid_props'  )ms.form0=fieldstr(lms(fjson(monad.cols(ifield(ob.sel[0],'value'))))),ms.edit_json=1
+	if(type=='grid_props'  )ms.form0=fieldstr(lms(flove(monad.cols(ifield(ob.sel[0],'value'))))),ms.edit_json=1
 	if(type=='canvas_props')ms.name=fieldstr(ifield(ob.sel[0],'name')),ms.text=fieldstr(ifield(ob.sel[0],'scale' ))
 	if(type=='slider_props'){
 		ms.name =fieldstr(   ifield(ob.sel[0],'name'    )    )
@@ -1441,7 +1446,7 @@ modal_enter=type=>{
 }
 modal_exit=value=>{
 	wid=ms.old_wid
-	if(ms.type=='gridcell'&&value)grid_edit_cell(ms.cell,rtext_string(ms.text.table))
+	if(ms.type=='gridcell'&&value)grid_edit_cell(ms.cell,ms.pending_grid_cell_rich?rtext_cast(ms.text.table):rtext_string(ms.text.table))
 	if(ms.type=='card_props'){iwrite(ifield(deck,'card'),lms('name'),rtext_string(ms.name.table)),mark_dirty()}
 	if(ms.type=='grid_props'){
 		const t=table_decode(rtext_string(ms.form0.table),rtext_string(ms.text.table))
@@ -1857,7 +1862,7 @@ modals=_=>{
 	else if(ms.type=='gridcell'){
 		const c=ms.pending_grid_cell
 		draw_rect(inset(c,-2),32),draw_box(inset(c,-2),0,1)
-		ui_field(c,ms.text)
+		if(ms.pending_grid_cell_rich){ui_richedit(c,1,ms.text)}else{ui_field(c,ms.text)}
 		if(ev.click&&!over(c))modal_exit(1)
 		if(ev.exit)modal_exit(0)
 	}
@@ -2137,7 +2142,7 @@ modals=_=>{
 		if(ui_checkbox(rint(rect(cb.x,cb.y,b.w/2,16)),'Grid Lines'    ,1,lines    )){lines    ^=1,iwrite(grid,lms('lines'    ),lmn(lines    )),mark_dirty()}cb.y+=16
 		if(ui_checkbox(rint(rect(cb.x,cb.y,b.w/2,16)),'Select by Cell',1,bycell   )){bycell   ^=1,iwrite(grid,lms('bycell'   ),lmn(bycell   )),mark_dirty()}cb.y+=16
 		const eb=rint(rect(b.x+(b.w/2),b.y+130+70))
-		if(ui_radio(rint(rect(eb.x,eb.y,b.w/2,16)),'Edit as JSON',1,ms.edit_json==1)){ms.form0=fieldstr(lms(fjson(monad.cols(val)))),ms.edit_json=1}eb.y+=16
+		if(ui_radio(rint(rect(eb.x,eb.y,b.w/2,16)),'Edit as JSON',1,ms.edit_json==1)){ms.form0=fieldstr(lms(flove(monad.cols(val)))),ms.edit_json=1}eb.y+=16
 		if(ui_radio(rint(rect(eb.x,eb.y,b.w/2,16)),'Edit as CSV' ,1,ms.edit_json==0))ms.form0=fieldstr(n_writecsv(count(format)?[val,format]:[val])),ms.edit_json=0
 		const c=rect(b.x,b.y+b.h-20), w=ll(ifield(grid,'widths'))
 		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))modal_exit(0),setscript(grid);c.x+=65
@@ -3811,7 +3816,7 @@ dopaste=x=>{
 	}
 	else if(ms.type=='recording'&&au.mode=='stopped'&&/^%%SND0/.test(x)){sound_edit(sound_replace(sound_read(x)))}
 	else if(ms.type==null&&/^%%WGT0/.test(x)){
-		const v=pjson(x,6,x.length-6).value; let defs=dget(v,lms('d')),wids=dget(v,lms('w'));wids=wids?ll(wids):[]
+		const v=plove(x,6,x.length-6).value; let defs=dget(v,lms('d')),wids=dget(v,lms('w'));wids=wids?ll(wids):[]
 		merge_fonts(deck,dget(v,lms('f'))),merge_prototypes(deck,defs?ld(defs):lmd(),wids),ob_create(wids)
 	}
 	else if(ms.type==null&&/^%%CRD0/.test(x)){

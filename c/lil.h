@@ -1305,7 +1305,7 @@ lv*n_printf(lv*a,int newline,FILE*out){
 	else{a=l_format(ls(l_first(a)),l_drop(ONE,a));fprintf(out,"%s",drom_to_utf8(a)->sv);}
 	if(newline)fprintf(out,"\n");return a;
 }
-#define fchar(x) (x=='I'?'i': x=='B'?'b': x=='L'?'s': x)
+#define fchar(x) (x=='I'?'i': x=='B'?'b': x=='L'?'s': x=='t'?'J': x=='T'?'J': x)
 lv*n_readcsv(lv*self,lv*a){
 	#define cm(x) t->sv[i]==x?(i++,1):0
 	#define css   while(cm(' ')){}

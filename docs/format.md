@@ -234,7 +234,7 @@ Each `type` of widget has its own additional optional fields:
 	- `bycell`: an integer; does this grid permit selection by cell, instead of simply by row? Default is `0`.
 	- `widths`: an array of up to 255 integers. How many pixels wide should each column be shown? If more columns exist than there are numbers in this array the remaining columns are automatically sized.
 	- `format`: a string consisting of a sequence of format type characters (as in the left argument to the Lil `format` operator) controlling how columns are displayed. If this string is not provided or not long enough for the table's columns, remaining columns are treated as strings (`s`). This format will also be applied to CSV data exported from the grid.
-	- `value`: a dictionary keyed by column names. Columns must be arrays, for which each item is recursively composed of _only_ arrays, dictionaries, strings, and numbers. Columns need not necessarily be of uniform types.
+	- `value`: a dictionary keyed by column names. Columns must be arrays, for which each item is recursively composed of valid LOVE values. Columns need not necessarily be of uniform types.
 	- `scroll`: an integer; the scroll offset in rows.
 	- `row`: an integer; the selected row index, or -1.
 	- `col`: an integer; the selected column index, or -1.
@@ -460,3 +460,6 @@ Changelog
 1.58:
 - Introduced the `field.pattern` field.
 - Rich text now includes a `pat` column specifying a pattern for text runs.
+
+1.59:
+- Relaxed the constraints on `grid.value` to permit any LOVE data in cells, including rich text.

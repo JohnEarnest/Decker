@@ -36,6 +36,12 @@ show[readcsv["first|second|third\n11|22|33" "fff" "|"]]
 # special column types
 show[t4:readcsv["number,fruit,bool\n1,Apple,1\n2,Banana,0" "ILB"]]
 show[writecsv[t4 "ILB"]]
+show[t4:readcsv["name,rich
+one,\"<'text':['Red'],'font':['menu'],'arg':[''],'pat':[35]>\"
+two,\"<'text':['Blue'],'font':['menu'],'arg':[''],'pat':[38]>\"
+three,\"<'text':['Green'],'font':['menu'],'arg':[''],'pat':[41]>\"" "sT"]]
+show[o4:writecsv[t4 "sT"]]
+show[readcsv[o4 "sT"]~t4]
 
 # allow spaces in column names
 show[t5:readcsv["Multi Word,another\n-1337.5,\"quoted string\""]]

@@ -725,7 +725,7 @@ runop=_=>{
 	}while(running()&&getpc()>=blk_here(getblock()))descope()
 }
 
-fchar=x=>x=='I'?'i': x=='B'?'b': x=='L'?'s': x
+fchar=x=>x=='I'?'i': x=='B'?'b': x=='L'?'s': x=='t'?'J': x=='T'?'J': x
 n_writecsv=([x,y,d])=>{
 	let r='', spec=y?ls(y).split(''):[];const t=lt(x), c=tab_cols(t).length; d=d?ls(d)[0]:','
 	while(spec.length<c)spec.push('s')
@@ -828,9 +828,9 @@ showt=(x,toplevel)=>{
 		return `insert ${tab_cols(x).map(x=>x+' ').join('')}with ${d?d+' ':''}end`
 	}
 	try{
-	const w=tab_cols(x).map(k=>tab_get(x,k).reduce((x,y)=>max(x,show(y).length+2),k.length+2))
+	const w=tab_cols(x).map(k=>tab_get(x,k).reduce((x,y)=>max(x,min(40,show(y).length)+2),k.length+2))
 	const s='+'+tab_cols(x).map((x,i)=>"-".repeat(w[i])).join('+')+'+'
-	const v=range(tab_rowcount(x)).map(r=>tab_cols(x).map(k=>' '+show(tab_cell(x,k,r))).map((f,i)=>f+(' '.repeat(max(0,w[i]-f.length)))))
+	const v=range(tab_rowcount(x)).map(r=>tab_cols(x).map(k=>' '+show(tab_cell(x,k,r))).map((f,i)=>f.slice(0,41)+(' '.repeat(max(0,w[i]-min(41,f.length))))))
 	         .map(x=>`|${x.join('|')}|`).join('\n')
 	return `${s}\n|${tab_cols(x).map((x,i)=>` ${x+(' '.repeat(w[i]-x.length-2))} `).join('|')}|\n${s}${v.length?'\n'+v+'\n'+s:''}`
 	}catch(err){console.log('cannot serialize',x);throw err}
@@ -852,7 +852,7 @@ on drag x do if !me.locked|me.draggable me.line[(pointer.prev-me.offset)/me.scal
 on order x do if !me.locked me.value:select orderby me.value[x] asc from me.value end end
 on changecell x do
 	f:me.format[me.col] f:if count f f else "s" end
-	me.cellvalue:("%%%l" format f) parse x
+	me.cellvalue:if "t"~f x else ("%%%l" format f) parse x end
 	me.event["change" me.value]
 end
 on navigate x do if x~"right" go["Next"] end if x~"left" go["Prev"] end end
@@ -2545,7 +2545,7 @@ con_copy=(card,z)=>{
 	const condefs=card.deck.contraptions;find_fonts(card.deck,v,z),wids.v.map(wid=>{
 		const type=dget(wid,lms('type')),def=dget(wid,lms('def'))
 		if(ls(type)=='contraption'&&dget(defs,def)==null)dset(defs,def,prototype_write(dget(condefs,def)))
-	});return lms(`%%WGT0${fjson(v)}`)
+	});return lms(`%%WGT0${flove(v)}`)
 }
 merge_prototypes=(deck,defs,uses)=>{
 	const condefs=deck.contraptions;defs.v.map(def=>{
@@ -2565,7 +2565,7 @@ merge_prototypes=(deck,defs,uses)=>{
 }
 con_paste=(card,z)=>{
 	if(!lis(z)||!z.v.startsWith('%%WGT0'))return NIL
-	const v=ld(pjson(ls(z),6,count(z)-6).value),defs=dget(v,lms('d'));let wids=dget(v,lms('w'));wids=wids?ll(wids):[]
+	const v=ld(plove(ls(z),6,count(z)-6).value),defs=dget(v,lms('d'));let wids=dget(v,lms('w'));wids=wids?ll(wids):[]
 	merge_fonts(card.deck,dget(v,lms('f'))),merge_prototypes(card.deck,defs?ld(defs):lmd(),wids);return lml(con_paste_raw(card,wids))
 }
 card_read=(x,deck,cdata)=>{
@@ -2785,11 +2785,11 @@ deck_remove=(deck,t)=>{
 deck_copy=(deck,z)=>{
 	if(!card_is(z))return NIL;const defs=lmd(),v=lmd(['c','d'].map(lms),[card_write(z),defs]);find_fonts(deck,v,z.widgets.v)
 	z.widgets.v.filter(contraption_is).map(wid=>{const d=wid.def,n=ifield(d,'name');if(dget(defs,n)==null)dset(defs,n,prototype_write(d))})
-	return lms(`%%CRD0${fjson(v)}`)
+	return lms(`%%CRD0${flove(v)}`)
 }
 deck_paste=(deck,z,name)=>{
 	if(!lis(z)||!ls(z).startsWith('%%CRD0'))return NIL
-	const v=ld(pjson(ls(z),6,count(z)-6).value);let payload=dget(v,lms('c')),defs=dget(v,lms('d'));payload=payload?ld(payload):lmd()
+	const v=ld(plove(ls(z),6,count(z)-6).value);let payload=dget(v,lms('c')),defs=dget(v,lms('d'));payload=payload?ld(payload):lmd()
 	const wids=dget(payload,lms('widgets'));if(wids&&lid(wids))wids.v.map((v,i)=>dset(v,lms('name'),wids.k[i]))
 	merge_fonts(deck,dget(v,lms('f')))
 	merge_prototypes(deck,defs?ld(defs):lmd(),wids?ll(wids):[]);const r=card_read(payload,deck);dset(deck.cards,name||ifield(r,'name'),r);return r

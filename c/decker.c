@@ -246,7 +246,7 @@ typedef struct {
 	int from_listener, from_action, from_keycaps;
 	int act_go, act_card, act_gomode, act_trans, act_transno, act_sound;
 	int time_curr, time_end; lv*carda, *cardb, *trans, *canvas;
-	rect pending_grid_cell;
+	rect pending_grid_cell;int pending_grid_cell_rich;
 } modal_state; modal_state ms={0};
 typedef struct {modal_state ms;widget_state wid;} modal_context;
 modal_context ms_stack[8]={{{0},{0}}};int ms_index=0;
@@ -658,6 +658,11 @@ int widget_grid(lv*target,grid x,grid_val*value){
 			rect oc=frame.clip; frame.clip=box_intersect(cell,frame.clip);
 			if     (z<fk&&x.format[z]=='I'){int i=MAX(0,MIN(8,ln(v)));if(i<8)draw_icon(ip,ICONS[i],ccol);}
 			else if(z<fk&&x.format[z]=='B'){if(lb(v))draw_icon(ip,ICONS[icon_chek],ccol);}
+			else if(z<fk&&(x.format[z]=='t'||x.format[z]=='T')){
+				rect r={hs.x+1,bb.y+rh*y,hs.w-2,rh}; // display rich text:
+				pair t=layout_richtext(deck,rtext_cast(v),fnt,align_left,r.w);
+				draw_text_rich((rect){r.x,r.y+ceil(t.y<r.h?(r.h-t.y)/2.0:0),r.w,r.h},ccol,0);
+			}
 			else{
 				rect r={hs.x+1,bb.y+rh*y,hs.w-2,rh}; // right-align numeric columns:
 				if(z<fk&&strchr("fcCihH",x.format[z])){draw_textr(r,cf.sv,fnt,ccol);}else{draw_text_fit(r,cf.sv,fnt,ccol);}
@@ -665,12 +670,13 @@ int widget_grid(lv*target,grid x,grid_val*value){
 			frame.clip=oc;
 			if(!x.locked&&sel&& ((ev.dclick&&over(cell)) || (ev.action&&x.bycell&&z==value->col&&y+value->scroll==value->row))){
 				char f=z<fk?x.format[z]:'s';pair tc=(pair){z,y+value->scroll};
-				if     (f=='I'||f=='L'){} // no editing allowed
-				else if(f=='B'||f=='b'){grid_edit_cell(tc,lmn(!lb(v)));} // toggle
+				if     (f=='I'||f=='L'||f=='T'){} // no editing allowed
+				else if(f=='B'||f=='b'){grid_edit_cell(tc,ls(lmn(!lb(v))));} // toggle
 				else{
+					ms.pending_grid_cell_rich=f=='t';
 					wid.pending_grid_edit=1,ms.pending_grid_cell=grid_cell(x,value,bb,(pair){tc.x,tc.y-value->scroll});
 					ms.pending_grid_cell.y-=1,ms.pending_grid_cell.w+=1,ms.pending_grid_cell.h+=2;
-					ms.cell=tc;ms.text=(field_val){rtext_cast(lmcstr(cf.sv)),0};
+					ms.cell=tc;ms.text=(field_val){f=='t'?rtext_cast(v):rtext_cast(lmcstr(cf.sv)),0};
 				}
 			}
 		}
@@ -704,14 +710,14 @@ void grid_edit(lv*v){wid.hist->c=wid.hist_cursor,ll_add(wid.hist,lml2(wid.gv->ta
 void grid_deleterow(void){grid_edit(l_drop(l_list(lmn(wid.gv->row)),wid.gv->table));}
 void grid_insertrow(void){
 	lv*f=grid_format(),*x=wid.gv->table,*r=lmt();int s=wid.gv->row+1;EACH(z,x){
-		lv*c=lml(x->n+1);dset(r,x->kv[z],c);EACH(i,c)c->lv[i]=(i==s)?(strchr("sluro",f->sv[z])?lmistr(""):ZERO): x->lv[z]->lv[i-(i>=s?1:0)];
+		lv*c=lml(x->n+1);dset(r,x->kv[z],c);EACH(i,c)c->lv[i]=(i==s)?(strchr("slurotT",f->sv[z])?lmistr(""):ZERO): x->lv[z]->lv[i-(i>=s?1:0)];
 	}grid_edit(torect(r));iwrite(wid.gt,lmistr("col"),ZERO),iwrite(wid.gt,lmistr("row"),lmn(s));
 	int os=wid.gv->scroll,ns=grid_scrollto(x,wid.g,os,s);if(os!=ns){wid.gv->scroll=ns,iwrite(wid.gt,lmistr("scroll"),lmn(ns));}
 }
 void grid_edit_cell(pair cell,lv*v){
 	wid.gv->col=cell.x,iwrite(wid.gt,lmistr("col"),lmn(cell.x));
 	wid.gv->row=cell.y,iwrite(wid.gt,lmistr("row"),lmn(cell.y));
-	msg.target_ccell=wid.gt,msg.arg_ccell=ls(v);
+	msg.target_ccell=wid.gt,msg.arg_ccell=v;
 }
 void grid_keys(int code){
 	lv*fnt=wid.g.font?wid.g.font:FONT_MONO, *hfnt=FONT_BODY;
@@ -1294,7 +1300,7 @@ void modal_enter(int type){
 		lv*w=ob.sel->lv[0];
 		ms.name=(field_val){rtext_cast(ifield(w,"name")),0};
 		ms.text=(field_val){rtext_cast(ifield(w,"format")),0};
-		str r=str_new();fjson(&r,l_cols(ifield(w,"value")));ms.edit_json=1;
+		str r=str_new();flove(&r,l_cols(ifield(w,"value")));ms.edit_json=1;
 		ms.form0=(field_val){rtext_cast(lmstr(r)),0};
 	}
 	if(type==modal_slider_props){
@@ -1400,7 +1406,7 @@ void import_image(char*path){
 	if(color){i=readimage(path,!dr.color);}else if(ow&&!tw){EACH(z,i->b)i->b->sv[z]=i->b->sv[z]!=32;}
 	setuimode(mode_draw),bg_paste(i->b,1);if(color&&!dr.color)dr.limbo_dither=1,dither_threshold=0.5;dr.fatbits=0;dr.omask=m;
 }
-lv* table_decode(lv*text,lv*format){return ms.edit_json?l_table(l_parse(lmistr("%j"),text)): n_readcsv(NULL,format->c?lml2(text,format):l_list(text));}
+lv* table_decode(lv*text,lv*format){return ms.edit_json?l_table(l_parse(lmistr("%J"),text)): n_readcsv(NULL,format->c?lml2(text,format):l_list(text));}
 lv* modal_open_path(void){
 	int n=ms.grid.table->n,r=ms.grid.row;
 	char t[PATH_MAX]={0};directory_cat(t,ms.path,r<n&&r>=0?ms.grid.table->lv[1]->lv[r]->sv:"");return lmcstr(t);
@@ -1438,7 +1444,7 @@ void modal_exit(int value){
 		return;
 	}
 	if(ms.type==modal_gridcell&&value){
-		grid_edit_cell(ms.cell,ls(rtext_all(ms.text.table)));
+		grid_edit_cell(ms.cell,ms.pending_grid_cell_rich?rtext_cast(ms.text.table):ls(rtext_all(ms.text.table)));
 	}
 	if(ms.type==modal_card_props){
 		lv*card=ifield(deck,"card");
@@ -1850,7 +1856,7 @@ void modals(void){
 	else if(ms.type==modal_gridcell){
 		rect c=ms.pending_grid_cell;
 		draw_rect(inset(c,-2),32),draw_box(inset(c,-2),0,1);
-		ui_field(c,&ms.text);
+		if(ms.pending_grid_cell_rich){ui_richedit(c,1,&ms.text);}else{ui_field(c,&ms.text);}
 		if(ev.click&&!over(c))modal_exit(1);
 		if(ev.exit)modal_exit(0);
 	}
@@ -2117,7 +2123,7 @@ void modals(void){
 		if(ui_checkbox((rect){cb.x,cb.y,b.w/2,16},"Select by Cell",1,bycell   )){bycell   ^=1;iwrite(grid,lmistr("bycell"   ),lmn(bycell   )),mark_dirty();}
 		pair eb={b.x+(b.w/2),b.y+130+70};
 		if(ui_radio((rect){eb.x,eb.y,b.w/2,16},"Edit as JSON",1,ms.edit_json==1)){
-			str r=str_new();fjson(&r,l_cols(eval));ms.form0=(field_val){rtext_cast(lmstr(r)),0};ms.edit_json=1;
+			str r=str_new();flove(&r,l_cols(eval));ms.form0=(field_val){rtext_cast(lmstr(r)),0};ms.edit_json=1;
 		}eb.y+=16;
 		if(ui_radio((rect){eb.x,eb.y,b.w/2,16},"Edit as CSV",1,ms.edit_json==0)){
 			ms.form0=(field_val){rtext_cast(n_writecsv(NULL,format->c?lml2(eval,format):l_list(eval))),0};ms.edit_json=0;
@@ -3620,7 +3626,7 @@ void paste_any(void){
 		lv*b=image_read(get_clip())->b;setuimode(mode_draw);bg_paste(b,0);
 	}}
 	else if(has_clip("%%WGT")){if(menu_item("Paste Widgets",1,'v')){
-		lv*t=get_clip();int f=1,i=6,n=t->c-i;lv*v=pjson(t->sv,&i,&f,&n);
+		lv*t=get_clip();int f=1,i=6,n=t->c-i;lv*v=plove(t->sv,&i,&f,&n);
 		lv*defs=dget(v,lmistr("d")),*wids=dget(v,lmistr("w"));wids=wids?ll(wids):lml(0);
 		merge_fonts(deck,dget(v,lmistr("f"))),merge_prototypes(deck,defs?ld(defs):lmd(),wids),ob_create(wids);
 	}}

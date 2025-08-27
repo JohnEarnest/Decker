@@ -253,6 +253,8 @@ Additionally, grids support a few special format codes:
 - `L`: Lock. Format as a plain string (like `s`), but do not allow the user to edit cells in this column.
 - `I`: Icon. Interpret the column as numeric and draw it using icons from the table below, and do not allow the user to edit cells in this column.
 - `B`: Boolean Icon. Interpret the column as boolean and draw it as a check icon (true) or no icon (false).
+- `t`: Rich text. Display the column as editable rtext cells. Note that links in rtext cells are not "clickable."
+- `T`: Rich text, Locked. Display the column as non-editable rtext cells. Note that links in rtext cells are not "clickable."
 
 ![](images/icons.gif)
 
@@ -1417,7 +1419,7 @@ Events are as follows:
 | grid        | `click`      | Row number.                                  | The user selects a row in the grid.                            |
 | grid        | `order`      | Column name as a string.                     | The user clicks a header cell on the grid.                     |
 | grid        | `change`     | `grid.value` (table).                        | The user alters the data in the the grid.                      |
-| grid        | `changecell` | Replacement value (string).                  | The user edits a cell in the grid.                             |
+| grid        | `changecell` | Replacement value (string or rtext).         | The user edits a cell in the grid.                             |
 | canvas      | `click`      | `pos` on the canvas.                         | The user depresses their pointing device on a canvas.          |
 | canvas      | `drag`       | `pos` on the canvas.                         | The user moves their pointing device while held on a canvas.   |
 | canvas      | `release`    | `pos` on the canvas.                         | The user releases their pointing device on a canvas.           |
@@ -1470,7 +1472,7 @@ end
 
 on changecell x do
 	f:me.format[me.col] f:if count f f else "s" end
-	me.cellvalue:("%%%l" format f) parse x
+	me.cellvalue:if "t"~f x else ("%%%l" format f) parse x end
 	me.event["change" me.value]
 end
 

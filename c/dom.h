@@ -144,7 +144,7 @@ char* default_handlers=""
 "end\n"
 "on changecell x do "
 "	f:me.format[me.col] f:if count f f else \"s\" end "
-"	me.cellvalue:(\"%%%l\" format f) parse x "
+"	me.cellvalue:if \"t\"~f x else (\"%%%l\" format f) parse x end "
 "	me.event[\"change\" me.value] "
 "end\n"
 "on loop x do"
@@ -2396,7 +2396,7 @@ lv* n_con_copy(lv*card,lv*z){
 	lv*deck=ivalue(card,"deck"),*condefs=ifield(deck,"contraptions");find_fonts(deck,v,z);EACH(w,wids){
 		lv*wid=wids->lv[w],*type=dget(wid,lmistr("type")),*def=dget(wid,lmistr("def"));
 		if(!strcmp(type->sv,"contraption")&&dget(defs,def)==NULL)dset(defs,def,prototype_write(dget(condefs,def)));
-	}str r=str_new();str_addz(&r,"%%WGT0");fjson(&r,v);return lmstr(r);
+	}str r=str_new();str_addz(&r,"%%WGT0");flove(&r,v);return lmstr(r);
 }
 lv* n_deck_add(lv*self,lv*z);lv* deck_read(lv*x); // forward refs
 void merge_prototypes(lv*deck,lv*defs,lv*uses){
@@ -2419,7 +2419,7 @@ void merge_prototypes(lv*deck,lv*defs,lv*uses){
 }
 lv* n_con_paste(lv*card,lv*z){
 	z=l_first(z);if(!lis(z)||!has_prefix(z->sv,"%%wgt0"))return LNIL;
-	int f=1,i=6,n=z->c-i;lv*v=ld(pjson(z->sv,&i,&f,&n)),*defs=dget(v,lmistr("d")),*wids=dget(v,lmistr("w"));wids=wids?ll(wids):lml(0);
+	int f=1,i=6,n=z->c-i;lv*v=ld(plove(z->sv,&i,&f,&n)),*defs=dget(v,lmistr("d")),*wids=dget(v,lmistr("w"));wids=wids?ll(wids):lml(0);
 	lv*deck=ivalue(card,"deck");merge_fonts(deck,dget(v,lmistr("f"))),merge_prototypes(deck,defs?ld(defs):lmd(),wids);
 	return con_paste_raw(card,wids);
 }
@@ -2597,11 +2597,11 @@ lv* n_deck_copy(lv*deck,lv*z){
 	lv*wids=ifield(z,"widgets");find_fonts(deck,v,wids);EACH(w,wids){
 		lv*wid=wids->lv[w];if(!contraption_is(wid))continue;
 		lv*d=ifield(wid,"def"),*n=ifield(d,"name");if(dget(defs,n)==NULL)dset(defs,n,prototype_write(d));
-	}str r=str_new();str_addz(&r,"%%CRD0");fjson(&r,v);return lmstr(r);
+	}str r=str_new();str_addz(&r,"%%CRD0");flove(&r,v);return lmstr(r);
 }
 lv* deck_paste_named(lv*deck,lv*z,lv*name){
 	z=l_first(z);if(!lis(z)||!has_prefix(z->sv,"%%crd0"))return LNIL;
-	int f=1,i=6,n=z->c-i;lv*v=ld(pjson(z->sv,&i,&f,&n)),*payload=dget(v,lmistr("c")),*defs=dget(v,lmistr("d"));payload=payload?ld(payload):lmd();
+	int f=1,i=6,n=z->c-i;lv*v=ld(plove(z->sv,&i,&f,&n)),*payload=dget(v,lmistr("c")),*defs=dget(v,lmistr("d"));payload=payload?ld(payload):lmd();
 	merge_fonts(deck,dget(v,lmistr("f")));
 	lv*wids=dget(payload,lmistr("widgets"));if(wids&&lid(wids)){EACH(z,wids)dset(wids->lv[z],lmistr("name"),wids->kv[z]);}
 	merge_prototypes(deck,defs?ld(defs):lmd(),wids?ll(wids):lml(0));
