@@ -789,7 +789,7 @@ widget_grid=(target,x,value)=>{
 		hrow=value.row,hcol=value.col
 		draw_rect(x.bycell&&value.col>=0?grid_hcell(rect(value.col,rr)): rowh(rr),fcol)
 	}
-	for(let z=0,cols=0,cx=0;z<nc&&cx+cw(cols)<=bb.w;z++,cols++){
+	let drawncol=0;for(let z=0,cols=0,cx=0;z<nc&&cx+cw(cols)<=bb.w;z++,cols++){
 		const hs=rect(bh.x+4+cx,bh.y+1,cw(cols)-5,bh.h-2)
 		if(hs.w<=0)continue; // suppressed column
 		if(headers){
@@ -798,7 +798,7 @@ widget_grid=(target,x,value)=>{
 			draw_textc(hs,tk[z],hfnt,x.lines^dp?bcol:fcol); if(oa&&!ev.drag)uicursor=cursor.point
 			if(oa&&ev.mu)msg.target_order=target,msg.arg_order=lms(tk[z])
 		}
-		if(cols&&x.lines)draw_invert(pal,rect(hs.x-3,b.y+1,1,b.h-2));cx+=cw(cols)
+		if(drawncol&&x.lines)draw_invert(pal,rect(hs.x-3,b.y+1,1,b.h-2));cx+=cw(cols),drawncol=1
 		for(let y=0;y<nrd;y++){
 			const cell=rect(hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1), v=tab_cell(value.table,tk[z],y+value.scroll)
 			const fc=x.format[z]=='L'?'s':(x.format[z]||'s'), ccol=y+value.scroll==hrow&&(x.bycell?cols==hcol :1)?bcol:fcol

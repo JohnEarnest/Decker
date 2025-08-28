@@ -640,7 +640,7 @@ int widget_grid(lv*target,grid x,grid_val*value){
 		if(x.bycell&&value->col>=0){draw_rect(grid_hcell(x,value->col,grid_cell(x,value,bb,(pair){value->col,rr})),fcol);}
 		else{draw_rect(rowh(rr),fcol);}
 	}
-	for(int z=0,cols=0,cx=0;z<nc&&cx+cw(cols)<=bb.w;z++,cols++){
+	int drawncol=0;for(int z=0,cols=0,cx=0;z<nc&&cx+cw(cols)<=bb.w;z++,cols++){
 		rect hs=(rect){bh.x+4+cx,bh.y+1,cw(cols)-5,bh.h-2};
 		if(hs.w<=0)continue; // suppressed column
 		if(x.headers){
@@ -650,7 +650,7 @@ int widget_grid(lv*target,grid x,grid_val*value){
 			if(oa&&!ev.drag)uicursor=cursor_point;
 			if(oa&&ev.mu){msg.target_order=target,msg.arg_order=value->table->kv[z];}
 		}
-		if(cols&&x.lines)draw_invert(pal,(rect){hs.x-3,b.y+1,1,b.h-2});cx+=cw(cols);
+		if(drawncol&&x.lines)draw_invert(pal,(rect){hs.x-3,b.y+1,1,b.h-2});cx+=cw(cols);drawncol=1;
 		for(int y=0;y<nrd;y++){
 			int ccol=y+value->scroll==hrow&&(x.bycell?cols==hcol :1)?bcol:fcol;
 			rect cell={hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1}; lv*v=value->table->lv[z]->lv[y+value->scroll];
