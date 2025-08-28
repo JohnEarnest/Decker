@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:3
+card:4
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -68,6 +68,18 @@ richy:{"type":"grid","size":[201,167],"pos":[14,137],"widths":[52],"format":"sT"
 {script:bycell.0}
 on view do
  me.text:"%j" format list two.cell,two.colname
+end
+{end}
+
+{card:bycell_skip}
+{widgets}
+grid1:{"type":"grid","size":[377,90],"pos":[71,77],"bycell":1,"widths":[0,0,50,50,0,50,0],"value":{"one":["11","111"],"two":["22","222"],"three":["33","333"],"four":["44","444"],"five":["55","555"],"six":["66","666"],"seven":["77","777"]},"row":1,"col":2}
+field1:{"type":"field","size":[100,20],"pos":[207,32],"animated":1,"volatile":1,"script":"bycell_skip.0"}
+grid2:{"type":"grid","size":[206,86],"pos":[136,205],"bycell":1,"widths":[50,50,0,0,50],"value":{"one":["11","111"],"two":["22","222"],"three":["33","333"],"four":["44","444"],"five":["55","555"]},"row":0,"col":1}
+
+{script:bycell_skip.0}
+on view do
+ me.data:grid1.cell
 end
 {end}
 

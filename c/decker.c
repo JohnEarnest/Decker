@@ -726,8 +726,8 @@ void grid_keys(int code){
 	int rh=font_h(fnt)+5, bh=wid.g.headers?font_h(hfnt)+5:0, nrd=MIN(nr,((wid.g.size.h-bh+1)/rh));
 	if(code==KEY_UP      ){m=1;if(r==-1){r=0;}else{r-=1;}}
 	if(code==KEY_DOWN    ){m=1;if(r==-1){r=0;}else{r+=1;}}
-	if(code==KEY_LEFT    ){m=1;if(c==-1){c=0;}else{c-=1;}}
-	if(code==KEY_RIGHT   ){m=1;if(c==-1){c=0;}else{c+=1;}}
+	if(code==KEY_LEFT    ){m=1;if(c==-1){c=0;}else{int d=c-1;while(d>0   &&d<wid.g.widths[0]&&wid.g.widths[d+1]==0)d--;if(d>=wid.g.widths[0]||wid.g.widths[d+1])c=d;}}
+	if(code==KEY_RIGHT   ){m=1;if(c==-1){c=0;}else{int d=c+1;while(d<nc-1&&d<wid.g.widths[0]&&wid.g.widths[d+1]==0)d++;if(d>=wid.g.widths[0]||wid.g.widths[d+1])c=d;}}
 	if(code==KEY_PAGEUP  ){m=1;if(r==-1)r=0;r-=nrd;}
 	if(code==KEY_PAGEDOWN){m=1;if(r==-1)r=0;r+=nrd;}
 	if(code==KEY_HOME    ){m=1;r=0;}

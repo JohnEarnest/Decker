@@ -868,11 +868,11 @@ grid_edit_cell=(cell,v)=>{
 grid_keys=(code,shift)=>{
 	const fnt=wid.g.font?wid.g.font:FONT_MONO, hfnt=FONT_BODY, nr=count(wid.gv.table), nc=tab_cols(wid.gv.table).length
 	let m=0, r=wid.gv.row, c=wid.gv.col
-	const rh=font_h(fnt)+5, bh=wid.g.headers?font_h(hfnt)+5:0, nrd=min(nr,0|((wid.g.size.h-bh+1)/rh))
+	const rh=font_h(fnt)+5, bh=wid.g.headers?font_h(hfnt)+5:0, nrd=min(nr,0|((wid.g.size.h-bh+1)/rh)), wd=wid.g.widths
 	if(code=='ArrowUp'   ){m=1;if(r==-1){r=0}else{r-=1}}
 	if(code=='ArrowDown' ){m=1;if(r==-1){r=0}else{r+=1}}
-	if(code=='ArrowLeft' ){m=1;if(c==-1){c=0}else{c-=1}}
-	if(code=='ArrowRight'){m=1;if(c==-1){c=0}else{c+=1}}
+	if(code=='ArrowLeft' ){m=1;if(c==-1){c=0;}else{let d=c-1;while(d>0   &&d<wd.length&&wd[d]==0)d--;if(d>=wd.length||wd[d])c=d}}
+	if(code=='ArrowRight'){m=1;if(c==-1){c=0;}else{let d=c+1;while(d<nc-1&&d<wd.length&&wd[d]==0)d++;if(d>=wd.length||wd[d])c=d}}
 	if(code=='PageUp'    ){m=1;if(r==-1)r=0;r-=nrd}
 	if(code=='PageDown'  ){m=1;if(r==-1)r=0;r+=nrd}
 	if(code=='Home'      ){m=1,r=0}
