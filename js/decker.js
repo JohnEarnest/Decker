@@ -770,15 +770,24 @@ widget_grid=(target,x,value)=>{
 	if(sel){if(wid.fv)field_exit();wid.ingrid=1,wid.g=x,wid.gv=value,wid.gt=target}; if(x.show!='transparent')draw_rect(b,bcol)
 	const bh=rect(b.x,b.y,b.w,headers?font_h(hfnt)+5:0), nrd=0|min(nr,((b.h-bh.h+1)/rh)), scrollmax=nr-nrd
 	const sbar=scrollbar(rect(b.x,b.y+(headers?bh.h-1:0),b.w,b.h-(headers?bh.h-1:0)),scrollmax,1,nrd,value.scroll,showscroll,x.show=='invert')
-	const bb=sbar.size; value.scroll=sbar.scroll, hwt=x.widths.reduce((x,y)=>x+y,0)
+	const bb=sbar.size; value.scroll=sbar.scroll
 	draw_box(x.lines?b:rect(b.x,bb.y,b.w,b.h-(bb.y-b.y)),0,sel?13:fcol)
-	const cw=n=>0|(n>=x.widths.length?((bb.w-hwt)/(nc-x.widths.length)):x.widths[n])
-	const grid_cell=pos=>{let cx=0;for(let z=0;z<min(nc,pos.x);z++)cx+=cw(z);return rclip(bb,rect(bb.x+cx,bb.y+rh*pos.y+1,pos.x==nc-1?bb.w-cx:cw(pos.x),rh-1))}
+
+	const cw=[];for(let z=0;z<nc;z++)cw.push(z>=x.widths.length?-1:x.widths[z])
+	const _patby =tk.indexOf('_patby');if(_patby !=-1)cw[_patby ]=0
+	const hwt=x.widths.reduce((sofar,_,i)=>sofar+cw[i],0), nwt=cw.filter(x=>x==-1).length
+	for(let z=x.widths.length;z<nc;z++)cw[z]=cw[z]==-1?0|((bb.w-hwt)/nwt):0
+
+	const grid_cell=pos=>{let cx=0;for(let z=0;z<min(nc,pos.x);z++)cx+=cw[z];return rclip(bb,rect(bb.x+cx,bb.y+rh*pos.y+1,pos.x==nc-1?bb.w-cx:cw[pos.x],rh-1))}
 	const grid_hcell=pos=>{const r=inset(grid_cell(pos),x.lines?1:0);if(pos.x&&x.lines)r.x+=1,r.w-=1;return r}
 	if(x.lines)draw_rect(bh,fcol);if(nc<=0)draw_textc(inset(bb,1),'(no data)',hfnt,fcol)
 	const rowb=n=>rect(bb.x,bb.y+rh*n,bb.w,rh)
 	const rowh=n=>inset(rect(bb.x+1,bb.y+rh*n+2,bb.w-2,rh-3),x.lines?0:-1)
 	let clicked=0,rsel=0,hrow=-1,hcol=-1;for(let y=0;y<nrd;y++){
+		if(_patby!=-1){
+			const p=clamp(0,ln(tab_cell(value.table,tk[_patby],y+value.scroll)),47)
+			if(p){const t=rowb(y);if(y==0)t.y+=1,t.h-=1; draw_rect(t,p)}
+		}
 		const ra=in_layer()&&over(bb)&&over(rowb(y));let cbox=rect()
 		if(ra&&x.bycell){for(let z=0;z<nc;z++){const cell=rect(z,y);if(over(grid_cell(cell)))hcol=z,cbox=grid_hcell(cell)}}
 		if(ra&&(ev.md||ev.drag)){rsel=1,hrow=y+value.scroll,draw_rect(x.bycell?cbox:rowh(y),fcol)}
@@ -789,8 +798,8 @@ widget_grid=(target,x,value)=>{
 		hrow=value.row,hcol=value.col
 		draw_rect(x.bycell&&value.col>=0?grid_hcell(rect(value.col,rr)): rowh(rr),fcol)
 	}
-	let drawncol=0;for(let z=0,cols=0,cx=0;z<nc&&cx+cw(cols)<=bb.w;z++,cols++){
-		const hs=rect(bh.x+4+cx,bh.y+1,cw(cols)-5,bh.h-2)
+	let drawncol=0;for(let z=0,cols=0,cx=0;z<nc&&cx+cw[cols]<=bb.w;z++,cols++){
+		const hs=rect(bh.x+4+cx,bh.y+1,cw[cols]-5,bh.h-2)
 		if(hs.w<=0)continue; // suppressed column
 		if(headers){
 			const oa=target&&in_layer()&&over(hs)&&((ev.drag||ev.mu)?dover(hs):1)&&!wid.col_drag
@@ -798,7 +807,7 @@ widget_grid=(target,x,value)=>{
 			draw_textc(hs,tk[z],hfnt,x.lines^dp?bcol:fcol); if(oa&&!ev.drag)uicursor=cursor.point
 			if(oa&&ev.mu)msg.target_order=target,msg.arg_order=lms(tk[z])
 		}
-		if(drawncol&&x.lines)draw_invert(pal,rect(hs.x-3,b.y+1,1,b.h-2));cx+=cw(cols),drawncol=1
+		if(drawncol&&x.lines)draw_invert(pal,rect(hs.x-3,b.y+1,1,b.h-2));cx+=cw[cols],drawncol=1
 		for(let y=0;y<nrd;y++){
 			const cell=rect(hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1), v=tab_cell(value.table,tk[z],y+value.scroll)
 			const fc=x.format[z]=='L'?'s':(x.format[z]||'s'), ccol=y+value.scroll==hrow&&(x.bycell?cols==hcol :1)?bcol:fcol
@@ -826,13 +835,14 @@ widget_grid=(target,x,value)=>{
 		}
 	}
 	if(x.lines)for(let y=1;y<nrd;y++)draw_hline(bb.x,bb.x+bb.w,bb.y+rh*y,fcol)
-	if(!x.locked&&in_layer()&&target)for(let z=0,cx=bh.x;z<nc;cx+=cw(z),z++){
-		const h=rect(cx+cw(z)-1,bh.y,5,bh.h);if(h.x+h.w>b.x+b.w)break
+	if(!x.locked&&in_layer()&&target)for(let z=0,cx=bh.x;z<nc;cx+=cw[z],z++){
+		if(cw[z]==0)continue
+		const h=rect(cx+cw[z]-1,bh.y,5,bh.h);if(h.x+h.w>b.x+b.w)break
 		if(over(h))draw_vline(h.x+2,h.y,h.y+h.h,13)
-		if(ev.md&&dover(h))wid.col_drag=1,wid.col_num=z,wid.col_orig=cw(z)
+		if(ev.md&&dover(h))wid.col_drag=1,wid.col_num=z,wid.col_orig=cw[z]
 		if(sel&&wid.col_drag&&wid.col_num==z&&ev.drag){
 			const s=min(max(10,wid.col_orig+(ev.pos.x-ev.dpos.x)),bb.w-10),i=z;uicursor=cursor.drag
-			iwrite(target,lms('widths'),lml(range(max(x.widths.length,i+1)).map(z=>lmn(i==z?s:cw(z))))),mark_dirty()
+			iwrite(target,lms('widths'),lml(range(max(x.widths.length,i+1)).map(z=>lmn(i==z?s:cw[z])))),mark_dirty()
 		}
 	}
 	if(target&&os!=value.scroll)iwrite(target,lms('scroll'),lmn(value.scroll)),mark_dirty()

@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:4
+card:5
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -80,6 +80,21 @@ grid2:{"type":"grid","size":[206,86],"pos":[136,205],"bycell":1,"widths":[50,50,
 {script:bycell_skip.0}
 on view do
  me.data:grid1.cell
+end
+{end}
+
+{card:grid_patby}
+{widgets}
+grid1:{"type":"grid","size":[118,150],"pos":[30,111],"widths":[66],"format":"sii","value":{"key":["white","yellow","orange","red","magenta","purple","blue","cyan","green","darkgreen","brown","tan","lightgray","mediumgray","darkgray","black"],"value":[32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47],"_patby":[32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]},"row":0}
+grid2:{"type":"grid","size":[118,150],"pos":[164,111],"lines":0,"widths":[66],"format":"sii","value":{"key":["white","yellow","orange","red","magenta","purple","blue","cyan","green","darkgreen","brown","tan","lightgray","mediumgray","darkgray","black"],"value":[32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47],"_patby":[32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]},"row":0}
+search:{"type":"field","size":[100,20],"pos":[358,46],"script":"grid_patby.0","value":"moonshine"}
+alcohols:{"type":"grid","size":[151,161],"pos":[336,99],"format":"s","value":{"name":["Turnip Wine","Turnip Moonshine","Potato Wine","Potato Moonshine","Fecal Kilju","Fecal Moonshine","Kilju","Moonshine","Carrot Wine","Carrot Moonshine","Beer","Rich Whiskey","Cider","Applejack","Ale","Whiskey","Sahti","Väkisahti","Kumis","Milk Moonshine","Rice Wine","Shochu","Watermelon Wine","Watermelon Moonshine","Blackcurrant Wine","Blackcurrant Liqueur","Wine","Brandy"],"_patby":[0,33,0,33,0,33,0,33,0,33,0,0,0,0,0,0,0,0,0,33,0,0,0,33,0,0,0,0]},"row":8}
+
+{script:grid_patby.0}
+on change val do
+ alcohols.value:update
+  _patby:colors.yellow * ((list "%l") format name) like ("*%l*" format me.text)
+ from alcohols.value
 end
 {end}
 

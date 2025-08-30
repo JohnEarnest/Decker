@@ -598,12 +598,10 @@ void widget_canvas(lv*target,canvas x,lv*image){
 	}
 }
 str cf;void grid_edit_cell(pair cell,lv*v);
-rect grid_cell(grid x,grid_val*value,rect bb,pair pos){
+rect grid_cell(grid x,grid_val*value,rect bb,pair pos,int*cw){
 	lv*fnt=x.font?x.font:FONT_MONO;
-	int hwt=0;for(int z=0;z<x.widths[0];z++)hwt+=x.widths[1+z];
-	#define cw(n) (n>=x.widths[0]?((bb.w-hwt)/(nc-x.widths[0])):x.widths[1+n])
-	int nc=value->table->c, rh=font_h(fnt)+(x.lines?5:3),cx=0; for(int z=0;z<MIN(nc,pos.x);z++)cx+=cw(z);
-	return box_intersect((rect){bb.x+cx,bb.y+rh*pos.y+1,pos.x==nc-1?bb.w-cx:cw(pos.x),rh-1},bb);
+	int nc=value->table->c, rh=font_h(fnt)+(x.lines?5:3),cx=0; for(int z=0;z<MIN(nc,pos.x);z++)cx+=cw[z];
+	return box_intersect((rect){bb.x+cx,bb.y+rh*pos.y+1,pos.x==nc-1?bb.w-cx:cw[pos.x],rh-1},bb);
 }
 rect grid_hcell(grid x,int column,rect cell){
 	cell=inset(cell,x.lines?1:0);if(column&&x.lines)cell.x+=1,cell.w-=1;return cell;
@@ -621,27 +619,37 @@ int widget_grid(lv*target,grid x,grid_val*value){
 	rect bh={b.x,b.y,b.w,x.headers?font_h(hfnt)+5:0}; int nrd=MIN(nr,((b.h-bh.h+1)/rh)), scrollmax=nr-nrd;
 	rect bb=scrollbar((rect){b.x,b.y+(x.headers?bh.h-1:0),b.w,b.h-(x.headers?bh.h-1:0)},scrollmax,1,nrd,&value->scroll,x.scrollbar,x.show==show_invert);
 	draw_box(x.lines?b:(rect){b.x,bb.y,b.w,b.h-(bb.y-b.y)},0,sel?13:fcol);
-	int hwt=0;for(int z=0;z<x.widths[0];z++)hwt+=x.widths[1+z];
 	char*pal=patterns_pal(ifield(deck,"patterns"));
 	if(x.lines)draw_rect(bh,fcol);if(nc<=0)draw_textc(inset(bb,1),"(no data)",hfnt,fcol);
+
+	int cw[MAX(1,nc)];for(int z=0;z<nc;z++)cw[z]=z>=x.widths[0]?-1:x.widths[1+z];
+	int _patby =dgeti(value->table,lmistr("_patby"));if(_patby !=-1)cw[_patby ]=0;
+	int hwt=0;for(int z=0;z<x.widths[0];z++)hwt+=cw[z];
+	int nwt=0;for(int z=0;z<nc         ;z++)nwt+=cw[z]==-1;
+	for(int z=x.widths[0];z<nc         ;z++)cw[z]=cw[z]==-1?(bb.w-hwt)/nwt:0;
+
 	if(!cf.sv)cf=str_new();
 	#define rowh(n) inset((rect){bb.x+1,bb.y+rh*n+2,bb.w-2,rh-3},x.lines?0:-1)
 	#define rowb(n) (rect){bb.x,bb.y+rh*n,bb.w,rh}
 	int clicked=0,rsel=0,hrow=-1,hcol=-1;
 	for(int y=0;y<nrd;y++){
+		if(_patby!=-1){
+			int p=CLAMP(0,ln(value->table->lv[_patby]->lv[y+value->scroll]),47);
+			if(p){rect t=rowb(y);if(y==0)t.y+=1,t.h-=1; draw_rect(t,p);}
+		}
 		int ra=in_layer()&&over(bb)&&over(rowb(y));rect cbox={0};
-		if(ra&&x.bycell){for(int z=0;z<nc;z++){rect cell=grid_cell(x,value,bb,(pair){z,y});if(over(cell))hcol=z,cbox=grid_hcell(x,z,cell);}}
+		if(ra&&x.bycell){for(int z=0;z<nc;z++){rect cell=grid_cell(x,value,bb,(pair){z,y},cw);if(over(cell))hcol=z,cbox=grid_hcell(x,z,cell);}}
 		if(ra&&(ev.md||ev.drag)){rsel=1,hrow=y+value->scroll;draw_rect(x.bycell?cbox:rowh(y),fcol);}
 		if(ra&&ev.mu)clicked=1,value->row=y+value->scroll,value->col=hcol;
 		if(ra&&!ev.drag)uicursor=cursor_point;
 	}int rr=value->row-value->scroll;
 	if(!rsel&&rr>=0&&rr<nrd&&(x.bycell?value->col>=0&&value->col<nc:1)){
 		hrow=value->row,hcol=value->col;
-		if(x.bycell&&value->col>=0){draw_rect(grid_hcell(x,value->col,grid_cell(x,value,bb,(pair){value->col,rr})),fcol);}
+		if(x.bycell&&value->col>=0){draw_rect(grid_hcell(x,value->col,grid_cell(x,value,bb,(pair){value->col,rr},cw)),fcol);}
 		else{draw_rect(rowh(rr),fcol);}
 	}
-	int drawncol=0;for(int z=0,cols=0,cx=0;z<nc&&cx+cw(cols)<=bb.w;z++,cols++){
-		rect hs=(rect){bh.x+4+cx,bh.y+1,cw(cols)-5,bh.h-2};
+	int drawncol=0;for(int z=0,cols=0,cx=0;z<nc&&cx+cw[cols]<=bb.w;z++,cols++){
+		rect hs=(rect){bh.x+4+cx,bh.y+1,cw[cols]-5,bh.h-2};
 		if(hs.w<=0)continue; // suppressed column
 		if(x.headers){
 			int oa=target&&in_layer()&&over(hs)&&((ev.drag||ev.mu)?dover(hs):1)&&!wid.col_drag;
@@ -650,7 +658,7 @@ int widget_grid(lv*target,grid x,grid_val*value){
 			if(oa&&!ev.drag)uicursor=cursor_point;
 			if(oa&&ev.mu){msg.target_order=target,msg.arg_order=value->table->kv[z];}
 		}
-		if(drawncol&&x.lines)draw_invert(pal,(rect){hs.x-3,b.y+1,1,b.h-2});cx+=cw(cols);drawncol=1;
+		if(drawncol&&x.lines)draw_invert(pal,(rect){hs.x-3,b.y+1,1,b.h-2});cx+=cw[cols];drawncol=1;
 		for(int y=0;y<nrd;y++){
 			int ccol=y+value->scroll==hrow&&(x.bycell?cols==hcol :1)?bcol:fcol;
 			rect cell={hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1}; lv*v=value->table->lv[z]->lv[y+value->scroll];
@@ -675,7 +683,7 @@ int widget_grid(lv*target,grid x,grid_val*value){
 				else if(f=='B'||f=='b'){grid_edit_cell(tc,ls(lmn(!lb(v))));} // toggle
 				else{
 					ms.pending_grid_cell_rich=f=='t';
-					wid.pending_grid_edit=1,ms.pending_grid_cell=grid_cell(x,value,bb,(pair){tc.x,tc.y-value->scroll});
+					wid.pending_grid_edit=1,ms.pending_grid_cell=grid_cell(x,value,bb,(pair){tc.x,tc.y-value->scroll},cw);
 					ms.pending_grid_cell.y-=1,ms.pending_grid_cell.w+=1,ms.pending_grid_cell.h+=2;
 					ms.cell=tc;ms.text=(field_val){f=='t'?rtext_cast(v):rtext_cast(lmcstr(cf.sv)),0};
 				}
@@ -683,13 +691,14 @@ int widget_grid(lv*target,grid x,grid_val*value){
 		}
 	}
 	if(x.lines)for(int y=1;y<nrd;y++)draw_hline(bb.x,bb.x+bb.w,bb.y+rh*y,fcol);
-	if(!x.locked&&in_layer()&&target)for(int z=0,cx=bh.x;z<nc;cx+=cw(z),z++){
-		rect h={cx+cw(z)-1,bh.y,5,bh.h};if(h.x+h.w>b.x+b.w)break;
+	if(!x.locked&&in_layer()&&target)for(int z=0,cx=bh.x;z<nc;cx+=cw[z],z++){
+		if(cw[z]==0)continue;
+		rect h={cx+cw[z]-1,bh.y,5,bh.h};if(h.x+h.w>b.x+b.w)break;
 		if(over(h))draw_vline(h.x+2,h.y,h.y+h.h,13);
-		if(ev.md&&dover(h)){wid.col_drag=1,wid.col_num=z,wid.col_orig=cw(z);}
+		if(ev.md&&dover(h)){wid.col_drag=1,wid.col_num=z,wid.col_orig=cw[z];}
 		if(sel&&wid.col_drag&&wid.col_num==z&&ev.drag){
 			int s=MIN(MAX(10,wid.col_orig+(ev.pos.x-ev.dpos.x)),bb.w-10),i=z;uicursor=cursor_drag;
-			GEN(r,MAX(x.widths[0],i+1))lmn(i==z?s:cw(z));iwrite(target,lmistr("widths"),r),mark_dirty();
+			GEN(r,MAX(x.widths[0],i+1))lmn(i==z?s:cw[z]);iwrite(target,lmistr("widths"),r),mark_dirty();
 		}
 	}
 	if(target&&os!=value->scroll)iwrite(target,lmistr("scroll"),lmn(value->scroll)),mark_dirty();

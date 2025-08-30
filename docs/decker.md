@@ -262,6 +262,10 @@ Numeric columns (format types `fcCihH`) are displayed right-aligned, and all oth
 
 For example, a grid containing a table with four columns given the format string `sfL` would display the first column as strings (`s`), the second column as floating-point numbers (`f`), the third column as a "locked" string column that cannot be edited (`L`), and since the fourth column does not have a format character specified it would _implicitly_ be formatted as a string column.
 
+If a grid's table contains columns with certain "magic names", those columns will be hidden and the values in their cells will influence how the corresponding rows are drawn:
+
+- `_patby`: a column of [pattern indices](#patternsinterface) used to control the background pattern/color for each row.
+
 The grid properties dialog displays the contents of the grid's table encoded as JSON or CSV, and allows it to be edited directly. In JSON mode, tables will initially be shown as an object containing columns as lists (as given by the Lil `cols` operator), but the dialog also _accepts_ a list of objects or a list of lists (as accepted by the Lil `table` operator). In CSV mode, the table will be parsed and displayed based on the table's format string, if any. Switching modes will parse the table under the current representation and then re-format in the new representation.
 
 In interact mode, you can select a particular row by clicking on it. If the grid is unlocked, you can additionally sort columns by clicking a header or edit a specific cell's value by double-clicking it. The user's input will be parsed based on the column's format type, if any. Double-clicking a boolean column (formatted as `b` or `B`) will directly toggle the value. Double-clicking a column formatted as `L` or `I` will have no effect. If the grid has headers and more than one column is displayed, you can drag the space between column headings to resize the columns. By default, every column is given equal horizontal space. You can restore default spacing by clicking "Reset Widths" in the grid properties dialog.
