@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:5
+card:6
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -86,7 +86,7 @@ end
 {card:grid_patby}
 {widgets}
 grid1:{"type":"grid","size":[118,150],"pos":[30,111],"widths":[66],"format":"sii","value":{"key":["white","yellow","orange","red","magenta","purple","blue","cyan","green","darkgreen","brown","tan","lightgray","mediumgray","darkgray","black"],"value":[32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47],"_patby":[32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]},"row":0}
-grid2:{"type":"grid","size":[118,150],"pos":[164,111],"lines":0,"widths":[66],"format":"sii","value":{"key":["white","yellow","orange","red","magenta","purple","blue","cyan","green","darkgreen","brown","tan","lightgray","mediumgray","darkgray","black"],"value":[32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47],"_patby":[32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]},"row":0}
+grid2:{"type":"grid","size":[118,150],"pos":[164,111],"lines":0,"widths":[66],"format":"sii","value":{"key":["white","yellow","orange","red","magenta","purple","blue","cyan","green","darkgreen","brown","tan","lightgray","mediumgray","darkgray","black"],"value":[32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47],"_patby":[32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]},"row":0,"col":0}
 search:{"type":"field","size":[100,20],"pos":[358,46],"script":"grid_patby.0","value":"moonshine"}
 alcohols:{"type":"grid","size":[151,161],"pos":[336,99],"format":"s","value":{"name":["Turnip Wine","Turnip Moonshine","Potato Wine","Potato Moonshine","Fecal Kilju","Fecal Moonshine","Kilju","Moonshine","Carrot Wine","Carrot Moonshine","Beer","Rich Whiskey","Cider","Applejack","Ale","Whiskey","Sahti","Väkisahti","Kumis","Milk Moonshine","Rice Wine","Shochu","Watermelon Wine","Watermelon Moonshine","Blackcurrant Wine","Blackcurrant Liqueur","Wine","Brandy"],"_patby":[0,33,0,33,0,33,0,33,0,33,0,0,0,0,0,0,0,0,0,33,0,0,0,33,0,0,0,0]},"row":8}
 
@@ -95,6 +95,52 @@ on change val do
  alcohols.value:update
   _patby:colors.yellow * ((list "%l") format name) like ("*%l*" format me.text)
  from alcohols.value
+end
+{end}
+
+{card:grid_hideby}
+{widgets}
+alcohols:{"type":"grid","size":[151,106],"pos":[336,99],"format":"s","value":{"name":["Turnip Wine","Turnip Moonshine","Potato Wine","Potato Moonshine","Fecal Kilju","Fecal Moonshine","Kilju","Moonshine","Carrot Wine","Carrot Moonshine","Beer","Rich Whiskey","Cider","Applejack","Ale","Whiskey","Sahti","Väkisahti","Kumis","Milk Moonshine","Rice Wine","Shochu","Watermelon Wine","Watermelon Moonshine","Blackcurrant Wine","Blackcurrant Liqueur","Wine","Brandy"],"_hideby":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"row":13}
+search:{"type":"field","size":[100,20],"pos":[358,46],"script":"grid_hideby.0"}
+field1:{"type":"field","size":[100,20],"pos":[364,248],"animated":1,"volatile":1,"script":"grid_hideby.1"}
+evens:{"type":"grid","size":[172,76],"pos":[59,147],"bycell":1,"format":"isiB","value":{"value":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],"name":["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen","twenty"],"_hideby":[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],"chek":[0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"row":12,"col":3}
+field2:{"type":"field","size":[141,18],"pos":[31,257],"animated":1,"volatile":1,"script":"grid_hideby.2"}
+button1:{"type":"button","size":[60,20],"pos":[185,258],"script":"grid_hideby.3","text":"reset"}
+scrolltarget:{"type":"field","size":[100,20],"pos":[52,291],"value":"1"}
+button2:{"type":"button","size":[60,20],"pos":[185,291],"script":"grid_hideby.4","text":"scrollto"}
+
+{script:grid_hideby.0}
+on change val do
+ alcohols.value:update
+  _hideby:!((list "%l") format name) like ("*%l*" format me.text)
+ from alcohols.value
+end
+{end}
+
+{script:grid_hideby.1}
+on view do
+ me.data:alcohols.cell,list alcohols.scroll
+end
+{end}
+
+{script:grid_hideby.2}
+on view do
+ v.row:evens.row
+ v.col:evens.col
+ v.scroll:evens.scroll
+ me.data:v
+end
+{end}
+
+{script:grid_hideby.3}
+on click do
+ evens.cell:-1,-1
+end
+{end}
+
+{script:grid_hideby.4}
+on click do
+ evens.scrollto[0+scrolltarget.text]
 end
 {end}
 

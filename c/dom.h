@@ -2048,15 +2048,35 @@ grid unpack_grid(lv*x,grid_val*value){
 	lv*w=ifield(x,"widths");r.widths[0]=w->c;EACH(z,w)r.widths[1+z]=ln(w->lv[z]);
 	return r;
 }
-int grid_scrollto(lv*t,grid g,int s,int r){
+void grid_pv(lv*self,lv**pv,lv**vp){
+	if(!self)return;
+	lv*pk=lmistr("pv"),*vk=lmistr("vp"),*p=dget(self->b,pk),*v=dget(self->b,vk);
+	if((!p)||p==LNIL){
+		lv*t=ifield(self,"value"),*c=dget(t,lmistr("_hideby"));
+		if(!c){p=lml(t->n);EACH(z,p)p->lv[z]=lmn(z);v=p;}
+		else{p=lml(0),v=lml(c->c);EACH(z,c){int n=lb(c->lv[z]);v->lv[z]=lmn(!n?p->c:-1);if(!n)ll_add(p,lmn(z));}}
+		dset(self->b,pk,p),dset(self->b,vk,v);
+	}*pv=p,*vp=v;
+}
+int grid_nrd(int rowcount,grid g){
 	int head=g.headers?10+5:0;         // default to body font height
 	int row=g.font?font_h(g.font):11;  // default to mono font height
-	int n=MIN(t->n,0|((g.size.h-head+1)/(row+5)));
-	return (r-s<0)?r: (r-s>=n)?r-(n-1): s;
+	return MIN(rowcount,0|((g.size.h-head+1)/(row+5)));
+}
+int grid_scrollto_simple(int rowcount,grid g,int s,int r){
+	int nrd=grid_nrd(rowcount,g);
+	return (r-s<0)?r: (r-s>=nrd)?r-(nrd-1): s;
+}
+int grid_scrollto(lv*self,grid g,int s,int r){
+	lv*pv=NULL,*vp=NULL;if(self!=NULL)grid_pv(self,&pv,&vp);r=CLAMP(0,r,vp->c-1);
+	#define permuted_row(disp_row) (((disp_row)==-1)?-1:pv?((int)ln(pv->lv[(disp_row)])):(disp_row))
+	#define display_row(perm_row)  (((perm_row)==-1)?-1:vp?((int)ln(vp->lv[(perm_row)])):(perm_row))
+	int nrd=grid_nrd(pv->c,g), rs=0;while(r<vp->c){rs=ln(vp->lv[r]);if(rs!=-1)break;r++;}
+	return (rs-s<0)?rs: (rs-s>=nrd)?rs-(nrd-1): s;
 }
 lv* n_grid_scrollto(lv*self,lv*x){
 	grid_val v;grid g=unpack_grid(self,&v);
-	int t=grid_scrollto(v.table,g,v.scroll,ln(l_first(x)));
+	int t=grid_scrollto(self,g,v.scroll,ln(l_first(x)));
 	if(t!=v.scroll)iwrite(self,lmistr("scroll"),lmn(t));
 	return self;
 }
@@ -2064,7 +2084,7 @@ lv* interface_grid(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return LNIL;
 	lv*data=self->b;
 	if(x){
-		ikey("value"    ){dset(data,i,lt(x));return x;}
+		ikey("value"    ){dset(data,i,lt(x)),dset(data,lmistr("pv"),LNIL);return x;}
 		ikey("scroll"   ){int n=MAX(0,ln(x));dset(data,i,lmn(n));return x;}
 		ikey("row"      ){int n=MAX(-1,ln(x));dset(data,i,lmn(n));return x;}
 		ikey("col"      ){if(!lin(x))return iwrite(self,lmistr("colname"),x);int n=MAX(-1,ln(x));dset(data,i,lmn(n));return x;}

@@ -1099,6 +1099,7 @@ data_write=(type,x)=>`%%${type}${btoa(Array.from(x).map(x=>String.fromCharCode(x
 is_rooted=x=>card_is(x)?!x.dead: widget_is(x)?(is_rooted(x.card)&&!x.dead): 1
 
 ceil=Math.ceil, clamp=(a,x,b)=>x<a?a:x>b?b:x, sign=x=>x>0?1:-1
+first=x=>x[0]
 last=x=>x[x.length-1]
 rect=(x,y,w,h)=>({x:x||0,y:y||0,w:w||0,h:h||0})
 rpair=(a,b)=>rect(a.x,a.y,b.x,b.y)
@@ -2182,16 +2183,35 @@ slider_write=x=>{
 	if(x.style&&x.style!='horiz')dset(r,lms('style'),lms(x.style))
 	return r
 }
-grid_scrollto=(t,g,s,r)=>{
-	const head=g.headers?10+5:0, row=g.font?font_h(g.font):11, n=min(count(t),0|((g.size.h-head+1)/(row+5)));
-	return (r-s<0)?r: (r-s>=n)?r-(n-1): s
+grid_pv=self=>{
+	let pv=null,vp=null
+	if(self&&!self.pv){
+		const t=ifield(self,'value'),c=tab_get(t,'_hideby'),nr=tab_rowcount(t);pv=[],vp=[]
+		if(!c){for(let z=0;z<nr;z++)pv.push(z);vp=pv}
+		else  {for(let z=0;z<nr;z++){const n=lb(c[z]);vp.push(n?-1:pv.length);if(!n)pv.push(z)}}
+		self.pv=pv,self.vp=vp
+	}else if(self){pv=self.pv,vp=self.vp}
+	const permuted_row=disp_row=> disp_row==-1?-1: !pv?disp_row: pv[disp_row]
+	const display_row =perm_row=> perm_row==-1?-1: !vp?perm_row: vp[perm_row]
+	return {pv,vp,permuted_row,display_row}
+}
+grid_nrd=(rowcount,g)=>{
+	const head=g.headers?10+5:0          // default to body font height
+	const row=g.font?font_h(g.font):11   // default to mono font height
+	return min(rowcount,0|((g.size.h-head+1)/(row+5)))
+}
+grid_scrollto=(self,g,s,r)=>{
+	let nrd=0;if((typeof self)!='number'){
+		const p=grid_pv(self);nrd=grid_nrd(p.pv.length,g);r=clamp(0,r,p.vp.length-1)
+		let rs=0;while(r<p.vp.length){rs=p.vp[r];if(rs!=-1)break;r++};r=rs
+	}else{nrd=grid_nrd(self,g)};return (r-s<0)?r: (r-s>=nrd)?r-(nrd-1): s
 }
 grid_read=(x,card)=>{
 	const ints=(x,n)=>{const r=[];for(let z=0;z<n&&z<x.length;z++)r.push(ln(x[z]));return r}
 	const ri=lmi((self,i,x)=>{
 		if(!is_rooted(self))return NIL
 		if(x){
-			if(ikey(i,'value'    ))return self.value=lt(x),x
+			if(ikey(i,'value'    ))return self.value=lt(x),self.pv=null,self.vp=null,x
 			if(ikey(i,'scroll'   ))return self.scroll=max(0,ln(x)),x
 			if(ikey(i,'row'      ))return self.row=max(-1,ln(x)),x
 			if(ikey(i,'col'      ))return (!lin(x)?iwrite(self,lms('colname'),x): self.col=max(-1,ln(x))),x
@@ -2227,7 +2247,7 @@ grid_read=(x,card)=>{
 			if(ikey(i,'scrollto'))return lmnat(z=>{
 				const sz=rpair(getpair(ifield(self,'pos')),getpair(ifield(self,'size'))), s=ln(ifield(self,'scroll'))
 				const g={size:sz,font:ifield(self,'font'),headers:lb(ifield(self,'headers'))}
-				const t=grid_scrollto(ifield(self,'value'),g,s,ln(z.length?z[0]:ZERO))
+				const t=grid_scrollto(self,g,s,ln(z.length?z[0]:ZERO))
 				if(t!=s)iwrite(self,lms('scroll'),lmn(t));return self
 			})
 		}return interface_widget(self,i,x)

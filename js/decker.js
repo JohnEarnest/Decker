@@ -762,7 +762,10 @@ grid_exit=_=>{
 widget_grid=(target,x,value)=>{
 	if(x.show=='none')return 0; const hfnt=FONT_BODY, hsize=x.headers?font_h(hfnt)+5:0, showscroll=x.size.h<=(50+hsize)||x.size.w<16?0:x.scrollbar
 	const fnt=x.font?x.font:FONT_MONO, os=value.scroll, or=value.row, oc=value.col, files=x.headers==2, headers=files||x.size.h<=hsize?0:x.headers
-	const tk=tab_cols(value.table), nr=count(value.table), nc=tk.length, rh=font_h(fnt)+(x.lines?5:3)
+	const tk=tab_cols(value.table), nc=tk.length, rh=font_h(fnt)+(x.lines?5:3), _patby=tk.indexOf('_patby'), _hideby=tk.indexOf('_hideby')
+	const p=grid_pv(target), nr=p.pv?p.pv.length: tab_rowcount(value.table)
+	const grid_cell_at=(col,row)=>tab_cell(value.table,col,p.permuted_row(row))
+
 	const fcol=!in_layer()?13:x.show=='invert'?32:1, bcol=x.show=='invert'?1:32, b=x.size, pal=deck.patterns.pal.pix
 	let sel=in_layer()&&x.show!='none'&&wid.active==wid.count
 	if(in_layer()&&dover(b)&&(ev.md||ev.mu||ev.drag)){if(!sel&&wid.gv)grid_exit(); wid.active=wid.count,sel=1}
@@ -774,7 +777,7 @@ widget_grid=(target,x,value)=>{
 	draw_box(x.lines?b:rect(b.x,bb.y,b.w,b.h-(bb.y-b.y)),0,sel?13:fcol)
 
 	const cw=[];for(let z=0;z<nc;z++)cw.push(z>=x.widths.length?-1:x.widths[z])
-	const _patby =tk.indexOf('_patby');if(_patby !=-1)cw[_patby ]=0
+	if(_patby!=-1)cw[_patby]=0;if(_hideby!=-1)cw[_hideby]=0
 	const hwt=x.widths.reduce((sofar,_,i)=>sofar+cw[i],0), nwt=cw.filter(x=>x==-1).length
 	for(let z=x.widths.length;z<nc;z++)cw[z]=cw[z]==-1?0|((bb.w-hwt)/nwt):0
 
@@ -785,17 +788,17 @@ widget_grid=(target,x,value)=>{
 	const rowh=n=>inset(rect(bb.x+1,bb.y+rh*n+2,bb.w-2,rh-3),x.lines?0:-1)
 	let clicked=0,rsel=0,hrow=-1,hcol=-1;for(let y=0;y<nrd;y++){
 		if(_patby!=-1){
-			const p=clamp(0,ln(tab_cell(value.table,tk[_patby],y+value.scroll)),47)
+			const p=clamp(0,ln(grid_cell_at(tk[_patby],y+value.scroll)),47)
 			if(p){const t=rowb(y);if(y==0)t.y+=1,t.h-=1; draw_rect(t,p)}
 		}
 		const ra=in_layer()&&over(bb)&&over(rowb(y));let cbox=rect()
 		if(ra&&x.bycell){for(let z=0;z<nc;z++){const cell=rect(z,y);if(over(grid_cell(cell)))hcol=z,cbox=grid_hcell(cell)}}
 		if(ra&&(ev.md||ev.drag)){rsel=1,hrow=y+value.scroll,draw_rect(x.bycell?cbox:rowh(y),fcol)}
-		if(ra&&ev.mu)clicked=1,value.row=y+value.scroll,value.col=hcol
+		if(ra&&ev.mu)clicked=1,value.row=p.permuted_row(y+value.scroll),value.col=hcol
 		if(ra&&!ev.drag)uicursor=cursor.point
-	}const rr=value.row-value.scroll;
+	}const rr=p.display_row(value.row)-value.scroll;
 	if(!rsel&&rr>=0&&rr<nrd&&(x.bycell?value.col>=0&&value.col<nc:1)){
-		hrow=value.row,hcol=value.col
+		hrow=p.display_row(value.row),hcol=value.col
 		draw_rect(x.bycell&&value.col>=0?grid_hcell(rect(value.col,rr)): rowh(rr),fcol)
 	}
 	let drawncol=0;for(let z=0,cols=0,cx=0;z<nc&&cx+cw[cols]<=bb.w;z++,cols++){
@@ -809,7 +812,7 @@ widget_grid=(target,x,value)=>{
 		}
 		if(drawncol&&x.lines)draw_invert(pal,rect(hs.x-3,b.y+1,1,b.h-2));cx+=cw[cols],drawncol=1
 		for(let y=0;y<nrd;y++){
-			const cell=rect(hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1), v=tab_cell(value.table,tk[z],y+value.scroll)
+			const cell=rect(hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1), v=grid_cell_at(tk[z],y+value.scroll)
 			const fc=x.format[z]=='L'?'s':(x.format[z]||'s'), ccol=y+value.scroll==hrow&&(x.bycell?cols==hcol :1)?bcol:fcol
 			const cf=ls(dyad.format(lms(`%${fc}`),fc=='j'||fc=='J'||fc=='a'?monad.list(v):v)), ip=rcenter(cell,ICONS[0].size)
 			const oc=frame.clip; frame.clip=rclip(cell,frame.clip)
@@ -821,15 +824,15 @@ widget_grid=(target,x,value)=>{
 			}
 			else{('fcCihH'.indexOf(x.format[z])>=0?draw_textr:draw_text_fit)(rect(hs.x+1,bb.y+rh*y,hs.w-2,rh),cf,fnt,ccol)} // right-align numeric
 			frame.clip=oc
-			if(!x.locked&&sel&& ((ev.dclick&&over(cell)) || (ev.action&&x.bycell&&z==value.col&&y+value.scroll==value.row))){
-				const f=x.format[z]||'s', tc=rect(z,y+value.scroll)
+			if(!x.locked&&sel&& ((ev.dclick&&over(cell)) || (ev.action&&x.bycell&&z==value.col&&y+value.scroll==p.display_row(value.row)))){
+				const f=x.format[z]||'s', tc=rect(z,y+value.scroll), tpc=rect(tc.x,p.permuted_row(tc.y))
 				if     (f=='I'||f=='L'||f=='T'){} // no editing allowed
-				else if(f=='B'||f=='b'){grid_edit_cell(tc,lms(0+(!lb(v))))} // toggle
+				else if(f=='B'||f=='b'){grid_edit_cell(tpc,lms(0+(!lb(v))))} // toggle
 				else{
 					ms.pending_grid_cell_rich=f=='t'
 					wid.pending_grid_edit=1,ms.pending_grid_cell=grid_cell(rect(tc.x,tc.y-value.scroll))
 					ms.pending_grid_cell.y-=1,ms.pending_grid_cell.w+=1,ms.pending_grid_cell.h+=2
-					ms.cell=tc,ms.text=fieldstr(f=='t'?v:lms(cf))
+					ms.cell=tpc,ms.text=fieldstr(f=='t'?v:lms(cf))
 				}
 			}
 		}
@@ -868,7 +871,7 @@ grid_insertrow=_=>{
 		const o=tab_get(x,k)
 		tab_set(r,k,range(o.length+1).map(i=>(i==s)?('slurotT'.indexOf(f[col])>=0?lms(''):ZERO): o[i-(i>=s?1:0)]))
 	});grid_edit(r),iwrite(wid.gt,lms('col'),ZERO),iwrite(wid.gt,lms('row'),lmn(s))
-	const os=wid.gv.scroll,ns=grid_scrollto(x,wid.g,os,s);if(os!=ns){wid.gv.scroll=ns,iwrite(wid.gt,lms('scroll'),lmn(ns))}
+	const os=wid.gv.scroll,ns=grid_scrollto(wid.gt,wid.g,os,s);if(os!=ns){wid.gv.scroll=ns,iwrite(wid.gt,lms('scroll'),lmn(ns))}
 }
 grid_edit_cell=(cell,v)=>{
 	wid.gv.col=cell.x,iwrite(wid.gt,lms('col'),lmn(cell.x))
@@ -876,24 +879,28 @@ grid_edit_cell=(cell,v)=>{
 	msg.target_ccell=wid.gt,msg.arg_ccell=v
 }
 grid_keys=(code,shift)=>{
-	const fnt=wid.g.font?wid.g.font:FONT_MONO, hfnt=FONT_BODY, nr=count(wid.gv.table), nc=tab_cols(wid.gv.table).length
+	const fnt=wid.g.font?wid.g.font:FONT_MONO, hfnt=FONT_BODY, tk=tab_cols(wid.gv.table), nc=tk.length
+	const p=grid_pv(wid.gt), npr=tab_rowcount(wid.gv.table), nr=p.pv?p.pv.length: npr
 	let m=0, r=wid.gv.row, c=wid.gv.col
 	const rh=font_h(fnt)+5, bh=wid.g.headers?font_h(hfnt)+5:0, nrd=min(nr,0|((wid.g.size.h-bh+1)/rh)), wd=wid.g.widths
-	if(code=='ArrowUp'   ){m=1;if(r==-1){r=0}else{r-=1}}
-	if(code=='ArrowDown' ){m=1;if(r==-1){r=0}else{r+=1}}
-	if(code=='ArrowLeft' ){m=1;if(c==-1){c=0;}else{let d=c-1;while(d>0   &&d<wd.length&&wd[d]==0)d--;if(d>=wd.length||wd[d])c=d}}
-	if(code=='ArrowRight'){m=1;if(c==-1){c=0;}else{let d=c+1;while(d<nc-1&&d<wd.length&&wd[d]==0)d++;if(d>=wd.length||wd[d])c=d}}
-	if(code=='PageUp'    ){m=1;if(r==-1)r=0;r-=nrd}
-	if(code=='PageDown'  ){m=1;if(r==-1)r=0;r+=nrd}
-	if(code=='Home'      ){m=1,r=0}
-	if(code=='End'       ){m=1,r=nr-1}
+	const cw=[];for(let z=0;z<nc;z++)cw.push(z>=wd.length?1:wd[z])
+	{const _patby =tk.indexOf('_patby' );if(_patby !=-1)cw[_patby ]=0}
+	{const _hideby=tk.indexOf('_hideby');if(_hideby!=-1)cw[_hideby]=0}
+	if(code=='Home'      ){m=1,r=p.pv?first(p.pv): 0}
+	if(code=='End'       ){m=1,r=p.pv?last (p.pv): npr-1}
+	if(code=='ArrowUp'   ){m=1;if(r==-1){r=p.pv?first(p.pv):0}else if(!p.pv){r-=1}else{for(let z=p.pv.length-1;z>=0;z--){const n=p.pv[z];if(n<r){r=n;break}}}}
+	if(code=='ArrowDown' ){m=1;if(r==-1){r=p.pv?first(p.pv):0}else if(!p.pv){r+=1}else{for(let z=0;z<p.pv.length   ;z++){const n=p.pv[z];if(n>r){r=n;break}}}}
+	if(code=='PageUp'    ){m=1;if(r==-1){r=p.pv?first(p.pv):0}if(!p.pv){r-=nrd}else{for(let c=0,z=p.pv.length-1;z>=0&&c<nrd;z--){const n=p.pv[z];if(n<r)r=n,c++}}}
+	if(code=='PageDown'  ){m=1;if(r==-1){r=p.pv?first(p.pv):0}if(!p.pv){r+=nrd}else{for(let c=0,z=0;z<p.pv.length   &&c<nrd;z++){const n=p.pv[z];if(n>r)r=n,c++}}}
+	if(code=='ArrowLeft' ){m=1;if(c==-1){c=0}else{let d=c-1;while(d>0   &&cw[d]==0)d--;if(d>=nc||((d!=-1)&&cw[d]))c=d}}
+	if(code=='ArrowRight'){m=1;if(c==-1){c=0}else{let d=c+1;while(d<nc-1&&cw[d]==0)d++;if(d>=nc||((d!=-1)&&cw[d]))c=d}}
 	if(!wid.g.locked&&(code=='Backspace'||code=='Delete'))grid_deleterow()
 	if(!m)return;if(ms.type=='prototype_attrs')ms.text.table=ms.name.table=null
-	wid.gv.row=r=max(0,min(r,nr-1)),wid.gv.col=c=max(0,min(c,nc-1));if(wid.gt){
+	wid.gv.row=r=max(0,min(r,npr-1)),wid.gv.col=c=max(0,min(c,nc-1));if(wid.gt){
 		iwrite(wid.gt,lms('row'),lmn(r)),iwrite(wid.gt,lms('col'),lmn(c)),mark_dirty()
 		msg.target_click=wid.gt,msg.arg_click=rect(0,r)
 	}
-	const os=wid.gv.scroll;if(r-os<0)wid.gv.scroll=r;if(r-os>=nrd)wid.gv.scroll=r-(nrd-1)
+	const os=wid.gv.scroll,rs=p.display_row(r);if(rs-os<0)wid.gv.scroll=rs;if(rs-os>=nrd)wid.gv.scroll=rs-(nrd-1)
 	if(wid.gt&&os!=wid.gv.scroll)iwrite(wid.gt,lms('scroll'),lmn(wid.gv.scroll)),mark_dirty()
 }
 
@@ -1656,7 +1663,7 @@ modals=_=>{
 		const b=draw_modalbox(rect(170,170))
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Fonts',FONT_MENU,1)
 		const gsize=rect(b.x,b.y+15,b.w,b.h-20-50-25)
-		if(ms.grid.scroll==-99){ms.grid.scroll=grid_scrollto(ms.grid.table,{size:gsize,font:FONT_BODY,headers:0},-1,ms.grid.row)}
+		if(ms.grid.scroll==-99){ms.grid.scroll=grid_scrollto(tab_rowcount(ms.grid.table),{size:gsize,font:FONT_BODY,headers:0},-1,ms.grid.row)}
 		const choose=ui_table(gsize,[16],'Is',ms.grid)
 		let psize=rect(b.x,gsize.y+gsize.h+5,b.w,50);draw_box(psize,0,1),psize=inset(psize,2)
 		if(ms.grid.row>=0){
@@ -2183,7 +2190,7 @@ modals=_=>{
 			if(ui_checkbox(rint(rect(b.x+b.w/2,b.y+20,b.w/2-19,16)),'With Transition',1,ms.act_trans))ms.act_trans^=1
 			if(ms.act_trans){
 				const gd=rint(rect(b.x+b.w/2,b.y+36,b.w/2,70))
-				if(ms.grid.scroll==-99){ms.grid.scroll=grid_scrollto(ms.grid.table,{size:gd,font:FONT_BODY,headers:0},-1,ms.grid.row)}
+				if(ms.grid.scroll==-99){ms.grid.scroll=grid_scrollto(tab_rowcount(ms.grid.table),{size:gd,font:FONT_BODY,headers:0},-1,ms.grid.row)}
 				ui_list(gd,ms.grid)
 				const pv=rpair(rect(b.x+b.w-17,b.y+20),ms.canvas.size), pi=image_make(ms.canvas.size)
 				ms.trans=dget(deck.transit,tab_cell(ms.grid.table,'value',ms.grid.row))

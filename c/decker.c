@@ -609,7 +609,11 @@ rect grid_hcell(grid x,int column,rect cell){
 int widget_grid(lv*target,grid x,grid_val*value){
 	if(x.show==show_none)return 0; lv*hfnt=FONT_BODY; int hsize=x.headers?font_h(hfnt)+5:0; if(x.size.h<=(50+hsize)||x.size.w<16)x.scrollbar=0;
 	lv*fnt=x.font?x.font:FONT_MONO; int os=value->scroll, or=value->row, oc=value->col, files=x.headers==2; if(files||x.size.h<=hsize)x.headers=0;
-	int nr=value->table->n, nc=value->table->c, rh=font_h(fnt)+(x.lines?5:3), fcol=!in_layer()?13:x.show==show_invert?32:1, bcol=x.show==show_invert?1:32;
+	int _patby=dgeti(value->table,lmistr("_patby")),_hideby=dgeti(value->table,lmistr("_hideby"));
+	lv*pv=NULL,*vp=NULL;if(target!=NULL&&_hideby!=-1)grid_pv(target,&pv,&vp);int nr=pv?pv->c: value->table->n;
+	#define grid_cell_at(col,row) (value->table->lv[col]->lv[permuted_row(row)])
+
+	int nc=value->table->c, rh=font_h(fnt)+(x.lines?5:3), fcol=!in_layer()?13:x.show==show_invert?32:1, bcol=x.show==show_invert?1:32;
 	int fk=strlen(x.format); rect b=x.size;
 	int sel=in_layer()&&x.show!=show_none&&wid.active==wid.count;
 	if(in_layer()&&dover(b)&&(ev.md||ev.mu||ev.drag)){if(!sel&&wid.gv)grid_exit(); wid.active=wid.count,sel=1;}
@@ -623,7 +627,7 @@ int widget_grid(lv*target,grid x,grid_val*value){
 	if(x.lines)draw_rect(bh,fcol);if(nc<=0)draw_textc(inset(bb,1),"(no data)",hfnt,fcol);
 
 	int cw[MAX(1,nc)];for(int z=0;z<nc;z++)cw[z]=z>=x.widths[0]?-1:x.widths[1+z];
-	int _patby =dgeti(value->table,lmistr("_patby"));if(_patby !=-1)cw[_patby ]=0;
+	if(_patby!=-1)cw[_patby]=0;if(_hideby!=-1)cw[_hideby]=0;
 	int hwt=0;for(int z=0;z<x.widths[0];z++)hwt+=cw[z];
 	int nwt=0;for(int z=0;z<nc         ;z++)nwt+=cw[z]==-1;
 	for(int z=x.widths[0];z<nc         ;z++)cw[z]=cw[z]==-1?(bb.w-hwt)/nwt:0;
@@ -634,17 +638,17 @@ int widget_grid(lv*target,grid x,grid_val*value){
 	int clicked=0,rsel=0,hrow=-1,hcol=-1;
 	for(int y=0;y<nrd;y++){
 		if(_patby!=-1){
-			int p=CLAMP(0,ln(value->table->lv[_patby]->lv[y+value->scroll]),47);
+			int p=CLAMP(0,ln(grid_cell_at(_patby,y+value->scroll)),47);
 			if(p){rect t=rowb(y);if(y==0)t.y+=1,t.h-=1; draw_rect(t,p);}
 		}
 		int ra=in_layer()&&over(bb)&&over(rowb(y));rect cbox={0};
 		if(ra&&x.bycell){for(int z=0;z<nc;z++){rect cell=grid_cell(x,value,bb,(pair){z,y},cw);if(over(cell))hcol=z,cbox=grid_hcell(x,z,cell);}}
 		if(ra&&(ev.md||ev.drag)){rsel=1,hrow=y+value->scroll;draw_rect(x.bycell?cbox:rowh(y),fcol);}
-		if(ra&&ev.mu)clicked=1,value->row=y+value->scroll,value->col=hcol;
+		if(ra&&ev.mu)clicked=1,value->row=permuted_row(y+value->scroll),value->col=hcol;
 		if(ra&&!ev.drag)uicursor=cursor_point;
-	}int rr=value->row-value->scroll;
+	}int rr=display_row(value->row)-value->scroll;
 	if(!rsel&&rr>=0&&rr<nrd&&(x.bycell?value->col>=0&&value->col<nc:1)){
-		hrow=value->row,hcol=value->col;
+		hrow=display_row(value->row),hcol=value->col;
 		if(x.bycell&&value->col>=0){draw_rect(grid_hcell(x,value->col,grid_cell(x,value,bb,(pair){value->col,rr},cw)),fcol);}
 		else{draw_rect(rowh(rr),fcol);}
 	}
@@ -661,7 +665,7 @@ int widget_grid(lv*target,grid x,grid_val*value){
 		if(drawncol&&x.lines)draw_invert(pal,(rect){hs.x-3,b.y+1,1,b.h-2});cx+=cw[cols];drawncol=1;
 		for(int y=0;y<nrd;y++){
 			int ccol=y+value->scroll==hrow&&(x.bycell?cols==hcol :1)?bcol:fcol;
-			rect cell={hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1}; lv*v=value->table->lv[z]->lv[y+value->scroll];
+			rect cell={hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1}; lv*v=grid_cell_at(z,y+value->scroll);
 			cf.c=0;format_type_simple(&cf,v,z>=fk?'s':x.format[z]=='L'?'s':x.format[z]);str_term(&cf);
 			rect ib=box_center(cell,image_size(ICONS[0]));pair ip={ib.x,ib.y};
 			rect oc=frame.clip; frame.clip=box_intersect(cell,frame.clip);
@@ -677,15 +681,15 @@ int widget_grid(lv*target,grid x,grid_val*value){
 				if(z<fk&&strchr("fcCihH",x.format[z])){draw_textr(r,cf.sv,fnt,ccol);}else{draw_text_fit(r,cf.sv,fnt,ccol);}
 			}
 			frame.clip=oc;
-			if(!x.locked&&sel&& ((ev.dclick&&over(cell)) || (ev.action&&x.bycell&&z==value->col&&y+value->scroll==value->row))){
-				char f=z<fk?x.format[z]:'s';pair tc=(pair){z,y+value->scroll};
+			if(!x.locked&&sel&& ((ev.dclick&&over(cell)) || (ev.action&&x.bycell&&z==value->col&&y+value->scroll==display_row(value->row)))){
+				char f=z<fk?x.format[z]:'s';pair tc=(pair){z,y+value->scroll},tpc=(pair){tc.x,permuted_row(tc.y)};
 				if     (f=='I'||f=='L'||f=='T'){} // no editing allowed
-				else if(f=='B'||f=='b'){grid_edit_cell(tc,ls(lmn(!lb(v))));} // toggle
+				else if(f=='B'||f=='b'){grid_edit_cell(tpc,ls(lmn(!lb(v))));} // toggle
 				else{
 					ms.pending_grid_cell_rich=f=='t';
 					wid.pending_grid_edit=1,ms.pending_grid_cell=grid_cell(x,value,bb,(pair){tc.x,tc.y-value->scroll},cw);
 					ms.pending_grid_cell.y-=1,ms.pending_grid_cell.w+=1,ms.pending_grid_cell.h+=2;
-					ms.cell=tc;ms.text=(field_val){f=='t'?rtext_cast(v):rtext_cast(lmcstr(cf.sv)),0};
+					ms.cell=tpc;ms.text=(field_val){f=='t'?rtext_cast(v):rtext_cast(lmcstr(cf.sv)),0};
 				}
 			}
 		}
@@ -722,7 +726,7 @@ void grid_insertrow(void){
 	lv*f=grid_format(),*x=wid.gv->table,*r=lmt();int s=wid.gv->row+1;EACH(z,x){
 		lv*c=lml(x->n+1);dset(r,x->kv[z],c);EACH(i,c)c->lv[i]=(i==s)?(strchr("slurotT",f->sv[z])?lmistr(""):ZERO): x->lv[z]->lv[i-(i>=s?1:0)];
 	}grid_edit(torect(r));iwrite(wid.gt,lmistr("col"),ZERO),iwrite(wid.gt,lmistr("row"),lmn(s));
-	int os=wid.gv->scroll,ns=grid_scrollto(x,wid.g,os,s);if(os!=ns){wid.gv->scroll=ns,iwrite(wid.gt,lmistr("scroll"),lmn(ns));}
+	int os=wid.gv->scroll,ns=grid_scrollto(wid.gt,wid.g,os,s);if(os!=ns){wid.gv->scroll=ns,iwrite(wid.gt,lmistr("scroll"),lmn(ns));}
 }
 void grid_edit_cell(pair cell,lv*v){
 	wid.gv->col=cell.x,iwrite(wid.gt,lmistr("col"),lmn(cell.x));
@@ -731,23 +735,28 @@ void grid_edit_cell(pair cell,lv*v){
 }
 void grid_keys(int code){
 	lv*fnt=wid.g.font?wid.g.font:FONT_MONO, *hfnt=FONT_BODY;
-	int m=0, nr=wid.gv->table->n, nc=wid.gv->table->c, r=wid.gv->row, c=wid.gv->col;
+	lv*pv=NULL,*vp=NULL;if(wid.gt!=NULL)grid_pv(wid.gt,&pv,&vp);
+	int npr=wid.gv->table->n, nr=pv?pv->c: npr;
+	int m=0, nc=wid.gv->table->c, r=wid.gv->row, c=wid.gv->col;
 	int rh=font_h(fnt)+5, bh=wid.g.headers?font_h(hfnt)+5:0, nrd=MIN(nr,((wid.g.size.h-bh+1)/rh));
-	if(code==KEY_UP      ){m=1;if(r==-1){r=0;}else{r-=1;}}
-	if(code==KEY_DOWN    ){m=1;if(r==-1){r=0;}else{r+=1;}}
-	if(code==KEY_LEFT    ){m=1;if(c==-1){c=0;}else{int d=c-1;while(d>0   &&d<wid.g.widths[0]&&wid.g.widths[d+1]==0)d--;if(d>=wid.g.widths[0]||wid.g.widths[d+1])c=d;}}
-	if(code==KEY_RIGHT   ){m=1;if(c==-1){c=0;}else{int d=c+1;while(d<nc-1&&d<wid.g.widths[0]&&wid.g.widths[d+1]==0)d++;if(d>=wid.g.widths[0]||wid.g.widths[d+1])c=d;}}
-	if(code==KEY_PAGEUP  ){m=1;if(r==-1)r=0;r-=nrd;}
-	if(code==KEY_PAGEDOWN){m=1;if(r==-1)r=0;r+=nrd;}
-	if(code==KEY_HOME    ){m=1;r=0;}
-	if(code==KEY_END     ){m=1;r=nr-1;}
+	int cw[MAX(1,nc)];for(int z=0;z<nc;z++)cw[z]=z>=wid.g.widths[0]?1:wid.g.widths[1+z];
+	{int _patby =dgeti(wid.gv->table,lmistr("_patby" ));if(_patby !=-1)cw[_patby ]=0;}
+	{int _hideby=dgeti(wid.gv->table,lmistr("_hideby"));if(_hideby!=-1)cw[_hideby]=0;}
+	if(code==KEY_HOME    ){m=1;r=pv?ln(l_first(pv)): 0    ;}
+	if(code==KEY_END     ){m=1;r=pv?ln(l_last (pv)): npr-1;}
+	if(code==KEY_UP      ){m=1;if(r==-1){r=pv?ln(l_first(pv)):0;}else if(!pv){r-=1;}else{for(int z=pv->c-1;z>=0;z--){int n=ln(pv->lv[z]);if(n<r){r=n;break;}}}}
+	if(code==KEY_DOWN    ){m=1;if(r==-1){r=pv?ln(l_first(pv)):0;}else if(!pv){r+=1;}else{for(int z=0;z<pv->c   ;z++){int n=ln(pv->lv[z]);if(n>r){r=n;break;}}}}
+	if(code==KEY_PAGEUP  ){m=1;if(r==-1){r=pv?lb(l_first(pv)):0;}if(!pv){r-=nrd;}else{for(int c=0,z=pv->c-1;z>=0&&c<nrd;z--){int n=ln(pv->lv[z]);if(n<r)r=n,c++;}}}
+	if(code==KEY_PAGEDOWN){m=1;if(r==-1){r=pv?lb(l_first(pv)):0;}if(!pv){r+=nrd;}else{for(int c=0,z=0;z<pv->c   &&c<nrd;z++){int n=ln(pv->lv[z]);if(n>r)r=n,c++;}}}
+	if(code==KEY_LEFT    ){m=1;if(c==-1){c=0;}else{int d=c-1;while(d>0   &&cw[d]==0)d--;if(d>=nc||((d!=-1)&&cw[d]))c=d;}}
+	if(code==KEY_RIGHT   ){m=1;if(c==-1){c=0;}else{int d=c+1;while(d<nc-1&&cw[d]==0)d++;if(d>=nc||((d!=-1)&&cw[d]))c=d;}}
 	if(!wid.g.locked&&(code==KEY_BACKSPACE||code==KEY_DELETE))grid_deleterow();
 	if(!m)return;if(ms.type==modal_prototype_attrs)ms.text.table=ms.name.table=NULL;
-	wid.gv->row=r=MAX(0,MIN(r,nr-1)),wid.gv->col=c=MAX(0,MIN(c,nc-1));if(wid.gt){
+	wid.gv->row=r=MAX(0,MIN(r,npr-1)),wid.gv->col=c=MAX(0,MIN(c,nc-1));if(wid.gt){
 		iwrite(wid.gt,lmistr("row"),lmn(r)),iwrite(wid.gt,lmistr("col"),lmn(c)),mark_dirty();
 		msg.target_click=wid.gt,msg.arg_click=(fpair){0,r};
 	}
-	int os=wid.gv->scroll;if(r-os<0)wid.gv->scroll=r;if(r-os>=nrd)wid.gv->scroll=r-(nrd-1);
+	int os=wid.gv->scroll, rs=display_row(r);if(rs-os<0)wid.gv->scroll=rs;if(rs-os>=nrd)wid.gv->scroll=rs-(nrd-1);
 	if(wid.gt&&os!=wid.gv->scroll)iwrite(wid.gt,lmistr("scroll"),lmn(wid.gv->scroll)),mark_dirty();
 }
 int layout_index(pair p){
@@ -1756,7 +1765,7 @@ void modals(void){
 		rect b=draw_modalbox((pair){170,170});
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Fonts",FONT_MENU,1);
 		rect gsize={b.x,b.y+15,b.w,b.h-20-50-25};
-		if(ms.grid.scroll==-99){ms.grid.scroll=grid_scrollto(ms.grid.table,(grid){gsize,FONT_BODY,{0},"",0,1,0,0,show_solid,1},-1,ms.grid.row);}
+		if(ms.grid.scroll==-99){ms.grid.scroll=grid_scrollto_simple(ms.grid.table->n,(grid){gsize,FONT_BODY,{0},"",0,1,0,0,show_solid,1},-1,ms.grid.row);}
 		int choose=ui_table(gsize,1,16,0,"Is",&ms.grid);
 		rect psize={b.x,gsize.y+gsize.h+5,b.w,50};draw_box(psize,0,1);psize=inset(psize,2);
 		if(ms.grid.row>=0){layout_plaintext(pangram,ifield(deck,"fonts")->lv[ms.grid.row],align_left,(pair){psize.w,psize.h});draw_text_wrap(psize,1);}
@@ -2236,7 +2245,7 @@ void modals(void){
 			if(ui_checkbox((rect){b.x+b.w/2,b.y+20,b.w/2-19,16},"With Transition",1,ms.act_trans))ms.act_trans^=1;
 			if(ms.act_trans){
 				rect gd={b.x+b.w/2,b.y+36,b.w/2,70},pv={b.x+b.w-17,b.y+20,17,13};
-				if(ms.grid.scroll==-99){ms.grid.scroll=grid_scrollto(ms.grid.table,(grid){gd,FONT_BODY,{0},"",0,1,0,0,show_solid,1},-1,ms.grid.row);}
+				if(ms.grid.scroll==-99){ms.grid.scroll=grid_scrollto_simple(ms.grid.table->n,(grid){gd,FONT_BODY,{0},"",0,1,0,0,show_solid,1},-1,ms.grid.row);}
 				ui_list(gd,&ms.grid);ms.trans=dget(dget(deck->b,lmistr("transit")),ms.grid.table->lv[0]->lv[ms.grid.row]);
 				do_transition((frame_count%60)/60.0,0),buffer_paste(pv,frame.clip,container_image(ms.canvas,1)->b,frame.buffer,1),draw_box(pv,0,1);
 			}
