@@ -845,10 +845,10 @@ void field_apply(lv*v,pair c){
 }
 void field_undo(void){lv*x=wid.hist->lv[--(wid.hist_cursor)];field_apply(x->lv[0],getpair(x->lv[1]));}
 void field_redo(void){lv*x=wid.hist->lv[(wid.hist_cursor)++];field_apply(x->lv[2],getpair(x->lv[3]));}
-void field_edit(lv*font,lv*arg,char*text,pair pos){
+void field_edit(lv*font,lv*arg,int pat,char*text,pair pos){
 	wid.hist->c=wid.hist_cursor; lv*o=lml(4);ll_add(wid.hist,o); pair c={0,0};
-	o->lv[0]=wid.fv->table                                     ,o->lv[1]=lmpair(wid.cursor); // before
-	o->lv[2]=rtext_splice(wid.fv->table,font,arg,1,text,pos,&c),o->lv[3]=lmpair(c         ); // after
+	o->lv[0]=wid.fv->table                                       ,o->lv[1]=lmpair(wid.cursor); // before
+	o->lv[2]=rtext_splice(wid.fv->table,font,arg,pat,text,pos,&c),o->lv[3]=lmpair(c         ); // after
 	field_redo();
 }
 void field_editr(lv*rtext,pair pos){
@@ -879,7 +879,7 @@ void field_comment(void){
 		if(ac){if(layout[z].c=='#'){z++;if(z<p.y&&layout[z].c==' ')z++;}}else{str_addz(&r,"# ");}
 		while(z<p.y&&layout[z].c!='\n')str_addc(&r,layout[z++].c);
 		if(z<p.y&&layout[z].c=='\n')str_addc(&r,'\n'),z++;
-	}field_edit(lmistr(""),lmistr(""),lmstr(r)->sv,p);wid.cursor=(pair){p.x,wid.cursor.y};
+	}field_edit(lmistr(""),lmistr(""),1,lmstr(r)->sv,p);wid.cursor=(pair){p.x,wid.cursor.y};
 }
 void field_indent(int add){
 	pair p=field_sel_lines();str r=str_new();int z=p.x;while(z<p.y){
@@ -887,7 +887,7 @@ void field_indent(int add){
 		while(z<p.y&&layout[z].c==' ')str_addc(&r,' '),z++;
 		while(z<p.y&&layout[z].c!='\n')str_addc(&r,layout[z++].c);
 		if(z<p.y&&layout[z].c=='\n')str_addc(&r,'\n'),z++;
-	}field_edit(lmistr(""),lmistr(""),lmstr(r)->sv,p);wid.cursor=(pair){p.x,wid.cursor.y};
+	}field_edit(lmistr(""),lmistr(""),1,lmstr(r)->sv,p);wid.cursor=(pair){p.x,wid.cursor.y};
 }
 void field_fontspan(lv*font){
 	lv*s=rtext_span(wid.fv->table,wid.cursor),*c=dget(s,lmistr("font"));
@@ -908,7 +908,8 @@ void field_input(char*text){
 		if(ev.shift||ms.type==modal_save)return;
 	}
 	str t=str_new();str_addz(&t,text);str_term(&t);
-	field_edit(rtext_font(wid.fv->table,wid.cursor.y),lmistr(""),t.sv,wid.cursor);free(t.sv);
+	lv* tb=wid.fv->table;int i=rtext_get(tb,wid.cursor.y), p=i<0?1:ln(dget(tb,lmistr("pat"))->lv[i]);lv* f=i<0?lmistr(""):dget(tb,lmistr("font"))->lv[i];
+	field_edit(f,lmistr(""),p,t.sv,wid.cursor);free(t.sv);
 }
 void field_keys(int code,int shift){
 	if(code==KEY_RETURN&&ms.type==modal_gridcell){modal_exit(1);ev.action=0;return;}
@@ -924,8 +925,8 @@ void field_keys(int code,int shift){
 	if(code==KEY_PAGEDOWN ){m=1;if(l>=0)wid.cursor.y=layout_index((pair){c.x-1,lines[l].pos.y+lines[l].pos.h+bi.h});}
 	if(code==KEY_HOME     ){m=1;if(ev.alt){wid.cursor.y=0           ;}else if(l>=0)wid.cursor.y=lines[l].range.x;}
 	if(code==KEY_END      ){m=1;if(ev.alt){wid.cursor.y=layout_count;}else if(l>=0)wid.cursor.y=lines[l].range.y+(l==lines_count-1?1:0);}
-	if(code==KEY_BACKSPACE){field_edit(lmistr(""),lmistr(""),"",s?wid.cursor:(pair){wid.cursor.y-1,wid.cursor.y});}
-	if(code==KEY_DELETE   ){field_edit(lmistr(""),lmistr(""),"",s?wid.cursor:(pair){wid.cursor.y,wid.cursor.y+1});}
+	if(code==KEY_BACKSPACE){field_edit(lmistr(""),lmistr(""),1,"",s?wid.cursor:(pair){wid.cursor.y-1,wid.cursor.y});}
+	if(code==KEY_DELETE   ){field_edit(lmistr(""),lmistr(""),1,"",s?wid.cursor:(pair){wid.cursor.y,wid.cursor.y+1});}
 	if(code==KEY_RETURN){
 		if(shift&&wid.ft){field_change();msg.target_run=wid.ft,msg.arg_run=rtext_string(wid.fv->table,s?wid.cursor:(pair){0,RTEXT_END});}
 		else{
@@ -3679,7 +3680,7 @@ void text_edit_menu(void){
 		set_clip((i?image_write(i):rtext_all(s)));
 	}
 	if(rich&&menu_item("Copy Rich Text",selection,'r'))set_clip(rtext_encode(rtext_span(wid.fv->table,wid.cursor)));
-	if(has_clip("%%IMG")&&rich&&menu_item("Paste Inline Image",wid.fv!=NULL,'v')){field_edit(lmistr(""),image_read(get_clip()),"i",wid.cursor);}
+	if(has_clip("%%IMG")&&rich&&menu_item("Paste Inline Image",wid.fv!=NULL,'v')){field_edit(lmistr(""),image_read(get_clip()),1,"i",wid.cursor);}
 	else if(has_clip("%%RTX")&&rich&&menu_item("Paste Rich Text",wid.fv!=NULL,'v')){field_editr(rtext_decode(get_clip()),wid.cursor);}
 	else if((!has_clip("%%RTX")||!rich)&&menu_item("Paste",wid.fv!=NULL&&strlen(clip_stash),'v')){
 		field_input(has_clip("%%RTX")?rtext_all(rtext_decode(get_clip()))->sv:get_clip()->sv);

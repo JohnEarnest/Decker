@@ -994,8 +994,8 @@ field_apply=(v,c)=>{
 }
 field_undo=_=>{const x=wid.hist[--(wid.hist_cursor)];field_apply(x[0],x[1])}
 field_redo=_=>{const x=wid.hist[(wid.hist_cursor)++];field_apply(x[2],x[3])}
-field_edit=(font,arg,text,pos)=>{
-	const c=rect(), spliced=rtext_splice(wid.fv.table,font,arg,1,text,pos,c); wid.hist=wid.hist.slice(0,wid.hist_cursor)
+field_edit=(font,arg,pat,text,pos)=>{
+	const c=rect(), spliced=rtext_splice(wid.fv.table,font,arg,pat,text,pos,c); wid.hist=wid.hist.slice(0,wid.hist_cursor)
 	wid.hist.push([wid.fv.table,rect(wid.cursor.x,wid.cursor.y), spliced,c]),field_redo()
 }
 field_editr=(rtext,pos)=>{
@@ -1019,7 +1019,7 @@ field_comment=_=>{
 		if(ac){if(layout[z].char=='#'){z++;if(z<p.y&&layout[z].char==' ')z++}}else{r+='# '}
 		while(z<p.y&&layout[z].char!='\n')r+=layout[z++].char
 		if(z<p.y&&layout[z].char=='\n')r+='\n',z++
-	}field_edit(lms(''),lms(''),r,p),wid.cursor=rect(p.x,wid.cursor.y)
+	}field_edit(lms(''),lms(''),1,r,p),wid.cursor=rect(p.x,wid.cursor.y)
 }
 field_indent=add=>{
 	const s=field_sel_lines(), p=s.sel, layout=s.layout.layout; let r='',z=p.x;while(z<p.y){
@@ -1027,15 +1027,15 @@ field_indent=add=>{
 		while(z<p.y&&layout[z].char==' ')r+=' ',z++
 		while(z<p.y&&layout[z].char!='\n')r+=layout[z++].char
 		if(z<p.y&&layout[z].char=='\n')r+='\n',z++
-	}field_edit(lms(''),lms(''),r,p);wid.cursor=rect(p.x,wid.cursor.y)
+	}field_edit(lms(''),lms(''),1,r,p);wid.cursor=rect(p.x,wid.cursor.y)
 }
 field_fontspan=font=>{const s=rtext_span(wid.fv.table,wid.cursor);tab_get(s,'font').fill(font    ),field_editr(rtext_cat([s]),wid.cursor)}
 field_linkspan=link=>{const s=rtext_span(wid.fv.table,wid.cursor);tab_get(s,'arg' ).fill(link    ),field_editr(rtext_cat([s]),wid.cursor)}
 field_patspan =pat =>{const s=rtext_span(wid.fv.table,wid.cursor);tab_get(s,'pat' ).fill(lmn(pat)),field_editr(rtext_cat([s]),wid.cursor)}
 field_input=text=>{
 	if(text=='\n'){if(ms.type=='save')ev.action=1;if(ms.type=='save'||ev.shift)return}
-	const rtext_font=(table,x)=>{const i=rtext_get(table,x);return i<0?lms(''):tab_cell(table,'font',i)}
-	field_edit(rtext_font(wid.fv.table,wid.cursor.y),lms(''),clchars(text),wid.cursor)
+	const t=wid.fv.table, i=rtext_get(t,wid.cursor.y), f=i<0?lms(''):tab_cell(t,'font',i), p=i<0?1:ln(tab_cell(t,'pat',i))
+	field_edit(f,lms(''),p,clchars(text),wid.cursor)
 }
 field_keys=(code,shift)=>{
 	if(code=='Enter'&&ms.type=='gridcell'){modal_exit(1),ev.action=0;return}
@@ -1051,8 +1051,8 @@ field_keys=(code,shift)=>{
 	if(code=='PageDown'    ){m=1;if(l>=0)wid.cursor.y=layout_index(layout,rect(c.x-1,layout.lines[l].pos.y+layout.lines[l].pos.h+bi.h))}
 	if(code=='Home'        ){m=1;if(ev.alt){wid.cursor.y=0                   }else if(l>=0)wid.cursor.y=layout.lines[l].range.x;}
 	if(code=='End'         ){m=1;if(ev.alt){wid.cursor.y=layout.layout.length}else if(l>=0)wid.cursor.y=layout.lines[l].range.y+(l==layout.lines.length-1?1:0);}
-	if(code=='Backspace'   ){field_edit(lms(''),lms(''),'',s?wid.cursor:rect(wid.cursor.y-1,wid.cursor.y))}
-	if(code=='Delete'      ){field_edit(lms(''),lms(''),'',s?wid.cursor:rect(wid.cursor.y,wid.cursor.y+1))}
+	if(code=='Backspace'   ){field_edit(lms(''),lms(''),1,'',s?wid.cursor:rect(wid.cursor.y-1,wid.cursor.y))}
+	if(code=='Delete'      ){field_edit(lms(''),lms(''),1,'',s?wid.cursor:rect(wid.cursor.y,wid.cursor.y+1))}
 	if(code=='Enter'       ){
 		if(shift&&wid.ft){field_change(),msg.target_run=wid.ft,msg.arg_run=rtext_string(wid.fv.table,s?wid.cursor:rect(0,RTEXT_END))}
 		else{
@@ -3830,7 +3830,7 @@ dopaste=x=>{
 		const i=image_read(x);if(i.size.x==0||i.size.y==0)return
 		if(wid.fv){
 			if(wid.f.style!='rich'){field_input(x)}
-			else{field_edit(lms(''),i,'i',wid.cursor)}
+			else{field_edit(lms(''),i,1,'i',wid.cursor)}
 		}else{setmode('draw'),bg_paste(i,0)}
 	}
 	else if(ms.type=='recording'&&au.mode=='stopped'&&/^%%SND0/.test(x)){sound_edit(sound_replace(sound_read(x)))}

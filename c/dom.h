@@ -1723,7 +1723,6 @@ lv* button_write(lv*x){
 int rtext_len(lv*table){lv*t=dget(table,lmistr("text"));int r=0;EACH(z,t)r+=t->lv[z]->c;return r;}
 int rtext_get(lv*table,int x){lv*t=dget(table,lmistr("text"));int i=0;EACH(z,t){i+=t->lv[z]->c;if(i>=x)return z;}return -1;}
 pair rtext_getr(lv*table,int x){lv*t=dget(table,lmistr("text"));int i=0;EACH(z,t){int c=t->lv[z]->c;if(i+c>=x)return (pair){i,i+c};i+=c;}return(pair){x,x};}
-lv* rtext_font(lv*table,int x){int i=rtext_get(table,x);return i<0?lmistr(""):dget(table,lmistr("font"))->lv[i];}
 int rtext_is_plain(lv*x){
 	if(!lit(x)||!dget(x,lmistr("text"))||!dget(x,lmistr("font"))||!dget(x,lmistr("arg"))||!dget(x,lmistr("pat"))||x->n>1)return 0;if(x->n==0)return 1;
 	lv*f=dget(x,lmistr("font"))->lv[0],*a=dget(x,lmistr("arg"))->lv[0],*p=dget(x,lmistr("pat"))->lv[0];return !strcmp(f->sv,"")&&!image_is(a)&&!strcmp(ls(a)->sv,"")&&ln(p)==1;
