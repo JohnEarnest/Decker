@@ -24,6 +24,32 @@ on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 
 # the problems:
 
+problem[338.1]
+# find the maximum row-sum in a matrix
+on f x do max sum @ x end
+assert[f["%J" parse "[[4,4,4,4],[10,0,0,0],[2,2,2,9]]"] 16]
+assert[f["%J" parse "[[1,5],[7,3],[3,5]]"] 10]
+assert[f["%J" parse "[[1,2,3],[3,2,1]]"] 6]
+assert[f["%J" parse "[[2,8,7],[7,1,3],[1,9,5]]"] 17]
+assert[f["%J" parse "[[10,20,30],[5,5,5],[0,100,0],[25,25,25]]"] 100]
+
+problem[338.2]
+# find the maximum difference between any pair of values from x and y
+on f x y do max mag @ raze x - list y end
+assert[f[(4,5,7)    (9,1,3,4)    ] 6]
+assert[f[(2,3,5,4)  (3,2,5,5,8,7)] 6]
+assert[f[(2,1,11,3) (2,5,10,2)   ] 9]
+assert[f[(1,2,3)    (3,2,1)      ] 2]
+assert[f[(1,0,2,3)  (5,0)        ] 5]
+
+problem[332.2]
+# do all letters in x appear an odd number of times?
+on f x do min extract 2%count value by value from x end
+assert[f["weekly"   ] 0]
+assert[f["perl"     ] 1]
+assert[f["challenge"] 0]
+assert[f["abcabcabc"] 1]
+
 problem[323.1]
 # perform a sequence of operations on a variable
 on f x do sum (("++x","x++","--x","x--")dict 1,1,-1,-1)@x end
