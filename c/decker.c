@@ -3759,8 +3759,9 @@ void all_menus(void){
 		}
 		menu_separator();
 		if(menu_item("Open...",1,'o'))modal_enter(modal_open_deck);
-		if(menu_item("Save",dirty&&strlen(document_path),'s'))save_deck(lmcstr(document_path));
-		if(menu_item("Save As...",1,'\0'))modal_enter(modal_save_deck);
+		int haspath=strlen(document_path)>0;
+		if(menu_item("Save",dirty&&haspath,haspath?'s':'\0'))save_deck(lmcstr(document_path));
+		if(menu_item("Save As...",1,!haspath?'s':'\0'))modal_enter(modal_save_deck);
 		menu_separator();
 		if(menu_item("Import Image..."   ,1,'\0'))modal_enter(modal_import_image);
 		if(menu_item("Export Image..."   ,1,'\0'))modal_enter(modal_export_image);
