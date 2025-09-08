@@ -609,7 +609,7 @@ rect grid_hcell(grid x,int column,rect cell){
 int widget_grid(lv*target,grid x,grid_val*value){
 	if(x.show==show_none)return 0; lv*hfnt=FONT_BODY; int hsize=x.headers?font_h(hfnt)+5:0; if(x.size.h<=(50+hsize)||x.size.w<16)x.scrollbar=0;
 	lv*fnt=x.font?x.font:FONT_MONO; int os=value->scroll, or=value->row, oc=value->col, files=x.headers==2; if(files||x.size.h<=hsize)x.headers=0;
-	int _patby=dgeti(value->table,lmistr("_patby")),_hideby=dgeti(value->table,lmistr("_hideby"));
+	int _bg=dgeti(value->table,lmistr("_bg")),_fg=dgeti(value->table,lmistr("_fg")),_hideby=dgeti(value->table,lmistr("_hideby"));
 	lv*pv=NULL,*vp=NULL;if(target!=NULL&&_hideby!=-1)grid_pv(target,&pv,&vp);int nr=pv?pv->c: value->table->n;
 	#define grid_cell_at(col,row) (value->table->lv[col]->lv[permuted_row(row)])
 
@@ -627,7 +627,7 @@ int widget_grid(lv*target,grid x,grid_val*value){
 	if(x.lines)draw_rect(bh,fcol);if(nc<=0)draw_textc(inset(bb,1),"(no data)",hfnt,fcol);
 
 	int cw[MAX(1,nc)];for(int z=0;z<nc;z++)cw[z]=z>=x.widths[0]?-1:x.widths[1+z];
-	if(_patby!=-1)cw[_patby]=0;if(_hideby!=-1)cw[_hideby]=0;
+	if(_bg!=-1)cw[_bg]=0;if(_fg!=-1)cw[_fg]=0;if(_hideby!=-1)cw[_hideby]=0;
 	int hwt=0;for(int z=0;z<x.widths[0];z++)hwt+=cw[z];
 	int nwt=0;for(int z=0;z<nc         ;z++)nwt+=cw[z]==-1;
 	for(int z=x.widths[0];z<nc         ;z++)cw[z]=cw[z]==-1?(bb.w-hwt)/nwt:0;
@@ -637,8 +637,8 @@ int widget_grid(lv*target,grid x,grid_val*value){
 	#define rowb(n) (rect){bb.x,bb.y+rh*n,bb.w,rh}
 	int clicked=0,rsel=0,hrow=-1,hcol=-1;
 	for(int y=0;y<nrd;y++){
-		if(_patby!=-1){
-			int p=CLAMP(0,ln(grid_cell_at(_patby,y+value->scroll)),47);
+		if(_bg!=-1){
+			int p=CLAMP(0,ln(grid_cell_at(_bg,y+value->scroll)),47);
 			if(p){rect t=rowb(y);if(y==0)t.y+=1,t.h-=1; draw_rect(t,p);}
 		}
 		int ra=in_layer()&&over(bb)&&over(rowb(y));rect cbox={0};
@@ -664,7 +664,7 @@ int widget_grid(lv*target,grid x,grid_val*value){
 		}
 		if(drawncol&&x.lines)draw_invert(pal,(rect){hs.x-3,b.y+1,1,b.h-2});cx+=cw[cols];drawncol=1;
 		for(int y=0;y<nrd;y++){
-			int ccol=y+value->scroll==hrow&&(x.bycell?cols==hcol :1)?bcol:fcol;
+			int ccol=y+value->scroll==hrow&&(x.bycell?cols==hcol :1)?bcol: _fg==-1?fcol: CLAMP(0,ln(grid_cell_at(_fg,y+value->scroll)),47);
 			rect cell={hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1}; lv*v=grid_cell_at(z,y+value->scroll);
 			cf.c=0;format_type_simple(&cf,v,z>=fk?'s':x.format[z]=='L'?'s':x.format[z]);str_term(&cf);
 			rect ib=box_center(cell,image_size(ICONS[0]));pair ip={ib.x,ib.y};
@@ -740,7 +740,8 @@ void grid_keys(int code){
 	int m=0, nc=wid.gv->table->c, r=wid.gv->row, c=wid.gv->col;
 	int rh=font_h(fnt)+5, bh=wid.g.headers?font_h(hfnt)+5:0, nrd=MIN(nr,((wid.g.size.h-bh+1)/rh));
 	int cw[MAX(1,nc)];for(int z=0;z<nc;z++)cw[z]=z>=wid.g.widths[0]?1:wid.g.widths[1+z];
-	{int _patby =dgeti(wid.gv->table,lmistr("_patby" ));if(_patby !=-1)cw[_patby ]=0;}
+	{int _bg    =dgeti(wid.gv->table,lmistr("_bg"    ));if(_bg    !=-1)cw[_bg    ]=0;}
+	{int _fg    =dgeti(wid.gv->table,lmistr("_fg"    ));if(_fg    !=-1)cw[_fg    ]=0;}
 	{int _hideby=dgeti(wid.gv->table,lmistr("_hideby"));if(_hideby!=-1)cw[_hideby]=0;}
 	if(code==KEY_HOME    ){m=1;r=pv?ln(l_first(pv)): 0    ;}
 	if(code==KEY_END     ){m=1;r=pv?ln(l_last (pv)): npr-1;}

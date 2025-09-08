@@ -264,7 +264,8 @@ For example, a grid containing a table with four columns given the format string
 
 If a grid's table contains columns with certain "magic names", those columns will be hidden and the values in their cells will influence how the corresponding rows are drawn:
 
-- `_patby`: a column of [pattern indices](#patternsinterface) used to control the background pattern/color for each row.
+- `_bg`: a column of [pattern indices](#patternsinterface) used to control the background pattern/color for each row.
+- `_fg`: a column of [pattern indices](#patternsinterface) used to control the foreground pattern/color for each row.
 - `_hideby`: a column of truthy or falsey values; where this is truthy, the grid widget will hide the corresponding row.
 
 With a little scripting, `_hideby` is a useful way of searching or filtering a grid without permanently removing rows from its table. Let's say we have a grid `mygrid` with string columns `name` and `notes` that we want to perform an infix search on based on the contents of a field. Our general approach will be to assemble a glob pattern (`p`) incorporating the search term (if any) and then compute a `_hideby` column that is truthy everywhere _neither_ of our source columns match the pattern. We can give the field a script something like the following:
@@ -287,7 +288,7 @@ on change do
  from mygrid.value
 end
 ```
-If you're ever unsure that you're computing `_hideby` correctly, try converting it into a `_patby` so you can see the rows highlighted in context.
+If you're ever unsure that you're computing `_hideby` correctly, try converting it into a `_bg` so you can see the rows highlighted in context.
 
 The grid properties dialog displays the contents of the grid's table encoded as JSON or CSV, and allows it to be edited directly. In JSON mode, tables will initially be shown as an object containing columns as lists (as given by the Lil `cols` operator), but the dialog also _accepts_ a list of objects or a list of lists (as accepted by the Lil `table` operator). In CSV mode, the table will be parsed and displayed based on the table's format string, if any. Switching modes will parse the table under the current representation and then re-format in the new representation.
 

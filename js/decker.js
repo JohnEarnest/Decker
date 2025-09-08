@@ -762,7 +762,7 @@ grid_exit=_=>{
 widget_grid=(target,x,value)=>{
 	if(x.show=='none')return 0; const hfnt=FONT_BODY, hsize=x.headers?font_h(hfnt)+5:0, showscroll=x.size.h<=(50+hsize)||x.size.w<16?0:x.scrollbar
 	const fnt=x.font?x.font:FONT_MONO, os=value.scroll, or=value.row, oc=value.col, files=x.headers==2, headers=files||x.size.h<=hsize?0:x.headers
-	const tk=tab_cols(value.table), nc=tk.length, rh=font_h(fnt)+(x.lines?5:3), _patby=tk.indexOf('_patby'), _hideby=tk.indexOf('_hideby')
+	const tk=tab_cols(value.table), nc=tk.length, rh=font_h(fnt)+(x.lines?5:3), _bg=tk.indexOf('_bg'), _fg=tk.indexOf('_fg'), _hideby=tk.indexOf('_hideby')
 	const p=grid_pv(target), nr=p.pv?p.pv.length: tab_rowcount(value.table)
 	const grid_cell_at=(col,row)=>tab_cell(value.table,col,p.permuted_row(row))
 
@@ -777,7 +777,7 @@ widget_grid=(target,x,value)=>{
 	draw_box(x.lines?b:rect(b.x,bb.y,b.w,b.h-(bb.y-b.y)),0,sel?13:fcol)
 
 	const cw=[];for(let z=0;z<nc;z++)cw.push(z>=x.widths.length?-1:x.widths[z])
-	if(_patby!=-1)cw[_patby]=0;if(_hideby!=-1)cw[_hideby]=0
+	if(_bg!=-1)cw[_bg]=0;if(_fg!=-1)cw[_fg]=0;if(_hideby!=-1)cw[_hideby]=0
 	const hwt=x.widths.reduce((sofar,_,i)=>sofar+cw[i],0), nwt=cw.filter(x=>x==-1).length
 	for(let z=x.widths.length;z<nc;z++)cw[z]=cw[z]==-1?0|((bb.w-hwt)/nwt):0
 
@@ -787,8 +787,8 @@ widget_grid=(target,x,value)=>{
 	const rowb=n=>rect(bb.x,bb.y+rh*n,bb.w,rh)
 	const rowh=n=>inset(rect(bb.x+1,bb.y+rh*n+2,bb.w-2,rh-3),x.lines?0:-1)
 	let clicked=0,rsel=0,hrow=-1,hcol=-1;for(let y=0;y<nrd;y++){
-		if(_patby!=-1){
-			const p=clamp(0,ln(grid_cell_at(tk[_patby],y+value.scroll)),47)
+		if(_bg!=-1){
+			const p=clamp(0,ln(grid_cell_at(tk[_bg],y+value.scroll)),47)
 			if(p){const t=rowb(y);if(y==0)t.y+=1,t.h-=1; draw_rect(t,p)}
 		}
 		const ra=in_layer()&&over(bb)&&over(rowb(y));let cbox=rect()
@@ -813,7 +813,7 @@ widget_grid=(target,x,value)=>{
 		if(drawncol&&x.lines)draw_invert(pal,rect(hs.x-3,b.y+1,1,b.h-2));cx+=cw[cols],drawncol=1
 		for(let y=0;y<nrd;y++){
 			const cell=rect(hs.x-3,bb.y+rh*y+1,hs.w+5,rh-1), v=grid_cell_at(tk[z],y+value.scroll)
-			const fc=x.format[z]=='L'?'s':(x.format[z]||'s'), ccol=y+value.scroll==hrow&&(x.bycell?cols==hcol :1)?bcol:fcol
+			const fc=x.format[z]=='L'?'s':(x.format[z]||'s'), ccol=y+value.scroll==hrow&&(x.bycell?cols==hcol :1)?bcol: _fg==-1?fcol: clamp(0,ln(grid_cell_at(tk[_fg],y+value.scroll)),47)
 			const cf=ls(dyad.format(lms(`%${fc}`),fc=='j'||fc=='J'||fc=='a'?monad.list(v):v)), ip=rcenter(cell,ICONS[0].size)
 			const oc=frame.clip; frame.clip=rclip(cell,frame.clip)
 			if     (x.format[z]=='I'){const i=clamp(0,ln(v),8);if(i<8)draw_icon(ip,ICONS[i],ccol)}
@@ -884,7 +884,8 @@ grid_keys=(code,shift)=>{
 	let m=0, r=wid.gv.row, c=wid.gv.col
 	const rh=font_h(fnt)+5, bh=wid.g.headers?font_h(hfnt)+5:0, nrd=min(nr,0|((wid.g.size.h-bh+1)/rh)), wd=wid.g.widths
 	const cw=[];for(let z=0;z<nc;z++)cw.push(z>=wd.length?1:wd[z])
-	{const _patby =tk.indexOf('_patby' );if(_patby !=-1)cw[_patby ]=0}
+	{const _bg    =tk.indexOf('_bg'    );if(_bg    !=-1)cw[_bg    ]=0}
+	{const _fg    =tk.indexOf('_fg'    );if(_fg    !=-1)cw[_fg    ]=0}
 	{const _hideby=tk.indexOf('_hideby');if(_hideby!=-1)cw[_hideby]=0}
 	if(code=='Home'      ){m=1,r=p.pv?first(p.pv): 0}
 	if(code=='End'       ){m=1,r=p.pv?last (p.pv): npr-1}
