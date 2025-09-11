@@ -600,7 +600,7 @@ void widget_canvas(lv*target,canvas x,lv*image){
 str cf;void grid_edit_cell(pair cell,lv*v);
 rect grid_cell(grid x,grid_val*value,rect bb,pair pos,int*cw){
 	lv*fnt=x.font?x.font:FONT_MONO;
-	int nc=value->table->c, rh=font_h(fnt)+(x.lines?5:3),cx=0; for(int z=0;z<MIN(nc,pos.x);z++)cx+=cw[z];
+	int nc=MIN(256,value->table->c), rh=font_h(fnt)+(x.lines?5:3),cx=0; for(int z=0;z<MIN(nc,pos.x);z++)cx+=cw[z];
 	return box_intersect((rect){bb.x+cx,bb.y+rh*pos.y+1,pos.x==nc-1?bb.w-cx:cw[pos.x],rh-1},bb);
 }
 rect grid_hcell(grid x,int column,rect cell){
@@ -613,7 +613,7 @@ int widget_grid(lv*target,grid x,grid_val*value){
 	lv*pv=NULL,*vp=NULL;if(target!=NULL&&_hideby!=-1)grid_pv(target,&pv,&vp);int nr=pv?pv->c: value->table->n;
 	#define grid_cell_at(col,row) (value->table->lv[col]->lv[permuted_row(row)])
 
-	int nc=value->table->c, rh=font_h(fnt)+(x.lines?5:3), fcol=!in_layer()?13:x.show==show_invert?32:1, bcol=x.show==show_invert?1:32;
+	int nc=MIN(256,value->table->c), rh=font_h(fnt)+(x.lines?5:3), fcol=!in_layer()?13:x.show==show_invert?32:1, bcol=x.show==show_invert?1:32;
 	int fk=strlen(x.format); rect b=x.size;
 	int sel=in_layer()&&x.show!=show_none&&wid.active==wid.count;
 	if(in_layer()&&dover(b)&&(ev.md||ev.mu||ev.drag)){if(!sel&&wid.gv)grid_exit(); wid.active=wid.count,sel=1;}
@@ -626,7 +626,7 @@ int widget_grid(lv*target,grid x,grid_val*value){
 	char*pal=patterns_pal(ifield(deck,"patterns"));
 	if(x.lines)draw_rect(bh,fcol);if(nc<=0)draw_textc(inset(bb,1),"(no data)",hfnt,fcol);
 
-	int cw[MAX(1,nc)];for(int z=0;z<nc;z++)cw[z]=z>=x.widths[0]?-1:x.widths[1+z];
+	int cw[256];for(int z=0;z<nc;z++)cw[z]=z>=x.widths[0]?-1:x.widths[1+z];
 	if(_bg!=-1)cw[_bg]=0;if(_fg!=-1)cw[_fg]=0;if(_hideby!=-1)cw[_hideby]=0;
 	int hwt=0;for(int z=0;z<x.widths[0];z++)hwt+=cw[z];
 	int nwt=0;for(int z=0;z<nc         ;z++)nwt+=cw[z]==-1;
@@ -737,9 +737,9 @@ void grid_keys(int code){
 	lv*fnt=wid.g.font?wid.g.font:FONT_MONO, *hfnt=FONT_BODY;
 	lv*pv=NULL,*vp=NULL;if(wid.gt!=NULL)grid_pv(wid.gt,&pv,&vp);
 	int npr=wid.gv->table->n, nr=pv?pv->c: npr;
-	int m=0, nc=wid.gv->table->c, r=wid.gv->row, c=wid.gv->col;
+	int m=0, nc=MIN(256,wid.gv->table->c), r=wid.gv->row, c=wid.gv->col;
 	int rh=font_h(fnt)+5, bh=wid.g.headers?font_h(hfnt)+5:0, nrd=MIN(nr,((wid.g.size.h-bh+1)/rh));
-	int cw[MAX(1,nc)];for(int z=0;z<nc;z++)cw[z]=z>=wid.g.widths[0]?1:wid.g.widths[1+z];
+	int cw[256];for(int z=0;z<nc;z++)cw[z]=z>=wid.g.widths[0]?1:wid.g.widths[1+z];
 	{int _bg    =dgeti(wid.gv->table,lmistr("_bg"    ));if(_bg    !=-1)cw[_bg    ]=0;}
 	{int _fg    =dgeti(wid.gv->table,lmistr("_fg"    ));if(_fg    !=-1)cw[_fg    ]=0;}
 	{int _hideby=dgeti(wid.gv->table,lmistr("_hideby"));if(_hideby!=-1)cw[_hideby]=0;}
