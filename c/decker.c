@@ -245,7 +245,7 @@ typedef struct {
 	lv*message,*verb;pair cell;
 	int from_listener, from_action, from_keycaps;
 	int act_go, act_card, act_gomode, act_trans, act_transno, act_sound;
-	int time_curr, time_end; lv*carda, *cardb, *trans, *canvas;
+	int time_curr, time_end; lv*carda, *cardb, *trans, *canvas, *hint;
 	rect pending_grid_cell;int pending_grid_cell_rich;
 } modal_state; modal_state ms={0};
 typedef struct {modal_state ms;widget_state wid;} modal_context;
@@ -1554,7 +1554,7 @@ void modal_exit(int value){
 		lv*path=modal_save_path(ms.filter==filter_sound?".wav":ms.filter==filter_gif?".gif": ms.path_suffix);
 		if(directory_exists(path)&&ms.type!=modal_confirm){modal_save_replace(modal_save_lil,"file",path);return;}
 		lv*value=arg();ret(!value?ZERO:
-			(image_is(value)||lil(value)||lid(value))?n_writegif(NULL,lml2(path,value)):
+			(image_is(value)||lil(value)||lid(value))?n_writegif(NULL,ms.hint?lml3(path,value,ms.hint):lml2(path,value)):
 			sound_is(value)?n_writewav(NULL,lml2(path,value)):
 			deck_is(value)?n_writedeck(NULL,lml2(path,value)):
 			array_is(value)?writebin(path,value):
@@ -2326,10 +2326,10 @@ lv*n_open(lv*self,lv*z){
 	return r;
 }
 lv*n_save(lv*self,lv*z){
-	(void)self;modal_enter(modal_save_lil);lv*value=l_first(z);ms.path_suffix[0]=0;
+	(void)self;modal_enter(modal_save_lil);lv*value=l_first(z);ms.path_suffix[0]=0;ms.hint=NULL;
 	if(array_is(value)){ms.desc="Save a binary file.";if(z->c>1)snprintf(ms.path_suffix,sizeof(ms.path_suffix),"%s",ls(z->lv[1])->sv);}
 	if(sound_is(value))ms.filter=filter_sound,ms.desc="Save a .wav sound file.";
-	if(image_is(value)||lid(value))ms.filter=filter_gif,ms.desc="Save a .gif image file.";
+	if(image_is(value)||lid(value)){ms.filter=filter_gif,ms.desc="Save a .gif image file.";ms.hint=z->c>1?z->lv[1]:NULL;}
 	if(deck_is(value))ms.filter=filter_deck,ms.desc="Save a .deck or .html file.";
 	if(lil(value)){EACH(z,value)if(image_is(value->lv[z]))ms.filter=filter_gif,ms.desc="Save a .gif image file.";}
 	ms.grid=(grid_val){directory_enumerate(ms.path,ms.filter,0),0,0,-1};
@@ -4154,6 +4154,7 @@ lv* modal_track(modal_state*m){
 	mtrack(m->cardb)
 	mtrack(m->trans)
 	mtrack(m->canvas)
+	mtrack(m->hint)
 	mtrack(m->old_wid.gt)
 	mtrack(m->old_wid.ft)
 	mtrack(m->old_wid.hist)

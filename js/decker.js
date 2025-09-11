@@ -70,30 +70,43 @@ makelzww=(lw,bw)=>{
 		f() {wb(sc),ih(),wb((1<<lw)+1),nb>0&&bw(b&0xff)}
 	}
 }
-writegif=(frames,delays)=>{
+writegif=(frames,delays,palette,pal_size)=>{
+	let paltrans=-1;for(let z=0;z<pal_size;z++)if(palette[z]==-1)paltrans=z
+	pal_size=pal_size?max(2,2**ceil(Math.log2(pal_size))):0
 	const size=frames.reduce((s,f)=>rmax(s,f.size),rect(1,1)), pal=deck.patterns.pal.pix; let frame_index=0, payload=[]
 	const anim_ants       =(x,y)=>(0|((x+y+frame_index)/3))%2?15:0
 	const draw_pattern    =(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
 	const draw_color_trans=(pix,x,y)=>pix==ANTS?anim_ants(x,y): pix==0?16: pix>47?0: pix>31?pix-32: draw_pattern(pix,x,y)?15:0
 	const b=x=>payload.push(x&0xFF), s=x=>{b(x);b(x>>8)}, t=x=>x.split('').forEach(x=>b(x.charCodeAt(0)))
 	t('GIF89a'),s(size.x),s(size.y) // header, dimensions
-	b(0xF4)                         // global colortable, 8-bits per channel, 32 colors
-	b(0),b(0)                       // background color is 0, 1:1 pixel aspect ratio
-	for(let z=0;z<16;z++)b(COLORS[z]>>16),b(COLORS[z]>>8),b(COLORS[z]) // global colortable
-	for(let z=0;z<16;z++)b(0xFF         ),b(0xFF        ),b(0xFF     ) // padding entries
+	if(pal_size){
+		const n=Math.log2(pal_size)-1
+		b(0xF0|n)                       // global colortable, 8-bits per channel, N colors
+		b(0),b(0)                       // background color is 0, 1:1 pixel aspect ratio
+		for(let z=0;z<pal_size;z++)b(palette[z]>>16),b(palette[z]>>8),b(palette[z]) // global colortable
+	}else{
+		b(0xF4)                         // global colortable, 8-bits per channel, 32 colors
+		b(0),b(0)                       // background color is 0, 1:1 pixel aspect ratio
+		for(let z=0;z<16;z++)b(COLORS[z]>>16),b(COLORS[z]>>8),b(COLORS[z]) // global colortable
+		for(let z=0;z<16;z++)b(0xFF         ),b(0xFF        ),b(0xFF     ) // padding entries
+	}
 	s(0xFF21),b(11),t('NETSCAPE2.0'),b(3),b(1),s(0),b(0)               // NAB; loop gif forever
 	for(let z=0;z<frames.length;z++){
 		const frame=frames[z]
 		s(0xF921),b(4)                            // graphic control extension
-		b(9),s(delays[z]),b(16)                   // dispose to bg + has transparency, 100ths of a second delay, color 16 is transparent
+		b(pal_size&&paltrans==-1?8:9)             // dispose to bg + has transparency
+		s(delays[z])                              // 100ths of a second delay
+		b(pal_size&&paltrans==-1?0: pal_size?paltrans: 16) // transparent color index, if any
 		b(0)                                      // end GCE
 		b(0x2C)                                   // image descriptor
 		s(0),s(0),s(frame.size.x),s(frame.size.y) // dimensions
-		b(0),b(5)                                 // no local colortable,  minimum LZW code size
+		const lws=pal_size?max(2,Math.log2(pal_size)): 5
+		b(0),b(lws)                               // no local colortable,  minimum LZW code size
 		let bo=payload.length
-		let lw=makelzww(5,b=>{if(bo==payload.length)payload.push(0);payload[bo]++;payload.push(b);if(payload[bo]==255)bo=payload.length});
-		for(let y=0;y<frame.size.y;y++)for(let x=0;x<frame.size.x;x++)lw.w(draw_color_trans(frame.pix[y*frame.size.x+x],x,y))
-		lw.f(),b(0),frame_index++ // end of frame
+		let lw=makelzww(lws,b=>{if(bo==payload.length)payload.push(0);payload[bo]++;payload.push(b);if(payload[bo]==255)bo=payload.length});
+		for(let y=0;y<frame.size.y;y++)for(let x=0;x<frame.size.x;x++){
+			const d=frame.pix[y*frame.size.x+x];lw.w(pal_size?min(pal_size,d): draw_color_trans(d,x,y))
+		}lw.f(),b(0),frame_index++ // end of frame
 	};b(0x3B);return payload
 }
 writewav=sound=>{
@@ -487,7 +500,7 @@ modal_state=_=>({ // modal state
 	filter:0, grid:null,grid2:null, text:null,name:null,form0:null,form1:null,form2:null,
 	desc:'',path:'',path_suffix:'',filter:'', message:null,verb:null, cell:rect(),
 	from_listener:0,from_action:0,from_keycaps:0, act_go:0,act_card:0,act_gomode:0,act_trans:0,act_transo:0,act_sound:0,
-	time_curr:0,time_end:0,time_start:0, carda:null,cardb:null,trans:null,canvas:null,pending_grid_cell:rect(),pending_grid_cell_rich:0,
+	time_curr:0,time_end:0,time_start:0, carda:null,cardb:null,trans:null,canvas:null,hint:null,pending_grid_cell:rect(),pending_grid_cell_rich:0,
 })
 modal_state_clone=x=>{const r=Object.assign({},x);r.cell=rcopy(r.cell);return r}
 let ms=modal_state(), ms_stack=[]
@@ -1909,7 +1922,7 @@ modals=_=>{
 						const c=anim_pattern(v,x,y,z),p=draw_pattern(c,x+off.x,y+off.y)
 						frame.pix[x+(i.size.x*y)]=c>=32?c: p?1:bg
 					}frames.push(bg_has_lasso()?image_mask(frame,dr.mask):frame)
-				}save_bin(name,writegif(a?frames:[frames[0]], a?frames.map(x=>10):[10]))
+				}save_bin(name,writegif(a?frames:[frames[0]], a?frames.map(x=>10):[10],new Int32Array(256),0))
 			}
 			if(subtype=='save_deck'    )savedeck()
 			if(subtype=='save_locked'  )iwrite(deck,lms('locked'),ONE),savedeck(),iwrite(deck,lms('locked'),ZERO)
@@ -1920,7 +1933,8 @@ modals=_=>{
 				let f=image_is(x)?[x]:     lid(x)?ll(dget(x,lms('frames'))||lml([])): lil(x)?ll(x): []
 				let d=image_is(x)?lml([]): lid(x)?   dget(x,lms('delays'))||lml([] ): lml([])
 				let ff=[],fd=[];f.map((v,i)=>{if(image_is(v))ff.push(v),fd.push(0|clamp(1,!lil(d)?ln(d): i>=count(d)?3: ln(d.v[i]),65535))})
-				if((lil(x)||lid(x)||image_is(x))&&f.length){save_bin(name,writegif(ff,fd))}
+				let p=new Int32Array(256),pn=0;if(ms.hint){for(let z=0;z<256;z++)p[z]=z>=ms.hint.length?0:ms.hint[z],pn=min(256,ms.hint.length)}
+				if((lil(x)||lid(x)||image_is(x))&&f.length){save_bin(name,writegif(ff,fd,p,pn))}
 				else if(sound_is(x))                       {save_bin(name,writewav(x))}
 				else if(array_is(x))                       {save_bin(name,writearray(x))}
 				else if(deck_is(x))                        {save_deck(name,x)}
@@ -2239,11 +2253,11 @@ n_open=([type,hint])=>{
 	ms.verb=t=='array'?lms(t): hint?ls(hint):'';return r
 }
 n_save=([x,s])=>{
-	modal_enter('save_lil');x=x||NIL;ms.path_suffix=array_is(x)&&s?ls(s):''
+	modal_enter('save_lil');x=x||NIL;ms.path_suffix=array_is(x)&&s?ls(s):'',ms.hint=null
 	if(array_is(x)                                      )ms.desc='Save a binary file.'        ,ms.text=fieldstr(lms('untitled'+ms.path_suffix))
 	if(sound_is(x)                                      )ms.desc='Save a .wav sound file.'    ,ms.text=fieldstr(lms('sound.wav'))
 	if(deck_is(x)                                       )ms.desc='Save a .deck or .html file.',ms.text=fieldstr(lms('untitled.deck'))
-	if(image_is(x)||lid(x)||(lil(x)&&x.v.some(image_is)))ms.desc='Save a .gif image file.'    ,ms.text=fieldstr(lms('image.gif'))
+	if(image_is(x)||lid(x)||(lil(x)&&x.v.some(image_is)))ms.desc='Save a .gif image file.'    ,ms.text=fieldstr(lms('image.gif')),ms.hint=s?ll(s).map(ln):null
 	ms.verb=x;return NIL
 }
 n_alert=([t,p,x,y])=>{

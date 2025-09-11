@@ -3016,27 +3016,41 @@ lv* readgif(char*data,int size,int gray,int frames){
 #define add_byte_framed(b) {if(bo==r.c)add_byte(0);r.sv[bo]++;add_byte(b);if((0xFF&r.sv[bo])==0xFF)bo=r.c;}
 #define add_bits(c) {b|=(c)<<nb;nb+=w;while(nb>=8){add_byte_framed(b&0xff);b>>=8,nb-=8;}}
 #define inc_hi() {hi++;if(hi==ov){w++;ov<<=1;}if(hi==0xfff){unsigned int c=1<<lw;add_bits(c);w=lw+1;hi=c+1;ov=c<<1;memset(t, 0, sizeof(t));tc=1;}}
-char* writegif(lv*frames,lv*delays,int*len){
+char* writegif(lv*frames,lv*delays,int*len,int*pal,int pal_size){
+	int paltrans=-1;for(int z=0;z<pal_size;z++)if(pal[z]==-1)paltrans=z;
+	if(pal_size)pal_size=pal_size?MAX(2,pow(2,ceil(log2(pal_size)))):0; // next-closest power of 2
 	lv*patterns=patterns_read(lmd());str r=str_new();pair size={1,1};
 	EACH(z,frames)size=pair_max(size,image_size(frames->lv[z]));
 	str_addz(&r,"GIF89a");add_short(size.x),add_short(size.y);
-	add_byte(0xF4);          // global colortable, 8-bits per channel, 32 colors
-	add_byte(0),add_byte(0); // background color is 0, 1:1 pixel aspect ratio
-	for(int z=0;z<16;z++)add_byte(COLORS[z]>>16),add_byte(COLORS[z]>>8),add_byte(COLORS[z]); // global colortable
-	for(int z=0;z<16;z++)add_byte(0xFF),add_byte(0xFF),add_byte(0xFF); // padding entries
+	if(pal_size){
+		int n=log2(pal_size)-1;
+		add_byte(0xF0|n);        // global colortable, 8-bits per channel, N colors
+		add_byte(0),add_byte(0); // background color is 0, 1:1 pixel aspect ratio
+		for(int z=0;z<pal_size;z++)add_byte(pal[z]>>16),add_byte(pal[z]>>8),add_byte(pal[z]); // global colortable
+	}
+	else{
+		add_byte(0xF4);          // global colortable, 8-bits per channel, 32 colors
+		add_byte(0),add_byte(0); // background color is 0, 1:1 pixel aspect ratio
+		for(int z=0;z<16;z++)add_byte(COLORS[z]>>16),add_byte(COLORS[z]>>8),add_byte(COLORS[z]); // global colortable
+		for(int z=0;z<16;z++)add_byte(0xFF),add_byte(0xFF),add_byte(0xFF); // padding entries
+	}
 	add_short(0xFF21),add_byte(11),str_addz(&r,"NETSCAPE2.0"),add_byte(3),add_byte(1),add_short(0),add_byte(0); // NAB; loop gif forever
 	str_provision(&r,r.size+frames->c*(20+(size.x*size.y*2)));
 	EACH(frame,frames)if(image_is(frames->lv[frame])){
 		add_byte(0x21),add_byte(0xF9),add_byte(4); // graphic control extension
-		add_byte(9),add_short(((int)ln(delays->lv[frame]))),add_byte(16); // dispose to bg + has transparency, 100ths of a second delay, color 16 is transparent
+		add_byte(pal_size&&paltrans==-1?8:9);                      // dispose to bg + has transparency
+		add_short(((int)ln(delays->lv[frame])));                   // 100ths of a second delay
+		add_byte(pal_size&&paltrans==-1?0: pal_size?paltrans: 16); // transparent color index, if any
 		add_byte(0); // end GCE
 		add_byte(0x2C); // image descriptor
 		size=image_size(frames->lv[frame]);add_short(0),add_short(0),add_short(size.x),add_short(size.y); // window {x,y,width,height}
-		add_byte(0),add_byte(5); // no local colortable, minimum LZW code size = 5
+		add_byte(0); // no local colortable
+		unsigned int lw=pal_size?MAX(2,((int)log2(pal_size))): 5;
+		add_byte(lw); // minimum LZW code size
 		unsigned int count=0; char*data=frames->lv[frame]->b->sv;
-		unsigned int lw=5,w=1+lw,hi=(1<<lw)+1,ov=1<<(lw+1),sc=-1,b=0,nb=0,t[1<<14]={0},tm=(1<<14)-1,tc;int bo=r.c;
+		unsigned int w=1+lw,hi=(1<<lw)+1,ov=1<<(lw+1),sc=-1,b=0,nb=0,t[1<<14]={0},tm=(1<<14)-1,tc;int bo=r.c;
 		for(int y=0;y<size.y;y++)for(int x=0;x<size.x;x++){
-			int v=draw_color_trans(patterns_pal(patterns),data[y*size.x+x],count,x,y);
+			int d=0xFF&data[y*size.x+x], v=pal_size?MIN(pal_size,d): draw_color_trans(patterns_pal(patterns),d,count,x,y);
 			unsigned int c=sc;if(c==(unsigned)-1){add_bits(1<<lw);sc=v;continue;} // first write sends clear code
 			unsigned int k=(c<<8)|v,hash=((k>>12)^k)&tm,em=0;
 			for(unsigned int h=hash;t[h];h=(h+1)&tm)if(k==t[h]>>12){em=1,sc=t[h]&0xfff;}
@@ -3081,11 +3095,12 @@ lv* n_readgif(lv*self,lv*a){
 	fclose(f);return readgif(data,st.st_size,gray,frames);
 }
 char* n_writegif_raw(lv*a,int*len){
-	if(a->c<2)return NULL;lv*i=lml(0),*d=lml(0);
+	if(a->c<2)return NULL;lv*i=lml(0),*d=lml(0),*hint=a->c>2?ll(a->lv[2]):NULL;
 	lv*si=lil(a->lv[1])?a->lv[1]: lid(a->lv[1])?dgetv(a->lv[1],lmistr("frames")): l_list(a->lv[1]); if(!lil(si))si=l_list(si);
 	lv*sd=lid(a->lv[1])?dget(a->lv[1],lmistr("delays")) :lml(0);
 	EACH(z,si)if(image_is(si->lv[z])&&!is_empty(si->lv[z]))ll_add(i,si->lv[z]),ll_add(d,lil(sd)?lmn(z>=sd->c?3: CLAMP(1,ln(sd->lv[z]),65535)): lmn(ln(sd)));
-	if(i->c<1)return NULL;return writegif(i,d,len);
+	int pal[256], pal_size=0;if(hint){for(int z=0;z<256;z++){pal[z]=z>=hint->c?0: ((int)ln(hint->lv[z]));}pal_size=MIN(256,hint->c);}
+	if(i->c<1)return NULL;return writegif(i,d,len,pal,pal_size);
 }
 lv* n_writegif(lv*self,lv*a){
 	(void)self;lv*name=drom_to_utf8(l_first(a));int len=0;char*data=n_writegif_raw(a,&len);if(!data)return ZERO;

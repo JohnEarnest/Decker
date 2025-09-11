@@ -561,7 +561,7 @@ If an image contains transparent pixels, they will be read as pattern 0.
 12) `write[x hint]` recognizes several types of Lil value and will serialize each appropriately:
 - _array interfaces_ are written as binary files. If `hint` is provided, use it as the file extension (for example `".png"`).
 - _sound interfaces_ are written as a .WAV audio file, and a `.wav` extension will be appended to any filename without it.
-- _image interfaces_ are written as GIF89a images, and a `.gif` extension will be appended to any filename without it.
+- _image interfaces_ are written as GIF89a images, and a `.gif` extension will be appended to any filename without it. By default, writing out an image will use Decker's current display palette. If `hint` is provided, it can specify a palette for the image as a list of up to 256 24-bit `RRGGBB` colors represented as integers. An explicit palette will translate the pixel values of the image "raw" through the palette, instead of interpreting 1-bit patterns and animated patterns as they are normally displayed within Decker. A value of `-1` in the palette can be used to represent transparency.
 - _deck interfaces_ are written as decks.
 - A list of _image interfaces_ is written as an animated gif.
 - A dictionary is written as an animated gif. The dictionary should contain the keys `frames` (a list of _image interfaces_) and `delays` (a list of integers representing interframe delays in 1/100ths of a second).
@@ -1972,16 +1972,16 @@ If you compile Native-Decker from source using the `DANGER_ZONE` flag, you can e
 
 When enabled, the _danger_ interface is available as a global constant named `danger`:
 
-| Name                     | Description                                                                                 |
-| :----------------------- | :------------------------------------------------------------------------------------------ |
-| `typeof danger`          | `"danger"`                                                                                  |
-| `danger.env`             | A dictionary of environment variable keys and their string values. Read-only.               |
-| `danger.homepath`        | A string containing the path to the user's home directory. Read-only.                       |
-| `danger.dir[path]`       | List the content of a directory as a table of `dir`, `name`, `type`.                        |
-| `danger.path[x y]`       | Canonical path `x` (joined with `y`, if given).                                             |
-| `danger.shell[x]`*       | Execute string `x` as a shell command and block for its completion.                         |
-| `danger.read[path hint]` | Read a file `path` using `hint` as necessary to control its interpretation.                 |
-| `danger.write[path x]`   | Write a value `x` to a file `path`. Returns `1` on success.                                 |
+| Name                        | Description                                                                                 |
+| :-------------------------- | :------------------------------------------------------------------------------------------ |
+| `typeof danger`             | `"danger"`                                                                                  |
+| `danger.env`                | A dictionary of environment variable keys and their string values. Read-only.               |
+| `danger.homepath`           | A string containing the path to the user's home directory. Read-only.                       |
+| `danger.dir[path]`          | List the content of a directory as a table of `dir`, `name`, `type`.                        |
+| `danger.path[x y]`          | Canonical path `x` (joined with `y`, if given).                                             |
+| `danger.shell[x]`*          | Execute string `x` as a shell command and block for its completion.                         |
+| `danger.read[path hint]`    | Read a file `path` using `hint` as necessary to control its interpretation.                 |
+| `danger.write[path x hint]` | Write a value `x` to a file `path`. Returns `1` on success.                                 |
 
 
 The `danger.path[]` function can perform a number of useful operations:

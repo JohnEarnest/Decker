@@ -339,6 +339,22 @@ if !sys.platform~"awk"
 		frame_a.size:0,0
 		assert["cannot write out a gif of dimension 0 on either axis." 0 write["temp.gif" frame_a]]
 		shell["rm temp.gif"]
+
+		i:image["%%IMG0AAUABgAgUHBQAA=="]
+		write["temp.gif" i (43775,16755384)]
+		assert_file["write 2-color gif with custom opaque palette" "tests/dom/pal2-blessed.gif" "temp.gif"]
+		write["temp.gif" i (-1,16755384)]
+		assert_file["write 2-color gif with custom transparent palette" "tests/dom/pal2trans-blessed.gif" "temp.gif"]
+
+		i:image["%%IMG1ABAAAQABAgMEBQYHCAkKCwwNDg8="]
+		p:"%J" parse "[16053492,6104925,11615827,15695191,16764277,11006064,3716964,2453881,2700911,3890633,4302582,7598071,9744578,5663878,3357783,1711148]" # sweetie 16
+		write["temp.gif" i p]
+		assert_file["write 16-color gif with custom palette" "tests/dom/pal16-blessed.gif" "temp.gif"]
+
+		i:image[16,16] i.pixels:range 256
+		p:nil drop (list "%h") parse "\n" split read["tests/dom/duel.hex"]
+		write["temp.gif" i p]
+		assert_file["write 256-color gif with custom palette" "tests/dom/pal256-blessed.gif" "temp.gif"]
 	end
 end
 

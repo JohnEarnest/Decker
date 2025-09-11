@@ -81,7 +81,7 @@ Built-in Functions
 | `dir[x]`         | List the content of a directory as a table.(1)                                                                              | Files   |
 | `path[x y]`      | Canonical path `x` (joined with `y`, if given) via [realpath()](https://www.man7.org/linux/man-pages/man3/realpath.3.html). | Files   |
 | `read[x hint]`   | Read a file `x` using `hint` as necessary to control its interpretation.(2)                                                 | Files   |
-| `write[x y]`     | Write a value `y` to a file `x`. Returns `1` on success.(3)                                                                 | Files   |
+| `write[x y hint]`| Write a value `y` to a file `x`. Returns `1` on success.(3)                                                                 | Files   |
 | `exit[x]`        | Stop execution with exit code `x`.                                                                                          | System  |
 | `shell[x]`       | Execute string `x` as a shell command and block for its completion.(4)                                                      | System  |
 | `eval[x y z]`    | Parse and execute a string `x` as a Lil program, using any variable bindings in dictionary `y`.(5)                          | System  |
@@ -129,10 +129,10 @@ The [WAV file format](https://en.wikipedia.org/wiki/WAV) is much more complex th
 ffmpeg -i input.mp3 -bitexact -map_metadata -1 -ac 1 -ar 8000 -acodec pcm_u8 output.wav
 ```
 
-3) `write[path x]` recognizes several types of Lil value and will serialize each appropriately:
+3) `write[path x hint]` recognizes several types of Lil value and will serialize each appropriately:
 - _array interfaces_ are written as binary files.
 - _sound interfaces_ are written as a .WAV audio file.
-- _image interfaces_ are written as GIF89a images.
+- _image interfaces_ are written as GIF89a images. By default, writing out an image will use Decker's default display palette. If `hint` is provided, it can specify a palette for the image as a list of up to 256 24-bit `RRGGBB` colors represented as integers. An explicit palette will translate the pixel values of the image "raw" through the palette, instead of interpreting 1-bit patterns and animated patterns as they are normally displayed within Decker. A value of `-1` in the palette can be used to represent transparency.
 - _deck interfaces_ are written as a "standalone" deck with a bundled HTML+JS runtime if the path ends in a `.html` suffix; otherwise the deck will be written as a "bare" deck, which is smaller.
 - a list of _image interfaces_ is written as an animated GIF89a image, with each image in the list written as one frame.
 - A dictionary is written as an animated GIF89a image. The dictionary should contain the keys `frames` (a list of _image interfaces_) and `delays` (a list of integers representing interframe delays in 1/100ths of a second).
