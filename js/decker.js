@@ -3466,12 +3466,12 @@ all_menus=_=>{
 		if(menu_check('Show Widget Names'    ,1,ob.show_names  ))ob.show_names  ^=1
 		if(menu_check('Show Cursor Info'     ,1,ob.show_cursor ))ob.show_cursor ^=1
 		if(menu_check('Show Alignment Guides',1,ob.show_guides ))ob.show_guides ^=1
+		if(menu_check('Show Animation'       ,1,dr.show_anim   ))dr.show_anim   ^=1
 		menu_separator()
 		if(menu_check('Show Grid Overlay',1,dr.show_grid))dr.show_grid^=1
 		if(menu_check('Snap to Grid'     ,1,dr.snap     ))dr.snap     ^=1
 		if(menu_item('Grid and Scale...',1))modal_enter('grid')
 		menu_separator()
-		if(menu_check('Show Animation'   ,1,dr.show_anim ))dr.show_anim ^=1
 		if(menu_check('Transparency Mask',1,dr.trans_mask))dr.trans_mask^=1
 		if(menu_check('Fat Bits'         ,1,dr.fatbits   )){
 			if(ms.type==null&&uimode!='draw')setmode('draw')
@@ -3490,11 +3490,11 @@ all_menus=_=>{
 	}
 	if(uimode=='object'){
 		menu_bar('Widgets',ms.type==null)
-		if(menu_item('New Button...'     ,1))ob_create([lmd([lms('type')],[lms('button')])])
-		if(menu_item('New Field...'      ,1))ob_create([lmd([lms('type')],[lms('field' )])])
-		if(menu_item('New Slider...'     ,1))ob_create([lmd([lms('type')],[lms('slider')])])
-		if(menu_item('New Canvas...'     ,1))ob_create([lmd([lms('type')],[lms('canvas')])])
-		if(menu_item('New Grid...'       ,1))ob_create([lmd([lms('type')],[lms('grid'  )])])
+		if(menu_item('New Button',1))ob_create([lmd([lms('type')],[lms('button')])])
+		if(menu_item('New Field' ,1))ob_create([lmd([lms('type')],[lms('field' )])])
+		if(menu_item('New Slider',1))ob_create([lmd([lms('type')],[lms('slider')])])
+		if(menu_item('New Canvas',1))ob_create([lmd([lms('type')],[lms('canvas')])])
+		if(menu_item('New Grid'  ,1))ob_create([lmd([lms('type')],[lms('grid'  )])])
 		if(card_is(con())&&menu_item('New Contraption...',1))modal_enter('pick_contraption')
 		menu_separator()
 		if(menu_item('Order...'   ,count(ifield(con(),'widgets'))))modal_enter('orderwids')

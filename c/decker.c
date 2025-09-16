@@ -3979,12 +3979,12 @@ void all_menus(void){
 		if(menu_check("Show Widget Names"    ,1,ob.show_names  ,'\0'))ob.show_names  ^=1;
 		if(menu_check("Show Cursor Info"     ,1,ob.show_cursor ,'\0'))ob.show_cursor ^=1;
 		if(menu_check("Show Alignment Guides",1,ob.show_guides ,'\0'))ob.show_guides ^=1;
+		if(menu_check("Show Animation"       ,1,dr.show_anim   ,'\0'))dr.show_anim   ^=1;
 		menu_separator();
 		if(menu_check("Show Grid Overlay",1,dr.show_grid,0  ))dr.show_grid^=1;
 		if(menu_check("Snap to Grid"     ,1,dr.snap     ,'p'))dr.snap     ^=1;
 		if(menu_item("Grid and Scale..." ,1,'\0'))modal_enter(modal_grid);
 		menu_separator();
-		if(menu_check("Show Animation"   ,1,dr.show_anim   ,0))dr.show_anim   ^=1;
 		if(menu_check("Transparency Mask",1,dr.trans_mask  ,0))dr.trans_mask  ^=1;
 		if(menu_check("Fat Bits"         ,1,dr.fatbits     ,0)){
 			if(ms.type==modal_none&&uimode!=mode_draw)setuimode(mode_draw);
@@ -4006,11 +4006,11 @@ void all_menus(void){
 	}
 	if(uimode==mode_object){
 		menu_bar("Widgets",ms.type==modal_none);
-		if(menu_item("New Button..."     ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("button"));ob_create(l_list(p));}
-		if(menu_item("New Field..."      ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("field" ));ob_create(l_list(p));}
-		if(menu_item("New Slider..."     ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("slider"));ob_create(l_list(p));}
-		if(menu_item("New Canvas..."     ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas"));ob_create(l_list(p));}
-		if(menu_item("New Grid..."       ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("grid"  ));ob_create(l_list(p));}
+		if(menu_item("New Button",1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("button"));ob_create(l_list(p));}
+		if(menu_item("New Field" ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("field" ));ob_create(l_list(p));}
+		if(menu_item("New Slider",1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("slider"));ob_create(l_list(p));}
+		if(menu_item("New Canvas",1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas"));ob_create(l_list(p));}
+		if(menu_item("New Grid"  ,1,'\0')){lv*p=lmd();dset(p,lmistr("type"),lmistr("grid"  ));ob_create(l_list(p));}
 		if(card_is(con())&&menu_item("New Contraption...",1,'\0'))modal_enter(modal_pick_contraption);
 		menu_separator();
 		if(menu_item("Order..."   ,ifield(con(),"widgets")->c,'O'))modal_enter(modal_orderwids);
