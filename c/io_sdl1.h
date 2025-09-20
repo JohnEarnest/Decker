@@ -103,7 +103,8 @@ void set_clip(lv*x){
 
 // audio
 
-#define SFX_FORMAT AUDIO_S8
+#define SFX_INPUT_FORMAT AUDIO_S8
+#define SFX_OUTPUT_FORMAT AUDIO_S16SYS
 #define SFX_CHANNELS 1
 int nosound=0;
 SDL_AudioSpec audio;
@@ -115,7 +116,7 @@ lv*n_readwav(lv*self,lv*a){
 	(void)self;char*name=ls(l_first(a))->sv;
 	Uint8* raw; Uint32 length; SDL_AudioSpec spec; SDL_AudioCVT cvt;
 	if(SDL_LoadWAV(name,&spec,&raw,&length)==NULL)return sound_make(lms(0));
-	if(SDL_BuildAudioCVT(&cvt, spec.format,spec.channels,spec.freq, SFX_FORMAT,SFX_CHANNELS,SFX_RATE)){
+	if(SDL_BuildAudioCVT(&cvt, spec.format,spec.channels,spec.freq, SFX_INPUT_FORMAT,SFX_CHANNELS,SFX_RATE)){
 		cvt.len=length,cvt.buf=malloc(cvt.len * cvt.len_mult);
 		memcpy(cvt.buf,raw,length),SDL_FreeWAV(raw),SDL_ConvertAudio(&cvt);
 		raw=cvt.buf, length=cvt.len_cvt;
@@ -281,7 +282,7 @@ void io_init(void){
 	CURSORS[3]=makeCursor((pair){7,7},image_read(lmistr("%%IMG2ABAAEAAHIAIADSABAQIgAQALIAEBBCABAAkgAQEGIAEAByAEAQIgBAAFIAEBASABAAEgAQECIAEAASABAQEgAQADIAEBAiADAQIgAwECIAEAASABAQ4gAgEOIAEAASABAQIgAwECIAMBAiABAAMgAQEBIAEAASABAQIgAQABIAEBASABAAUgBAECIAQAByABAQYgAQAJIAEBBCABAAsgAQECIAEADSACAAc=")));
 	if(!nosound){
 		audio.freq=SFX_RATE;
-		audio.format=SFX_FORMAT;
+		audio.format=SFX_OUTPUT_FORMAT;
 		audio.channels=SFX_CHANNELS;
 		audio.samples=(SFX_RATE/10);
 		audio.callback=sfx_pump;

@@ -3266,8 +3266,9 @@ void sfx_doloop(int clear){
 	lv*loop=audio_loop.clip;if(loop&&audio_loop.sample>=((Uint32)loop->c))audio_loop.sample=0;
 	interpreter_unlock();
 }
-void sfx_pump(void*user,Uint8*stream,int len){
+void sfx_pump(void*user,Uint8*bstream,int bytes){
 	if(msg.pending_loop)sfx_doloop(0);
+	Sint16*stream=(Sint16*)bstream;int len=bytes/sizeof(Sint16);
 	(void)user;int play=0;for(int z=0;z<len;z++){
 		float samples=0;for(int z=0;z<SFX_SLOTS;z++){
 			if(audio_slots[z].clip==NULL)continue;play=1;
@@ -3289,7 +3290,7 @@ void sfx_pump(void*user,Uint8*stream,int len){
 			if(au.head>=end){au.head=start;au.mode=record_stopped;}
 			else{int8_t*data=(int8_t*)au.target->b->sv;int b=data[au.head++];samples+=(b/128.0)*1.0;}
 		}
-		stream[z]=0xFF&(int)((master_volume*(samples/(SFX_SLOTS+1)))*120);
+		stream[z]=(Sint16)((master_volume*(samples/(SFX_SLOTS+1)))*32767);
 	}audio_playing=play;
 }
 int sfx_any(void){if(nosound)return 0;for(int z=0;z<SFX_SLOTS;z++)if(audio_slots[z].clip!=NULL)return 1;return 0;}
