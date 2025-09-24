@@ -132,7 +132,7 @@ runweb: web-decker
 	$(OPEN) js/build/decker.html
 
 .PHONY: docs
-docs:
+docs: lilt
 	@./c/build/lilt scripts/lildoc.lil docs/lil.md         docs/lil.html
 	@./c/build/lilt scripts/lildoc.lil docs/lilt.md        docs/lilt.html
 	@./c/build/lilt scripts/lildoc.lil docs/decker.md      docs/decker.html
