@@ -3785,6 +3785,7 @@ q('body').onkeyup=e=>{
 	if(e.key=='m'&&uimode=='draw'&&in_layer())ev.hidemenu^=1
 	if(e.key=='t'&&uimode=='draw'&&in_layer())dr.trans^=1
 	if(e.key=='u'&&uimode=='draw'&&in_layer())dr.under^=1
+	if(e.key=='r'&&uimode=='draw'&&in_layer())dr.trans_mask^=1
 	const brush_count=24+count(deck.brushes)
 	if(e.key=='9'&&uimode=='draw'&&ms.type==null)dr.brush=max(            0,dr.brush-1)
 	if(e.key=='0'&&uimode=='draw'&&ms.type==null)dr.brush=min(brush_count-1,dr.brush+1)

@@ -99,6 +99,7 @@ A number of shortcuts are available with any of the drawing tools selected:
 - Pressing `t` toggles transparency mode (_Style &#8594; Transparency_).
 - Pressing `u` toggles underpaint mode (_Style &#8594; Underpaint_).
 - Pressing `y` toggles tracing mode (_Style &#8594; Tracing Mode_).
+- Pressing `r` toggles transparency mask mode (_View &#8594; Transparency Mask_).
 - If you have imported a color image, you can press `j` or `k` to lighten or darken the image, respectively. This adjustment can only be performed while the box selection remains active.
 - Pressing `9` or `0` will decrement or increment the current brush shape, respectively.
 - Holding control or command while clicking will enter Fat Bits mode centered on the position you click, or exit Fat Bits mode.

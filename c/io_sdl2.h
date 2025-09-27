@@ -37,6 +37,7 @@ SDL_Cursor*CURSORS[4];
 #define KEY_j            SDLK_j
 #define KEY_k            SDLK_k
 #define KEY_m            SDLK_m
+#define KEY_r            SDLK_r
 #define KEY_t            SDLK_t
 #define KEY_u            SDLK_u
 #define KEY_y            SDLK_y
