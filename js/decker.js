@@ -1045,10 +1045,13 @@ field_indent=add=>{
 field_fontspan=font=>{const s=rtext_span(wid.fv.table,wid.cursor);tab_get(s,'font').fill(font    ),field_editr(rtext_cat([s]),wid.cursor)}
 field_linkspan=link=>{const s=rtext_span(wid.fv.table,wid.cursor);tab_get(s,'arg' ).fill(link    ),field_editr(rtext_cat([s]),wid.cursor)}
 field_patspan =pat =>{const s=rtext_span(wid.fv.table,wid.cursor);tab_get(s,'pat' ).fill(lmn(pat)),field_editr(rtext_cat([s]),wid.cursor)}
-field_input=text=>{
-	if(text=='\n'){if(ms.type=='save')ev.action=1;if(ms.type=='save'||ev.shift)return}
+field_input_raw=text=>{
 	const t=wid.fv.table, i=rtext_get(t,wid.cursor.y), f=i<0?lms(''):tab_cell(t,'font',i), p=i<0?1:ln(tab_cell(t,'pat',i))
 	field_edit(f,lms(''),p,clchars(text),wid.cursor)
+}
+field_input=text=>{
+	if(text=='\n'){if(ms.type=='save')ev.action=1;if(ms.type=='save'||ev.shift)return}
+	field_input_raw(text)
 }
 field_keys=(code,shift)=>{
 	if(code=='Enter'&&ms.type=='gridcell'){modal_exit(1),ev.action=0;return}
@@ -3861,11 +3864,11 @@ dopaste=x=>{
 		if(wid.fv){
 			const t=rtext_decode(x)
 			if(wid.f.style=='rich'){field_editr(t,wid.cursor)}
-			else{field_input(ls(rtext_string(t)))}
+			else{field_input_raw(ls(rtext_string(t)))}
 		}
 	}
 	else if(wid.gv&&!wid.g.locked&&ms.type==null){grid_edit(n_readcsv([lms(x),lms(wid.g.format)]))}
-	else if(wid.fv){field_input(x)}
+	else if(wid.fv){field_input_raw(x)}
 }
 cutcard=_=>{const c=ifield(deck,'card');setclipboard(ls(deck_copy(deck,c))),deck_remove(deck,c),mark_dirty()}
 copycard=_=>{const c=ifield(deck,'card');setclipboard(ls(deck_copy(deck,c)))}

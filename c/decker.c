@@ -901,15 +901,18 @@ void field_patspan(int pat){
 	lv*s=rtext_span(wid.fv->table,wid.cursor),*c=dget(s,lmistr("pat"));
 	EACH(z,c)c->lv[z]=lmn(pat);field_editr(n_rtext_cat(NULL,l_list(s)),wid.cursor);
 }
+void field_input_raw(char*text){
+	str t=str_new();str_addz(&t,text);str_term(&t);
+	lv* tb=wid.fv->table;int i=rtext_get(tb,wid.cursor.y), p=i<0?1:ln(dget(tb,lmistr("pat"))->lv[i]);lv* f=i<0?lmistr(""):dget(tb,lmistr("font"))->lv[i];
+	field_edit(f,lmistr(""),p,t.sv,wid.cursor);free(t.sv);
+}
 void field_input(char*text){
 	if(!wid.infield)return;
 	if(!strcmp(text,"\n")){
 		if(ms.type==modal_save)ev.action=1;
 		if(ev.shift||ms.type==modal_save)return;
 	}
-	str t=str_new();str_addz(&t,text);str_term(&t);
-	lv* tb=wid.fv->table;int i=rtext_get(tb,wid.cursor.y), p=i<0?1:ln(dget(tb,lmistr("pat"))->lv[i]);lv* f=i<0?lmistr(""):dget(tb,lmistr("font"))->lv[i];
-	field_edit(f,lmistr(""),p,t.sv,wid.cursor);free(t.sv);
+	field_input_raw(text);
 }
 void field_keys(int code,int shift){
 	if(code==KEY_RETURN&&ms.type==modal_gridcell){modal_exit(1);ev.action=0;return;}
@@ -3685,7 +3688,7 @@ void text_edit_menu(void){
 	if(has_clip("%%IMG")&&rich&&menu_item("Paste Inline Image",wid.fv!=NULL,'v')){field_edit(lmistr(""),image_read(get_clip()),1,"i",wid.cursor);}
 	else if(has_clip("%%RTX")&&rich&&menu_item("Paste Rich Text",wid.fv!=NULL,'v')){field_editr(rtext_decode(get_clip()),wid.cursor);}
 	else if((!has_clip("%%RTX")||!rich)&&menu_item("Paste",wid.fv!=NULL&&strlen(clip_stash),'v')){
-		field_input(has_clip("%%RTX")?rtext_all(rtext_decode(get_clip()))->sv:get_clip()->sv);
+		field_input_raw(has_clip("%%RTX")?rtext_all(rtext_decode(get_clip()))->sv:get_clip()->sv);
 	}
 	if(menu_item("Clear",wid.fv!=NULL,0)){wid.cursor=(pair){0,RTEXT_END};field_keys(KEY_DELETE,0);}
 	if(!enable_touch&&!kc.on){
