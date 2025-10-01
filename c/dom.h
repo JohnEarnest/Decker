@@ -2379,7 +2379,7 @@ lv* n_card_add(lv*self,lv*z){
 lv* n_card_remove(lv*self,lv*z){
 	z=l_first(z);
 	if(lil(z)||lid(z)){int r=1;EACH(i,z)r&=lb(n_card_remove(self,z->lv[i]));return lmbool(r);}
-	if(!widget_is(z)||lin(dkey(ivalue(self,"widgets"),z)))return ZERO;
+	if(!widget_is(z)||linil(dkey(ivalue(self,"widgets"),z)))return ZERO;
 	lv*name=ifield(z,"name"),*widgets=ivalue(self,"widgets"),*target=dget(widgets,name);
 	dset(self->b,lmistr("widgets"),l_drop(name,widgets));
 	dset(target->b,lmistr("dead"),ONE);return ONE;
@@ -2681,17 +2681,17 @@ lv* n_deck_remove(lv*self,lv*z){
 	if(widget_is(t)&&is_rooted(t))return n_card_remove(ivalue(t,"card"),t);
 	if(module_is(t)){
 		lv*k=lmistr("modules"),*m=dget(data,k);
-		lv*n=dkey(m,t);if(lin(n))return ZERO; // this module isn't part of this deck
+		lv*n=dkey(m,t);if(linil(n))return ZERO; // this module isn't part of this deck
 		dset(data,k,l_drop(n,m));return ONE;
 	}
 	if(sound_is(t)){
 		lv*k=lmistr("sounds"),*s=dget(data,k);
-		lv*n=dkey(s,t);if(lin(n))return ZERO; // this sound isn't part of this deck
+		lv*n=dkey(s,t);if(linil(n))return ZERO; // this sound isn't part of this deck
 		dset(data,k,l_drop(n,s));return ONE;
 	}
 	if(font_is(t)){
 		lv*k=lmistr("fonts"),*fonts=dget(data,k);
-		lv*n=dkey(fonts,t);if(lin(n))return ZERO; // this font isn't part of this deck
+		lv*n=dkey(fonts,t);if(linil(n))return ZERO; // this font isn't part of this deck
 		if(!strcmp("body",n->sv)||!strcmp("menu",n->sv)||!strcmp("mono",n->sv))return ZERO; // cannot delete builtin fonts
 		EACH(c,cards)remove_font(ifield(cards->lv[c],"widgets"),t);
 		EACH(c,defs )remove_font(ifield(defs ->lv[c],"widgets"),t);
@@ -2699,7 +2699,7 @@ lv* n_deck_remove(lv*self,lv*z){
 	}
 	if(prototype_is(t)){
 		lv*k=lmistr("contraptions");
-		lv*n=dkey(defs,t);if(lin(n))return ZERO; // this contraption isn't part of the deck
+		lv*n=dkey(defs,t);if(linil(n))return ZERO; // this contraption isn't part of the deck
 		lv*cards=ifield(self,"cards");EACH(c,cards){ // scrub instances from every card:
 			lv*card=cards->lv[c],*widgets=ifield(card,"widgets");EACH(w,widgets){
 				lv*widget=widgets->lv[w];if(contraption_is(widget)&&ifield(widget,"def")==t)n_card_remove(card,widget);

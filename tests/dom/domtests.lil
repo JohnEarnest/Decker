@@ -1393,6 +1393,13 @@ assert["deck string encoding" "{deck}\nversion:1\ncard:0\nsize:[512,342]\nname:\
 deck:newdeck[deck.encoded]
 assert["deck string decoding" "Test Deck" deck.name]
 
+deck1:newdeck[]
+deck2:newdeck[]
+a:deck1.add["module" "local"]
+b:deck2.add["module" "local"]
+assert["removing modules from the wrong deck should fail"       0                       deck1.remove[b]]
+assert["removing modules from the wrong deck should be a no-op" ((list "local") dict a) deck1.modules  ]
+
 #######################################
 #
 #  Names and Indices
