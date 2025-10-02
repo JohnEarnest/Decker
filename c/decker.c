@@ -4244,7 +4244,7 @@ void tick(lv*env){
 
 void quit(void){
 	if(ms.type!=modal_none)return;
-	if(!dirty||lb(ifield(deck,"locked"))){should_exit=1;return;}
+	if(lb(ifield(deck,"locked"))){should_exit=1;return;}
 	if(autosave&&strlen(document_path)){save_deck(lmcstr(document_path));should_exit=1;return;}
 	modal_enter(modal_confirm_quit);
 	ms.message=lmcstr("The current deck has unsaved changes.\nAre you sure you want to quit?");
