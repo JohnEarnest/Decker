@@ -370,8 +370,6 @@ void menu_finish(void){
 			if(o)draw_invert(pal,inset(x.b,1));
 		}if(ev.mu)menu.stick=-1;
 	}
-	int ccolor=ln(ifield(deck,"corners"));
-	if(!windowed)for(int x=0;x<=1;x++)for(int y=0;y<=1;y++)draw_icon((pair){x*(context.size.x-5),y*(context.size.y-5)},CORNERS[x+y*2],ccolor);
 }
 
 // Widgets
@@ -4188,6 +4186,8 @@ void tick(lv*env){
 	if(uimode==mode_script&&enable_touch&&ms.type==modal_none)wid.active=0;
 	menu_finish();
 	if(uimode==mode_draw&&dr.fatbits&&!ev.hidemenu)draw_icon((pair){frame.size.x-14,2},ZOOM,1);
+	int ccolor=ln(ifield(deck,"corners"));
+	if(!windowed)if(ccolor)for(int x=0;x<=1;x++)for(int y=0;y<=1;y++)draw_icon((pair){x*(context.size.x-5),y*(context.size.y-5)},CORNERS[x+y*2],ccolor);
 	double used=interpret();
 	if(uimode==mode_interact&&profiler){
 		rect r={frame.size.x-60,2,50,12};char*pal=patterns_pal(ifield(deck,"patterns"));
