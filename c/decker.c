@@ -4239,6 +4239,11 @@ void tick(lv*env){
 	track(audio_loop.clip)
 	track(orig_loop)
 	lv_collect();
+	if(!running()&&danger_open_pending){
+		danger_open_pending=0;
+		lv*file=n_read(NULL,l_list(lmcstr(danger_open_path)));
+		load_deck(deck_get(file)),set_path(l_count(file)?danger_open_path:"");
+	}
 	interpreter_unlock();
 }
 

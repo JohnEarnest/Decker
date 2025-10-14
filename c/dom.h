@@ -3292,6 +3292,12 @@ lv*n_writefile(lv*self,lv*a){
 }
 lv*n_readdeck(lv*self,lv*a){return deck_read(lin(l_first(a))?lmistr(""):n_read(self,a));}
 lv*n_readfile(lv*self,lv*a);// forward ref
+char danger_open_path[PATH_MAX];
+int danger_open_pending=0;
+lv*n_danger_open(lv*self,lv*a){
+	snprintf(danger_open_path,sizeof(danger_open_path),"%s",ls(l_first(a))->sv);
+	danger_open_pending=1;(void)self;return LNIL;
+}
 lv* interface_danger(lv*self,lv*i,lv*x){
 	ikey("homepath"){char t[PATH_MAX];directory_home(t);return lmcstr(t);}
 	ikey("env"     )return env_enumerate();
@@ -3299,6 +3305,7 @@ lv* interface_danger(lv*self,lv*i,lv*x){
 	ikey("path"    )return lmnat(n_path     ,self);
 	ikey("write"   )return lmnat(n_writefile,self);
 	ikey("read"    )return lmnat(n_readfile ,self);
+	ikey("open"    )return lmnat(n_danger_open,self);
 #ifndef _WIN32
 	ikey("shell"   )return lmnat(n_shell    ,self);
 #endif
