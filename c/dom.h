@@ -393,7 +393,7 @@ lv* buffer_hist(lv*x,int sign){
 lv* buffer_bounds(lv*b){
 	pair s=buff_size(b);rect d={s.x,s.y,0,0};
 	for(int z=0;z<b->c;z++)if(b->sv[z]!=0){int x=z%s.x, y=z/s.x; d.x=MIN(d.x,x), d.y=MIN(d.y,y), d.w=MAX(d.w,x), d.h=MAX(d.h,y);}
-	pair rp={d.x,d.y},rs={MIN(s.x,d.w-d.x+1),MIN(s.y,d.h-d.y+1)};
+	pair rp={d.x,d.y},rs={MAX(0,MIN(s.x,d.w-d.x+1)),MAX(0,MIN(s.y,d.h-d.y+1))};
 	lv*r=lmd();dset(r,lmistr("pos"),lmpair(rp)),dset(r,lmistr("size"),lmpair(rs));return r;
 }
 int is_empty(lv*x){pair s=image_size(x);return s.x==0&&s.y==0;}

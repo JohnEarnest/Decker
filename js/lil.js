@@ -1686,7 +1686,7 @@ buffer_hist=(buff,sign)=>{
 image_bounds=i=>{
 	const s=i.size,d=rect(s.x,s.y,0,0)
 	for(let z=0;z<i.pix.length;z++)if(i.pix[z]!=0){const x=z%s.x,y=0|(z/s.x);d.x=min(d.x,x),d.y=min(d.y,y),d.w=max(d.w,x),d.h=max(d.h,y)}
-	return lmd(["pos","size"].map(lms),[d,rmin(s,rect(d.w-d.x+1,d.h-d.y+1))].map(lmpair))
+	return lmd(["pos","size"].map(lms),[d,rmin(s,rect(max(0,d.w-d.x+1),max(0,d.h-d.y+1)))].map(lmpair))
 }
 image_merge_op=(target,src,op)=>{
 	const ts=target.size,bs=src.size,t=target.pix,b=src.pix;if(bs.x==0||bs.y==0)return

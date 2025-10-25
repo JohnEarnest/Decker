@@ -229,6 +229,7 @@ assert["image bounds 1x1 empty" ("%J" parse "{'pos':[1,1],'size':[0,0]}") image[
 assert["image bounds 1x1 solid" ("%J" parse "{'pos':[0,0],'size':[1,1]}") image[1,1].map[0 dict 1]   .bounds]
 assert["image bounds edges"     ("%J" parse "{'pos':[0,0],'size':[5,4]}") image["%%IMG0AAUABJiACMg="].bounds]
 assert["image bounds inset"     ("%J" parse "{'pos':[2,1],'size':[2,3]}") image["%%IMG0AAYABQAgMDAA"].bounds]
+assert["image bounds big empty" ("%J" parse "{'pos':[9,9],'size':[0,0]}") image[9,9]                 .bounds]
 
 mi:image["%%IMG0AA4ADQAAA8AH4B/gP/A/8D/4P/gf+B/4D/AH4AAA"].merge[image["%%IMG1AAIAAyYkJCYmJA=="] image["%%IMG0AAYABviIqLiA/A=="]]
 assert["image merge" "%%IMG1AA4ADSYkJiQmJCYkJiQmJCYkJCYkJiQmAQAAACQmJCYmJCYkJgABAAEAASQmJCYkJgEBAAEAAQEBJCYkJCYAAAAAAQAAAAAAJCYmJAEBAQEBAQEBAQEmJCYkAQEBAAEBAQEBAAEkJCYAAAEAAQAAAAEAASYmJCYAAQABAAEAAQABJCYkJgEBAAEAAQEBAAEkJCYkJgAAAQAAAAAAJCYmJCYkJgEBAQEBASQmJCYkJiQmJCYkJiQmJCYk" mi.encoded]
