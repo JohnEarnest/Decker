@@ -833,7 +833,7 @@ widget_grid=(target,x,value)=>{
 			else if(x.format[z]=='B'){if(lb(v))draw_icon(ip,ICONS[ICON.chek],ccol)}
 			else if(x.format[z]=='t'||x.format[z]=='T'){
 				const r=rect(hs.x+1,bb.y+rh*y,hs.w-2,rh), l=layout_richtext(deck,rtext_cast(v),fnt,ALIGN.left,r.w), t=l.size
-				draw_text_rich(rect(r.x,r.y+ceil(t.y<r.h?(r.h-t.y)/2.0:0),r.w,r.h),l,ccol,0)
+				draw_text_rich_raw(rect(r.x,r.y+ceil(t.y<r.h?(r.h-t.y)/2.0:0),r.w,r.h),l,ccol,0)
 			}
 			else{('fcCihH'.indexOf(x.format[z])>=0?draw_textr:draw_text_fit)(rect(hs.x+1,bb.y+rh*y,hs.w-2,rh),cf,fnt,ccol)} // right-align numeric
 			frame.clip=oc

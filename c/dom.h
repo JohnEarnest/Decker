@@ -1246,15 +1246,18 @@ void draw_text_wrap(rect r,int pattern){
 		font_each(g.font,g.c)if(font_gpix(g.font,g.c,b,a)&&inclip(g.pos.x+b,g.pos.y+a))PIX(g.pos.x+b,g.pos.y+a)=gc;
 	}frame.clip=oc;
 }
-void draw_text_rich(rect r,int pattern,int opaque){
-	rect oc=frame.clip;frame.clip=r;for(int z=0;z<layout_count;z++){
+void draw_text_rich_raw(rect r,int pattern,int opaque){
+	for(int z=0;z<layout_count;z++){
 		glyph_box g=layout[z];if(g.pos.w<1)continue; // skip squashed spaces/newlines
 		if(g.pos.y+g.pos.h<0||g.pos.y>r.h)continue; g.pos.x+=r.x, g.pos.y+=r.y; // coarse clip
 		int gc=g.pat==1?pattern:g.pat;
 		if(lis(g.arg)&&g.arg->c){draw_hline(g.pos.x,g.pos.x+g.pos.w,g.pos.y+g.pos.h-1,19);}
 		if(image_is(g.arg)){buffer_paste(g.pos,frame.clip,g.arg->b,frame.buffer,opaque);}
 		else{font_each(g.font,g.c)if(font_gpix(g.font,g.c,b,a)&&inclip(g.pos.x+b,g.pos.y+a))PIX(g.pos.x+b,g.pos.y+a)=gc;}
-	}frame.clip=oc;
+	}
+}
+void draw_text_rich(rect r,int pattern,int opaque){
+	rect oc=frame.clip;frame.clip=r;draw_text_rich_raw(r,pattern,opaque);frame.clip=oc;
 }
 
 // Sound interface

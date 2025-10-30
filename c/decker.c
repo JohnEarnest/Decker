@@ -672,7 +672,7 @@ int widget_grid(lv*target,grid x,grid_val*value){
 			else if(z<fk&&(x.format[z]=='t'||x.format[z]=='T')){
 				rect r={hs.x+1,bb.y+rh*y,hs.w-2,rh}; // display rich text:
 				pair t=layout_richtext(deck,rtext_cast(v),fnt,align_left,r.w);
-				draw_text_rich((rect){r.x,r.y+ceil(t.y<r.h?(r.h-t.y)/2.0:0),r.w,r.h},ccol,0);
+				draw_text_rich_raw((rect){r.x,r.y+ceil(t.y<r.h?(r.h-t.y)/2.0:0),r.w,r.h},ccol,0);
 			}
 			else{
 				rect r={hs.x+1,bb.y+rh*y,hs.w-2,rh}; // right-align numeric columns:

@@ -1394,14 +1394,17 @@ draw_text_wrap=(r,l,pattern)=>{
 		draw_char(radd(g.pos,r),g.font,g.char,g.pat==1?pattern:g.pat)
 	}frame.clip=oc;
 }
-draw_text_rich=(r,l,pattern,opaque)=>{
-	const oc=frame.clip;frame.clip=r;for(let z=0;z<l.layout.length;z++){
+draw_text_rich_raw=(r,l,pattern,opaque)=>{
+	for(let z=0;z<l.layout.length;z++){
 		const g=l.layout[z];if(g.pos.w<1)continue
 		if(g.pos.y+g.pos.h<0||g.pos.y>r.h)continue; g.pos.x+=r.x, g.pos.y+=r.y
 		if(lis(g.arg)&&count(g.arg))draw_hline(g.pos.x,g.pos.x+g.pos.w,g.pos.y+g.pos.h-1,19)
 		if(image_is(g.arg)){image_paste(g.pos,frame.clip,g.arg,frame.image,opaque)}
 		else{draw_char(g.pos,g.font,g.char,g.pat==1?pattern:g.pat)}
-	}frame.clip=oc
+	}
+}
+draw_text_rich=(r,l,pattern,opaque)=>{
+	const oc=frame.clip;frame.clip=r;draw_text_rich_raw(r,l,pattern,opaque),frame.clip=oc
 }
 draw_9seg=(r,dst,src,m,clip,opaque,pal)=>{
 	const o=rect(r.x,r.y), s=src.size, ss=s, ds=dst.size; if(s.x<1||s.y<1)return
