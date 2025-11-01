@@ -53,13 +53,13 @@ coltab=x=>{
 	x.k.map((k,i)=>tab_set(r,ls(k),dyad.take(n,dyad.take(n,lil(x.v[i])?x.v[i]:lml([x.v[i]]))).v));return r
 }
 rowtab=x=>{
-	const ok=[],t=lmt()
-	x.v.map(r=>r.k.map(k=>{if(!tab_has(t,ls(k)))ok.push(k);tab_set(t,ls(k),[])}))
-	x.v.map(x=>ok.map(k=>tab_get(t,ls(k)).push(dget(x,k)||NIL)));return t
+	const ok=[],t=lmt(),v=x.v.map(ld)
+	v.map(r=>r.k.map(k=>{if(!tab_has(t,ls(k)))ok.push(k);tab_set(t,ls(k),[])}))
+	v.map(x=>ok.map(k=>tab_get(t,ls(k)).push(dget(x,k)||NIL)));return t
 }
 listab=x=>{
-	const m=x.v.reduce((r,x)=>max(r,count(x)),0);const t=lmt();for(let z=0;z<m;z++)tab_set(t,'c'+z,[])
-	x.v.map(row=>{for(let z=0;z<m;z++)tab_get(t,'c'+z).push(z>=count(row)?NIL:row.v[z])});return t
+	const v=x.v.map(ll), m=v.reduce((r,x)=>max(r,x.length),0);const t=lmt();for(let z=0;z<m;z++)tab_set(t,'c'+z,[])
+	v.map(row=>{for(let z=0;z<m;z++)tab_get(t,'c'+z).push(z>=row.length?NIL:row[z])});return t
 }
 tflip=x=>{
 	const c=tab_cols(x),kk=c.indexOf('key')>-1?'key':c[0],k=(tab_get(x,kk)||[]).map(ls),cc=c.filter(k=>k!=kk),r=lmt()
@@ -212,7 +212,7 @@ monad={
 	flip:   x=>lit(x)?tflip(x):lml(range(ll(x).reduce((w,z)=>max(w,lil(z)?count(z):1),0)).map(i=>lml(ll(x).map(c=> !lil(c)?c: i<count(c)?c.v[i]: NIL)))),
 	rows:   x=>rows(x),
 	cols:   x=>{const t=lt(x),k=tab_cols(t);return lmd(k.map(lms),k.map(x=>lml(tab_get(t,x))))},
-	table:  x=>lid(x)?coltab(x): lil(x)&&x.v.every(lid)?rowtab(x): lil(x)&&x.v.every(lil)?listab(x): lt(x),
+	table:  x=>lid(x)?coltab(x): lil(x)&&x.v.every(x=>lid(x)||linil(x))?rowtab(x): lil(x)&&x.v.every(x=>lil(x)||linil(x))?listab(x): lt(x),
 	'@tab': t=>{
 		t=lt(t);const r=tab_clone(t)
 		tab_set(r,'index' ,range(count(r)).map(lmn))

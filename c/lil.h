@@ -395,12 +395,12 @@ monad(l_range){if(!lin(x))return ll(x);int n=ln(x);if(n<0)n=0;GEN(r,n)lmn(z);ret
 monad(l_rows){x=lt(x);lv*r=lml(x->n);for(int w=0;w<x->n;w++){DMAP(t,x,x->lv[z]->lv[w]);r->lv[w]=t;}return r;}
 monad(l_cols){x=lt(x);DMAP(r,x,x->lv[z]);return r;}
 monad(l_ltable){
-	int c=1;EACH(z,x)c&=lid(x->lv[z]);if(c){ // list-of-dicts
+	int c=1;EACH(z,x)c&=lid(x->lv[z])||linil(x->lv[z]);if(c){ // list-of-dicts
 		lv*t=lmt(),*ok=lml(0);t->n=x->c;
 		EACH(r,x)EACH(c,x->lv[r]){lv*k=x->lv[r]->kv[c];dset(t,ls(k),NULL);if(t->c>ok->c)ll_add(ok,k);};EACH(z,t)t->lv[z]=lml(x->c);
 		EACH(r,x)EACH(c,t){t->lv[c]->lv[r]=dgetv(x->lv[r],ok->lv[c]);}return t;
 	}
-	int m=0;c=1;EACH(z,x)c&=lil(x->lv[z]),m=MAX(m,x->lv[z]->c);if(c){ // list-of-lists
+	int m=0;c=1;EACH(z,x)c&=lil(x->lv[z])||linil(x->lv[z]),m=MAX(m,x->lv[z]->c);if(c){ // list-of-lists
 		lv*t=lmt();t->n=x->c;for(int c=0;c<m;c++)dset(t,l_format(lmistr("c%i"),lmn(c)),lml(0));
 		EACH(z,x)for(int c=0;c<m;c++)ll_add(t->lv[c],c>=x->lv[z]->c?LNIL:x->lv[z]->lv[c]);return t;
 	}return lt(x);
