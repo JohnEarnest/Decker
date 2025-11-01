@@ -37,7 +37,10 @@ interface_danger=lmi((self,i,x)=>{
 			return js_to_lil(r)
 		}catch(e){console.log('danger.js[] error',e);return NIL}
 	})
-	if(ikey(i,'open'))return lmnat(args=>{window.open(ls(args[0]),'_self')})
+	if(ikey(i,'open'))return lmnat(args=>{
+		if(deck_is(args[0])){load_deck(args[0])}
+		else{window.open(ls(args[0]),'_self')}
+	})
 	return x?x:NIL
 },'danger')
 ext_add_constant=(k,v)=>{ext_constants[k]=js_to_lil(v)}

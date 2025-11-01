@@ -3297,8 +3297,15 @@ lv*n_readdeck(lv*self,lv*a){return deck_read(lin(l_first(a))?lmistr(""):n_read(s
 lv*n_readfile(lv*self,lv*a);// forward ref
 char danger_open_path[PATH_MAX];
 int danger_open_pending=0;
+lv* danger_open_deck=NULL;
 lv*n_danger_open(lv*self,lv*a){
-	snprintf(danger_open_path,sizeof(danger_open_path),"%s",ls(l_first(a))->sv);
+	if(deck_is(l_first(a))){
+		danger_open_deck=l_first(a);
+		snprintf(danger_open_path,sizeof(danger_open_path),"%s","");
+	}else{
+		danger_open_deck=deck_read(n_read(NULL,l_list(l_first(a))));
+		snprintf(danger_open_path,sizeof(danger_open_path),"%s",ls(l_first(a))->sv);
+	}
 	danger_open_pending=1;(void)self;return LNIL;
 }
 lv* interface_danger(lv*self,lv*i,lv*x){

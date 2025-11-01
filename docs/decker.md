@@ -1983,7 +1983,7 @@ When enabled, the _danger_ interface is available as a global constant named `da
 | `danger.shell[x]`*          | Execute string `x` as a shell command and block for its completion.                         |
 | `danger.read[path hint]`    | Read a file `path` using `hint` as necessary to control its interpretation.                 |
 | `danger.write[path x hint]` | Write a value `x` to a file `path`. Returns `1` on success.                                 |
-| `danger.open[path]`         | Instruct Decker to open a deck at `path`.                                                   |
+| `danger.open[x]`            | Instruct Decker to open a deck `x` or a deck at filesystem path `x` .                       |
 
 
 The `danger.path[]` function can perform a number of useful operations:
@@ -2007,7 +2007,7 @@ table t.dataset_data.column_names dict flip t.dataset_data.data
 
 Note that this function executes subcommands _synchronously_; a long-running shell invocation can lock up Decker! The `danger.shell[]` function is not available on Windows.
 
-The `danger.open[path]` function schedules Decker to open a target deck when the current script completes; Decker will reset its history and tool configuration as if the deck were opened manually. If `path` does not indicate a valid `.html` or `.deck` file (or any file), Decker will open a new document.
+The `danger.open[x]` function schedules Decker to open a target deck when the current script completes; Decker will reset its history and tool configuration as if the deck were opened manually. Providing this function with an existing deck interface offers an opportunity to choose a starting card, insert data, or generally customize the target deck before opening it. If path `x` does not indicate a valid `.html` or `.deck` file (or any file), Decker will open a new document.
 
 ---
 
@@ -2017,7 +2017,7 @@ Web-Decker also offers its own _danger_ interface which exposes a low-level brid
 | :----------------------- | :------------------------------------------------------------------------------------------ |
 | `typeof danger`          | `"danger"`                                                                                  |
 | `danger.js[x args...]`   | Evaluate a string `x` as JavaScript, optionally called with arguments `args`.               |
-| `danger.open[url]`       | Navigate to a different URL without prompting the user to confirm.                          |
+| `danger.open[url]`       | Navigate to a URL `x` or open a deck interface `x`.                                         |
 
 If `danger.js[x]` is called with a single argument, it will evaluate `x` as JavaScript and return the result. If the result of evaluating `x` is a JS function and additional arguments are supplied, those arguments will be passed to the function and it will be called. Lil values are automatically translated to JS values and vice-versa. Numbers, strings, lists, and dictionaries are recursively converted as copies, with appropriate coercion between the respective type systems. Array interfaces are converted into `Uint8Array` objects and vice-versa (irrespective of `cast`) using a shared underlying data store, allowing both Lil and JS to observe future mutations to such a data structure. Array _slices_ are not converted. Resizing Array interfaces from Lil may reallocate the internal buffer, breaking any shared references. Deck, Card, or Widget interfaces are passed unmodified, but should be treated as opaque values from the JS side. Functions are wrapped in thunks: Lil functions are exposed to JS as JS functions accepting and returning JS values, and JS functions are exposed to Lil as Lil functions accepting and returning Lil values. Any other values- including arbitrary JS objects and Lil tables or otherinterfaces- are converted to a JS `null` or a Lil `nil`, respectively.
 

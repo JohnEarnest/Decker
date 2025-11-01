@@ -4231,6 +4231,7 @@ void tick(lv*env){
 	track(sc.next)
 	track(sc.f.table)
 	track(ob.sel)
+	track(danger_open_deck)
 	dset(env,lmistr("wid"),wid_track(&wid));
 	dset(env,lmistr("ms"),modal_track(&ms));
 	if(ms_index){lv*r=lml(0);for(int z=0;z<ms_index;z++)ll_add(r,modal_track(&ms_stack[z].ms)),ll_add(r,wid_track(&ms_stack[z].wid));dset(env,lmistr("ms-stack"),r);}
@@ -4239,11 +4240,7 @@ void tick(lv*env){
 	track(audio_loop.clip)
 	track(orig_loop)
 	lv_collect();
-	if(!running()&&danger_open_pending){
-		danger_open_pending=0;
-		lv*file=n_read(NULL,l_list(lmcstr(danger_open_path)));
-		load_deck(deck_get(file)),set_path(l_count(file)?danger_open_path:"");
-	}
+	if(!running()&&danger_open_pending){danger_open_pending=0;load_deck(danger_open_deck),set_path(danger_open_path);}
 	interpreter_unlock();
 }
 
