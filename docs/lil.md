@@ -1318,7 +1318,7 @@ The modulus operator `%` takes its arguments in the opposite order of common not
 
 The `=` comparison operator always produces the number 1 or 0 as a result. If _either_ operand is an interface or a nil value, they are equal only if both are identical. If _both_ arguments are numbers, they are compared numerically, and otherwise they are converted to strings and compared.
 
-The `<` and `>` comparison operators always produce the number 1 or 0 as a result. If _either_ operand is a number or nil, they are compared numerically. Otherwise, the arguments are treated as strings and compared lexicographically. Note the differences between how these operators handle `nil` or mixed-type operands and the behavior of `=`!
+The `<` and `>` comparison operators always produce the number 1 or 0 as a result. If _either_ operand is a number, they are compared numerically. Otherwise, the arguments are treated as strings and compared lexicographically. Note the differences between how these operators handle `nil` or mixed-type operands and the behavior of `=`!
 
 The `&` and `|` operators calculate the minimum or maximum of their arguments. As a consequence, for the numbers 0 and 1 they are equivalent to logical "AND" and logical "OR"- thus their notation. Applied to strings, they compare values lexicographically in the same fashion as `<` and `>`.
 
