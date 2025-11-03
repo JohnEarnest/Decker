@@ -1745,8 +1745,8 @@ void rtext_appendr(lv*table,lv*suffix){
 	EACH(z,t)rtext_append(table,t->lv[z],f->lv[z],a->lv[z],p->lv[z]);
 }
 lv* rtext_string(lv*table,pair cursor){
-	str r=str_new(); int i=0,a=MIN(cursor.x,cursor.y),b=MAX(cursor.x,cursor.y); lv*t=dget(table,lmistr("text"));
-	EACH(z,t){lv*s=t->lv[z];for(int z=0;z<s->c;z++,i++)if(i>=a&&i<b)str_addc(&r,s->sv[z]);}
+	str r=str_new(); int i=0,a=MIN(cursor.x,cursor.y),b=MAX(cursor.x,cursor.y); lv*t=dget(table,lmistr("text")),*g=dget(table,lmistr("arg"));
+	EACH(z,t){lv*s=t->lv[z];int img=image_is(g->lv[z]);for(int z=0;z<s->c;z++,i++)if(!img&&i>=a&&i<b)str_addc(&r,s->sv[z]);}
 	return lmstr(r);
 }
 lv* rtext_all(lv*table){return rtext_string(table,(pair){0,RTEXT_END});}

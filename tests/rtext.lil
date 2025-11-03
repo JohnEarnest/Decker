@@ -11,6 +11,11 @@ rt2:insert text arg font with
  " never " ""               ""
  "mind."   "the_brain_page" ""
 end
+rt3:insert text arg with
+ "before " ""
+ "i"       image[16,16]
+ "after"   ""
+end
 
 show[rtext.end]
 show[rtext.len[rt1]]
@@ -40,6 +45,9 @@ show[rtext.cat[image[3,4]]]                   # cast to inline image
 show[rtext.cat[insert text pat with "a" -1 "b" 5 "c" 256 end]] # clamp bogus patterns
 
 show[rtext.string[rt1 4,19]]
+show[rtext.string[rt3]]
+show[rtext.string[rt3 5,9]]
+
 show[rtext.span[rt1 8,12]]                   # onechunk
 show[rtext.span[rt1 4,19]]                   # multichunk
 show[rtext.span[rtext.make[""] 0,0        ]] # empty start

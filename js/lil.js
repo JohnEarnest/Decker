@@ -1961,8 +1961,8 @@ rtext_append=(tab,t,f,a,p)=>{
 }
 rtext_appendr=(tab,row)=>{fv=tab_get(row,'font'),av=tab_get(row,'arg'),pv=tab_get(row,'pat');tab_get(row,'text').map((t,i)=>rtext_append(tab,t,fv[i],av[i],pv[i]))}
 rtext_string=(tab,pos)=>{
-	pos=pos||rect(0,RTEXT_END);let r='',i=0,a=min(pos.x,pos.y),b=max(pos.x,pos.y)
-	tab_get(tab,'text').map(s=>{for(let z=0;z<s.v.length;z++,i++)if(i>=a&&i<b)r+=s.v[z]});return lms(r)
+	pos=pos||rect(0,RTEXT_END);let r='',i=0,a=min(pos.x,pos.y),b=max(pos.x,pos.y),g=tab_get(tab,'arg')
+	tab_get(tab,'text').map((s,ix)=>{const img=image_is(g[ix]);for(let z=0;z<s.v.length;z++,i++)if(!img&&i>=a&&i<b)r+=s.v[z]});return lms(r)
 }
 rtext_is_plain=x=>{
 	if(!lit(x))return 0;const tv=tab_get(x,'text'),fv=tab_get(x,'font'),av=tab_get(x,'arg'),pv=tab_get(x,'pat');
