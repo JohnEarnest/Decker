@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:8
+card:10
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -147,17 +147,19 @@ end
 
 {card:conditional_formatting}
 {widgets}
-grid1:{"type":"grid","size":[222,147],"pos":[84,95],"script":"conditional_formatting.0","font":"mono","bycell":1,"widths":[133,69],"format":"st","value":{"item":["aggregate bone sales","calcium recycling","enamel stripping","wisdom teeth","implements","personnel","bones of personnel","candles"],"profit":[<"text":["    $20.23"],"font":[""],"arg":[""],"pat":[1]>,<"text":["    $97.40"],"font":[""],"arg":[""],"pat":[1]>,<"text":["    -$0.15"],"font":[""],"arg":[""],"pat":[35]>,<"text":["     $3.50"],"font":[""],"arg":[""],"pat":[1]>,<"text":["    -$6.75"],"font":[""],"arg":[""],"pat":[35]>,<"text":[" -$1400.00"],"font":[""],"arg":[""],"pat":[35]>,<"text":["   $900.00"],"font":[""],"arg":[""],"pat":[1]>,<"text":[" -$5000.00"],"font":[""],"arg":[""],"pat":[35]>]},"row":6,"col":0}
+grid1:{"type":"grid","size":[222,147],"pos":[84,95],"script":"conditional_formatting.0","bycell":1,"widths":[133,69],"format":"st","value":{"item":["aggregate bone sales","calcium recycling","enamel stripping","wisdom teeth","implements","personnel","bones of personnel","candles"],"profit":[<"text":["    $20.23"],"font":["mono"],"arg":[""],"pat":[1]>,<"text":["    $97.40"],"font":["mono"],"arg":[""],"pat":[1]>,<"text":["    -$0.15"],"font":["mono"],"arg":[""],"pat":[35]>,<"text":["   -$32.00"],"font":["mono"],"arg":[""],"pat":[35]>,<"text":["    -$6.75"],"font":["mono"],"arg":[""],"pat":[35]>,<"text":[" -$1400.00"],"font":["mono"],"arg":[""],"pat":[35]>,<"text":["   $900.00"],"font":["mono"],"arg":[""],"pat":[1]>,<"text":[" -$5000.00"],"font":["mono"],"arg":[""],"pat":[35]>]},"row":0,"col":1}
 
 {script:conditional_formatting.0}
 on changecell x do
  if me.col~1
   t:rtext.string[x]
   n:"%c" parse t
-  x:rtext.make[("%10c" format n)  "" "" if n<0 colors.red else 1 end]
+  c:if n<0 colors.red else 1 end
+  x:rtext.make[("%10c" format n)  "mono" "" c]
  end
  send changecell[x]
 end
+
 {end}
 
 {card:pokeymans}
@@ -192,6 +194,17 @@ field5:{"type":"field","size":[131,28],"pos":[347,192],"show":"invert","pattern"
 {script:fields.0}
 on run x do
   alert["tried to run <%s>" format x]
+end
+{end}
+
+{card:card6}
+{widgets}
+inline images next to links:{"type":"field","size":[129,63],"pos":[181,102],"value":{"text":["this is a ","i","link elsewhere."],"font":["","",""],"arg":["","%%IMG0ABwAEAA+AwBDw44A9gB4ABwAMAAIABjgaAAPMLoAjAAIQgQAOAAH4EQqBjBPFAQQSYAPgAhgGIAIH/DACAAAQAAAAEA=","http://beyondloom.com/decker"]}}
+spans:{"type":"grid","size":[392,104],"pos":[56,207],"animated":1,"volatile":1,"script":"card6.0","widths":[93,56,205]}
+
+{script:card6.0}
+on view do
+ me.value:(first card.widgets).value
 end
 {end}
 
@@ -702,6 +715,7 @@ button2:{"type":"button","size":[106,28],"pos":[183,145],"script":"Sound Loops.1
 button3:{"type":"button","size":[106,28],"pos":[310,123],"script":"Sound Loops.2","text":"Sosumi"}
 button4:{"type":"button","size":[106,28],"pos":[63,124],"script":"Sound Loops.3","text":"Reset The Loop"}
 button5:{"type":"button","size":[113,47],"pos":[332,255],"script":"Sound Loops.4","text":"Play and\nBusywait"}
+button11:{"type":"button","size":[60,20],"pos":[47,281],"script":"Sound Loops.5","text":"Play!"}
 
 {script:Sound Loops.0}
 on click do
@@ -736,6 +750,12 @@ on click do
 end
 {end}
 
+{script:Sound Loops.5}
+on click do
+ play[sound[127*sin (440/8000)*2*pi*range 8000]] 
+end
+{end}
+
 {card:contraptions}
 image:"%%IMG2AgABVgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8AIwElAP8A2wEnAP8A2gEnAP8A2gEnAP8A2AEoAP8A2AEIAP8A+QEIAP8A+QEHAAsBBgD/AOkBBgAHAQ4A/wDlAQYABwERAP8A4wEGAAYBFAD/AOEBBQAGARYA/wDfAQYABQELAAIBCwD/AN0BBwAFAQYACgEJAP8A3AEGAAYBBQANAQgA/wDbAQUABwEFAA8BBgD/ANsBBQAHAQUAEAEFAP8A2wEFAAcBBQAQAQYA/wDaAQUABwEGAA8BBgD/ANoBBQAHAQYADwEGAP8A2gEFAAgBBgANAQYA/wDbAQUACAEIAAsBBgD/ANsBBQAJAQ0ABQEGAP8A2wEFAAoBDQAEAQUA/wDcAQUACwEMAAQBBQD/ANwBBQAMAQsABAEGAP8A2wEFAA4BCAAFAQYA/wDbAQUAHAEFAP8A2wEFAAYBBQARAQYA/wDaAQUABQEHABABBgD/ANoBBQACAQsAEAEFAP8A2gEFAAEBDQAPAQUA/wDaARQADgEFAP8A2gEVAAIBEAD/ANoBDAADARgA/wDaAQkABgEYAP8A2wEHAAgBFgD/AOwBEwD/APABBgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8ALQ3wAP8AEA3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAP8ADw3yAFsBZgBNDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWgFoAEwN8gBaAWgATA3yAFoBaABMDfIAWwFmAE0N8gD/AA8N8gD/AA8N8gD/AA8N8gD/AA8N8gD/AA8N8gD/AA8N8gD/AA8N8gD/AA8N8gD/AA8N8gD/AA8N8gD/AA8N8gD/AA8N8gD/AA8N8gD/ABAN8AD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AAw="
 {widgets}
@@ -744,7 +764,7 @@ b:{"type":"contraption","size":[150,50],"pos":[40,150],"def":"spinner","widgets"
 contraption1:{"type":"contraption","size":[200,140],"pos":[276,89],"def":"enchilada","widgets":{"bool":{},"number":{},"string":{},"code":{},"rich":{}}}
 contraption2:{"type":"contraption","size":[150,90],"pos":[54,222],"def":"paintbox","widgets":{}}
 smol1:{"type":"contraption","size":[20,20],"pos":[222,268],"def":"smol","widgets":{}}
-viewCounter1:{"type":"contraption","size":[102,26],"pos":[326,29],"def":"viewCounter","widgets":{"c":{"value":"13"}}}
+viewCounter1:{"type":"contraption","size":[102,26],"pos":[326,29],"def":"viewCounter","widgets":{"c":{"value":"14"}}}
 
 {script:contraptions.0}
 on change do
@@ -757,7 +777,7 @@ end
 dieRoller1:{"type":"contraption","size":[137,23],"pos":[45,66],"def":"dieRoller","widgets":{"result":{"value":"1+1 = 2"},"button1":{}}}
 dieRoller2:{"type":"contraption","size":[229,23],"pos":[45,94],"def":"dieRoller","widgets":{"result":{"size":[143,19],"value":"2+10+7+6+10+5+2+4 = 46"},"button1":{"text":"5d10+3d6"}}}
 dieRoller3:{"type":"contraption","size":[137,23],"pos":[45,38],"def":"dieRoller","widgets":{"result":{"value":"1"},"button1":{"text":"1d6"}}}
-clock1:{"type":"contraption","size":[100,25],"pos":[375,39],"font":"menu","def":"clock","widgets":{"canvas1":{"size":[100,25],"font":"menu","image":"%%IMG0AGQAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPPwDDB5+AAAAAAAAAGYMBxwzBgAAAAAAAABmDYsNswYAAAAAAAAAZg2TDbMGAAAAAAAAAGYYIwwzDAAAAAAAAABmMD+MMxgAAAAAAAAAZjADDDMYAAAAAAAAAGYxgw2zGAAAAAAAAAA8MYMNnhgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="},"tz":{"size":[35,0],"pos":[6,19]},"mil":{"size":[31,0],"pos":[54,18]}}}
+clock1:{"type":"contraption","size":[100,25],"pos":[375,39],"font":"menu","def":"clock","widgets":{"canvas1":{"size":[100,25],"font":"menu","image":"%%IMG0AGQAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPDg/PAZ4AAAAAAAAAGZgMGYOzAAAAAAAAABmwbBmxswAAAAAAAAAZvm+ZsbMAAAAAAAAAGbMA2YGzAAAAAAAAABmzANmBnwAAAAAAAAAZswDZgYMAAAAAAAAAGbNo2bGGAAAAAAAAAA8eZ48xnAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="},"tz":{"size":[35,0],"pos":[6,19]},"mil":{"size":[31,0],"pos":[54,18]}}}
 datePicker1:{"type":"contraption","size":[109,123],"pos":[371,92],"def":"datePicker","widgets":{"canv":{"image":"%%IMG0AGcAZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIIAAAAAAAAAAAAAAADGAAAAAAAAAAAAAAAAqmSAAAAAAAAAAAAAAJIUgAAAAAAAAAAAAACCdIAAAAAAAAAAAAAAgpSAAAAAAAAAAAAAAIJzgAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAggHwBBAH0B4AHAAiAMYAQAQQARAQACIAIJCqYESCowEcELAgYByQkpBEgqSBEhzAHBACkIKQRIFHgRIQgAJwIpCCkESBRAESEIAikBxwgmBDgUMBEhCAHHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////////////+AAAgAIACAAgAIACAAgAAIACAAgAIACAAgAIAACAggcIPiAQg+IDCAAAgYIIiAQgMIICBAgAAICCAIgIIFCDwggIAACAggEIHCCQgCIPCAAAgIICCAIg+IAiCIgAAICCBAgiIBCCIgiIAACAgg+IHCAQgcIHCAAAgAIACAAgAIACAAgAAIACAAgAIACAAgAIAACAAgAIACAAgAIACD////////////////ggAIAD//gAIACAAgAIIACAA//4ACAAgAIACCD4gcP4+IciCIhyI+ggCIIj93mIphiYimBIIBCCI/d4iKIIiAogiCAQgcP4eIiiCIgSIcggIIIj/3iIogiIIiAoICCCI/74iKIIiEIiKCAggcP5+IciCIj6IcggAIAD//gAIACAAgAIIACAA//4ACAAgAIACCAAgAP/+AAgAIACAAg////////////////4IACAAgAIACAAgAIACCAAgAIACAAgAIACAAgiBIj6IMiPohyIcnHIJgyYgmEJgKYimIqKKCIUiPIiCIEiIoiKCigiJIgKI8iBIhyIehIoIj6ICiIogiIiiAoiKCIEiIoiKIIiIogSQigiBIhyIciCIhyIYvnIIACAAgAIACAAgAIACCAAgAIACAAgAIACAAggAIACAAgAIACAAgAIP///////////////+CAAgAIACAAgAIACAAggAIACAAgAIACAAgAIJwiccnPpwSc+nDJz6CiYooqISiMooKJCiCggiIIKCIglILyCgghIIQiEEhHISSEChPIQSCIIiCIgKI+iAoiKIIgkCJBCQikBJCKQikCIL4i++vnL4S+cvnL4iCAAgAIACAAgAIACAAggAIACAAgAIACAAgAIIACAAgAIACAAgAIACD////////////////ggAIACAAgAIAAAAAAAIACAAgAIACAAAAAAACccnHL5y+IgAAAAAAAooqKKEihGIAAAAAAAIKKCiiIogiAAAAAAACEchHpyKcIgAAAAAAAiIogKCigiIAAAAAAAJCKQEooqIiAAAAAAAC+cvmJxycIgAAAAAAAgAIACAAgAIAAAAAAAIACAAgAIACAAAAAAACAAgAIACAAgAAAAAAA/////////4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="},"val":{"value":"2023-05-09"},"next":{},"prev":{}}}
 fancyBorder1:{"type":"contraption","size":[31,45],"pos":[76,142],"def":"fancyBorder","widgets":{}}
 fancyBorder2:{"type":"contraption","size":[87,47],"pos":[114,142],"def":"fancyBorder","widgets":{}}
@@ -854,7 +874,7 @@ end
 {card:anime 2}
 script:"anime 2.0"
 {widgets}
-canvas:{"type":"canvas","size":[175,164],"pos":[163,60],"animated":1,"script":"anime 2.1","image":"%%IMG2AK8ApAD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A7wEEAKkBBgAHAQEAoQEGAAcBAgChAQUABgEEAKABBQAGAQYAlgECAAYBBQAFAQgAlAEEAAYBBAAFAQcAlQEEAAYBBAAEAQcAlQEGAAYBAwAEAQUAlgEIAAUBAwAEAQQAlwEJAAQBAwADAQQAmgEIAAQBAgADAQMACgEBAJMBBgADAQIAAgEDAAgBBACVAQUAAgECAAIBAgAGAQcAlwEEAAIBAQABAQIABQEJAJkBAwABAQEAAQEBAAMBDACcAQEAAQEBAAIBDwCLASQAiwEPAAIBAQABAQEAnAEMAAMBAQABAQEAAQEDAJkBCQAFAQIAAQEBAAIBBACXAQcABgECAAIBAgACAQUAlQEEAAgBAwACAQIAAwEGAJMBAQAKAQMAAwECAAQBCACaAQQAAwEDAAQBCQCXAQQABAEDAAUBCACWAQUABAEDAAYBBgCVAQcABAEEAAYBBACVAQcABQEEAAYBBACUAQgABQEFAAYBAgCWAQYABgEFAKABBAAGAQUAoQECAAcBBgChAQEABwEGAKkBBAD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8APw==","scale":1}
+canvas:{"type":"canvas","size":[175,164],"pos":[163,60],"animated":1,"script":"anime 2.1","image":"%%IMG2AK8ApAD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wC1AQIApwEIAKQBCwClAQoACwECAJgBCgALAQQAlgEKAAoBBgCWAQkACgEIAJQBCQAJAQoAhwEBAAwBCAAJAQwAhQECAAsBCAAJAQwAhAEEAAoBCAAIAQwAhAEFAAsBBwAIAQsAhQEGAAoBBwAHAQoAhgEIAAoBBgAHAQkAhgEKAAkBBgAGAQkAhgEMAAgBBgAGAQgAhwENAAgBBQAGAQcAhwEPAAcBBQAFAQcAiQEPAAcBBAAFAQYAjQENAAYBBAAEAQYADwEDAH4BDAAFAQQABAEFAA4BBQCAAQsABQEDAAMBBQAMAQgAgwEJAAQBAwADAQQACwEKAIUBCAAEAQIAAwEDAAkBDQCHAQcAAwECAAIBAwAIARAAiQEFAAIBAgACAQIABgETAIsBBAACAQEAAQECAAUBFQCNAQMAAQEBAAEBAQADARgAkAEBAAEBAQACARoAdQE6AHUBGgACAQEAAQEBAJABGAADAQEAAQEBAAEBAwCNARUABQECAAEBAQACAQQAiwETAAYBAgACAQIAAgEFAIkBEAAIAQMAAgECAAMBBwCHAQ0ACQEDAAMBAgAEAQgAhQEKAAsBBAADAQMABAEJAIMBCAAMAQUAAwEDAAUBCwCAAQUADgEFAAQBBAAFAQwAfgEDAA8BBgAEAQQABgENAI0BBgAFAQQABwEPAIkBBwAFAQUABwEPAIcBBwAGAQUACAENAIcBCAAGAQYACAEMAIYBCQAGAQYACQEKAIYBCQAHAQYACgEIAIYBCgAHAQcACgEGAIUBCwAIAQcACwEFAIQBDAAIAQgACgEEAIQBDAAJAQgACwECAIUBDAAJAQgADAEBAIcBCgAJAQkAlAEIAAoBCQCWAQYACgEKAJYBBAALAQoAmAECAAsBCgClAQsApAEIAKcBAgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wAF","scale":1}
 button1:{"type":"button","size":[151,29],"pos":[173,240],"script":"anime 2.2","text":"Interrupt"}
 
 {script:anime 2.0}

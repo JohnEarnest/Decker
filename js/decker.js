@@ -509,7 +509,7 @@ modal_pop=value=>{
 	const l=ms.type=='link'&&value?rtext_string(ms.text.table):null
 	const p=value!=-1&&ms.type=='spanpattern'
 	modal_exit(value);if(ms_stack.length){const c=ms_stack.pop();ms=c.ms,wid=c.wid}
-	if(l){const c=rcopy(wid.cursor);field_linkspan(l),wid.cursor=c}
+	if(l){const c=rcopy(wid.cursor),s=field_linkspan(l);if(c.x<c.y){c.y-=s}else{c.x-=s};wid.cursor=c}
 	if(p){const c=rcopy(wid.cursor);field_patspan(value);wid.cursor=c}
 }
 let kc={shift:0,lock:0,alt:0,comb:0,on:0,heading:null}, keydown={},keyup={}
@@ -1043,8 +1043,12 @@ field_indent=add=>{
 	}field_edit(lms(''),lms(''),1,r,p);wid.cursor=rect(p.x,wid.cursor.y)
 }
 field_fontspan=font=>{const s=rtext_span(wid.fv.table,wid.cursor);tab_get(s,'font').fill(font    ),field_editr(rtext_cat([s]),wid.cursor)}
-field_linkspan=link=>{const s=rtext_span(wid.fv.table,wid.cursor);tab_get(s,'arg' ).fill(link    ),field_editr(rtext_cat([s]),wid.cursor)}
 field_patspan =pat =>{const s=rtext_span(wid.fv.table,wid.cursor);tab_get(s,'pat' ).fill(lmn(pat)),field_editr(rtext_cat([s]),wid.cursor)}
+field_linkspan=link=>{
+	const s=rtext_span(wid.fv.table,wid.cursor),t=tab_get(s,'text'),a=tab_get(s,'arg');let sk=0
+	a.map((v,i)=>{if(image_is(v)){t[i]=lms(''),sk++}else{a[i]=link}})
+	field_editr(rtext_cat([s]),wid.cursor);return sk
+}
 field_input_raw=text=>{
 	const t=wid.fv.table, i=rtext_get(t,wid.cursor.y), f=i<0?lms(''):tab_cell(t,'font',i), p=i<0?1:ln(tab_cell(t,'pat',i))
 	field_edit(f,lms(''),p,clchars(text),wid.cursor)
@@ -1395,8 +1399,10 @@ modal_enter=type=>{
 	if(type=='fonts')ms.grid=fonts_enumerate(),ms.grid.scroll=-99
 	if(type=='resources')ms.message=null,ms.grid=gridtab(lmt()),ms.grid2=gridtab(res_enumerate(deck))
 	if(type=='link'){
-		const t=ms.old_wid.fv.table,ol=tab_cell(t,'arg',rtext_get(t,ms.old_wid.cursor.y))
-		ms.text=fieldstr(ol);if(count(ol))ms.old_wid.cursor=rtext_getr(t,ms.old_wid.cursor.y)
+		const t=ms.old_wid.fv.table,s=tab_get(rtext_span(t,ms.old_wid.cursor),'arg')
+		let ol=lms('');for(let z=0;z<s.length;z++){const v=s[z];if(lis(v)&&count(v)){ol=v;break}}
+		if(count(ol)&&s.length==1)ms.old_wid.cursor=rtext_getr(t,ms.old_wid.cursor.y)
+		ms.text=fieldstr(ol)
 	}
 	if(type=='grid'        )ms.name=fieldstr(lmn(dr.grid_size.x     )),ms.text=fieldstr(lmn(dr.grid_size.y       ))
 	if(type=='deck_props'  )ms.name=fieldstr(ifield(deck     ,'name')),ms.text=fieldstr(ifield(deck     ,'author'))

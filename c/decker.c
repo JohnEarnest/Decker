@@ -250,7 +250,7 @@ typedef struct {
 } modal_state; modal_state ms={0};
 typedef struct {modal_state ms;widget_state wid;} modal_context;
 modal_context ms_stack[8]={{{0},{0}}};int ms_index=0;
-void modal_enter(int type);void modal_exit(int value);void field_linkspan(lv*arg);void field_patspan(int pat); // forward refs
+void modal_enter(int type);void modal_exit(int value);int field_linkspan(lv*arg);void field_patspan(int pat); // forward refs
 void modal_push(int type){
 	if(ms.type!=modal_none){
 		ms_stack[ms_index]=(modal_context){ms,wid};
@@ -273,7 +273,7 @@ void modal_pop(int value){
 		unswizzle_slot(ms.old_wid.gv,ms.old_wid.gv_slot)
 		unswizzle_slot(ms.old_wid.fv,ms.old_wid.fv_slot)
 	}
-	if(l){pair c=wid.cursor;field_linkspan(l);wid.cursor=c;}
+	if(l){pair c=wid.cursor;int s=field_linkspan(l);if(c.x<c.y){c.y-=s;}else{c.x-=s;}wid.cursor=c;}
 	if(p){pair c=wid.cursor;field_patspan(value);wid.cursor=c;}
 }
 int no_menu(void){return menu.active==-1&&menu.stick==-1;}
@@ -891,9 +891,10 @@ void field_fontspan(lv*font){
 	lv*s=rtext_span(wid.fv->table,wid.cursor),*c=dget(s,lmistr("font"));
 	EACH(z,c)c->lv[z]=font;field_editr(n_rtext_cat(NULL,l_list(s)),wid.cursor);
 }
-void field_linkspan(lv*link){
-	lv*s=rtext_span(wid.fv->table,wid.cursor),*c=dget(s,lmistr("arg"));
-	EACH(z,c)c->lv[z]=link;field_editr(n_rtext_cat(NULL,l_list(s)),wid.cursor);
+int field_linkspan(lv*link){
+	lv*s=rtext_span(wid.fv->table,wid.cursor),*c=dget(s,lmistr("arg")),*t=dget(s,lmistr("text"));int sk=0;
+	EACH(z,c){if(image_is(c->lv[z])){t->lv[z]=lmistr(""),sk++;}else{c->lv[z]=link;}}field_editr(n_rtext_cat(NULL,l_list(s)),wid.cursor);
+	return sk;
 }
 void field_patspan(int pat){
 	lv*s=rtext_span(wid.fv->table,wid.cursor),*c=dget(s,lmistr("pat"));
@@ -1295,9 +1296,10 @@ void modal_enter(int type){
 		ms.grid2=(grid_val){res_enumerate(deck),0,-1,-1};
 	}
 	if(type==modal_link){
-		lv*t=ms.old_wid.fv->table;int i=rtext_get(t,ms.old_wid.cursor.y);
-		lv*ol=dget(t,lmistr("arg"))->lv[i<0?0:i];
-		ms.text=(field_val){rtext_cast(ol),0};if(ol->c)ms.old_wid.cursor=rtext_getr(t,ms.old_wid.cursor.y);
+		lv*t=ms.old_wid.fv->table,*s=dget(rtext_span(t,ms.old_wid.cursor),lmistr("arg"));
+		lv*ol=lmistr("");for(int z=0;z<s->c;z++){lv*v=s->lv[z];if(lis(v)&&v->c){ol=v;break;}}
+		if(ol->c&&s->c==1){ms.old_wid.cursor=rtext_getr(t,ms.old_wid.cursor.y);}
+		ms.text=(field_val){rtext_cast(ol),0};
 	}
 	if(type==modal_grid){
 		ms.name=(field_val){rtext_cast(lmn(dr.grid_size.x)),0};
