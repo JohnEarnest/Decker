@@ -250,7 +250,12 @@ typedef struct {
 } modal_state; modal_state ms={0};
 typedef struct {modal_state ms;widget_state wid;} modal_context;
 modal_context ms_stack[8]={{{0},{0}}};int ms_index=0;
+lv* modal_open_path(void){
+	int n=ms.grid.table->n,r=ms.grid.row;
+	char t[PATH_MAX]={0};directory_cat(t,ms.path,r<n&&r>=0?ms.grid.table->lv[1]->lv[r]->sv:"");return lmcstr(t);
+}
 void modal_enter(int type);void modal_exit(int value);int field_linkspan(lv*arg);void field_patspan(int pat); // forward refs
+void sound_edit(lv*v);
 void modal_push(int type){
 	if(ms.type!=modal_none){
 		ms_stack[ms_index]=(modal_context){ms,wid};
@@ -264,6 +269,7 @@ void modal_push(int type){
 }
 void modal_pop(int value){
 	lv*l=(ms.type==modal_link&&value)?rtext_all(ms.text.table):NULL;
+	lv*s=(ms.subtype==modal_import_sound&&value)?modal_open_path():NULL;
 	int p=value!=-1&&ms.type==modal_spanpattern;
 	modal_exit(value);if(ms_index>0){
 		ms_index--,ms=ms_stack[ms_index].ms,wid=ms_stack[ms_index].wid;
@@ -275,6 +281,10 @@ void modal_pop(int value){
 	}
 	if(l){pair c=wid.cursor;int s=field_linkspan(l);if(c.x<c.y){c.y-=s;}else{c.x-=s;}wid.cursor=c;}
 	if(p){pair c=wid.cursor;field_patspan(value);wid.cursor=c;}
+	if(s){
+		au.target=n_deck_add(deck,l_list(lmistr("sound")));mark_dirty();modal_enter(modal_recording);
+		sound_edit(n_readwav(NULL,l_list(s)));au.sel=(pair){0,0},au.head=0;
+	}
 }
 int no_menu(void){return menu.active==-1&&menu.stick==-1;}
 int in_layer(void){return no_menu()&&(ms.type?ms.in_modal:1)&&((!running()&&!msg.overshoot)||ms.type!=modal_none);}
@@ -1431,10 +1441,6 @@ void import_image(char*path){
 	setuimode(mode_draw),bg_paste(i->b,1);if(color&&!dr.color)dr.limbo_dither=1,dither_threshold=0.5;dr.fatbits=0;dr.omask=m;
 }
 lv* table_decode(lv*text,lv*format){return ms.edit_json?l_table(l_parse(lmistr("%J"),text)): n_readcsv(NULL,format->c?lml2(text,format):l_list(text));}
-lv* modal_open_path(void){
-	int n=ms.grid.table->n,r=ms.grid.row;
-	char t[PATH_MAX]={0};directory_cat(t,ms.path,r<n&&r>=0?ms.grid.table->lv[1]->lv[r]->sv:"");return lmcstr(t);
-}
 lv* modal_save_path(char*suffix){
 	char t[PATH_MAX]={0};directory_cat(t,ms.path,rtext_all(ms.text.table)->sv);
 	size_t sn=strlen(suffix)+1;if(!has_suffix(t,suffix)&&strlen(t)<PATH_MAX-sn)snprintf(t+strlen(t),sn,"%s",suffix);return lmcstr(t);
@@ -1451,10 +1457,6 @@ void modal_exit(int value){
 	if(wid.fv==&ms.old_wid.fv_slot)wid.fv=&wid.fv_slot;
 	if(ms.subtype==modal_import_script&&value){
 		field_exit(),sc.f=(field_val){rtext_cast(n_read(NULL,l_list(modal_open_path()))),0};
-	}
-	if(ms.subtype==modal_import_sound){
-		if(value){sound_edit(n_readwav(NULL,l_list(modal_open_path())));au.sel=(pair){0,0},au.head=0;}
-		modal_enter(modal_recording);return;
 	}
 	if(ms.subtype==modal_import_image&&value){import_image(modal_open_path()->sv);}
 	if(ms.subtype==modal_open_deck&&value){
@@ -1897,9 +1899,9 @@ void modals(void){
 			if(0==ln(ms.grid.table->lv[0]->lv[ms.grid.row])){
 				directory_child(ms.path,ms.grid.table->lv[1]->lv[ms.grid.row]->sv);
 				ms.grid=(grid_val){directory_enumerate(ms.path,ms.filter,0),0,0,-1};
-			}else{modal_exit(1);}
+			}else{if(ms.subtype==modal_import_sound){modal_pop(1);}else{modal_exit(1);}}
 		};c.x-=65;
-		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_exit(0);
+		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit){if(ms.subtype==modal_import_sound){modal_pop(0);}else{modal_exit(0);}}
 		if(ui_button((rect){b.x+b.w-125,b.y,60,20},"Home",!directory_is_home(ms.path))){
 			directory_home(ms.path);ms.grid=(grid_val){directory_enumerate(ms.path,ms.filter,0),0,0,-1};
 		}
@@ -3727,7 +3729,7 @@ void all_menus(void){
 		text_edit_menu();
 		return;
 	}
-	menu_bar("File",(ms.type==modal_none||ms.type==modal_recording)&&(!kc.on||uimode==mode_script));
+	menu_bar("File",(ms.type==modal_none||ms.type==modal_sounds||ms.type==modal_recording)&&(!kc.on||uimode==mode_script));
 	if(uimode==mode_script){
 		if(menu_item("Close Script",1,'\0'))close_script(NULL);
 		if(menu_item("Save Script",1,'s')){
@@ -3745,9 +3747,10 @@ void all_menus(void){
 		else                       {if(menu_item("Go to Card"     ,sc.target!=container,'\0'))close_script(container);}
 		if(menu_check("X-Ray Specs",!kc.on,sc.xray,'r'))sc.xray^=1;
 	}
+	else if(ms.type==modal_sounds){
+		if(menu_item("Import Sound...",1,'\0'))modal_push(modal_import_sound);
+	}
 	else if(ms.type==modal_recording){
-		if(menu_item("Import Sound...",1,'\0'))modal_enter(modal_import_sound);
-		menu_separator();
 		if(menu_item("Close Sound",1,'\0'))modal_exit(0);
 	}
 	else{

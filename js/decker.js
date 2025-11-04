@@ -3253,7 +3253,7 @@ all_menus=_=>{
 		text_edit_menu()
 		return
 	}
-	menu_bar('File',(ms.type==null||ms.type=='recording')&&(!kc.on||uimode=='script'))
+	menu_bar('File',(ms.type==null||ms.type=='sounds'||ms.type=='recording')&&(!kc.on||uimode=='script'))
 	if(uimode=='script'){
 		if(menu_item('Close Script',1))close_script()
 		if(menu_item('Save Script',1,'s')){
@@ -3269,9 +3269,10 @@ all_menus=_=>{
 		if(menu_item(`Go to ${prototype_is(container)?'Prototype':'Card'}`,sc.target!=container))close_script(container)
 		if(menu_check('X-Ray Specs',!kc.on,sc.xray))sc.xray^=1
 	}
-	else if(ms.type=='recording'){
+	else if(ms.type=='sounds'){
 		menu_item('Import Sound...',1,0,_=>open_file('audio/*',load_sound))
-		menu_separator();
+	}
+	else if(ms.type=='recording'){
 		if(menu_item('Close Sound',1))modal_exit(0)
 	}
 	else{
