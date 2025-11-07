@@ -1479,7 +1479,6 @@ modal_enter=type=>{
 	if(type=='multiscript'   )ms.type=type='confirm'
 	if(type=='save_deck'     )ms.type=type='save',ms.text=fieldstr(dname(deck.name,'.deck')),ms.desc='Save a .deck or .html file.'
 	if(type=='save_locked'   )ms.type=type='save',ms.text=fieldstr(dname(deck.name,'.html')),ms.desc='Save locked standalone deck as an .html file.'
-	if(type=='export_script' )ms.type=type='save',ms.text=fieldstr(lms('script.lil'  )),ms.desc='Save script as a .lil file.'
 	if(type=='export_image'  )ms.type=type='save',ms.text=fieldstr(lms('image.gif'   )),ms.desc='Save a .gif image file.'
 	if(type=='save_lil'      )ms.type=type='save',ms.text=fieldstr(lms('untitled.txt')),ms.desc='Save a text file.'
 	if(type=='input'         )ms.text=fieldstr(lms(''))
@@ -1935,7 +1934,6 @@ modals=_=>{
 			}
 			if(subtype=='save_deck'    )savedeck()
 			if(subtype=='save_locked'  )iwrite(deck,lms('locked'),ONE),savedeck(),iwrite(deck,lms('locked'),ZERO)
-			if(subtype=='export_script')save_text(name,ls(rtext_string(sc.f.table)))
 			if(subtype=='export_image' )save_image()
 			if(subtype=='save_lil'){
 				let x=ms.verb;arg();ret(ONE)
@@ -3256,13 +3254,6 @@ all_menus=_=>{
 	menu_bar('File',(ms.type==null||ms.type=='sounds'||ms.type=='recording')&&(!kc.on||uimode=='script'))
 	if(uimode=='script'){
 		if(menu_item('Close Script',1))close_script()
-		if(menu_item('Save Script',1,'s')){
-			try{const text=ls(rtext_string(sc.f.table));parse(text),script_save(lms(text));sc.status='Saved.'}
-			catch(e){sc.status=`Error: ${e.x}`,wid.cursor=rect(e.i,e.i)}
-		}
-		menu_separator()
-		menu_item('Import Script...',1,0,_=>open_text('.lil,.txt',text=>{field_exit(),sc.f=fieldstr(lms(text))}))
-		if(menu_item('Export Script...',1))modal_enter('export_script')
 		menu_separator()
 		if(menu_item('Go to Deck',!deck_is(sc.target)           ))close_script(deck)
 		const container=con()
