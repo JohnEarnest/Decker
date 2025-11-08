@@ -1259,6 +1259,10 @@ void draw_text_rich_raw(rect r,int pattern,int opaque){
 void draw_text_rich(rect r,int pattern,int opaque){
 	rect oc=frame.clip;frame.clip=r;draw_text_rich_raw(r,pattern,opaque);frame.clip=oc;
 }
+void draw_text_align(rect r,char*text,lv*font,int pattern,int align){
+	int fh=font_h(font);pair s=layout_plaintext(text,font,align,(pair){r.w,MAX(r.h,fh)});
+	draw_text_rich_raw(box_center(r,s),pattern,1);
+}
 
 // Sound interface
 

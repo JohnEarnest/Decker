@@ -667,13 +667,13 @@ widget_button=(target,x,value,func)=>{
 	if(x.show=='none')return 0; let ar=inset(b,2)
 	if(x.style=='round'){
 		draw_boxr(b,fcol,bcol,x.show!='transparent')
-		draw_textc(inset(b,3),x.text,font,fcol)
+		draw_text_align(inset(b,3),x.text,font,fcol,ALIGN.center)
 		if(sel)draw_box(ar,0,13);if(cl)draw_invert(pal,ar)
 	}
 	if(x.style=='rect'){
 		if(cl){b=rect(b.x+1,b.y+1,b.w-1,b.h-1),ar=rect(ar.x+1,ar.y+1,ar.w-1,ar.h-1);if(x.show!='transparent')draw_rect(b,bcol);draw_box(b,0,fcol)}
 		else  {b=rect(b.x  ,b.y  ,b.w-1,b.h-1),ar=rect(ar.x  ,ar.y  ,ar.w-1,ar.h-1);draw_shadow(b,fcol,bcol,x.show!='transparent')}
-		draw_textc(inset(b,3),x.text,font,fcol);if(sel)draw_box(ar,0,13)
+		draw_text_align(inset(b,3),x.text,font,fcol,ALIGN.center);if(sel)draw_box(ar,0,13)
 	}
 	if(x.style=='check'||x.style=='radio'){
 		if(x.show!='transparent')draw_rect(b,bcol)
@@ -684,7 +684,7 @@ widget_button=(target,x,value,func)=>{
 		else{const p=rect(br.x,br.y);draw_icon(p,RADIOS[3],bcol),draw_icon(p,RADIOS[cl||cr?1:0],fcol);if(value)draw_icon(p,RADIOS[2],fcol)}
 		draw_text_fit(to,x.text,font,fcol);ar=to;if(sel)draw_box(rect(to.x-2,to.y-1,to.w+2,to.h+2),0,13);if(cl)draw_invert(pal,ar)
 	}
-	if(x.style=='invisible'){draw_textc(inset(b,3),x.text,font,fcol);if(cl&&x.show!='transparent')draw_invert(pal,ar)}
+	if(x.style=='invisible'){draw_text_align(inset(b,3),x.text,font,fcol,ALIGN.center);if(cl&&x.show!='transparent')draw_invert(pal,ar)}
 	if(target&&cr)msg.target_click=target
 	if(!x.locked&&in_widgets())wid.count++
 	return cr

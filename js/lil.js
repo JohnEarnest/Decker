@@ -1342,7 +1342,7 @@ layout_plaintext=(text,font,align,mx)=>{
 			if(c=='\n'){lnl()}else{cursor.x+=size.x}
 			if(cursor.y>=(mx.y/fh)){
 				layout=layout.slice(0,max(1,layout.length-3))
-				layout[layout.length-1].c=ELLIPSIS,layout[layout.length-1].pos.w=font_gw(font,ELLIPSIS)+fs
+				layout[layout.length-1].char=ELLIPSIS,layout[layout.length-1].pos.w=font_gw(font,ELLIPSIS)+fs
 				z=text.length-1;break
 			}
 		}
@@ -1405,6 +1405,10 @@ draw_text_rich_raw=(r,l,pattern,opaque)=>{
 }
 draw_text_rich=(r,l,pattern,opaque)=>{
 	const oc=frame.clip;frame.clip=r;draw_text_rich_raw(r,l,pattern,opaque),frame.clip=oc
+}
+draw_text_align=(r,text,font,pattern,align)=>{
+	const fh=font_h(font),l=layout_plaintext(text,font,align,rect(r.w,max(r.h,fh)))
+	draw_text_rich_raw(rcenter(r,l.size),l,pattern,1)
 }
 draw_9seg=(r,dst,src,m,clip,opaque,pal)=>{
 	const o=rect(r.x,r.y), s=src.size, ss=s, ds=dst.size; if(s.x<1||s.y<1)return

@@ -501,14 +501,14 @@ int widget_button(lv*target,button x,int value){
 	if(x.show==show_none)return 0; rect ar=inset(b,2);
 	if(x.style==button_round){
 		draw_boxr(b,fcol,bcol,x.show!=show_transparent);
-		draw_textc(inset(b,3),x.text,x.font,fcol);
+		draw_text_align(inset(b,3),x.text,x.font,fcol,align_center);
 		if(sel)draw_box(ar,0,13);
 		if(cl)draw_invert(pal,ar);
 	}
 	if(x.style==button_rect){
 		if(cl){b=(rect){b.x+1,b.y+1,b.w-1,b.h-1},ar=(rect){ar.x+1,ar.y+1,ar.w-1,ar.h-1};if(x.show!=show_transparent)draw_rect(b,bcol);draw_box(b,0,fcol);}
 		else  {b=(rect){b.x  ,b.y  ,b.w-1,b.h-1},ar=(rect){ar.x  ,ar.y  ,ar.w-1,ar.h-1};draw_shadow(b,fcol,bcol,x.show!=show_transparent);}
-		draw_textc(inset(b,3),x.text,x.font,fcol);if(sel)draw_box(ar,0,13);
+		draw_text_align(inset(b,3),x.text,x.font,fcol,align_center);if(sel)draw_box(ar,0,13);
 	}
 	if(x.style==button_check||x.style==button_radio){
 		if(x.show!=show_transparent)draw_rect(b,bcol);
@@ -522,7 +522,7 @@ int widget_button(lv*target,button x,int value){
 		if(cl)draw_invert(pal,ar);
 	}
 	if(x.style==button_invisible){
-		draw_textc(inset(b,3),x.text,x.font,fcol);
+		draw_text_align(inset(b,3),x.text,x.font,fcol,align_center);
 		if(cl&&x.show!=show_transparent)draw_invert(pal,ar);
 	}
 	if(target&&cr)msg.target_click=target;
