@@ -151,6 +151,34 @@ Web-Decker has generally the same tools and functionality as Native-Decker, but 
 In a nutshell, Web-Decker provides an excellent way to share your decks with other people, and a convenient way to play with Decker when you're unable or unwilling to install the native application. If you're making new decks, Native-Decker's saving functionality and keyboard shortcuts may provide a better experience. You can use both however you please- a deck is a deck!
 
 
+Locked Decks
+============
+Sometimes when you share a deck with others you won't want Decker's editing tools to be visible. Perhaps they're visually distracting, or maybe you want to keep parts of your deck a surprise until the right moment? The solution is to _lock_ your deck.
+
+In the _File &#8594; Properties_ dialog, clicking _Protect..._ will prompt you for a location to save a locked copy of the current deck. Locked decks hide the menu bar and disable most editing features and keyboard shortcuts, leaving the user strictly in "Interact Mode". Note that card backgrounds in a locked deck will reveal drawings underneath the menu bar: pressing `m` while using drawing tools can temporarily reveal this area as well.
+
+Locking a deck is _not_ obfuscation or encryption; it's a polite suggestion. If you ever get stuck in a locked deck in Native-Decker, you can use ctrl+U+L+D (Un-Lock-Deck) to unlock it again. In Web-Decker, you can unlock a deck by opening your browser's JavaScript console and typing
+```
+deck.locked=false
+```
+When needed, the [App Interface](#appinterface) can be used to reintroduce your own UI for controlling fullscreen mode, saving, and exiting decks.
+
+Here's a very simple [Contraption](#contraptions) you can paste into your own decks for toggling between "locked" and "unlocked" mode for a deck. Consider using it to test your decks before exporting locked versions! For some decks you could leave this contraption on the title card; perhaps games could offer it as a reward for completion?
+```
+%%WGT0{"w":[{"name":"lockbox1","type":"contraption","size":[20,20],"pos":[210,146],
+"def":"lockbox","widgets":{"c":{},"b":{},"ims":{}}}],"d":{"lockbox":{"name":"lockbox",
+"size":[20,20],"margin":[1,1,2,2],"description":"Make your deck manually lockable and unlockable.",
+"script":"on view do\n i:ims.images[deck.locked]\n c.clear[]\n c.paste[i .5*c.size-i.size]\nend",
+"attributes":{"name":[],"label":[],"type":[]},"widgets":{"c":{"type":"canvas","size":[20,20],
+"pos":[0,0],"locked":1,"volatile":1,"border":0,"scale":1},"b":{"type":"button","size":[20,20],
+"pos":[0,0],"script":"on click do\n deck.locked:!deck.locked\n view[]\nend\n","show":"transparent",
+"style":"invisible"},"ims":{"type":"field","size":[100,20],"pos":[154,-5],"locked":1,"show":"none",
+"value":{"text":["","i","i"],"font":["","",""],
+"arg":["","%%IMG0ABAAEAAAP/xAAkPCR+JGYkZiQGJP8k/yT/JP8k/yQAI//AAA",
+"%%IMG0ABAAEAAAP/xAAkACQ8JH4kZiRmJP8k/yT/JP8k/yQAI//AAA"]}}}}}}
+```
+
+
 The Widgets
 ===========
 Let's take a look at each of Decker's widgets in detail.
