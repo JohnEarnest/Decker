@@ -193,6 +193,7 @@ Some properties are common to all widgets:
 - `animated` an integer; if nonzero, this widget will be sent a `view[]` event on each frame (60hz). The default is `0`.
 - `volatile` an integer; if nonzero, this widget does not serialize its _value state_: the `value` attribute of buttons, fields, sliders or grids, the `scroll` attribute of fields or grids, the `row` and `col` attribute of grids, and the image content of a canvas. The default is `0`.
 - `font` a string corresponding to the ID of a _Font Record_, used for drawing any text on this widget.
+- `pattern` an integer pattern index controlling the appearance of the widget. For buttons or compact sliders, defaults to 32; otherwise defaults to 1.
 - `script` a number or string corresponding to a `{script:ID}` chunk, representing event handlers applying to this widget.
 
 Each `type` of widget has its own additional optional fields:
@@ -204,7 +205,6 @@ Each `type` of widget has its own additional optional fields:
 	- `shortcut`: a 0- or 1-character string; a keyboard key which can be used as an alternative to clicking this button to activate it. Shortcuts must be a lowercase letter (`a-z`), a digit (`0-9`), or a space character (` `).
 - `"field"`: Fields are the basic widget for storing information. They can contain "formatted" text or plain user-entered text, and may have a vertical scrollbar. Locked fields may also be useful for labels, headings, or displaying information computed by a script.
 	- `border`: an integer; draw an outline for the field? Default is `1`.
-	- `pattern`: an integer pattern index used for drawing text. Default is `1`.
 	- `scrollbar`: an integer; does this field have a scrollbar? Default is `0`. Note that without a visible scrollbar, it is still possible to scroll a field programmatically, or by dragging a selection.
 	- `style`: one of { `"rich"` (default), `"plain"`, `"code"` }. A `"rich"` field permits entry and editing of formatted text. A `"plain"` field is text-only, with a single font. A `"code"` field is likewise text-only, with some changes in behavior making the field more suitable as a code editor: tabbing does not leave the field, shift+`/` toggles Lil block comments, etc.
 	- `align`: one of { `"left"` (default), `"center"`, `"right"` }.
@@ -225,7 +225,6 @@ Each `type` of widget has its own additional optional fields:
 	- `draggable`: an integer; allow this canvas to be repositioned in interact mode? Default in `0`.
 	- `image`: an _Image Record_.
 	- `brush`: an integer brush-shape index used for drawing. Default is `0`.
-	- `pattern`: an integer pattern index used for drawing. Default is `1`.
 	- `clip`: an array of four numbers giving the x, y, width, and height of the clipping rectangle, respectively. Default is the entire canvas.
 	- `scale`: a float scale-up factor used when drawing the canvas. Default is `1.0`. The logical size of a given canvas is the ceiling of its `size` divided by its `scale`.
 - `"grid"`: Grids display tabular information. The grid may scroll vertically and the user can select a row or cell by clicking. Grids are less flexible than a set of fields, but make it easier to see a lot of information at once. A single-column grid is also a reasonable stand-in for a dropdown or list selector.
@@ -465,3 +464,6 @@ Changelog
 1.59:
 - Relaxed the constraints on `grid.value` to permit any LOVE data in cells, including rich text.
 - Introduced the `corners` property to the `{deck}` section.
+
+1.61:
+- Generalized the `.pattern` property to all widgets.

@@ -164,6 +164,7 @@ b:card.add["button"]
 dattr:()
 dattr.name:    "button1"
 dattr.font:    deck.fonts.menu
+dattr.pattern: 32
 dattr.script:  ""
 dattr.locked:  0
 dattr.animated:0
@@ -179,6 +180,7 @@ on buttonattrs x do
 	r:()
 	r.name:    x.name
 	r.font:    x.font
+	r.pattern: x.pattern
 	r.script:  x.script
 	r.locked:  x.locked
 	r.animated:x.animated
@@ -195,6 +197,7 @@ assert["button default attributes and types" dattr buttonattrs[b]]
 
 dattr.name:     b.name:     "bertram butan"
 dattr.font:     b.font:     deck.fonts.menu
+dattr.pattern:  b.pattern:  5
 dattr.script:   b.script:   "2+3"
 dattr.locked:   b.locked:   1
 dattr.animated: b.animated: 1
@@ -210,6 +213,7 @@ assert["button mutable attributes" dattr buttonattrs[b]]
 
 dattr.name:"23"             b.name: 23
 dattr.font:deck.fonts.body  b.font: "zoop"
+dattr.pattern:0             b.pattern: -99
 dattr.script:"0"            b.script: 0
 dattr.locked:1              b.locked: 99
 dattr.animated:1            b.animated: 37

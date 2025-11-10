@@ -54,7 +54,7 @@ title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","sh
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text":"Index","style":"rect"}
 ex1:{"type":"field","size":[236,139],"pos":[10,45],"border":1,"scrollbar":1,"style":"code","value":"d:insert x y g with\n 10 11 \"A\"\n 15 12 \"B\"\n 23  8 \"A\"\n 19  7 \"A\"\n 12 11 \"B\"\n -9 -2 \"A\"\nend\nplot.scatter[target d]\n\n"}
 try:{"type":"button","size":[60,20],"pos":[252,164],"script":"scatterplot.1","text":"Try It!"}
-target:{"type":"canvas","size":[176,129],"pos":[326,175],"locked":1,"volatile":1,"brush":3,"pattern":13,"scale":1}
+target:{"type":"canvas","size":[176,129],"pos":[326,175],"locked":1,"volatile":1,"pattern":13,"brush":3,"scale":1}
 field2:{"type":"field","size":[250,100],"pos":[252,45],"locked":1,"border":0,"value":{"text":["","plot.scatter[canvas data]","\n\n\"canvas\" is any canvas widget.\n\n\"data\" is a list or table. if it's a list, interpret it as the y axis, with an implicit sequential x axis. if it's a table, look for columns x, y, and g (group). With a \"g\" column, group by that column to form multiple series, which will each be assigned a distinct pattern."],"font":["","mono",""],"arg":["","",""]}}
 ex2:{"type":"field","size":[236,111],"pos":[10,193],"border":1,"scrollbar":1,"style":"code","value":"d:100,115,210,120,93,130\nplot.scatter[target d]"}
 button4:{"type":"button","size":[60,20],"pos":[252,284],"script":"scatterplot.2","text":"Try It!"}
@@ -97,7 +97,7 @@ try:{"type":"button","size":[60,20],"pos":[252,207],"script":"scatterplot.1","te
 field2:{"type":"field","size":[250,100],"pos":[252,45],"locked":1,"border":0,"value":{"text":["","plot.line[canvas data]","\n\n\"canvas\" is any canvas widget.\n\n\"data\" is a list or table. if it's a list, interpret it as the y axis, with an implicit sequential x axis. if it's a table, look for columns x, y, and g (group). With a \"g\" column, group by that column to form multiple series, which will each be assigned a distinct pattern."],"font":["","mono",""],"arg":["","",""]}}
 ex2:{"type":"field","size":[236,70],"pos":[10,234],"border":1,"scrollbar":1,"style":"code","value":"d:100,115,210,120,93,130\nplot.line[target d]"}
 button4:{"type":"button","size":[60,20],"pos":[252,284],"script":"scatterplot.2","text":"Try It!"}
-target:{"type":"canvas","size":[176,129],"pos":[326,175],"locked":1,"volatile":1,"brush":1,"pattern":13,"scale":1}
+target:{"type":"canvas","size":[176,129],"pos":[326,175],"locked":1,"volatile":1,"pattern":13,"brush":1,"scale":1}
 field1:{"type":"field","size":[176,14],"pos":[326,159],"locked":1,"border":0,"align":"center","value":"target"}
 button5:{"type":"button","size":[60,20],"pos":[146,312],"script":"scatterplot.3","text":"Styling","style":"rect"}
 
@@ -180,7 +180,7 @@ button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text"
 ex1:{"type":"field","size":[236,260],"pos":[10,45],"border":1,"scrollbar":1,"style":"code","value":"d:insert x y g with\n 10 11 \"A\"\n 15 12 \"B\"\n 23  8 \"A\"\n 19  7 \"A\"\n 12 11 \"B\"\n -9 -2 \"C\"\nend\nplot.scatter[target d]\n\netc.margin:20\netc.font:\"menu\"\netc.bg:44\netc.bgdata:39\netc.brush:4\netc.stroke:46\netc.fill:33,36,37\n\nplot.scatter[target d etc]"}
 try:{"type":"button","size":[60,20],"pos":[252,285],"script":"scatterplot.1","text":"Try It!"}
 field2:{"type":"field","size":[250,63],"pos":[252,45],"locked":1,"border":0,"value":"An example of a scatter plot with custom styling."}
-target:{"type":"canvas","size":[242,143],"pos":[256,131],"locked":1,"volatile":1,"font":"menu","brush":4,"pattern":37,"scale":1}
+target:{"type":"canvas","size":[242,143],"pos":[256,131],"locked":1,"volatile":1,"font":"menu","pattern":37,"brush":4,"scale":1}
 field1:{"type":"field","size":[242,14],"pos":[256,115],"locked":1,"border":0,"align":"center","value":"target"}
 button4:{"type":"button","size":[60,20],"pos":[146,312],"script":"scatterplotstyle.0","text":"Usage","style":"rect"}
 
@@ -256,7 +256,7 @@ button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.2","text"
 ex1:{"type":"field","size":[236,260],"pos":[10,45],"border":1,"scrollbar":1,"style":"code","value":"etc.margin:20\netc.bg:44\netc.stroke:46\netc.fill:33,35,36\n\nd:2,15,33\n\nplot.pie[target d etc]\n"}
 try:{"type":"button","size":[60,20],"pos":[252,285],"script":"scatterplot.1","text":"Try It!"}
 field2:{"type":"field","size":[250,63],"pos":[252,45],"locked":1,"border":0,"value":"An example of a pie chart with custom styling."}
-target:{"type":"canvas","size":[242,143],"pos":[256,131],"locked":1,"volatile":1,"font":"menu","brush":1,"pattern":46,"scale":1}
+target:{"type":"canvas","size":[242,143],"pos":[256,131],"locked":1,"volatile":1,"font":"menu","pattern":46,"brush":1,"scale":1}
 field1:{"type":"field","size":[242,14],"pos":[256,115],"locked":1,"border":0,"align":"center","value":"target"}
 button4:{"type":"button","size":[60,20],"pos":[146,312],"script":"scatterplotstyle.0","text":"Usage","style":"rect"}
 
@@ -690,7 +690,7 @@ template:"on change do\n \nend"
 attributes:{"name":["options_text"],"label":["Sources"],"type":["code"]}
 {widgets}
 o:{"type":"field","size":[100,20],"pos":[123,1],"show":"none","style":"plain","value":"card"}
-c:{"type":"canvas","size":[100,18],"pos":[0,0],"locked":1,"volatile":1,"show":"transparent","border":0,"pattern":32,"scale":1}
+c:{"type":"canvas","size":[100,18],"pos":[0,0],"locked":1,"volatile":1,"pattern":32,"show":"transparent","border":0,"scale":1}
 i:{"type":"slider","size":[100,25],"pos":[123,32],"show":"none","interval":[0,2]}
 scr:{"type":"field","size":[96,79],"pos":[2,19],"volatile":1,"border":0,"scrollbar":1,"style":"code"}
 

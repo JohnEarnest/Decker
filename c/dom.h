@@ -1616,7 +1616,6 @@ lv* interface_canvas(lv*self,lv*i,lv*x){
 	lv*data=self->b;lv*card=dget(data,lmistr("card")),*deck=dget(card->b,lmistr("deck")),*fonts=dget(deck->b,lmistr("fonts"));
 	if(x){
 		ikey("brush"  ){int n=MAX(0,ln(x));if(lis(x)){int v=dgeti(dget(deck->b,lmistr("brushes")),x);if(v!=-1)n=24+v;}dset(data,i,lmn(n));return x;}
-		ikey("pattern"){int n=CLAMP(0,ln(x),255);dset(data,i,lmn(n));return x;}
 		ikey("font"   ){dset(data,i,normalize_font(fonts,x));return x;}
 		if(!lis(i)    ){return interface_image(container_image(self,1),i,x);}
 		if(dget(data,lmistr("free")))return x;
@@ -1630,7 +1629,6 @@ lv* interface_canvas(lv*self,lv*i,lv*x){
 		ikey("border"   ){lv*r=dget(data,i);return r?r:ONE;}
 		ikey("draggable"){lv*r=dget(data,i);return r?r:ZERO;}
 		ikey("brush"    ){lv*r=dget(data,i);return r?r:ZERO;}
-		ikey("pattern"  ){lv*r=dget(data,i);return r?r:ONE;}
 		ikey("size"     ){lv*r=dget(data,i);return r?r:lmpair((pair){100,100});}
 		ikey("scale"    ){lv*r=dget(data,i);return r?r:lmn(1.0);}
 		ikey("lsize"    ){pair s=getpair(ifield(self,"size"));float z=ln(ifield(self,"scale"));return lmpair((pair){ceil(s.x/z),ceil(s.y/z)});}
@@ -1660,7 +1658,6 @@ lv* canvas_read(lv*x,lv*r){
 	init_field(ri,"border"   ,x);
 	init_field(ri,"draggable",x);
 	init_field(ri,"brush"    ,x);
-	init_field(ri,"pattern"  ,x);
 	init_field(ri,"font"     ,x);
 	return ri;
 }
@@ -1670,7 +1667,6 @@ lv* canvas_write(lv*x){
 	{lv*k=lmistr("image"    ),*v=dget(data,k);if(v&&!is_blank(v)&&!lb(ifield(x,"volatile")))dset(r,k,image_write(v));}
 	{lv*k=lmistr("draggable"),*v=dget(data,k);if(v&&ln(v)!=0)dset(r,k,v);}
 	{lv*k=lmistr("brush"    ),*v=dget(data,k);if(v&&ln(v)!=0)dset(r,k,v);}
-	{lv*k=lmistr("pattern"  ),*v=dget(data,k);if(v&&ln(v)!=1)dset(r,k,v);}
 	{lv*k=lmistr("scale"    ),*v=dget(data,k);if(v)dset(r,k,v);}
 	{lv*k=lmistr("clip"     ),*v=dget(data,k);if(v&&!matchr(v,lmrect((rect){0,0,lsize.x,lsize.y})))dset(r,k,v);}
 	return r;
@@ -1679,13 +1675,14 @@ lv* canvas_write(lv*x){
 // Button interface
 
 enum button_style{button_round,button_rect,button_check,button_invisible,button_radio};
-typedef struct {char*text;rect size;lv*font;int style,show,locked;char shortcut;} button;
+typedef struct {char*text;rect size;lv*font;int pattern,style,show,locked;char shortcut;} button;
 char*button_styles[]={"round","rect","check","invisible",NULL};
 button unpack_button(lv*x){
 	return (button){
 		ifield(x,"text")->sv,
 		rect_pair(getpair(ifield(x,"pos")),getpair(ifield(x,"size"))),
 		ifield(x,"font"),
+		ln(ifield(x,"pattern")),
 		ordinal_enum(ifield(x,"style"),button_styles),
 		ordinal_enum(ifield(x,"show"),widget_shows),
 		lb(ifield(x,"locked")),
@@ -1925,7 +1922,6 @@ lv* interface_field(lv*self,lv*i,lv*x){
 			dset(data,i,rtext_cast(x));field_notify(self);return x;
 		}
 		ikey("border"   ){dset(data,i,lmn(lb(x)));return x;}
-		ikey("pattern"  ){int n=CLAMP(0,ln(x),255);dset(data,i,lmn(n));return x;}
 		ikey("scrollbar"){dset(data,i,lmn(lb(x)));return x;}
 		ikey("style"    ){dset(data,i,normalize_enum(x,field_styles));iwrite(self,lmistr("value"),dget(data,lmistr("value")));return x;}
 		ikey("align"    ){dset(data,i,normalize_enum(x,field_aligns));return x;}
@@ -1937,7 +1933,6 @@ lv* interface_field(lv*self,lv*i,lv*x){
 		ikey("scroll"   ){lv*r=value_inherit(self,i);return r?r:ZERO;}
 		ikey("scrollbar"){lv*r=dget(data,i);return r?r:ZERO;}
 		ikey("border"   ){lv*r=dget(data,i);return r?r:ONE;}
-		ikey("pattern"  ){lv*r=dget(data,i);return r?r:ONE;}
 		ikey("style"    ){lv*r=dget(data,i);return r?r:lmistr(field_styles[0]);}
 		ikey("align"    ){lv*r=dget(data,i);return r?r:lmistr(field_aligns[0]);}
 		ikey("size"     ){lv*r=dget(data,i);return r?r:lmpair((pair){100,20});}
@@ -1953,7 +1948,6 @@ lv* field_read(lv*x,lv*r){
 	x=ld(x),r=lmi(interface_field,lmistr("field"),r);
 	{lv*k=lmistr("value"),*v=dget(x,k);if(v)iwrite(r,k,rtext_read(v));}
 	init_field(r,"border"   ,x);
-	init_field(r,"pattern"  ,x);
 	init_field(r,"scrollbar",x);
 	init_field(r,"style"    ,x);
 	init_field(r,"align"    ,x);
@@ -1963,7 +1957,6 @@ lv* field_read(lv*x,lv*r){
 lv* field_write(lv*x){
 	lv*data=x->b,*r=lmd();dset(r,lmistr("type"),lmistr("field"));int vol=lb(ifield(x,"volatile"));
 	{lv*k=lmistr("border"   ),*v=dget(data,k);if(v)dset(r,k,v);}
-	{lv*k=lmistr("pattern"  ),*v=dget(data,k);if(v&&ln(v)!=1)dset(r,k,v);}
 	{lv*k=lmistr("scrollbar"),*v=dget(data,k);if(v)dset(r,k,v);}
 	{lv*k=lmistr("style"    ),*v=dget(data,k);if(v&&strcmp(field_styles[0],v->sv))dset(r,k,v);}
 	{lv*k=lmistr("align"    ),*v=dget(data,k);if(v&&strcmp(field_aligns[0],v->sv))dset(r,k,v);}
@@ -1975,7 +1968,7 @@ lv* field_write(lv*x){
 // Slider interface
 
 enum slider_style{slider_horiz,slider_vert,slider_bar,slider_compact};
-typedef struct {rect size;lv*font,*format;int show,style,locked;double min,max,step,value;} slider;
+typedef struct {rect size;lv*font,*format;int pattern,show,style,locked;double min,max,step,value;} slider;
 char*slider_styles[]={"horiz","vert","bar","compact",NULL};
 double slider_normalize(fpair interval,double step,double n){double r=round(n/step)*step;return CLAMP(interval.x,r,interval.y);}
 slider unpack_slider(lv*x){
@@ -1984,6 +1977,7 @@ slider unpack_slider(lv*x){
 		rect_pair(getpair(ifield(x,"pos")),getpair(ifield(x,"size"))),
 		ifield(x,"font"),
 		ifield(x,"format"),
+		ln(ifield(x,"pattern")),
 		ordinal_enum(ifield(x,"show"),widget_shows),
 		ordinal_enum(ifield(x,"style"),slider_styles),
 		lb(ifield(x,"locked")),
@@ -2171,7 +2165,7 @@ void contraption_reflow(lv*c){
 }
 lv* interface_contraption(lv*self,lv*i,lv*x){
 	lv*data=self->b;char*masks[]={
-		"name","index","image","script","locked","animated","volatile","pos","show","font","toggle","event","offset","parent",
+		"name","index","image","script","locked","animated","volatile","pos","show","font","pattern","toggle","event","offset","parent",
 		NULL
 	};
 	lv*def=dget(data,lmistr("def"));
@@ -2221,6 +2215,7 @@ lv* contraption_read(lv*x,lv*r){
 
 // Widget interface
 
+int default_pattern(lv*wid){return button_is(wid)||(slider_is(wid)&&matchr(ifield(wid,"style"),lmistr("compact")))?32:1;}
 lv* n_toggle(lv*wid,lv*x){
 	lv*s=x->c<1?lmistr("solid"):x->lv[0], *v=x->c<2?ZERO:x->lv[1], *o=ifield(wid,"show"), *n=lmistr("none");
 	lv*r=(x->c<2?matchr(o,n):(lb(v)&&!matchr(v,n)))?s:n;iwrite(wid,lmistr("show"),r);return r;
@@ -2236,6 +2231,7 @@ lv* interface_widget(lv*self,lv*i,lv*x){
 		}
 		ikey("index"   ){reorder(widgets,dgeti(widgets,name),ln(x));return x;}
 		ikey("font"    ){dset(data,i,normalize_font(fonts,x));return x;}
+		ikey("pattern" ){dset(data,i,lmn(CLAMP(0,ln(x),255)));return x;}
 		ikey("script"  ){dset(data,i,ls(x));return x;}
 		ikey("locked"  ){dset(data,i,lmn(lb(x)));return x;}
 		ikey("animated"){dset(data,i,lmn(lb(x)));return x;}
@@ -2253,6 +2249,7 @@ lv* interface_widget(lv*self,lv*i,lv*x){
 		ikey("pos"     ){lv*r=dget(data,i);return r?r:lmpair((pair){0,0});}
 		ikey("show"    ){lv*r=dget(data,i);return r?r:lmistr(widget_shows[0]);}
 		ikey("font"    ){lv*r=dget(data,i);return r?dget(fonts,r): fonts->lv[button_is(self)?1:0];}
+		ikey("pattern" ){lv*r=dget(data,i);return r?r:lmn(default_pattern(self));}
 		ikey("toggle"  )return lmnat(n_toggle,self);
 		ikey("event"   )return lmnat(n_event,self);
 		ikey("parent"  )return card;
@@ -2277,6 +2274,7 @@ lv* widget_read(lv*x,lv*card){
 	init_field(ri,"size"    ,x);
 	init_field(ri,"script"  ,x);
 	init_field(ri,"font"    ,x);
+	init_field(ri,"pattern" ,x);
 	init_field(ri,"locked"  ,x);
 	init_field(ri,"animated",x);
 	init_field(ri,"volatile",x);
@@ -2296,6 +2294,7 @@ lv* widget_write(lv*x){
 	{lv*k=lmistr("volatile"),*v=dget(data,k);if(v&&lb(v))dset(r,k,v);}
 	{lv*k=lmistr("script"  ),*v=dget(data,k);if(v&&v->c)dset(r,k,v);}
 	{lv*k=lmistr("font"    ),*v=dget(data,k);if(v&&strcmp(button_is(x)?"menu":"body",v->sv))dset(r,k,v);}
+	{lv*k=lmistr("pattern" ),*v=dget(data,k);if(v&&ln(v)!=default_pattern(x))dset(r,k,v);}
 	{lv*k=lmistr("show"    ),*v=dget(data,k);if(v&&strcmp(widget_shows[0],v->sv))dset(r,k,v);}
 	return l_comma(r,button_is(x)?button_write(x): field_is (x)?field_write (x):slider_is(x)?slider_write(x):
 	                 grid_is  (x)?grid_write  (x): canvas_is(x)?canvas_write(x):contraption_is(x)?contraption_write(x): lmd());
@@ -2561,6 +2560,7 @@ lv* interface_prototype(lv*self,lv*i,lv*x){
 		ikey("script"     ){lv*r=dget(data,i);return r?r:lmistr("");}
 		ikey("template"   ){lv*r=dget(data,i);return r?r:lmistr("");}
 		ikey("font"       )return l_first(ifield(ivalue(self,"deck"),"fonts"));
+		ikey("pattern"    )return ONE;
 		ikey("show"       )return lmistr("solid");
 		ikey("parent"     )return ifield(deck,"card");
 		ikey("size"       )return dget(data,i);

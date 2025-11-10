@@ -417,7 +417,7 @@ script:"Canvases.0"
 back:{"type":"button","size":[86,26],"pos":[12,304],"script":"Buttons.0","text":"Back","style":"rect"}
 field1:{"type":"field","size":[286,45],"pos":[123,290],"locked":1,"border":0,"style":"plain","align":"center","value":"Canvases each contain an image.\nBy default, you can scribble on them,\nand with scripting you can use them for input\nor display animations."}
 field2:{"type":"field","size":[272,42],"pos":[114,24],"locked":1,"font":"deckbuilder","border":0,"align":"center","value":"Canvases"}
-four:{"type":"canvas","size":[105,74],"pos":[70,83],"border":1,"brush":16,"pattern":35}
+four:{"type":"canvas","size":[105,74],"pos":[70,83],"pattern":35,"border":1,"brush":16}
 board:{"type":"canvas","size":[96,93],"pos":[143,176],"script":"Canvases.1","show":"invert","image":"%%IMG0AAwADAAAf+BJIEkgTyBJIEkgTyBBIEEgf+AAAA==","scale":8}
 field3:{"type":"field","size":[63,26],"pos":[182,92],"locked":1,"border":0,"style":"plain","value":"a canvas you can draw on"}
 field4:{"type":"field","size":[62,44],"pos":[71,187],"locked":1,"border":0,"style":"plain","value":"a scaled canvas that acts like a pixel editor"}

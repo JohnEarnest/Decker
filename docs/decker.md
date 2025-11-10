@@ -1122,6 +1122,7 @@ The button widget is a clickable button, possibly with a stateful checkbox.
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
+| `x.pattern`             | Int. The pattern used for styling this widget. r/w.                                                   |
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
 | `x.parent`              | The Card, Contraption or Prototype containing this widget.                                            |
 | `x.text`                | String. The label shown on this button. r/w.                                                          |
@@ -1208,6 +1209,7 @@ The slider widget represents a single number, constrained within a configurable 
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
+| `x.pattern`             | Int. The pattern used for styling this widget. r/w.                                                   |
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
 | `x.parent`              | The Card, Contraption or Prototype containing this widget.                                            |
 | `x.value`               | Number. The numeric content of this slider. r/w.                                                      |
@@ -1235,6 +1237,7 @@ The grid widget represents an interactive spreadsheet-style view of a table.
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
+| `x.pattern`             | Int. The pattern used for styling this widget. r/w.                                                   |
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
 | `x.parent`              | The Card, Contraption or Prototype containing this widget.                                            |
 | `x.value`               | The table displayed in this grid. r/w.                                                                |
@@ -1353,6 +1356,7 @@ Contraptions are custom widgets, defined in a [Prototype](#prototypeinterface). 
 | `x.size`                | The `size` of the widget in pixels. r/w.                                                              |
 | `x.show`                | Widget compositing mode; one of {`"solid"`, `"invert"`, `"transparent"`, `"none"`}. r/w.              |
 | `x.font`                | The font used for drawing this widget. Can be set by font name or a font interface. r/w.              |
+| `x.pattern`             | Int. The pattern used for styling this widget. r/w.                                                   |
 | `x.index`               | The ordinal position of this widget on the card, counting from 0. r/w.                                |
 | `x.parent`              | The Card containing this widget.                                                                      |
 | `x.def`                 | The Prototype of this contraption.                                                                    |
@@ -1417,6 +1421,7 @@ Prototypes are definitions from which [Contraptions](#contraptioninterface) are 
 | `x.image`               | An _image_ interface representing the Prototype's background. r/w.                                     |
 | `x.show`                | The string `"solid"`.                                                                                  |
 | `x.font`                | The default font `body`.                                                                               |
+| `x.pattern`             | The default pattern index `1`.                                                                         |
 | `x.parent`              | Equivalent to `deck.card`.                                                                             |
 | `x.resizable`           | Bool. Can instances of this Prototype be resized? r/w.                                                 |
 | `x.margin`              | A list of 4 integers. See below for details. r/w.                                                      |
@@ -1444,7 +1449,7 @@ The `attributes` table provides information about the attributes of contraption 
 | `"code"`       | A Lil string          | Large field in "code" editing mode. |
 | `"rich"`       | An rtext table        | Large field in "rich" editing mode. |
 
-Modifying the attributes of a Prototype will automatically update Contraption instances in the current deck. Modifying the attributes of widgets contained in this Prototype will require explicitly calling `prototype.update[]`. In either case, when a definition is updated, the `name`, `pos`, `show`, `locked`, `animated`, `volatile`, `font`, and `script` attributes of Contraptions will be preserved, as well the `value`, `scroll`, `row`, `col`, and image content of the widgets they contain (as applicable) if they have been modified from their original values in the prototype, but everything else will be regenerated from the definition. The _state_ of contraptions is kept, and the _behavior and appearance_ is changed.
+Modifying the attributes of a Prototype will automatically update Contraption instances in the current deck. Modifying the attributes of widgets contained in this Prototype will require explicitly calling `prototype.update[]`. In either case, when a definition is updated, the `name`, `pos`, `show`, `locked`, `animated`, `volatile`, `font`, `pattern`, and `script` attributes of Contraptions will be preserved, as well the `value`, `scroll`, `row`, `col`, and image content of the widgets they contain (as applicable) if they have been modified from their original values in the prototype, but everything else will be regenerated from the definition. The _state_ of contraptions is kept, and the _behavior and appearance_ is changed.
 
 
 Events

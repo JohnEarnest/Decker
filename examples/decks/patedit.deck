@@ -18,7 +18,7 @@ button5:{"type":"button","size":[30,60],"pos":[215,107],"script":"home.7","show"
 button6:{"type":"button","size":[30,60],"pos":[8,108],"script":"home.8","show":"transparent"}
 button7:{"type":"button","size":[73,31],"pos":[94,228],"script":"home.9","show":"transparent"}
 button8:{"type":"button","size":[73,31],"pos":[89,22],"script":"home.10","show":"transparent"}
-clip:{"type":"canvas","size":[40,40],"pos":[228,35],"locked":1,"script":"home.2","image":"%%IMG0AAgACIgiiCKIIogi","pattern":0,"scale":5}
+clip:{"type":"canvas","size":[40,40],"pos":[228,35],"locked":1,"script":"home.2","pattern":0,"image":"%%IMG0AAgACIgiiCKIIogi","scale":5}
 field1:{"type":"field","size":[230,55],"pos":[271,276],"locked":1,"style":"plain","value":"Note: if you save this deck, you can import the custom patterns into another deck via the Font/DA Mover. Alternatively, you can copy this card directly into your deck, edit the patterns in-place, and delete the card when you're satisfied."}
 button9:{"type":"button","size":[60,20],"pos":[25,286],"script":"home.11","show":"transparent","text":"Flip        "}
 button10:{"type":"button","size":[60,20],"pos":[90,286],"script":"home.12","show":"transparent","text":"Flip        "}

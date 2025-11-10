@@ -301,24 +301,26 @@ unpack_widget=x=>({
 })
 unpack_button=x=>({
 	size    :rpair(getpair(ifield(x,'pos')),getpair(ifield(x,'size'))),
-	text    :ls(ifield(x,'text'  )),
-	font    :   ifield(x,'font'  ) ,
-	style   :ls(ifield(x,'style' )),
-	show    :ls(ifield(x,'show'  )),
-	locked  :lb(ifield(x,'locked')),
+	text    :ls(ifield(x,'text'    )),
+	font    :   ifield(x,'font'    ) ,
+	pattern :ln(ifield(x,'pattern' )),
+	style   :ls(ifield(x,'style'   )),
+	show    :ls(ifield(x,'show'    )),
+	locked  :lb(ifield(x,'locked'  )),
 	shortcut:ls(ifield(x,'shortcut')),
 })
 unpack_slider=x=>({
-	size  :rpair(getpair(ifield(x,'pos')),getpair(ifield(x,'size'))),
-	font  :   ifield(x,'font'  ) ,
-	format:ls(ifield(x,'format')),
-	show  :ls(ifield(x,'show'  )),
-	style :ls(ifield(x,'style' )),
-	locked:lb(ifield(x,'locked')),
-	step  :ln(ifield(x,'step'  )),
-	value :ln(ifield(x,'value' )),
-	min   :getpair(ifield(x,'interval')).x,
-	max   :getpair(ifield(x,'interval')).y,
+	size   :rpair(getpair(ifield(x,'pos')),getpair(ifield(x,'size'))),
+	font   :   ifield(x,'font'   ) ,
+	pattern:ln(ifield(x,'pattern')),
+	format :ls(ifield(x,'format' )),
+	show   :ls(ifield(x,'show'   )),
+	style  :ls(ifield(x,'style'  )),
+	locked :lb(ifield(x,'locked' )),
+	step   :ln(ifield(x,'step'   )),
+	value  :ln(ifield(x,'value'  )),
+	min    :getpair(ifield(x,'interval')).x,
+	max    :getpair(ifield(x,'interval')).y,
 })
 unpack_canvas=x=>({
 	size     :rpair(getpair(ifield(x,'pos')),getpair(ifield(x,'size'))),
@@ -658,7 +660,7 @@ scrollbar=(r,n,line,page,scroll,visible,inverted)=>{
 
 widget_button=(target,x,value,func)=>{
 	const l=x.locked||!in_layer(), pal=deck.patterns.pal.pix, font=x.font||FONT_MENU;let b=x.size
-	const fcol=l?13:x.show=='invert'?32:1, bcol=x.show=='invert'?1:32, scol=x.show=='invert'?32:1
+	const fcol=l?13:x.show=='invert'?x.pattern:1, bcol=x.show=='invert'?1:x.pattern, scol=x.show=='invert'?x.pattern:1
 	const sel=!l&&x.show!='none'&&x.style!='invisible'&&wid.active==wid.count
 	let sh=0,shh=0;if(!l&&uimode=='interact'&&!wid.fv&&!ev.shift&&x.show!='none'&&x.shortcut){if(keyup[x.shortcut]){shh=1}else if(keydown[x.shortcut]){sh=1}}
 	const a=!l&&dover(b)&&over(b), cs=sel&&!func&&ev.action, cl=cs||sh||((ev.md||ev.drag)&&a), cr=cs||shh|(ev.mu&&a)
@@ -667,8 +669,9 @@ widget_button=(target,x,value,func)=>{
 	if(x.show=='none')return 0; let ar=inset(b,2)
 	if(x.style=='round'){
 		draw_boxr(b,fcol,bcol,x.show!='transparent')
-		draw_text_align(inset(b,3),x.text,font,fcol,ALIGN.center)
-		if(sel)draw_box(ar,0,13);if(cl)draw_invert(pal,ar)
+		if(cl)draw_rect(ar,fcol)
+		draw_text_align(inset(b,3),x.text,font,cl?bcol:fcol,ALIGN.center)
+		if(sel)draw_box(ar,0,13)
 	}
 	if(x.style=='rect'){
 		if(cl){b=rect(b.x+1,b.y+1,b.w-1,b.h-1),ar=rect(ar.x+1,ar.y+1,ar.w-1,ar.h-1);if(x.show!='transparent')draw_rect(b,bcol);draw_box(b,0,fcol)}
@@ -682,7 +685,7 @@ widget_button=(target,x,value,func)=>{
 		draw_rect(rect(br.x+1,br.y+1,cdim.x-4,cdim.y-3),bcol)
 		if(x.style=='check'){draw_icon(rect(br.x,br.y),CHECKS[(value^(cl||cr))+2*x.locked],scol)}
 		else{const p=rect(br.x,br.y);draw_icon(p,RADIOS[3],bcol),draw_icon(p,RADIOS[cl||cr?1:0],fcol);if(value)draw_icon(p,RADIOS[2],fcol)}
-		draw_text_fit(to,x.text,font,fcol);ar=to;if(sel)draw_box(rect(to.x-2,to.y-1,to.w+2,to.h+2),0,13);if(cl)draw_invert(pal,ar)
+		if(cl)draw_rect(to,fcol);draw_text_fit(to,x.text,font,cl?bcol:fcol);if(sel)draw_box(rect(to.x-2,to.y-1,to.w+2,to.h+2),0,13)
 	}
 	if(x.style=='invisible'){draw_text_align(inset(b,3),x.text,font,fcol,ALIGN.center);if(cl&&x.show!='transparent')draw_invert(pal,ar)}
 	if(target&&cr)msg.target_click=target
@@ -734,7 +737,9 @@ widget_slider=(target,x)=>{
 	}
 	if(x.style=='compact'){
 		if(x.show=='transparent')draw_rect(rect(b.x+1,b.y+1,13,b.h-2),bcol),draw_rect(rect(b.x+b.w-14,b.y+1,13,b.h-2),bcol)
-		draw_boxr(b,fcol,bcol,x.show!='transparent'),draw_textc(rect(b.x+14,b.y,b.w-28,b.h),t,font,fcol)
+		draw_boxr(b,fcol,bcol,x.show!='transparent')
+		const tr=rect(b.x+14,b.y,b.w-28,b.h), ccol=x.show=='invert'?1:x.pattern
+		draw_rect(rect(tr.x,tr.y+1,tr.w,tr.h-2),ccol),draw_textc(tr,t,font,fcol==ccol?bcol:fcol)
 		const comp_btn=(xo,dir,ba,li,en)=>{
 			const bb=rect(b.x+xo,b.y,14,b.h), a=en&&!l&&over(bb), o=a&&(ev.mu||ev.drag)&&dover(bb)
 			if(o&&ev.md)x.value+=(dir*x.step); if(a)uicursor=cursor.point
@@ -1129,10 +1134,10 @@ handle_widgets=(x,offset)=>{
 	})
 }
 
-ui_button  =(r,label,    enable,func )=>widget_button(null,{text:label,size:r,font:FONT_MENU,style:'round',show:             'solid',locked:!enable},0,func)
-ui_toggle  =(r,label,inv,enable,func )=>widget_button(null,{text:label,size:r,font:FONT_MENU,style:'round',show:inv?'invert':'solid',locked:!enable},0,func)
-ui_radio   =(r,label,    enable,value)=>widget_button(null,{text:label,size:r,font:FONT_BODY,style:'radio',show:             'solid',locked:!enable},value)
-ui_checkbox=(r,label,    enable,value)=>widget_button(null,{text:label,size:r,font:FONT_BODY,style:'check',show:             'solid',locked:!enable},value)
+ui_button  =(r,label,    enable,func )=>widget_button(null,{text:label,size:r,font:FONT_MENU,pattern:32,style:'round',show:             'solid',locked:!enable},0,func)
+ui_toggle  =(r,label,inv,enable,func )=>widget_button(null,{text:label,size:r,font:FONT_MENU,pattern:32,style:'round',show:inv?'invert':'solid',locked:!enable},0,func)
+ui_radio   =(r,label,    enable,value)=>widget_button(null,{text:label,size:r,font:FONT_BODY,pattern:32,style:'radio',show:             'solid',locked:!enable},value)
+ui_checkbox=(r,label,    enable,value)=>widget_button(null,{text:label,size:r,font:FONT_BODY,pattern:32,style:'check',show:             'solid',locked:!enable},value)
 ui_field   =(r,       value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:0,border:1,style:'plain',align:ALIGN.left,locked:0,pattern:1},value)
 ui_dfield  =(r,enable,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:0,border:1,style:'plain',align:ALIGN.left,locked:!enable,pattern:1},value)
 ui_textedit=(r,border,value)=>widget_field(null,{size:r,font:FONT_BODY,show:'solid',scrollbar:1,border  ,style:'plain',align:ALIGN.left,locked:0,pattern:1},value)
@@ -1515,7 +1520,7 @@ modal_exit=value=>{
 		const name=rtext_string(ms.name.table);rename_sound(deck,au.target,name)
 		au.mode='stopped',modal_enter('sounds'),ms.grid.row=dkix(deck.sounds,name);return
 	}
-	if(ms.type=='widpattern'&&value!=-1)ob.sel.map(w=>iwrite(w,lms('pattern'),lmn(value)))
+	if(ms.type=='widpattern'&&value!=-1)ob_edit_prop('pattern',lmn(value))
 	if(ms.subtype=='confirm_new'   &&value)load_deck(deck_read(''))
 	if(ms.subtype=='confirm_script'&&value)finish_script()
 	if(ms.subtype=='multiscript'   &&value)setscript(ob.sel)
@@ -2118,7 +2123,6 @@ modals=_=>{
 		if(ui_radio(rint(rect(ab.x,ab.y,b.w/2,16)),'Align Right',1,align=='right' )){iwrite(f,lms('align'),lms('right' )),mark_dirty()}ab.y+=16
 		const c=rect(b.x,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(f),modal_exit(0);c.x+=65
-		if(ui_button(rect(c.x,c.y,65,20),'Pattern...',1))ob.pending_pattern=p.pattern,modal_push('widpattern')
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
 	}
 	else if(ms.type=='slider_props'){
@@ -3497,7 +3501,6 @@ all_menus=_=>{
 		if(menu_item('New Canvas',1))ob_create([lmd([lms('type')],[lms('canvas')])])
 		if(menu_item('New Grid'  ,1))ob_create([lmd([lms('type')],[lms('grid'  )])])
 		if(card_is(con())&&menu_item('New Contraption...',1))modal_enter('pick_contraption')
-		menu_separator()
 		if(menu_item('Order...'   ,count(ifield(con(),'widgets'))))modal_enter('orderwids')
 		menu_separator()
 		let al=1,aa=1,av=1,as=1,at=1,ai=1,an=1
@@ -3513,7 +3516,8 @@ all_menus=_=>{
 		if(menu_check('Show Inverted'   ,ob.sel.length,ob.sel.length&&ai))ob_edit_prop('show',lms('invert'     ))
 		if(menu_check('Show None'       ,ob.sel.length,ob.sel.length&&an))ob_edit_prop('show',lms('none'       ))
 		menu_separator()
-		if(menu_item('Font...'  ,ob.sel.length))modal_enter('fonts')
+		if(menu_item('Font...',ob.sel.length))modal_enter('fonts')
+		if(menu_item('Pattern...',ob.sel.length)){ob.pending_pattern=ln(ifield(ob.sel[0],'pattern')),modal_enter('widpattern')}
 		if(menu_item('Script...',ob.sel.length)){
 			if(ob.sel.reduce((m,v)=>m&&ob.sel[0].script==v.script,1)){setscript(ob.sel)}else{
 				modal_enter('multiscript')

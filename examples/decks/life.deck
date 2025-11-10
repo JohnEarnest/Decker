@@ -10,7 +10,7 @@ image:"%%IMG2AgABVgD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8
 script:"home.0"
 {widgets}
 field1:{"type":"field","size":[164,20],"pos":[147,44],"locked":1,"font":"menu","show":"invert","border":0,"align":"center","value":"Conway's Game of Life"}
-board:{"type":"canvas","size":[204,195],"pos":[126,106],"script":"home.1","show":"invert","image":"%%IMG0ABoAGWBSCAAATGDABgAFQIcAAAAYgAAAIjY4gIh/AADCfyeACD4wQCIcN0CiCChAEIEhAKyBCYCQYIGAMACcwKAAUIAsdYEATBQpgAoWLQCkQDAApQ+/AMEREYDgKBKAgIAbACZgAEA=","pattern":0,"scale":8}
+board:{"type":"canvas","size":[204,195],"pos":[126,106],"script":"home.1","pattern":0,"show":"invert","image":"%%IMG0ABoAGWBSCAAATGDABgAFQIcAAAAYgAAAIjY4gIh/AADCfyeACD4wQCIcN0CiCChAEIEhAKyBCYCQYIGAMACcwKAAUIAsdYEATBQpgAoWLQCkQDAApQ+/AMEREYDgKBKAgIAbACZgAEA=","scale":8}
 button1:{"type":"button","size":[87,24],"pos":[381,119],"script":"home.2","text":"Clear"}
 button2:{"type":"button","size":[87,24],"pos":[381,150],"script":"home.3","text":"Randomize"}
 button3:{"type":"button","size":[87,24],"pos":[381,203],"script":"home.4","text":"1"}
