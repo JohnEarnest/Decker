@@ -149,16 +149,16 @@ field4:{"type":"field","size":[232,13],"pos":[10,133],"locked":1,"show":"transpa
 
 {module:bn}
 description:"arbitrary-precision arithmetic for natural numbers."
-version:1
+version:1.1
 {script}
 digits:"" split "0123456789"
 names:"%j" parse "[
  'million','billion','trillion','quadrillion','quintillion','sextillion','septillion','octillion',
  'nonillion','decillion','undecillion','duodecillion','tredecillion','quattuordecillion','quindecillion',
  'sexdecillion','septendecillion','octodecillion','novemdecillion','vigintillion','unvigintillion',
- 'duovigintillion','tresvigintillion','quattuor?vigint?illion','quinvigintillion','sesvigintillion',
+ 'duovigintillion','tresvigintillion','quattuorvigintillion','quinvigintillion','sesvigintillion',
  'septemvigintillion','octovigintillion','novemvigintillion','trigintillion','untrigintillion',
- 'duotrigintillion','trestrigintillion','quattuor?trigint?illion','quintrigintillion','sestrigintillion',
+ 'duotrigintillion','trestrigintillion','quattuortrigintillion','quintrigintillion','sestrigintillion',
  'septentrigintillion','octotrigintillion','noventrigintillion','quadragintillion'
 ]"
 
