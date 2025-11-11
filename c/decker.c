@@ -512,7 +512,7 @@ int widget_button(lv*target,button x,int value){
 	}
 	if(x.style==button_check||x.style==button_radio){
 		if(x.show!=show_transparent)draw_rect(b,bcol);
-		pair ts=font_textsize(x.font,x.text), cdim=image_size(x.style==button_check?CHECKS[0]:RADIOS[0]); int bh=MAX(ts.y,cdim.y);
+		pair ts=font_textsize(x.font,x.text), cdim=image_size(x.style==button_check?CHECKS[0]:RADIOS[0]); ts.y=MIN(ts.y,b.h); int bh=MAX(ts.y,cdim.y);
 		rect br={b.x,b.y+((b.h-bh)/2),b.w,bh}, to=box_intersect(b,(rect){br.x+cdim.x,br.y+(br.h-ts.y)/2,b.w-cdim.x,ts.y});
 		draw_rect((rect){br.x+1,br.y+1,cdim.x-4,cdim.y-3},bcol);
 		if(x.style==button_check){draw_icon((pair){br.x,br.y},CHECKS[(value^(cl||cr))+2*x.locked],scol);}

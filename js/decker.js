@@ -182,7 +182,7 @@ draw_text_fit=(r,text,font,pattern)=>{
 		else if(x+font_gw(font,c)>=(r.w-ew)){glyph_push(rect(x,y),ELLIPSIS);while(z<text.length&&text[z]!='\n')z++;x=0;if(z<text.length){y+=fh}else{z--}}
 		else{glyph_push(rect(x,y),c),x+=font_gw(font,c)+font_sw(font)}
 	}
-	let yo=ceil((r.h-(y+fh))/2.0);glyphs.map(g=>{g.pos.x+=r.x,g.pos.y+=yo+r.y,draw_char(g.pos,font,g.c,pattern)})
+	let yo=max(0,ceil((r.h-(y+fh))/2.0));glyphs.map(g=>{g.pos.x+=r.x,g.pos.y+=yo+r.y,draw_char(g.pos,font,g.c,pattern)})
 }
 draw_scaled=(r,image,opaque)=>{
 	if(r.w==0||r.h==0)return;const s=image.size
@@ -680,7 +680,7 @@ widget_button=(target,x,value,func)=>{
 	}
 	if(x.style=='check'||x.style=='radio'){
 		if(x.show!='transparent')draw_rect(b,bcol)
-		const ts=font_textsize(font,x.text), cdim=(x.style=='check'?CHECKS[0]:RADIOS[0]).size, bh=max(ts.y,cdim.y)
+		const ts=font_textsize(font,x.text), cdim=(x.style=='check'?CHECKS[0]:RADIOS[0]).size; ts.y=min(ts.y,b.h); const bh=max(ts.y,cdim.y)
 		const br=rect(b.x,b.y+(0|((b.h-bh)/2)),b.w,bh), to=rclip(b,rect(br.x+cdim.x,0|(br.y+(br.h-ts.y)/2),b.w-cdim.x,ts.y))
 		draw_rect(rect(br.x+1,br.y+1,cdim.x-4,cdim.y-3),bcol)
 		if(x.style=='check'){draw_icon(rect(br.x,br.y),CHECKS[(value^(cl||cr))+2*x.locked],scol)}

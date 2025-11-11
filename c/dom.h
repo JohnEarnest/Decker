@@ -1151,7 +1151,7 @@ void draw_text_fit(rect r,char*text,lv*f,int pattern){
 		else if(x+font_gw(f,c)>=(r.w-ew)){glyph_push((pair){x,y},ELLIPSIS);while(text[z]&&text[z]!='\n')z++;x=0;if(text[z]){y+=fh;}else{z--;}}
 		else{glyph_push((pair){x,y},c),x+=font_gw(f,c)+font_sw(f);}
 	}
-	int yo=ceil((r.h-(y+fh))/2.0);for(int z=0;z<glyph_count;z++){
+	int yo=MAX(0,ceil((r.h-(y+fh))/2.0));for(int z=0;z<glyph_count;z++){
 		glyph g=glyphs[z]; g.pos.x+=r.x,g.pos.y+=yo+r.y;
 		font_each(f,g.c)if(font_gpix(f,g.c,b,a)&&inclip(g.pos.x+b,g.pos.y+a))PIX(g.pos.x+b,g.pos.y+a)=pattern;
 	}
