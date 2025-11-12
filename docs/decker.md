@@ -675,6 +675,7 @@ The _app_ interface exposes control over the Decker application itself. It is av
 | :------------------------- | :---------------------------------------------------------------------------------------------------- |
 | `typeof x`                 | `"app"`                                                                                               |
 | `x.fullscreen`             | Is Decker in fullscreen mode? On write, attempt to switch if possible; may not succeed. (r/w)         |
+| `x.gridsize`               | A `(w,h)` pair giving the current grid overlay dimensions. (r/w)                                      |
 | `x.playing`                | If any audio is currently playing (not counting a background `loop`), `1`. Otherwise, `0`.            |
 | `x.render[x]`              | Draw the visual appearance of card or widget `x` as an Image interface.                               |
 | `x.save[]`                 | Save the current deck, in-place if possible. May prompt the user for a save location.                 |

@@ -1172,8 +1172,10 @@ let audio_playing=0
 interface_app=lmi((self,i,x)=>{
 	if(x&&lis(i)){
 		if(i.v=='fullscreen')return set_fullscreen(lb(x)),x
+		if(i.v=='gridsize'  )return dr.grid_size=rmax(rect(1,1),rint(getpair(x))),x
 	}else if(lis(i)){
 		if(i.v=='fullscreen')return lmn(is_fullscreen())
+		if(i.v=='gridsize'  )return lmpair(dr.grid_size)
 		if(i.v=='playing'   )return lmn(audio_playing)
 		if(i.v=='save'      )return lmnat(_=>((modal_enter&&modal_enter('save_deck'),NIL)))
 		if(i.v=='exit'      )return lmnat(_=>NIL) // does nothing in web-decker

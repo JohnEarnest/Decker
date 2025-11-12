@@ -312,9 +312,11 @@ lv*n_apprender(lv*self,lv*a){(void)self;a=l_first(a);return widget_is(a)?draw_wi
 lv*interface_app(lv*self,lv*i,lv*x){
 	if(x&&lis(i)){
 		ikey("fullscreen"){toggle_fullscreen=windowed!=!lb(x);return x;}
+		ikey("gridsize"  ){dr.grid_size=pair_max((pair){1,1},getpair(x));return x;}
 	}else if(lis(i)){
 		ikey("fullscreen")return lmn(!windowed);
 		ikey("playing"   )return lmn(audio_playing);
+		ikey("gridsize"  )return lmpair(dr.grid_size);
 		ikey("save"      )return lmnat(n_appsave,NULL);
 		ikey("exit"      )return lmnat(n_appexit,NULL);
 		ikey("show"      )return lmnat(n_appshow,NULL);
