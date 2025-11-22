@@ -1617,6 +1617,7 @@ lv* interface_canvas(lv*self,lv*i,lv*x){
 	if(x){
 		ikey("brush"  ){int n=MAX(0,ln(x));if(lis(x)){int v=dgeti(dget(deck->b,lmistr("brushes")),x);if(v!=-1)n=24+v;}dset(data,i,lmn(n));return x;}
 		ikey("font"   ){dset(data,i,normalize_font(fonts,x));return x;}
+		ikey("pattern"){return interface_widget(self,i,x);}
 		if(!lis(i)    ){return interface_image(container_image(self,1),i,x);}
 		if(dget(data,lmistr("free")))return x;
 		ikey("border"   ){dset(data,i,lmn(lb(x)));return x;}

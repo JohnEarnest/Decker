@@ -2326,6 +2326,7 @@ canvas_read=(x,card)=>{
 		if(x){
 			if(ikey(i,'brush'    )){let n=0|max(0,ln(x));if(lis(x)){const v=dkix(self.card.deck.brushes,x);if(v!=-1)n=24+v};return self.brush=n,x}
 			if(ikey(i,'font'     ))return self.font=normalize_font(self.card.deck.fonts,x),x
+			if(ikey(i,'pattern'  ))return interface_widget(self,i,x)
 			if(!lis(i)){const img=container_image(self,1);return img.f(img,i,x)}
 			if(self.free)return x
 			if(ikey(i,'border'   ))return self.border=lb(x),x
