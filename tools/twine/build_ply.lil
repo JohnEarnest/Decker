@@ -5,7 +5,7 @@ template:"{{LIL_INTEPRETER}}" split read["template.html"]
 compiled:"" fuse template[0],lib,template[1]
 
 payload.name       :"Ply"
-payload.version    :"1.0.7"
+payload.version    :"1.0.8"
 payload.author     :"John Earnest"
 payload.description:"A Decker-compatible Story Format"
 payload.url        :"https://beyondloom/decker/ply/"
