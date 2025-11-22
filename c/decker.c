@@ -1667,7 +1667,7 @@ void modals(void){
 		if(ev.mu){
 			if(ms.grid.row!=-1&&gutter!=-1){
 				lv*s=wids->lv[ms.grid.row];int oi=ln(ifield(s,"index"));
-				iwrite(s,lmistr("index"),lmn(gutter>oi?gutter-1:gutter));m=1;object_select(s);
+				iwrite(s,lmistr("index"),lmn(gutter>oi?gutter-1:gutter));m=1;object_select(s);mark_dirty();
 			}ms.grid.row=-1;
 		}
 		else if(ev.drag&&ms.grid.row!=-1){rect r={ev.pos.x-5,ev.pos.y-5,10,10};draw_rect(r,0);draw_box(r,0,1);uicursor=cursor_drag;}
