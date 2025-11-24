@@ -1232,7 +1232,7 @@ pair layout_richtext(lv*deck,lv*table,lv*font,int align,int width){
 	int y=0;for(int i=0,line=0;i<layout_count;i++,line++){
 		int a=i;while(i<(layout_count-1)&&(layout[i+1].pos.y==line))i++;        // find bounds of line
 		int h=0;for(int z=a;z<=i;z++)h=MAX(h,layout[z].pos.h);                  // find height of line
-		int w=(a&&a==i)?0:(layout[i].pos.x+layout[i].pos.w);                    // find width of line
+		int w=layout[i].pos.x+layout[i].pos.w;                                  // find width of line
 		int x=align==align_center?(width-w)/2: align==align_right?(width-w): 0; // justify
 		lines_push((rect){x,y,w,h},(pair){a,i});
 		for(int z=a;z<=i;z++){rect*g=&layout[z].pos;g->y=y+((h-g->h)/2);g->x+=x;}y+=h;

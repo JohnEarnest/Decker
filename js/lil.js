@@ -1384,7 +1384,7 @@ layout_richtext=(deck,table,font,align,width)=>{
 	let y=0;for(let i=0,line=0;i<layout.length;i++,line++){
 		let a=i;while(i<(layout.length-1)&&(layout[i+1].pos.y==line))i++            // find bounds of line
 		let h=0;for(let z=a;z<=i;z++)h=max(h,layout[z].pos.h)                       // find height of line
-		let w=(a&&a==i)?0:(layout[i].pos.x+layout[i].pos.w)                         // find width of line
+		let w=layout[i].pos.x+layout[i].pos.w                                       // find width of line
 		let x=align==ALIGN.center?0|((width-w)/2): align==ALIGN.right?(width-w): 0  // justify
 		lines.push({pos:rect(x,y,w,h),range:rect(a,i)})
 		for(let z=a;z<=i;z++){const g=layout[z].pos;g.y=y+0|((h-g.h)/2);g.x+=x;}y+=h
