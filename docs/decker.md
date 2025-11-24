@@ -139,6 +139,7 @@ Web-Decker has generally the same tools and functionality as Native-Decker, but 
 - Opening or importing files uses the browser's native "Open" dialog instead of Decker's UI.
 - Saving or exporting files _cannot_ display a file browser to choose a destination, so Web-Decker provides a simplified dialog which only prompts for a filename. For similar reasons there is no "Autosave" functionality, and `app.save[]` downloads a copy of the deck instead of saving in-place.
 - Web-Decker does nothing if `app.exit[]` is called.
+- Web-Decker does not respect `app.kiosk` and cannot intercept user attempts to close the browser.
 - Web-Decker sends output from `app.show[]` and `app.print[]` to `console.log()` instead of POSIX _stdout_.
 - Web-Decker always fills the browser window. The toolbars are hidden by default, but can be toggled on (if space is available) from the _Decker_ menu.
 - Web-Decker will always report `sys.platform` as `"web"`, irrespective of the operating system the browser is running on.
@@ -676,6 +677,7 @@ The _app_ interface exposes control over the Decker application itself. It is av
 | `typeof x`                 | `"app"`                                                                                               |
 | `x.fullscreen`             | Is Decker in fullscreen mode? On write, attempt to switch if possible; may not succeed. (r/w)         |
 | `x.gridsize`               | A `(w,h)` pair giving the current grid overlay dimensions. (r/w)                                      |
+| `x.kiosk`                  | Are we in "kiosk mode"? (r/w)                                                                         |
 | `x.playing`                | If any audio is currently playing (not counting a background `loop`), `1`. Otherwise, `0`.            |
 | `x.render[x]`              | Draw the visual appearance of card or widget `x` as an Image interface.                               |
 | `x.save[]`                 | Save the current deck, in-place if possible. May prompt the user for a save location.                 |
@@ -684,6 +686,8 @@ The _app_ interface exposes control over the Decker application itself. It is av
 | `x.print[...x]`            | Display a string `x` to _stdout_.                                                                     |
 
 Note that `app.exit[]` doesn't do anything in Web-Decker. Exposing a button for closing Decker is very handy in locked decks, but you may want to hide or disable it when `sys.platform~"web"`.
+
+In "kiosk mode", Decker will disable the normal behavior of the _Decker &#8594; Quit_ menu item (or its keyboard shortcut); instead, these user actions will send a `quit` event to the active card, offering Lil scripts the opportunity to intercept them. This functionality is intended to make it possible to use Decker to make locked-down displays in public settings where users should not be able to exit the application or to make decks behave more like freestanding applications. Exercise caution with this feature: malformed scripts in a locked deck with this feature enabled can get you into a real pickle! Kiosk mode is not available for Web-Decker.
 
 
 Bits Interface
@@ -1496,6 +1500,7 @@ Events are as follows:
 | contraption | `view`       | None.                                        | The surrounding card is sent a `view` event (see above).       |
 | widget      | `view`       | None.                                        | The surrounding card is active, repeatedly at 60hz.            |
 | card        | `loop`       | Previous _sound interface_ or nil.           | The card is navigated to, or the background loop completes.    |
+| card        | `quit`       | None.                                        | The user attempts to quit Decker while in "kiosk mode".        |
 
 Editing a cell in a grid produces a `changecell` event, which provides an opportunity to parse/validate input, produce side-effects, or cancel applying the change entirely. The `row`, `col`, and `colname` attributes of the target grid (`me`) can be referenced to identify the cell being altered.
 
@@ -1542,6 +1547,10 @@ end
 
 on loop prev do
 	prev
+end
+
+on quit do
+	app.exit[]
 end
 ```
 
@@ -2011,7 +2020,6 @@ When enabled, the _danger_ interface is available as a global constant named `da
 | :-------------------------- | :------------------------------------------------------------------------------------------ |
 | `typeof danger`             | `"danger"`                                                                                  |
 | `danger.env`                | A dictionary of environment variable keys and their string values. Read-only.               |
-| `danger.kiosk`              | Are we in "kiosk mode"? See [Startup](#startup).                                            |
 | `danger.homepath`           | A string containing the path to the user's home directory. Read-only.                       |
 | `danger.dir[path]`          | List the content of a directory as a table of `dir`, `name`, `type`.                        |
 | `danger.path[x y]`          | Canonical path `x` (joined with `y`, if given).                                             |
@@ -2089,20 +2097,12 @@ Native-Decker accepts several other optional CLI flags:
 - `--fullscreen`: Open in fullscreen mode.
 - `--unlock`: Force the deck (if any) to be "unlocked" initially.
 - `--card x`: Open the deck (if any) to a specified card name.
-- `--kiosk`: Enable "kiosk mode".
+- `--kiosk`: Start Decker in "kiosk mode"; see [App Interface](#appinterface).
 
 If a file path is not specified (or you open Decker by double-clicking the application), Decker will next check for the existence of a file named `start.deck` in the same directory as the executable (or on MacOS within the `.app/Resources/` directory of the application bundle), opening it if available. This can be helpful if you wish to build a personal "home deck", or if you wish to distribute your own decks along with a Decker runtime.
 
 If neither an explicit file path nor a `start.deck` is available, Decker will open the built-in "guided tour" deck.
 
-In "kiosk mode", Decker will disable the normal behavior of the _Decker &#8594; Quit_ menu item (or its keyboard shortcut); instead, these user actions will send a `quit` event to the active card, offering Lil scripts the opportunity to intercept them. This functionality is intended to make it possible to use Decker to make locked-down displays in public settings where users should not be able to exit the application. Exercise caution with this feature: malformed scripts in a locked deck with this feature enabled can get you into a real pickle!
-
-The default event handler for `quit` is:
-```lil
-on quit do
- app.exit[]
-end
-```
 
 See Also
 ========

@@ -22,7 +22,7 @@ lv*FONT_BODY,*FONT_MENU,*FONT_MONO,*TOOLS,*ARROWS,*TOOLB,*PLAYING,*ATTRS;
 enum mini_icons {icon_dir,icon_doc,icon_sound,icon_font,icon_app,icon_lil,icon_pat,icon_chek,icon_none};
 enum cursor_styles {cursor_default,cursor_point,cursor_ibeam,cursor_drag};
 int uicursor=0, enable_touch=0, set_touch=0;
-int set_tracing=0, tracing=0, toolbar_scroll=0, toolbars_enable=0;
+int set_tracing=0, tracing=0, toolbar_scroll=0, toolbars_enable=0, kiosk=0;
 #define PROFILE_HIST_SZ 200
 int profiler=0, profiler_ix=0, profiler_hist[PROFILE_HIST_SZ]={0};
 
@@ -314,10 +314,12 @@ lv*interface_app(lv*self,lv*i,lv*x){
 	if(x&&lis(i)){
 		ikey("fullscreen"){toggle_fullscreen=windowed!=!lb(x);return x;}
 		ikey("gridsize"  ){dr.grid_size=pair_max((pair){1,1},getpair(x));return x;}
+		ikey("kiosk"     ){kiosk=lb(x);return x;}
 	}else if(lis(i)){
 		ikey("fullscreen")return lmn(!windowed);
 		ikey("playing"   )return lmn(audio_playing);
 		ikey("gridsize"  )return lmpair(dr.grid_size);
+		ikey("kiosk"     )return lmn(kiosk);
 		ikey("save"      )return lmnat(n_appsave,NULL);
 		ikey("exit"      )return lmnat(n_appexit,NULL);
 		ikey("show"      )return lmnat(n_appshow,NULL);
@@ -4239,7 +4241,7 @@ void tick(lv*env){
 
 void quit(void){
 	if(ms.type!=modal_none)return;
-	if(danger_kiosk){msg.pending_quit=1;return;}
+	if(kiosk){msg.pending_quit=1;return;}
 	if(lb(ifield(deck,"locked"))){should_exit=1;return;}
 	if(autosave&&strlen(document_path)){save_deck(lmcstr(document_path));should_exit=1;return;}
 	if(!dirty){should_exit=1;return;}
@@ -4288,7 +4290,7 @@ int main(int argc,char**argv){
 		if(!strcmp("--fullscreen" ,argv[z])){toggle_fullscreen=1;continue;}
 		if(!strcmp("--unlock"     ,argv[z])){ul=1;continue;}
 		if(!strcmp("--card"       ,argv[z])){if(z<argc-1)startcard=argv[++z];continue;}
-		if(!strcmp("--kiosk"      ,argv[z])){danger_kiosk=1;continue;}
+		if(!strcmp("--kiosk"      ,argv[z])){kiosk=1;continue;}
 		file=argv[z],set_path(argv[z]);
 	}
 	init_interns();
