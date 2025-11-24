@@ -60,6 +60,7 @@ typedef struct {
 	int pending_halt;
 	int pending_view, next_view, overshoot;
 	int pending_loop;
+	int pending_quit;
 	lv* target_click;    fpair arg_click;
 	lv* target_drag;     fpair arg_drag, lastdrag;
 	lv* target_release;  fpair arg_release;
@@ -3621,6 +3622,7 @@ int interpret(void){
 		if(!running()&&pending_popstate){popstate();pending_popstate=0;}
 		lv*a=find_animated();
 		if(msg.pending_halt||pending_popstate){/*suppress other new events until this one finishes*/}
+		else if(msg.pending_quit){fire_event_async(ifield(deck,"card"),lmistr("quit"),lml(0));msg.pending_quit=0;}
 		else if(msg.pending_view){fire_view(con()),msg.pending_view=0;}
 		else if(msg.target_click){
 			lv*arg=grid_is(msg.target_click)?lmn(msg.arg_click.y): canvas_is(msg.target_click)?lmfpair(msg.arg_click): LNIL;
@@ -4237,6 +4239,7 @@ void tick(lv*env){
 
 void quit(void){
 	if(ms.type!=modal_none)return;
+	if(danger_kiosk){msg.pending_quit=1;return;}
 	if(lb(ifield(deck,"locked"))){should_exit=1;return;}
 	if(autosave&&strlen(document_path)){save_deck(lmcstr(document_path));should_exit=1;return;}
 	if(!dirty){should_exit=1;return;}
@@ -4285,6 +4288,7 @@ int main(int argc,char**argv){
 		if(!strcmp("--fullscreen" ,argv[z])){toggle_fullscreen=1;continue;}
 		if(!strcmp("--unlock"     ,argv[z])){ul=1;continue;}
 		if(!strcmp("--card"       ,argv[z])){if(z<argc-1)startcard=argv[++z];continue;}
+		if(!strcmp("--kiosk"      ,argv[z])){danger_kiosk=1;continue;}
 		file=argv[z],set_path(argv[z]);
 	}
 	init_interns();

@@ -2011,6 +2011,7 @@ When enabled, the _danger_ interface is available as a global constant named `da
 | :-------------------------- | :------------------------------------------------------------------------------------------ |
 | `typeof danger`             | `"danger"`                                                                                  |
 | `danger.env`                | A dictionary of environment variable keys and their string values. Read-only.               |
+| `danger.kiosk`              | Are we in "kiosk mode"? See [Startup](#startup).                                            |
 | `danger.homepath`           | A string containing the path to the user's home directory. Read-only.                       |
 | `danger.dir[path]`          | List the content of a directory as a table of `dir`, `name`, `type`.                        |
 | `danger.path[x y]`          | Canonical path `x` (joined with `y`, if given).                                             |
@@ -2088,11 +2089,20 @@ Native-Decker accepts several other optional CLI flags:
 - `--fullscreen`: Open in fullscreen mode.
 - `--unlock`: Force the deck (if any) to be "unlocked" initially.
 - `--card x`: Open the deck (if any) to a specified card name.
+- `--kiosk`: Enable "kiosk mode".
 
 If a file path is not specified (or you open Decker by double-clicking the application), Decker will next check for the existence of a file named `start.deck` in the same directory as the executable (or on MacOS within the `.app/Resources/` directory of the application bundle), opening it if available. This can be helpful if you wish to build a personal "home deck", or if you wish to distribute your own decks along with a Decker runtime.
 
 If neither an explicit file path nor a `start.deck` is available, Decker will open the built-in "guided tour" deck.
 
+In "kiosk mode", Decker will disable the normal behavior of the _Decker &#8594; Quit_ menu item (or its keyboard shortcut); instead, these user actions will send a `quit` event to the active card, offering Lil scripts the opportunity to intercept them. This functionality is intended to make it possible to use Decker to make locked-down displays in public settings where users should not be able to exit the application. Exercise caution with this feature: malformed scripts in a locked deck with this feature enabled can get you into a real pickle!
+
+The default event handler for `quit` is:
+```lil
+on quit do
+ app.exit[]
+end
+```
 
 See Also
 ========
