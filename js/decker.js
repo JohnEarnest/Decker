@@ -1496,6 +1496,11 @@ modal_exit=value=>{
 		const t=table_decode(rtext_string(ms.form0.table),rtext_string(ms.text.table))
 		if(!match(t,ifield(ob.sel[0],'value')))ob_edit_prop('value',t)
 	}
+	if(ms.type=='canvas_props'){
+		const c=ob.sel[0], sn=clamp(0.1,ln(rtext_string(ms.text.table)),16),f=frame,img=ifield(c,'copy').f([])
+		iwrite(c,lms('size'),lmpair(rect(ceil(img.size.x*sn),ceil(img.size.y*sn))))
+		iwrite(c,lms('scale'),lmn(sn)),ifield(c,'paste').f([img]),frame=f
+	}
 	if(ms.type=='contraption_props'){
 		const w=ob.sel[0],a=ifield(w.def,'attributes');tab_get(a,'name').map((n,i)=>{
 			const t=ls(tab_cell(a,'type',i));let v=lmn(attrs[i].bval)
@@ -2156,8 +2161,7 @@ modals=_=>{
 		draw_text(rect(b.x,b.y+42,42,20),'Scale',FONT_MENU,1)
 		ui_field(rect(b.x+42,b.y+20,b.w-42,18),ms.name)
 		ui_field(rect(b.x+42,b.y+40,b.w-42,18),ms.text)
-		iwrite(canvas,lms('name' ),rtext_string(ms.name.table))
-		iwrite(canvas,lms('scale'),rtext_string(ms.text.table)),mark_dirty()
+		iwrite(canvas,lms('name' ),rtext_string(ms.name.table)),mark_dirty()
 		let border=lb(ifield(canvas,'border')),draggable=lb(ifield(canvas,'draggable')),cb=rect(b.x,b.y+50+20)
 		if(ui_checkbox(rect(cb.x,cb.y,b.w,16),'Border'   ,1,border   ))border   ^=1,iwrite(canvas,lms('border'   ),lmn(border   )),mark_dirty();cb.y+=16
 		if(ui_checkbox(rect(cb.x,cb.y,b.w,16),'Draggable',1,draggable))draggable^=1,iwrite(canvas,lms('draggable'),lmn(draggable)),mark_dirty()

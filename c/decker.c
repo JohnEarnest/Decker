@@ -1487,6 +1487,13 @@ void modal_exit(int value){
 		lv*t=table_decode(rtext_all(ms.form0.table),rtext_all(ms.text.table));
 		if(!matchr(t,ifield(g,"value")))ob_edit_prop("value",t);
 	}
+	if(ms.type==modal_canvas_props){
+		lv*c=ob.sel->lv[0];double sn=CLAMP(0.1,ln(rtext_all(ms.text.table)),16);
+		cstate f=frame;lv*img=n_canvas_copy(c,lml(0));pair ls=image_size(img);
+		iwrite(c,lmistr("size"),lmpair((pair){ceil(ls.x*sn),ceil(ls.y*sn)}));
+		iwrite(c,lmistr("scale"),lmn(sn));
+		n_canvas_paste(c,l_list(img));frame=f;
+	}
 	if(ms.type==modal_contraption_props){
 		lv*w=ob.sel->lv[0],*a=ifield(ifield(w,"def"),"attributes");;
 		for(int z=0;z<a->n;z++){
@@ -2112,8 +2119,7 @@ void modals(void){
 		draw_text((rect){b.x,b.y+42,42,20},"Scale",FONT_MENU,1);
 		ui_field((rect){b.x+42,b.y+20,b.w-42,18},&ms.name);
 		ui_field((rect){b.x+42,b.y+40,b.w-42,18},&ms.text);
-		iwrite(canvas,lmistr("name" ),rtext_all(ms.name.table));
-		iwrite(canvas,lmistr("scale"),rtext_all(ms.text.table));mark_dirty();
+		iwrite(canvas,lmistr("name"),rtext_all(ms.name.table));mark_dirty();
 		int border=lb(ifield(canvas,"border")),draggable=lb(ifield(canvas,"draggable"));pair cb={b.x,b.y+50+20};
 		if(ui_checkbox((rect){cb.x,cb.y,b.w,16},"Border"   ,1,border   )){border   ^=1;iwrite(canvas,lmistr("border"   ),lmn(border   )),mark_dirty();}cb.y+=16;
 		if(ui_checkbox((rect){cb.x,cb.y,b.w,16},"Draggable",1,draggable)){draggable^=1;iwrite(canvas,lmistr("draggable"),lmn(draggable)),mark_dirty();}
