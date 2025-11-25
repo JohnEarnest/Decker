@@ -663,20 +663,20 @@ widget_button=(target,x,value,func)=>{
 	const fcol=l?13:x.show=='invert'?x.pattern:1, bcol=x.show=='invert'?1:x.pattern, scol=x.show=='invert'?x.pattern:1
 	const sel=!l&&x.show!='none'&&x.style!='invisible'&&wid.active==wid.count
 	let sh=0,shh=0;if(!l&&uimode=='interact'&&!wid.fv&&!ev.shift&&x.show!='none'&&x.shortcut){if(keyup[x.shortcut]){shh=1}else if(keydown[x.shortcut]){sh=1}}
-	const a=!l&&dover(b)&&over(b), cs=sel&&!func&&ev.action, cl=cs||sh||((ev.md||ev.drag)&&a), cr=cs||shh|(ev.mu&&a)
+	const a=!l&&dover(b)&&over(b), cs=sel&&!func&&ev.action, cl=cs||sh||((ev.md||ev.drag)&&a), cr=cs||shh|(ev.mu&&a), so=x.pattern>=2&&x.pattern<=27
 	if(func&&a){ev.callback=func,ev.callback_rect=rcopy(b)}
 	if(!l&&over(b)&&!ev.drag&&x.show!='none')uicursor=cursor.point
 	if(x.show=='none')return 0; let ar=inset(b,2)
 	if(x.style=='round'){
 		draw_boxr(b,fcol,bcol,x.show!='transparent')
 		if(cl)draw_rect(ar,fcol)
-		draw_text_align(inset(b,3),x.text,font,cl?bcol:fcol,ALIGN.center)
+		draw_text_align(inset(b,3),x.text,font,cl?bcol:fcol,ALIGN.center,so)
 		if(sel)draw_box(ar,0,13)
 	}
 	if(x.style=='rect'){
 		if(cl){b=rect(b.x+1,b.y+1,b.w-1,b.h-1),ar=rect(ar.x+1,ar.y+1,ar.w-1,ar.h-1);if(x.show!='transparent')draw_rect(b,bcol);draw_box(b,0,fcol)}
 		else  {b=rect(b.x  ,b.y  ,b.w-1,b.h-1),ar=rect(ar.x  ,ar.y  ,ar.w-1,ar.h-1);draw_shadow(b,fcol,bcol,x.show!='transparent')}
-		draw_text_align(inset(b,3),x.text,font,fcol,ALIGN.center);if(sel)draw_box(ar,0,13)
+		draw_text_align(inset(b,3),x.text,font,fcol,ALIGN.center,so);if(sel)draw_box(ar,0,13)
 	}
 	if(x.style=='check'||x.style=='radio'){
 		if(x.show!='transparent')draw_rect(b,bcol)
@@ -687,7 +687,7 @@ widget_button=(target,x,value,func)=>{
 		else{const p=rect(br.x,br.y);draw_icon(p,RADIOS[3],bcol),draw_icon(p,RADIOS[cl||cr?1:0],fcol);if(value)draw_icon(p,RADIOS[2],fcol)}
 		if(cl)draw_rect(to,fcol);draw_text_fit(to,x.text,font,cl?bcol:fcol);if(sel)draw_box(rect(to.x-2,to.y-1,to.w+2,to.h+2),0,13)
 	}
-	if(x.style=='invisible'){draw_text_align(inset(b,3),x.text,font,fcol,ALIGN.center);if(cl&&x.show!='transparent')draw_invert(pal,ar)}
+	if(x.style=='invisible'){draw_text_align(inset(b,3),x.text,font,fcol,ALIGN.center,so);if(cl&&x.show!='transparent')draw_invert(pal,ar)}
 	if(target&&cr)msg.target_click=target
 	if(!x.locked&&in_widgets())wid.count++
 	return cr

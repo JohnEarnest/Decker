@@ -1399,17 +1399,25 @@ draw_text_wrap=(r,l,pattern)=>{
 draw_text_rich_raw=(r,l,pattern,opaque)=>{
 	for(let z=0;z<l.layout.length;z++){
 		const g=l.layout[z];if(g.pos.w<1)continue
-		if(g.pos.y+g.pos.h<0||g.pos.y>r.h)continue; g.pos.x+=r.x, g.pos.y+=r.y
+		if(g.pos.y+g.pos.h<0||g.pos.y>r.h)continue
+		g.pos.x+=r.x, g.pos.y+=r.y
 		if(lis(g.arg)&&count(g.arg))draw_hline(g.pos.x,g.pos.x+g.pos.w,g.pos.y+g.pos.h-1,19)
 		if(image_is(g.arg)){image_paste(g.pos,frame.clip,g.arg,frame.image,opaque)}
 		else{draw_char(g.pos,g.font,g.char,g.pat==1?pattern:g.pat)}
+		g.pos.x-=r.x,g.pos.y-=r.y
 	}
 }
 draw_text_rich=(r,l,pattern,opaque)=>{
 	const oc=frame.clip;frame.clip=r;draw_text_rich_raw(r,l,pattern,opaque),frame.clip=oc
 }
-draw_text_align=(r,text,font,pattern,align)=>{
-	const fh=font_h(font),l=layout_plaintext(text,font,align,rect(r.w,max(r.h,fh)))
+draw_text_align=(r,text,font,pattern,align,outline)=>{
+	const fh=font_h(font),l=layout_plaintext(text,font,align,rect(r.w,max(r.h,fh))),c=rcenter(r,l.size),background=pattern==1?32:1
+	if(outline){
+		draw_text_rich_raw(rect(c.x-1,c.y  ,c.w,c.h),l,background,1)
+		draw_text_rich_raw(rect(c.x  ,c.y-1,c.w,c.h),l,background,1)
+		draw_text_rich_raw(rect(c.x+1,c.y  ,c.w,c.h),l,background,1)
+		draw_text_rich_raw(rect(c.x  ,c.y+1,c.w,c.h),l,background,1)
+	}
 	draw_text_rich_raw(rcenter(r,l.size),l,pattern,1)
 }
 draw_9seg=(r,dst,src,m,clip,opaque,pal)=>{

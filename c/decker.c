@@ -501,19 +501,20 @@ int widget_button(lv*target,button x,int value){
 	int sh=0,shh=0;if(!l&&uimode==mode_interact&&!wid.fv&&!ev.shift&&x.show!=show_none&&x.shortcut){
 		if(keyup[(int)x.shortcut]){shh=1;}else if(keydown[(int)x.shortcut]){sh=1;}
 	}
-	int a=!l&&dover(b)&&over(b), cs=(sel&&ev.action), cl=cs||sh||((ev.md||ev.drag)&&a), cr=cs||shh|(ev.mu&&a);
+	int a=!l&&dover(b)&&over(b), cs=(sel&&ev.action), cl=cs||sh||((ev.md||ev.drag)&&a), cr=cs||shh|(ev.mu&&a), so=x.pattern>=2&&x.pattern<=27;
 	if(!l&&over(b)&&!ev.drag&&x.show!=show_none)uicursor=cursor_point;
 	if(x.show==show_none)return 0; rect ar=inset(b,2);
 	if(x.style==button_round){
 		draw_boxr(b,fcol,bcol,x.show!=show_transparent);
 		if(cl)draw_rect(ar,fcol);
-		draw_text_align(inset(b,3),x.text,x.font,cl?bcol:fcol,align_center);
+		draw_text_align(inset(b,3),x.text,x.font,cl?bcol:fcol,align_center,so);
 		if(sel)draw_box(ar,0,13);
 	}
 	if(x.style==button_rect){
 		if(cl){b=(rect){b.x+1,b.y+1,b.w-1,b.h-1},ar=(rect){ar.x+1,ar.y+1,ar.w-1,ar.h-1};if(x.show!=show_transparent)draw_rect(b,bcol);draw_box(b,0,fcol);}
 		else  {b=(rect){b.x  ,b.y  ,b.w-1,b.h-1},ar=(rect){ar.x  ,ar.y  ,ar.w-1,ar.h-1};draw_shadow(b,fcol,bcol,x.show!=show_transparent);}
-		draw_text_align(inset(b,3),x.text,x.font,fcol,align_center);if(sel)draw_box(ar,0,13);
+		draw_text_align(inset(b,3),x.text,x.font,fcol,align_center,so);
+		if(sel)draw_box(ar,0,13);
 	}
 	if(x.style==button_check||x.style==button_radio){
 		if(x.show!=show_transparent)draw_rect(b,bcol);
@@ -527,7 +528,7 @@ int widget_button(lv*target,button x,int value){
 		if(sel)draw_box((rect){to.x-2,to.y-1,to.w+2,to.h+2},0,13);
 	}
 	if(x.style==button_invisible){
-		draw_text_align(inset(b,3),x.text,x.font,fcol,align_center);
+		draw_text_align(inset(b,3),x.text,x.font,fcol,align_center,so);
 		if(cl&&x.show!=show_transparent)draw_invert(pal,ar);
 	}
 	if(target&&cr)msg.target_click=target;
