@@ -3871,7 +3871,7 @@ void all_menus(void){
 			}
 			if(menu_item("Paste into Canvas",has_clip("%%IMG")&&ob.sel->c==1&&canvas_is(ob.sel->lv[0]),'\0')){
 				lv*i=image_read(get_clip());
-				lv*c=ob.sel->lv[0];iwrite(c,lmistr("size"),ifield(i,"size")),dset(c->b,lmistr("image"),i);
+				lv*c=ob.sel->lv[0];iwrite(c,lmistr("lsize"),ifield(i,"size")),dset(c->b,lmistr("image"),i);
 			}
 			menu_separator();
 			if(menu_item("Select All",1,'a')){lv*wids=con_wids();ob.sel->c=0;EACH(z,wids)ll_add(ob.sel,wids->lv[z]);}

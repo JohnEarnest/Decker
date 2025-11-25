@@ -3876,7 +3876,7 @@ cutcard=_=>{const c=ifield(deck,'card');setclipboard(ls(deck_copy(deck,c))),deck
 copycard=_=>{const c=ifield(deck,'card');setclipboard(ls(deck_copy(deck,c)))}
 copywidgetimg=_=>{setclipboard(image_write(draw_widget(ob.sel[0]))),frame=context}
 pasteascanvas=_=>getclipboard(t=>{ob_create([lmd(['type','locked','image','border'].map(lms),[lms('canvas'),ONE,lms(t),ZERO])]),frame=context})
-pasteintocanvas=_=>getclipboard(t=>{const i=image_read(t),c=ob.sel[0];iwrite(c,lms('size'),ifield(i,'size')),c.image=i})
+pasteintocanvas=_=>getclipboard(t=>{const i=image_read(t),c=ob.sel[0];iwrite(c,lms('lsize'),ifield(i,'size')),c.image=i})
 menucut=_=>{const r=docut();if(r)setclipboard(r)}
 menucopy=_=>{const r=docopy();if(r)setclipboard(r)}
 menucopyrich=_=>{setclipboard(rtext_encode(rtext_span(wid.fv.table,wid.cursor)))}
