@@ -191,6 +191,8 @@ drop/take:
 +-------+
 (nil,nil,nil,nil,nil)
 (nil,nil,nil)
+"DEF"
+"AB"
 (11,22,55)
 ("quux","zami")
 ("bar","quux")

@@ -32,7 +32,7 @@ wnum=y=>{
 	return s+('0'+w).replace(/^(0+)(?=[^0])/,'')+('.'+d).replace(/(\.?0+)$/,'')
 }
 mod=(x,y)=>x-y*Math.floor(x/y)
-range=x=>Array.from(Array(x)).map((_,i)=>i)
+range=x=>Array.from(Array(0|x)).map((_,i)=>i)
 tab_get=(t,c)=>t.v.get(c)
 tab_has=(t,c)=>t.v.get(c)!=undefined
 tab_cell=(t,c,i)=>(t.v.get(c)||[])[i]
