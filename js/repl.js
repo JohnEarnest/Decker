@@ -43,6 +43,15 @@ env.local('dir',lmnat(([x])=>{
 		rn.push(lms(name)),rt.push(lms(pt.extname(name)))
 	});return r
 }))
+env.local('import',lmnat(([a])=>{
+	filename=ls(a);if(filename.toLowerCase().endsWith('.deck')||filename.toLowerCase().endsWith('.html')){
+		const d=deck_read(readTextFile(filename))
+		const m=ifield(d,'modules'),r=lmd([],[])
+		ll(monad.keys(m)).forEach(key=>dset(r,key,ifield(dget(m,key),'value')))
+		return r
+	}
+	throw 'nyi'
+}))
 env.local('random',lmnat(n_random))
 env.local('array',lmnat(n_array))
 env.local('image',lmnat(n_image))
