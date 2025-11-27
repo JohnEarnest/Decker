@@ -1411,12 +1411,16 @@ draw_text_rich=(r,l,pattern,opaque)=>{
 	const oc=frame.clip;frame.clip=r;draw_text_rich_raw(r,l,pattern,opaque),frame.clip=oc
 }
 draw_text_align=(r,text,font,pattern,align,outline)=>{
-	const fh=font_h(font),l=layout_plaintext(text,font,align,rect(r.w,max(r.h,fh))),c=rcenter(r,l.size),background=pattern==1?32:1
+	const fh=font_h(font),l=layout_plaintext(text,font,align,rect(r.w,max(r.h,fh))),c=rcenter(r,l.size)
 	if(outline){
-		draw_text_rich_raw(rect(c.x-1,c.y  ,c.w,c.h),l,background,1)
-		draw_text_rich_raw(rect(c.x  ,c.y-1,c.w,c.h),l,background,1)
-		draw_text_rich_raw(rect(c.x+1,c.y  ,c.w,c.h),l,background,1)
-		draw_text_rich_raw(rect(c.x  ,c.y+1,c.w,c.h),l,background,1)
+		draw_text_rich_raw(rect(c.x-1,c.y  ,c.w,c.h),l,outline,1)
+		draw_text_rich_raw(rect(c.x  ,c.y-1,c.w,c.h),l,outline,1)
+		draw_text_rich_raw(rect(c.x+1,c.y  ,c.w,c.h),l,outline,1)
+		draw_text_rich_raw(rect(c.x  ,c.y+1,c.w,c.h),l,outline,1)
+		draw_text_rich_raw(rect(c.x-1,c.y-1,c.w,c.h),l,outline,1)
+		draw_text_rich_raw(rect(c.x-1,c.y+1,c.w,c.h),l,outline,1)
+		draw_text_rich_raw(rect(c.x+1,c.y-1,c.w,c.h),l,outline,1)
+		draw_text_rich_raw(rect(c.x+1,c.y+1,c.w,c.h),l,outline,1)
 	}
 	draw_text_rich_raw(rcenter(r,l.size),l,pattern,1)
 }

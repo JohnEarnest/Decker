@@ -1264,12 +1264,16 @@ void draw_text_rich(rect r,int pattern,int opaque){
 }
 void draw_text_align(rect r,char*text,lv*font,int pattern,int align,int outline){
 	int fh=font_h(font);pair s=layout_plaintext(text,font,align,(pair){r.w,MAX(r.h,fh)});
-	rect c=box_center(r,s);int background=pattern==1?32:1;
+	rect c=box_center(r,s);
 	if(outline){
-		draw_text_rich_raw((rect){c.x-1,c.y  ,c.w,c.h},background,1);
-		draw_text_rich_raw((rect){c.x  ,c.y-1,c.w,c.h},background,1);
-		draw_text_rich_raw((rect){c.x+1,c.y  ,c.w,c.h},background,1);
-		draw_text_rich_raw((rect){c.x  ,c.y+1,c.w,c.h},background,1);
+		draw_text_rich_raw((rect){c.x-1,c.y  ,c.w,c.h},outline,1);
+		draw_text_rich_raw((rect){c.x  ,c.y-1,c.w,c.h},outline,1);
+		draw_text_rich_raw((rect){c.x+1,c.y  ,c.w,c.h},outline,1);
+		draw_text_rich_raw((rect){c.x  ,c.y+1,c.w,c.h},outline,1);
+		draw_text_rich_raw((rect){c.x-1,c.y-1,c.w,c.h},outline,1);
+		draw_text_rich_raw((rect){c.x-1,c.y+1,c.w,c.h},outline,1);
+		draw_text_rich_raw((rect){c.x+1,c.y-1,c.w,c.h},outline,1);
+		draw_text_rich_raw((rect){c.x+1,c.y+1,c.w,c.h},outline,1);
 	}
 	draw_text_rich_raw(c,pattern,1);
 }

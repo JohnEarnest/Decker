@@ -496,7 +496,7 @@ rect scrollbar(rect r,int n,int line,int page,int*scroll,int visible,int inverte
 }
 int widget_button(lv*target,button x,int value){
 	int l=x.locked||!in_layer(); if(!x.font)x.font=FONT_MENU; rect b=x.size; char*pal=patterns_pal(ifield(deck,"patterns"));
-	int fcol=l?13:x.show==show_invert?x.pattern:1, bcol=x.show==show_invert?1:x.pattern, scol=x.show==show_invert?x.pattern:1;
+	int inv=x.show==show_invert, fcol=l?13:inv?x.pattern:1, bcol=inv?1:x.pattern, scol=inv?x.pattern:1;
 	int sel=!l&&x.show!=show_none&&x.style!=button_invisible&&wid.active==wid.count;
 	int sh=0,shh=0;if(!l&&uimode==mode_interact&&!wid.fv&&!ev.shift&&x.show!=show_none&&x.shortcut){
 		if(keyup[(int)x.shortcut]){shh=1;}else if(keydown[(int)x.shortcut]){sh=1;}
@@ -507,13 +507,13 @@ int widget_button(lv*target,button x,int value){
 	if(x.style==button_round){
 		draw_boxr(b,fcol,bcol,x.show!=show_transparent);
 		if(cl)draw_rect(ar,fcol);
-		draw_text_align(inset(b,3),x.text,x.font,cl?bcol:fcol,align_center,so);
+		draw_text_align(inset(b,3),x.text,x.font,!cl?fcol: !so?bcol: inv?1:32,align_center,!so?0: cl?(fcol==1?1:32):(fcol==1?32:1));
 		if(sel)draw_box(ar,0,13);
 	}
 	if(x.style==button_rect){
 		if(cl){b=(rect){b.x+1,b.y+1,b.w-1,b.h-1},ar=(rect){ar.x+1,ar.y+1,ar.w-1,ar.h-1};if(x.show!=show_transparent)draw_rect(b,bcol);draw_box(b,0,fcol);}
 		else  {b=(rect){b.x  ,b.y  ,b.w-1,b.h-1},ar=(rect){ar.x  ,ar.y  ,ar.w-1,ar.h-1};draw_shadow(b,fcol,bcol,x.show!=show_transparent);}
-		draw_text_align(inset(b,3),x.text,x.font,fcol,align_center,so);
+		draw_text_align(inset(b,3),x.text,x.font,fcol,align_center,!so?0: fcol==1?32:1);
 		if(sel)draw_box(ar,0,13);
 	}
 	if(x.style==button_check||x.style==button_radio){
@@ -528,7 +528,7 @@ int widget_button(lv*target,button x,int value){
 		if(sel)draw_box((rect){to.x-2,to.y-1,to.w+2,to.h+2},0,13);
 	}
 	if(x.style==button_invisible){
-		draw_text_align(inset(b,3),x.text,x.font,fcol,align_center,so);
+		draw_text_align(inset(b,3),x.text,x.font,fcol,align_center,!so?0: fcol==1?32:1);
 		if(cl&&x.show!=show_transparent)draw_invert(pal,ar);
 	}
 	if(target&&cr)msg.target_click=target;
