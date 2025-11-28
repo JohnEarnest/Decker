@@ -2701,10 +2701,11 @@ void bg_lasso_preview(void){
 	rect r=ev.drag&&insel?dh:dr.sel_here;pair origin=con_to_screen((pair){0,0});
 	if(dr.fatbits){
 		rect o=dr.sel_start;char*pal=patterns_pal(ifield(deck,"patterns"));
-		pair os=buff_size(dr.omask);
-		for(int a=0;a<os.y;a++)for(int b=0;b<os.x;b++){
-			if(!dr.omask->sv[b+a*os.x])continue;
-			draw_rect(rect_add((rect){(b+o.x)*FAT,(a+o.y)*FAT,FAT,FAT},origin),dr.fill);
+		if(dr.omask){
+			pair os=buff_size(dr.omask);for(int a=0;a<os.y;a++)for(int b=0;b<os.x;b++){
+				if(!dr.omask->sv[b+a*os.x])continue;
+				draw_rect(rect_add((rect){(b+o.x)*FAT,(a+o.y)*FAT,FAT,FAT},origin),dr.fill);
+			}
 		}
 		for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++){
 			if(!dr.mask->sv[b+a*r.w])continue;

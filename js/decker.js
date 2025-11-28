@@ -2561,7 +2561,7 @@ bg_lasso_preview=_=>{
 	const o=dr.sel_start, anim=deck.patterns.anim, pal=deck.patterns.pal.pix
 	const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][(0|(frame_count/4))%max(1,anim[pix-28].length)]
 	const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
-	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
+	if(dr.omask)for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
 		if(!dr.omask.pix[b+a*dr.omask.size.x])continue
 		draw_rect(radd(rmul(rect(b+o.x,a+o.y,1,1),dr.zoom),origin),dr.fill)
 	}
