@@ -3393,6 +3393,7 @@ void rtoolbar(pair pos,pair dn){
 // Input and Events
 
 void event_quit(void){
+	if(kiosk){msg.pending_quit=1;return;}
 	if(lb(ifield(deck,"locked")))should_exit=1;
 	ev.shortcuts['q']=1;
 }
