@@ -10,11 +10,12 @@ image:"%%IMG2AgABVhMBAQIAAQEBAAEBAQABAQESAwEBEgIAAQEBAAEBAQABAQEAAQEBAAEBAQABAQE
 script:"Listing.0"
 {widgets}
 options:{"type":"grid","size":[111,298],"pos":[12,29],"volatile":1,"script":"Listing.1","font":"menu","show":"invert","scrollbar":1,"headers":0,"lines":0}
-descript:{"type":"field","size":[170,25],"pos":[325,148],"style":"plain","value":"Spinning star-shaped zoom-in."}
+descript:{"type":"field","size":[170,25],"pos":[325,148],"style":"plain"}
 button1:{"type":"button","size":[82,24],"pos":[325,177],"script":"Listing.2","text":"Preview","style":"rect"}
 button2:{"type":"button","size":[83,24],"pos":[412,177],"script":"Listing.3","text":"Fullscreen","style":"rect"}
 preview:{"type":"canvas","size":[170,114],"pos":[325,30],"image":"%%IMG0AKoAcgAAAAAAAAAAAAAAAAAAAAAAAAAAEUAAAAAAAAAAAAAAAAAAAAAAAAAAABVAAAAAAAAAAAAAAAAAAAAAAAAAAABVQAAAAAAAAAAAAAAAAAAAAAAAAAAAFEAAAAAAAAAAAAAAAAAAAAAAAAAAABVAAAAAAAAAAAAAAAAAAAAAAAAAAABUQAAAAAAAAAAAAAAAAAAAAAAAAAAfVUAAAAAAAAAAAAAAAAAAAAAAAAAAP1UAAAAAAAAAAAAAAAAAAAAAAAAAAF9VQAAAAAAAAAAAAAAAAAAAAAAAAAAfVQAAAAAAAAAAAAAAAAAAAAAAAAAAH0FAAAAAAAAAAAAAAAAAAAAAAAAAAB8RQAAAAAAAAAAAAAAAAAAAAAAAAABfUUAAAAAAAAAAAAAAAAAAAAAAAAAAX1FAAAAAAAAAAAAAAAAAAAAAAAAAAF9UQAAAAAAAAAAAAAAAAAAAAAAAAAFfVQAAAAAAAAAAAAAAAAAAAAAAAAABH1VAAAAAAAAAAAAAAAAAAAAAAAAAAV8FQAAAAAAAAAAAAAAAAAAAAAAAAAVfBUAAAAAAAAAAAAAAAAAAAAAAAAAFX0HAAAAAAAAAAAAAAAAAAAAAAAAABX9XwAAAAAAAAAAAAAAAAAAAAAAAAAVef8AAAAAAAAAAAAAAAAAAAAAAAAAVX//AAAAAAAAAAAAAAAAAAAAAAAAflV//wAAAAAAAAAAAAAAAAAAAAAAAP9X//8AAAAAAAAAAAAAAAAAAAAAAAD/k//7AAAAAAAAAAAAAAAAAAAAAAAA/B///wAAAAAAAAAAAAAAAAAAAAAAAXz//u8DAAAAAAAAAAAAAAAAAAAAABX/////AQAAAAAAAAAAAAAAAAAAAABV//+7/wOAAAAAAAAAAAAAAAAAAAAABX////8BQAAAAAAAAAAAAAAAAAAAAAB/7v//A+AAAAAAAAAAAAAAAAAAAAAAf////wFAAAAAAAAAAAAAAAAAAAAAAHu///8DwAAAAAAAAAAAAAAAAAAAAAD////fAQAAAAAAAAAAAAAAAAAAAAAC7///3wMAAAAAAAAAAAAAAAAAAAAAA///998BAAAAAAAAAAAAAAAAAAAAAAP///ffAwKqooAAAAAAAAAAAAAAAAAD///33wEAAAAAAAAAAAAAAAAAAAAAAf//998DCqqqoAAAAAAAAAAAAAAAAAH///ffAQAAAAAAAAAAAAAAAAAAAAAB///33wMKqoqgAAAAAAAAAAAAAAAAAf//998BAAAAAAAAAAAAAAAKgAAAAAP///ffA8qqqqAAAAAAAAAAH4AAAAAD///33wFgAAAAAAAAAAAAACqAAAAAA///998DwKCgIAAAAAAAAAA/wAAAAAH///ffAUAAAAAAAAAAAAAAKoAAAAAB///33wPKqqqoAAAAAAAAAH/AAAAAA///998BYAAAAAAAAAAAAAAqgAAAAAP///ffA+qqqqgAAAAAAAAA/8AAAAAD///33wEAAAAAAAAAAAAAAKqAAAAAAP//9/8DKqqqqAAAAAAAAAD/wAAAAAH/////AQAAAAAAAAAAAAAAqoAAAAAB/////wMqqqqoAAAAAAAAAf/AAAAAAf////8BAAAAAAAAAAAAAAKqgAAAAAD/////AyqqqqgAAAAAAAAD/8AAAAAB/////wEAAAAAAAAAAAAAAqqAAAAAAf////8DaqqqqABcAAAAAAP/wAAAAAH/////AUAAAAAEBAAAAAACqoAAAAAA/////wOqqqqoBdwAAAAAA//AAAAAAf////8BQAAAAAd0AAAAAACqgAAAAAP//7u7A+qqqqgAxAAAAAAA//4AAAAP/////wFIiIiIiHcAAAAAAKqqqqqq7u7v//8D4AhAOA/dAAAAAALv/5JJN///////A0iIiIiJdoB3d3dgqqiCGAO5/////wPhbBAGAZwAABAAAu/xEkAH//////8ByP4CQQGMf574H+DhxgIQP/7/////A////////////////////////////wF3d3d3d3d3d3d3e7u7u7u7u/////8C////////////////////////////Af/////////////////////+/////wL///////////////////////////8Bd3d3d3d3d3d3d3u7u7u7u7v/////Av///////////////////////////wH////////QD/wF/A////////////8C////////wAfwA/AH////////////AX///////wAD4APwA//////7/////wL///////8AA8AB4AH///////////8B////////AAHAAcAA/////+//////Av///////wABwAHwAf///////////wF///////8AAcAB4AG///////////8C////////IAHAAeAB////////////Af///////wABwAHAAO///////////wL///////8AA8AD8AH///////////8Bf///////AAHAAeAB//////v/////Av///////yAh4CHhAf///////////wH///////8AAcAB4ADv//////////8C////////AgPCA/AR////////////AX///////wABwAHAAT6qrUAX/////wLv7v6q//8gIaAh4QH/////V/////8BVd3d3c3dAAAgAGAAru7u7uh/////Av//vv///wIDwgPwEfX////93////wF3dHF3dAAAAUABQAK4Oyq7urd///8C/+uq/vquoCf6I/lffVX////9V///AUFVVUFAAABRUBVIAKqqqqru7u3//wKq/+qq//qqv/ur////////////H/8BVVVVVVAABVVVVUAAqqqqqru7u9v/A////////+v////9///////////3/wFVVVVVVVVVVVQVSqqqqqqqquru7f8D//////////////////////////9/AVVVVVVVVVVVVVVKqqqqqqqqq7u7VQP///////////////////////////UBVVVVVVVVVVVVVUqqqqgAAAKqrq7uA//////////////////8EBAT/////wFUAAAAAAAAAAAAAAAAAAAAACqru7sAICAgICAgICAgICEBAQEBAQE/////AAAAAAAAAAAAAAAAAAAAAAAAAqru7gICAgICAgICAgICEBAQEBAQEBP///8AAAAAAAAAAAAAAAAAAAAAAAAACru7ACAgICAgICAgICAhAQEBAQEBAR///wAAAAAAAAAAAAAAAAAAAAAAAAAAquoCAgICAgICAgICAhAQEBAQEBAQEf//AAAAAAAAAAAAAAAAAAAAAAAAAAAKqwA==","scale":1}
 field1:{"type":"field","size":[237,25],"pos":[259,302],"show":"invert","style":"plain","align":"center","value":"import the \"PublicTransit\" module from this deck in order to use these transitions in your own projects!"}
+version:{"type":"field","size":[27,14],"pos":[133,313],"volatile":1,"show":"invert"}
 
 {script:Listing.0}
 
@@ -39,6 +40,7 @@ end
 on view do
  options.value:table keys PublicTransit.descs
  descript.text:PublicTransit.descs[options.rowvalue.value]
+ version.text:"v%0.1f" format deck.modules.PublicTransit.version
 end
 {end}
 
@@ -69,7 +71,7 @@ image:"%%IMG0AgABVgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 {module:PublicTransit}
 description:"Fancy transition animations"
-version:1.2
+version:1.3
 {data}
 dissolveLut:%%IMG1ACAAIE89euIjSGos8HDHDdaH0cTJI1FA4vxarzRTKlUc0N/Az4L8n7UcRCOz68jQ5bwirLO5ymT7VnFa7t3owcHH1cqgoe6SHc4uD3FLVSFBA+RGwQf9ROaTpLZZwFhZhDyTLlt7vyk4AoXn62MWR2jQbwRzFIHNHxlBRAj11jfi9pE29hm9KMYyqAVzUvNLBQ6QWv6nsobtztFugL4AHnxgrdCst32fmiwEDEq95NMtX/gg5w/0S+kSnztUJJhDOverTrq4h+R8G727VJH1Y4SqxSJXntWPre+I+Tay8eCdZULeLyeNZ4oB+6qMGD5u9YKucjH/zh4/zjE3t07rtnf82TF4/qMqAGfSPol2+TmbYy+dm54J4OY0xt30/d6CGVfYmBNgeFdSzHSkakxejZF72l7YrMsxxUDsIdQfF20ZIZbTM8anpEMOgwcEg+Cwi5hZNRrjcCVFtEl6GMIAbzvxqadk+qmqINLbjn5P6gq9nhhyhP9GJ+GTg8heKTd716IoH4bfKNSJeruxCMXMy9qQ7SSxivNrNtcQ6EyNujoGyunVUFIWTTBS90qhd/tOw4s8llGwbIo/p668h25riz/fIFb0CZ3DLAUScmqlbn0vAjaAEdwQc6FV/2Od8ZAJsekhxzq23ZUCXBOxMpQOz5Sv+l+XTCdxFoDMeiYNs4zvLplNCxx1z3g34UZbK6AfXfIUvDP+QQPCviJiKYGW8qM/pjmjZlsi3aUjqqtrmdt2dMMBvvMy1xqvB03s2ZlsjR11JjAAnIHgm2hsVlMqmtLECew+6Vz0k5wISHk9ZmGgFVg4uOOJXefEK1SXRTVHPXnz44lwhUOM2i0r+ECfuxT2TxuBdUHw/8sKuX5RIHdkiFFthZLshFneWPrZBrSUmBOI8fJ42ciuGgN9PG9LosqPmpTNA0TNaD3jzGlCCySM644qCuV/4dM1DjUVoAbkAZB7XEAe20YPt8IMdFsmR3nuv+JtZsn+pl+b/HwHGLU5YsVOLr+yCklQUMumWjuha3Y4nF4RYSy62w1igwEmzSu5aXEbkkh+FXkXz/ALx8n4T+1W5gZ3ZRbGGm/DAoXlZkIUZ2moEIZgjxDTVSf5akWClhK8Qn/cubTyHWSj0V0esqi3qEdcZd52VJ71lzTh2KXClabvc1NMsDuKjtSZ+q0TbPvwKNEzUyR8OTNp3Fd/SSWIujSpLWiXSffnMLjSuHQbF3+OYg2tYQxDpFDWyTgR6C0SlZwwqSX2rqt93Iea7+q23wVF7fi+v+qLSl8EPPclZ/nWStew1di7s+gdtGUIMnI+5nAptZHayMAvTToLD3Wi5Y9dlRX9rKLA6mHBkhyAtX6GYKuvxKUXbUj97hEMWNQ=
 noiseLut:%%IMG1AEAAQBMgNERUX2hyfH2LiIaFipObkZGepa+no5uIjomGhoePhnVjVVNhcXl2fI6LfH+GiX9lY2R4gH5/dXh+hH6NkpQTKDlIWVptdX1+f4iHhouPkJKXoKCgpaKSjY6OiYCHf351a2ZYYG94cn+CgoWEhHt0bWpre4B8e3t5en2BiIqLFiZDVFphc4CEeHl9jZOTlY+RkpSOmKCimY+Oi4eCg3l0bGtpY2lwcG50c3aCh4Z0a2tucXyAgoV+cHJ/fn92dRcnRVpkcX6Hh3t6fJGampyTjomGgI6Xn56UlI+Ig4F6dG1tamdoaWZfZ2tzgoiKe25pb3R6fYGEfG1ue3Z3a2caKzxVc4KHgICEhoeXn6Gimol8eHl/hZGenaOelIyMhXZuamZhX2BdTVtreICEjIx/cHZ5dXV2dXVzcnVxcmZfICo6VHWHkYiEiY6VoKaprJx/c3lvdXeHn6eqqZ6Smo9yZWFbWVtXTD5TaHZ5goSTi3iAgHp7e3N4dnJ0eGpgXR0sQVt2hpOXlpOeoZ+dnZuRgHNxanJ2hJqpoaWekZ2Te29rYFtSTEdGSV9weHaGjImEfHyAhYV1dHdwaW1tYVocMUpea3mHoamjsK6jm5KHh4F4dnZ0eIicoqGfnJeVkIJ3b1pQRkE9QklVYGtwfYeMioOOlZaRi396dG1vdGhdJTNJWWFqfZysr7izpZmMeXl5dnZ7d3qHmZyhn6KjnJqKeGhURkI/Oj5JTVFZYXOFkZORn6elnJmMg315fHxtYDQ2RlReYXuTqLaysKiai3JtcXFudXx+h5eeoKOprKqrlHhcUERKST47RkVFTlRwhpedn6mxsKmmmYaAhI2BdGUyPEVNWWV3kqizsry0noZ9bm1vb3N+f4aWm6ioq6ysqpd7WkhHUE4/PDk+RFBSZn+Xp7Cvr6uor5aAgJCXjoNuLz5ETFxmg5iora21s6KOhHlubHB5dn2JlpKWmZ+mrKGLcVZPQ0lMR0BBTE5QV2yGm6itqK2qpKObgX6QjIyDcS41Q1NpcYWVoaeqq6idlJaCb298hIGJjomBhoqMjZCIgnJcU1BMTUo9RlRXWFpthZutsq2inJ+flX97io6MhHQwNElec3uIkpeXmpebmpiejnh3h4qKkJGEd3t+e3d1dHdxYlhcWVhUR1BdX15hdImcrLOvoZqdnI58d4GIhn90MTpVaniAiYyKhoWAiI+XnpuDf5GNkpWTg3B0d3JrZm1ycmleX2ZmZWVjYmBfan2Rn6GmpaSfl5KIgHt6d3duaik8WW57eX9+enl3eHV+lJ6XiIeTnZuakXZrb25iVFVaaXJrY2FmanJzb2BhcHuCmamnm6WooJKRj4+HfHp7bWRASFtobXR6dWxgYWNseoyVj4aGkJOSi4Z9cmhpYFBDT1tjZGtpaGpze3tsZmt0hJehnaSjnZiVi5OZlYl9hIR+VFRVYHB3dHRsWUxYaXV6hImOjomIiX13cmlnaFpBO0BFTl5kZmNnb3F5fHx6dYGUn56koJqWl5qbmZeSkZeYjV1dV15uc29waFVKVWFqcXmEjo6FgYV/e3ZoZmZXPTs7PURVXmFeZG5xeoKFgnyFlZ+ho6GdmJihnZuamZufnZFdY2FjZWRnZl5OU1NVXm1wgIuMhHqGkJKKcmZfUkREQD9DT2FfWV9sd32DhYB/ipSdpKGkpqGdpZyZmZiWmpqRUl9sc3BfXWFdUFBPVF1pfICAgICFjJSTiHxsVEhOUEtBQUtfWFhfaGpzgYqIfIyeqKaZnKmpo6mgnp2Xm5uaj1tiaWtlX19bWFdSVl1jbH57e3x5d3+LkZB9c2NYVk1HRUdOXVleZWpzdHuBgHyOnaCXm5qem5iUoZyco6OamY5QWGVsaFthZWReUllrc3iFfnt5dHV6houOg3trX1lcVlNRT1BcXmh4f3R0eX2Ei6Cik5OMiYaGiY+SlaCgmY6CSVBfaWhcZm9uZVxhcnp+hIN+enZ4eISJioZ8cmtocmlgV1FPXWBtgYZ7eH2Ci46dmYWEe3h2d3x9gISPkIp/dktJT1pfYG58em1wb3N3eniGf3yDgnuChoKDc3V3f4t7Z1lRVVtrfIyNi4WIkpufmIl1d25ubW5wcG1vd3lwa2dMQEdUXmttiZCDgnt5enyCfXx6f3x8eHx9fX57e4meiG5cT05dcoSVm5KTlpmhpZOCc2xncHJvaWtiYmheY1VWREVHVWh2g5KUiY+FgoB+fHlybnN2bXB1eH+HgYaWoJKIeGJXaX6PmpKZk5WjoKSYiHNnbHFsZXBlW1dXU1dWWUdFTmB0hpSXmJaYkJOQiYF7bmlsZWVeY3iBioiRnZ+hoY1saHGGlJSMlZiaoaCkmYlxY2Jra2hnZmFaUE1aY2hAQUxgeYmanaCfm5iblIiCeGplZl5hV1dsdIGHmKapq6uWdW94jJmWkpuhoaWjo5iIcGRha29uaGliWVBPXGRsKjpGXH6JnKaropqdnI+Ag3RpZGFeYV9cXWN1hZytsqmmlYByf46anaCrq6mupp+MfWtmZW5wb2tjVE1SVVdaZiEuRl12h5qlqqKakpWOg3N0cWldXGlpZGFdb4egr7WuoY1/e3+ElauzsaensqaegXFoY2JvdXZrXlFLTUxOV2YpPE9jfIaTnKKdmpaUin91bWJdYWNkXVtlYHSGna6xp52Ognh6hpWhoqKhoqeinoh2bG1mc3l1b2hZUE1LUFpmSVBVY3yBioiPlZeTlY+Fd2lZUVRUVFNYa3GCjJqlq52XjX10eYOLkZCRkY+KiYmNhXt+cXB5hH92aVxPSVFgaV1dXGR4e4WCiZOXkpiVjH9xXU9LSEpRW299houSlp2Pjo2GfYCBgYGAgoJ+dXh6hYF7f3N0gI+If3BfTkhRX2diYmJlam5/ipScpZiamZSMgm1aSkJKWGNyhYKGioyViYmRlYqGfnd2eHt8eGlqcXJubXJxgI6VjYJuXFFPV11jaGlnYlxlcJCgpq+dk5aimY56ZVBIUWNueIiMgn2Ci4WOl5SIhn1zbW11eHhsZmJnam51eIqUlpOBbV9dWVZcYXFycWtgZ3iIkJaelpibnpWNfGlXUV1pc32Dfn18foWCi5CLhX15cWheYW1zbmpzd3yBfnuIkpuhlXdkYF9jZGZxd3p5bm5zfIKHkI6XmZWPgnJnZWNla3JwbXR7fXt3dYKHio2GeGpZTVhpdYGIlJiWi4aFiJChnpR/cmxrcmtnZ294fnh2eX6ChoqHj5CNjIFxaWxra25xbWdyeX17d3d/hIiGgXJjU0paa3uOmaSnpJaTkpCSnZWPhH99gIV8dFVbb3yDhY+Qj4uEfYCCiZGKdGlpam9sbXBvdXZ4fISEgYGAbWxnXldWZ3OCj5yhoqOjpKGdlo2Eh42QkZWXkohLWWx8jZWgn5aBfHx6f5CJgnRsZ2hxaGRpcGxsdIaSjIWAcmVnZVxaYWt+kJeip6anra6lo5yNe4SSm6Kbo5WHUmNteISOkY+Lg4GAgICFg4F5cGlrcHN0dHl2dHuOlomCf3ZnZ2JbXVZmcIKSlJ6qr66lq6OYjo+RlpqbmJaQhGBrdoGEi4yHgoODf4OFgHZ8fnhza3Z4fH96eXqBkZOMeXFramZaUUxHUWJ0hJKdsrarpamrpJ+gnZ2emJmOhHxeaXSCh4qMiIKAe3t/gn96gH94cmdyeIGJh4SFiZOVj3puZmhhVUtHSUtcbn2Rmq+1rKqusq2qp6OgoZ2fkYmES1pjcoGBiZCKe214fYCFkY+FeWlhZHF/jJuTkpCTnJGCd25sX1FKS1ZPWWt8kZekrbCuuLm0sKekmZulqJyalkBHWmp2iIyViW9pbn6HjpWOhXpoaWBneI6jmpWUnaGfi4B+d21XUFdZU2N2hJCfpKmurLC2tK6eopqbpbOyophMR1FgcISFiH9xaXeDjZiYk4N4cm1mc4STnaGZlJaVlI+IgW9yaWJeZWdmcoWXmKGqsrGvrailpKShqbq4uK6jUUhRXGd2fXpzbGZyg5CZkpB9cnJ5eHqCipGQkY+LhYyYlIFxd319fHZ3cnqPoJudoquyqZiUoa+orrnEzca1pFNMTFFXZG1ubWxncIOSnZiXhXp6foB8f4KJg4eIhIKJl5WGfX6Lj46Jh4CEkKCbmZqip5+Oi5yqpa27ytbNtJ5ZVUVAS11cY2tydHN6ip6qpJSLi4OFgYKBhH+Cg4aOj46PjIyElJiRlpOPjIqWlpWXnZiZk5Kamp+gsc7Wz62UVlNGQ05eW19mcHx3c4SlvamhlYqSi4SAeYGAgoeUkZGMkJKKj5GUlY6Uj4yOjJCUkZCRmJaUlZOVm6/M2tO1mVxWTEZIWl5kbn18foGRq7SumIuNjIp7en58fYCBh4mOiouMhYiQlJWTmJWRjY2NkJOXkpqbmZeRkJmsxs7Bp5JSVVBNT1ZgbnmEhY+WoKuro4+Fi4+OgoB/fHt+goeFi4qKioGBio+UlI+Gg4mMkIiMlpWbopyOiY6aqry+saSZUllWVlldaXmHk5afo6eqppyMhYyQjYSEhIGDhIiQjZCQjoiAgIiMkY6Gf32AgImFi5SYm6OZh4WLmKWvrqegnFtfXF1jbHSAkaGgqq+vqaCXjoiLiYJ8go6RmY+QlZOUmpSFgoWPkY6GgomEdGx4iZGNkpWakYeIj52mpqKlpKRbVE5UZXGEgpCkqKy4s6CalpGNjol/goqWnZ+alouMj5eThoKJm52NgIeHfWdaYnqHhYuSjYWJjJCYoaWnoq2xUk1WXmNsgI+anKKotLGkn5ublYuEhICDkJiQiIiKlJiSjoyGiJOWko6IioBqWF1wfX1ydH56dH2Pl56hnaCmqTpCUVlYXXSSoJ6jq7Gwsa6lnZSJhIKIjI+OhXuBkpeTj42Fg4yQkI+Mi4uEeWlmY2RiYmdwb3F9iJKan6Cdl5crM0RQUlhuj6GhoKmxsbOxqpyOgnx6goeKhn91eouRjY+QiouRkZCOi4+Sj4V3b2NaUVJcZGZvf4aSm6KknpWQJSQ3SFNaboicopmer7CqqqubiXpwcXJ3gYB/dnZ4gYmRl5uflo2Ki42Tn52Rh3tuYExFUVdbaoCGk5+rqqKbkhMdMERYYnWBjpWep7CxsrKklIJ1cW1oa3d/fHp6cm+BjZObpJaNj5WTmKqnl5aIeGlWSUpUWWN5iJCdrKWnn5YZIjdJWGd3h5SXmaWopairnJGGf3lycHJ1hYB6fHt3fIqNio+PjJGblJ+pppaAd3VpUkVLUldkfImTnqqjoJaLKzVOXGJ2g5Ogn5uen5iVmJCFf392d3d6eXh0c3Z3dnl9fHV5gIuTn5mcm5R+cW5xalhGT1tiaXODk52ioJ+Th0ROZG1teYSVoZ6Yl5SIgISBeXh9dHd2enp5dnN1dnN2d3JqaG59hpGOkI2FcGdpbmxjUVxmbHF3hJSbnJ6cjYE=
@@ -159,6 +161,10 @@ transition[on StretchDown    c a b t do c.paste[a] c.paste[b (       0    ,  0),
 transition[on StretchUp      c a b t do c.paste[a] c.paste[b (c.size*0    ,1-t),(0,1)+b.size*1,t] end]
 transition[on StretchRight   c a b t do c.paste[a] c.paste[b (       0    ,  0),      b.size*t,1] end]
 transition[on StretchLeft    c a b t do c.paste[a] c.paste[b (c.size*(1-t),  0),(1,0)+b.size*t,1] end]
+transition[on RotateDown     c a b t do c.paste[a (c.size*0,t),c.size*   1,1-t ] c.paste[b (       0    ,  0),      c.size*1,t] end]
+transition[on RotateUp       c a b t do c.paste[a (       0,0),c.size*   1,1-t ] c.paste[b (c.size*0    ,1-t),(0,1)+c.size*1,t] end]
+transition[on RotateRight    c a b t do c.paste[a (c.size*t,0),c.size*(1-t),1  ] c.paste[b (       0    ,  0),      c.size*t,1] end]
+transition[on RotateLeft     c a b t do c.paste[a (       0,0),c.size*(1-t),1  ] c.paste[b (c.size*(1-t),  0),(1,0)+c.size*t,1] end]
 transition[on BarnDoorIn     c a b t do BarnHoriz[c a b 0~t   t] end]
 transition[on BarnDoorOut    c a b t do BarnHoriz[c b a 0~t 1-t] end]
 transition[on BlinkIn        c a b t do BarnVert [c a b 0~t   t] end]
@@ -168,6 +174,31 @@ transition[on SlitVertOut    c a b t do c.rect[(c.size/2,0)-((1-t)*c.size/2,0) (
 transition[on SlitHorizIn    c a b t do c.rect[(c.size/0,2)-(   t *c.size/0,2) (c.size*1,   t )] c.merge[a b] end]
 transition[on SlitHorizOut   c a b t do c.rect[(c.size/0,2)-((1-t)*c.size/0,2) (c.size*1,(1-t))] c.merge[b a] end]
 
+transition[on PageUp c a b t do
+ c.rect[0,0 c.size*1,.5].merge[b a]
+ if t<.5 i:t*2    c.paste[a.copy[c.size*0,.5 c.size*1,.5] (0,0,0,1)+(0,.5,1,(.5*1-i))*c.size]
+ else    i:2*t-.5 c.paste[b.copy[c.size*0, 0 c.size*1,.5] (0,0,0,1)+(0,(.5*1-i),1,(.5*i))*c.size]
+ end
+end]
+transition[on PageDown c a b t do
+ c.rect[0,0 c.size*1,.5].merge[a b]
+ if t<.5 i:t*2    c.paste[a.copy[c.size*0,.0 c.size*1,.5] (0,0,0,1)+(0,(.5*i),1,(.5*1-i))*c.size]
+ else    i:2*t-.5 c.paste[b.copy[c.size*0,.5 c.size*1,.5] (0,0,0,1)+(0,.5,1,(.5*i))*c.size]
+ end
+end]
+transition[on PageRight c a b t do
+ c.rect[0,0 c.size*.5,1].merge[a b]
+ if t<.5 i:t*2    c.paste[a.copy[c.size*.0,0 c.size*.5,1] (0,0,1,0)+((.5*i),0,(.5*1-i),1)*c.size]
+ else    i:2*t-.5 c.paste[b.copy[c.size*.5,0 c.size*.5,1] (0,0,1,0)+(.5,0,(.5*i),1)*c.size]
+ end
+end]
+transition[on PageLeft c a b t do
+ c.rect[0,0 c.size*.5,1].merge[b a]
+ if t<.5 i:t*2    c.paste[a.copy[c.size*.5,0 c.size*.5,1] (0,0,1,0)+(.5,0,(.5*1-i),1)*c.size]
+ else    i:2*t-.5 c.paste[b.copy[c.size* 0,0 c.size*.5,1] (0,0,1,0)+((.5*1-i),0,(.5*i),1)*c.size]
+ end
+end]
+
 transition[on Wink c a b t do
  s:if t<.5 c.paste[a] t else c.paste[b] 1-t end
  c.rect[       0,0 c.size*1, s]
@@ -175,6 +206,10 @@ transition[on Wink c a b t do
 end]
 
 module.descs:raze insert k v with
+ "PageDown"       "Stretch the source and destination like flipping a book page down."
+ "PageUp"         "Stretch the source and destination like flipping a book page up."
+ "PageRight"      "Stretch the source and destination like flipping a book page right."
+ "PageLeft"       "Stretch the source and destination like flipping a book page left."
  "Dissolve"       "A randomized dissolve."
  "Melt"           "A smoothed noise dissolve."
  "BlindsVert"     "Vertical Venetian blinds."
@@ -195,6 +230,10 @@ module.descs:raze insert k v with
  "StretchUp"      "Stretch the destination in from the bottom edge."
  "StretchRight"   "Stretch the destination in from the left edge."
  "StretchLeft"    "Stretch the destination in from the right edge."
+ "RotateDown"     "Stretch the source and destination like rotating a cube down."
+ "RotateUp"       "Stretch the source and destination like rotating a cube up."
+ "RotateRight"    "Stretch the source and destination like rotating a cube right."
+ "RotateLeft"     "Stretch the source and destination like rotating a cube left."
  "Wink"           "Vertical squint to black, then unsquint to destination."
  "BarnDoorIn"     "Slide left and right halves apart vertically."
  "BarnDoorOut"    "Slide left and right halves together vertically."
