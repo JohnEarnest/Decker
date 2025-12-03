@@ -1978,9 +1978,9 @@ rtext_append=(tab,t,f,a,p)=>{
 	else{tv.push(t),fv.push(f),av.push(a),pv.push(p)}return count(t)
 }
 rtext_appendr=(tab,row)=>{fv=tab_get(row,'font'),av=tab_get(row,'arg'),pv=tab_get(row,'pat');tab_get(row,'text').map((t,i)=>rtext_append(tab,t,fv[i],av[i],pv[i]))}
-rtext_string=(tab,pos)=>{
+rtext_string=(tab,pos,preserve_images)=>{
 	pos=pos||rect(0,RTEXT_END);let r='',i=0,a=min(pos.x,pos.y),b=max(pos.x,pos.y),g=tab_get(tab,'arg')
-	tab_get(tab,'text').map((s,ix)=>{const img=image_is(g[ix]);for(let z=0;z<s.v.length;z++,i++)if(!img&&i>=a&&i<b)r+=s.v[z]});return lms(r)
+	tab_get(tab,'text').map((s,ix)=>{const img=(!preserve_images)&&image_is(g[ix]);for(let z=0;z<s.v.length;z++,i++)if(!img&&i>=a&&i<b)r+=s.v[z]});return lms(r)
 }
 rtext_is_plain=x=>{
 	if(!lit(x))return 0;const tv=tab_get(x,'text'),fv=tab_get(x,'font'),av=tab_get(x,'arg'),pv=tab_get(x,'pat');
@@ -2037,17 +2037,17 @@ interface_rtext=lmi((self,i,x)=>{
 	if(ikey(i,'make'  ))return lmnat(([t,f,a,p])=>rtext_make(t,f,a,p))
 	if(ikey(i,'len'   ))return lmnat(([t])=>lmn(rtext_len(rtext_cast(t))))
 	if(ikey(i,'get'   ))return lmnat(([t,n])=>lmn(rtext_get(rtext_cast(t),n?ln(n):0)))
-	if(ikey(i,'string'))return lmnat(([t,i])=>rtext_string(rtext_cast(t),i?getpair(i):undefined))
+	if(ikey(i,'string'))return lmnat(([t,i,p])=>rtext_string(rtext_cast(t),i?getpair(i):undefined,p&&lb(p)))
 	if(ikey(i,'span'  ))return lmnat(([t,i])=>rtext_span  (rtext_cast(t),i?getpair(i):undefined))
 	if(ikey(i,'cat'   ))return lmnat(rtext_cat)
 	if(ikey(i,'split' ))return lmnat(([x,y])=>{
-		const d=ls(x),v=rtext_cast(y),t=ls(rtext_string(v)),r=lml([]);if(d.length<1||!x||!y)return r
+		const d=ls(x),v=rtext_cast(y),t=ls(rtext_string(v,null,true)),r=lml([]);if(d.length<1||!x||!y)return r
 		let n=0;for(let z=0;z<t.length;z++){
 			let m=1;for(let w=0;w<d.length;w++)if(d[w]!=t[z+w]){m=0;break}if(m){r.v.push(rtext_span(v,rect(n,z))),z+=d.length-1,n=z+1}
 		}if(n<=t.length)r.v.push(rtext_span(v,rect(n,t.length)));return r
 	})
 	if(ikey(i,'replace'))return lmnat(([tab,k,v,i])=>{
-		if(!k||!v)return tab||NIL;const t=rtext_cast(tab),r=[],tx=ls(rtext_string(t)),nocase=i&&lb(i),text=nocase?tx.toLowerCase():tx,c=rect(0,0)
+		if(!k||!v)return tab||NIL;const t=rtext_cast(tab),r=[],tx=ls(rtext_string(t,null,true)),nocase=i&&lb(i),text=nocase?tx.toLowerCase():tx,c=rect(0,0)
 		if(!lil(k))k=monad.list(k);if(!lil(v))v=monad.list(v)
 		k=dyad.take(lmn(max(count(k),count(v))),k),k.v=k.v.map(nocase?x=>ls(x).toLowerCase():ls)
 		v=dyad.take(lmn(max(count(k),count(v))),v),v.v=v.v.map(rtext_cast)
@@ -2059,7 +2059,7 @@ interface_rtext=lmi((self,i,x)=>{
 		}if(c.x<text.length)r.push(rtext_span(t,rect(c.x,RTEXT_END)));return rtext_cat(r)
 	})
 	if(ikey(i,'find'))return lmnat(([tab,k,i])=>{
-		const r=[];if(!tab||!k)return lml(r);const nocase=i&&lb(i),tx=ls(rtext_string(rtext_cast(tab))),text=nocase?tx.toLowerCase():tx
+		const r=[];if(!tab||!k)return lml(r);const nocase=i&&lb(i),tx=ls(rtext_string(rtext_cast(tab),null,true)),text=nocase?tx.toLowerCase():tx
 		k=lil(k)?ll(k):[k];k=k.map(x=>nocase?ls(x).toLowerCase(): ls(x))
 		for(let x=0;x<text.length;){
 			let any=0;for(let ki=0;ki<k.length;ki++){
@@ -2069,7 +2069,7 @@ interface_rtext=lmi((self,i,x)=>{
 		}return lml(r)
 	})
 	if(ikey(i,'index'))return lmnat(([tab,g])=>{
-		if(!tab)return ZERO;let r=0;const t=ls(rtext_string(rtext_cast(tab)));g=g?rint(getpair(g)):rect()
+		if(!tab)return ZERO;let r=0;const t=ls(rtext_string(rtext_cast(tab),null,true));g=g?rint(getpair(g)):rect()
 		while(r<t.length&&g.x>0)if(t[r++]=='\n')g.x--;while(r<t.length&&g.y>0&&t[r]!='\n'){g.y--,r++};return lmn(r)
 	})
 	return x?x:NIL

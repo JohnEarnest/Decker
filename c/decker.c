@@ -947,7 +947,7 @@ void field_keys(int code,int shift){
 	if(code==KEY_BACKSPACE){field_edit(lmistr(""),lmistr(""),1,"",s?wid.cursor:(pair){wid.cursor.y-1,wid.cursor.y});}
 	if(code==KEY_DELETE   ){field_edit(lmistr(""),lmistr(""),1,"",s?wid.cursor:(pair){wid.cursor.y,wid.cursor.y+1});}
 	if(code==KEY_RETURN){
-		if(shift&&wid.ft){field_change();msg.target_run=wid.ft,msg.arg_run=rtext_string(wid.fv->table,s?wid.cursor:(pair){0,RTEXT_END});}
+		if(shift&&wid.ft){field_change();msg.target_run=wid.ft,msg.arg_run=rtext_string(wid.fv->table,s?wid.cursor:(pair){0,RTEXT_END},1);}
 		else{
 			int i=0;if(wid.f.style==field_code){pair s=field_sel_lines();while(s.x<layout_count&&layout[s.x].c==' ')i++,s.x++;}
 			char tmp[4096];snprintf(tmp,sizeof(tmp),"%-*s",i+1,"\n");field_input(tmp);
@@ -3685,7 +3685,7 @@ void text_edit_menu(void){
 	if(menu_item("Undo",wid.hist_cursor>0          ,'z'))field_undo();
 	if(menu_item("Redo",wid.hist_cursor<wid.hist->c,'Z'))field_redo();
 	menu_separator();
-	if(menu_item("Cut",selection,'x')){set_clip(rtext_string(wid.fv->table,wid.cursor));field_keys(KEY_DELETE,0);}
+	if(menu_item("Cut",selection,'x')){set_clip(rtext_string(wid.fv->table,wid.cursor,1));field_keys(KEY_DELETE,0);}
 	if(menu_item("Copy",selection,'c')){
 		lv*s=rtext_span(wid.fv->table,wid.cursor),*i=rtext_is_image(s);
 		set_clip((i?image_write(i):rtext_all(s)));

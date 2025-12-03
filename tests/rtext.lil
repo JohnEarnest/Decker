@@ -47,6 +47,7 @@ show[rtext.cat[insert text pat with "a" -1 "b" 5 "c" 256 end]] # clamp bogus pat
 show[rtext.string[rt1 4,19]]
 show[rtext.string[rt3]]
 show[rtext.string[rt3 5,9]]
+show[rtext.string[rt3 5,9 1]]                # preserve inline image text(!)
 
 show[rtext.span[rt1 8,12]]                   # onechunk
 show[rtext.span[rt1 4,19]]                   # multichunk
@@ -69,6 +70,7 @@ show[rtext.split["" d1]]
 show[first rtext.split["not present" d1]]
 print["--d1--"] each v in rtext.split["|" d1] show[v] end
 print["--d2--"] each v in rtext.split["\n\n" d2] show[v] end
+print["--d3--"] each v in rtext.split["f" rt3] show[v] end
 
 norm:select text font arg pat from rt1
 show[rt1~rtext.replace[rt1]]                             # bogus args
@@ -81,6 +83,7 @@ show[rtext.replace[rt1 ("Hello","about") "?!?"]]         # multiple keys, one va
 show[rtext.replace[rt1 ("Hello","about") ("{A}","{B}")]] # multiple keys, multiple values
 show[rtext.replace[rt1 "about" rtext.make["ABOUT" "menu" "http://about.com"]]] # rtext replacement
 show[rtext.replace["Some some somE none" "some" "Q" 1]]  # case-insensitive
+show[rtext.replace[rt3 "aft" "AFT"]]                     # inline images present
 
 show[rtext.find[]]                                        # bogus args 1
 show[rtext.find[rt1]]                                     # bogus args 2
@@ -93,3 +96,4 @@ show[rtext.find["one two one three one" ("two","three")]] # multiple keys
 show[rtext.find["one a two A A three a" "a" 0]]           # case-sensitive
 show[rtext.find["one a two A A three a" "a" 1]]           # case-insensitive
 show[rtext.find["aaaaaa" "aaa"]]                          # matches don't overlap
+show[rtext.find[rt3 "aft"]]                               # inline images present

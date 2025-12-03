@@ -741,12 +741,14 @@ The _rtext_ interface contains a number of helper routines for building and mani
 | `rtext.len[table]`              | The number of character positions in the text content of `table`.                 |
 | `rtext.get[table x]`            | The row number of `table` containing character position `x`, or -1.               |
 | `rtext.index[table (l,c)]`      | The character position of line `l` and column `c` of the text content of `table`. |
-| `rtext.string[table (x,y)]`     | The text content of `table` between character positions `x` and `y`.              |
+| `rtext.string[table (x,y) f]`   | The text content of `table` between character positions `x` and `y`.              |
 | `rtext.span[table (x,y)]`       | An rtext subtable containing content between character positions `x` and `y`.     |
 | `rtext.split[delim table]`      | Break an rtext into a list of tables at instances of a delimiter string `delim`.  |
 | `rtext.replace[table x y i]`    | Replace every instance in `table` of `x` with `y`. If `i`, ignore case.           |
 | `rtext.find[table x i]`         | Find every instance in `table` of `x`. If `i`, ignore case.                       |
 | `rtext.cat[...x]`               | Concatenate rtext tables sequentially. Accepts any number of arguments.           |
+
+If the third argument to `rtext.string[table (x,y) f]` is truthy, it will preserve the `text` data associated with inline images; normally this text is stripped. Preserving this `text` data may be desirable to retain a correspondence between character positions in the converted string and character positions in the rtext table.
 
 Dictionary arguments to `rtext.cat[]` are promoted to tables, Image interfaces are turned into inline image spans, and any other arguments which are not already tables will be interpreted as strings and converted to text runs as by `rtext.make[x "" ""]`. Thus, with a single argument, `rtext.cat[]` can be used to _cast_ values to properly formed rtext tables. Sequential rows with matching `font`, `pat`, and (non-image) `arg` values will be coalesced together, and rows with empty `text` spans will be dropped.
 
