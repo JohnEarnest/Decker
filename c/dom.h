@@ -2320,7 +2320,7 @@ lv* widget_write(lv*x){
 lv* interface_keystore(lv*self,lv*i,lv*x){
 	i=ls(i);ikey("keys")return l_keys(self->b);
 	if(x){
-		lv*f=lmistr("%J");x=l_parse(f,l_format(f,x));
+		lv*f=lmistr("%J");x=l_parse(f,l_format(f,l_list(x)));
 		if(linil(x)){self->b=l_drop(i,self->b);}else{dset(self->b,i,x);}return x;
 	}else{return dgetv(self->b,i);}
 }

@@ -1466,7 +1466,7 @@ keystore_read=x=>{
 	return {f:(self,i,x)=>{
 		i=ls(i);if(i=='keys')return monad.keys(self.data)
 		if(x){
-			const f=lms('%J'),val=dyad.parse(f,dyad.format(f,x))
+			const f=lms('%J'),val=dyad.parse(f,dyad.format(f,lml([x])))
 			if(linil(val)){self.data=dyad.drop(lms(i),self.data)}else{dset(self.data,lms(i),val)}
 			return x
 		}else{return dget(self.data,lms(i))||NIL}
