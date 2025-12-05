@@ -572,7 +572,7 @@ lv* pjson(char*t,int*i,int*f,int*n){
 	if(jm('"' )){str r=str_new();while(jc()&&!(jm('"' ))){char tmp=(jm('\\'))?esc(jn(),i,t,n):jn();if(tmp)str_addc(&r,tmp);}return lmstr(r);}
 	if(jm('\'')){str r=str_new();while(jc()&&!(jm('\''))){char tmp=(jm('\\'))?esc(jn(),i,t,n):jn();if(tmp)str_addc(&r,tmp);}return lmstr(r);}
 	int ns=*i;jm('-');jd();jm('.');jd();if(jm('e')||jm('E')){jm('-')||jm('+');jd();}if(*i<=ns){*f=0;return LNIL;}
-	char tb[NUM];snprintf(tb,MIN(*i-ns+1,NUM),"%s",t+ns);return lmn(atof(tb));
+	char tb[NUM];int nl=MIN(*i-ns,NUM);memcpy(tb,t+ns,nl);tb[nl]='\0';return lmn(atof(tb));
 }
 lv* plove(char*t,int*i,int*f,int*n){
 	if(jm('[')){lv*r=lml(0);while(jc()){js();if(jm(']'))break;ll_add(r,plove(t,i,f,n));js();jm(',');}return r;}
