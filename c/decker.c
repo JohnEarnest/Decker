@@ -1573,7 +1573,7 @@ void modal_exit(int value){
 	if(ms.subtype==modal_confirm_new&&value)load_deck(deck_get(lmistr(""))),set_path("");
 	if(ms.subtype==modal_confirm_script&&value)finish_script();
 	if(ms.subtype==modal_multiscript&&value)setscript(l_drop(ZERO,ob.sel));
-	if(ms.subtype==modal_alert_lil  ){arg();ret(ONE);}
+	if(ms.subtype==modal_alert_lil  ){arg();ret(lmn(value));}
 	if(ms.subtype==modal_confirm_lil){arg();ret(lmn(value));}
 	if(ms.subtype==modal_input_lil  ){arg();ret(rtext_all(ms.text.table));}
 	if(ms.subtype==modal_choose_lil ){arg();ret(ms.verb->lv[ms.grid.row]);}
