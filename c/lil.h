@@ -1181,7 +1181,7 @@ void runop(void){
 		}
 		case CALL:case TAIL:{lv*a=arg(),*f=arg();docall(f,a,op==TAIL);break;}
 		case BIND:{
-			lv*f=arg();str n=str_new();str_addz(&n,f->sv);MAP(a,f)f->lv[z];
+			lv*f=arg();str n=str_new();str_addz(&n,f->sv),str_term(&n);MAP(a,f)f->lv[z];
 			lv*r=lmon(n,a,f->b);r->env=ev(),env_local(ev(),lmcstr(r->sv),r),ret(r);break;
 		}
 		case ITER:{lv*x=arg();ret(lil(x)?x:ld(x));ret(lid(x)?lmd():lml(0));break;}
