@@ -1249,33 +1249,33 @@ void draw_text_wrap(rect r,int pattern){
 		font_each(g.font,g.c)if(font_gpix(g.font,g.c,b,a)&&inclip(g.pos.x+b,g.pos.y+a))PIX(g.pos.x+b,g.pos.y+a)=gc;
 	}frame.clip=oc;
 }
-void draw_text_rich_raw(rect r,int pattern,int opaque){
+void draw_text_rich_raw(rect r,int pattern,int opaque,lv*alink){
 	for(int z=0;z<layout_count;z++){
 		glyph_box g=layout[z];if(g.pos.w<1)continue; // skip squashed spaces/newlines
 		if(g.pos.y+g.pos.h<0||g.pos.y>r.h)continue; g.pos.x+=r.x, g.pos.y+=r.y; // coarse clip
 		int gc=g.pat==1?pattern:g.pat;
-		if(lis(g.arg)&&g.arg->c){draw_hline(g.pos.x,g.pos.x+g.pos.w,g.pos.y+g.pos.h-1,19);}
+		if(lis(g.arg)&&g.arg->c){draw_hline(g.pos.x,g.pos.x+g.pos.w,g.pos.y+g.pos.h-1,alink==g.arg?pattern:19);}
 		if(image_is(g.arg)){buffer_paste(g.pos,frame.clip,g.arg->b,frame.buffer,opaque);}
 		else{font_each(g.font,g.c)if(font_gpix(g.font,g.c,b,a)&&inclip(g.pos.x+b,g.pos.y+a))PIX(g.pos.x+b,g.pos.y+a)=gc;}
 	}
 }
 void draw_text_rich(rect r,int pattern,int opaque){
-	rect oc=frame.clip;frame.clip=r;draw_text_rich_raw(r,pattern,opaque);frame.clip=oc;
+	rect oc=frame.clip;frame.clip=r;draw_text_rich_raw(r,pattern,opaque,NULL);frame.clip=oc;
 }
 void draw_text_align(rect r,char*text,lv*font,int pattern,int align,int outline){
 	int fh=font_h(font);pair s=layout_plaintext(text,font,align,(pair){r.w,MAX(r.h,fh)});
 	rect c=box_center(r,s);
 	if(outline){
-		draw_text_rich_raw((rect){c.x-1,c.y  ,c.w,c.h},outline,1);
-		draw_text_rich_raw((rect){c.x  ,c.y-1,c.w,c.h},outline,1);
-		draw_text_rich_raw((rect){c.x+1,c.y  ,c.w,c.h},outline,1);
-		draw_text_rich_raw((rect){c.x  ,c.y+1,c.w,c.h},outline,1);
-		draw_text_rich_raw((rect){c.x-1,c.y-1,c.w,c.h},outline,1);
-		draw_text_rich_raw((rect){c.x-1,c.y+1,c.w,c.h},outline,1);
-		draw_text_rich_raw((rect){c.x+1,c.y-1,c.w,c.h},outline,1);
-		draw_text_rich_raw((rect){c.x+1,c.y+1,c.w,c.h},outline,1);
+		draw_text_rich_raw((rect){c.x-1,c.y  ,c.w,c.h},outline,1,NULL);
+		draw_text_rich_raw((rect){c.x  ,c.y-1,c.w,c.h},outline,1,NULL);
+		draw_text_rich_raw((rect){c.x+1,c.y  ,c.w,c.h},outline,1,NULL);
+		draw_text_rich_raw((rect){c.x  ,c.y+1,c.w,c.h},outline,1,NULL);
+		draw_text_rich_raw((rect){c.x-1,c.y-1,c.w,c.h},outline,1,NULL);
+		draw_text_rich_raw((rect){c.x-1,c.y+1,c.w,c.h},outline,1,NULL);
+		draw_text_rich_raw((rect){c.x+1,c.y-1,c.w,c.h},outline,1,NULL);
+		draw_text_rich_raw((rect){c.x+1,c.y+1,c.w,c.h},outline,1,NULL);
 	}
-	draw_text_rich_raw(c,pattern,1);
+	draw_text_rich_raw(c,pattern,1,NULL);
 }
 
 // Sound interface

@@ -283,8 +283,8 @@ Additionally, grids support a few special format codes:
 - `L`: Lock. Format as a plain string (like `s`), but do not allow the user to edit cells in this column.
 - `I`: Icon. Interpret the column as numeric and draw it using icons from the table below, and do not allow the user to edit cells in this column.
 - `B`: Boolean Icon. Interpret the column as boolean and draw it as a check icon (true) or no icon (false).
-- `t`: Rich text. Display the column as editable rtext cells. Note that links in rtext cells are not "clickable."
-- `T`: Rich text, Locked. Display the column as non-editable rtext cells. Note that links in rtext cells are not "clickable."
+- `t`: Rich text. Display the column as editable rtext cells.
+- `T`: Rich text, Locked. Display the column as non-editable rtext cells.
 
 ![](images/icons.gif)
 
@@ -1494,6 +1494,7 @@ Events are as follows:
 | canvas      | `drag`       | `pos` on the canvas.                         | The user moves their pointing device while held on a canvas.   |
 | canvas      | `release`    | `pos` on the canvas.                         | The user releases their pointing device on a canvas.           |
 | field       | `link`       | Link contents (string).                      | The user clicks a link in rich text.                           |
+| grid        | `link`       | Link contents (string).                      | The user clicks a link in a rich text cell.                    |
 | field       | `run`        | Selection or `field.text` (string).          | The user presses shift+return with the field active.           |
 | field       | `change`     | `field.text` (string).                       | The user alters the field, debounced to 1/4 second.            |
 | slider      | `change`     | `slider.value` (number).                     | The user alters the slider, debounced to 1 frame.              |

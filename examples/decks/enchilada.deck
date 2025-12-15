@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:11
+card:4
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -68,6 +68,16 @@ richy:{"type":"grid","size":[201,167],"pos":[14,137],"widths":[52],"format":"sT"
 {script:bycell.0}
 on view do
  me.text:"%j" format list two.cell,two.colname
+end
+{end}
+
+{card:inline links}
+{widgets}
+richy:{"type":"grid","size":[201,167],"pos":[126,60],"script":"inline links.0","widths":[52],"format":"sT","value":{"text":["one","two","three","four","five"],"rich":[<"text":["Red"],"font":["menu"],"arg":[""],"pat":[35]>,<"text":["","Blue"],"font":["","menu"],"arg":["","beepo"],"pat":[1,38]>,<"text":["","Green"," and ","Orange"],"font":["","mono","mono","mono"],"arg":["","","",""],"pat":[1,41,1,34]>,<"text":["i"],"font":[""],"arg":[%%IMG2AB8AHQANIAUADyAEAAYgAQEFIAIADCABAQQgAgAFIAMBBCACAAsgAgEEIAEAByABAQIgAQECIAEADCACAQMgAQAHIAIBASACAQEgAQANIAEBASABAQEgAQAIIAEBASACAQEgAQANIAEBASABAQEgAgAHIAEBASACAQEgAQANIAEBASABAQIgAQAHIAEBASACAQEgAQANIAEBASACAQEgCQEBIAIBASABAA0gAQEBIAIBCiADAQEgAQAMIAEBASAPAQEgAQAMIAEBASACAQUgAwEFIAEBASABAAogAQEBIBEBASABAAogAQEBIAUBASADAQEgAwEBIAQBASABAAkgAQEBIAYBAyABAQMgBQEBIAEACCABAQEgEwEBIAEACCABAQEgEwEBIAEACCABAQEgEwEBIAEACCABAQEgCQEBIAUBASADAQEgAQAHIAEBASAEAQIgBQEBIAQBASACAQIgAQAHIAEBASAGAQIgBAEBIAIBASACAQEgAQEBIAEABiABAQEgCQEFIAIBAyACAQEgAQAFIAEBASAGAQEgDwEBIAEABCABAQEgCAECIAoBAiABAQEgAQADIAEBASALAQIgBgECIAMBASABAAMgAQEBIAUBASAHAQEgBAEBIAUBASABAAIgAQEBIAcBByAGAQYgAQABIAEBASAaAQEgAgEBIBoBASABAAE=],"pat":[1]>,<"text":["a ","hyperlink"," or ","two","!"],"font":["","","","",""],"arg":["","http://beyondloom.com","","https://internet-janitor.itch.io",""],"pat":[1,1,1,1,1]>]},"row":3}
+
+{script:inline links.0}
+on link x do
+ app.show["linked" me x]
 end
 {end}
 
@@ -147,7 +157,7 @@ end
 
 {card:conditional_formatting}
 {widgets}
-grid1:{"type":"grid","size":[222,147],"pos":[84,95],"script":"conditional_formatting.0","bycell":1,"widths":[133,69],"format":"st","value":{"item":["aggregate bone sales","calcium recycling","enamel stripping","wisdom teeth","implements","personnel","bones of personnel","candles"],"profit":[<"text":["    $20.23"],"font":["mono"],"arg":[""],"pat":[1]>,<"text":["    $97.40"],"font":["mono"],"arg":[""],"pat":[1]>,<"text":["    -$0.15"],"font":["mono"],"arg":[""],"pat":[35]>,<"text":["   -$32.00"],"font":["mono"],"arg":[""],"pat":[35]>,<"text":["    -$6.75"],"font":["mono"],"arg":[""],"pat":[35]>,<"text":[" -$1400.00"],"font":["mono"],"arg":[""],"pat":[35]>,<"text":["   $900.00"],"font":["mono"],"arg":[""],"pat":[1]>,<"text":[" -$5000.00"],"font":["mono"],"arg":[""],"pat":[35]>]},"row":0,"col":1}
+grid1:{"type":"grid","size":[222,147],"pos":[84,95],"script":"conditional_formatting.0","bycell":1,"widths":[133,69],"format":"st","value":{"item":["aggregate bone sales","calcium recycling","enamel stripping","wisdom teeth","implements","personnel","bones of personnel","candles"],"profit":[<"text":["    $20.23"],"font":["mono"],"arg":[""],"pat":[1]>,<"text":["    $97.40"],"font":["mono"],"arg":[""],"pat":[1]>,<"text":["    -$0.15"],"font":["mono"],"arg":[""],"pat":[35]>,<"text":["   -$32.00"],"font":["mono"],"arg":[""],"pat":[35]>,<"text":["    -$6.75"],"font":["mono"],"arg":[""],"pat":[35]>,<"text":[" -$1400.00"],"font":["mono"],"arg":[""],"pat":[35]>,<"text":["   $900.00"],"font":["mono"],"arg":[""],"pat":[1]>,<"text":[" -$5000.00"],"font":["mono"],"arg":[""],"pat":[35]>]},"row":5,"col":1}
 
 {script:conditional_formatting.0}
 on changecell x do

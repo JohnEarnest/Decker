@@ -837,8 +837,17 @@ widget_grid=(target,x,value)=>{
 			if     (x.format[z]=='I'){const i=clamp(0,ln(v),8);if(i<8)draw_icon(ip,ICONS[i],ccol)}
 			else if(x.format[z]=='B'){if(lb(v))draw_icon(ip,ICONS[ICON.chek],ccol)}
 			else if(x.format[z]=='t'||x.format[z]=='T'){
-				const r=rect(hs.x+1,bb.y+rh*y,hs.w-2,rh), l=layout_richtext(deck,rtext_cast(v),fnt,ALIGN.left,r.w), t=l.size
-				draw_text_rich_raw(rect(r.x,r.y+ceil(t.y<r.h?(r.h-t.y)/2.0:0),r.w,r.h),l,ccol,0)
+				const rr=rect(hs.x+1,bb.y+rh*y,hs.w-2,rh), l=layout_richtext(deck,rtext_cast(v),fnt,ALIGN.left,rr.w), t=l.size
+				const r=rect(rr.x,rr.y+ceil(t.y<rr.h?(rr.h-t.y)/2.0:0),rr.w,rr.h);let alink=null
+				if(x.format[z]=='T'&&in_layer()&&(ev.md||ev.drag||ev.mu))for(let z=0;z<l.layout.length;z++){
+					const g=l.layout[z], pos=rcopy(g.pos);if(pos.w<1)continue // skip squashed spaces/newlines
+					if(pos.y+pos.h<0||pos.y>r.h)continue; pos.x+=r.x, pos.y+=r.y // coarse clip
+					if(lis(g.arg)&&count(g.arg)&&dover(pos)&&over(pos)){
+						if(ev.md||ev.drag){alink=g.arg;break}
+						if(ev.mu){msg.target_link=target,msg.arg_link=g.arg}
+					}
+				}
+				draw_text_rich_raw(r,l,ccol,0,alink)
 			}
 			else{('fcCihH'.indexOf(x.format[z])>=0?draw_textr:draw_text_fit)(rect(hs.x+1,bb.y+rh*y,hs.w-2,rh),cf,fnt,ccol)} // right-align numeric
 			frame.clip=oc

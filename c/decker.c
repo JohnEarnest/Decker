@@ -687,9 +687,18 @@ int widget_grid(lv*target,grid x,grid_val*value){
 			if     (z<fk&&x.format[z]=='I'){int i=MAX(0,MIN(8,ln(v)));if(i<8)draw_icon(ip,ICONS[i],ccol);}
 			else if(z<fk&&x.format[z]=='B'){if(lb(v))draw_icon(ip,ICONS[icon_chek],ccol);}
 			else if(z<fk&&(x.format[z]=='t'||x.format[z]=='T')){
-				rect r={hs.x+1,bb.y+rh*y,hs.w-2,rh}; // display rich text:
-				pair t=layout_richtext(deck,rtext_cast(v),fnt,align_left,r.w);
-				draw_text_rich_raw((rect){r.x,r.y+ceil(t.y<r.h?(r.h-t.y)/2.0:0),r.w,r.h},ccol,0);
+				rect rr={hs.x+1,bb.y+rh*y,hs.w-2,rh}; // display rich text:
+				pair t=layout_richtext(deck,rtext_cast(v),fnt,align_left,rr.w);
+				rect r={rr.x,rr.y+ceil(t.y<rr.h?(rr.h-t.y)/2.0:0),rr.w,rr.h};
+				lv*alink=NULL;if(x.format[z]=='T'&&in_layer()&&(ev.md||ev.drag||ev.mu))for(int z=0;z<layout_count;z++){
+					glyph_box g=layout[z];if(g.pos.w<1)continue; // skip squashed spaces/newlines
+					if(g.pos.y+g.pos.h<0||g.pos.y>r.h)continue; g.pos.x+=r.x, g.pos.y+=r.y; // coarse clip
+					if(lis(g.arg)&&g.arg->c&&dover(g.pos)&&over(g.pos)){
+						if(ev.md||ev.drag){alink=g.arg;break;}
+						if(ev.mu){msg.target_link=target,msg.arg_link=g.arg;break;}
+					}
+				}
+				draw_text_rich_raw(r,ccol,0,alink);
 			}
 			else{
 				rect r={hs.x+1,bb.y+rh*y,hs.w-2,rh}; // right-align numeric columns:
