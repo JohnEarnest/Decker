@@ -1413,6 +1413,10 @@ lv* time_ms(void){
 	ULARGE_INTEGER i; i.LowPart=t.dwLowDateTime, i.HighPart=t.dwHighDateTime;
 	return lmn(i.QuadPart*1e-4);
 }
+lv* time_zone_offset(void){
+	TIME_ZONE_INFORMATION tzi={0};int r=GetTimeZoneInformation(&tzi);
+	return r==TIME_ZONE_ID_INVALID?LNIL: lmn(tzi.Bias/-60.0); // minutes -> hours
+}
 #else
 #ifndef __COSMOPOLITAN__
 #include <sys/time.h>
@@ -1420,6 +1424,10 @@ lv* time_ms(void){
 lv* time_ms(void){
 	struct timeval now;gettimeofday(&now,NULL);
 	return lmn((((long long)now.tv_sec)*1000)+(now.tv_usec/1000));
+}
+lv* time_zone_offset(void){
+	time_t t=time(NULL);struct tm utc_tm;gmtime_r(&t,&utc_tm);utc_tm.tm_isdst=0;time_t utc_epoch=mktime(&utc_tm);
+	return lmn(difftime(t,utc_epoch)/(60*60)); // seconds -> hours
 }
 #endif
 
@@ -1453,6 +1461,7 @@ lv*interface_sys(lv*self,lv*i,lv*x){
 		ikey("seed"      )return lmn(seed);
 		ikey("frame"     )return lmn(frame_count);
 		ikey("now"       ){time_t now;time(&now);return lmn(now);}
+		ikey("z"         )return time_zone_offset();
 		ikey("ms"        )return time_ms();
 		ikey("workspace"){
 			lv*r=lmd();

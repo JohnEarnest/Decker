@@ -654,6 +654,7 @@ The _system_ interface exposes information about the Lil runtime. It is availabl
 | `x.seed`                   | The `random[]` number generator's numeric seed.(1)                                                    |
 | `x.frame`                  | An integer that counts up every time a frame is rendered, at 60hz.                                    |
 | `x.now`                    | The current GMT as a Unix epoch.                                                                      |
+| `x.z`                      | The local time zone offset, in hours.                                                                 |
 | `x.ms`                     | The current time in milliseconds- useful for timing intervals.                                        |
 | `x.workspace`              | Dictionary of information about Lil's runtime memory usage.(2)                                        |
 
