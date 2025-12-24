@@ -183,7 +183,7 @@ void tracking(void){
 	}
 }
 
-#define LISTEN_LINES 30
+#define LISTEN_LINES 100
 typedef struct {
 	lv*hist, *vars;
 	int scroll;

@@ -6,7 +6,7 @@ let FONT_BODY=null,FONT_MENU=null,FONT_MONO=null
 const DOUBLE_CLICK_DELAY=20
 const FIELD_CURSOR_DUTY =20
 const FIELD_CHANGE_DELAY=15
-const LISTEN_LINES      =30
+const LISTEN_LINES      =100
 const LISTEN_SIZE       =_=>rect(context.size.x-22,100)
 const MASTER_VOLUME     =0.3
 const BG_MASK           =100
