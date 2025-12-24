@@ -24,6 +24,16 @@ on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 
 # the problems:
 
+problem[352.2]
+# which binary prefixes are divisible by 5?
+on b2d x do n:count x  sum x*2^n-1+range n end
+on f x do !5%each n in 1+range count x b2d[n take x] end end
+assert[f[(0,1,1,0,0,1,0,1,1,1)] (1,0,0,0,0,1,1,0,0,0)]
+assert[f[(1,0,1,0,1,0        )] (0,0,1,1,0,0        )]
+assert[f[(0,0,1,0,1          )] (1,1,0,0,1          )]
+assert[f[(1,1,1,1,1          )] (0,0,0,1,0          )]
+assert[f[(1,0,1,1,0,1,0,0,1,1)] (0,0,1,0,0,1,1,1,0,0)]
+
 problem[338.1]
 # find the maximum row-sum in a matrix
 on f x do max sum @ x end
