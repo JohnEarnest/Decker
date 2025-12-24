@@ -653,14 +653,17 @@ The _system_ interface exposes information about the Lil runtime. It is availabl
 | `x.platform`               | The host operating system; one of {`"mac"`,`"unix"`,`"win"`,`"web"`,`"other"`}.                       |
 | `x.seed`                   | The `random[]` number generator's numeric seed.(1)                                                    |
 | `x.frame`                  | An integer that counts up every time a frame is rendered, at 60hz.                                    |
+| `x.ops`                    | An integer that counts up every time a Lil opcode is executed. (r/w) (2)                              |
 | `x.now`                    | The current GMT as a Unix epoch.                                                                      |
 | `x.z`                      | The local time zone offset, in hours.                                                                 |
 | `x.ms`                     | The current time in milliseconds- useful for timing intervals.                                        |
-| `x.workspace`              | Dictionary of information about Lil's runtime memory usage.(2)                                        |
+| `x.workspace`              | Dictionary of information about Lil's runtime memory usage.(3)                                        |
 
 1) Assigning to `sys.seed` will initialize the random number generator behind the `random[]` function, causing it to produce consistent results thereafter.
 
-2) Workspace statistics can provide some insight into performance, but all values should be taken as approximate- the act of retrieving this information will itself result in several allocations. Lil's garbage collector only runs periodically, so the number of truly "live" values at any given time may be lower than shown here.  The workspace dictionary contains:
+2) The `sys.ops` counter measures the bytecode steps underlying Lil execution. This is the same measurement used to cap execution quotas for a variety of subsystems within Decker, such as functional brushes, contraption attributes, the audio loop event, transition functions, and general per-frame script execution. The measurements observed by this counter for a given piece of code may vary significantly between Lil interpreters; it is purely meant to serve as a tool for estimating relative performance. Since this is a global counter, results measured within Decker may also be inaccurate if competing scripts interleave with one another.
+
+3) Workspace statistics can provide some insight into performance, but all values should be taken as approximate- the act of retrieving this information will itself result in several allocations. Lil's garbage collector only runs periodically, so the number of truly "live" values at any given time may be lower than shown here.  The workspace dictionary contains:
 - `allocs`: the number of Lil values which have been allocated.
 - `frees`: the number of Lil values which have been freed.
 - `gcs`: the number of garbage collection generations which have been carried out.

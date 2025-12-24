@@ -662,7 +662,7 @@ env_setr =(e,n,x)=>{const k=ls(n);r=e.v.get(k);return r?e.v.set(k,x): e.p?env_se
 env_get  =(e,n  )=>env_getr(e,n)||NIL
 env_set  =(e,n,x)=>{const r=env_getr(e,n);r?env_setr(e,n,x):env_local(e,n,x)}
 env_bind =(e,k,v)=>{const r=lmenv(e); k.map((a,i)=>env_local(r,lms(a),v.v[i]||NIL));return r}
-const monadi=Object.values(monad), dyadi=Object.values(dyad), triadi=Object.values(triad), states=[]; let state=null
+const monadi=Object.values(monad), dyadi=Object.values(dyad), triadi=Object.values(triad), states=[]; let state=null, op_count=0
 pushstate=env=>{if(state){states.push(state)};state={e:[env],p:[],t:[],pcs:[]}}
 popstate =_=>{state=states.pop()}
 halt     =_=>{state.p=[],state.t=[],state.e=[state.e[0]]}
@@ -683,6 +683,7 @@ docall=(f,a,tail)=>{
 	calldepth=max(calldepth,state.e.length)
 }
 runop=_=>{
+	op_count+=1
 	const b=getblock();if(!liblk(b))ret(state.t.pop())
 	const pc=getpc(),o=blk_getb(b,pc),imm=(oplens[o]==3?blk_gets(b,1+pc):0); setpc(pc+oplens[o])
 	switch(o){
@@ -812,11 +813,15 @@ n_random=z=>{
 let frame_count=0
 interface_system=lmi((self,i,x)=>{
 	if(!i)return NIL
-	if(x){if(lis(i)&&i.v=='seed'){seed=0|ln(x);return x}}
+	if(x){
+		if(lis(i)&&i.v=='seed'){seed=0|ln(x);return x}
+		if(lis(i)&&i.v=='ops' ){op_count=ln(x);return x}
+	}
 	if(lis(i)&&i.v=='version'   )return lms(VERSION)
 	if(lis(i)&&i.v=='platform'  )return lms('web')
 	if(lis(i)&&i.v=='seed'      )return lmn(seed)
 	if(lis(i)&&i.v=='frame'     )return lmn(frame_count)
+	if(lis(i)&&i.v=='ops'       )return lmn(op_count)
 	if(lis(i)&&i.v=='now'       )return lmn(0|(new Date().getTime()/1000))
 	if(lis(i)&&i.v=='z'         )return lmn(0|(new Date().getTimezoneOffset()/-60))
 	if(lis(i)&&i.v=='ms'        )return lmn(0|(Date.now()))

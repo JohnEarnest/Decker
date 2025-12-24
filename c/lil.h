@@ -1154,7 +1154,9 @@ void docall(lv*f,lv*a,int tail){
 	issue(f->c==1&&f->lv[0]->sv[0]=='.'?env_bind(f->env,l_list(lmcstr(f->lv[0]->sv+3)),l_list(a)) :env_bind(f->env,f,a),f->b);
 	gc.depth=MAX(gc.depth,state.e->c);
 }
+double op_count=0;
 void runop(void){
+	op_count+=1;
 	lv*b=getblock();
 	int*pc=getpc(),op=blk_getb(b,*pc),imm=(oplens[op]==3?blk_gets(b,1+*pc):0);(*pc)+=oplens[op];
 	switch(op){
@@ -1455,10 +1457,12 @@ int frame_count=0;
 lv*interface_sys(lv*self,lv*i,lv*x){
 	if(x&&lis(i)){
 		ikey("seed"      ){seed=0xFFFFFFFF&(long long int)ln(x);return x;}
+		ikey("ops"       ){op_count=ln(x);return x;}
 	}else if(lis(i)){
 		ikey("version"   )return lmistr(VERSION);
 		ikey("platform"  )return lmistr(PLATFORM);
 		ikey("seed"      )return lmn(seed);
+		ikey("ops"       )return lmn(op_count);
 		ikey("frame"     )return lmn(frame_count);
 		ikey("now"       ){time_t now;time(&now);return lmn(now);}
 		ikey("z"         )return time_zone_offset();
