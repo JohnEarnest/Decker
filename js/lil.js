@@ -454,8 +454,8 @@ triad={
 
 findop=(n,prims)=>Object.keys(prims).indexOf(n), as_enum=x=>x.split(',').reduce((x,y,i)=>{x[y]=i;return x},{})
 let tnames=0;tempname=_=>lms(`@t${tnames++}`)
-op=as_enum('JUMP,JUMPF,LIT,DUP,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,IPRE,IPOST,FIDX,FMAP')
-oplens=   [ 3   ,3    ,3  ,1  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3   ,3    ,3   ,3    ]
+op=as_enum('JUMP,JUMPF,JUMPT,LIT,DUP,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,IPRE,IPOST,FIDX,FMAP')
+oplens=   [ 3   ,3    ,3    ,3  ,1  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3   ,3    ,3   ,3    ]
 blk_addb=(x,n  )=>x.b.push(0xFF&n)
 blk_here=(x    )=>x.b.length
 blk_setb=(x,i,n)=>x.b[i]=0xFF&n
@@ -477,7 +477,7 @@ blk_getimm=(x,i)=>x.locals[i]
 blk_cat=(x,y)=>{
 	let z=0,base=blk_here(x);while(z<blk_here(y)){
 		const b=blk_getb(y,z);if(b==op.LIT||b==op.GET||b==op.SET||b==op.LOC||b==op.AMEND){blk_imm(x,b,blk_getimm(y,blk_gets(y,z+1)))}
-		else if(b==op.JUMP||b==op.JUMPF||b==op.EACH||b==op.NEXT||b==op.FIDX){blk_opa(x,b,blk_gets(y,z+1)+base)}
+		else if(b==op.JUMP||b==op.JUMPF||b==op.JUMPT||b==op.EACH||b==op.NEXT||b==op.FIDX){blk_opa(x,b,blk_gets(y,z+1)+base)}
 		else{for(let i=0;i<oplens[b];i++)blk_addb(x,blk_getb(y,z+i))}z+=oplens[b]
 	}
 }
@@ -606,8 +606,8 @@ parse=text=>{
 			}
 		}
 		if(match('while')){
-			blk_lit(b,NIL);const head=blk_here(b);expr(b);const cond=blk_opa(b,op.JUMPF,0)
-			blk_op(b,op.DROP),iblock(b),blk_opa(b,op.JUMP,head),blk_sets(b,cond,blk_here(b));return
+			blk_lit(b,NIL);const cond=blk_opa(b,op.JUMP,0);const e=lmblk();expr(e);const head=blk_here(b)
+			blk_op(b,op.DROP),iblock(b),blk_sets(b,cond,blk_here(b)),blk_cat(b,e),blk_opa(b,op.JUMPT,head);return
 		}
 		if(match('each')){const n=names('in','variable');expr(b),blk_loop(b,n,_=>iblock(b));return}
 		if(match('on')){
@@ -693,6 +693,7 @@ runop=_=>{
 		case op.OVER :{const a=arg(),b=arg();ret(b),ret(a),ret(b);break}
 		case op.JUMP :setpc(imm);break
 		case op.JUMPF:if(!lb(arg()))setpc(imm);break
+		case op.JUMPT:if( lb(arg()))setpc(imm);break
 		case op.LIT  :ret(blk_getimm(b,imm));break
 		case op.GET  :{ret(env_get(getev(),blk_getimm(b,imm)));break}
 		case op.SET  :{const v=arg();env_set(getev(),blk_getimm(b,imm),v),ret(v);break}

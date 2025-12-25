@@ -853,8 +853,8 @@ primitive triads[]={
 
 int findop(char*n,primitive*p){if(n)for(int z=0;p[z].name[0];z++)if(!strcmp(n,p[z].name))return z;return -1;}
 int tnames=0;lv* tempname(void){char t[64];snprintf(t,sizeof(t),"@t%d",tnames++);return lmcstr(t);}
-enum opcodes {JUMP,JUMPF,LIT,DUP,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,IPRE,IPOST,FIDX,FMAP};
-int oplens[]={3   ,3    ,3  ,1  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3   ,3    ,3   ,3   };
+enum opcodes {JUMP,JUMPF,JUMPT,LIT,DUP,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,IPRE,IPOST,FIDX,FMAP};
+int oplens[]={3   ,3    ,3    ,3  ,1  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3   ,3    ,3   ,3   };
 void blk_addb(lv*x,int n){
 	if(x->ns<x->n+1)x->sv=realloc(x->sv,(x->ns*=2)*sizeof(int));x->sv[x->n++]=n;
 	if(x->n>=65536||x->c>=65536)printf("TOO MUCH BYTECODE!\n"),exit(1);
@@ -879,7 +879,7 @@ lv*  blk_getimm(lv*x,int i){return x->lv[i];}
 void blk_cat(lv*x,lv*y){
 	int z=0,base=blk_here(x);while(z<blk_here(y)){
 		int b=blk_getb(y,z);if(b==LIT||b==GET||b==SET||b==LOC||b==AMEND){blk_imm(x,b,blk_getimm(y,blk_gets(y,z+1)));}
-		else if(b==JUMP||b==JUMPF||b==EACH||b==NEXT||b==FIDX){blk_opa(x,b,blk_gets(y,z+1)+base);}
+		else if(b==JUMP||b==JUMPF||b==JUMPT||b==EACH||b==NEXT||b==FIDX){blk_opa(x,b,blk_gets(y,z+1)+base);}
 		else{for(int i=0;i<oplens[b];i++)blk_addb(x,blk_getb(y,z+i));}z+=oplens[b];
 	}
 }
@@ -1073,8 +1073,8 @@ void term(lv*b){
 		}
 	}
 	if(match("while")){
-		blk_lit(b,LNIL);int head=blk_here(b);expr(b);int cond=blk_opa(b,JUMPF,0);
-		blk_op(b,DROP);iblock(b);blk_opa(b,JUMP,head);blk_sets(b,cond,blk_here(b));return;
+		blk_lit(b,LNIL);int cond=blk_opa(b,JUMP,0);lv*e=lmblk();expr(e);int head=blk_here(b);
+		blk_op(b,DROP);iblock(b);blk_sets(b,cond,blk_here(b));blk_cat(b,e);blk_opa(b,JUMPT,head);return;
 	}
 	if(match("each")){lv*n=names("in","variable");expr(b),blk_loop(b,n,block());return;}
 	if(match("on")){
@@ -1166,6 +1166,7 @@ void runop(void){
 		case OVER:{lv*a=arg(),*b=arg();ret(b),ret(a),ret(b);break;}
 		case JUMP:*pc=imm;break;
 		case JUMPF:if(!lb(arg()))*pc=imm;break;
+		case JUMPT:if( lb(arg()))*pc=imm;break;
 		case LIT:ret(blk_getimm(b,imm));break;
 		case GET:{ret(env_get(ev(),blk_getimm(b,imm)));break;}
 		case SET:{lv*v=arg();env_set(ev(),blk_getimm(b,imm),v);ret(v);break;}
