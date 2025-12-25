@@ -607,7 +607,8 @@ parse=text=>{
 		}
 		if(match('while')){
 			blk_lit(b,NIL);const cond=blk_opa(b,op.JUMP,0);const e=lmblk();expr(e);const head=blk_here(b)
-			blk_op(b,op.DROP),iblock(b),blk_sets(b,cond,blk_here(b)),blk_cat(b,e),blk_opa(b,op.JUMPT,head);return
+			if(!match('end')){blk_op(b,op.DROP),iblock(b)}
+			blk_sets(b,cond,blk_here(b)),blk_cat(b,e),blk_opa(b,op.JUMPT,head);return
 		}
 		if(match('each')){const n=names('in','variable');expr(b),blk_loop(b,n,_=>iblock(b));return}
 		if(match('on')){

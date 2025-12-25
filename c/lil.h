@@ -1074,7 +1074,8 @@ void term(lv*b){
 	}
 	if(match("while")){
 		blk_lit(b,LNIL);int cond=blk_opa(b,JUMP,0);lv*e=lmblk();expr(e);int head=blk_here(b);
-		blk_op(b,DROP);iblock(b);blk_sets(b,cond,blk_here(b));blk_cat(b,e);blk_opa(b,JUMPT,head);return;
+		if(!match("end")){blk_op(b,DROP);iblock(b);}
+		blk_sets(b,cond,blk_here(b));blk_cat(b,e);blk_opa(b,JUMPT,head);return;
 	}
 	if(match("each")){lv*n=names("in","variable");expr(b),blk_loop(b,n,block());return;}
 	if(match("on")){
