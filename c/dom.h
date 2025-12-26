@@ -2326,7 +2326,7 @@ lv* keystore_value(lv*self,lv*k,lv*v){
 lv* n_keystore_value(lv*self,lv*x){return x->c<1?self: keystore_value(self,l_first(x),x->c<2?NULL: x->lv[1]);}
 lv* interface_keystore(lv*self,lv*i,lv*x){
 	ikey("keys" )return l_keys(self->b);
-	ikey("dict" )return l_drop(ZERO,self->b);
+	ikey("dict" )return dclone(self->b);
 	ikey("value")return lmnat(n_keystore_value,self);
 	return keystore_value(self,i,x);
 }
@@ -2776,8 +2776,8 @@ lv* interface_deck(lv*self,lv*i,lv*x){
 		ikey("corners" ){lv*r=dget(data,i);return r?r:ONE;}
 		ikey("script"  )return dget(data,i);
 		ikey("patterns")return dget(data,i);
-		ikey("sounds"  )return l_drop(ZERO,dget(data,i)); // expose a shallow copy
-		ikey("fonts"   )return l_drop(ZERO,dget(data,i)); // expose a shallow copy
+		ikey("sounds"  )return dclone(dget(data,i)); // expose a shallow copy
+		ikey("fonts"   )return dclone(dget(data,i)); // expose a shallow copy
 		ikey("cards"   )return dget(data,i);
 		ikey("modules" )return dget(data,i);
 		ikey("contraptions")return dget(data,i);

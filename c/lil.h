@@ -166,6 +166,10 @@ int matchr(lv*x,lv*y){
 void dsetuq(lv*d,lv*k,lv*x){
 	FIND(z,d,k){str s=str_new();str_addl(&s,k);str_addc(&s,'_');k=lmstr(s);break;}ld_add(d,k,x);
 }
+lv* dclone(lv*d){
+	lv*r=lmvv(3,d->s);r->c=d->c;r->kv=calloc(d->s,sizeof(lv*));
+	memcpy(r->kv,d->kv,d->c*sizeof(lv*)),memcpy(r->lv,d->lv,d->c*sizeof(lv*));return r;
+}
 void dset(lv*d,lv*k,lv*x){FIND(z,d,k){d->lv[z]=x;return;}ld_add(d,k,x);}
 lv* dget(lv*d,lv*k){FIND(z,d,k)return d->lv[z];return NULL;}
 lv* dgetv(lv*d,lv*k){FIND(z,d,k)return d->lv[z];return LNIL;}
@@ -184,7 +188,7 @@ lv* amend(lv*x,lv*i,lv*y){
 	if(!lis(x)&&!lil(x)&&!lid(x))return amend(lml(0),i,y);
 	if((lil(x)||lis(x))&&(!lin(i)||(i->nv<0||i->nv>x->c)))return amend(ld(x),i,y);
 	if(lil(x)){int n=ln(i);MAP(r,x)z==n?y:x->lv[z];if(n==x->c)ll_add(r,y);return r;}
-	if(lid(x)){DMAP(r,x,x->lv[z])return dset(r,i,y),r;}
+	if(lid(x)){lv*r=dclone(x);return dset(r,i,y),r;}
 	if(lis(x)){
 		str r=str_new();int n=ln(i);y=ls(y);
 		str_add(&r,x->sv,n),str_addl(&r,y),str_addz(&r,x->sv+n+1);return lmstr(r);
@@ -513,7 +517,7 @@ dyad(l_tcomma){
 }
 dyad(l_comma){
 	if(lit(x)&&lit(y))return l_tcomma(x,y);
-	if(lid(x)){y=ld(y);DMAP(r,x,x->lv[z]);EACH(z,y)dset(r,y->kv[z],y->lv[z]);return r;}
+	if(lid(x)){y=ld(y);lv*r=dclone(x);EACH(z,y)dset(r,y->kv[z],y->lv[z]);return r;}
 	if(lis(x)||linil(x))return l_comma(l_list(x),y);if(lis(y)||linil(y))return l_comma(x,l_list(y));
 	x=ll(x),y=ll(y);GEN(r,x->c+y->c)z<x->c?x->lv[z]:y->lv[z-x->c];return r;
 }
