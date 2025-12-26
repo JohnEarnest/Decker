@@ -1073,6 +1073,7 @@ DEFAULT_PATTERNS=
 array_is      =x=>lii(x)&&x.n=='array'
 image_is      =x=>lii(x)&&x.n=='image'
 sound_is      =x=>lii(x)&&x.n=='sound'
+keystore_is   =x=>lii(x)&&x.n=='keystore'
 font_is       =x=>lii(x)&&x.n=='font'
 button_is     =x=>lii(x)&&x.n=='button'
 field_is      =x=>lii(x)&&x.n=='field'
@@ -1472,14 +1473,18 @@ pointer={f:(self,i,x)=>{
 keystore_read=x=>{
 	let store=lmd();if(x)x.k.filter((k,i)=>!linil(x.v[i])).map((k,i)=>dset(store,k,x.v[i]))
 	return {f:(self,i,x)=>{
-		i=ls(i);if(i=='keys')return monad.keys(self.data)
-		if(x){
-			const f=lms('%J'),val=dyad.parse(f,dyad.format(f,lml([x])))
-			if(linil(val)){self.data=dyad.drop(lms(i),self.data)}else{dset(self.data,lms(i),val)}
-			return x
-		}else{return dget(self.data,lms(i))||NIL}
+		const keystore_value=(k,v)=>{
+			if(!v)return dget(self.data,k)||NIL
+			if(linil(v)){self.data=dyad.drop(monad.list(k),self.data)}else{dset(self.data,k,v)}return self
+		}
+		if(ikey(i,'keys'))return monad.keys(self.data)
+		if(ikey(i,'dict'))return dyad.drop(ZERO,self.data)
+		if(ikey(i,'value'))return lmnat(([k,v])=>!k?self: keystore_value(k,v))
+		return keystore_value(i,x)
 	},t:'int',n:'keystore',data:store}
 }
+keystore_strip=x=>{const r=lmd();x.data.k.map((k,i)=>dset(r,lms(ls(k)),x.data.v[i]));return r}
+n_keystore=([x])=>keystore_read(!x?null: keystore_is(x)?x.data: ld(x))
 
 module_read=(x,deck)=>{
 	const ri=lmi((self,i,x)=>{
@@ -1523,7 +1528,7 @@ module_read=(x,deck)=>{
 module_write=x=>{
 	const r=lmd()
 	dset(r,lms('name'  ),ifield(x,'name'))
-	dset(r,lms('data'  ),x.data.data)
+	dset(r,lms('data'  ),keystore_strip(x.data))
 	dset(r,lms('script'),ifield(x,'script'))
 	if(x.description)dset(r,lms('description'),ifield(x,'description'))
 	if(x.version)dset(r,lms('version'),ifield(x,'version'))
@@ -3061,6 +3066,7 @@ primitives=(env,deck)=>{
 	env.local('array'     ,lmnat(n_array   ))
 	env.local('image'     ,lmnat(n_image   ))
 	env.local('sound'     ,lmnat(n_sound   ))
+	env.local('keystore'  ,lmnat(n_keystore))
 	env.local('newdeck'   ,lmnat(([x])=>deck_read(lis(x)?ls(x):'')))
 	env.local('readcsv'   ,lmnat(n_readcsv ))
 	env.local('writecsv'  ,lmnat(n_writecsv))

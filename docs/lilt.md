@@ -94,6 +94,7 @@ Built-in Functions
 | `array[x y]`     | Create a new _array_ with size `x` and cast string `y`, or decode an encoded array string `x`.                              | Decker  |
 | `image[x]`       | Create a new _image_ interface with size `x` (`(width,height)`) or decode an encoded image string.                          | Decker  |
 | `sound[x]`       | Create a new _sound_ interface with size `x` (sample count) or decode an encoded sound string.                              | Decker  |
+| `keystore[x]`    | Create a new _keystore_ interface, optionally as a copy from a dict or keystore `x`.                                        | Decker  |
 | `newdeck[x]`     | Create a new _deck_ interface from scratch, or decode an encoded deck string.                                               | Decker  |
 
 0) If `print[]` or `error[]` are given a single _array interface_ as an argument, the raw bytes of that array will be sent to _stdout_ or _stderr_, respectively, with no trailing newline added. In this way it is possible to print characters which do not have a valid representation as Lil strings, like Unicode block characters.
@@ -186,3 +187,6 @@ v1.54:
 - generalized `read[]` to recognize `.deck` files and decode them as deck interfaces.
 - generalized `write[]` to accept deck interfaces and write them as `.deck` or `.html` files.
 - deprecated the specialized `readdeck[]` and `writedeck[]` functions in favor of the above.
+
+v1.64:
+- introduced `keystore[]` as a way of constructing mutable dictionaries.

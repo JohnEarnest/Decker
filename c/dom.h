@@ -26,7 +26,7 @@ typedef struct {
 } cstate; cstate frame;
 
 itype(image)itype(sound)itype(font)itype(button)itype(field)itype(slider)itype(grid)itype(canvas)itype(deck)itype(card)itype(patterns)itype(module)itype(array)
-itype(prototype)itype(contraption)itype(proxy)
+itype(prototype)itype(contraption)itype(proxy)itype(keystore)
 int widget_is(lv*x){return button_is(x)||field_is(x)||slider_is(x)||grid_is(x)||canvas_is(x)||contraption_is(x)||proxy_is(x);}
 
 int sleep_frames=0, sleep_play=0;
@@ -41,6 +41,7 @@ lv*n_save(lv*self,lv*z);
 lv*n_array(lv*self,lv*z);
 lv*n_image(lv*self,lv*z);
 lv*n_sound(lv*self,lv*z);
+lv*n_keystore(lv*self,lv*z);
 
 lv* n_go(lv*self,lv*z){
 	lv*data=self->b,*x=l_first(z),*r=NULL,*k=lmistr("card"),*cards=ifield(self,"cards");int i=ln(dget(data,k));
@@ -116,6 +117,7 @@ void primitives(lv*env,lv*deck){
 	dset(env,lmistr("array"     ),lmnat(n_array     ,NULL));
 	dset(env,lmistr("image"     ),lmnat(n_image     ,NULL));
 	dset(env,lmistr("sound"     ),lmnat(n_sound     ,NULL));
+	dset(env,lmistr("keystore"  ),lmnat(n_keystore  ,NULL));
 	dset(env,lmistr("newdeck"   ),lmnat(n_newdeck   ,NULL));
 	dset(env,lmistr("readcsv"   ),lmnat(n_readcsv   ,NULL));
 	dset(env,lmistr("writecsv"  ),lmnat(n_writecsv  ,NULL));
@@ -2317,17 +2319,23 @@ lv* widget_write(lv*x){
 
 // Keystore interface
 
+lv* keystore_value(lv*self,lv*k,lv*v){
+	if(!v)return dgetv(self->b,k);
+	if(linil(v)){self->b=l_drop(l_list(k),self->b);}else{dset(self->b,k,v);}return self;
+}
+lv* n_keystore_value(lv*self,lv*x){return x->c<1?self: keystore_value(self,l_first(x),x->c<2?NULL: x->lv[1]);}
 lv* interface_keystore(lv*self,lv*i,lv*x){
-	i=ls(i);ikey("keys")return l_keys(self->b);
-	if(x){
-		lv*f=lmistr("%J");x=l_parse(f,l_format(f,l_list(x)));
-		if(linil(x)){self->b=l_drop(i,self->b);}else{dset(self->b,i,x);}return x;
-	}else{return dgetv(self->b,i);}
+	ikey("keys" )return l_keys(self->b);
+	ikey("dict" )return l_drop(ZERO,self->b);
+	ikey("value")return lmnat(n_keystore_value,self);
+	return keystore_value(self,i,x);
 }
 lv* keystore_make(lv*x){
-	lv*r=lmd();if(x){x=ld(x);EACH(z,x)if(!linil(x->lv[z]))dset(r,ls(x->kv[z]),x->lv[z]);}
+	lv*r=lmd();if(x){x=ld(x);EACH(z,x)if(!linil(x->lv[z]))dset(r,x->kv[z],x->lv[z]);}
 	return lmi(interface_keystore,lmistr("keystore"),r);
 }
+lv* keystore_strip(lv*x){lv*r=lmd();EACH(z,x->b)dset(r,ls(x->b->kv[z]),x->b->lv[z]);return r;}
+lv* n_keystore(lv*self,lv*x){(void)self;return keystore_make(x->c==0?NULL: keystore_is(x->lv[0])?x->lv[0]->b: ld(x->lv[0]));}
 
 // Module interface
 
@@ -2372,7 +2380,7 @@ lv* module_read(lv*x,lv*deck){
 lv* module_write(lv*x){
 	lv*data=x->b,*r=lmd();
 	{lv*k=lmistr("name"       ),*v=dget(data,k);dset(r,k,v);}
-	{lv*k=lmistr("data"       ),*v=dget(data,k);dset(r,k,v->b);}
+	{lv*k=lmistr("data"       ),*v=dget(data,k);dset(r,k,keystore_strip(v));}
 	{lv*k=lmistr("script"     ),*v=dget(data,k);dset(r,k,v);}
 	{lv*k=lmistr("description"),*v=dget(data,k);if(v&&v->c)dset(r,k,v);}
 	{lv*k=lmistr("version"    ),*v=dget(data,k);if(v&&ln(v))dset(r,k,v);}

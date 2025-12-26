@@ -1675,6 +1675,19 @@ write["temp.deck" ld]
 assert_file["serialize a module with data" "tests/dom/logger2.deck" "temp.deck"]
 
 deck:newdeck[]
+m:deck.add["module" "tripper"]
+m.data.value["alpha" (11,22,33)]
+m.data.value[451 "fahrenheit"]
+m.data.value[nil ("ab" dict "cd")]
+m.data.value["key" nil]
+write["temp.deck" deck]
+deck:read["temp.deck"]
+assert["module keystore roundtrip"
+	"%J" parse "{'alpha':[11,22,33],'451':'fahrenheit','':{'a':'c','b':'d'}}"
+	deck.modules.tripper.data.dict
+]
+
+deck:newdeck[]
 m2:deck.add[m "namedcopy"]
 assert["module copy with name" (().namedcopy:m2) (deck.modules)]
 
@@ -1695,6 +1708,36 @@ assert["upgrade module"    (1.2,31) (d3.modules.testy.version,d3.modules.testy.v
 d3.add[m1]
 assert["downgrade module in-place" (list "testy") (keys d3.modules)]
 assert["downgrade module"  (1.1,20) (d3.modules.testy.version,d3.modules.testy.value.foof[10])]
+
+#######################################
+#
+#  KeyStores
+#
+#######################################
+
+k:keystore[]
+assert["new keystore typeof" "keystore" typeof k]
+assert["new keystore .type"  "keystore" k.type]
+assert["new keystore .keys"  () k.keys]
+
+d:"ab" dict 11,22
+k:keystore[d]
+assert["dict keystore .keys" ("a","b") k.keys]
+assert["dict keystore .dict" d k.dict]
+assert["dict keystore .value[] bogus" k k.value[]]
+assert["dict keystore .value[] read"  22 k.value["b"]]
+k.value["b" 33]
+assert["dict keystore .value[] replace" ("ab" dict 11,33) k.dict]
+k.value["c" 99]
+assert["dict keystore .value[] append" ("abc" dict 11,33,99) k.dict]
+
+k:keystore[k]
+assert["keystore clone" ("abc" dict 11,33,99) k.dict]
+assert["keystore raw read" 33 k.b]
+k.a:44
+assert["keystore raw write" 44 k.a]
+k.a:nil
+assert["keystore remove" ("bc" dict 33,99) k.dict]
 
 #######################################
 #

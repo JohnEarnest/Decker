@@ -480,6 +480,7 @@ Decker provides a number of useful pre-defined functions:
 | `array[x y]`           | Create a new [Array Interface](#arrayinterface) with size `x` and cast string `y`, or decode an array string `x`.         | System     |
 | `image[x]`             | Create a new [Image Interface](#imageinterface) with size `x` (`(width,height)`), or decode an image string.              | System     |
 | `sound[x]`             | Create a new [Sound Interface](#soundinterface) with a size or list of samples `x`, or decode a sound string.             | System     |
+| `keystore[x]`          | Create a new [KeyStore Interface](#keystoreinterface), optionally as a copy from a dict or keystore `x`.                  | System     |
 | `newdeck[x]`           | Create a new [Deck Interface](#deckinterface) from scratch, or decode an encoded deck string.                             | System     |
 | `eval[x y z]`          | Parse and execute a string `x` as a Lil program, using any variable bindings in dictionary `y`. (5)                       | System     |
 | `random[x y]`          | Choose `y` random elements from `x`. (6)                                                                                  | System     |
@@ -1400,21 +1401,24 @@ Module scripts are given a small amount of time to execute; if this limit is exc
 
 KeyStore Interface
 ------------------
-Modules each have a _keystore_, which behaves much like a mutable dictionary of supplementary data. The contents of the keystore is serialized along with the module whenever a deck is saved or a module is copied.
+A _keystore_ is a mutable dictionary, for situations where Lil's immutable dictionaries would be unsuitable or unacceptably slow. Modules each have a keystore for stashing supplementary data and state, serialized along with the module whenever a deck is saved or a module is copied. Temporary, non-persistent keystores can also be created with the `keystore[]` built-in function.
 
 | Name                    | Description                                                                                            |
 | :---------------------- | :----------------------------------------------------------------------------------------------------- |
 | `typeof x`              | `"keystore"`                                                                                           |
 | `x.keys`                | List of strings. Every key in this store with an associated value. Read-only.                          |
+| `x.dict`                | A copy of the contents of this store as a dictionary. Read-only.                                       |
+| `x.value[k v]`          | A function for getting (`k` only) or setting (`k` and `v`) entries in this store.                      |
 | `x[key]`                | Get the data associated with a string `key`.                                                           |
 | `x[key]:y`              | Set data associated with a string `key` to `y`.                                                        |
 
 A keystore is subject to several constraints:
 
-- Keys are coerced to strings.
-- Since it has a special meaning (above), the key `"keys"` cannot be used for storing data.
-- Values must be recursively composed of LOVE-compatible data: numbers, strings, lists, dictionaries, tables, or _Image_, _Sound_, or _Array_ interfaces. Other values will be converted to nil.
+- Since they have special meaning (above) the keys `"keys"`, `"dict"`, `"value"` (as well as `"type"`, which applies to all interfaces) cannot be manipulated through the shortcut syntax of direct access; use `keystore.value[]` instead.
 - Setting a value to nil will remove the key-value binding from storage.
+- When serialized with a module, keys will be coerced to strings.
+- When serialized with a module, values must be recursively composed of LOVE-compatible data: numbers, strings, lists, dictionaries, tables, or _Image_, _Sound_, or _Array_ interfaces. Other values will be converted to nil.
+
 
 Prototype Interface
 -------------------

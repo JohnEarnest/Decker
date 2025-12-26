@@ -87,6 +87,7 @@ lv* globals(void){
 	dset(env,lmistr("array"    ),lmnat(n_array,NULL));
 	dset(env,lmistr("image"    ),lmnat(n_image,NULL));
 	dset(env,lmistr("sound"    ),lmnat(n_sound,NULL));
+	dset(env,lmistr("keystore" ),lmnat(n_keystore,NULL));
 	dset(env,lmistr("newdeck"  ),lmnat(n_newdeck,NULL));
 	dset(env,lmistr("readcsv"  ),lmnat(n_readcsv,NULL));
 	dset(env,lmistr("writecsv" ),lmnat(n_writecsv,NULL));
