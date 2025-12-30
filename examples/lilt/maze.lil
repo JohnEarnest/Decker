@@ -4,14 +4,14 @@
 on maze w h do
 	used:up:lf:()
 	on walk here do
+		used[here]:1
 		each delta in random[(list -1,0),(list 1,0),(list 0,-1),(list 0,1) -4]
-			there:(w,h)&(0,0)|here+delta
+			there:(-1+w,h)&(0,0)|here+delta
 			if !used[there]
 				if delta[0]<0 lf[here ]:1 end
 				if delta[0]>0 lf[there]:1 end
 				if delta[1]<0 up[here ]:1 end
 				if delta[1]>0 up[there]:1 end
-				used[there]:1
 				walk[there]
 			end
 		end
@@ -26,4 +26,4 @@ on maze w h do
 	print[(1+w*3) take "+--"]
 end
 
-maze[20 8]
+maze[20 10]
