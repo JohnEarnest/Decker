@@ -1434,7 +1434,7 @@ lv* time_ms(void){
 	return lmn((((long long)now.tv_sec)*1000)+(now.tv_usec/1000));
 }
 lv* time_zone_offset(void){
-	time_t t=time(NULL);struct tm utc_tm;gmtime_r(&t,&utc_tm);utc_tm.tm_isdst=0;time_t utc_epoch=mktime(&utc_tm);
+	time_t t=time(NULL);struct tm utc_tm;gmtime_r(&t,&utc_tm);utc_tm.tm_isdst=-1;time_t utc_epoch=mktime(&utc_tm);
 	return lmn(difftime(t,utc_epoch)/(60*60)); // seconds -> hours
 }
 #endif
