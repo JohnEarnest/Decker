@@ -826,7 +826,7 @@ interface_system=lmi((self,i,x)=>{
 	if(lis(i)&&i.v=='ops'       )return lmn(op_count)
 	if(lis(i)&&i.v=='now'       )return lmn(0|(new Date().getTime()/1000))
 	if(lis(i)&&i.v=='z'         )return lmn(0|(new Date().getTimezoneOffset()/-60))
-	if(lis(i)&&i.v=='ms'        )return lmn(0|(Date.now()))
+	if(lis(i)&&i.v=='ms'        )return lmn(Math.round(Date.now()))
 	if(lis(i)&&i.v=='workspace' )return lmd(['allocs','depth'].map(lms),[allocs,calldepth].map(lmn))
 	return x?x:NIL
 },'system')
