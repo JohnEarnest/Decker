@@ -246,6 +246,22 @@ char* DROM_INKEY[]={
 	"Ș","ș","ș","Ț","Ț","ț","ț","ẞ","¡","¿","«","»","€","°","“","”",
 	"‘","’", 0
 };
+char DROM_INLEN[]={
+	3,2,3,2,3,2,3,2,3,2,3,2,3,2,2,3,
+	2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,
+	2,2,3,2,3,2,3,2,3,2,3,2,3,2,2,3,
+	2,3,2,3,2,3,2,3,2,2,2,3,2,3,2,3,
+	2,3,2,3,2,3,2,2,3,2,3,2,3,2,3,2,
+	3,2,3,2,3,2,3,2,3,2,2,3,2,3,2,3,
+	2,3,2,3,2,3,2,2,3,2,3,2,3,2,3,2,
+	3,2,2,3,2,3,2,3,2,3,2,3,2,3,2,3,
+	2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,
+	2,2,2,2,3,2,3,2,3,2,3,2,3,2,3,2,
+	2,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,
+	3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,
+	3,2,3,2,3,2,3,3,2,2,2,2,3,2,3,3,
+	3,3, 0
+};
 int DROM_INPOINT[]={
 	0x2026,0x00c0,0x0041,0x00c1,0x0041,0x00c2,0x0041,0x00c3,0x0041,0x00c4,0x0041,0x00c5,0x0041,0x00c6,0x00c7,0x0043,
 	0x00c8,0x0045,0x00c9,0x0045,0x00ca,0x0045,0x00cb,0x0045,0x00cc,0x0049,0x00cd,0x0049,0x00ce,0x0049,0x00cf,0x0049,
@@ -344,8 +360,12 @@ void utf8_to_drom(str*s,char*x,int n){
 		else if(c<' '&&c!='\n'){c=255;}       // unix newlines are the only control code we respect
 		else if(c>'~'||((z+1<n)&&(0xFF&x[z+1])==0xCC)){ // possible combining accent
 			int f=0;for(int i=0;DROM_INKEY[i];i++){
-				int ln=strlen(DROM_INKEY[i]);
-				if((z+ln<=n)&&!memcmp(x+z,DROM_INKEY[i],ln)){c=DROM_INVAL[i];z+=(ln-1);f=1;break;}
+				int ln=DROM_INLEN[i],ff=0;
+				if(z+ln<=n){
+					if(ln==2&&DROM_INKEY[i][0]==x[z]&&DROM_INKEY[i][1]==x[z+1]                          )ff=1;
+					if(ln==3&&DROM_INKEY[i][0]==x[z]&&DROM_INKEY[i][1]==x[z+1]&&DROM_INKEY[i][2]==x[z+2])ff=1;
+				}
+				if(ff){c=DROM_INVAL[i];z+=(ln-1);f=1;break;}
 			}
 			if((!f)&&(c>'~')){ // neither recognized nor in the plain ASCII range
 				if     ((c&0xF0)==0xF0)z+=3; // skip 4-byte codepoints
@@ -860,7 +880,7 @@ int tnames=0;lv* tempname(void){char t[64];snprintf(t,sizeof(t),"@t%d",tnames++)
 enum opcodes {JUMP,JUMPF,JUMPT,LIT,DUP,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,IPRE,IPOST,FIDX,FMAP};
 int oplens[]={3   ,3    ,3    ,3  ,1  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3   ,3    ,3   ,3   };
 void blk_addb(lv*x,int n){
-	if(x->ns<x->n+1)x->sv=realloc(x->sv,(x->ns*=2)*sizeof(int));x->sv[x->n++]=n;
+	if(x->ns<x->n+1)x->sv=realloc(x->sv,(x->ns*=2)*sizeof(char));x->sv[x->n++]=n;
 	if(x->n>=65536||x->c>=65536)printf("TOO MUCH BYTECODE!\n"),exit(1);
 }
 int  blk_here(lv*x){return x->n;}
