@@ -880,7 +880,7 @@ int tnames=0;lv* tempname(void){char t[64];snprintf(t,sizeof(t),"@t%d",tnames++)
 enum opcodes {JUMP,JUMPF,JUMPT,LIT,DUP,DROP,SWAP,OVER,BUND,OP1,OP2,OP3,GET,SET,LOC,AMEND,TAIL,CALL,BIND,ITER,EACH,NEXT,COL,IPRE,IPOST,FIDX,FMAP};
 int oplens[]={3   ,3    ,3    ,3  ,1  ,1   ,1   ,1   ,3   ,3  ,3  ,3  ,3  ,3  ,3  ,3    ,1   ,1   ,1   ,1   ,3   ,3   ,1  ,3   ,3    ,3   ,3   };
 void blk_addb(lv*x,int n){
-	if(x->ns<x->n+1)x->sv=realloc(x->sv,(x->ns*=2)*sizeof(int));x->sv[x->n++]=n;
+	if(x->ns<x->n+1)x->sv=realloc(x->sv,(x->ns*=2)*sizeof(char));x->sv[x->n++]=n;
 	if(x->n>=65536||x->c>=65536)printf("TOO MUCH BYTECODE!\n"),exit(1);
 }
 int  blk_here(lv*x){return x->n;}
