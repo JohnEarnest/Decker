@@ -51,6 +51,7 @@ str str_new(void){return(str){0,32,calloc(32,1)};}
 void str_provision(str*s,int size){if(s->size<size)s->sv=realloc(s->sv,s->size=size);}
 void str_addraw(str*s,int x){if(s->c+1>=s->size)s->sv=realloc(s->sv,s->size*=2);s->sv[s->c++]=x;}
 void str_term(str*s){str_addraw(s,'\0');}
+void str_pop(str*s){if(s->c>0)s->c--;}
 void str_addc(str*s,char x){if(x!='\r')str_addraw(s,x=='\t'?' ':((0xFF&x)>=32)||x=='\n'?x:255);}
 void str_add(str*s,char*x,int n){for(int z=0;z<n;z++)str_addc(s,x[z]);}
 void str_addz(str*s,char*x){str_add(s,x,strlen(x));} // null-terminated c-string
@@ -162,9 +163,6 @@ int matchr(lv*x,lv*y){
 	if(lil(x)){EACH(z,x)if(!matchr(x->lv[z],y->lv[z]))return 0;return 1;}
 	if(lid(x)||lit(x)){EACH(z,x)if(!matchr(x->lv[z],y->lv[z])||!matchr(x->kv[z],y->kv[z]))return 0;return 1;}
 	return 0;
-}
-void dsetuq(lv*d,lv*k,lv*x){
-	FIND(z,d,k){str s=str_new();str_addl(&s,k);str_addc(&s,'_');k=lmstr(s);break;}ld_add(d,k,x);
 }
 lv* dclone(lv*d){
 	lv*r=lmvv(3,d->s);r->c=d->c;r->kv=calloc(d->s,sizeof(lv*));
@@ -549,8 +547,14 @@ dyad(l_cross){
 		return r;
 	}
 	x=lt(x),y=lt(y);lv*r=lmt();r->n=x->n*y->n;
-	EACH(c,x){GEN(t,r->n)x->lv[c]->lv[z%x->n];dset  (r,x->kv[c],t);}
-	EACH(c,y){GEN(t,r->n)y->lv[c]->lv[z/x->n];dsetuq(r,y->kv[c],t);}return r;
+	EACH(c,x){GEN(t,r->n)x->lv[c]->lv[z%x->n];dset(r,x->kv[c],t);}
+	EACH(c,y){
+		GEN(t,r->n)y->lv[c]->lv[z/x->n];
+		str s=str_new();str_addl(&s,y->kv[c]);str_term(&s);while(1){
+			int f=0;for(int v=0;v<r->c;v++)if(!strcmp(r->kv[v]->sv,s.sv)){f=1;break;}
+			if(!f)break;str_pop(&s),str_addc(&s,'_'),str_term(&s);
+		}dset(r,lmstr(s),t);
+	}return r;
 }
 dyad(l_join){
 	if(!lit(x)||!lit(y)){

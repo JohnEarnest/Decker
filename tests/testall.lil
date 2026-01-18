@@ -415,6 +415,14 @@ show[ # a cross join which has no result rows
 	insert one two with end cross
 	insert two three with end
 ]
+show[ # a cross join with a column name collision
+	(insert a a_ with 11 22 33 44 end) cross
+	(insert a with 55 66 end)
+]
+show[ # a cross join which will produce multiple collisions
+	(insert a a_ with 11 22 33 44 end) cross
+	(insert a a__ with 55 66 77 88 end)
+]
 show[(1,2) cross 3,4,5]
 show[3 cross 2]
 show[2 cross "ABC"]

@@ -258,8 +258,10 @@ dyad={
 	},
 	cross: (x,y)=>{ // cartesian join; force columns to be unique:
 		const f=x=>lt(lin(x)?monad.range(x):lml(ll(x)));if(!lit(x)||!lit(y))return lml(rows(dyad.cross(f(x),f(y))).v.map(x=>lml(x.v)))
-		const a=lt(x),b=lt(y), ak=tab_cols(a),bk=tab_cols(b), uk=bk.map(x=>ak.indexOf(x)>=0?x+'_':x)
-		const r=lmt(); ak.forEach(k=>tab_set(r,k,[])), uk.forEach(k=>tab_set(r,k,[]))
+		const a=lt(x),b=lt(y), ak=tab_cols(a),bk=tab_cols(b),uk=[]
+		const r=lmt(); ak.forEach(k=>tab_set(r,k,[])), bk.forEach(k=>{
+			while(tab_has(r,k))k=k+'_';tab_set(r,k,[]),uk.push(k)
+		})
 		for(let bi=0;bi<count(b);bi++)for(let ai=0;ai<count(a);ai++){
 			ak.forEach(k=>tab_get(r,k).push(tab_cell(a,k,ai)))
 			bk.forEach((k,i)=>tab_get(r,uk[i]).push(tab_cell(b,k,bi)))
