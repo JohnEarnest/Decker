@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:4
+card:33
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -921,6 +921,25 @@ end
 on click do
  alert["you clicked the button!"]
 end
+{end}
+
+{card:textclip}
+{widgets}
+c:{"type":"canvas","size":[100,100],"pos":[119,111],"volatile":1,"script":"textclip.0","scale":1,"clip":[10,10,80,80]}
+ref:{"type":"field","size":[31,25],"pos":[243,122],"align":"center","value":{"text":["some\n","Text"],"font":["","menu"],"arg":["",""]}}
+clip:{"type":"button","size":[82,20],"pos":[246,161],"text":"clip","style":"check","value":1}
+field1:{"type":"field","size":[100,20],"pos":[120,69],"locked":1,"border":0,"align":"center","value":"click and drag below:"}
+rich:{"type":"button","size":[82,20],"pos":[246,186],"text":"rich-text","style":"check","value":1}
+
+{script:textclip.0}
+on drag pos do
+ me.clear[]
+ if clip.value me.clip[10,10 me.size-20,20] else me.clip[] end
+ t:if rich.value ref.value else ref.text end
+ me.box[pos ref.size "center"]
+ me.text[t (pos-ref.size/2),ref.size "center"] 
+end
+
 {end}
 
 {module:fancyTransitions}

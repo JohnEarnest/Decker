@@ -19,6 +19,12 @@ on image_format i do
 	f:"%%%ii" format cw
 	print["(%s)" format (",\n ","(list %s)",",",f) format i]
 end
+on image_format_json i do
+	i:image_matrix[i]
+	cw:1+9<max max i
+	f:"%%%ii" format cw
+	print["\"%%J\"parse\"[\n %s]\"" format (",\n ","[%s]",",",f) format i]
+end
 on image_matrix i do
 	r:if "image"~typeof i i.pixels else () end
 	if 0~count r list r else r end
@@ -1106,20 +1112,21 @@ i:c.copy[]
 c.size:11,9
 c.clear[]
 rt:rtext.cat[
-	rtext.make["b" "mono"]
+	rtext.make["y" "mono"]
 	rtext.make["" "" i]
 ]
 c.text[rt 0,-2]
 assert_image["canvas rich text with inline image"
-	((list 0,0,0,0,0,0,0,0,0,0,0),
-	 (list 0,0,0,0,0,0,0,0,0,0,0),
-	 (list 1,0,0,0,0,0,0,0,0,0,0),
-	 (list 1,0,0,0,0,0,1,1,1,1,1),
-	 (list 1,1,1,1,0,0,1,0,1,0,1),
-	 (list 1,0,0,0,1,0,1,1,0,1,1),
-	 (list 1,0,0,0,1,0,1,0,1,0,1),
-	 (list 1,0,0,0,1,0,1,1,1,1,1),
-	 (list 1,1,1,1,0,0,0,0,0,0,0))
+	"%J"parse"[
+	 [0,0,0,0,0,0,0,0,0,0,0],
+	 [0,0,0,0,0,0,1,1,1,1,1],
+	 [1,0,0,0,1,0,1,0,1,0,1],
+	 [1,0,0,0,1,0,1,1,0,1,1],
+	 [1,0,0,0,1,0,1,0,1,0,1],
+	 [1,0,0,0,1,0,1,1,1,1,1],
+	 [0,1,1,1,1,0,0,0,0,0,0],
+	 [0,0,0,0,1,0,0,0,0,0,0],
+	 [0,1,1,1,0,0,0,0,0,0,0]]"
 	c.copy[]
 ]
 
@@ -1136,6 +1143,22 @@ assert_image["canvas plaintext centered"
 	 (list 0,0,1,0,0,1,0,0,1,0,0,0,0,0,0),
 	 (list 0,0,1,0,0,1,0,0,1,0,1,0,0,0,0),
 	 (list 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0))
+	c.copy[]
+]
+
+c.clear[]
+c.text["M" (-4,0,10,10) "center"]
+assert_image["canvas rich text clipping at boundary"
+	"%J"parse"[
+	 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	 [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],
+	 [0,0,1,1,0,0,0,0,0,0,0,0,0,0,0],
+	 [0,1,0,1,0,0,0,0,0,0,0,0,0,0,0],
+	 [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0],
+	 [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],
+	 [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],
+	 [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],
+	 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]"
 	c.copy[]
 ]
 

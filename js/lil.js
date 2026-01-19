@@ -2338,10 +2338,10 @@ canvas_read=(x,card)=>{
 		const font=ifield(frame,'font')
 		if(pos&&lil(pos)&&count(pos)>=4){
 			a=anchors[ls(a)]||0;const r=rint(getrect(pos)), align=(a==0||a==3||a==6)?ALIGN.left:(a==2||a==5||a==8)?ALIGN.right:ALIGN.center
+			const l=lit(t)?layout_richtext(frame.card.deck,t,font,align,r.w):layout_plaintext(ls(t),font,align,rect(r.w,r.h))
 			const valign=s=>rect(align==ALIGN.left?0:align==ALIGN.right?r.w-s.x:0|((r.w-s.x)/2), y=(a==0||a==1||a==2)?0:(a==6||a==7||a==8)?r.h-s.y:0|((r.h-s.y)/2))
-			const rbox=s=>{const a=valign(s);return rclip(rint(rect(r.x+a.x,r.y+a.y,s.x,s.y)),frame.clip)}
-			if(lit(t)){const l=layout_richtext(frame.card.deck,t,font,align,r.w);draw_text_rich(rbox(l.size),l,frame.pattern,0)}
-			else      {const l=layout_plaintext(ls(t),font,align,rect(r.w,r.h)) ;draw_text_wrap(rbox(l.size),l,frame.pattern  )}
+			const rbox=s=>{const a=valign(s);return rint(rect(r.x+a.x,r.y+a.y,s.x,s.y))}
+			draw_text_rich_raw(rbox(l.size),l,frame.pattern,0,null)
 		}else{
 			if(lit(t)){const p=getpair(pos);return text(t,lml([p.x,p.y,RTEXT_END/1000,RTEXT_END].map(lmn)))}
 			const p=anchor(rpair(getpair(pos),font_textsize(font,ls(t))),a)
@@ -2407,9 +2407,9 @@ canvas_read=(x,card)=>{
 	},'canvas');ri.card=card
 	ri.card=card
 	{const v=dget(x,lms('image'));if(v)ri.image=image_read(ls(v)),iwrite(ri,lms('size'),lmpair(ri.image.size))}
-	{const v=dget(x,lms('clip' ));if(v)canvas_clip(ri,ll(v))}
 	{const v=dget(x,lms('size' ));if(v)ri.size=getpair(v)}
 	{const v=dget(x,lms('scale'));if(v)ri.scale=max(0.1,ln(v))}
+	{const v=dget(x,lms('clip' ));if(v)canvas_clip(ri,[dyad.take(lmn(2),v),dyad.drop(lmn(2),v)])}
 	init_field(ri,'border'   ,x)
 	init_field(ri,'draggable',x)
 	init_field(ri,'brush'    ,x)
@@ -2524,7 +2524,7 @@ widget_read=(x,card)=>{
 	const ctors={button:button_read,field:field_read,slider:slider_read,grid:grid_read,canvas:canvas_read,contraption:contraption_read}
 	const ri=(ctors[type]||button_read)(ld(x),card);if(!lii(ri))return null
 	ri.name=ls(ukey(card.widgets,dget(x,lms('name')),tname))
-	init_field(ri,'size'    ,x)
+	if(!canvas_is(ri))init_field(ri,'size',x)
 	init_field(ri,'script'  ,x)
 	init_field(ri,'font'    ,x)
 	init_field(ri,'pattern' ,x)
