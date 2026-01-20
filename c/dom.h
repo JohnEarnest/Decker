@@ -1583,10 +1583,9 @@ lv* n_canvas_text(lv*self,lv*z){
 	pick_canvas(self);lv*t=lit(l_first(z))?rtext_cast(l_first(z)):ls(l_first(z)),*deck=dget(dget(self->b,lmistr("card"))->b,lmistr("deck"));
 	if(z->c>=2&&lil(z->lv[1])&&z->lv[1]->c>=4) {
 		rect r=getrect(z->lv[1]);int a=2<z->c?ordinal_enum(z->lv[2],anchor):0, align=(a==0||a==3||a==6)?align_left:(a==2||a==5||a==8)?align_right:align_center;
-		#define valign int x=align==align_left?0:align==align_right?r.w-s.x:(r.w-s.x)/2, y=(a==0||a==1||a==2)?0:(a==6||a==7||a==8)?r.h-s.y:(r.h-s.y)/2;
-		#define rbox   box_intersect((rect){r.x+x,r.y+y,s.x,s.y},frame.clip)
-		if(lit(t)){pair s=layout_richtext (deck,t,frame.font,align,r.w)           ;valign;draw_text_rich(rbox,frame.pattern,0);}
-		else      {pair s=layout_plaintext(t->sv,frame.font,align,(pair){r.w,r.h});valign;draw_text_wrap(rbox,frame.pattern  );}
+		pair s=lit(t)?layout_richtext(deck,t,frame.font,align,r.w):layout_plaintext(t->sv,frame.font,align,(pair){r.w,r.h});
+		int x=align==align_left?0:align==align_right?r.w-s.x:(r.w-s.x)/2, y=(a==0||a==1||a==2)?0:(a==6||a==7||a==8)?r.h-s.y:(r.h-s.y)/2;
+		draw_text_rich_raw((rect){r.x+x,r.y+y,s.x,s.y},frame.pattern,0,NULL);
 	}else{
 		if(lit(t))return n_canvas_text(self,lml2(t,lmrect(rect_pair(unpack_pair(z,1),(pair){RTEXT_END/1000,RTEXT_END}))));
 		rect pos=unpack_anchor(rect_pair(unpack_pair(z,1),font_textsize(frame.font,ls(l_first(z))->sv)),z,2);
@@ -1669,9 +1668,9 @@ lv* interface_canvas(lv*self,lv*i,lv*x){
 lv* canvas_read(lv*x,lv*r){
 	x=ld(x);lv*ri=lmi(interface_canvas,lmistr("canvas"),r);
 	{lv*k=lmistr("image"),*v=dget(x,k);if(v){lv*i=image_read(v);dset(r,k,i);iwrite(ri,lmistr("size"),lmpair(image_size(i)));}}
-	{lv*k=lmistr("clip" ),*v=dget(x,k);if(v)n_canvas_clip(ri,l_list(x));}
 	{lv*k=lmistr("size" ),*v=dget(x,k);if(v)dset(ri->b,k,lmpair(getpair(v)));}
 	{lv*k=lmistr("scale"),*v=dget(x,k);if(v)dset(ri->b,k,lmn(MAX(0.1,ln(v))));}
+	{lv*k=lmistr("clip" ),*v=dget(x,k);if(v){n_canvas_clip(ri,lml2(l_take(lmn(2),v),l_drop(lmn(2),v)));}}
 	init_field(ri,"border"   ,x);
 	init_field(ri,"draggable",x);
 	init_field(ri,"brush"    ,x);
@@ -2288,7 +2287,7 @@ lv* widget_read(lv*x,lv*card){
 	      (type&&!strcmp(type->sv,"slider"     ))?slider_read(x,r):
 	      (type&&!strcmp(type->sv,"contraption"))?contraption_read(x,r): button_read(x,r);
 	if(!lii(ri))return NULL;
-	init_field(ri,"size"    ,x);
+	if(!canvas_is(ri))init_field(ri,"size",x);
 	init_field(ri,"script"  ,x);
 	init_field(ri,"font"    ,x);
 	init_field(ri,"pattern" ,x);
