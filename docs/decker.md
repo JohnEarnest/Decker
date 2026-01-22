@@ -1491,27 +1491,27 @@ For widgets within a contraption, `card` will be the contraption. While editing/
 
 Events are as follows:
 
-| Target      | Name         | Argument                                     | When                                                           |
-| :---------- | :----------- | :------------------------------------------- | :------------------------------------------------------------- |
-| button      | `click`      | None.                                        | The user clicks the button or activates its _shortcut_.        |
-| grid        | `click`      | Row number.                                  | The user selects a row in the grid.                            |
-| grid        | `order`      | Column name as a string.                     | The user clicks a header cell on the grid.                     |
-| grid        | `change`     | `grid.value` (table).                        | The user alters the data in the the grid.                      |
-| grid        | `changecell` | Replacement value (string or rtext).         | The user edits a cell in the grid.                             |
-| canvas      | `click`      | `pos` on the canvas.                         | The user depresses their pointing device on a canvas.          |
-| canvas      | `drag`       | `pos` on the canvas.                         | The user moves their pointing device while held on a canvas.   |
-| canvas      | `release`    | `pos` on the canvas.                         | The user releases their pointing device on a canvas.           |
-| field       | `link`       | Link contents (string).                      | The user clicks a link in rich text.                           |
-| grid        | `link`       | Link contents (string).                      | The user clicks a link in a rich text cell.                    |
-| field       | `run`        | Selection or `field.text` (string).          | The user presses shift+return with the field active.           |
-| field       | `change`     | `field.text` (string).                       | The user alters the field, debounced to 1/4 second.            |
-| slider      | `change`     | `slider.value` (number).                     | The user alters the slider, debounced to 1 frame.              |
-| card        | `navigate`   | One of {`"up"`,`"down"`,`"left"`,`"right"`}. | The user performs a navigation input.                          |
-| card        | `view`       | None.                                        | The card is navigated to, or the user enters interaction mode. |
-| contraption | `view`       | None.                                        | The surrounding card is sent a `view` event (see above).       |
-| widget      | `view`       | None.                                        | The surrounding card is active, repeatedly at 60hz.            |
-| card        | `loop`       | Previous _sound interface_ or nil.           | The card is navigated to, or the background loop completes.    |
-| card        | `quit`       | None.                                        | The user attempts to quit Decker while in "kiosk mode".        |
+| Target      | Name         | Argument                                     | When                                                                           |
+| :---------- | :----------- | :------------------------------------------- | :----------------------------------------------------------------------------- |
+| button      | `click`      | None.                                        | The user clicks the button or activates its _shortcut_.                        |
+| grid        | `click`      | Row number.                                  | The user selects a row in the grid.                                            |
+| grid        | `order`      | Column name as a string.                     | The user clicks a header cell on the grid.                                     |
+| grid        | `change`     | `grid.value` (table).                        | The user alters the data in the the grid.                                      |
+| grid        | `changecell` | Replacement value (string or rtext).         | The user edits a cell in the grid.                                             |
+| canvas      | `click`      | `pos` on the canvas.                         | The user depresses their pointing device on a canvas.                          |
+| canvas      | `drag`       | `pos` on the canvas.                         | The user moves their pointing device while held on a canvas.                   |
+| canvas      | `release`    | `pos` on the canvas.                         | The user releases their pointing device on a canvas.                           |
+| field       | `link`       | Link contents (string).                      | The user clicks a link in rich text.                                           |
+| grid        | `link`       | Link contents (string).                      | The user clicks a link in a locked rich text cell (column format `T`).         |
+| field       | `run`        | Selection or `field.text` (string).          | The user presses shift+return with the field active.                           |
+| field       | `change`     | `field.text` (string).                       | The user alters the field, debounced to 1/4 second.                            |
+| slider      | `change`     | `slider.value` (number).                     | The user alters the slider, debounced to 1 frame.                              |
+| card        | `navigate`   | One of {`"up"`,`"down"`,`"left"`,`"right"`}. | The user performs a navigation input (arrow keys or swipes).                   |
+| card        | `view`       | None.                                        | The card is navigated to or refreshed, including entering interact mode.       |
+| contraption | `view`       | None.                                        | The surrounding card is sent a `view` event (see above).                       |
+| widget      | `view`       | None.                                        | The surrounding card is active and the widget is animated, repeatedly at 60hz. |
+| card        | `loop`       | Previous _sound interface_ or nil.           | The card is navigated to, or the background loop completes.                    |
+| card        | `quit`       | None.                                        | The user attempts to quit Decker while in "kiosk mode".                        |
 
 Editing a cell in a grid produces a `changecell` event, which provides an opportunity to parse/validate input, produce side-effects, or cancel applying the change entirely. The `row`, `col`, and `colname` attributes of the target grid (`me`) can be referenced to identify the cell being altered.
 
