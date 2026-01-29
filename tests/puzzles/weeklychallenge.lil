@@ -24,6 +24,15 @@ on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
 
 # the problems:
 
+problem[355.1]
+# add thousands separators to the number x
+on f x do "" fuse rev["," fuse 3 window rev["" split x]] end
+assert[f[      1]         "1"]
+assert[f[    123]       "123"]
+assert[f[   1234]     "1,234"]
+assert[f[  12345]    "12,345"]
+assert[f[1000000] "1,000,000"]
+
 problem[352.2]
 # which binary prefixes are divisible by 5?
 on b2d x do n:count x  sum x*2^n-1+range n end
