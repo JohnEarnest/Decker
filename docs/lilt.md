@@ -145,7 +145,7 @@ ffmpeg -i input.mp3 -bitexact -map_metadata -1 -ac 1 -ar 8000 -acodec pcm_u8 out
 
 5) See the Decker Manual for details of `eval[]`, `readcsv[]`, `writecsv[]`, `readxml[]`, and `writexml[]`.
 
-6) Scripts loaded with `import[]` will not have access to `args` or `env`. Scripts may use `args~0` as an idiom to detect when they have been imported as a library. If you `import[]` a `.deck` or `.html` file, the function will return a dictionary of the module values within that deck, keyed by module name, as a convenience:
+6) Scripts loaded with `import[]` will not have access to `args` or `env`. Scripts may use `args~nil` as an idiom to detect when they have been imported as a library. If you `import[]` a `.deck` or `.html` file, the function will return a dictionary of the module values within that deck, keyed by module name, as a convenience:
 ```lil
 bn:read["examples/decks/bignums.deck"].modules.bn.value   # without import[]
 bn:import["examples/decks/bignums.deck"].bn               # with import[]
