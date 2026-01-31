@@ -17,16 +17,15 @@ end
 
 # utilities:
 
-on rev       x do x @ (-1+count x)-range count x                    end # k: |:
-on sortstr   x do "" fuse extract orderby value asc from x          end # k: {x@<x}
-on sumscan   x do a:0 each v in x a:a+v end                         end # k: +\
-on maxscan   x do a:0 each v in x a:a|v end                         end # k: |\
+on sortstr   x do "" fuse extract orderby value asc from x  end # k: {x@<x}
+on sumscan   x do a:0 each v in x a:a+v end                 end # k: +\
+on maxscan   x do a:0 each v in x a:a|v end                 end # k: |\
 
 # the problems:
 
 problem[355.1]
 # add thousands separators to the number x
-on f x do "" fuse rev["," fuse 3 window rev["" split x]] end
+on f x do rev "," fuse 3 window rev "" split x end
 assert[f[      1]         "1"]
 assert[f[    123]       "123"]
 assert[f[   1234]     "1,234"]
@@ -93,7 +92,7 @@ assert[f["a#b"  "c"   ] 0]
 problem[322.1]
 # format letters in x in groups of size i
 on f x i do
-  "-" fuse rev[rev @ i window rev["-" drop x]]
+  "-" fuse rev rev @ i window rev "-" drop x
 end
 assert[f["ABC-D-E-F" 3] "ABC-DEF"]
 assert[f["A-BC-D-E"  2] "A-BC-DE"]
@@ -663,7 +662,7 @@ problem[254.2]
 # reverse the vowels in the given string, preserving the order of casing.
 on f x do
  on zipcase a b do each v i in a ("%l","%u")[v in "AEIOUY"]format b[i] end end
- "" fuse first cols update value:zipcase[value rev[value]] where value in "aeiouyAEIOUY" from x
+ "" fuse first cols update value:zipcase[value rev value] where value in "aeiouyAEIOUY" from x
 end
 assert[f["Raku" ] "Ruka" ]
 assert[f["Perl" ] "Perl" ]
@@ -723,7 +722,7 @@ problem[248.1]
 on f x y do
  m:!("" split x)=y
  on fscan x do r:1000000 each v in x r:v*1+r end end
- fscan[m]&rev[fscan[rev[m]]]
+ fscan[m]&rev fscan[rev m]
 end
 assert[f["loveleetcode" "e"] (3,2,1,0,1,0,0,1,2,2,1,0)]
 assert[f["aaab"         "b"] (3,2,1,0)]
@@ -1383,14 +1382,14 @@ assert[f["The purpose of our lives is to be happy"] 23]
 problem[79.2]
 # how much water can be trapped between the columns of a histogram?
 on f x do
- sum mag @ x - rev[maxscan[rev[x]]] & maxscan[x]
+ sum mag @ x - maxscan[x] & rev maxscan[rev x]
 end
 assert[f[(2, 1, 4, 1, 2, 5)] 6]
 assert[f[(3, 1, 3, 1, 1, 5)] 6]
 
 problem[78.1]
 # identify elements which are greater than all the elements to their right.
-on f x do extract where value=rev[maxscan[rev[x]]] from x end
+on f x do extract where value=rev maxscan[rev x] from x end
 assert[f[(9, 10, 7, 5, 6, 1)] (10, 7, 6, 1)]
 assert[f[(3, 4, 5          )] (list 5     )]
 

@@ -149,7 +149,7 @@ field4:{"type":"field","size":[232,13],"pos":[10,133],"locked":1,"show":"transpa
 
 {module:bn}
 description:"arbitrary-precision arithmetic for natural numbers."
-version:1.1
+version:1.2
 {script}
 digits:"" split "0123456789"
 names:"%j" parse "[
@@ -222,10 +222,7 @@ on format_plain x do
  "" fuse if ()~x 0 else x end
 end
 on format_commas x do
- "" fuse each digit i in x:"" split format_plain[x]
-  local p:(-1+count x)-i
-  if p&!3%p digit,"," else digit end
- end
+ rev "," fuse 3 window rev "" split format_plain[x]
 end
 on format_name x do
  x:"" split format_plain[x]

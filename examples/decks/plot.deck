@@ -369,7 +369,7 @@ try:{"type":"button","size":[60,20],"pos":[252,287],"script":"scatterplot.1","te
 
 {module:plot}
 description:"draw graphs and plots to canvases"
-version:2.1
+version:2.2
 {script}
 local grays:(1,13,12,9,8,5)
 
@@ -390,8 +390,8 @@ on label x y do
   n*10^e
  end
  d:nice[nice[y-x 0]/5 1]
- a:d* floor x/d
- b:d*-floor-y/d
+ a:d*floor x/d
+ b:d*ceil  y/d
  v:() while a<b+.5*d  v:v,a  a:a+d end v
 end
 

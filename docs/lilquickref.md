@@ -18,9 +18,10 @@ Primitives
 ----------
 | Valence | Purpose    |                                                                                       |
 | :------ | :--------- | :------------------------------------------------------------------------------------ |
-| monad   | arithmetic | `-` `!` `floor` `cos` `sin` `tan` `exp` `ln` `sqrt` `mag` `unit` `heading`            |
+| monad   | arithmetic | `-` `!` `floor` `ceil` `cos` `sin` `tan` `exp` `ln` `sqrt` `mag` `unit` `heading`     |
 | monad   | reducers   | `count` `first` `last` `sum` `prod` `min` `max` `raze`                                |
-| monad   | data       | `range` `keys` `list` (enlist) `rows` `cols` `table` `typeof` `flip`                  |
+| monad   | data       | `range` `rev` `keys` `list` (enlist) `rows` `cols` `table` `typeof` `flip`            |
+| monad   | string     | `trim`                                                                                |
 | dyad    | arithmetic | `+` `-` `*` `/` `%` (y mod x) `^` (pow) `&` (min) `|` (max)                           |
 | dyad    | logical    | `<` `>` `=` (conforming equal) `~` (match) `unless` (x if y is `0`)                   |
 | dyad    | string     | `fuse` `split` `parse` `format` `like`                                                |
