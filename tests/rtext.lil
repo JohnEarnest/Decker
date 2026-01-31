@@ -97,3 +97,13 @@ show[rtext.find["one a two A A three a" "a" 0]]           # case-sensitive
 show[rtext.find["one a two A A three a" "a" 1]]           # case-insensitive
 show[rtext.find["aaaaaa" "aaa"]]                          # matches don't overlap
 show[rtext.find[rt3 "aft"]]                               # inline images present
+
+show[rtext.trim[""            ]] # trim empty
+show[rtext.trim["A"           ]] # trim single
+show[rtext.trim[" AB\n "      ]] # trim actual whitespace
+show[rtext.trim[" \nAB"       ]] # leading only
+show[rtext.trim["C "          ]] # trailing only
+show[rtext.trim["aaABBAa" ""  ]] # custom delim empty
+show[rtext.trim["aaABBAa" "a" ]] # custom delim single
+show[rtext.trim["aaABBAa" "aA"]] # custom delim multiple
+show[rtext.trim[rt2           ]] # trim actual rtext

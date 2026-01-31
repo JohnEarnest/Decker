@@ -2070,6 +2070,12 @@ interface_rtext=lmi((self,i,x)=>{
 			let m=1;for(let w=0;w<d.length;w++)if(d[w]!=t[z+w]){m=0;break}if(m){r.v.push(rtext_span(v,rect(n,z))),z+=d.length-1,n=z+1}
 		}if(n<=t.length)r.v.push(rtext_span(v,rect(n,t.length)));return r
 	})
+	if(ikey(i,'trim'))return lmnat(([tab,d])=>{
+		tab=rtext_cast(tab);const delim=(d?ls(d):'\n ').split(''),t=ls(rtext_string(tab))
+		let a=0         ;while(delim.indexOf(t[a])>=0)a++;
+		let b=t.length-1;while(delim.indexOf(t[b])>=0)b--;
+		return rtext_span(tab,rect(a,b+1));
+	})
 	if(ikey(i,'replace'))return lmnat(([tab,k,v,i])=>{
 		if(!k||!v)return tab||NIL;const t=rtext_cast(tab),r=[],tx=ls(rtext_string(t,null,true)),nocase=i&&lb(i),text=nocase?tx.toLowerCase():tx,c=rect(0,0)
 		if(!lil(k))k=monad.list(k);if(!lil(v))v=monad.list(v)
