@@ -369,6 +369,7 @@ rtext.replace["the orange!" "orange" "apple"] # rtext: rich text tables
 # built-in functions for constructing instances of certain interfaces:
 arr:array[16 "i16b"] # array: a 1D mutable array for manipulating binary data
 img:image[(10,20)]   # image: a 2D mutable byte array for graphics operations
+dic:keystore[]       # keystore: a mutable dictionary
 
 sys~sys              # -> 1          # interfaces compare with reference-equality.
 sys=(sys,sys,123)    # -> (1,1,0)
