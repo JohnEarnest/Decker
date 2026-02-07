@@ -3347,7 +3347,7 @@ all_menus=_=>{
 			if(menu_item('Invert',sel&&!dr.limbo_dither,'i')){
 				if(bg_has_sel())bg_scoop_selection()
 				const s=dr.limbo.size, pal=deck.patterns.pal.pix
-				for(let z=0;z<dr.limbo.pix.length;z++)dr.limbo.pix[z]=1^draw_pattern(dr.limbo.pix[z],(z%s.x),0|(z/s.x))
+				for(let z=0;z<dr.limbo.pix.length;z++)dr.limbo.pix[z]=1^draw_pattern(pal,dr.limbo.pix[z],(z%s.x),0|(z/s.x))
 			}
 			if(menu_item('Flip Horizontal',sel)){
 				if(bg_has_sel())bg_scoop_selection()
