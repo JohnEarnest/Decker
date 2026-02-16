@@ -749,6 +749,7 @@ The _rtext_ interface contains a number of helper routines for building and mani
 | `rtext.string[table (x,y) f]`   | The text content of `table` between character positions `x` and `y`.              |
 | `rtext.span[table (x,y)]`       | An rtext subtable containing content between character positions `x` and `y`.     |
 | `rtext.split[delim table]`      | Break an rtext into a list of tables at instances of a delimiter string `delim`.  |
+| `rtext.trim[table d?]`          | Trim chars in `d` (or whitespace) from the start and end of rtext `table`.        |
 | `rtext.replace[table x y i]`    | Replace every instance in `table` of `x` with `y`. If `i`, ignore case.           |
 | `rtext.find[table x i]`         | Find every instance in `table` of `x`. If `i`, ignore case.                       |
 | `rtext.cat[...x]`               | Concatenate rtext tables sequentially. Accepts any number of arguments.           |

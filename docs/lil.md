@@ -1277,7 +1277,9 @@ sys.bogus:123        # 123
 
 Appendix 1: Unary Primitives
 ----------------------------
-The unary arithmetic primitives `-` (negation), `!` (logical not), `floor`, `cos`, `sin`, `tan`, `exp` (the exponential function), `ln` (natural log), and `sqrt` (square root) _conform_, and generalize to dictionaries, lists, and numbers.
+The unary arithmetic primitives `-` (negation), `!` (logical not), `floor`, `ceil`, `cos`, `sin`, `tan`, `exp` (the exponential function), `ln` (natural log), and `sqrt` (square root) _conform_, and generalize to dictionaries, lists, and numbers.
+
+`trim` removes whitespace (spaces and newline characters) from the beginning and end of strings. It likewise _conforms_ and will trim all the strings within lists or dictionaries.
 
 The unary aggregation primitives `sum`, `prod`, `raze`, `min`, and `max` take a list and collapse it into a single result as if by combining every element of the list with the binary primitives `+`, `*`, `,`, `&` and `|`, respectively.
 
@@ -1290,6 +1292,8 @@ The `raze` of a table `x` will convert it into a dictionary as if by `x[(keys x)
 `first` and `last` pick the first or last elements of a value. The `first` of a function is the function's name.
 
 `range` of a number produces a list of the integers `[0,x)`. Applied to anything else, it will produce a list of the _values_ of its dictionary equivalent.
+
+`rev` reverses the order of the _elements_ of a list, string (characters), or table (rows). For a dictionary, `rev` produces a reverse-lookup dictionary. If the values of a reversed dictionary are not distinct, Lil will preserve the association which appears last. Thus, `rev "ABC" dict "DFD"` is equivalent to `"DF" dict "CB"`.
 
 `keys` produces a list of the _keys_ of a value's dictionary equivalent. The `keys` of a function are a list of its argument names.
 
@@ -1388,8 +1392,9 @@ Appendix 3: Language Grammar
 The following is a slightly hand-waved EBNF description of Lil's syntax. The production `ALPHA` is taken as any alphabetic character (upper- or lowercase), and the production `NON_ESC` is any [DeckRoman](format.html#deckroman) character (except backslash). All whitespace is interchangeable in Lil, any amount of whitespace may appear between tokens, and line comments begin with `#`.
 
 ```
-MONAD   := '-'|'!'|'floor'|'cos'|'sin'|'tan'|'exp'|'ln'|'sqrt'|'count'|'first'|'last'|'sum'|'min'|'max'|
-           'raze'|'prod'|'range'|'keys'|'list'|'rows'|'cols'|'table'|'typeof'|'flip'|'mag'|'unit'|'heading'
+MONAD   := '-'|'!'|'floor'|'ceil'|'cos'|'sin'|'tan'|'exp'|'ln'|'sqrt'|'count'|'first'|'last'|'sum'|'min'|'max'|
+           'raze'|'prod'|'range'|'keys'|'list'|'rows'|'cols'|'table'|'typeof'|'flip'|'mag'|'unit'|'heading'|
+           'trim'|'rev'
 DYAD    := '+'|'-'|'*'|'/'|'%'|'^'|'<'|'>'|'='|'&'|'|'|','|'~'|'@'|'split'|'fuse'|'dict'|'take'|'drop'|
            'in'|'join'|'cross'|'parse'|'format'|'unless'|'limit'|'like'|'window'|'fill'
 DIGIT   := '0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'

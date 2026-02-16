@@ -1,0 +1,44 @@
+# test fixture for the bn module
+bn:import["examples/decks/bignums.deck"].bn
+
+on assert x y do
+ a:"%J" format x
+ b:"%J" format y
+ if !a~b
+  print["error\ngot:       %s\nexpected:  %s" a b]
+  exit[0]
+ end
+end
+
+assert[bn.make[       0] ()       ]
+assert[bn.make[  "1234"] (1,2,3,4)]
+assert[bn.make["-1,234"] (1,2,3,4)]
+assert[bn.format_plain ["71780085"]     "71780085"]
+assert[bn.format_commas["71780085"]   "71,780,085"]
+assert[bn.format_name  ["71780085"] "71.7 million"]
+assert[bn.more [bn.make["12"] bn.make["34"]] 0]
+assert[bn.more [bn.make["34"] bn.make["34"]] 0]
+assert[bn.more [bn.make["34"] bn.make["12"]] 1]
+assert[bn.less [bn.make["12"] bn.make["34"]] 1]
+assert[bn.less [bn.make["34"] bn.make["34"]] 0]
+assert[bn.less [bn.make["34"] bn.make["12"]] 0]
+assert[bn.equal[bn.make["12"] bn.make["34"]] 0]
+assert[bn.equal[bn.make["34"] bn.make["34"]] 1]
+assert[bn.equal[bn.make["34"] bn.make["12"]] 0]
+
+on factorial x do
+ t:bn.make[1]
+ each v in 1+range x
+  t:bn.mul[t v]
+ end
+ t
+end
+assert[bn.format_commas[factorial[27]] "10,888,869,450,418,352,160,768,000,000"]
+assert[bn.divmod[80087 221] "%j" parse "[[3,6,2],[8,5]]"]
+assert[bn.divmod[    3   0] (0,0)]
+assert[bn.format_commas[bn.minall [1,20,3000,400000,500000000,600000000000]] "1"]
+assert[bn.format_commas[bn.maxall [1,20,3000,400000,500000000,600000000000]] "600,000,000,000"]
+assert[bn.format_commas[bn.sumall [1,20,3000,400000,500000000,600000000000]] "600,500,403,021"]
+assert[bn.format_commas[bn.prodall[1,20,3000,400000,500000000,600000000000]] "7,200,000,000,000,000,000,000,000,000,000"]
+
+print["all tests passed."]

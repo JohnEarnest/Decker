@@ -188,12 +188,14 @@ monad={
 	'-':    vm(x=>lmn(-ln(x))),
 	'!':    vm(x=>lmbool(!lb(x))),
 	floor:  vm(x=>lmn(Math.floor(ln(x)))),
+	ceil:   vm(x=>lmn(Math.ceil(ln(x)))),
 	cos:    vm(x=>lmn(Math.cos(ln(x)))),
 	sin:    vm(x=>lmn(Math.sin(ln(x)))),
 	tan:    vm(x=>lmn(Math.tan(ln(x)))),
 	exp:    vm(x=>lmn(Math.exp(ln(x)))),
 	ln:     vm(x=>lmn(Math.log(ln(x)))),
 	sqrt:   vm(x=>lmn(Math.sqrt(ln(x)))),
+	trim:   vm(x=>lms(ls(x).trim())),
 	unit:   vm(x=>{const n=ln(x);return lml([lmn(Math.cos(n)),lmn(Math.sin(n))])}),
 	mag:    vmnl(x=>lmn(Math.sqrt(ll(x).reduce((x,y)=>x+Math.pow(ln(y),2),0)))),
 	heading:vmnl(x=>{const a=getpair(x);return lmn(Math.atan2(a.y,a.x))}),
@@ -213,6 +215,13 @@ monad={
 	rows:   x=>rows(x),
 	cols:   x=>{const t=lt(x),k=tab_cols(t);return lmd(k.map(lms),k.map(x=>lml(tab_get(t,x))))},
 	table:  x=>lid(x)?coltab(x): lil(x)&&x.v.every(x=>lid(x)||linil(x))?rowtab(x): lil(x)&&x.v.every(x=>lil(x)||linil(x))?listab(x): lt(x),
+	rev:    x=>{
+		if(lis(x)&&count(x)>1)return lms(ls(x).split('').reverse().join(''))
+		if(lil(x)&&count(x)>1)return lml(ll(x).slice(0).reverse())
+		if(lit(x)&&count(x)>1){const r=lmt();for(let k of x.v.keys())tab_set(r,k,tab_get(x,k).slice(0).reverse());return r}
+		if(lid(x)){const r=lmd();x.v.map((v,i)=>dset(r,v,x.k[i]));return r;}
+		return x
+	},
 	'@tab': t=>{
 		t=lt(t);const r=tab_clone(t)
 		tab_set(r,'index' ,range(count(r)).map(lmn))
@@ -2100,6 +2109,12 @@ interface_rtext=lmi((self,i,x)=>{
 		let n=0;for(let z=0;z<t.length;z++){
 			let m=1;for(let w=0;w<d.length;w++)if(d[w]!=t[z+w]){m=0;break}if(m){r.v.push(rtext_span(v,rect(n,z))),z+=d.length-1,n=z+1}
 		}if(n<=t.length)r.v.push(rtext_span(v,rect(n,t.length)));return r
+	})
+	if(ikey(i,'trim'))return lmnat(([tab,d])=>{
+		tab=rtext_cast(tab);const delim=(d?ls(d):'\n ').split(''),t=ls(rtext_string(tab))
+		let a=0         ;while(delim.indexOf(t[a])>=0)a++;
+		let b=t.length-1;while(delim.indexOf(t[b])>=0)b--;
+		return rtext_span(tab,rect(a,b+1));
 	})
 	if(ikey(i,'replace'))return lmnat(([tab,k,v,i])=>{
 		if(!k||!v)return tab||NIL;const t=rtext_cast(tab),r=[],tx=ls(rtext_string(t,null,true)),nocase=i&&lb(i),text=nocase?tx.toLowerCase():tx,c=rect(0,0)

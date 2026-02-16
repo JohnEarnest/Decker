@@ -1891,6 +1891,12 @@ lv*n_rtext_split(lv*self,lv*z){
 		ll_add(r,rtext_span(v,(pair){n,z})),z+=d->c-1,n=z+1;
 	}if(n<=t->c)ll_add(r,rtext_span(v,(pair){n,t->c}));return r;
 }
+lv*n_rtext_trim(lv*self,lv*z){
+	(void)self;lv*v=rtext_cast(l_first(z)),*t=rtext_string(v,(pair){0,RTEXT_END},0);char*delim=z->c>1?ls(z->lv[1])->sv: "\n ";
+	int a=0;     while(t->sv[a]&&strchr(delim,t->sv[a]))a++;
+	int b=t->c-1;while(b>0     &&strchr(delim,t->sv[b]))b--;
+	return rtext_span(v,(pair){a,b+1});
+}
 lv*n_rtext_len   (lv*self,lv*z){(void)self;return lmn(rtext_len(rtext_cast(l_first(z))));}
 lv*n_rtext_get   (lv*self,lv*z){(void)self;return lmn(rtext_get(rtext_cast(l_first(z)),z->c<2?0:ln(z->lv[1])));}
 lv*n_rtext_string(lv*self,lv*z){(void)self;return rtext_string(rtext_cast(l_first(z)),z->c<2?(pair){0,RTEXT_END}:unpack_pair(z,1),z->c<3?1:!lb(z->lv[2]));}
@@ -1938,6 +1944,7 @@ lv* interface_rtext(lv*self,lv*i,lv*x){
 	ikey("string" )return lmnat(n_rtext_string ,self);
 	ikey("span"   )return lmnat(n_rtext_span   ,self);
 	ikey("split"  )return lmnat(n_rtext_split  ,self);
+	ikey("trim"   )return lmnat(n_rtext_trim   ,self);
 	ikey("replace")return lmnat(n_rtext_replace,self);
 	ikey("find"   )return lmnat(n_rtext_find   ,self);
 	ikey("cat"    )return lmnat(n_rtext_cat    ,self);

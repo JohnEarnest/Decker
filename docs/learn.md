@@ -49,6 +49,7 @@ nil+2          # -> 2          # nil will coerce to identity values- 0, "", ()- 
 count    11,22,33    # -> 3
 first    11,22,33    # -> 11
 last     11,22,33    # -> 33
+rev      11,22,33    # -> 33,22,11
 2 take   11,22,33    # -> (11,22)
 2 drop   11,22,33    # -> (33)
 typeof   11,22,33    # -> "list"
@@ -241,6 +242,9 @@ flip x      # transpose a table's rows and columns.
 #
 ###################################################
 
+trim " foo \n" # remove leading and trailing whitespace.
+# -> "foo"
+
 ",|" split "one,|two,|three"    # break a string on a delimiter.
 # -> ("one","two","three")
 
@@ -342,7 +346,7 @@ raze ((list 1,2),(list 3,4))  # -> 1,2,3,4  (flatten nesting)
 # no x<=y or x>=y operators; use !x>y or !x<y instead
 
 # named unary operators, which all conform:
-# floor cos sin tan exp ln sqrt
+# floor ceil cos sin tan exp ln sqrt
 
 # the constants "pi" and "e" are predefined as globals
 
@@ -365,6 +369,7 @@ rtext.replace["the orange!" "orange" "apple"] # rtext: rich text tables
 # built-in functions for constructing instances of certain interfaces:
 arr:array[16 "i16b"] # array: a 1D mutable array for manipulating binary data
 img:image[(10,20)]   # image: a 2D mutable byte array for graphics operations
+dic:keystore[]       # keystore: a mutable dictionary
 
 sys~sys              # -> 1          # interfaces compare with reference-equality.
 sys=(sys,sys,123)    # -> (1,1,0)

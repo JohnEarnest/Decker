@@ -286,7 +286,7 @@ field2:{"type":"field","size":[292,21],"pos":[118,101],"style":"code","align":"c
 
 {module:twee}
 description:"manipulate and create Twine story files in the Twee 3 format"
-version:1
+version:1.1
 {script}
 #######################################
 #
@@ -297,12 +297,6 @@ version:1
 #  https://github.com/iftechfoundation/twine-specs/blob/master/twine-2-htmloutput-spec.md
 #
 #######################################
-
-on trim x do
- while (first x)in (" ","\n") x: 1 drop x end
- while (last  x)in (" ","\n") x:-1 drop x end 
- x
-end
 
 on twee_read text do
  local r:insert name body tags meta with end
@@ -317,7 +311,7 @@ on twee_read text do
      body # string
      tags # list-of-string
      meta # json-compatible dict
-   with n trim["\n" fuse p] t m into r
+   with n trim "\n" fuse p t m into r
    p:()
    t:()
    m:() dict ()
@@ -340,7 +334,7 @@ on twee_read text do
     tn:()
     while (!"]"~line[i])&i<count line
      on add_tag do
-      if count tn t:t,trim["" fuse tn] tn:() end
+      if count tn t:t,trim "" fuse tn tn:() end
      end
      if "\\"~line[i] # escaped tag name char
       i:i+1
@@ -358,7 +352,7 @@ on twee_read text do
    end
    i:i+1
   end
-  n:trim["" fuse n]
+  n:trim"" fuse n
  end
  each line in "\n" split text
   if "::"~2 limit line
@@ -430,8 +424,8 @@ on twee_html_read story do
   if p.attr.pid~x.attr.startnode startname:p.attr.name end
   insert name body tags meta with
    p.attr.name
-   trim[p.children[0]]
-   if "tags" in p.attr trim @ " " split p.attr.tags else () end
+   trim p.children[0]
+   if "tags" in p.attr trim " " split p.attr.tags else () end
    ("position","size") take p.attr
   end
  end
@@ -559,7 +553,7 @@ on ply_render story name vars do
    rtext.make[(first tok) "mono"]
   elseif last tok:"[[%s->%s]]%n%m" parse head
    i:i+tok[2]
-   rtext.make[trim[tok[0]] "" trim[tok[1]]]
+   rtext.make[(trim tok[0]) "" (trim tok[1])]
   elseif "["~first head
    i:i+1
    rtext.make["["]
@@ -600,7 +594,7 @@ size:[100,100]
 resizable:1
 margin:[2,2,2,2]
 description:"a self-contained player for Twine stories written using the Ply story format."
-version:1.1
+version:1.2
 script:"plyPlayer.0p"
 template:"on passage name body tags meta do\n \nend"
 attributes:{"name":["story","passage","scrollbar"],"label":["Twee Story","Passage Name","Scrollbar"],"type":["code","string","bool"]}
@@ -659,11 +653,6 @@ end
 # since contraptions depending on modules is rather brittle,
 # we'll just settle for making things self-contained:
 
-on trim x do
- while (first x)in (" ","\n") x: 1 drop x end
- while (last  x)in (" ","\n") x:-1 drop x end 
- x
-end
 on twee_read text do
  local r:insert name body tags meta with end
  local n:0
@@ -677,7 +666,7 @@ on twee_read text do
      body # string
      tags # list-of-string
      meta # json-compatible dict
-   with n trim["\n" fuse p] t m into r
+   with n trim "\n" fuse p t m into r
    p:()
    t:()
    m:() dict ()
@@ -700,7 +689,7 @@ on twee_read text do
     tn:()
     while (!"]"~line[i])&i<count line
      on add_tag do
-      if count tn t:t,trim["" fuse tn] tn:() end
+      if count tn t:t,trim "" fuse tn tn:() end
      end
      if "\\"~line[i] # escaped tag name char
       i:i+1
@@ -718,7 +707,7 @@ on twee_read text do
    end
    i:i+1
   end
-  n:trim["" fuse n]
+  n:trim "" fuse n
  end
  each line in "\n" split text
   if "::"~2 limit line
@@ -778,7 +767,7 @@ on ply_render story name vars do
    rtext.make[(first tok) "mono"]
   elseif last tok:"[[%s->%s]]%n%m" parse head
    i:i+tok[2]
-   rtext.make[trim[tok[0]] "" trim[tok[1]]]
+   rtext.make[(trim tok[0]) "" (trim tok[1])]
   elseif "["~first head
    i:i+1
    rtext.make["["]

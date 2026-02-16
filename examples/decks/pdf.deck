@@ -136,7 +136,7 @@ button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"build.0","text
 
 {module:pdf}
 description:"A utility module for assembling PDF documents from Images and vector drawing streams."
-version:1.1
+version:1.2
 {script}
 
 on build ...parts do
@@ -253,7 +253,7 @@ on page_horizontal images margin do
 end
 on page_grid images margin width do
  local cell:max images..size
- local height:-floor-(count images)/width
+ local height:ceil(count images)/width
  local w:(cell[0]*width )+margin*1+width
  local h:(cell[1]*height)+margin*1+height
  local code:"" fuse each pos i in (count images) take width cross height

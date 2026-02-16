@@ -390,8 +390,8 @@ dyad(l_format);
 
 #define vm(n,op,arg) monad(a_##n){return lmn(op(arg(x)));}monad(l_##n){return perfuse(x,a_##n);}
 #define vd(n)        dyad(l_##n){return conform(x,y,a_##n);}
-vm(not,!  ,lb) vm(negate,-  ,ln) vm(floor,floor,ln) vm(cos,cos,ln)
-vm(sin,sin,ln) vm(tan   ,tan,ln) vm(exp  ,exp  ,ln) vm(ln ,log,ln) vm(sqrt,sqrt,ln)
+vm(not,!  ,lb) vm(negate,-  ,ln) vm(floor,floor,ln) vm(ceil,ceil,ln) vm(cos,cos,ln)
+vm(sin,sin,ln) vm(tan   ,tan,ln) vm(exp  ,exp  ,ln) vm(ln ,log,ln)   vm(sqrt,sqrt,ln)
 monad(l_count){return lmn(lin(x)||lis(x)||lil(x)||lid(x)?x->c:lit(x)?x->n:0);}
 monad(l_list ){lv*r=lml(1);r->lv[0]=x;return r;}
 monad(l_first){
@@ -439,12 +439,26 @@ monad(l_flip){
 	for(int i=0;i<w;i++){MAP(c,x)!lil(x->lv[z])?x->lv[z]:i<x->lv[z]->c?x->lv[z]->lv[i]:LNIL;ll_add(r,c);}
 	return r;
 }
+monad(l_rev){
+	if(lis(x)&&x->c>1){str r=str_new();EACH(z,x)str_addc(&r,x->sv[(x->c-1)-z]);return lmstr(r);}
+	if(lil(x)&&x->c>1){lv*r=lml(x->c);EACH(z,r)r->lv[z]=x->lv[(x->c-1)-z];return r;}
+	if(lit(x)&&x->n>1){lv*r=lmt();EACH(z,x)dset(r,x->kv[z],l_rev(x->lv[z]));return torect(r);}
+	if(lid(x)        ){lv*r=lmd();EACH(z,x)dset(r,x->lv[z],x->kv[z]);return r;}
+	return x;
+}
 monad(a_mag    ){double s=0;EACH(z,x){double v=ln(x->lv[z]);s+=v*v;};return lmn(sqrt(s));}
 monad(a_heading){double a=x->c>0?ln(x->lv[0]):0,b=x->c>1?ln(x->lv[1]):0;return lmn(atan2(b,a));}
 monad(a_unit   ){double n=ln(x);lv*r=lml(2);r->lv[0]=lmn(cos(n)),r->lv[1]=lmn(sin(n));return r;}
 monad(l_mag    ){return nlperfuse(x,a_mag    );}
 monad(l_heading){return nlperfuse(x,a_heading);}
 monad(l_unit   ){return perfuse  (x,a_unit   );}
+monad(a_trim){
+	x=ls(x);
+	int a=0;     while(     (x->sv[a]==' '||x->sv[a]=='\n'))a++;
+	int b=x->c-1;while(b>0&&(x->sv[b]==' '||x->sv[b]=='\n'))b--;
+	str r=str_new();str_add(&r,x->sv+a,b-a+1);return lmstr(r);
+}
+monad(l_trim){return perfuse(x,a_trim);}
 dyad(a_add ){return lmn(ln(x)+ln(y));}vd(add)
 dyad(a_sub ){return lmn(ln(x)-ln(y));}vd(sub)
 dyad(a_mul ){return lmn(ln(x)*ln(y));}vd(mul)
@@ -854,13 +868,14 @@ lv* l_orderby(lv*col,lv*tab,lv*dir){
 
 #define prim(n,f) {n,(void*)f}
 primitive monads[]={
-	prim("-",l_negate),prim("!",l_not),prim("floor",l_floor),prim("cos",l_cos),prim("sin",l_sin),
-	prim("tan",l_tan),prim("exp",l_exp),prim("ln",l_ln),prim("sqrt",l_sqrt),
+	prim("-",l_negate),prim("!",l_not),prim("floor",l_floor),prim("ceil",l_ceil),
+	prim("cos",l_cos),prim("sin",l_sin),prim("tan",l_tan),prim("exp",l_exp),prim("ln",l_ln),prim("sqrt",l_sqrt),
 	prim("sum",l_sum),prim("prod",l_prod),prim("raze",l_raze),prim("max",l_amax),prim("min",l_amin),
 	prim("count",l_count),prim("first",l_first),prim("last",l_last),prim("flip",l_flip),
 	prim("range",l_range),prim("keys",l_keys),prim("list",l_list),prim("rows",l_rows),
 	prim("cols",l_cols),prim("table",l_table),prim("typeof",l_typeof),prim("@tab",l_tab),
-	prim("mag",l_mag),prim("heading",l_heading),prim("unit",l_unit),prim("",NULL)
+	prim("mag",l_mag),prim("heading",l_heading),prim("unit",l_unit),prim("trim",l_trim),prim("rev",l_rev),
+	prim("",NULL)
 };
 primitive dyads[]={
 	prim("+",l_add),prim("-",l_sub),prim("*",l_mul),prim("/",l_div),prim("%",l_mod),
