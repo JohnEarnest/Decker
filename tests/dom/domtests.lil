@@ -1097,7 +1097,7 @@ rt:rtext.cat[
 ]
 c.text[rt 1,1]
 assert["canvas rich text color"
-	"%%IMG2ABQADQAqDQQADw0CAAINAgAKJAEAAw0CAAINAgACAQQABCQBAAMNAgACDQIAAQEBAAMBAgACJAEAASQBAAINBgACAQUAAiQBAAEkAQACDQIAAg0CAAEBAgACAQIAASQFAAENAgACDQIAAQECAAIBAgABJAEAAyQBAAENAgACDQIAAQECAAIBAgABJAEAAyQBAAENAgACDQIAAgEFAC4="
+	"%%IMG3ABQADQZAgHBILBqPSGNj2Ugqm4ClkzSURqGBbIBIFVqlW2FWSO0ymWJtuOyFgsNjklx+bQPG920XQP028XFDfW5Yak6HiIlB"
 	c.copy[].encoded
 ]
 
@@ -1231,10 +1231,10 @@ assert["canvas plaintext size w/ width" ( 30,55) c.textsize["Some words to wrap!
 c:deck.card.add["canvas"]
 i:image["%%IMG1AAcABwABAQEBAQABJyEhISMBASclJCMjAQEnJCUjIwEBKCgoIyMBASgoKCgjAQABAQEBAQE="]
 c.segment[i 1,1,9,9 2,2,3,3]
-assert["canvas segment scale" "%%IMG2AAsACwANAQcAAwEBJwEhBSMBAQEAAgEBJwElASQBJQEkASMCAQEAAgEBJwEkASUBJAElASMCAQEAAgEBJwElASQBJQEkASMCAQEAAgEBJwEkASUBJAElASMCAQEAAgEBKAUjAgEBAAIBASgGIwEBAQADAQgADA==" c.copy[0,0 11,11].encoded]
+assert["canvas segment scale" "%%IMG3AAsACwZAgHBIHAaOyIDxFGo2R0pA4FQiVUdQ4dRqxUan1WtWeuKWvFqUWo2WrtdjaRJZrAOC" c.copy[0,0 11,11].encoded]
 c.clear[]
 c.segment[i 1,1,-5,-2.3 2,2,3,3]
-assert["canvas segment minscale" "%%IMG1AAYABgAAAAAAAAAAAQEBAAABJyEjAQABKCMjAQABKCgjAQAAAQEBAQ==" c.copy[0,0 6,6].encoded]
+assert["canvas segment minscale" "%%IMG3AAYABgZAgHAoDBiLp9AoAAigRssm6slsGgNB" c.copy[0,0 6,6].encoded]
 
 c.clear[]
 c.size:8,8
@@ -1246,7 +1246,7 @@ i:image["%%IMG0AAYABgBgUHgYAA=="]
 c.size:i.size
 c.paste[i]
 c.outline[37].outline[38]
-assert["canvas outline" "%%IMG1AAYABiYlJSYAACUBASUmACUBJQElJiUBAQEBJSYlJQEBJQAmJiUlJg==" c.copy[].encoded]
+assert["canvas outline" "%%IMG3AAYABgZAU6lkAgBKgQDxqFQKk0niMAowCYlB" c.copy[].encoded]
 
 #######################################
 #
@@ -2045,7 +2045,7 @@ deck.card.event["install"]
 c.clear[]
 c.brush:"color"
 c.box[1,1 13,9]
-assert["custom brush box: color" "%%IMG2AA8ACyMBKAEBASMKKAEBASMBKAEBASEJIwEoAQEBIwEoAQEBAAkjASgBAQEjASgBAQEACSMBKAEBASMBKAEBAQAJIwEoAQEBIwEoAQEBAAkjASgBAQEjASgBAQEACSMBKAEBASMBKAEBAQAJIwEoAQEBIwEoAQEBIwooAQEBIQEnASELJwEAEA==" c.copy[].encoded]
+assert["custom brush box: color" "%%IMG3AA8ACwbAESowKhqPQ2EgxGw2lUqAdDqFDqlYawBL1XKryesX4B1rj2hl6ORsM0/jcRA=" c.copy[].encoded]
 
 deck.card.script:"
 	on install do
@@ -2060,7 +2060,7 @@ deck.card.event["install"]
 c.clear[]
 c.brush:"dotted"
 c.line[1,1 13,9]
-assert["custom brush line: dotted" "%%IMG0AA8ACwAAQAAQAAAABAABAABAAAAAEAAEAAA=" c.copy[].encoded]
+assert["custom brush line: dotted" "%%IMG3AA8ACwKEjwmhfeyifDPBai7ei3deAA==" c.copy[].encoded]
 
 deck.card.script:"on install do brush[] end"
 assert["custom brush enumeration" ("star","diag","color","dotted") (keys deck.card.event["install"])]

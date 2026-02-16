@@ -684,7 +684,7 @@ resizable:1
 margin:[3,20,3,3]
 description:"a tabbed editor for viewing and editing the scripts of one or more widgets on the current card."
 version:1.1
-image:"%%IMG2AGQAZAD/AP8A/wD/AP8A/wCqAWUgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAQIgYgECIGIBAiBiAWU="
+image:"%%IMG3AGQAZAZAgHBILBqPyKRyyWw6n9CodEqtWq/YrHbL7Xq/4LB4TC6bz+i0es1uu9/wuHxOr9vv+Pw7wO/7/4CBgoOEhYaHhCCKi4yNjo+QkZKTlJWPfJaZmpucnJidoKGimZ+jpqempairrJaqrbCxjK+ytay0trmjuLq9ngG+waG8wsWRxMbJs8DKzZDIzsbQ0cLT1L7W17rZ2rbc3bLf4LDi47fM5tLo6dXr7Nju79vx8t709eH3+OT6++f+8wDmKidQE8GCrvohFHVw4aSGDo8pjPiL4j+LqCBiXLbxlMaOID52FLmRJEaTFlFSVBmRpUOXC2EilFmQpkCbAHH607mPJz6f9YDKE/qOKDuj6ZCaUzqOKTin3aBqk3qNKjWr0bA609qMqzKvycCqA7lrIllJYoulbXd2mNm2lxDJnUu3rt0AQQA="
 script:"scriptViewer.0p"
 template:"on change do\n \nend"
 attributes:{"name":["options_text"],"label":["Sources"],"type":["code"]}

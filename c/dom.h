@@ -516,15 +516,39 @@ void buffer_outline(lv*target,int p){
 	}
 }
 lv* n_image_outline(lv*self,lv*z){buffer_outline(self->b,ln(l_first(z)));return self;}
+
+#define dst_add_byte(x)  str_addraw(dst,(x)&0xFF)
+#define dst_add_byte_framed(b) {if(segment){if(bo==dst->c)dst_add_byte(0);dst->sv[bo]++;}dst_add_byte(b);if(segment&&(0xFF&dst->sv[bo])==0xFF)bo=dst->c;}
+#define dst_add_bits(c) {b|=(c)<<nb;nb+=w;while(nb>=8){dst_add_byte_framed(b&0xff);b>>=8,nb-=8;}}
+#define dst_inc_hi() {hi++;if(hi==ov){w++;ov<<=1;}if(hi==0xfff){unsigned int c=1<<lw;dst_add_bits(c);w=lw+1;hi=c+1;ov=c<<1;memset(t,0,sizeof(t));tc=1;}}
+void encode_lzw(char*src,int length,str*dst,int min_code_size,int segment){
+	unsigned int lw=min_code_size;
+	unsigned int w=1+lw,hi=(1<<lw)+1,ov=1<<(lw+1),sc=-1,b=0,nb=0,t[1<<14]={0},tm=(1<<14)-1,tc;int bo=dst->c;
+	for(int z=0;z<length;z++){
+		int v=0xFF&src[z];
+		unsigned int c=sc;if(c==(unsigned)-1){dst_add_bits(1<<lw);sc=v;continue;} // first write sends clear code
+		unsigned int k=(c<<8)|v,hash=((k>>12)^k)&tm,em=0;
+		for(unsigned int h=hash;t[h];h=(h+1)&tm)if(k==t[h]>>12){em=1,sc=t[h]&0xfff;}
+		if(!em){dst_add_bits(c);sc=v;tc=0;dst_inc_hi();if(!tc){while(t[hash])hash=(hash+1)&tm;t[hash]=(k<<12)|hi;}}
+	}
+	dst_add_bits(sc);dst_inc_hi();dst_add_bits((1<<lw)+1);if(nb>0)dst_add_byte_framed(b&0xff);
+}
 lv* image_write(lv*x){
-	x=image_is(x)?x:image_empty();pair s=image_size(x);str t=str_new();char f;int colors=0;for(int z=0;z<s.x*s.y;z++)if(x->b->sv[z]>1)colors=1;
+	x=image_is(x)?x:image_empty();pair s=image_size(x);str t=str_new();char f;int maxcol=1;for(int z=0;z<s.x*s.y;z++)maxcol=MAX(maxcol,0xFF&(x->b->sv[z]));
 	str_addraw(&t,(s.x>>8)&0xFF),str_addraw(&t,s.x&0xFF);str_addraw(&t,(s.y>>8)&0xFF),str_addraw(&t,s.y&0xFF);
 	str l=str_new();for(int z=0;z<4;z++)str_addraw(&l,t.sv[z]);
 	for(int z=0;z<x->b->c;){int c=0,p=x->b->sv[z];while(c<255&&z<x->b->c&&x->b->sv[z]==p)c++,z++;str_addraw(&l,p),str_addraw(&l,c);}
-	if(!colors&&(l.c>4+s.x*s.y/8)){
+	int rawsize=4+s.x*s.y, packedsize=4+(ceil(s.x/8.0)*s.y), colors=maxcol>1;
+	str lzw=str_new();int mc=MAX(2,(ceil(log2(maxcol+1))));
+	for(int z=0;z<4;z++)str_addraw(&lzw,t.sv[z]);str_addraw(&lzw,mc);encode_lzw(x->b->sv,s.x*s.y,&lzw,mc,0);
+	if     (  colors &&                    (lzw.c<l.c)){f='3';free(l.sv),free(t.sv);t=lzw;}
+	else if((!colors)&&(lzw.c<packedsize)&&(lzw.c<l.c)){f='3';free(l.sv),free(t.sv);t=lzw;}
+	else if((!colors)&&(l.c>packedsize)){
 		f='0';int stride=8*ceil(s.x/8.0);for(int a=0;a<s.y;a++)for(int b=0;b<stride;b+=8)
 		{int v=0;for(int i=0;i<8;i++)v=(v<<1)|(b+i>=s.x?0: x->b->sv[b+i+a*s.x]?1:0);str_addraw(&t,v);}
-	}else if(l.c>4+s.x*s.y){f='1';free(l.sv);for(int z=0;z<s.x*s.y;z++)str_addraw(&t,x->b->sv[z]);}else{f='2';free(t.sv);t=l;}
+	}
+	else if(l.c>rawsize){f='1';free(l.sv),free(lzw.sv);for(int z=0;z<s.x*s.y;z++)str_addraw(&t,x->b->sv[z]);}
+	else{f='2';free(t.sv),free(lzw.sv);t=l;}
 	lv*ts=lmv(1);ts->c=t.c;ts->sv=t.sv;return data_write("IMG",f,ts);
 }
 lv* interface_image(lv*self,lv*i,lv*x){
@@ -553,6 +577,30 @@ lv* interface_image(lv*self,lv*i,lv*x){
 	ikey("bounds"   )return buffer_bounds(self->b);
 	return x?x:LNIL;
 }
+#define dst_append(x) {unsigned int v=x;if(di<dst_size){dst[di++]=v;}else{printf("attempted to unpack extra data for decode lzw!\n");}}
+void decode_lzw(unsigned char*src,int length,unsigned char*dst,unsigned int dst_size,int min_code_size){
+	unsigned int lw=CLAMP(2,min_code_size,8), di=0;
+	int prefix[4096]={0}, suffix[4096]={0}, code[4096]={0};
+	int clear=1<<lw, size=lw+1, mask=(1<<size)-1, next=clear+2, old=-1;
+	int first, i=0,b=0,d=0;
+	for(int z=0;z<clear;z++)suffix[z]=z;
+	while(i<length){
+		while(b<size)d+=(0xFF&src[i++])<<b, b+=8;
+		int t=d&mask; d>>=size, b-=size;
+		if(t>next||t==clear+1)break;
+		if(t==clear){size=lw+1, mask=(1<<size)-1, next=clear+2, old=-1;}
+		else if (old==-1){dst_append(suffix[old=first=t]);}
+		else{
+			int ci=0,tt=t;
+			if   (t==next)code[ci++]=first,    t=old;
+			while(t>clear)code[ci++]=suffix[t],t=prefix[t];
+			dst_append(first=suffix[t]);
+			while(ci>0)dst_append(code[--ci]);
+			if(next<4096){prefix[next]=old, suffix[next++]=first;if((next&mask)==0&&next<4096)size++, mask+=next;}
+			old=tt;
+		}
+	}
+}
 lv* image_make(lv*buffer){return lmi(interface_image,lmistr("image"),buffer);}
 lv* image_read(lv*x){
 	char f=0;lv*data=data_read("IMG",&f,x);if(!data||data->c<4)return image_empty();
@@ -560,6 +608,7 @@ lv* image_read(lv*x){
 	if(f=='0'&&data->c-4>=w*h/8){int s=ceil(w/8.0),o=0;for(int a=0;a<h;a++)for(int b=0;b<w;b++)r->sv[o++]=data->sv[4+(b/8)+a*s]&(1<<(7-(b%8)))?1:0;}
 	if(f=='1'&&data->c-4>=w*h)memcpy(r->sv,data->sv+4,w*h);
 	if(f=='2'){int i=4,o=0;while(i+2<=data->c){int p=data->sv[i++],c=0xFF&data->sv[i++];while(c&&o+1<=r->c)c--,r->sv[o++]=p;}}
+	if(f=='3'){int mc=0xFF&data->sv[4];decode_lzw((unsigned char*)(data->sv+5),data->c-5,(unsigned char*)(r->sv),w*h,mc);}
 	return image_make(r);
 }
 void buffer_overlay(lv*dst,lv*src,int mask,pair offset){
@@ -3010,28 +3059,8 @@ lv* readgif(char*data,int size,int gray,int frames){
 		if(type==0x2C){ // image descriptor
 			int xo=readshort(&i,data),yo=readshort(&i,data),iw=readshort(&i,data),ih=readshort(&i,data),packed=data[i++],local=packed&0x80;
 			if(local){readcolors(&i,data,lpal,packed,gray);}else{memcpy(lpal,gpal,sizeof(lpal));}if(hastrans)lpal[trans]=gray?255:0;
-			int min_code=0xFF&data[i++], si=0, di=0; unsigned char*src=calloc(iw*ih*2,1),*dst=calloc(iw*ih,1);
-			while(1){unsigned char s=data[i++];if(!s)break;for(int z=0;z<s;z++)src[si++]=data[i++];}
-			int prefix[4096]={0}, suffix[4096]={0}, code[4096]={0};
-			int clear=1<<min_code, size=min_code+1, mask=(1<<size)-1, next=clear+2, old=-1;
-			int first, i=0,b=0,d=0;
-			for(int z=0;z<clear;z++)suffix[z]=z;
-			while(i<si){
-				while(b<size)d+=(0xFF&src[i++])<<b, b+=8;
-				int t=d&mask; d>>=size, b-=size;
-				if(t>next||t==clear+1)break;
-				if(t==clear){size=min_code+1, mask=(1<<size)-1, next=clear+2, old=-1;}
-				else if (old==-1) dst[di++]=suffix[old=first=t];
-				else{
-					int ci=0,tt=t;
-					if   (t==next)code[ci++]=first,    t=old;
-					while(t>clear)code[ci++]=suffix[t],t=prefix[t];
-					dst[di++]=first=suffix[t];
-					while(ci>0)dst[di++]=code[--ci];
-					if(next<4096){prefix[next]=old, suffix[next++]=first;if((next&mask)==0&&next<4096)size++, mask+=next;}
-					old=tt;
-				}
-			}
+			int min_code=0xFF&data[i++], si=0; unsigned char*src=calloc(iw*ih*2,1),*dst=calloc(iw*ih,1);
+			while(1){unsigned char s=data[i++];if(!s)break;for(int z=0;z<s;z++)src[si++]=data[i++];}decode_lzw(src,si,dst,iw*ih,min_code);
 			for(int y=0;y<ih;y++)for(int x=0;x<iw;x++)if(xo+x>=0&&yo+y>=0&&xo+x<w&&yo+y<h&&(!hastrans||dst[x+y*iw]!=trans))r->sv[(xo+x)+(yo+y)*w]=lpal[0xFF&(int)dst[x+y*iw]];
 			free(src),free(dst);ll_add(r_frames,image_make(buffer_clone(r))),ll_add(r_delays,lmn(delay)),ll_add(r_disposal,lmn(dispose));if(!frames)break;
 			if(dispose==2){memset(r->sv,hastrans?0:lpal[back],r->c);} // dispose to background
@@ -3042,9 +3071,6 @@ lv* readgif(char*data,int size,int gray,int frames){
 #define add_byte(x)  str_addraw(&r,(x)&0xFF)
 #define add_short(x) str_addraw(&r,(x)&0xFF),str_addraw(&r,((x)>>8)&0xFF) // more like bug-endian, amirite?
 #define add_long(x)  str_addraw(&r,(x)&0xFF),str_addraw(&r,((x)>>8)&0xFF),str_addraw(&r,((x)>>16)&0xFF),str_addraw(&r,((x)>>24)&0xFF)
-#define add_byte_framed(b) {if(bo==r.c)add_byte(0);r.sv[bo]++;add_byte(b);if((0xFF&r.sv[bo])==0xFF)bo=r.c;}
-#define add_bits(c) {b|=(c)<<nb;nb+=w;while(nb>=8){add_byte_framed(b&0xff);b>>=8,nb-=8;}}
-#define inc_hi() {hi++;if(hi==ov){w++;ov<<=1;}if(hi==0xfff){unsigned int c=1<<lw;add_bits(c);w=lw+1;hi=c+1;ov=c<<1;memset(t, 0, sizeof(t));tc=1;}}
 char* writegif(lv*frames,lv*delays,int*len,int*pal,int pal_size){
 	int paltrans=-1;for(int z=0;z<pal_size;z++)if(pal[z]==-1)paltrans=z;
 	if(pal_size)pal_size=pal_size?MAX(2,pow(2,ceil(log2(pal_size)))):0; // next-closest power of 2
@@ -3074,19 +3100,13 @@ char* writegif(lv*frames,lv*delays,int*len,int*pal,int pal_size){
 		add_byte(0x2C); // image descriptor
 		size=image_size(frames->lv[frame]);add_short(0),add_short(0),add_short(size.x),add_short(size.y); // window {x,y,width,height}
 		add_byte(0); // no local colortable
-		unsigned int lw=pal_size?MAX(2,((int)log2(pal_size))): 5;
+		unsigned int lw=pal_size?MAX(2,(ceil(log2(pal_size)))): 5;
 		add_byte(lw); // minimum LZW code size
-		unsigned int count=0; char*data=frames->lv[frame]->b->sv;
-		unsigned int w=1+lw,hi=(1<<lw)+1,ov=1<<(lw+1),sc=-1,b=0,nb=0,t[1<<14]={0},tm=(1<<14)-1,tc;int bo=r.c;
+		int ts=size.x*size.y,ti=0;char*temp=calloc(ts,sizeof(char)*ts),*data=frames->lv[frame]->b->sv;
 		for(int y=0;y<size.y;y++)for(int x=0;x<size.x;x++){
-			int d=0xFF&data[y*size.x+x], v=pal_size?MIN(pal_size,d): draw_color_trans(patterns_pal(patterns),d,count,x,y);
-			unsigned int c=sc;if(c==(unsigned)-1){add_bits(1<<lw);sc=v;continue;} // first write sends clear code
-			unsigned int k=(c<<8)|v,hash=((k>>12)^k)&tm,em=0;
-			for(unsigned int h=hash;t[h];h=(h+1)&tm)if(k==t[h]>>12){em=1,sc=t[h]&0xfff;}
-			if(!em){add_bits(c);sc=v;tc=0;inc_hi();if(!tc){while(t[hash])hash=(hash+1)&tm;t[hash]=(k<<12)|hi;}}
-		}
-		add_bits(sc);inc_hi();add_bits((1<<lw)+1);if(nb>0)add_byte_framed(b&0xff);
-		add_byte(0),count++; // end of frame
+			int d=0xFF&data[y*size.x+x]; temp[ti++]=pal_size?MIN(pal_size,d): draw_color_trans(patterns_pal(patterns),d,frame,x,y);
+		}encode_lzw(temp,ts,&r,lw,1);free(temp);
+		add_byte(0); // end of frame
 	}add_byte(0x3B); // end of GIF
 	return *len=r.c, r.sv;
 }

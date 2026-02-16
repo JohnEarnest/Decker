@@ -1803,21 +1803,61 @@ image_make=size=>{
 		return x?x:NIL
 	};return {t:'int',f:f,n:'image',size:size,pix:new Uint8Array(size.x*size.y)}
 }
+encode_lzw=(src,min_code_size,segment)=>{
+	const lw=min_code_size, r=[]
+	let w=1+lw,hi=(1<<lw)+1,ov=1<<(lw+1),sc=-1,b=0,nb=0,t={}, bo=0
+	const bw=b=>{if(segment){if(bo==r.length)r.push(0);r[bo]++;}r.push(b);if(segment&&r[bo]==255)bo=r.length}
+	const wb=c=>{b|=c<<nb;nb+=w;while(nb>=8){bw(b&0xff),b>>=8,nb-=8}}
+	const ih=()=>{hi++;if(hi==ov){w++,ov<<=1}if(hi==0xfff){let c=1<<lw;wb(c),w=lw+1,hi=c+1,ov=c<<1,t={};return 1}}
+	for(let z=0;z<src.length;z++){
+		const b=0xFF&src[z]
+		let c=sc;if(c==-1){wb(1<<lw),sc=b;continue;} /* first write sends clear code */
+		let k=(c<<8)|b;if(t[k]!==undefined){sc=t[k]}else{wb(c),sc=b;if(!ih())t[k]=hi}
+	}wb(sc),ih(),wb((1<<lw)+1),nb>0&&bw(b&0xff);return r
+}
+decode_lzw=(src,dst_size,min_code_size)=>{
+	const min_code=clamp(2,min_code_size,8), dst=new Uint8Array(dst_size)
+	const prefix=new Int32Array(4096), suffix=new Int32Array(4096), code=new Int32Array(4096)
+	const clear=1<<min_code; let size=min_code+1, mask=(1<<size)-1, next=clear+2, old=-1, first=0, i=0,b=0,d=0, di=0
+	for(let z=0;z<clear;z++)suffix[z]=z
+	while(i<src.length){
+		while(b<size)d+=(0xFF&src[i++])<<b, b+=8
+		let t=d&mask; d>>=size, b-=size
+		if(t>next||t==clear+1)break
+		if(t==clear){size=min_code+1, mask=(1<<size)-1, next=clear+2, old=-1}
+		else if (old==-1) dst[di++]=suffix[old=first=t]
+		else{
+			let ci=0,tt=t
+			if   (t==next)code[ci++]=first,    t=old
+			while(t>clear)code[ci++]=suffix[t],t=prefix[t]
+			dst[di++]=first=suffix[t]
+			while(ci>0)dst[di++]=code[--ci]
+			if(next<4096){prefix[next]=old, suffix[next++]=first;if((next&mask)==0&&next<4096)size++, mask+=next}
+			old=tt
+		}
+	}return dst
+}
 image_read=x=>{
 	const data=data_read('IMG',x);if(!data||data.length<4)return image_make(rect())
 	const f=data_enc(x), w=(data[0]<<8)|data[1], h=(data[2]<<8)|data[3], r=image_make(rect(w,h))
 	if(f==0&&data.length-4>=w*h/8){let s=ceil(w/8),o=0;for(let a=0;a<h;a++)for(let b=0;b<w;b++)r.pix[o++]=data[4+(0|b/8)+a*s]&(1<<(7-(b%8)))?1:0}
 	if(f==1&&data.length-4>=w*h){r.pix=data.slice(4)}
 	if(f==2){let i=4,o=0;while(i+2<=data.length){let p=data[i++],c=0xFF&data[i++];while(c&&o+1<=r.pix.length)c--,r.pix[o++]=p;}}
+	if(f==3){const mc=data[4];r.pix=decode_lzw(data.slice(5),w*h,mc)}
 	return r
 }
 image_write=x=>{
 	x=image_is(x)?x:image_make(rect());let f=0,s=x.size,t=[0xFF&(s.x>>8),0xFF&s.x,0xFF&(s.y>>8),0xFF&s.y],l=t.slice(0)
 	for(let z=0;z<x.pix.length;){let c=0,p=x.pix[z];while(c<255&&z<x.pix.length&&x.pix[z]==p)c++,z++;l.push(p),l.push(c)}
-	if(!x.pix.some(x=>x>1)&&(l.length>4+s.x*s.y/8)){
+	const maxcol=x.pix.reduce((x,y)=>max(x,y),1), rawsize=4+s.x*s.y, packedsize=4+(ceil(s.x/8)*s.y), colors=maxcol>1
+	const mc=max(2,(ceil(Math.log2(maxcol+1)))), lzw=t.slice(0).concat([mc],encode_lzw(x.pix,mc,0))
+	if     (  colors &&                         (lzw.length<l.length)){f='3',t=lzw}
+	else if((!colors)&&(lzw.length<packedsize)&&(lzw.length<l.length)){f='3',t=lzw}
+	else if((!colors)&&(l.length  >packedsize)){
 		f='0';let stride=8*ceil(s.x/8);for(let a=0;a<s.y;a++)for(let b=0;b<stride;b+=8)
 		{let v=0;for(let i=0;i<8;i++)v=(v<<1)|(b+i>=s.x?0: x.pix[b+i+a*s.x]?1:0);t.push(v)}
-	}else if(l.length>4+s.x*s.y){f='1';for(let z=0;z<s.x*s.y;z++)t.push(x.pix[z])}else{f='2',t=l}
+	}
+	else if(l.c>rawsize){f='1';for(let z=0;z<s.x*s.y;z++)t.push(x.pix[z])}else{f='2',t=l}
 	return data_write('IMG'+f,t)
 }
 n_image=([size])=>lis(size)?image_read(ls(size)):image_make(getpair(size))
@@ -3162,27 +3202,9 @@ readgif=(data,hint)=>{
 		if(type==0x2C){ // image descriptor
 			const xo=s(),yo=s(),iw=s(),ih=s(),packed=ub(),local=packed&0x80
 			const lpal=new Uint8Array(gpal);if(local)readcolors(lpal,packed);if(hastrans)lpal[trans]=gray?255:0
-			const min_code=ub(),src=new Uint8Array(iw*ih*2),dst=new Uint8Array(iw*ih);let si=0, di=0
+			const min_code=ub(),src=new Uint8Array(iw*ih*2);let si=0
 			while(1){const s=ub();if(!s)break;for(let z=0;z<s;z++)src[si++]=ub()}
-			const prefix=new Int32Array(4096),suffix=new Int32Array(4096),code=new Int32Array(4096)
-			const clear=1<<min_code; let size=min_code+1, mask=(1<<size)-1, next=clear+2, old=-1, first=0, i=0,b=0,d=0
-			for(let z=0;z<clear;z++)suffix[z]=z
-			while(i<si){
-				while(b<size)d+=(0xFF&src[i++])<<b, b+=8
-				let t=d&mask; d>>=size, b-=size
-				if(t>next||t==clear+1)break
-				if(t==clear){size=min_code+1, mask=(1<<size)-1, next=clear+2, old=-1}
-				else if (old==-1) dst[di++]=suffix[old=first=t]
-				else{
-					let ci=0,tt=t
-					if   (t==next)code[ci++]=first,    t=old
-					while(t>clear)code[ci++]=suffix[t],t=prefix[t]
-					dst[di++]=first=suffix[t]
-					while(ci>0)dst[di++]=code[--ci]
-					if(next<4096){prefix[next]=old, suffix[next++]=first;if((next&mask)==0&&next<4096)size++, mask+=next}
-					old=tt
-				}
-			}
+			const dst=decode_lzw(src,iw*ih,min_code)
 			for(let y=0;y<ih;y++)for(let x=0;x<iw;x++)if(xo+x>=0&&yo+y>=0&&xo+x<w&&yo+y<h&&(!hastrans||dst[x+y*iw]!=trans))r.pix[(xo+x)+(yo+y)*w]=lpal[dst[x+y*iw]]
 			r_frames.push(image_copy(r)),r_delays.push(lmn(delay)),r_disposal.push(dispose);if(!frames)break
 			if(dispose==2){r.pix.fill(hastrans?0:lpal[back])} // dispose to background

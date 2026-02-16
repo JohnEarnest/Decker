@@ -171,7 +171,7 @@ assert_image["image rotate right"
 	img
 ]
 
-assert["image encode" "%%IMG2AAMABAEFAwEAAQECAAIBAQ==" img.encoded]
+assert["image encode" "%%IMG3AAMABAKMPWCgBQ==" img.encoded]
 assert_image["image decode"
 	((list 1,1,1),
 	 (list 1,1,3),
@@ -224,6 +224,10 @@ assert_image["image paste onto itself"
 ]
 assert["image histogram" ((0,11,22,33,44) dict (4,2,2,2,2)) self.hist]
 
+i:image[2,2]
+i.pixels:0,1,32,0
+assert["image roundtrip data" ((list 0,1),(list 32,0)) image[i.encoded].pixels]
+
 assert["image bounds zero"      ("%J" parse "{'pos':[0,0],'size':[0,0]}") image[0,0]                 .bounds]
 assert["image bounds 1x1 empty" ("%J" parse "{'pos':[1,1],'size':[0,0]}") image[1,1]                 .bounds]
 assert["image bounds 1x1 solid" ("%J" parse "{'pos':[0,0],'size':[1,1]}") image[1,1].map[0 dict 1]   .bounds]
@@ -232,15 +236,15 @@ assert["image bounds inset"     ("%J" parse "{'pos':[2,1],'size':[2,3]}") image[
 assert["image bounds big empty" ("%J" parse "{'pos':[9,9],'size':[0,0]}") image[9,9]                 .bounds]
 
 mi:image["%%IMG0AA4ADQAAA8AH4B/gP/A/8D/4P/gf+B/4D/AH4AAA"].merge[image["%%IMG1AAIAAyYkJCYmJA=="] image["%%IMG0AAYABviIqLiA/A=="]]
-assert["image merge" "%%IMG1AA4ADSYkJiQmJCYkJiQmJCYkJCYkJiQmAQAAACQmJCYmJCYkJgABAAEAASQmJCYkJgEBAAEAAQEBJCYkJCYAAAAAAQAAAAAAJCYmJAEBAQEBAQEBAQEmJCYkAQEBAAEBAQEBAAEkJCYAAAEAAQAAAAEAASYmJCYAAQABAAEAAQABJCYkJgEBAAEAAQEBAAEkJCYkJgAAAQAAAAAAJCYmJCYkJgEBAQEBASQmJCYkJiQmJCYkJiQmJCYk" mi.encoded]
+assert["image merge" "%%IMG3AA4ADQZAE0lIHBqFx2EAwDwWTYClNGkKSKNW45DJXHIBQ6F1TA4Ux1h0gLSNurtRE9F9nRKtdPz6CP+Gj2VrT1RJQQ==" mi.encoded]
 
 horiz:image["%%IMG2AAgACAAIAQgCCAMIBAgFCAYIBwg="]
 vert :image["%%IMG1AAgACAABAgMEBQYHAAECAwQFBgcAAQIDBAUGBwABAgMEBQYHAAECAwQFBgcAAQIDBAUGBwABAgMEBQYHAAECAwQFBgc="]
-assert["image + merge" "%%IMG1AAgACAABAgMEBQYHAQIDBAUGBwgCAwQFBgcICQMEBQYHCAkKBAUGBwgJCgsFBgcICQoLDAYHCAkKCwwNBwgJCgsMDQ4=" horiz.copy[].merge["+" vert].encoded]
-assert["image - merge" "%%IMG1AAgACAD//v38+/r5AQD//v38+/oCAQD//v38+wMCAQD//v38BAMCAQD//v0FBAMCAQD//gYFBAMCAQD/BwYFBAMCAQA=" horiz.copy[].merge["-" vert].encoded]
-assert["image * merge" "%%IMG1AAgACAAAAAAAAAAAAAECAwQFBgcAAgQGCAoMDgADBgkMDxIVAAQIDBAUGBwABQoPFBkeIwAGDBIYHiQqAAcOFRwjKjE=" horiz.copy[].merge["*" vert].encoded]
-assert["image & merge" "%%IMG1AAgACAAAAAAAAAAAAAEBAQEBAQEAAQICAgICAgABAgMDAwMDAAECAwQEBAQAAQIDBAUFBQABAgMEBQYGAAECAwQFBgc=" horiz.copy[].merge["&" vert].encoded]
-assert["image | merge" "%%IMG1AAgACAABAgMEBQYHAQECAwQFBgcCAgIDBAUGBwMDAwMEBQYHBAQEBAQFBgcFBQUFBQUGBwYGBgYGBgYHBwcHBwcHBwc=" horiz.copy[].merge["|" vert].encoded]
+assert["image + merge" "%%IMG3AAgACAQQBDFIMWfWexC1GJJsYaKAnblworIwpcs0qdw4EQ=="                                 horiz.copy[].merge["+" vert].encoded]
+assert["image - merge" "%%IMG3AAgACAgAAfzz14/fPn35AggkaFCfAIUDC+4b8HBhQQIUIRIsgLHiQAMcMwo8ALKjwoA="             horiz.copy[].merge["-" vert].encoded]
+assert["image * merge" "%%IMG3AAgACAZAgHA4DAgGhILhABAQDAgFwwEYGBKMh6QCICAYEAqGAygoHpSMZwQwMCQYD0kFODgqnJEqFgQ=" horiz.copy[].merge["*" vert].encoded]
+assert["image & merge" "%%IMG3AAgACAMIuhv+AQRBqxQj5zuIJxxRjGFhGKVxJA=="                                         horiz.copy[].merge["&" vert].encoded]
+assert["image | merge" "%%IMG3AAgACAMIIUNlJ6z2jrgUjp0P+V9VjCRknCh0rOyaAA=="                                     horiz.copy[].merge["|" vert].encoded]
 assert["image = merge" "%%IMG0AAgACIBAIBAIBAIB"                                                                             horiz.copy[].merge["=" vert].encoded]
 assert["image > merge" "%%IMG0AAgACACAwODw+Pz+"                                                                             horiz.copy[].merge[">" vert].encoded]
 assert["image < merge" "%%IMG0AAgACH8/Hw8HAwEA"                                                                             horiz.copy[].merge["<" vert].encoded]
@@ -256,13 +260,13 @@ b:image[2,1] b[0,0]:200 b[1,0]:5
 assert["image merge overflow"  (list  44,  6) image_matrix[a.copy[].merge["+" b]]]
 assert["image merge underflow" (list 156,252) image_matrix[a.copy[].merge["-" b]]]
 
-assert["image outline zero"   "%%IMG2AAAAAA=="                                 image[0,0                 ].outline[34].encoded]
-assert["image outline one"    "%%IMG0AAEAAYA="                                 image["%%IMG0AAEAAYA="    ].outline[34].encoded]
-assert["image outline empty"  "%%IMG0AAMAAwAAAA=="                             image["%%IMG0AAMAAwAAAA=="].outline[ 1].encoded]
-assert["image outline ident"  "%%IMG0AAMAA0DgQA=="                             image["%%IMG0AAMAA0DgQA=="].outline[  ].encoded]
-assert["image outline corner" "%%IMG1AAMAAyMBIwEBASMBIw=="                     image["%%IMG0AAMAA0DgQA=="].outline[35].encoded]
-assert["image outline full"   "%%IMG1AAUABQAAJAAAACQBJAAkAQEBJAAkASQAAAAkAAA=" image["%%IMG0AAUABQAgcCAA"].outline[36].encoded]
-assert["image outline iter"   "%%IMG1AAYABiYlJSYAACUBASUmACUBJQElJiUBAQEBJSYlJQEBJQAmJiUlJg==" image["%%IMG0AAYABgBgUHgYAA=="].outline[37].outline[38].encoded]
+assert["image outline zero"   "%%IMG2AAAAAA=="                             image[0,0                 ].outline[34].encoded]
+assert["image outline one"    "%%IMG0AAEAAYA="                             image["%%IMG0AAEAAYA="    ].outline[34].encoded]
+assert["image outline empty"  "%%IMG2AAMAAwAJ"                             image["%%IMG0AAMAAwAAAA=="].outline[ 1].encoded]
+assert["image outline ident"  "%%IMG0AAMAA0DgQA=="                         image["%%IMG0AAMAA0DgQA=="].outline[  ].encoded]
+assert["image outline corner" "%%IMG3AAMAAwbAUUAYGA6D"                     image["%%IMG0AAMAA0DgQA=="].outline[35].encoded]
+assert["image outline full"   "%%IMG3AAUABQZAAIAkHAaIpIASeSwSAUE="         image["%%IMG0AAUABQAgcCAA"].outline[36].encoded]
+assert["image outline iter"   "%%IMG3AAYABgZAU6lkAgBKgQDxqFQKk0niMAowCYlB" image["%%IMG0AAYABgBgUHgYAA=="].outline[37].outline[38].encoded]
 
 if !sys.platform~"awk"
 	assert_image["read nonexistent gif"
@@ -308,7 +312,12 @@ if !sys.platform~"awk"
 		assert[("read animated %s.gif frames" format s) (ae,be) f.frames..encoded]
 	end
 
-	con:("%%IMG2ACYAJgARAQQAIQEGAB8BAiEEAQIAHQECIQYBAgAbAQIhCAECABkBAiEKAQIAFwECIQwBAgAVAQIhBQEEIQUBAgATAQIhBQEGIQUBAgARAQIhBgEGIQYBAgAPAQIhBwEGIQcBAgANAQIhCAEGIQgBAgALAQIhAgEHIQEBBCEKAQIACQECIQMBASEDAQQhDwECAAcBAiEFAQEhAQEGIQ8BAgAFAQIhBgEGIQEBASEQAQIAAwECIQcBBSECAQEhEQECAAEBAiEHAQYhAgEBIRIBBCEHAQUhAQEBIQEBASESAQQhBwEFIQIBAiESAQQhBwEGIQIBASESAQIAAQECIQYBByECAQEhEAECAAMBAiEFAQMhAQEEIQIBASEOAQIABQECIQQBAyECAQMhAwEBIQwBAgAHAQIhAwEDIQIBAyEEAQMhCAECAAkBAiECAQMhAgEDIQQBBCEGAQIACwECIQEBAyECAQIhBAEGIQQBAgANAQIhAQECIQIBAyECAQghAgECAA8BAiEBAQEhAgEDIQIBCCEBAQIAEQECIRABAgATAQIhDgECABUBAiEMAQIAFwECIQoBAgAZAQIhCAECABsBAiEGAQIAHQECIQQBAgAfAQYAIQEEABE=","%%IMG2ACYAJgARAQQAIQEGAB8BAiEEAQIAHQECIQYBAgAbAQIhCAECABkBAiEKAQIAFwECIQwBAgAVAQIhBQEEIQUBAgATAQIhBQEGIQUBAgARAQIhBgEGIQYBAgAPAQIhBwEGIQcBAgANAQIhCAEGIQgBAgALAQIhAQEIIQEBBCEKAQIACQECIQIBASEEAQQhDwECAAcBAiEEAQEhAgEGIQ8BAgAFAQIhBgEGIQEBASEQAQIAAwECIQcBBSECAQEhEQECAAEBAiEHAQUhAQEBIQEBASESAQQhBwEFIQIBAiESAQQhBwEFIQQBASERAQQhBwEGIQQBASEQAQIAAQECIQYBByEEAQEhDgECAAMBAiEFAQMhAQEEIQQBBCEJAQIABQECIQQBAyECAQMhBAEFIQcBAgAHAQIhAwEDIQIBAyEEAQUhBgECAAkBAiECAQMhAgEDIQQBBSEFAQIACwECIQEBAyECAQIhBAEGIQQBAgANAQIhAQECIQIBAyECAQghAgECAA8BAiEBAQEhAgEDIQIBCCEBAQIAEQECIRABAgATAQIhDgECABUBAiEMAQIAFwECIQoBAgAZAQIhCAECABsBAiEGAQIAHQECIQQBAgAfAQYAIQEEABE=","%%IMG2ACYAJgARAQQAIQEGAB8BAiEEAQIAHQECIQYBAgAbAQIhCAECABkBAiEKAQIAFwECIQwBAgAVAQIhBQEEIQUBAgATAQIhBQEGIQUBAgARAQIhBgEGIQYBAgAPAQIhBwEGIQcBAgANAQIhCAEGIQgBAgALAQIhAQEIIQEBBCEKAQIACQECIQIBASEEAQQhDwECAAcBAiEDAQEhAwEGIQ8BAgAFAQIhBAEBIQEBBiEBAQEhEAECAAMBAiEFAQchAgEBIREBAgABAQIhBwEFIQMBASESAQQhBwEHIQEBASEFAQIhCwEEIQcBBSECAQMhAwEEIQoBBCEHAQYhBAEIIQkBAgABAQIhBgEHIQUBBiEIAQIAAwECIQUBAyEBAQQhBAEGIQcBAgAFAQIhBAEDIQIBAyEHAQMhBgECAAcBAiEDAQMhAgEDIQUBAiEIAQIACQECIQIBAyECAQMhBAEEIQYBAgALAQIhAQEDIQIBAiEEAQYhBAECAA0BAiEBAQIhAgEDIQIBCCECAQIADwECIQEBASECAQMhAgEIIQEBAgARAQIhEAECABMBAiEOAQIAFQECIQwBAgAXAQIhCgECABkBAiEIAQIAGwECIQYBAgAdAQIhBAECAB8BBgAhAQQAEQ==","%%IMG2ACYAJgARAQQAIQEGAB8BAiEEAQIAHQECIQYBAgAbAQIhCAECABkBAiEKAQIAFwECIQwBAgAVAQIhBQEEIQUBAgATAQIhBQEGIQUBAgARAQIhBgEGIQYBAgAPAQIhBwEGIQQBAiEBAQIADQECIQgBBiECAQEhAQECIQIBAgALAQIhAQEIIQEBBCEKAQIACQECIQIBASEEAQQhCAEBIQYBAgAHAQIhAwEBIQMBBiEHAQEhAQEBIQUBAgAFAQIhBAEBIQEBBiEBAQEhBQEBIQMBASEGAQIAAwECIQUBASEBAQUhAgEBIQUBASEBAQEhCQECAAEBAiEGAQYhAwEBIRIBBCEGARUhBwEEIQcBBSEDAQEhBQEFIQgBBCEHAQYhCAEEIQkBAgABAQIhBgEHIRMBAgADAQIhBQEDIQEBBCERAQIABQECIQQBAyECAQMhEAECAAcBAiEDAQMhAgEDIQUBAiEIAQIACQECIQIBAyECAQMhBAEEIQYBAgALAQIhAQEDIQIBAiEEAQYhBAECAA0BAiEBAQIhAgEDIQIBCCECAQIADwECIQEBASECAQMhAgEIIQEBAgARAQIhEAECABMBAiEOAQIAFQECIQwBAgAXAQIhCgECABkBAiEIAQIAGwECIQYBAgAdAQIhBAECAB8BBgAhAQQAEQ==")
+	con:(
+		"%%IMG3ACYAJgZAgHBILAoDyIBxyWwOk0mn1IkMWUPIqZZYvVqz22nX+1WGm2Ny+bxMq9fsZ4AMpZvZbmj+vnVj9WpgWn5/dYF8aHNveoqHUl2Mc4Zvf4lXjZOUXoJcjV+FSZqOnYd1nqJwAISAWKiOq6ynrqCLpq2zm6GlkLKumZexuLmqspGfwoJ7krq9tUVpzGPNw0bSvJ66o22K0djZwI/L3N6ZnJbXZYypYpLp6YDm7MKVcYTOcUfT4PhyovH49v7x8yOQHzFqBpkwShiuIJMg",
+		"%%IMG3ACYAJgZAgHBILAoDyIBxyWwOk0mn1IkMWUPIqZZYvVqz22nX+1WGm2Ny+bxMq9fsZ4AMpZvZbmj+vnVj9WpgWn5/dYF8aHNveoqHUlWMkElvV4JGXY2FmZSViEeZioycjlybmpCjpACEgFipjqx1c6avhnaTf6+Hsbhful62wK2+v3+rppHAv4J7s72anJbHwqFpw8JtjbjP13DZZdWgwcZUztXU3J7fmOyi5IOz4OCA0mK00er2y/nwtfx997zFKUWp3sBPqg5eEqewHJSGj6KcCQI=",
+		"%%IMG3ACYAJgZAgHBILAoDyIBxyWwOk0mn1IkMWUPIqZZYvVqz22nX+1WGm2Ny+bxMq9fsZ4AMpZvZbmj+vnVj9WpgWn5/dYF8aHNveoqHUlWMkElvV4JGXY2FmZSViEeNoICcdkVpc4xYo46fdqKbqn8AhKKpsK2vmpObhF6Gt4qTZbzCuKidxotKfpG/uLGsvZKmtNGlmcHBravWx8J2lJbchd7Hr+GXp5jX1Odt6eSRwJ6JtdjM7VTO4PNi+qRx0EbhCzPsGUAuzgbGWcbvoKx1DvNBifgoypkg",
+		"%%IMG3ACYAJgZAgHBILAoDyIBxyWwOk0mn1IkMWUPIqZZYvVqz22nX+1WGm2Ny+bxMq9fsZ4AMpZvZbmj+vnVj9WpgWn5/dVdVglRzb3qLc12JbY+Nk4SHfEWQXoaBgZhHi1iXnJuim5hplUmmh612cnSFmqWhngB+ja5vu7KelL+ko7XCocOAjKu+ycq8Wbi5vM13e6rRyJm1ycvWcNijZcbDl2iOkKnb3UyI5qekkeqT4ODH7+Sm2pR/eOLR9WL81+KA4uYvjKV0AgcGTOjtFUNJpx6SgyJRUUEmQQA="
+	)
 	assert["read color animated gif" con (read["tests/dom/construction.gif" "frames"].frames..encoded)]
 
 	if !sys.platform~"web"
@@ -361,11 +370,11 @@ end
 
 rot:"%%IMG2ACgAIgD/AFsBAQAlAQQAIgEGACABBwAeAQoAHgEKAB8BCQAgAQcAIAEIAB8BCQAeAQQAAQEEAB4BBAADAQMAHQEEAAUBAQAdAQQAJAEDACYBAQD/AKo="
 assert["rotate image negative"
-	"%%IMG2ACgAIgD/APEBAwAkAQQABwEBABsBBQACAQEAAQEFABkBBgABAQgAGQEMAAEBAgAYAQsAHAEKAB0BDAAdAQsAIAEIAP8A8w=="
+	"%%IMG3ACgAIgKEj6nL7Q+jnLTai7PevPsPhuIYlGNSmkrwpSrrslwM0/Jmx4Cq5Snou3mCvGHwlDspl8ym8wmNSqfUKqIA"
 	image[rot].rotate[pi*-.8].encoded
 ]
 assert["rotate image positive"
-	"%%IMG2ACgAIgD/AJ0BAgAlAQcAIgEJAB8BCwAeAQsAHQEKAB8BCAAgAQcAIgEHACEBAwABAQQAIAECAAMBBAAlAQQAJQEEACUBBAAlAQIA/wB3"
+	"%%IMG3ACgAIgKEj6nL7Q+jnLTai7PevPsPKkEQMuM5lgjKquxbvi0on66sAniuw7mN+pEMQd6haOylksphcsmMSqfUqvWKhRQA"
 	image[rot].rotate[pi*3.5].encoded
 ]
 assert["rotate image empty" image[0,0].encoded image[0,0].rotate[pi].encoded]
@@ -382,15 +391,15 @@ assert["translate image floored" "%%IMG0AAsACQAAAAACAAIABQAEgA/ACCAcYA==" image[
 assert["translate image wrapped" "%%IMG0AAsACfggBCCOYAAAAABAAEAAoACQAA==" image[a].translate[-3,4 1].encoded]
 
 b:"%%IMG0AAcACAA4fGx8bGwA"
-assert["scale image up uniform"    "%%IMG0AA4AEAAAAAAPwA/AP/A/8DzwPPA/8D/wPPA88DzwPPAAAAAA"                         image[b].scale[ 2  ].encoded]
-assert["scale image up nonuniform" "%%IMG0AA4AGAAAAAAAAA/AD8APwD/wP/A/8DzwPPA88D/wP/A/8DzwPPA88DzwPPA88AAAAAAAAA==" image[b].scale[ 2,3].encoded]
-assert["scale image down"          "%%IMG0AAQACAAgcFBwUFAA"                                                         image[b].scale[.7,1].encoded]
-assert["scale image negative"      "%%IMG2AAAAAA=="                                                                 image[b].scale[-3,4].encoded]
-assert["scale image none"          "%%IMG2AAAAAA=="                                                                 image[b].scale[    ].encoded]
+assert["scale image up uniform"    "%%IMG0AA4AEAAAAAAPwA/AP/A/8DzwPPA/8D/wPPA88DzwPPAAAAAA"                     image[b].scale[ 2  ].encoded]
+assert["scale image up nonuniform" "%%IMG3AA4AGAKEj6nLDQEji3JRqO5FmvKOHd5TGeNoVigJfq0IBq7M0mm4nmV92/zfCzqGREcB" image[b].scale[ 2,3].encoded]
+assert["scale image down"          "%%IMG0AAQACAAgcFBwUFAA"                                                     image[b].scale[.7,1].encoded]
+assert["scale image negative"      "%%IMG2AAAAAA=="                                                             image[b].scale[-3,4].encoded]
+assert["scale image none"          "%%IMG2AAAAAA=="                                                             image[b].scale[    ].encoded]
 assert["scale 0x0 image"           "%%IMG2AAAAAA==" image[0,0].scale[2,3].encoded]
 
 assert["scale image exact"
-	"%%IMG0AAwAbj/AP8DAMMAw//D/8MAwwDD/8P/wwDDAMP/w//DAMMAw//D/8MAwwDD/8P/wwDDAMP/w//DAMMAw//D/8MAwwDD/8P/wwDDAMP/w//DAMMAw//D/8MAwwDD/8P/wwDDAMP/w//DAMMAw//D/8MAwwDD/8P/wwDDAMP/w//DAMMAw//D/8MAwwDD/8P/wwDDAMP/w//DAMMAw//D/8MAwwDD/8P/wwDDAMP/w//DAMMAw//D/8MAwwDD/8P/wwDDAMP/w//DAMMAw//D/8MAwwDD/8P/wwDDAMD/AP8A="
+	"%%IMG3AAwAbgIEgolmqh2YPGkyh7NelnK7hVvnRZ2IOuRzpu5atS4Kf9Oc1iaIi7rey/xkQSERWGTxbJKkZrh0Km+xqJR5qVKv2mY3y8VCxCUudBs+e8M7NFKqBqePRDPdeo2P59G3U1+Wd4dm19eyN/UEUAA="
 	image["%%IMG0AAYAN3iE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hPyE/IT8hHg="].scale[2].encoded
 ]
 
