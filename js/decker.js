@@ -58,18 +58,6 @@ save_deck=(n,x)=>{
 	if(/\.html$/i.test(n)){q('script[language="decker"]').innerHTML='\n'+d,d=`<meta charset="UTF-8"><body>${q('body').innerHTML}</body>`}
 	save_text(n,d)
 }
-makelzww=(lw,bw)=>{
-	let w=1+lw,hi=(1<<lw)+1,ov=1<<(lw+1),sc=-1,b=0,nb=0,t={}
-	wb=c=>{b|=c<<nb;nb+=w;while(nb>=8){bw(b&0xff),b>>=8,nb-=8}}
-	ih=()=>{hi++;if(hi==ov){w++,ov<<=1}if(hi==0xfff){let c=1<<lw;wb(c),w=lw+1,hi=c+1,ov=c<<1,t={};return 1}}
-	return {
-		w(b) {
-			let c=sc;if(c==-1){wb(1<<lw),sc=b;return} /* first write sends clear code */
-			let k=(c<<8)|b;if(t[k]!==undefined){sc=t[k]}else{wb(c),sc=b;if(!ih())t[k]=hi}
-		},
-		f() {wb(sc),ih(),wb((1<<lw)+1),nb>0&&bw(b&0xff)}
-	}
-}
 writegif=(frames,delays,palette,pal_size)=>{
 	let paltrans=-1;for(let z=0;z<pal_size;z++)if(palette[z]==-1)paltrans=z
 	pal_size=pal_size?max(2,2**ceil(Math.log2(pal_size))):0
@@ -103,10 +91,10 @@ writegif=(frames,delays,palette,pal_size)=>{
 		const lws=pal_size?max(2,Math.log2(pal_size)): 5
 		b(0),b(lws)                               // no local colortable,  minimum LZW code size
 		let bo=payload.length
-		let lw=makelzww(lws,b=>{if(bo==payload.length)payload.push(0);payload[bo]++;payload.push(b);if(payload[bo]==255)bo=payload.length});
-		for(let y=0;y<frame.size.y;y++)for(let x=0;x<frame.size.x;x++){
-			const d=frame.pix[y*frame.size.x+x];lw.w(pal_size?min(pal_size,d): draw_color_trans(d,x,y))
-		}lw.f(),b(0),frame_index++ // end of frame
+		const t=[];for(let y=0;y<frame.size.y;y++)for(let x=0;x<frame.size.x;x++){
+			const d=frame.pix[y*frame.size.x+x];t.push(pal_size?min(pal_size,d): draw_color_trans(d,x,y))
+		}encode_lzw(t,lws,1).forEach(x=>payload.push(x))
+		b(0),frame_index++ // end of frame
 	};b(0x3B);return payload
 }
 writewav=sound=>{
