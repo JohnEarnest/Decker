@@ -222,6 +222,12 @@ monad={
 		if(lid(x)){const r=lmd();x.v.map((v,i)=>dset(r,v,x.k[i]));return r;}
 		return x
 	},
+	distinct: x=>{
+		if(lis(x)&&count(x)>1){const d=new Map();return lms(ls(x).split('').filter(x=>d.get(x)?0: (d.set(x,1),1)).join(''))}
+		if(lil(x)&&count(x)>1){const d=lmd();return lml(ll(x).filter(x=>dget(d,x)?0: (dset(d,x,1),1)))}
+		if(lit(x)&&count(x)>1)return monad.table(monad.distinct(monad.rows(x)))
+		return x
+	},
 	'@tab': t=>{
 		t=lt(t);const r=tab_clone(t)
 		tab_set(r,'index' ,range(count(r)).map(lmn))

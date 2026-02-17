@@ -49,7 +49,8 @@ nil+2          # -> 2          # nil will coerce to identity values- 0, "", ()- 
 count    11,22,33    # -> 3
 first    11,22,33    # -> 11
 last     11,22,33    # -> 33
-rev      11,22,33    # -> 33,22,11
+rev      11,22,33    # -> (33,22,11)
+distinct 22,11,11,22 # -> (22,11)
 2 take   11,22,33    # -> (11,22)
 2 drop   11,22,33    # -> (33)
 typeof   11,22,33    # -> "list"

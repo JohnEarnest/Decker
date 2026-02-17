@@ -446,6 +446,12 @@ monad(l_rev){
 	if(lid(x)        ){lv*r=lmd();EACH(z,x)dset(r,x->lv[z],x->kv[z]);return r;}
 	return x;
 }
+monad(l_distinct){
+	if(lis(x)&&x->c>1){str r=str_new();char m[256]={0};EACH(z,x){char c=x->sv[z];if(!m[0xFF&c])m[0xFF&c]=1,str_addc(&r,c);}return lmstr(r);}
+	if(lil(x)&&x->c>1){lv*r=lml(0),        *m=lmd()   ;EACH(z,x){lv*e=x->lv[z]  ;if(!dget(m,e))dset(m,e,LNIL),ll_add(r,e);}return r;}
+	if(lit(x)&&x->c>1){return l_table(l_distinct(l_rows(x)));}
+	return x;
+}
 monad(a_mag    ){double s=0;EACH(z,x){double v=ln(x->lv[z]);s+=v*v;};return lmn(sqrt(s));}
 monad(a_heading){double a=x->c>0?ln(x->lv[0]):0,b=x->c>1?ln(x->lv[1]):0;return lmn(atan2(b,a));}
 monad(a_unit   ){double n=ln(x);lv*r=lml(2);r->lv[0]=lmn(cos(n)),r->lv[1]=lmn(sin(n));return r;}
@@ -874,7 +880,7 @@ primitive monads[]={
 	prim("count",l_count),prim("first",l_first),prim("last",l_last),prim("flip",l_flip),
 	prim("range",l_range),prim("keys",l_keys),prim("list",l_list),prim("rows",l_rows),
 	prim("cols",l_cols),prim("table",l_table),prim("typeof",l_typeof),prim("@tab",l_tab),
-	prim("mag",l_mag),prim("heading",l_heading),prim("unit",l_unit),prim("trim",l_trim),prim("rev",l_rev),
+	prim("mag",l_mag),prim("heading",l_heading),prim("unit",l_unit),prim("trim",l_trim),prim("rev",l_rev),prim("distinct",l_distinct),
 	prim("",NULL)
 };
 primitive dyads[]={

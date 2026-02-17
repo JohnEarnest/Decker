@@ -595,9 +595,6 @@ extract list index by value from "ABBAAC"              # group a list
 
 extract list value by floor index/3 from "ABCDEFGHI"   # partition a list (see 'window')
 # (("A","B","C"),("D","E","F"),("G","H","I"))
-
-extract first value by value from "ABBAAC"             # distinct items in a list
-# ("A","B","C")
 ```
 If names are specified, all results are collected into a dictionary:
 ```lil
@@ -1295,6 +1292,8 @@ The `raze` of a table `x` will convert it into a dictionary as if by `x[(keys x)
 
 `rev` reverses the order of the _elements_ of a list, string (characters), or table (rows). For a dictionary, `rev` produces a reverse-lookup dictionary. If the values of a reversed dictionary are not distinct, Lil will preserve the association which appears last. Thus, `rev "ABC" dict "DFD"` is equivalent to `"DF" dict "CB"`.
 
+`distinct` dereplicates the characters of a string, elements of a list, or rows of a table, leaving unique items in their original order of appearance.
+
 `keys` produces a list of the _keys_ of a value's dictionary equivalent. The `keys` of a function are a list of its argument names.
 
 `list` of anything produces a list of length 1 containing that value.
@@ -1394,7 +1393,7 @@ The following is a slightly hand-waved EBNF description of Lil's syntax. The pro
 ```
 MONAD   := '-'|'!'|'floor'|'ceil'|'cos'|'sin'|'tan'|'exp'|'ln'|'sqrt'|'count'|'first'|'last'|'sum'|'min'|'max'|
            'raze'|'prod'|'range'|'keys'|'list'|'rows'|'cols'|'table'|'typeof'|'flip'|'mag'|'unit'|'heading'|
-           'trim'|'rev'
+           'trim'|'rev'|'distinct'
 DYAD    := '+'|'-'|'*'|'/'|'%'|'^'|'<'|'>'|'='|'&'|'|'|','|'~'|'@'|'split'|'fuse'|'dict'|'take'|'drop'|
            'in'|'join'|'cross'|'parse'|'format'|'unless'|'limit'|'like'|'window'|'fill'
 DIGIT   := '0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'

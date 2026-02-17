@@ -70,7 +70,7 @@ assert[f[1000000] "1,000,000"]
 problem[352.2]
 # which binary prefixes are divisible by 5?
 on b2d x do n:count x  sum x*2^n-1+range n end
-on f x do !5%each n in 1+range count x b2d[n take x] end end
+on f x do !5%each n in 1+keys x b2d[n take x] end end
 assert[f[(0,1,1,0,0,1,0,1,1,1)] (1,0,0,0,0,1,1,0,0,0)]
 assert[f[(1,0,1,0,1,0        )] (0,0,1,1,0,0        )]
 assert[f[(0,0,1,0,1          )] (1,1,0,0,1          )]
@@ -192,7 +192,7 @@ assert[f[(1, 3         )]  4]
 problem[305.2]
 # sort strings x according to an alphabet a
 on f a x do
- extract orderby (a dict range count a)@@value asc from x
+ extract orderby (a dict keys a)@@value asc from x
 end
 assert[f["hlabydefgirkmnopqjstuvwxcz" ("perl","python","raku"    )] ("raku","python","perl"    )]
 assert[f["corldabtefghijkmnpqswuvxyz" ("the","weekly","challenge")] ("challenge","the","weekly")]
@@ -268,7 +268,7 @@ assert[f[(4, 3, 1, 1, 1, 4)] 3]
 
 problem[283.2]
 # for every index i in the range [0<=i<count x], does the digit i occur exactly x[i] times?
-on f x do x~sum x=list range count x end
+on f x do x~sum x=list keys x end
 assert[f[(1, 2, 1, 0)] 1]
 assert[f[(0, 3, 0   )] 0]
 
@@ -351,7 +351,7 @@ problem[279.2]
 # is there a split point which divides x into two strings containing the same number of vowels?
 on f x do
  x:("" split x) in "aeiouy"
- max each i in range count x
+ max each i in keys x
   (sum i take x)~(sum i drop x)
  end
 end
@@ -644,7 +644,7 @@ problem[260.1]
 # are the number of occurrences for each digit in an array distinct?
 on f x do
  t:extract count value by value from x
- t~keys t dict 0
+ t~distinct t
 end
 assert[f[(1,2,2,1,1,3           )] 1]
 assert[f[(1,2,3                 )] 0]
@@ -779,7 +779,7 @@ assert[f[("c++","haskell","java") (1,3,2)] ("c++","java","haskell")]
 
 problem[242.1]
 # find the (distinct) members of x missing from y.
-on missing x y do extract first value by value where !value in y from x end
+on missing x y do distinct extract where !value in y from x end
 on f x y do (list missing[x y]),list missing[y x] end
 assert[f[(1,2,3)   (2,4,6)  ] "%j"parse"[[1,3],[4,6]]"]
 assert[f[(1,2,3,3) (1,1,2,2)] "%j"parse"[[3],[]]     "]
@@ -989,7 +989,7 @@ assert[f[("pq1122","rs3334"         )] ("001122","013334"         )]
 
 problem[183.1]
 # remove duplicate sublists from a list.
-on f x do keys x dict () end
+on f x do distinct x end
 assert[f["%j"parse"[[1,2],[3,4],[5,6],[1,2]]"] "%j"parse"[[1,2],[3,4],[5,6]]"]
 assert[f["%j"parse"[[9,1],[3,7],[2,5],[2,5]]"] "%j"parse"[[9,1],[3,7],[2,5]]"]
 
@@ -1166,7 +1166,7 @@ problem[134.2]
 # (took some liberties with the display format here)
 on f m n do
  t:(1+range m)*list 1+range n
- d:extract first value by value from raze t
+ d:distinct raze t
  w:floor 2+(1/ln 10)*ln max t
  c:("","%%%ii")format w
  "\n"fuse("\n x |%s"format c format first t),

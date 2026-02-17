@@ -22,7 +22,7 @@
              rows cols table mag heading unit
              split fuse like dict take window
              drop limit in unless join cross
-             parse format fill ceil trim rev))
+             parse format fill ceil trim rev distinct))
      . 'font-lock-builtin-face)
     (,(wds '(show panic print play go transition brush
                   sleep array image sound newdeck eval random

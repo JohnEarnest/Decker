@@ -79,7 +79,7 @@ assert[f8[1,2,34,3,4,5,7,23,12] 1]
 
 problem[9 "skyline"]
 on f9 x do
- count maxs[x]dict 0
+ count distinct maxs[x]
 end
 assert[f9[5,5,2,10,3,15,10] 3]
 assert[f9[4,3,1           ] 1]
@@ -99,4 +99,3 @@ assert[f10[2,2,2,2] list 3 ]
 # 2, 3, 4, 6, 8: Lil doesn't have scan, so we must use an each loop with an explicit carried variable.
 # 3, 5, 6, 7:    Lil conforming over ragged vectors permits the (1 drop x) op x pattern to substitute for 'eachprior'.
 # 5, 10:         Lil doesn't have 'where' as a primitive; it's integrated into query forms. (not ideal for code-golf!)
-# 9:             Lil doesn't have 'distinct', but we can use the dictionary construction (dict) as a substitute.
