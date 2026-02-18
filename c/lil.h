@@ -1472,7 +1472,7 @@ lv* time_ms(void){
 }
 lv* time_zone_offset(void){
 	TIME_ZONE_INFORMATION tzi={0};int r=GetTimeZoneInformation(&tzi);
-	return r==TIME_ZONE_ID_INVALID?LNIL: lmn(tzi.Bias/-60.0); // minutes -> hours
+	return lmn((tzi.Bias+(r==TIME_ZONE_ID_STANDARD?tzi.StandardBias: r==TIME_ZONE_ID_DAYLIGHT?tzi.DaylightBias: 0))/-60.0); // minutes -> hours
 }
 #else
 #ifndef __COSMOPOLITAN__
