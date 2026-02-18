@@ -106,6 +106,8 @@ show[(distinct ()) (distinct list 99) (distinct 99,88) (distinct 99,77,99,88,77,
 show[distinct insert value with end]
 show[distinct insert value with "singleton" end]
 show[distinct insert a b with 11 22 11 33 11 22 44 88 11 33 end]
+show[distinct 1000 take "" split "ABCD"]
+show[count distinct range 1000]
 
 header["dyads"]
 show[2+3]

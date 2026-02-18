@@ -446,12 +446,6 @@ monad(l_rev){
 	if(lid(x)        ){lv*r=lmd();EACH(z,x)dset(r,x->lv[z],x->kv[z]);return r;}
 	return x;
 }
-monad(l_distinct){
-	if(lis(x)&&x->c>1){str r=str_new();char m[256]={0};EACH(z,x){char c=x->sv[z];if(!m[0xFF&c])m[0xFF&c]=1,str_addc(&r,c);}return lmstr(r);}
-	if(lil(x)&&x->c>1){lv*r=lml(0),        *m=lmd()   ;EACH(z,x){lv*e=x->lv[z]  ;if(!dget(m,e))dset(m,e,LNIL),ll_add(r,e);}return r;}
-	if(lit(x)&&x->c>1){return l_table(l_distinct(l_rows(x)));}
-	return x;
-}
 monad(a_mag    ){double s=0;EACH(z,x){double v=ln(x->lv[z]);s+=v*v;};return lmn(sqrt(s));}
 monad(a_heading){double a=x->c>0?ln(x->lv[0]):0,b=x->c>1?ln(x->lv[1]):0;return lmn(atan2(b,a));}
 monad(a_unit   ){double n=ln(x);lv*r=lml(2);r->lv[0]=lmn(cos(n)),r->lv[1]=lmn(sin(n));return r;}
@@ -513,6 +507,16 @@ dyad(l_in){
 		MAP(r,x)lmn(hash_in(x->lv[z]));return free(hash_v),r;
 	}
 	if(lil(x)){MAP(r,x)l_ina(x->lv[z],y);return r;}return l_ina(x,y);
+}
+monad(l_distinct){
+	if(lis(x)&&x->c>1){str r=str_new();char m[256]={0};EACH(z,x){char c=x->sv[z];if(!m[0xFF&c])m[0xFF&c]=1,str_addc(&r,c);}return lmstr(r);}
+	if(lil(x)&&x->c>32){
+		lv*r=lml(0);hash_n=ceil(1.3*x->c),hash_v=calloc(hash_n,sizeof(lv*));
+		EACH(z,x){lv*e=x->lv[z];if(!hash_in(e))hash_add(e),ll_add(r,e);}free(hash_v);return r;
+	}
+	if(lil(x)&&x->c>1){lv*r=lml(0),*m=lmd();EACH(z,x){lv*e=x->lv[z];if(!dget(m,e))dset(m,e,LNIL),ll_add(r,e);}return r;}
+	if(lit(x)&&x->c>1){return l_table(l_distinct(l_rows(x)));}
+	return x;
 }
 lv*filter(int in,lv*x,lv*y){
 	x=(lis(x)||linil(x))?l_list(x):ll(x);int n=1;EACH(z,x)if(!lin(x->lv[z]))n=0;
