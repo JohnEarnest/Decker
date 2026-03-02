@@ -559,7 +559,7 @@ lv* interface_image(lv*self,lv*i,lv*x){
 		return ib?lmn(0xFF&(self->b->sv[p.x+p.y*s.x])):LNIL;
 	}
 	ikey("pixels"){ // read/write all pixels
-		if(x){lv*t=l_raze(ll(x));EACH(z,t){if(z>=self->b->c)break;self->b->sv[z]=0xFF&(int)ln(t->lv[z]);}return x;}
+		if(x){lv*t=ll(l_raze(ll(x)));EACH(z,t){if(z>=self->b->c)break;self->b->sv[z]=0xFF&(int)ln(t->lv[z]);}return x;}
 		lv*r=lml(s.y);for(int y=0;y<s.y;y++){GEN(t,s.x)lmn(0xFF&(self->b->sv[z+y*s.x]));r->lv[y]=t;}return r;
 	}
 	ikey("size"     ){if(x){image_resize(self,getpair(x));return x;}return lmpair(s);}

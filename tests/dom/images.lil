@@ -224,6 +224,12 @@ assert_image["image paste onto itself"
 ]
 assert["image histogram" ((0,11,22,33,44) dict (4,2,2,2,2)) self.hist]
 
+i:image[1,1]
+i.pixels:5
+assert["image pixels write scalar" (list list 5) i.pixels]
+i.pixels:nil
+assert["image pixels write nil (nop)" (list list 5) i.pixels]
+
 i:image[2,2]
 i.pixels:0,1,32,0
 assert["image roundtrip data" ((list 0,1),(list 32,0)) image[i.encoded].pixels]
