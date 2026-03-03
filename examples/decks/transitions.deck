@@ -1,0 +1,725 @@
+{deck}
+version:1
+card:0
+size:[512,342]
+name:"All About Transitions"
+author:"Internet Janitor"
+
+{card:Index}
+image:"%%IMG3AgABVgMIutz+MMpJq7046827/2AojmRpnmiqrmzrvnAsz3Rt33iu73zv/8CgcEgsGo/IpHLJbDqf0Kh0Sq1ar9isdsvter/gsHhMLpvP6LR6zW673/C4fE6v2+/4vH7P7/v/gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp+goaKjpKWmp6ipqqusra6vsLGys7S1tre4ubq7vL2+v8DBwsPExcbHyMnKy8zNzs/Q0dKBAdXT123V2tjcaNrb3cTgD9Yv5T3f5+G/6Q3pAS7fP+3r7O8L7+op8vPj9bz58AVkwc9HwX+78sFTMHDFwR30EAKE9xBAxRMXcWSUmKviRhIfa4TkWMujv30ndYwkOcukPhQrZRSMyXLTPXIpaVK4yTBlvIUCFfKsOUohzpc6JRjt+XKEz5lCGxIFFRVoUKtMsXIQerVDxKtaoVb1OdVmVQcutW6ImnXhULRL28JVN7ZpWbPjvlrMSTaDvIh/4zI429Ud2aR3LR3Um1bEObF1DbPNOlftXruJPyE92dgEvbqL293sXDmzq4ekS/BrGBfwar5P+5r2NLnwYNkWxrZV61rf682xfVuerbg2ZcnDc+s+frQcanBpOedFTDxRZNvYNYDOjpz58a9cwUqtXmk7d70XQAPd+Pn3dPXOCZMvLp3uc9wR0EOGMHr5Za4DGTcfJanphx9/wcWn3m3hiQeZfdQNaEhq/1WWXH4JurUgcujthlWEEj7C01AGHsjhcuZZeCGIIWaS4n9hIQafhgK2eMyGTCF4IYYpYmYjMy8S5N+P6/S3I0pHEqnkkkw26eSTUEYp5ZRUVmnllVhmqSUkM3YZJDIzwhCmMV6WeR2YXf40pjhmtilYMWYK6SWbbtbZYTBxOlQmnXb2ieacegIqTJ+EJqlLniogimehdv6ZpnZvnYjjooy66eia6b3J4KODVmrpjXtiUKODX/ri6adkhqrcqDDCx+epnMKpagVDboopMLAq+qqrq7Kqqz25xrrrpEqdKWmpvQQrqKzLFlsrqcbiquytw/zanHzHRgvstMhK2+y12NrKa6fcdrsttSr6Oqu35T5LrrDpstqquYe2q2218MbboL7yTmRvuETlW8+/7pL07T8EA8zSwQMnvG9N6yLk8MOpjCdTxHixGOjEd6oUKTodfzCuORhfTLFIIXs1cg4cg7cytCZ6OCK16M77sV+o8hgko/xaTGvNE6BL789tstwydMu+DG6DqjYLdNCE6oyjp+LeK/XTPb+J9dVF33D0eoIKDHNAiDYtNtc5jz3ZqTJbnXXBS5/JsLNRE9F1pnPObTPbe6Ood9yNVm0e39a+7bbg1xUOeJ12l0z3tI8H27ayvVaard+W963w5WdPnmvlVAehONqwkk54wkR/7vnaoY+u+d8Op843EK4vHrrhha6uuum5677U6XrPbrvkvPfez9/D84x77xNHrnqewIu9+/KZ6wj58Z0nbzzizzevfd3Qt+749JxT/r2f2G9NPePlR0+w9ea/Hp77SsufttrEr3+3QY4Xrzz33fNe++pmP9b8z1rcOp/wfEdA/iFPf/tjoPJaBsGyRex+BfxYAivYQAkGLn31cx75YpfBBZaQfSeEDcN+1S4Oog9//3Ng9lwoLBIeDYDVSyFwVnjBctHwgzqsnQ2EOMAO2tBSKAzirFhYOCb6EIe6SaK9hEBEKG7Peznb3xRhaLEIcvEt/yqiYLTYQtH1D37xUyL7vKioLXowOjXTVRitqKk2lpF2Z1SgFI/Yw6Q98Ysl4qEf5/jGDI3sjnh8oBiBiEWM3Q2RQeQgGieFOkBexI4bNKMi6fhCjhWyKY/84ydjVDJMujGSFeRkEkFILNnFz5OoXGRvrmdJFQrMgpWMpSpDk8lEzlCWqIIlAnGZxlFKUo/veZ8xU1nLPGrEmcAMJR/zJc1i6nKUliEmIYc5SGvKUH3R1OaYPsXNsPVymbvMiDjvWE5MidKX4EynKTnVtXau6Z3XVOIkexSnYDpyibSkIjTl6TP/7aue/wRo/zrkREE+iozmPJgcR5cyj22ymTczqNZCZc+V1c6QrfTiMiEKqI7u7KM+gshAMSqjPj40oU6DJm9cekuOTrSkMKWZMw3ltZViM6X71Fb4JNrQeDKToNm06beGSs2chlAJVWQpTwnKTJN+aZWuDGkTlQovpgrNqb8U6EV/uhWa8sqqVsOqCIW6VZwulatfdWhUv/nUoB4Oam91a1PHB0SNRkqkqCzqWcFqrr4eYa76LGteX0rUhb7QrgADrFdfNtlW5jOcGYVnXZEJ1LU+q7KlAixSPyLY+oGWrXqN6wwf27ixXhZvXYWr0kSLWXWa1bSy1WpqZztQw2oyrBj1QGkHR9ihjTapi63pbnXL2L0CV41TRZlrEYvUcKKzupAq7mfb2lydLje0PiVra5/7WtB5NLfgDS82jypVztIott+9F3XXOwTEzpe+wb0sG4EaweFSFr0vQmhj97oT9cbAvgbGb2LRul3Z9Pe2p8VcN++pXYWFjLZGm26Crytg59bwoGnz754iPKR1phe+UlErDxDsWsyKl8HhEqWI82Y2AMutwjXC54rDe9+frhHHApIxkBdk4kzCmGI6VqmGW3xccg55owE9MpFrrEz9rguSIFsyeWv74wHHCpFS3k6RaRlmMCbZouTtMXSd7GV3CrnNRRtz/qwc03NmOc0b9nGHVfvlN3sYiQo9ZZkZc+YM45nJTSbxqKoZ5SdHZp5+5vMhsbxjLRsVssQb9CwbDed+BhrMjnZZoZ9p6c0WuJKaflAauQvoOr8z1RCyc6UPveUf2tjCcs4hq+N85VPSuc+j7mmpLZvdOcJaQZHGbaNmnMNfU5jSSqb1pTFdOmePE5KK8xOzt3fd/K7Z1EPkcZ6lquiT7bmY2V42hE14bHJP+8DiRjSXb73ocnM73Yw7tqQtm+sYstK41g0BqkMtGixTNN8ETzgo6e3vf9/VvU4xtsKt4evyrvm13rT2hipOV2J7dnNrkXinxaxj1yF8buSjalWDbehpq3ne1x75o2VtcbLi+3bszS/LWw5ulUf8ifrWc1rz2OqzmdDnPg9ofeNda78GLuhClxcRPQ27hgf86t/u151dPu71BXbiVkk50vEaJpSyFuI5rzYSmN5znE05onFM7tlzTva3r9a3dP+krSvqcJB/XFM/98+EiV3KuVM7s39PJrhVjEynY6aDSWj6u0VVK+/SS30YVqDAH3ZpFl/e1JkPxcm2MHkzNF2sAC9FZ7sAeD08XAqt31LGoiv72tv+9rjPve53z/ve+/73wA++8IdP/OIb//jIT77yl8/85jv/+dCPvvSnT/3qW//62M++9rfP/e57//vgD7/4x0/+8pv//OhPv/qzMPr1m+r17qdF6TXb/uHT3g35IID+979/vo+37bgXM2/wDvxXgAXof32XerenMYPxBQRogBDYfwjIcwEQgRAYe7k3gc7Cet9ggR6ofxpIA/n3gRGIgVcAN+wXghZFAIhHNxvYBOlAgjLYgqqRUgohgx9Yf7CHQU+gdccDgjrYHenCBB2IgzhIgyBwMyNohDMYhJGndlDFbTOgDfyHLGPkg3fGhEZogiFXRw+ohUyIhf9XgTkYeqRGhVVoeEhSghJGhUhDgFxIamAIhnHoWSyIbEU4h3rohL9FhnoIhPA3hTFogVYHEtVwhOoBiF+YhnUIKSrjh3+4hQVVd4OoiIsYiX/YiEqGiWUohi1wiZzocSJziHS4hJZIioQYiFLThZw4h5MYL2wIiq2Yia9YabMoiSroGXl4i7EoiniFiah4gLvYhCjINW7Hi66IeJXogWiIjLeoiYIIic7IjLm4iqcmjdOYisU4OcCojcDod5VxhzzVjNmIi4Q2jOWYjheIhMWmg+SojtroGCb4jvCojfU3FumIjaFYi0zBiKtSj2FINssIkAQpgQJIiXBDjwXJiNHlcei4kMQ4U1UBkbyYMu+IHw9JkesoFBpJkdWoYP3YkQZIExNpkM0hkgGJjyhZjneikOyhkCs5khkZk+qogjdIgiVJk6dYJhuZTDoZkab4k8h4jvZYNUKZg0e5kDR4kykpizTZJYjIlElpjzM5ld/oDzC5kwNplVypkUoolaVYlTGZiE0pll15lvBYcPook0GJlm5JkF7ylm6ZlXJZl9PYlr1ol3pZkHWxl375l4C5j2YZmIRZk2BZmIiZmIo5mIrZmI75mJAZmckomZRZmZZ5mZiZmZq5mZzZmZ75maAZmqI5mqRZmqZ5mqiZmqq5mqzZmq75mrAZm7I5m7RZm7Z5m7iZm7q5m7zZm775m8AZnMI5nMRZnMZ5nMiZnMq5nMzZnM75nNAZndI5ndRZndZ5ndiZndq5ndzZnd75neAZnuI5nuRZnuZ5nuiZnuq5nuzZnu75nvAZn/I5n/RZn/Z5n/iZn/q5n/zZn/75nwAaoAI6oARaoAZ6oAiaoAq6oAzaoA76oBAaoRI6oRRaoRZ6oRiaoRq6oRzaoR76oSAaoiI6oiRaoiZ6oiiaoiq6oizaoi76ojAaozI6ozRaozZ6oziaozq6ozzaoz76o0AapEI6pERapEZ6pEiapEq6pEzapE76pFAapVI6pVRapVZ6pViapVq6pVzapV76pWAapmI6pmRapmZ6pmiapmq6pmzapm76pnAap3I6p3Rap3Z6p3iap3q6p3zap376p4AaqII6qIRaqIZ6qIiaqIq6qIzaqI76qJAaqZI6qZRaqZZ6qZiaqZq6qZzaqZ76qaDqmQkA"
+script:"Index.0"
+{widgets}
+version:{"type":"field","size":[25,14],"pos":[480,321],"locked":1,"border":0,"value":"v0.9"}
+index:{"type":"field","size":[292,97],"pos":[7,238],"locked":1,"volatile":1,"script":"Index.1","scrollbar":1}
+button1:{"type":"button","size":[116,23],"pos":[344,255],"script":"Index.2","text":"Tutorial..."}
+button2:{"type":"button","size":[116,23],"pos":[344,285],"script":"Index.3","text":"Transition Gallery"}
+field1:{"type":"field","size":[115,13],"pos":[377,177],"locked":1,"border":0,"align":"right","value":"An interactive tutorial"}
+titleshape:{"type":"button","size":[484,107],"pos":[14,79],"script":"Index.4","show":"transparent","style":"invisible","value":0}
+
+{script:Index.0}
+on view do
+ bullet:image["%%IMG0AAYADQAAAAB49Pz8/HgAAAA="]
+ i:select c:key t:value..widgets.title.text where value..widgets.title from deck.cards
+ index.value:raze each row in rows i
+  rtext.make["" "" bullet],
+  rtext.make["  "],
+  rtext.make[("%s\n" format row.t) "mono" row.c]
+ end
+end
+{end}
+
+{script:Index.1}
+on link val do
+ go[val "BoxIn" 15]
+end
+{end}
+
+{script:Index.2}
+on click do
+  go["Next" "SlideLeft" 15]
+end
+{end}
+
+{script:Index.3}
+on click do
+ go[gallery "BoxIn" 15]
+end
+{end}
+
+{script:Index.4}
+on click do
+ t:card.image.copy[me.pos me.size]
+ if me.value
+  t.map[(0,1) dict (0,0) 1]
+ else
+  t.map[(0,1) dict (0,39)]
+  p1:0,me.size[1]*1/5
+  p2:0,me.size[1]*2/5
+  t.paste[t.copy[p1 me.size*1,3/5].map[0 dict 0 36] p1]
+  t.paste[t.copy[p2 me.size*1,1/5].map[0 dict 0 32] p2]
+  t.outline[1].outline[1]
+ end
+ me.value:!me.value
+ a:card.image.copy[]
+ b:card.image.copy[].paste[t me.pos]
+ c:card.add["canvas"]
+ c.show:"none"
+ c.size:card.size
+ f:transition[].HeartIn
+ duration:20
+ each time in range duration
+  c.clear[]
+  f[c a b time/duration-1]
+  card.image.paste[c.copy[]]
+  sleep[]
+ end
+ card.remove[c]
+end
+{end}
+
+{card:whatisatransition}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"What is a Transition?"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,192],"pos":[254,110],"locked":1,"border":0,"value":"When Decker moves between cards, it can use a \"transition effect\", or simply a \"transition\".\n\nBy animating movement between cards, transitions can help produce the illusion of the cards being located in space relative to one another, helping make decks more intuitive to navigate. They can also add creative visual flair!\n\nIn this deck we'll explore how transitions work, how to get more, and even how to write your own with a little bit of scripting!"}
+demo:{"type":"canvas","size":[85,57],"pos":[91,139],"locked":1,"animated":1,"volatile":1,"script":"whatisatransition.1","show":"transparent","scale":1}
+a:{"type":"canvas","size":[85,57],"pos":[37,218],"locked":1,"show":"none","image":"%%IMG3AFUAOQSwyUmrvTjrzbv/YCiOZGmeaKqubOu+cCzPFmADdH7dt+43PN4vF+wNZUXh8ZVULltN43MVdU5PVeuVlA1uS93idxQFJsehsuSM9qjX7PamWXnLd3EK/Y7Z18R8f4B4XoF1eYeDhn6EhYZmio1SgYx9kXeVkpOYYZ2LnZ6UoGGfo118pqFtqaporKSriB2ZU7Rzsk+2HLo/vBq+RLgfwr3Es8bBjlzINMy7l0POt8q5WsvU1Tgp0o+Wm90i3+Dj5OXm5+jp6mgR"}
+b:{"type":"canvas","size":[85,57],"pos":[133,218],"locked":1,"show":"none","image":"%%IMG3AFUAOQQwyUmrvTjrzbv/YCiOZGmeaKqubOu+cCzPdG3fZKDvPA7zQKBvFSwKhzmjsocULZ+6ZggKlYKoT+sHOylqPdmK98sxYszkzfiCTmfWYribHaTL5/GjJIw/1xNVfW91WIVfhYhtSImMekONkFFNkZCTlIyWl4mLiFN3NXwlnzSKJ6OkfymnM6tXrTGlTkqZjrKztDuiS1avFlRavXtcwKm+mGSxlWlol3iawTjPTH3SghTN1nnD2YO/3GU9td9qkuPm5+jp6uszEQ=="}
+
+{script:whatisatransition.0}
+on click do
+ local t:()
+ t.Prev:"SlideRight"
+ t.Next:"SlideLeft"
+ t.Index:"BoxOut"
+ go[me.text t[me.text] 15]
+end
+{end}
+
+{script:whatisatransition.1}
+on view do
+ d:120
+ t:1&(d%sys.frame)/(d/3)-1
+ c1:if 2%floor sys.frame/d a else b end
+ c2:if 2%floor sys.frame/d b else a end
+ me.clear[]
+ transition[].SlideRight[me c1.copy[] c2.copy[] t]
+end
+{end}
+
+{card:builtintransitions}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"The Built-In Transitions"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,224],"pos":[254,78],"locked":1,"border":0,"value":{"text":["Decker always has 10 basic transition effects available:\n\nThe ","slide"," transitions translate the source card over to the destination card, moving up, down, left, or right; these are good for representing movement on a flat plane.\n\nThe ","wipe"," transitions keep the source and destination cards in the same location, but gradually replace one with the other along a straight division; these are good for animated sequences.\n\nThe ","box"," transitions replace the source with the destination along a growing or shrinking centered rectangle; these are good for representing non-local motion in a deck."],"font":["","menu","","menu","","menu",""],"arg":["","","","","","",""]}}
+demo:{"type":"canvas","size":[85,57],"pos":[90,69],"locked":1,"animated":1,"volatile":1,"script":"builtintransitions.0","show":"transparent","scale":1}
+a:{"type":"canvas","size":[85,57],"pos":[37,218],"locked":1,"show":"none","image":"%%IMG3AFUAOQSwyUmrvTjrzbv/YCiOZGmeaKqubOu+cCzPFmADdH7dt+43PN4vF+wNZUXh8ZVULltN43MVdU5PVeuVlA1uS93idxQFJsehsuSM9qjX7PamWXnLd3EK/Y7Z18R8f4B4XoF1eYeDhn6EhYZmio1SgYx9kXeVkpOYYZ2LnZ6UoGGfo118pqFtqaporKSriB2ZU7Rzsk+2HLo/vBq+RLgfwr3Es8bBjlzINMy7l0POt8q5WsvU1Tgp0o+Wm90i3+Dj5OXm5+jp6mgR"}
+b:{"type":"canvas","size":[85,57],"pos":[133,218],"locked":1,"show":"none","image":"%%IMG3AFUAOQQwyUmrvTjrzbv/YCiOZGmeaKqubOu+cCzPdG3fZKDvPA7zQKBvFSwKhzmjsocULZ+6ZggKlYKoT+sHOylqPdmK98sxYszkzfiCTmfWYribHaTL5/GjJIw/1xNVfW91WIVfhYhtSImMekONkFFNkZCTlIyWl4mLiFN3NXwlnzSKJ6OkfymnM6tXrTGlTkqZjrKztDuiS1avFlRavXtcwKm+mGSxlWlol3iawTjPTH3SghTN1nnD2YO/3GU9td9qkuPm5+jp6uszEQ=="}
+transitionName:{"type":"grid","size":[100,145],"pos":[82,139],"locked":1,"lines":0,"format":"s","value":{"Transition Name":["SlideRight","SlideLeft","SlideDown","SlideUp","WipeRight","WipeLeft","WipeDown","WipeUp","BoxIn","BoxOut"]},"row":0,"col":0}
+
+{script:builtintransitions.0}
+on view do
+ d:120
+ t:1&(d%sys.frame)/(d/3)-1
+ c1:if 2%floor sys.frame/d a else b end
+ c2:if 2%floor sys.frame/d b else a end
+ me.clear[]
+ transition[][first transitionName.rowvalue][me c1.copy[] c2.copy[] t]
+end
+{end}
+
+{card:applyingtransitions}
+image:"%%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"
+script:"applyingtransitions.0"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Using Transitions with \"Action...\""}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,198],"pos":[254,104],"locked":1,"border":0,"value":{"text":["The simplest way to use transitions doesn't require any scripting: the \"Action...\" button in a button widget's properties modal lets you choose a transition to apply when a button is clicked.\n\nWhen \"With Transition\" is enabled, you'll see a list of available transitions to choose from and a tiny preview of the selected transition.\n\nThe list here will always include the built-in transitions. If you have added a module to your deck which provides more transitions, like the ","PublicTransit"," module included here, you may have many additional options!"],"font":["","",""],"arg":["","gallery",""]}}
+field2:{"type":"field","size":[82,15],"pos":[61,117],"locked":1,"font":"menu","border":0,"align":"center","value":"Button Action"}
+enable:{"type":"button","size":[88,13],"pos":[102,141],"volatile":1,"script":"applyingtransitions.1","font":"body","show":"transparent","text":"With Transition","style":"check"}
+preview:{"type":"canvas","size":[17,13],"pos":[195,140],"locked":1,"animated":1,"volatile":1,"script":"applyingtransitions.2","show":"none","scale":1}
+tname:{"type":"grid","size":[109,69],"pos":[103,156],"locked":1,"show":"none","headers":0,"lines":0,"format":"s","value":{"Transition Name":["SlideRight","SlideLeft","SlideDown","SlideUp","WipeRight","WipeLeft","WipeDown","WipeUp","BoxIn","BoxOut"]},"row":0,"col":0}
+field3:{"type":"field","size":[58,34],"pos":[22,174],"locked":1,"border":0,"align":"center","value":"enable a transition animation"}
+
+{script:applyingtransitions.0}
+on view do
+ tname.toggle["solid" enable.value]
+ preview.toggle["solid" enable.value]
+end
+{end}
+
+{script:applyingtransitions.1}
+on click do
+ view[]
+end
+{end}
+
+{script:applyingtransitions.2}
+
+
+on view do
+ d:60
+ a:image["%%IMG0ABEADQAAAAAAAACAAAFAAAIgAAIgAAQQAAfwAAgIAAgIAAgIAAAAAAAAAA=="]
+ b:image["%%IMG0ABEADf//gP//gPA/gPffgPffgPAPgPf3gPf3gPf3gPf3gPAPgP//gP//gA=="]
+ t:(d%sys.frame)/d-1
+ c1:if 2%floor sys.frame/d a else b end
+ c2:if 2%floor sys.frame/d b else a end
+ me.clear[]
+ transition[][first tname.rowvalue][me c1 c2 t]
+end
+{end}
+
+{card:scriptingtransition}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Using Transitions with \"go[]\""}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[248,230],"pos":[254,72],"locked":1,"border":0,"value":"The \"Action...\" dialog is really just a shortcut for writing a simple script for your buttons.\n\nThe go[] function is how you tell Decker to change cards. The first argument to go[] will always be the card you want to visit; either specified as a card value or the card's name, as a string.\n\nThe go[] function can optionally take a transition name (as a string) as its second argument.\n\nThe go[] function can also optionally take a time delay (a number of frames) as its third argument. By default, Decker will make transitions last 30 frames, or half a second. A smaller number here will make the transition faster, and a larger number will make it slower.\n\nTry experimenting a bit with the example to the left!"}
+ex1:{"type":"field","size":[234,137],"pos":[10,85],"script":"scriptingtransition.0","style":"code","value":"on click do\n go[liminalspace \"BoxIn\" 15]\nend"}
+demobtn:{"type":"button","size":[79,29],"pos":[95,228],"script":"scriptingtransition.1","show":"invert","text":"Try It!","style":"rect"}
+
+{script:scriptingtransition.0}
+on change do
+ demobtn.script:me.text
+end
+{end}
+
+{script:scriptingtransition.1}
+on click do
+ go[liminalspace "BoxIn" 15]
+end
+{end}
+
+{card:sequenced}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Sequenced Transitions"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[180,189],"pos":[292,117],"locked":1,"border":0,"value":"By transitioning between several cards in sequence, potentially alternating go[] with sleep[] to introduce additional pauses, it is possible to string together elaborate \"slide show\" animations with only a single very simple script.\n\nDon't underestimate the creative potential of this technique!"}
+ex1:{"type":"field","size":[228,95],"pos":[32,116],"scrollbar":0,"style":"code","value":"go[allblack \"Dissolve\"]\nsleep[30]\ngo[typography1 \"WipeDown\" 60]\nsleep[30]\ngo[typography2 \"WipeRight\" 30]\nsleep[60]\ngo[sequenced \"StarSpinOut\"]"}
+demobtn:{"type":"button","size":[79,29],"pos":[103,223],"script":"sequenced.0","show":"invert","text":"Try It!","style":"rect"}
+
+{script:sequenced.0}
+on click do
+ eval[ex1.text () 1]
+end
+{end}
+
+{card:card1}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Finding More Transitions"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[240,259],"pos":[262,47],"locked":1,"border":0,"value":{"text":["Looking for more transition modules to use in your projects? In addition to the PublicTransit module, Decker users have created several libraries you might want to check out:\n\n","Screen Melting Transitions"," by Screwtapello are designed to mimic Doom's level transition animations. Be sure to open the .deck in a text editor and read through the source code!\n\n","Wacky Wipes"," by Millie Squilly offers a handful of silly wipe effects with hand-drawn decorations. These could also be a good starting point for making your own variants.\n\nThe ","Utena"," module by Internet Janitor (that's me) is internally based on transitions and offers scriptable title effects based on the titular anime series."],"font":["","","","","","",""],"arg":["","https://screwtapello.itch.io/screen-melt-transitions","","https://micpp.itch.io/wackywipes","","http://beyondloom.com/decker/goofs/utena.html",""]}}
+ref:{"type":"canvas","size":[148,138],"pos":[10,159],"locked":1,"show":"none","border":0,"image":"%%IMG3AJQAigZAgHBILBqPyKRyyWw6n9CodEqtWq/YrHbL7Xq/4LB4TC6bz+i0es1uu9/wuHxOr9vv+Lx+z+/7/4B/AYOEg4GHQ4WKiwGIeoyQkYqObpKWIJggkpRqloyZoKGYjJxml6KoqZmTpWGRqrCxmpCtWpCqnoOxubVTn6i5i8DBhL1Nt6LEyKPKhbWsRL+gkruKzM2Lpcqh1LKrhLOFw56UuuHL58Le3Ojjm4jm3+LX0uvT7bjvgfH3ut327urlo7UvQEB8APv9gxWp4EF1CeVtW5cNED+JAiligygLGh9wyV7Z23hKo6E+FzHO60gy2Mhie0Cyy/iw5UKWMVPSWznwpkJiAE/i0ZlOZk+aR0t6E1qHaFGnO61FfIownx2oSFUanRo168ymBhlyDOk1Ya6ljehsJbv2J0+uM31+VRs2ad2acMXKvQf27kG9UvPaDUyWrt+A1QgLTuVpnGG0bbUeXsw2ozM5bytjLUu5cb85mTVP7lp37GKll+GEjhuZtFLBqFO3USx6tGutlF3z88hm9b10gImahnuTdxrf8oD3TAxuOEuROyu1Tk67H+TXz9EZRzP92k6xQT2/bLe9DHLvyseFF3/ddPkx5+dVZ7b+rEma711BVT68u2TsjEH303HdSdXffreRNp5z+XmBXGCWIViVc7WN1mAXD/Lknm3/6UShW61duEWGRgm0H4SrnadgcKaESJh2HKJ4IIeSMZcWGdNxBONR31hHVnv+iXgFiVst49RKKbUV5IcY4ZijYiIpKZ+Hk8XHZJNiEJnkLVLGI9xFzcV4ZXRZpsigXFNaCKY5R46ZDnxmzqeberMslxx6rNE4YJmRcSagd5t5WeKWKmKpX59uRkikRDPlueCNYMzHmVuODoQRW5c+Cieibj4VV2KZfppedkx9MaOceH1naVGIoZqnk126mieA57Aa4KSG8kllp1S9xt6sTFa06a6yAtuYS7ci61aLsRZqrE0nTqQSs8Q6+6xNNrpEkHmZ/XkftFb6tRF3oVVFKrjPJUvOGdV5+2hLkAW3LbXV+idvMy+dKyQXpxZ7r30djaIvTJ2U6+5UAGv0LqQFG2xublwhKJl0zfoLscLfErxGvxZfrNfCDBNIG60e3wfyGxzzWrKqQJa6cbskr4xYyy6/7PDBMrMGcsg237xXzp02FMeZyuZsK8019+xi0Ssnqg/KXuHrMa7rDh01Nrnh2qvGqpVFUsQPX8sz1MGCKybOFXIN2oRmw7tz0pj92bbbb3809932VigI3m2DLZtFfGML4ot/wxM4UGKnObYjGkMneNq/FG6MEGjntdE5kx9ROcJmZ27E5ma17XkRP0c09+ikg470tvOiHnPGTyeyLye/vi3s55KPzvTApCiRu+sJ/9s67qgzgbi6lhQ/orS69a68LYf//nwV0U8fKd7WD2tT9uxiw73SQn8v/vjkl2/++einr/767Lfv/vvwxy///PTXb//9+OfPfRA=","scale":1}
+rose1:{"type":"canvas","size":[148,138],"pos":[21,55],"locked":1,"script":"card1.0","show":"transparent","border":0,"image":"%%IMG3AJQAigZAgHBILBqPyKRyyWw6n9CodEqtWq/YrHbL7Xq/4LB4TC6bz+i0es1uu9/wuHxOr9vv+Lx+z+/7/4B/AYOEg4GHQ4WKiwGIeoyQkYqObpKWIJggkpRqloyZoKGYjJxml6KoqZmTpWGRqrCxmpCtWpCqnoOxubVTn6i5i8DBhL1Nt6LEyKPKhbWsRL+gkruKzM2Lpcqh1LKrhLOFw56UuuHL58Le3Ojjm4jm3+LX0uvT7bjvgfH3ut327urlo7UvQEB8APv9gxWp4EF1CeVtW5cNED+JAiligygLGh9wyV7Z23hKo6E+FzHO60gy2Mhie0Cyy/iw5UKWMVPSWznwpkJiAE/i0ZlOZk+aR0t6E1qHaFGnO61FfIownx2oSFUanRo168ymBhlyDOk1Ya6ljehsJbv2J0+uM31+VRs2ad2acMXKvQf27kG9UvPaDUyWrt+A1QgLTuVp3Jy3jCG7hbq4K2RncRSzbav1cOW47WDC0bzZ6bKxi5VifkMaNFZsn6ka9cimdWfAgcsGXUi7E2d26XB7Lhr7Zm80kmcG75kYHGq0IndWonxteeThrqsOnr3aN3WQtmftVgpd4PEyyfvtHDiefHPU58f8lrg+cvvGJmnGB5O+/vP5k+HHEkL7fdHfcv9RJ9tt+bVWYBf95Qbfd0g9V9NwD3IRIU8TDkhgeJ1h1x0ZG3KnGGUScnagZc2dMR9H6Lwm04fYBfgeei8SFqOIK/HTFoAstkhijm+dxmM8Kf1IIYjSyUfkViIpCZ5OVAKoGz1D/jbhJ1LWRRSU/tR4ZTpOqmihe+dUN45y4l23YpOuJOeVXFMyJ8+dpb0kGn9yWhjgYc6JOaOJeTZY5pd+Zleom/Sp55aeTBnYJ5OPVnodRmxhCmlacUqmXWl+HThol/WVF6mkXb7JoHVrErcZq+9x2mmViYK6lzh+RmeqrHymCuSfxqFpGYgVHerZpxde4pKbZ2WHo68KZmeTqBOp5OJlY0o7bY2yUUPQs0kiy+y2KF5E0rXQcrsdSQOOqw+44WZrK2ztrjuiscfKO++yaHlIine01uovUEuNMvC9pniqa17NvrTpqWmQtldsXEVL1XTpWkwxSw9DjG7G6m5c764efxyvuCLbSTKva0gsbMpHdcxyywpPDPOrK88McMAow0zpsHIkKODNrsms884YEky0qzkfHXGuSvv8syVBz1ltcQIPuydrVjfzWbbkPFYWu1MtLFyxYtdKrqBm2+s0xmeuTXaDaF+1sNxz041wX3jjXfa3H/W9dsUZ3iH4tNqaWLIgh0ettTp7O7JndDa5203kvbRd2UbnGIOE5gyT6/kRoBMu+uhF2GzW2qgbobrR3wLeOgAvw163ELe3PvR9VH+Ouef86i2761vPnkjDsb5L+tvGO5547sZT4TWw/0ZvS+O/W+9L49r3Knf3+J4LfsLNjE9z2Oanr/767Lfv/vvwxy///PTXb//9+Oev//789+///wAcXxAA","scale":1}
+r1:{"type":"field","size":[23,18],"pos":[175,313],"volatile":1,"show":"none"}
+r2:{"type":"field","size":[23,18],"pos":[206,313],"volatile":1,"show":"none"}
+rose2:{"type":"canvas","size":[88,82],"pos":[128,178],"locked":1,"script":"card1.1","show":"transparent","border":0,"image":"%%IMG3AFgAUgZAgHBILBqPyKRyyWw6n9CodEqtWq/YrHbL7Xq/4LB4TC6bz+hlYM1up8PtuHz9zs7boLw+765P43uBgntxfk6AgXeCd4ZJeIR3jyCRbH6UenKDfAGTbJByaZxzm5KanZ6LoGicmKKIpq2viX1mrKSlppRrmrRktqe4qbq7vHS+s6iDw5HFAWPEt7+xssCKvGLQ0cLJudbKzl/SwN/csNXlreHk29nm0ejGXe3jyPPu5+Lg8uKn5Pz3+CB5gUcQHcCAmwbyo4YvGKxMpLgYZIjIYTdJlbbY20VwncF6xDJq2Uhq0UWGn5KJvDKxJKSTKN99srOQFTd772JCjIhlHiqMNct9rIasZ76QKoPe/EhtJZV2jyoedbW0WVArPpN6gmrzZSt/zapkhQYo20+vm8CSE8u17VJXaDluC/vUrb9fuH7axIvzFFtpFukJTtvva+G1dQEPfZXVZcnF8f6YHdqQ6+Fp/3gmTmlOV0N2jJ1KeZs55zLQQCNL5ku58qVZmFVhnRw49mvYIEWPJl3a9s5Ud/WxpN06Ze3MvYwqLn7QpFXhw4n3ba4MpkTe06lfBrlPevbmkHXP9s68c3jVNN3+ps5UtsZgng8GnhMOfvyH8913V7/sdvBn/QUYk3G1CCigO+JhY6B/l6BXx3oAeebgGxCa118jQ1QIky4YZqghaislSOEoG+o2oSHe5JYcACc2chslHa4mYIyJBUhjdIzcqOOOPPbo449ABinkkEQWaeSRNAYB","scale":1}
+
+{script:card1.0}
+on click pos do
+ me.animated:!me.animated
+end
+
+on view do
+ a:r1.data:r1.data+0.02
+ me.clear[]
+ me.paste[ref.copy[].rotate[a]]
+end
+{end}
+
+{script:card1.1}
+on click pos do
+ me.animated:!me.animated
+end
+
+on view do
+ a:r2.data:r2.data-0.008
+ me.clear[]
+ me.paste[ref.copy[].scale[me.size 1].rotate[a]]
+end
+{end}
+
+{card:card2}
+image:"%%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"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Interlude"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[222,67],"pos":[144,90],"locked":1,"border":0,"align":"center","value":{"text":["So far we've focused on using existing transitions and very simple scripting.\n\nIn the following sections we'll dive into writing new transitions from scratch. This will involve a bit of ","fancier"," scripting..."],"font":["","menu",""],"arg":["","",""]}}
+field2:{"type":"field","size":[120,26],"pos":[199,220],"locked":1,"border":0,"align":"center","value":"If that's not your thing, why not skip ahead to the"}
+button4:{"type":"button","size":[132,38],"pos":[194,245],"script":"Index.3","text":"Transition Gallery?"}
+
+{card:transitionfunctions}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Transition Functions"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[240,259],"pos":[262,47],"locked":1,"border":0,"value":{"text":["The heart of a transition is a function which takes four arguments:\n\n- A ","canvas"," widget the size of the screen.\n\n- An ","image"," of the source card.\n\n- An ","image"," of the destination card.\n\n- A ","number"," between 0 and 1 giving a \"tweening\" value for the animation.\n\nUsing the images and the tweening value, the function should draw something on the canvas.\n\nUsually, when the tweening value is 0 the function should draw the source image, when the tweening value is 1 it should draw the destination image, and for any value in-between the function should draw some combination of the images.\n\nWith an appropriately written function, an enormous range of transitions are possible. We'll explore some ideas on the following cards."],"font":["","menu","","menu","","menu","","menu",""],"arg":["","","","","","","","",""]}}
+ex1:{"type":"field","size":[240,101],"pos":[10,71],"style":"code","value":"on BoxIn c a b t do\n c.rect[(c.size/2) (c.size*t) \"center\"]\n c.merge[a b]\nend"}
+
+{card:transitionregistration}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Transition Installation"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[240,258],"pos":[262,48],"locked":1,"border":0,"value":"To define new transitions, you'll need to declare them to Decker with the transition[] function.\n\nCalling transition[] with a function will register a transition of the same name, allowing it to appear in the \"Action...\" dialog and be used by go[] in the future. If a module uses transition[], deckbuilders will not need to do any scripting to take advantage of the new transitions!\n\n\n\n\nCalling transition[] will also return a dictionary of the currently registered transitions, allowing you to easily enumerate their names or retrieve a transition's function for use elsewhere, as in many of this deck's interactive demonstrations."}
+ex1:{"type":"field","size":[240,82],"pos":[10,51],"style":"code","value":"transition[\n on MyTransition c a b t do\n  \n  # draw something...\n  \n end\n]"}
+names:{"type":"field","size":[224,70],"pos":[21,161],"volatile":1,"scrollbar":1,"style":"code"}
+ex2:{"type":"field","size":[240,21],"pos":[11,238],"style":"code","value":"names.data:keys transition[]"}
+demobtn:{"type":"button","size":[79,29],"pos":[94,263],"script":"transitionregistration.0","show":"invert","text":"Try It!","style":"rect"}
+
+{script:transitionregistration.0}
+on click do
+ eval[ex2.text () 1]
+end
+{end}
+
+{card:canvasdrawing}
+script:"canvasdrawing.0"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Background: Canvas Drawing"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[245,259],"pos":[257,47],"locked":1,"border":0,"value":{"text":["Before we dive into writing our own transitions, let's briefly explore a few supporting concepts: canvas drawing, compositing images with canvas.merge[], and tweening.\n","\nCanvas widgets"," offer a wide range of functions for drawing  programmatically, including:\n\n","canvas.clear[]"," for erasing the canvas.\n\n","canvas.rect[pos size]"," for filled rectangles.\n\n","canvas.poly[points]"," for filled polygons.\n\n","canvas.paste[image pos]"," for drawing an image on the canvas. The second argument can specify a size to squash or stretch the image into, and a third argument, if truthy, can ask for the image to be drawn with transparency.\n\nAll sizes and positions are in pixels, relative to the top left corner of the canvas."],"font":["","","","menu","","menu","","menu","","menu",""],"arg":["","http://beyondloom.com/decker/decker.html#canvasinterface","","","","","","","","",""]}}
+ex1:{"type":"field","size":[240,129],"pos":[10,47],"script":"canvasdrawing.1","scrollbar":1,"style":"code","value":"c.clear[]\n\nc.rect[(10,40) (30,50)]\n\nc.poly[(100,20) (110,40) (80,50)]\n\ni:image[\"%%IMG0AAcAB0Bg0Ij8goA=\"]\nc.paste[i (130,70)]\nc.paste[i (130,30,20,20)]"}
+c:{"type":"canvas","size":[167,100],"pos":[54,191],"locked":1,"volatile":1,"scale":1}
+
+{script:canvasdrawing.0}
+on view do
+ eval[ex1.text () 1]
+end
+{end}
+
+{script:canvasdrawing.1}
+on change val do
+ view[]
+end
+{end}
+
+{card:canvasmerge}
+image:"%%IMG3AgABVgKEj6nL7Q+jnLTai7PevPsPhuJIluaJpurKtu4Lx/JM1/aN5/rO9/4PDAqHxKLxiEwql8ym8wmNSqfUqvWKzWq33K73Cw6Lx+Sy+YxOq9fstvsNj8vn9Lr9js/r9/y+/w8YKDhIWGh4iJiouMjY6PgIGSk5SVlpeYmZqbnJ2en5CRoqOkpaanqKmqq6ytrq+gobKztLW2t7i5uru8vb6/sLHCw8TFxsfIycrLzM3Oz8DB0tPU1dbX2Nna29zd3t/Q0eLj5OXm5+jp6uvs7e7v4OHy8/T19vf4+fr7/P3+//DzCgwIEECxo8iDChwoUMGzp8CDGixIkUK1q8iDGjxo0cO3r8CDKkyJEkS5o8iTKlypUsW7p8CTOmzJk0a9q8iTOnzp08e/r8CTSo0KFEixo9ijSp0qVMmzp9CjWq1KlUq1q9ijWr1q1cu3r9Cjas2LFky5o9izat2rVs27p9Czeu3Ll069q9izev3r18+/r9Cziw4MGECxs+jDix4sWMGzt+DDmy5MmUK1u+TCRAAMxtNGuO8pnzBs+bn5DeErrqadOetaym+rpJbCuzo9ZWcntKbqe7j/SG8ntp7NS+W2cJrnQ16dLFiR9wzgQ50dPLqyeZvRy4cd7Vu0P3oXx79+ilX28/6n38EOvhreNu3f770PTnhbCHr/49fek+vV/fn50TAMpXVH7/0afbfk+5twSCCfonFX8/QEgFhREyJ1uAtGko2gIcXkFgh8+FKGKJJp6IYooqrshiiy6+CGOMMs5IY4023ohjjjruyGOPPv4IZJBCDklkkUYeiWSSSi7JZJNOPnkCiVDKIOGUK1RpZQpYZhllfVzOsOWXJIQppghklslBaNhJieZo+BH3YZsgpIdAnHJ+QKGdd+IZIIN7jnDfmX9GoOCgXRpo6JiIJqqol4yW4Oijkk5KaaWWXopppppuymmnnn4Kaqiijkpqqaaeimqqqq7KaquuvgprrLLOSmuttt6Ka6667sprr77+Cmywwg5LbLHGHotsssouy2yzzj4LbbTSTktttdZei2222m7LbbfefgtuuOKOS2655p6Lbrrqrstuu+6+C2+88s5Lb7323otvvvpKVAA="
+script:"canvasdrawing.0"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Background: Canvas.merge[]"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[212,259],"pos":[290,47],"locked":1,"border":0,"value":{"text":["The ","canvas.merge[]"," function can do a number of handy things, but the most pertinent to making transitions is compositing images together based on a mask.\n\nWhen we call merge[] with one or more images (as separate arguments or as a list), each pixel in the current contents of the canvas will be treated as a number N and be replaced with the corresponding pixel in the Nth input image.\n\nPut another way, if we draw a \"mask\" out of patterns 0 and 1 on a canvas and then merge[] in images A and B, the parts of the mask that were pattern 0 will be taken from image A, and the parts of the image that were pattern 1 will be taken from image B.\n\nSpend a little time staring at this example until it makes sense; we will use canvas.merge[] for nearly every transition function we write. Try scribbling on the \"mask\" canvas, if you like."],"font":["","menu",""],"arg":["","",""]}}
+ex1:{"type":"field","size":[240,29],"pos":[30,181],"script":"canvasdrawing.1","scrollbar":0,"style":"code","value":"c.paste[mask.copy[]]\nc.merge[a.copy[] b.copy[]]\n"}
+c:{"type":"canvas","size":[85,57],"pos":[103,236],"locked":1,"volatile":1,"show":"transparent","scale":1}
+a:{"type":"canvas","size":[85,57],"pos":[103,100],"locked":1,"image":"%%IMG3AFUAOQSwyUmrvTjrzbv/YCiOZGmeaKqubOu+cCzPFmADdH7dt+43PN4vF+wNZUXh8ZVULltN43MVdU5PVeuVlA1uS93idxQFJsehsuSM9qjX7PamWXnLd3EK/Y7Z18R8f4B4XoF1eYeDhn6EhYZmio1SgYx9kXeVkpOYYZ2LnZ6UoGGfo118pqFtqaporKSriB2ZU7Rzsk+2HLo/vBq+RLgfwr3Es8bBjlzINMy7l0POt8q5WsvU1Tgp0o+Wm90i3+Dj5OXm5+jp6mgR"}
+b:{"type":"canvas","size":[85,57],"pos":[192,100],"locked":1,"image":"%%IMG3AFUAOQQwyUmrvTjrzbv/YCiOZGmeaKqubOu+cCzPdG3fZKDvPA7zQKBvFSwKhzmjsocULZ+6ZggKlYKoT+sHOylqPdmK98sxYszkzfiCTmfWYribHaTL5/GjJIw/1xNVfW91WIVfhYhtSImMekONkFFNkZCTlIyWl4mLiFN3NXwlnzSKJ6OkfymnM6tXrTGlTkqZjrKztDuiS1avFlRavXtcwKm+mGSxlWlol3iawTjPTH3SghTN1nnD2YO/3GU9td9qkuPm5+jp6uszEQ=="}
+mask:{"type":"canvas","size":[85,57],"pos":[14,100],"script":"canvasmerge.0","image":"%%IMG3AFUAOQKEj6nL7Q+jnLTai7PevPsPhuIVlOaJjqqCtu56hu6cgvRH56WnB12v4wB9kdvwpjlCjswaieloSneYZmM6zVgXWGwVyup6LduEeFwpI85ZspLLVlOG1zjYHYza6d9ZcQ+U1DIHmLfyUJhzKJH4svjXaAJJJBMZg+gERzlpuamZuXa51CnK4GfmqEcqqQqK1ErK6Wlouko1entA+xm7sRtmK6QI2yn8WhvsO1yXrHzKvMqTShyJAwpt+YhbrI2Z3e3dCC5rN85YaD4BmE7Ixo6H9t4uJa/1Vm88iL/P3+//DzCgwIESCgA=","brush":4,"scale":1}
+field2:{"type":"field","size":[85,23],"pos":[14,73],"locked":1,"border":0,"align":"center","value":"mask\n(scribble on me!)"}
+field3:{"type":"field","size":[85,13],"pos":[103,83],"locked":1,"border":0,"align":"center","value":"a"}
+field4:{"type":"field","size":[85,13],"pos":[192,83],"locked":1,"border":0,"align":"center","value":"b"}
+button4:{"type":"button","size":[84,20],"pos":[15,46],"script":"canvasmerge.1","text":"Clear Mask"}
+field5:{"type":"field","size":[85,13],"pos":[103,293],"locked":1,"border":0,"align":"center","value":"c"}
+
+{script:canvasmerge.0}
+on drag pos do
+ send drag[pos]
+ view[]
+end
+
+{end}
+
+{script:canvasmerge.1}
+on click do
+ mask.clear[]
+ view[]
+end
+{end}
+
+{card:tweening}
+script:"tweening.0"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Background: Tweening"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[240,145],"pos":[262,47],"locked":1,"border":0,"value":{"text":["In the context of a transition function, \"tweening\" is the process of creating smooth variations between our initial and final frame based on a number that varies between 0 and 1.\n\nThe simplest mathematical tool for tweening is linear interpolation, or \"lerp[]\". You can vary the position, scale, rotation, or other properties of shapes drawn on a canvas by giving lerp[] a tweening value and two \"anchors\" to vary between. Try modifying this example and scrubbing the slider to see the effects.\n\nThe ","ease"," module contains a variety of more complex tools that work in the same basic way. "],"font":["","",""],"arg":["","http://beyondloom.com/decker/ease.html",""]}}
+ex1:{"type":"field","size":[243,146],"pos":[10,46],"script":"tweening.1","style":"code","value":"on lerp t a b do\n a+t*b-a\nend\n\nc.clear[]\nc.rect[\n lerp[t.value (100,10) ( 20,55)]\n lerp[t.value (  5, 5) ( 30,30)]\n \"center\"\n]"}
+t:{"type":"slider","size":[144,25],"pos":[186,291],"script":"canvasdrawing.1","interval":[0,1],"value":0.4,"step":0.05}
+c:{"type":"canvas","size":[119,74],"pos":[198,211],"locked":1,"volatile":1,"scale":1}
+tv:{"type":"field","size":[144,14],"pos":[185,319],"locked":1,"volatile":1,"border":0,"align":"center"}
+
+{script:tweening.0}
+on view do
+ tv.text:"tweening value %3.2f" format t.value
+ eval[ex1.text () 1]
+end
+{end}
+
+{script:tweening.1}
+on change do
+ view[]
+end
+{end}
+
+{card:compositingtransitions}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"A Complete Transition Function"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[222,259],"pos":[280,47],"locked":1,"border":0,"value":"Now we're ready to put the pieces together and write a complete transition function.\n\nWe draw a centered diamond on the canvas \"c\", scaled with a lerp[] to fill the canvas when the tween value \"t\" is 1. Having thus prepared a mask, we can use canvas.merge[] to composite together screenshots of the old card \"a\" and the new card \"b\".\n\nTry some variations. How could you reverse the direction of the animation? Add rotation? Can you simplify this to remove the need for lerp[]?\n\nCan you use this as a starting point to replicate the \"StarIn\" transition from PublicTransit?"}
+ex1:{"type":"field","size":[259,174],"pos":[10,49],"style":"code","value":"on lerp t a b do\n a+t*b-a\nend\n\non diamond pos size do\n flip pos+size*flip unit 2*pi*(range 4)/4\nend\n\non DiamondIn c a b t do\n c.poly[diamond[\n   c.size/2\n   lerp[t 0 (max c.size)]\n ]]\n c.merge[a b]\nend"}
+c_mask:{"type":"canvas","size":[85,57],"pos":[34,243],"locked":1,"animated":1,"volatile":1,"script":"compositingtransitions.0","show":"transparent","scale":1}
+a:{"type":"canvas","size":[85,57],"pos":[249,264],"locked":1,"show":"none","image":"%%IMG3AFUAOQSwyUmrvTjrzbv/YCiOZGmeaKqubOu+cCzPFmADdH7dt+43PN4vF+wNZUXh8ZVULltN43MVdU5PVeuVlA1uS93idxQFJsehsuSM9qjX7PamWXnLd3EK/Y7Z18R8f4B4XoF1eYeDhn6EhYZmio1SgYx9kXeVkpOYYZ2LnZ6UoGGfo118pqFtqaporKSriB2ZU7Rzsk+2HLo/vBq+RLgfwr3Es8bBjlzINMy7l0POt8q5WsvU1Tgp0o+Wm90i3+Dj5OXm5+jp6mgR"}
+b:{"type":"canvas","size":[85,57],"pos":[254,271],"locked":1,"show":"none","image":"%%IMG3AFUAOQQwyUmrvTjrzbv/YCiOZGmeaKqubOu+cCzPdG3fZKDvPA7zQKBvFSwKhzmjsocULZ+6ZggKlYKoT+sHOylqPdmK98sxYszkzfiCTmfWYribHaTL5/GjJIw/1xNVfW91WIVfhYhtSImMekONkFFNkZCTlIyWl4mLiFN3NXwlnzSKJ6OkfymnM6tXrTGlTkqZjrKztDuiS1avFlRavXtcwKm+mGSxlWlol3iawTjPTH3SghTN1nnD2YO/3GU9td9qkuPm5+jp6uszEQ=="}
+field3:{"type":"field","size":[85,14],"pos":[34,229],"locked":1,"border":0,"align":"center","value":"mask only"}
+c_full:{"type":"canvas","size":[85,57],"pos":[142,243],"locked":1,"volatile":1,"show":"transparent","scale":1}
+field2:{"type":"field","size":[85,14],"pos":[142,229],"locked":1,"border":0,"align":"center","value":"with images"}
+
+{script:compositingtransitions.0}
+on view do
+ f:eval[ex1.text () 1].value
+ d:120
+ t:1&(d%sys.frame)/d-1
+ 
+ c_mask.clear[]
+ f[c_mask image[c_mask.size] image[c_mask.size].map[0 dict 1] t]
+ 
+ c_full.clear[]
+ f[c_full a.copy[] b.copy[] t]
+end
+{end}
+
+{card:texturemappedtheory}
+script:"canvasdrawing.0"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Texture-Mapped Transitions (Theory)"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[223,259],"pos":[279,47],"locked":1,"border":0,"value":"For some kinds of effect, it would be too computationally intensive to draw a mask texture from scratch for every transition frame.\n\nThe canvas.merge[] function will always tile its input images to match the dimensions of the canvas. Thus, if we merge[] a single image onto a blank canvas, we can efficiently fill the entire canvas in one step.\n\nIf we prepare an image in advance with up to 256 levels of \"gray\" in its pixels, we could compare those levels against a threshold in order to efficiently extract a 0/1 mask, which can then be used to merge our card screenshots as usual.\n\nIt's possible to create a grayscale lookup texture for this sort of effect as large as an entire card, but this can take up a great deal of space as well as tie an effect to a specific deck size."}
+c:{"type":"canvas","size":[80,77],"pos":[36,225],"locked":1,"volatile":1,"scale":1}
+threshold:{"type":"slider","size":[100,25],"pos":[142,252],"script":"canvasdrawing.1","interval":[0,5],"value":2,"style":"compact"}
+ex1:{"type":"field","size":[260,168],"pos":[10,49],"script":"canvasdrawing.1","style":"code","value":"# a small repeating texture:\np:0,1,2,3,4,3,2,1\ni:image[(count p),1]\ni.pixels:p\n\n# tile the texture onto the canvas:\nc.clear[]\nc.merge[i]\n\n# apply a threshold:\na:image[1,1]               # all pattern 0\nb:image[1,1].map[0 dict 1] # all pattern 1\nt:threshold.value\nc.merge[(t take b),(256 take a)]"}
+field3:{"type":"field","size":[85,13],"pos":[150,237],"locked":1,"border":0,"align":"center","value":"threshold"}
+
+{card:texturemappedpractice}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Texture-Mapped Transitions (Practice)"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[222,259],"pos":[280,47],"locked":1,"border":0,"value":"Note how we can compute the texture \"i\" at our leisure before our transition function ever runs.\n\nWith more levels in our grayscale texture, the transition will appear smoother, or remain smooth-looking for a longer transition duration.\n\nOne downside to this approach is that the effect has a fixed scale; the vertical stripes in this example will always have the same width, irrespective of the canvas dimensions, making small preview images of the transition misleading.\n\nStill, many complex and useful effects are possible with this technique. PublicTransit uses it for transitions like \"Dissolve\" and \"Melt\"."}
+ex1:{"type":"field","size":[259,174],"pos":[10,49],"style":"code","value":"n:8\np:(range n),(rev range n)\ni:image[(count p),1]\ni.pixels:p\n\non Blinds c a b t do\n c.merge[i]\n c.merge[((t*n) take b),(256 take a)]\nend"}
+c_mask:{"type":"canvas","size":[85,57],"pos":[34,243],"locked":1,"animated":1,"volatile":1,"script":"compositingtransitions.0","show":"transparent","scale":1}
+a:{"type":"canvas","size":[85,57],"pos":[249,264],"locked":1,"show":"none","image":"%%IMG3AFUAOQSwyUmrvTjrzbv/YCiOZGmeaKqubOu+cCzPFmADdH7dt+43PN4vF+wNZUXh8ZVULltN43MVdU5PVeuVlA1uS93idxQFJsehsuSM9qjX7PamWXnLd3EK/Y7Z18R8f4B4XoF1eYeDhn6EhYZmio1SgYx9kXeVkpOYYZ2LnZ6UoGGfo118pqFtqaporKSriB2ZU7Rzsk+2HLo/vBq+RLgfwr3Es8bBjlzINMy7l0POt8q5WsvU1Tgp0o+Wm90i3+Dj5OXm5+jp6mgR"}
+b:{"type":"canvas","size":[85,57],"pos":[254,271],"locked":1,"show":"none","image":"%%IMG3AFUAOQQwyUmrvTjrzbv/YCiOZGmeaKqubOu+cCzPdG3fZKDvPA7zQKBvFSwKhzmjsocULZ+6ZggKlYKoT+sHOylqPdmK98sxYszkzfiCTmfWYribHaTL5/GjJIw/1xNVfW91WIVfhYhtSImMekONkFFNkZCTlIyWl4mLiFN3NXwlnzSKJ6OkfymnM6tXrTGlTkqZjrKztDuiS1avFlRavXtcwKm+mGSxlWlol3iawTjPTH3SghTN1nnD2YO/3GU9td9qkuPm5+jp6uszEQ=="}
+field3:{"type":"field","size":[85,14],"pos":[34,229],"locked":1,"border":0,"align":"center","value":"mask only"}
+c_full:{"type":"canvas","size":[85,57],"pos":[142,243],"locked":1,"volatile":1,"show":"transparent","scale":1}
+field2:{"type":"field","size":[85,14],"pos":[142,229],"locked":1,"border":0,"align":"center","value":"with images"}
+
+{card:designprinciples}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Design Principles"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[305,259],"pos":[197,47],"locked":1,"border":0,"value":{"text":["Here are a few ideas to keep in mind when designing transition functions. All of these rules can be bent, in the right circumstances, but following them will make your transitions easier to reason about and more reusable.\n\n","Scale Invariance:"," Not all decks are the same size. Don't hardcode card dimensions; always adapt to the size and aspect-ratio of the canvas you're given.\n\n","Timing Invariance:"," Transitions can be run at many speeds. If Decker is running slow, it may choose to drop transition frames. Don't write your transition functions to expect a specific number of frame steps. The tween value will, however, always hit exactly 0 initially and exactly 1 on the final frame.\n\n","Purity:"," Avoid depending on external state in your function; the same inputs should yield the same output. If you need random-looking behavior, prefer pre-shuffled lookup tables to actually calling random[].\n\nRemember that your transition function must complete within a small quota. Keep it as light as possible! You will not have time to compute every pixel of the screen individually; leverage what ","the canvas widget"," and ","the image interface"," can do for you."],"font":["","menu","","menu","","menu","","","","",""],"arg":["","","","","","","","http://beyondloom.com/decker/decker.html#canvasinterface","","http://beyondloom.com/decker/decker.html#imageinterface",""]}}
+ex1:{"type":"field","size":[129,101],"pos":[36,111],"locked":1,"style":"code","value":"on BoxIn c a b t do\n c.rect[\n  (c.size/2)\n  (c.size*t)\n  \"center\"\n ]\n c.merge[a b]\nend"}
+field12:{"type":"field","size":[119,35],"pos":[40,218],"locked":1,"show":"invert","border":0,"align":"center","value":"the built-in transitions adhere to all of these principles."}
+
+{card:inline functions}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Tips & Tricks: Inline Functions"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[180,215],"pos":[322,91],"locked":1,"border":0,"value":"If you're making a fancy transition effect that relates to state in your deck or will only ever be used in one place, you don't necessarily have to install it with transition[].\n\nIt's also perfectly valid to provide an \"inline\" transition function as the second argument to go[]."}
+ex1:{"type":"field","size":[271,141],"pos":[32,71],"style":"code","value":"go[\n liminalspace\n on OneOffTransition c a b t do\n  p:c.size/2\n  s:t*max c.size\n  o:t*pi/2\n  d:flip p+s*flip unit o+2*pi*(range 4)/4\n  c.poly[d]\n  c.merge[a b]\n end\n 30\n]"}
+demobtn:{"type":"button","size":[79,29],"pos":[125,223],"script":"sequenced.0","show":"invert","text":"Try It!","style":"rect"}
+
+{card:screenshake}
+image:"%%IMG3AgABVgKEj6nL7Q+jnLTai7PevPsPhuIIBOSJpurKtu4Lx/JM1/aN5/rO9/4PDAqHxKLxiEwql8ym8wmNSqc6E/WKzWq3Hyv3Cw6Lx+Sy+YxOq9fstvsNj8vn9Lr9js/r9/y+/w8YKDhIWGh4iJiouMjY6PgIGSk5SVlpeYmZqbnJ2en5CRoqOkpaanqKmqq6ytrq+gobKztLW2t7i5uru8vb6/sLHCw8TFxsfIycrLzM3Oz8DB0tPU1dbX2Nna29zd3t/Q0eLj5OXm5+jp6uvs7e7v4OHy8/T19vf4+fr7/P3+//DzCgwIEECxo8iDChwoUMGzp8CDGixIkUK1q8iDGjxo0cO3r8CDKkyJEkS5o8iTKlypUsW7p8CTOmzJk0a9q8iTOnzp08e/r8CTSo0KFEixo9ijSp0qVMmzp9CjWq1KlUq1q9ijWr1q1cu3r9Cjas2LFky5o9izat2rVs27p9Czeu3Ll069q9izev3r18+/r9Cziw4MGECxs+jDix4sWMGzt+DDmy5MmUK1u+jDmz5s2cO3v+DDq06NGkS5s+jTq16tWsW7t+DTu27Nm0a9u+jTu37t28e/v+DTy48OHEixs/jjy58uXMmzt/Dj269OnUq1u/jj279u3cu3v/Dj68+PHky5s/jz69+vXs27t/Dz++/Pn069u/jz+//v38+/v/D2CAAg5IYIEGHohgggouyGCDDj4IYYQSTkhhhRZeiGGGGm7IYYcefghiiCKOSGKJJp6IYooqrshiiy6+CGOMMs5IY4023ohjjjruyGOPPv4IZJBCDklkkUYeiWSSSi7JZJNOPglllFJOSWWVVl6JZZZaFAA="
+{widgets}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Tips & Tricks: Screen Shake"}
+button3:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+field1:{"type":"field","size":[180,200],"pos":[322,106],"locked":1,"border":0,"value":{"text":["Transitions don't necessarily have to move you between cards. They're handy for any situation where you want to temporarily take over the entire screen to draw some kind of effect.\n\nHere's an example of a simple ","screen-shake"," effect you can drop into nearly any script!"],"font":["","",""],"arg":["","https://gdcvault.com/play/1016487/Juice-It-or-Lose",""]}}
+ex1:{"type":"field","size":[271,119],"pos":[32,93],"style":"code","value":"go[\n card\n on ScreenShake c a b t do\n  local m:(30,30)*1-t\n  c.rect[0,0 c.size]\n  c.paste[a (random@2*m)-m]\n end\n 15\n]"}
+demobtn:{"type":"button","size":[79,29],"pos":[125,223],"script":"sequenced.0","show":"invert","text":"Try It!","style":"rect"}
+
+{card:gallery}
+image:"%%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"
+script:"gallery.0"
+{widgets}
+options:{"type":"grid","size":[111,171],"pos":[10,51],"script":"gallery.1","font":"menu","show":"invert","scrollbar":1,"headers":0,"lines":0,"value":{"value":["PageDown","PageUp","PageRight","PageLeft","Dissolve","Melt","BlindsVert","BlindsHoriz","StarIn","StarOut","StarSpinIn","StarSpinOut","HeartIn","HeartOut","ClockIn","ClockOut","CircleIn","CircleOut","CircleInClick","CircleOutClick","StretchDown","StretchUp","StretchRight","StretchLeft","RotateDown","RotateUp","RotateRight","RotateLeft","Wink","BarnDoorIn","BarnDoorOut","BlinkIn","BlinkOut","SlitVertIn","SlitVertOut","SlitHorizIn","SlitHorizOut"]},"row":0,"col":0}
+descript:{"type":"field","size":[170,25],"pos":[332,169],"style":"plain","value":"Stretch the source and destination like flipping a book page down."}
+button1:{"type":"button","size":[82,24],"pos":[332,198],"script":"gallery.2","text":"Preview","style":"rect"}
+button2:{"type":"button","size":[83,24],"pos":[419,198],"script":"gallery.3","text":"Fullscreen","style":"rect"}
+preview:{"type":"canvas","size":[170,114],"pos":[332,51],"image":"%%IMG3AKoAcgKEj6nL7Q+jnLS6cDC2vPsPhpMGkOKJpqpItusLx3JW0vON55S76f6vcxl6wKIRFEgma7yj87lTLpvQqnWhkTK3xKsXKm12v+RjuIYwldfA85A2ZsthWeX2HZ/rUfUp+r4XmNJH9Sd46NGiVYjYyNFzJuY4ucOklQZIqYnFdQlnuBmKZ2nXZSeK2hlJupQqynMa5uk6KSZ7m0dLJjuqiOumK4er+nsbPPf7VlK8mHtcxZvGnPxcRjg0PaU9W23Gmg3u1+3tG75MODz+VB4+nanuVHx+3t4KH1+f/X5f1Iyeb49fP4C8Vgk0UodePoUBD/oguC2iGocPISpkOEaSmokUI0C8ZrBjRYAXjX3SyAWUyAYWIy1aOXKhS2ApCzGCyaClP3EHhcz4WDIdSpSCov3UWeplw2o36SCVyO0dR2V70h0lOdOPM11NnWLd6WZozX27rMYAmlXRva4r0IJdJVaSMGoy3CYtxU8uDoIYo8UdO/WLvBsfmalkOnZvYcOAG7O1wvjq4oLwiCqebPKv5bKDJWPGq25z3c/GtDpu/CBhkMijSePdGiIO7EGoL7t+fVo0nG0xzZ69bbr1vNkq9LZuN5x36dy1c0JqA644cKVUn1e38cc6NtU5NDO3lfBu8sIsMWFZynB49/GDN7hX5v7fdMrZsWu/byN84PH8xTcUS1WA6G03T1+3YaJNArkM2Mopj1ign1HWvXfBfMnEkoFR5plyXoYZ+nXXUr45WOAynGD3oTwWrshiiy6i1Z9yMkYYI43+zchejTreaCNUrhn4YpBCvgjkkEYKWaRdRy7J5IE9PrkjjjxGGSGUU14ppYVJNslll+54uV9nCGq4HZjkeZkamQrStKaZLW2ppUdRtUmiAkSuCGecEMxpZ53nuSkTlyMM2KYEeLaY53yDzsZmn4DW882Qi8pJqIePIifoYYXu6aejl0bX5aScEhfip8NkOipsatJpqmHyEWlopSmmquWhTQaI4pxEzCJbq/qEGiujnTqaqJvFAmfnn7sqix4kvn557I/BUupRmXH5lCyL7PFIHTuMySbNYbuS2Cuy3v4IHpX8megfhLFWa2WW4UnjJKZvLaSgsuaxCq61kU627WKk9PfhbjayoGm+qg5Mr4mASWlJwIFeqN65JalCVnz0ZefXNxfDgi4x5nDkHYfElfdcYFRsVXJu8iZ37MMUawQtzRea9qw+1p76Xc/7oexzYnsGfW28fbCb878A51yaikQ/3bJxiUUNtcwY3xgt01ovTRnVXlcN4NdiW41lTVuffSjYao9N1NixuQxyjWhLum/d+Sn6GE4nDPVyQP3mm2zggA9uN66GG/J34eKeCPiBepNjtpWMK544ipYfXrmAk1++uOCU78zX45BdLePnnnOeeeeEo2766phv/jro0YkuWOQpnR6766q3znvqvsO+u33I0b4GzQUA","scale":1}
+field1:{"type":"field","size":[237,25],"pos":[265,307],"show":"invert","style":"plain","align":"center","value":"import the \"PublicTransit\" module from this deck in order to use these transitions in your own projects!"}
+button3:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisatransition.0","text":"Index","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Transition Gallery"}
+
+{script:gallery.0}
+
+on scaledback c do
+ preview.paste[c.image 0,0,preview.size]
+ preview.copy[]
+end
+
+on example do
+ t:transition[][options.rowvalue.value]
+ sa:scaledback[gallery]
+ sb:scaledback[Darkmode]
+ preview.paste[sa 0,0,sa.size]
+ each i in range 30
+  preview.clear[]
+  t[preview sa sb i/30]
+  sleep[]
+ end
+ preview.paste[sb 0,0,sb.size]
+end
+
+on view do
+ options.value:table keys PublicTransit.descs
+ descript.text:PublicTransit.descs[options.rowvalue.value]
+ version.text:"v%0.1f" format deck.modules.PublicTransit.version
+end
+{end}
+
+{script:gallery.1}
+on click row do
+ view[]
+ example[]
+end
+{end}
+
+{script:gallery.2}
+on click do
+ example[]
+end
+{end}
+
+{script:gallery.3}
+on click do
+ t:options.rowvalue.value
+ go[Darkmode t]
+ sleep[60]
+ go["Back" t]
+end
+{end}
+
+{card:liminalspace}
+image:"%%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"
+{widgets}
+button1:{"type":"button","size":[102,35],"pos":[132,295],"script":"liminalspace.0","text":"Escape this place."}
+
+{script:liminalspace.0}
+on click do
+ go["Back" "BoxOut"]
+end
+{end}
+
+{card:allblack}
+image:"%%IMG3AgABVgKMj6nL7Q+jnLTai7PevPsPhuJIluaJpurKtu4Lx/JM1/aN5/rO9/4PDAqHxKLxiEwql8ym8wmNSqfUqvWKzWq33K73Cw6Lx+Sy+YxOq9fstvsNj8vn9Lr9js/r9/y+/w8YKDhIWGh4iJiouMjY6PgIGSk5SVlpeYmZqbnJ2en5CRoqOkpaanqKmqq6ytrq+gobKztLW2t7i5uru8vb6/sLHCw8TFxsfIycrLzM3Oz8DB0tPU1dbX2Nna29zd3t/Q0eLj5OXm5+jp6uvs7e7v4OHy8/T19vf4+fr7/P3+//DzCgwIEECxo8iDChwoUMGzp8CDGixIkUK1q8iDGjxo0cO3r8CDKkyJEkS5o8iTKlypUsW7p8CTOmzJk0a9q8iTOnzp08e/r8CTSo0KFEixo9ijSp0qVMmzp9CjWq1KlUq1q9ijWr1q1cu3r9Cjas2LFky5o9izat2rVs27p9Czeu3Ll069q9izev3r18+/r9Cziw4MGECxs+jDix4sWMGzt+DDmy5MmUK1u+jDmz5s2cO3v+DDq06NGkS5s+jTq16tWsW7t+DTu27Nm0a9u+jTu37t28e/v+DTy48OHEixs/jjy58uXMmzt/Dj269OnUq1u/jj279u3cu3v/Dj68+PHky5s/jz69+vXs27t/Dz++/Pn069u/jz+//v38+/v/D2CAAg5IYIEGHohgggouyGCDDj4IYYQSTkhhhRZeiGGGGm7IYYcefghiiCKOSGKJJp6IYooqrshiiy6+CGOMMs5IY4023ohjjjruyGOPPv4IZJBCDklkkUYeiWSSSi7JZJNOPglllFJOyUoB"
+
+{card:typography1}
+image:"%%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"
+
+{card:typography2}
+image:"%%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"
+
+{card:Darkmode}
+image:"%%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"
+{widgets}
+field1:{"type":"field","size":[85,14],"pos":[5,20],"locked":1,"show":"invert","align":"center","value":"~ art by Noyemi ~"}
+
+{module:PublicTransit}
+description:"Fancy transition animations"
+version:1.4
+{data}
+dissolveLut:%%IMG3ACAAIAgAn/TQI24EEjUs4ME51sDaoWjEko2IAkQcPy2vaExRUYUDtG/Angni96kWByIjZq1DBq0cLxGsZuVSRmaflTha3HVDFyzYsWrKQIVyJ6mDMxcP4iypEiLIAHJGgh3oR8TcJFK2sgDDkoUQj0kutuz5lQKHgELn1o2xcAQNtDcE5lAI1OxDhiBEENSzdkOcvUg27GXohcKYDFQF5kiZt6SAA0ha/J2SZaids2huAPkC4IEPmFbQWN3q80kTCwIMlPQiN63FF3wgzj2gtySdhE87qJDANETHvVVOdOE6RI7Phl67qESqN4aQqmIirniq9qjVO0T5bMiKB65TGSHeXpxodEZRgH2qGGHw4aaeIFdyYvxz5uGHsxg3bjlZZ+sOv2wx4OHPKCoAcIY0PiRiRz45bDLGC51s4kkC4JhDgzHd0NOPN4JkcAU2mEwABh5XSMEMHaSowYQXjUSyhzZeYMPKMjEUAwQ7IVDzwQVtZBCCJdPMYMwppAzhwCAHEDAIOLAsgkkWNWgwDhwlFEFLEnpgIAwAb+wQTyqnkKFPKqqAIM02jvjxhDoK9OIJBnIQ8o8RJ4QzySDIeJHCDXtcIwoKHxjyDQrUJKLHLrEgUAwzy2gDSTskxKLIPGvYcA0E6DDRiC46GKBMOtVAIYUFTcAgxT1KhHLHPk4MswgPlkQBCxuK/HCKK7wc4sYai/zwDQhW0JNAJ8OwUIAEcqhRiht9vCCADYBEwA0Ec4RSxT9jdBIPJAnEkk4Ix+hgSzeVCMDFBLHIQIkDz1Dyij5fXMLECXFYAAgzepjQwCyMvONCJk0swEEdz+BxQzhGbLECKB90IQ8FvMzgj1PC+CKCGCkEYok8o/xgSg6jmLGFCN2UMoIqq6yRyTZ20DFMAL7MI8M1GrxyQBPsZJMJG410UIcJMADASSDgbIIGG1ZspIk0xCTAjg/pcEHPJJwggEQePZgRBigVYIEDLuMk0sU5xKxAxSVF1HBED3nMEzYchQzBiDYtrIAPEJ/sQoE9T2wQSB1BwPPPMgrk4kcUINxBBiJRtFGIJOwQkoU3WOiTjQG0UBIiIvHIg0c2yLiiwQB98PDGEqIo84gmlDQzABHNoNHDOMykIcQCJDCyjiMqKFDOH+FMU4MDNVQAigHkBADJHlwA4cE2RjxwizAM0LGFCUfk4c4v4rRhRjL+mPLFJvzwcQAGteQgRjFOuPCLLAokAQUUy5iixQ6hrGEHDpx4EUEYLNDFNhoghkEEwATNWEEu0hCHDUgCCX6oQB4u8Ax4LOAYycDHE9phBXMY4A5lsIAxNPCGYZylHGYQAgXOkAZUQMAQYHgEBKZRhRPkQw1FEIQlJMALIfyBG7mghTw6QIZRRKMLHpAFKm6BiiNwoQzesAMVPFGPS9AgHNgohTAqYYp3zGEKTIDFDhThCGpkQh+tmAAb9gEPFERjBlMgAR9yMIM0cOMKf0hCCRChCxqkogVouEQS7nEOGOBCGrigwwYu8AdHiKEBrQgDA4ZACihYIxk4iAA6WiCBSnACBqkogT1csYo+cOMQmniHOmzxjQIUoR348MUv1LEIJXyBADy4RwnOkA9rKOEasKgGNnYxC3R0gBZlQIAM5OADc8AhBbWIhDaQAYwXNEEHC3hAHURRjkd0oRIV6AcrRAEMdYQhGJLgACBq4QcYruIVxCgFj5DQD3dEgAFYoEZAAA==
+noiseLut:%%IMG3AEAAQAgAJ4CgQYTKFzRy+PRZhMhQIUWTNkWK5KnUq1OjNiFylMiQoUOPDNUZU2VKmDh57PBxtIjPH0OJ/pQZQwYPID9/6uDxQ8hPI0mUJqDIgSSLljZ1+uBEdMjQokeQJF0CRbWUKEmNHHEEdOiPnzprzGAB8waPnD+CBBUiRGgPnTZq1uwBxGfPnjx6+gRCpGiRBRNDqGgJMwcQITx5+jSaNKnSo0hAHWECJSrTI5aHBA3KQ4fNmjRj0sCB44bOHDuCmtJZs8ZNHD6A1PqBcxannToXThTRQiaOn0OH9ujhE0mTJk6TOBoC5OjSJ0+UKD1CNCiQnrdwz6BJY+bLmTVzBPHd4ybNGzp5AxHi08bNHjt31pzRsIJHlfCHABn+6DyUKE2J8IHYH4VQ1Mko0DHCSCF2uKGGGWF8AUYXTWyxhk2EKPgHHHbkUUcdt9Uxhxx1xCFHdyCooAMVdRwSCSKEJOJIJaCYkgornPwxRx5v1HHHIZ+cokoqnkiiySNylBHGFllscQUTPkyBRoeCEDLJIjYBooddc+Bhhxx04KHGhB2wEMQWdhgyySWWTOJJKJ900olEgMwRhxpy2EGIJqmEUoonkXQyyR5vrAHGFlIwcYQRSXwBh5eGMJLIerAVUkgddNwBRxpttBGGFhzEoIQXa+RxSCipjAKLKxlJAlwgXtoRJiKciAInJ5dUAokgd7yhBRRGBNGDEElUAcYacPRxCCOKDDKjJZEs8sd1bZyHRhclzJBEFmGo0QcnrLyCyyylZMJIHujaYcced+hxSCacwCnKKJxooggeaFBhhBA/6OBDEk1Ewe0cBU4SSZClcGLuIH3kwQd7YNBggxFUeBHGHpOgYosssKCiySJytBFHHG7Uwcdvl3gCyig3qrIKJXhwAQURSiThww5GFFGEE1TAYcglnXySSiywpGJKJssR0kggdJQhAw9FNJFFGXdIgsossvBCiyeG9OFGtW/MgZMhlmyCCiqrsMKKKpfsoQUSR0DhxA885OADEVBIYcYfl5wCyyuvrILKK5boB8kljgzixgt3M8GFGYNggkorrdQyiyiOEJKHG2zAkVIfiVgiiSWZfGIKK6EsEocVTwyRhKJABMGEE1BcwYYhZrcyuSqkZBSIH5AoOEgcLtQwxBRpxFFIJaEIKXgnlFgiyBtv8EFIIDImEoghijDSCCSICCIHF1NAwUQTSvRA8RVYHFXIJq3I0ooonHzySSV/7KGII4wQQgcMNEiCF+awB0RI5RKauMQmNIEJTzgCDz9ShCIgEQlC3GEPfmAXpu4QBzFggQtZwAIV4taFL1iMDokA1yxeEQpNdIITjuDDHfZiiD/QIQY6qIIabJIIZjkEEIh4RMo2MYg/ROInlZjEIOCQKTmEpQ1ykEMavPAFM5ihDDMRAxi+4K2DhcIUpSDFJy4hCUQAQjh3uIODUsCDLLgnD17RQx7ugIc6+IESnrgEUyYxJ01Ewg5reIMbxECFKmghDU4cQxjMgKc5vAEMYYDDHgSRiVScYhOlQAUoJBGJRzziEHzYUhvIAAQkbAENbUBPHdgAyTGwQQ+McIxHIDEJSSyia3LYDhigMIQnbIEmn0GDGgi4BzaYYQ10IMQlQtGJ3nUCE5VYxCQyUYlE9IEtfqBCIcEAhzvQoTNZYAIW0lAHPcRIK4lAhDXvIEXtaCEIOwDCzrxABjOM4QxvQMnD9FCHQFDiOaQAhSYsgcBNZIKMkbgEJhrRhS5cwQtucCQc0FAFJVShWyghhFYKEYhC5M8OaLDiFXqwgx30gAhVsBg9XaMHtQiCD8v7RChGwUxMYIKZC8zEJuIUiS4ocgxlIMMZzOAFJ0xhCiltAxwAsYj+6cEQUVHEib4gBSIQAQg/6GWEsvAFNtyhD4MoBCD+oAhKNDMUpDAFMxOWiUxgwhLGiYQUujoHOHyhC2HoAhSg8AQqdCENsNEPIArBCEpMAhF8YAMVkEC7JQQhCEv4AhawcJBhBkIRiGWEJ1BxNE6kIlWpAIUnOqHABT5iC2JIwxrK8IUvbAELV5CCFXzKhgzugQ9z/MMiIgGJPsxhDFiwQhOOUIQjOKELWfBCGYZJhz0Egi6O6AQoFKgJT2wCE5QIBSc4MYpRaCITjoACFsrABjRsIQxB9YIUsgAePBQig5wpp1MSt4c1fCELXLDCFKLwBChwwQtowIMN6ZAYQiyCMoyRlEcS8QhJ0AgU4BVEEqDwhTSg4XGCLAMXwiAHPfBkEH7Qgx3wgIcYKcIQfHAiQtIAhivwtwtgaMP29oCHPghiEdHNxFpoDB+FGAYqiviDHZaQhCdoQUJuCKVSw9YuPNSQD4MQxCQNoZk5+Ei3ezhDFqJQBQvxwXuLKIQBd4qJRPjIDV9zw2iqdYc8wEE+TADCESq2hjYkAhJRvstwBNGHUP7hYXhQiFLskghPIMINXHjCceVAiEpsQhKTIJ2fJiGIObDhDLR5g2rFIAY0eIEkViBCcaswpUEAhcGFEMRNcCuHiNpBqTr5wyG2Z4lNIgIPYrhCGvzwCE1IIhONGQUoSIEJRMzhDGyIAxvKAIcyOOkKU7iCFbJAXCeAgQ6GoIRCLYEJWkJCe+RJw7LL8Gk8XBYRgZJpKBpR3jhkmxKxxIQmQjHsTCQiDmMQA2vQMNRPQaEJWhgDGmLHBDDkIREuBMUnrrsJSoRPTGUgahiuYDs6BOIQmLDRKlZhiTqUhRGZEN0mQuGn7hYbDmQIQyDdsB0xZIGvXCADG1RkBC74IYWmWMV/XvgIQAyCDmlIucW+wAWf1qEQnIif0SoBiLM4IuEbT4UrTPEJRvQhLGVQc6HGQIUmSKEKV9CCGULgAiN0wQ6H0EQpVPEfByduDnSIQxq6wIU0BD2vbzgEKF5RC1esO39/aPQqZhGLU5xCFqbwRCDigIZ89wiQXojCEpowuyuYgY1PGAMf1FSrTgyUEkGuQxvEgFeadGELZbi2ITrhisJ3whGCwMNTmScKW4niFKIwtB3Y0AYz7MjjaHh5E5YABbFPuAqaP/cjKnGJxjyiEHdIw5a1SYUpYGENcRAEI9S+CtI2og8EHsRuKdhJRSQiEY0oBAbj4DlCCDkNiU5CFMAwd7rXZA+pTsSaJAFNRvwhDl3wBEuABEoQBVvwBn3gFKPTCZfRCF0DCIEQgbEhCF8hexy1BzpCB4AwHRvyBU6ABFHgHZwmBsvlBmRFCZxQCvKWCfAmCG2gBUogBEqABWMgB6nGPbF0fpFQCSfmB3cwYreFB2mgBibyNXIQB8xRCY0gCIjGX1fgU9txBmLABcwGCTXyCoJiCZXhCHpQBlAAgmPgBniACIzAZzdWCM3hcF0zB52iE3hgTGJwBmpQMnhQVm0SCG1wV1lgBRtmInFgKGcwhpBgCZ7AbZvgCUrIB2ngYn81B2DlB33mB6m2CJAQZg3DeBbTBnPgIHNwB3zwOwUkCSNXCXdABltEE2YQB+2yORHFB6kBCc1BTY8gPmcwE2WwBnIAB6m0B32gQamhCA4oJlnQBOPUT4hACW91S2IGCaEAHX8gB57hRGeATzvhJXngB4LAPSABCY3ACIsnbqzhGm1wBnKQGOxyB4HXEIEgB2MwBUqgBXLhCJlACqdACm0iCVHRCY7hfn0wWHxAB11WPWEFFY+wCITQj4KQCJGgCEA3hG/Ae3DweIHGFhLYBpfmBdJ2BuHxCPEyL6NACsxkCY1ACIfwPTtIRoiwBFnABnzQCDTyCZYQCPv0B98mCJ2hHYxHBqLBBmyAbZKwIE1XBrXIBYOxBsBzCbdnCqfQCq5QCvTSCHtACKIoCpswCpVwCFIwBm1QYo7QSYtQHYJVCNXhZqoFB3BHYLKyB45gCYkgCEI2jWKwBV1gBWYAB4IAFJ6gCq/QlKswCpjgCI8BV9dlCZBACMdiB+rRVJkxCEUUVoCgEn6AB3OwBiPmEnKkB4EQCZNwLn/4IFoQBYoSBWKQTJLQCbJgC6tQCqmwCmIECnLiCZgAXuvhBWlAB7/ICOFzRhjolnowVmZBjuaWCIdACIWgf46hB25gBmgQBlWwBEeQBEvABW7QB8XBd2vjCvKjChgBCsz0CZEwKUsQcHIQgXemCHuwlf1YIM+XB2kQBr3xB4ywCbVES5wQCbzCOV8QBUqwBKzDXsRxCaTQCquCC7lAC7BQjzqVSfViCXKmBWpgB2RYTZrmBr8xI45QCHqgS4HoCN5VCWYFJ4twE3fQBldQO1kwBWOgJ5DwCaQgdawAC7ZAC67gCf+BSVgjCpgQmtxEnIjwf2lwB4PQCDalRGbRe3NgJZ0QCixoCR46HYHwBlIkBso1VDaoUKGgCrIQC6+gO2EEkqmgC7iAC6wSBSDIBWdgB32gB5ZmBnIwCJCQCfjYB1GUB7InCIrAW15JWNi1eF/VZ/DRYY8ACpvQCaKwCrKQCtgVCq+ACq6QC8TQDMZQC6QwBUzABFFwBWTQHhaJaab2TJeAoR5GF2iRCINwCDCSkLnSNX7wFByRH4RghQalCbf3CSzBCapQCq2wC8pgDc2wNVlQBUUABEtAd2OAi6ahB4qQl6RACYvwlRwlCOqBFoNgCIAJmApCCMgYCW3yCMxiCUwKNLFZS8bxCaAQC85gDc/QCpSgX0YwBE7gBVtQRXAgQ0daCr3QJzxoS4QACHnwXKlBCRPBCFH1GJRQCY4gHYzAP5AAsBT0VgXbGJvwCsygDdNQC5mQX0xgBEigBSsViZm5CjKKCYvQjebpYT52cTLSFwuCCAubRNB0RI3wPfunCQZ1CbyVCaxgDM4QDKcgCV/3b09gBWDgBnlAnI9Qaxs3Cs/Hqqr2ZxiUGoWwCBKkCBGoCI8QHSExCD0EPozApJtAPxzxdKrAC74QC6SQCetlBdP2V6YSaZ8wCkJiCpywIAI7khQ5CITAst8Di2YERIwQCY5QQ/0ICIkQtchYlZlwCFGLCRbhCqcACpwQr0XnShoYCfSml68QWoiDCIvQlq7YlZYBCUlECZpACalWCI8RuAnpP2yABwqJRH5kqo/QCaZgCqLQpVtABTxTBnFACIIACaSACqwwLgIFLVkRE3ZqCUEzUE0lRJNAZYkwqI3AFYfQB2egBWLgLlGLFcUpsDdVCrjXCrEgBU1gBZ/GBht4HKKACrRgtgu3CdHEFj4HCd2GCHyBjJLAP4aACJGWv3wBCGqABV2QLHJKByFGB30gRG8iXTaiA0IgMAJMB5IgWqOwCkQTC00JPZMiHoxwGeoXCFIxCY+QfoMgsJDArc2qOdxBE5yGafnUBwakCeRKWpewAjOAN1KABW7wCCQHCkMTC4SnCjD0Ui11CCeWE3qwW40AZLvFWyzRYM/XK2PwmVIQc2bwBi8xlaSAiJBQAiRwA0gwBVrgBrRSGZ7wCrCgCi6zCYmgB3BgIjM0VuoSnAm1UyLZF4vBU8HhBmDABEVwqVugBoCgJp+wCmz3aBPQATBABFggBv00I57gN7EgC7KwrIJQIm2ABmuAjqGkB3LwBoGwGJtgj0vsstrJJreWBlaQBEpABVkwBnnAsp3ACuALkxkgAjeQBFhwBj+ibZmQSZm0CvVZQ3mQiyQiVsPBLnwAjFbLrZHQcEJjCoVzB3WQBlJQBEsgBZjKB/qXl8JmCYuwAjXgBFwgBnYwCJOgcIf4CdDUbR4lZGkkR3hgGvDRIX1WB3nAVJPwCfDScH5AMneCBUbgS6k1B+hMqAo3CYdABE6QqW1QtMwDm5fgcIYRCHQKfj+oB3JkB1bG0X+qBmgwnYYAuNxYCHBwBmnAOWMQBY+TbHeArZvACZ7ACUsTEA==
+blindsVertLut:%%IMG3AEAAAQgAASCAgAEEChg4gCCBggUMGjh4ACGChAkUKli4gCGDhg0cOnj48MFDBw4bNGTAcMFCBQoTJESA8MBBAwYLFCRAcMBAAQIDBAQAAgI=
+blindsHorizLut:%%IMG3AAEAMAgAASioAEJFDSBKqoBRUweQokqgVNUCpqwaOHX17K0DZ20ZMFurQFlaBMjOGjBWlgCxsQKEhQUAAgI=
+{script}
+dissolveLut:data.dissolveLut
+noiseLut:data.noiseLut
+blindsVertLut:data.blindsVertLut
+blindsHorizLut:data.blindsHorizLut
+
+on lookup c a b t lut do
+ c.merge[lut]
+ c.merge[((floor 255*t) take b),(256 take a)]
+end
+
+on oval pos size do
+ flip pos+size*flip unit 2*pi*(range 20)/20
+end
+
+on star c t rot do
+ o:c.size/2
+ r:(2.5*t)*o
+ i:unit(pi/2)+(pi*rot/2)+(range 10)*(pi/5)
+ p:each v index in i
+  o+(if 2%index 1 else 0.5 end*r)*v
+ end
+ c.poly[p]
+end
+
+on heart c t do
+ o:(0.5,0.6)*c.size
+ r:t*c.size
+ p:each v in (1,0,-1,0)join(0,-1,0,1) o+r*v end
+ c.poly[p]
+ c.poly[oval[o+r*( 1,-1)/2 r/sqrt 2]]
+ c.poly[oval[o+r*(-1,-1)/2 r/sqrt 2]]
+end
+
+clickpos:0,0
+on circleClick c t do c.poly[oval[clickpos t*max c.size]] end
+on circle      c t do c.poly[oval[c.size/2 t*max c.size]] end
+
+on clock c t do
+ pos:c.size/2
+ size:max c.size
+ c.poly[flip pos+size*flip (list 0,0),unit 2*pi*-.25+(range 20*t)/20]
+end
+
+ba:bb:nil
+on BarnHoriz c a b fst t do
+ if fst
+  ba:a.copy[        0,0 a.size/2,1]
+  bb:a.copy[a.size*.5,0 a.size/2,1]
+ end
+ c.paste[b]
+ c.paste[ba              t*a.size/-2,0]
+ c.paste[bb (a.size/2,0)+t*a.size/ 2,0]
+end
+on BarnVert c a b fst t do
+ if fst
+  ba:a.copy[       0, 0 a.size/1,2]
+  bb:a.copy[a.size*0,.5 a.size/1,2]
+ end
+ c.paste[b]
+ c.paste[ba              t*a.size/0,-2]
+ c.paste[bb (a.size/0,2)+t*a.size/0, 2]
+end
+
+transition[on Dissolve       c a b t do lookup[c a b t dissolveLut   ] end]
+transition[on Melt           c a b t do lookup[c a b t noiseLut      ] end]
+transition[on BlindsVert     c a b t do lookup[c a b t blindsVertLut ] end]
+transition[on BlindsHoriz    c a b t do lookup[c a b t blindsHorizLut] end]
+transition[on StarIn         c a b t do star  [c   t 0] c.merge[a b] end]
+transition[on StarOut        c a b t do star  [c 1-t 0] c.merge[b a] end]
+transition[on StarSpinIn     c a b t do star  [c   t t] c.merge[a b] end]
+transition[on StarSpinOut    c a b t do star  [c 1-t t] c.merge[b a] end]
+transition[on HeartIn        c a b t do heart [c   t  ] c.merge[a b] end]
+transition[on HeartOut       c a b t do heart [c 1-t  ] c.merge[b a] end]
+transition[on ClockIn        c a b t do clock [c   t  ] c.merge[a b] end]
+transition[on ClockOut       c a b t do clock [c 1-t  ] c.merge[b a] end]
+transition[on CircleIn       c a b t do circle[c   t  ] c.merge[a b] end]
+transition[on CircleOut      c a b t do circle[c 1-t  ] c.merge[b a] end]
+transition[on CircleInClick  c a b t do if 0~t clickpos:pointer.start end circleClick[c   t] c.merge[a b] end]
+transition[on CircleOutClick c a b t do if 0~t clickpos:pointer.start end circleClick[c 1-t] c.merge[b a] end]
+transition[on StretchDown    c a b t do c.paste[a] c.paste[b (       0    ,  0),      b.size*1,t] end]
+transition[on StretchUp      c a b t do c.paste[a] c.paste[b (c.size*0    ,1-t),(0,1)+b.size*1,t] end]
+transition[on StretchRight   c a b t do c.paste[a] c.paste[b (       0    ,  0),      b.size*t,1] end]
+transition[on StretchLeft    c a b t do c.paste[a] c.paste[b (c.size*(1-t),  0),(1,0)+b.size*t,1] end]
+transition[on RotateDown     c a b t do c.paste[a (c.size*0,t),c.size*   1,1-t ] c.paste[b (       0    ,  0),      c.size*1,t] end]
+transition[on RotateUp       c a b t do c.paste[a (       0,0),c.size*   1,1-t ] c.paste[b (c.size*0    ,1-t),(0,1)+c.size*1,t] end]
+transition[on RotateRight    c a b t do c.paste[a (c.size*t,0),c.size*(1-t),1  ] c.paste[b (       0    ,  0),      c.size*t,1] end]
+transition[on RotateLeft     c a b t do c.paste[a (       0,0),c.size*(1-t),1  ] c.paste[b (c.size*(1-t),  0),(1,0)+c.size*t,1] end]
+transition[on BarnDoorIn     c a b t do BarnHoriz[c a b 0~t   t] end]
+transition[on BarnDoorOut    c a b t do BarnHoriz[c b a 0~t 1-t] end]
+transition[on BlinkIn        c a b t do BarnVert [c a b 0~t   t] end]
+transition[on BlinkOut       c a b t do BarnVert [c b a 0~t 1-t] end]
+transition[on SlitVertIn     c a b t do c.rect[(c.size/2,0)-(   t *c.size/2,0) (c.size*   t ,1)] c.merge[a b] end]
+transition[on SlitVertOut    c a b t do c.rect[(c.size/2,0)-((1-t)*c.size/2,0) (c.size*(1-t),1)] c.merge[b a] end]
+transition[on SlitHorizIn    c a b t do c.rect[(c.size/0,2)-(   t *c.size/0,2) (c.size*1,   t )] c.merge[a b] end]
+transition[on SlitHorizOut   c a b t do c.rect[(c.size/0,2)-((1-t)*c.size/0,2) (c.size*1,(1-t))] c.merge[b a] end]
+
+transition[on PageUp c a b t do
+ c.rect[0,0 c.size*1,.5].merge[b a]
+ if t<.5 i:t*2    c.paste[a.copy[c.size*0,.5 c.size*1,.5] (0,0,0,1)+(0,.5,1,(.5*1-i))*c.size]
+ else    i:2*t-.5 c.paste[b.copy[c.size*0, 0 c.size*1,.5] (0,0,0,1)+(0,(.5*1-i),1,(.5*i))*c.size]
+ end
+end]
+transition[on PageDown c a b t do
+ c.rect[0,0 c.size*1,.5].merge[a b]
+ if t<.5 i:t*2    c.paste[a.copy[c.size*0,.0 c.size*1,.5] (0,0,0,1)+(0,(.5*i),1,(.5*1-i))*c.size]
+ else    i:2*t-.5 c.paste[b.copy[c.size*0,.5 c.size*1,.5] (0,0,0,1)+(0,.5,1,(.5*i))*c.size]
+ end
+end]
+transition[on PageRight c a b t do
+ c.rect[0,0 c.size*.5,1].merge[a b]
+ if t<.5 i:t*2    c.paste[a.copy[c.size*.0,0 c.size*.5,1] (0,0,1,0)+((.5*i),0,(.5*1-i),1)*c.size]
+ else    i:2*t-.5 c.paste[b.copy[c.size*.5,0 c.size*.5,1] (0,0,1,0)+(.5,0,(.5*i),1)*c.size]
+ end
+end]
+transition[on PageLeft c a b t do
+ c.rect[0,0 c.size*.5,1].merge[b a]
+ if t<.5 i:t*2    c.paste[a.copy[c.size*.5,0 c.size*.5,1] (0,0,1,0)+(.5,0,(.5*1-i),1)*c.size]
+ else    i:2*t-.5 c.paste[b.copy[c.size* 0,0 c.size*.5,1] (0,0,1,0)+((.5*1-i),0,(.5*i),1)*c.size]
+ end
+end]
+
+transition[on Wink c a b t do
+ s:if t<.5 c.paste[a] t else c.paste[b] 1-t end
+ c.rect[       0,0 c.size*1, s]
+ c.rect[c.size*0,1 c.size*1,-s]
+end]
+
+module.descs:raze insert k v with
+ "PageDown"       "Stretch the source and destination like flipping a book page down."
+ "PageUp"         "Stretch the source and destination like flipping a book page up."
+ "PageRight"      "Stretch the source and destination like flipping a book page right."
+ "PageLeft"       "Stretch the source and destination like flipping a book page left."
+ "Dissolve"       "A randomized dissolve."
+ "Melt"           "A smoothed noise dissolve."
+ "BlindsVert"     "Vertical Venetian blinds."
+ "BlindsHoriz"    "Horizontal Venetian blinds."
+ "StarIn"         "Star-shaped zoom-in."
+ "StarOut"        "Star-shaped zoom-out."
+ "StarSpinIn"     "Spinning star-shaped zoom-in."
+ "StarSpinOut"    "Spinning star-shaped zoom-out."
+ "HeartIn"        "Heart-shaped zoom-in."
+ "HeartOut"       "Heart-shaped zoom-out."
+ "ClockIn"        "Clockwise pie-slice wipe."
+ "ClockOut"       "Counter-clockwise pie-slice wipe."
+ "CircleIn"       "Circle-shaped zoom-in."
+ "CircleOut"      "Circle-shaped zoom-out."
+ "CircleInClick"  "Circle-shaped zoom-in centered on the user's last click."
+ "CircleOutClick" "Circle-shaped zoom-out centered on the user's last click."
+ "StretchDown"    "Stretch the destination in from the top edge."
+ "StretchUp"      "Stretch the destination in from the bottom edge."
+ "StretchRight"   "Stretch the destination in from the left edge."
+ "StretchLeft"    "Stretch the destination in from the right edge."
+ "RotateDown"     "Stretch the source and destination like rotating a cube down."
+ "RotateUp"       "Stretch the source and destination like rotating a cube up."
+ "RotateRight"    "Stretch the source and destination like rotating a cube right."
+ "RotateLeft"     "Stretch the source and destination like rotating a cube left."
+ "Wink"           "Vertical squint to black, then unsquint to destination."
+ "BarnDoorIn"     "Slide left and right halves apart vertically."
+ "BarnDoorOut"    "Slide left and right halves together vertically."
+ "BlinkIn"        "Slide top and bottom halves apart vertically."
+ "BlinkOut"       "Slide top and bottom halves together vertically."
+ "SlitVertIn"     "Merge in destination in a vertically opening slit."
+ "SlitVertOut"    "Merge in destination in a vertically closing slit."
+ "SlitHorizIn"    "Merge in destination in a horizontally opening slit."
+ "SlitHorizOut"   "Merge in destination in a horizontally closing slit."
+end
+{end}
+
