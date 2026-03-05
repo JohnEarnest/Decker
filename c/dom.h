@@ -3109,7 +3109,7 @@ char* writegif(lv*frames,lv*delays,int*len,int*pal,int pal_size){
 		add_byte(0); // no local colortable
 		unsigned int lw=pal_size?MAX(2,(ceil(log2(pal_size)))): 5;
 		add_byte(lw); // minimum LZW code size
-		int ts=size.x*size.y,ti=0;char*temp=calloc(ts,sizeof(char)*ts),*data=frames->lv[frame]->b->sv;
+		int ts=size.x*size.y,ti=0;char*temp=calloc(ts,sizeof(char)),*data=frames->lv[frame]->b->sv;
 		for(int y=0;y<size.y;y++)for(int x=0;x<size.x;x++){
 			int d=0xFF&data[y*size.x+x]; temp[ti++]=pal_size?MIN(pal_size,d): draw_color_trans(patterns_pal(patterns),d,frame,x,y);
 		}encode_lzw(temp,ts,&r,lw,1);free(temp);
