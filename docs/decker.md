@@ -1541,7 +1541,7 @@ end
 
 on drag pos do
 	if !me.locked|me.draggable
-		me.line[(pointer.prev-me.offset)/me.scale x]
+		me.line[(pointer.prev-me.offset)/me.scale pos]
 	end
 end
 
