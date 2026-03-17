@@ -3846,7 +3846,7 @@ docopy=_=>{
 }
 dopaste=x=>{
 	x=clchars(x)
-	if((ms.type==null||(ms.type=='contraption_props'&&wid.fv))&&/^%%IMG[012]/.test(x)){
+	if((ms.type==null||(ms.type in{'contraption_props':1,'field_props':1}&&wid.fv))&&/^%%IMG[0123]/.test(x)){
 		const i=image_read(x);if(i.size.x==0||i.size.y==0)return
 		if(wid.fv){
 			if(wid.f.style!='rich'){field_input(x)}
