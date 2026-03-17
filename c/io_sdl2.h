@@ -257,4 +257,5 @@ void io_init(void){
 }
 void io_run(lv*env){
 	while(!should_exit){tick(env);sync();}
+	SDL_Quit();
 }
