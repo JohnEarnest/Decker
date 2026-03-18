@@ -1246,7 +1246,7 @@ pair layout_plaintext(char*text,lv*font,int align,pair max){
 			if(cursor.x+size.x>=max.x)lnl(); // hard-break overlong words
 			layout_push((rect){cursor.x,cursor.y,size.x,size.y},cursor.y,c,font,LNIL,1);
 			if(c=='\n'){lnl();}else{cursor.x+=size.x;}
-			if(cursor.y>=(max.y/fh)){
+			if(cursor.y>=(max.y/(fh*1.0))){
 				layout_count=MAX(1,layout_count-3);
 				layout[layout_count-1].c=ELLIPSIS;layout[layout_count-1].pos.w=font_gw(font,ELLIPSIS)+fs;
 				z=strlen(text)-1;break;

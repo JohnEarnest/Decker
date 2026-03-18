@@ -1448,7 +1448,7 @@ draw_text_align=(r,text,font,pattern,align,outline)=>{
 		draw_text_rich_raw(rect(c.x+1,c.y-1,c.w,c.h),l,outline,1,null)
 		draw_text_rich_raw(rect(c.x+1,c.y+1,c.w,c.h),l,outline,1,null)
 	}
-	draw_text_rich_raw(rcenter(r,l.size),l,pattern,1,null)
+	draw_text_rich_raw(c,l,pattern,1,null)
 }
 draw_9seg=(r,dst,src,m,clip,opaque,pal)=>{
 	const o=rect(r.x,r.y), s=src.size, ss=s, ds=dst.size; if(s.x<1||s.y<1)return
