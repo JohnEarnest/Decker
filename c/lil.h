@@ -604,9 +604,14 @@ monad(l_sum ){x=ll(x);lv*r=ZERO      ;for(int z=0;z<x->c;z++)r=l_add  (r,x->lv[z
 monad(l_prod){x=ll(x);lv*r=ONE       ;for(int z=0;z<x->c;z++)r=l_mul  (r,x->lv[z]);return r;}
 monad(l_amax){x=ll(x);lv*r=l_first(x);for(int z=1;z<x->c;z++)r=l_max  (r,x->lv[z]);return r;}
 monad(l_amin){x=ll(x);lv*r=l_first(x);for(int z=1;z<x->c;z++)r=l_min  (r,x->lv[z]);return r;}
-monad(l_raze){if(lit(x))return l_dict(x->c?x->lv[0]:lml(0), x->c>1?x->lv[1]:lml(0));
-	          x=ll(x);lv*r=l_first(x);for(int z=1;z<x->c;z++)r=l_comma(r,x->lv[z]);return r;}
-
+monad(l_raze){
+	if(lit(x))return l_dict(x->c?x->lv[0]:lml(0), x->c>1?x->lv[1]:lml(0));
+	if(lid(x)|linil(x))return x;
+	if(!lil(x))return l_list(x);
+	if(x->c==0)return LNIL;
+	lv*f=l_first(x);if(lit(f)||lid(f)){lv*r=f;for(int z=1;z<x->c;z++)r=l_comma(r,x->lv[z]);return r;}
+	lv*r=lml(0);for(int z=0;z<x->c;z++)r=l_comma(r,x->lv[z]);return r;
+}
 char esc(char e,int*i,char*t,int*n){
 	if(e=='n')return '\n';if(strchr("\\\"/'",e))return e;if(e!='u'||*n<4)return ' ';
 	char h[5]={0};memcpy(h,t+*i,4),(*i)+=4,(*n)-=4;return drom_from_codepoint(0xFFFF&strtol(h,NULL,16));

@@ -184,6 +184,7 @@ format_has_names=x=>{
 	}return 0
 }
 razetab=x=>{const k=tab_cols(x);return dyad.dict(lml(tab_get(x,k[0])||[]),lml(tab_get(x,k[1])||[]))}
+razelst=x=>{const f=x[0];return lit(f)||lid(f)?x.slice(1).reduce(dyad[','],f): x.reduce(dyad[','],lml([]))}
 monad={
 	'-':    vm(x=>lmn(-ln(x))),
 	'!':    vm(x=>lmbool(!lb(x))),
@@ -201,7 +202,7 @@ monad={
 	heading:vmnl(x=>{const a=getpair(x);return lmn(Math.atan2(a.y,a.x))}),
 	sum:    x=>ll(x).reduce(dyad['+'],ZERO),
 	prod:   x=>ll(x).reduce(dyad['*'],ONE),
-	raze:   x=>lit(x)?razetab(x) :ll(x).slice(1).reduce(dyad[','],monad.first(x)),
+	raze:   x=>lit(x)?razetab(x): lid(x)||linil(x)?x: !lil(x)?lml([x]): count(x)<1?NIL: razelst(ll(x)),
 	max:    x=>ll(x).slice(1).reduce(dyad['|'],monad.first(x)),
 	min:    x=>ll(x).slice(1).reduce(dyad['&'],monad.first(x)),
 	count:  x=>lmn(count(x)),
