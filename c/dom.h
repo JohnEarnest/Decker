@@ -430,6 +430,7 @@ lv* n_image_transform(lv*self,lv*z){
 	else if(!strcmp("flip"  ,z->sv))self->b=buffer_transpose(self->b);
 	else if(!strcmp("left"  ,z->sv))buffer_flip_h(self->b),self->b=buffer_transpose(self->b);
 	else if(!strcmp("right" ,z->sv))self->b=buffer_transpose(self->b),buffer_flip_h(self->b);
+	else if(!strcmp("turn"  ,z->sv))buffer_flip_h(self->b),buffer_flip_v(self->b);
 	else if(!strcmp("dither",z->sv))buffer_dither(self->b);
 	return self;
 }

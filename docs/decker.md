@@ -1000,6 +1000,7 @@ The `image.transform[x]` function modifies the entire image in place, depending 
 - `"flip"`: transpose the image about the x/y axis, like the Lil `flip` operator on a list of lists.
 - `"left"`: rotate the image 90 degrees to the left.
 - `"right"`: rotate the image 90 degrees to the right.
+- `"turn"`: rotate the image 180 degrees.
 - `"dither"`: dither a 256-gray image to 1-bit color, in patterns 0 and 1, using Bill Atkinson's algorithm.
 
 Any other value will leave the image unchanged.

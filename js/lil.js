@@ -1789,7 +1789,7 @@ image_make=size=>{
 		})
 		if(ikey(i,'transform'))return lmnat(([x])=>{
 			if(x.v=='horiz')image_flip_h(self); if(x.v=='vert')image_flip_v(self); if(x.v=='flip')image_flip(self); if(x.v=='dither')image_dither(self)
-			if(x.v=='left' )image_flip_h(self),image_flip(self); if(x.v=='right')image_flip(self),image_flip_h(self)
+			if(x.v=='left' )image_flip_h(self),image_flip(self); if(x.v=='right')image_flip(self),image_flip_h(self); if(x.v=='turn' )image_flip_h(self),image_flip_v(self)
 			return self
 		})
 		if(ikey(i,'rotate'))return lmnat(([n])=>{
