@@ -52,6 +52,13 @@ ifeq ($(UNAME),NetBSD)
 	FLAGS=-std=c99 -lm -Wall -Wextra -O2
 	FLAGS:=$(FLAGS) -Wno-misleading-indentation -Wno-format-truncation
 endif
+ifeq ($(UNAME),Haiku)
+	# Required packages: libsdl2(_devel), sdl2_image(_devel), xxd (through vim)
+	OPEN=open
+	COMPILER=gcc
+	FLAGS=-std=c99 -lm -Wall -Wextra -O2
+	FLAGS:=$(FLAGS) -Wno-misleading-indentation -Wno-format-truncation
+endif
 ifneq ("$(EXTRA_FLAGS)","")
 	FLAGS:=$(FLAGS) $(EXTRA_FLAGS)
 endif
