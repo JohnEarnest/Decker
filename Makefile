@@ -43,7 +43,17 @@ ifeq ($(UNAME),OpenBSD)
 	FLAGS:=$(FLAGS) -lm -Wno-implicit-const-int-float-conversion
 	# -Wno-overlength-strings works around a standards limitation which in practice is still portable.
 	FLAGS:=$(FLAGS) -Wno-overlength-strings
-
+endif
+ifeq ($(UNAME),FreeBSD)
+	OPEN=xdg-open
+	COMPILER=clang
+	FLAGS=-Wall -Werror -Wextra -Wpedantic -O2
+	# -Wno-misleading-indentation silences warnings which are entirely spurious.
+	FLAGS:=$(FLAGS) -Wno-misleading-indentation -Wno-unknown-warning-option
+	FLAGS:=$(FLAGS) -lm
+	FLAGS:=$(FLAGS) -lm -Wno-implicit-const-int-float-conversion
+	# -Wno-overlength-strings works around a standards limitation which in practice is still portable.
+	FLAGS:=$(FLAGS) -Wno-overlength-strings
 endif
 ifeq ($(UNAME),NetBSD)
 	# Required packages: bash, gmake, SDL2, SDL2_image, xdg-tools
