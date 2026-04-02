@@ -3024,7 +3024,7 @@ const patorder=[0,1,4,5,8,9,16,17,12,13,18,19,20,21,22,23,24,25,26,27,2,6,3,7,10
 
 toolbars=_=>{
 	if(!toolbars_enable||kc.on)return
-	if(ms.type||uimode=='script'){
+	if(ms.type||uimode=='script'||deck.locked){
 		clr=x=>{const c=q(x);c.getContext('2d').clearRect(0,0,c.width,c.height);}
 		clr('#ltools'),clr('#rtools');return
 	}
