@@ -1752,16 +1752,28 @@ image_merge_op=(target,src,op)=>{
 	if(op=='=')for(let y=0,i=0;y<ts.y;y++)for(let x=0;x<ts.x;x++,i++)t[i]=t[i]==   b[(x%bs.x)+(y%bs.y)*bs.x]
 }
 image_outline=(target,p)=>{
-	if(p<1||p>47)return;const t=image_copy(target),s=target.size
-	for(let a=0,i=0;a<s.y;a++)for(let b=0;b<s.x;b++,i++){
-		if(t.pix[i])continue;let n=0
-		if(b>0    )n|=t.pix[(b-1)+(a  )*s.x]
-		if(b<s.x-1)n|=t.pix[(b+1)+(a  )*s.x]
-		if(a>0    )n|=t.pix[(b  )+(a-1)*s.x]
-		if(a<s.y-1)n|=t.pix[(b  )+(a+1)*s.x]
-		if(n)target.pix[i]=p
+	if(p<0||p>255)return;const t=image_copy(target),s=target.size
+	if(p==0){ // erode
+		for(let a=0,i=0;a<s.y;a++)for(let b=0;b<s.x;b++,i++){
+			if(!t.pix[i])continue;let n=0
+			if(b>0    )n|=t.pix[(b-1)+(a  )*s.x]==0
+			if(b<s.x-1)n|=t.pix[(b+1)+(a  )*s.x]==0
+			if(a>0    )n|=t.pix[(b  )+(a-1)*s.x]==0
+			if(a<s.y-1)n|=t.pix[(b  )+(a+1)*s.x]==0
+			if(n)target.pix[i]=0
+		}
+	}else{ // dilate
+		for(let a=0,i=0;a<s.y;a++)for(let b=0;b<s.x;b++,i++){
+			if(t.pix[i])continue;let n=0
+			if(b>0    )n|=t.pix[(b-1)+(a  )*s.x]
+			if(b<s.x-1)n|=t.pix[(b+1)+(a  )*s.x]
+			if(a>0    )n|=t.pix[(b  )+(a-1)*s.x]
+			if(a<s.y-1)n|=t.pix[(b  )+(a+1)*s.x]
+			if(n)target.pix[i]=p
+		}
 	}
 }
+image_outlines=(target,p)=>{if(!p)return;if(lin(p)){image_outline(target,ln(p))}else{ll(p).map(x=>image_outline(target,ln(x)))}}
 image_make=size=>{
 	size=rint(size)
 	const f=(self,i,x)=>{
@@ -1810,7 +1822,7 @@ image_make=size=>{
 			const o=image_copy(self), n=lin(z)?rect(ln(z),ln(z)):getpair(z), r=rmax(rect(),rint(a&&lb(a)?n:rect(n.x*o.size.x,n.y*o.size.y))), d=rpair(rect(),r)
 			image_resize(self,r),image_paste_scaled(d,d,o,self,1);return self
 		})
-		if(ikey(i,'outline'))return lmnat(([pat])=>(image_outline(self,ln(pat)),self))
+		if(ikey(i,'outline'))return lmnat(([pats])=>(image_outlines(self,pats),self))
 		if(ikey(i,'copy'))return lmnat(z=>image_copy(self,unpack_rect(z,self.size)))
 		if(ikey(i,'paste'))return lmnat(([img,pos,t])=>{
 			img=getimage(img), pos=(pos?ll(pos):[]).map(ln); let solid=t?!lb(t):1, cl=rect(0,0,self.size.x,self.size.y); if(img==self)img=image_copy(img)
@@ -2459,7 +2471,7 @@ canvas_read=(x,card)=>{
 				canvas_pick(self);if(!image_is(img))return self;const r=rint(getrect(x)),m=normalize_margin(y,img.size)
 				r.w=max(r.w,m.x+m.w),r.h=max(r.h,m.y+m.h),draw_9seg(r,frame.image,img,m,frame.clip,0,null);return self
 			})
-			if(ikey(i,'outline'))return lmnat(([pat])=>(canvas_pick(self),image_outline(frame.image,ln(pat)),self))
+			if(ikey(i,'outline'))return lmnat(([pats])=>(canvas_pick(self),image_outlines(frame.image,pats),self))
 			if(ikey(i,'text'))return lmnat(([x,pos,a])=>(canvas_pick(self),text(x=lit(x)?rtext_cast(x):lms(ls(x)),pos,a),self))
 			if(ikey(i,'textsize'))return lmnat(([x,wid])=>{
 				const l=layout_richtext(self.card.deck,rtext_cast(x||lms('')),ifield(self,'font'),ALIGN.left,wid?ln(wid):RTEXT_END)

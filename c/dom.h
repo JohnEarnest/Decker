@@ -506,17 +506,33 @@ lv* n_image_scale(lv*self,lv*z){
 	image_resize(self,r);buffer_paste_scaled(rect_pair((pair){0,0},r),rect_pair((pair){0,0},r),o->b,self->b,1);return self;
 }
 void buffer_outline(lv*target,int p){
-	if(p<1||p>47)return;pair s=buff_size(target);lv*t=buffer_clone(target);
-	for(int a=0,i=0;a<s.y;a++)for(int b=0;b<s.x;b++,i++){
-		if(t->sv[i])continue;int n=0;
-		if(b>0    )n|=t->sv[(b-1)+(a  )*s.x];
-		if(b<s.x-1)n|=t->sv[(b+1)+(a  )*s.x];
-		if(a>0    )n|=t->sv[(b  )+(a-1)*s.x];
-		if(a<s.y-1)n|=t->sv[(b  )+(a+1)*s.x];
-		if(n)target->sv[i]=p;
+	if(p<0||p>255)return;pair s=buff_size(target);lv*t=buffer_clone(target);
+	if(p==0){ // erode
+		for(int a=0,i=0;a<s.y;a++)for(int b=0;b<s.x;b++,i++){
+			if(!t->sv[i])continue;int n=0;
+			if(b>0    )n|=t->sv[(b-1)+(a  )*s.x]==0;
+			if(b<s.x-1)n|=t->sv[(b+1)+(a  )*s.x]==0;
+			if(a>0    )n|=t->sv[(b  )+(a-1)*s.x]==0;
+			if(a<s.y-1)n|=t->sv[(b  )+(a+1)*s.x]==0;
+			if(n)target->sv[i]=0;
+		}
+	}else{ // dilate
+		for(int a=0,i=0;a<s.y;a++)for(int b=0;b<s.x;b++,i++){
+			if(t->sv[i])continue;int n=0;
+			if(b>0    )n|=t->sv[(b-1)+(a  )*s.x];
+			if(b<s.x-1)n|=t->sv[(b+1)+(a  )*s.x];
+			if(a>0    )n|=t->sv[(b  )+(a-1)*s.x];
+			if(a<s.y-1)n|=t->sv[(b  )+(a+1)*s.x];
+			if(n)target->sv[i]=p;
+		}
 	}
 }
-lv* n_image_outline(lv*self,lv*z){buffer_outline(self->b,ln(l_first(z)));return self;}
+void buffer_outlines(lv*target,lv*z){
+	lv*p=l_first(z);
+	if(lin(p)){buffer_outline(target,ln(p));}
+	else{p=ll(p);EACH(z,p)buffer_outline(target,ln(p->lv[z]));}
+}
+lv* n_image_outline(lv*self,lv*z){buffer_outlines(self->b,z);return self;}
 
 #define dst_add_byte(x)  str_addraw(dst,(x)&0xFF)
 #define dst_add_byte_framed(b) {if(segment){if(bo==dst->c)dst_add_byte(0);dst->sv[bo]++;}dst_add_byte(b);if(segment&&(0xFF&dst->sv[bo])==0xFF)bo=dst->c;}
@@ -1675,7 +1691,7 @@ lv* n_canvas_segment(lv*self,lv*z){
 	rect r=getrect(z->c>1?z->lv[1]:NULL),m=getrect(normalize_margin(z->c>2?z->lv[2]:NULL,buff_size(i)));
 	r.w=MAX(r.w,m.x+m.w),r.h=MAX(r.h,m.y+m.h);draw_9seg(r,frame.buffer,i,m,frame.clip,0,NULL);return self;
 }
-lv* n_canvas_outline(lv*self,lv*z){pick_canvas(self);buffer_outline(frame.buffer,ln(l_first(z)));return self;}
+lv* n_canvas_outline(lv*self,lv*z){pick_canvas(self);buffer_outlines(frame.buffer,z);return self;}
 lv* interface_canvas(lv*self,lv*i,lv*x){
 	if(!is_rooted(self))return LNIL;
 	lv*data=self->b;lv*card=dget(data,lmistr("card")),*deck=dget(card->b,lmistr("deck")),*fonts=dget(deck->b,lmistr("fonts"));

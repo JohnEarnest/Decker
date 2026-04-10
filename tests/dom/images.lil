@@ -280,6 +280,8 @@ assert["image outline ident"  "%%IMG0AAMAA0DgQA=="                         image
 assert["image outline corner" "%%IMG3AAMAAwbAUUAYGA6D"                     image["%%IMG0AAMAA0DgQA=="].outline[35].encoded]
 assert["image outline full"   "%%IMG3AAUABQZAAIAkHAaIpIASeSwSAUE="         image["%%IMG0AAUABQAgcCAA"].outline[36].encoded]
 assert["image outline iter"   "%%IMG3AAYABgZAU6lkAgBKgQDxqFQKk0niMAowCYlB" image["%%IMG0AAYABgBgUHgYAA=="].outline[37].outline[38].encoded]
+assert["image outline erode"    "%%IMG0AAcABwAAADBwAAA="                   image["%%IMG0AAcABwAEMPj4eAA="].outline[0].encoded]
+assert["image outline sequence" "%%IMG3AAUABQZAgHAIIA1JAaNQSQQEAQ=="       image["%%IMG0AAUABSBw+HAg"].outline[0,0,36].encoded]
 
 if !sys.platform~"awk"
 	assert_image["read nonexistent gif"

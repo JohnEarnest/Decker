@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:33
+card:34
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -940,6 +940,31 @@ on drag pos do
  me.text[t (pos-ref.size/2),ref.size "center"] 
 end
 
+{end}
+
+{card:erosion}
+{widgets}
+c:{"type":"canvas","size":[172,162],"pos":[92,94],"volatile":1,"brush":4,"scale":1}
+button1:{"type":"button","size":[60,20],"pos":[314,99],"script":"erosion.0","text":"clear"}
+button2:{"type":"button","size":[60,20],"pos":[314,148],"script":"erosion.1","text":"dilate"}
+button3:{"type":"button","size":[60,20],"pos":[314,197],"script":"erosion.2","text":"erode"}
+
+{script:erosion.0}
+on click do
+ c.clear[]
+end
+{end}
+
+{script:erosion.1}
+on click do
+ c.outline[1]
+end
+{end}
+
+{script:erosion.2}
+on click do
+ c.outline[0]
+end
 {end}
 
 {module:fancyTransitions}

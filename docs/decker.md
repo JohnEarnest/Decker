@@ -957,7 +957,7 @@ Images are dynamically created interfaces, each representing a mutable rectangul
 | `x.rotate[x]`          | Update the image in place, rotating it clockwise around its centerpoint by `x` radians.                                  |
 | `x.translate[pos w]`   | Update the image in place, translating it by `pos` (x,y) pixels. If `w` is truthy, wrap the image at the edges.          |
 | `x.scale[n a]`         | Update the image in place, nearest-neighbor scaling it by `n`, which can be a single number or `(x,y)` pair.             |
-| `x.outline[p]`         | Update the image in place, setting pattern-0 pixels to pattern `p` when orthogonally adjacent to nonzero pixels.         |
+| `x.outline[p]`         | Set pattern-0 pixels to pattern `p` when adjacent to nonzero pixels. (See `canvas.outline[]`.)                           |
 | `x.merge[...x]`        | Consistent with `canvas.merge[]`: Replace every pixel of the image by compositing together images by index.              |
 | `x.copy[pos size a]`   | Consistent with `canvas.copy[]`: grab and return a sub-image at `pos`/`size`, respecting anchor `a`.                     |
 | `x.paste[image pos t]` | Consistent with `canvas.paste[]`: composite in another image at `pos`. If `t` is truthy, treat pattern 0 as transparent. |
@@ -1318,7 +1318,7 @@ The canvas will scale _up_ logical pixels to display them on the card (resulting
 | `x.copy[pos size a]`    | Grab an _image_ at `pos`/`size`.                                                                                  |
 | `x.paste[img pos t]`    | Draw an _image_ at `pos`. If `t` is truthy, treat pattern 0 as transparent.                                       |
 | `x.segment[img rect m]` | Draw an _image_ scaled to fit `rect`, based on margins `m`. Treat pattern 0 as transparent.                       |
-| `x.outline[p]`          | Set pattern-0 pixels to pattern `p` when orthogonally adjacent to nonzero pixels.                                 |
+| `x.outline[p]`          | Set pattern-0 pixels to pattern `p` when adjacent to nonzero pixels.                                              |
 | `x.event[n ...x]`       | Issue an event named `n` at this widget with argument(s) `x`.                                                     |
 | `x.toggle[s v]`         | Toggle visibility of this widget between compositing mode `"none"` and `s`, iff `v`. (See [Button Interface](#buttoninterface)) |
 
@@ -1350,6 +1350,8 @@ c.paste[i (0,0),2*i.size]
 ```
 
 The `canvas.segment[img rect m]` function interprets margins (`m`) like the background image of a [Prototype](#prototypeinterface): offsets inward from the left, top, right, and bottom edge of the rectangle, logically dividing it into 9 regions. The four corners retain their original size. The left and right center regions are repeated (or truncated) vertically, the top and bottom center regions are repeated (or truncated) horizontally, and the centermost region is repeated (or truncated) horizontally _and_ vertically.
+
+The `canvas.outline[p]` function accepts `p` as a single number or a list of numbers. If `p` is the number `0`, nonzero pixels adjacent to zero pixels will be _eroded_ and set to pattern `0`. If `p` is a number between `1` and `255` (inclusive), zero pixels adjacent to nonzero pixels will be _dilated_ and set to pattern `p`. If `p` is a list of numbers, they will be applied as above sequentially. Note that dilation followed by erosion or vice versa is not necessarily an inverse operation! Pixels are considered adjacent if they are immediately above, below, left or right from one another.
 
 
 Contraption Interface
