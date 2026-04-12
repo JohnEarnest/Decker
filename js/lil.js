@@ -1488,6 +1488,30 @@ pointer={f:(self,i,x)=>{
 	return x?x:NIL
 },t:'int',n:'pointer',held:0,down:0,up:0,pos:rect(),start:rect(),prev:rect(),end:rect()}
 
+let keypress={},keydown={},keyup={}
+gamepad={f:(self,i,x)=>{
+	const keymap={
+		'up'    :['ArrowUp'   ,'GamepadUp','GamestickUp'],
+		'down'  :['ArrowDown' ,'GamepadDn','GamestickDn'],
+		'left'  :['ArrowLeft' ,'GamepadLf','GamestickLf'],
+		'right' :['ArrowRight','GamepadRt','GamestickRt'],
+		'action':['z','c','n',' ','GamepadA1'],
+		'cancel':['x','v','m'    ,'GamepadA2'],
+	}
+	const f=x=>lmd(Object.keys(keymap).map(lms),Object.values(keymap).map(x).map(lmn))
+	if(ikey(i,'held'))return f(x=>x.some(z=>keydown [z]))
+	if(ikey(i,'down'))return f(x=>x.some(z=>keypress[z]))
+	if(ikey(i,'up'  ))return f(x=>x.some(z=>keyup[z])&&!x.some(z=>keydown[z]))
+	if(ikey(i,'dir')){
+		const l=keymap.left .some(z=>keydown[z])
+		const r=keymap.right.some(z=>keydown[z])
+		const u=keymap.up   .some(z=>keydown[z])
+		const d=keymap.down .some(z=>keydown[z])
+		return lmpair(rect(l&&r?0: l?-1: r?1: 0, u&&d?0: u?-1: d?1: 0))
+	}
+	return x?x:NIL
+},t:'int',n:'gamepad'}
+
 keystore_read=x=>{
 	let store=lmd();if(x)x.k.filter((k,i)=>!linil(x.v[i])).map((k,i)=>dset(store,k,x.v[i]))
 	return {f:(self,i,x)=>{
@@ -3120,6 +3144,7 @@ constants=env=>{
 	env.local('bits'   ,interface_bits)
 	env.local('rtext'  ,interface_rtext)
 	env.local('pointer',pointer)
+	env.local('gamepad',gamepad)
 	env.local('pi'   ,lmn(3.141592653589793))
 	env.local('e'    ,lmn(2.718281828459045))
 	env.local('colors',lmd(

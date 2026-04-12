@@ -64,6 +64,7 @@ lv* n_go(lv*self,lv*z){
 lv* interface_rtext(lv*self,lv*i,lv*x); // forward ref
 lv* interface_bits(lv*self,lv*i,lv*x); // forward ref
 lv* interface_pointer(lv*self,lv*i,lv*x); // forward ref
+lv* interface_gamepad(lv*self,lv*i,lv*x); // forward ref
 lv* interface_danger(lv*self,lv*i,lv*x); // forward ref
 lv* interface_app(lv*self,lv*i,lv*x); // forward ref
 lv* n_brush(lv*self,lv*z); // forward ref
@@ -76,6 +77,7 @@ void constants(lv*env){
 	dset(env,lmistr("rtext"  ),lmi(interface_rtext,  lmistr("rtext"  ),NULL));
 	dset(env,lmistr("bits"   ),lmi(interface_bits,   lmistr("bits"   ),NULL));
 	dset(env,lmistr("pointer"),lmi(interface_pointer,lmistr("pointer"),NULL));
+	dset(env,lmistr("gamepad"),lmi(interface_gamepad,lmistr("gamepad"),NULL));
 #ifdef DANGER_ZONE
 	// potentially unsafe/nonportable scripting APIs
 	dset(env,lmistr("danger" ),lmi(interface_danger, lmistr("danger" ),NULL));
@@ -1558,6 +1560,71 @@ lv* interface_pointer(lv*self,lv*i,lv*x){
 	ikey("start")return lmpair(pointer_start);
 	ikey("prev" )return lmpair(pointer_prev);
 	ikey("end"  )return lmpair(pointer_end);
+	return x?x:LNIL;(void)self;
+}
+
+// Gamepad Interface
+
+#define KEYBOARD_UP 4082
+#define KEYBOARD_DN 4083
+#define KEYBOARD_LF 4084
+#define KEYBOARD_RT 4085
+#define GAMEPAD_UP  4086
+#define GAMEPAD_DN  4087
+#define GAMEPAD_LF  4088
+#define GAMEPAD_RT  4089
+#define GAMESTK_UP  4090
+#define GAMESTK_DN  4091
+#define GAMESTK_LF  4092
+#define GAMESTK_RT  4093
+#define GAMEPAD_A1  4094
+#define GAMEPAD_A2  4095
+int keypress[4096]={0},keydown[4096]={0},keyup[4096]={0};
+lv* interface_gamepad(lv*self,lv*i,lv*x){
+	lv*kup=lmistr("up"),*kdown=lmistr("down"),*kleft=lmistr("left"),*kright=lmistr("right");
+	lv*ka1=lmistr("action"),*ka2=lmistr("cancel");
+	#define gamepad_up(s) (s[KEYBOARD_UP]||s[GAMEPAD_UP]||s[GAMESTK_UP])
+	#define gamepad_dn(s) (s[KEYBOARD_DN]||s[GAMEPAD_DN]||s[GAMESTK_DN])
+	#define gamepad_lf(s) (s[KEYBOARD_LF]||s[GAMEPAD_LF]||s[GAMESTK_LF])
+	#define gamepad_rt(s) (s[KEYBOARD_RT]||s[GAMEPAD_RT]||s[GAMESTK_RT])
+	#define gamepad_a1(s) (s['z']||s['c']||s['n']||s[' ']||s[GAMEPAD_A1])
+	#define gamepad_a2(s) (s['x']||s['v']||s['m']        ||s[GAMEPAD_A2])
+	ikey("held"){
+		lv*r=lmd();
+		dset(r,kleft ,lmbool(gamepad_lf(keydown)));
+		dset(r,kright,lmbool(gamepad_rt(keydown)));
+		dset(r,kup   ,lmbool(gamepad_up(keydown)));
+		dset(r,kdown ,lmbool(gamepad_dn(keydown)));
+		dset(r,ka1   ,lmbool(gamepad_a1(keydown)));
+		dset(r,ka2   ,lmbool(gamepad_a2(keydown)));
+		return r;
+	}
+	ikey("down"){
+		lv*r=lmd();
+		dset(r,kleft ,lmbool(gamepad_lf(keypress)));
+		dset(r,kright,lmbool(gamepad_rt(keypress)));
+		dset(r,kup   ,lmbool(gamepad_up(keypress)));
+		dset(r,kdown ,lmbool(gamepad_dn(keypress)));
+		dset(r,ka1   ,lmbool(gamepad_a1(keypress)));
+		dset(r,ka2   ,lmbool(gamepad_a2(keypress)));
+		return r;
+	}
+	ikey("up"){
+		lv*r=lmd();
+		dset(r,kleft ,lmbool(gamepad_lf(keyup)&&!gamepad_lf(keydown)));
+		dset(r,kright,lmbool(gamepad_rt(keyup)&&!gamepad_rt(keydown)));
+		dset(r,kup   ,lmbool(gamepad_up(keyup)&&!gamepad_up(keydown)));
+		dset(r,kdown ,lmbool(gamepad_dn(keyup)&&!gamepad_dn(keydown)));
+		dset(r,ka1   ,lmbool(gamepad_a1(keyup)&&!gamepad_a1(keydown)));
+		dset(r,ka2   ,lmbool(gamepad_a2(keyup)&&!gamepad_a2(keydown)));
+		return r;
+	}
+	ikey("dir"){
+		return lmpair((pair){
+			gamepad_lf(keydown)&&gamepad_rt(keydown)?0: gamepad_lf(keydown)?-1: gamepad_rt(keydown)?1: 0,
+			gamepad_up(keydown)&&gamepad_dn(keydown)?0: gamepad_up(keydown)?-1: gamepad_dn(keydown)?1: 0
+		});
+	}
 	return x?x:LNIL;(void)self;
 }
 

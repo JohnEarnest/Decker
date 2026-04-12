@@ -291,7 +291,6 @@ int in_layer(void){return no_menu()&&(ms.type?ms.in_modal:1)&&((!running()&&!msg
 int in_widgets(void){return ms.type!=modal_none?ms.in_modal:1;}
 
 typedef struct {int shift,alt,comb,lock,on;char*heading;} keycaps_state;keycaps_state kc={0};
-int keydown[4096]={0},keyup[4096]={0};
 void keycaps_force_enter(void){kc.shift=0,kc.alt=0,kc.comb=0,kc.lock=0,kc.on=1,ev.mu=ev.md=0;}
 void keycaps_enter(void){if(!enable_touch||kc.on)return;keycaps_force_enter();}
 
@@ -3412,12 +3411,12 @@ void event_touch(void){
 void event_key(int c,int m,int down,const char*name){
 	int cmd=m&(KEYM_LCTRL|KEYM_RCTRL|KEYM_LGUI|KEYM_RGUI);
 	if(down){
-		if(c>0&&c<4096)keydown[c]=1;
+		if(c>0&&c<4096)keypress[c]=!keydown[c],keydown[c]=1;
 		if(c==KEY_LSHIFT||c==KEY_RSHIFT)ev.shift=1;
-		if(c==KEY_UP   )ev.dir=dir_up;
-		if(c==KEY_DOWN )ev.dir=dir_down;
-		if(c==KEY_LEFT )ev.dir=dir_left;
-		if(c==KEY_RIGHT)ev.dir=dir_right;
+		if(c==KEY_UP   )keypress[KEYBOARD_UP]=!keydown[KEYBOARD_UP],keydown[KEYBOARD_UP]=1,ev.dir=dir_up;
+		if(c==KEY_DOWN )keypress[KEYBOARD_DN]=!keydown[KEYBOARD_DN],keydown[KEYBOARD_DN]=1,ev.dir=dir_down;
+		if(c==KEY_LEFT )keypress[KEYBOARD_LF]=!keydown[KEYBOARD_LF],keydown[KEYBOARD_LF]=1,ev.dir=dir_left;
+		if(c==KEY_RIGHT)keypress[KEYBOARD_RT]=!keydown[KEYBOARD_RT],keydown[KEYBOARD_RT]=1,ev.dir=dir_right;
 		if(cmd){
 			ev.alt=1;
 			if(strlen(name)==1){char i=ev.shift?drom_toupper(name[0]):drom_tolower(name[0]);ev.shortcuts[0xFF&i]=1;}
@@ -3455,6 +3454,10 @@ void event_key(int c,int m,int down,const char*name){
 		if(c==KEY_LCTRL||c==KEY_RCTRL||c==KEY_LGUI||c==KEY_RGUI)ev.alt=0;
 		if(c==KEY_RETURN&&ev.shift)ev.eval=1;
 		if(c==KEY_LSHIFT||c==KEY_RSHIFT)ev.shift=0;
+		if(c==KEY_UP   )keyup[KEYBOARD_UP]=1,keydown[KEYBOARD_UP]=0;
+		if(c==KEY_DOWN )keyup[KEYBOARD_DN]=1,keydown[KEYBOARD_DN]=0;
+		if(c==KEY_LEFT )keyup[KEYBOARD_LF]=1,keydown[KEYBOARD_LF]=0;
+		if(c==KEY_RIGHT)keyup[KEYBOARD_RT]=1,keydown[KEYBOARD_RT]=0;
 		if(c==KEY_m&&uimode==mode_draw&&in_layer())ev.hidemenu^=1;
 		if(c==KEY_t&&uimode==mode_draw&&in_layer())dr.trans^=1;
 		if(c==KEY_u&&uimode==mode_draw&&in_layer())dr.under^=1;
@@ -3502,6 +3505,32 @@ void event_pointer_button(int primary,int middle,int down){
 		if(ev.clicklast)ev.dclick=1;ev.clicklast=DOUBLE_CLICK_DELAY;
 		if(!primary)ev.rup=1;
 	}
+}
+void event_padbutton(int b,int down){
+	int btn=b==SDL_CONTROLLER_BUTTON_DPAD_UP   ?GAMEPAD_UP:
+	        b==SDL_CONTROLLER_BUTTON_DPAD_DOWN ?GAMEPAD_DN:
+	        b==SDL_CONTROLLER_BUTTON_DPAD_LEFT ?GAMEPAD_LF:
+	        b==SDL_CONTROLLER_BUTTON_DPAD_RIGHT?GAMEPAD_RT:
+	        b==SDL_CONTROLLER_BUTTON_A         ?GAMEPAD_A2:
+	        b==SDL_CONTROLLER_BUTTON_B         ?GAMEPAD_A1:
+	        b==SDL_CONTROLLER_BUTTON_X         ?GAMEPAD_A2:
+	        b==SDL_CONTROLLER_BUTTON_Y         ?GAMEPAD_A1:
+	        0;
+	if(btn==0)return;
+	if(down){keypress[btn]=!keydown[btn];keydown[btn]=1;}
+	else    {keydown[btn]=0;keyup[btn]=1;}
+}
+void padaxis(int btn,int state){
+	keypress[btn]=!keydown[btn]&& state;
+	keyup   [btn]= keydown[btn]&&!state;
+	keydown [btn]=state;
+}
+void event_padaxes(int x,int y){
+	#define DEAD_ZONE ((int)(32768*0.2))
+	padaxis(GAMESTK_UP,y<-DEAD_ZONE);
+	padaxis(GAMESTK_DN,y> DEAD_ZONE);
+	padaxis(GAMESTK_LF,x<-DEAD_ZONE);
+	padaxis(GAMESTK_RT,x> DEAD_ZONE);
 }
 float color_dist(int a,int b){
 	int dr=(0xFF&(a>>16))-(0xFF&(b>>16));
@@ -3559,7 +3588,7 @@ void sync(void){
 	if(ev.pos.x!=ev.dpos.x||ev.pos.y!=ev.dpos.y)ev.clicklast=0;
 	wid.cursor_timer=(wid.cursor_timer+1)%(2*FIELD_CURSOR_DUTY);
 	if(wid.change_timer){wid.change_timer--;if(wid.change_timer==0)field_change();}
-	for(int z=0;z<256;z++)ev.shortcuts[z]=0;memset(keyup,0,sizeof(keyup));
+	for(int z=0;z<256;z++)ev.shortcuts[z]=0;memset(keyup,0,sizeof(keyup));memset(keypress,0,sizeof(keypress));
 	process_events(disp,size,scale);
 	pointer_down=ev.md,pointer_up=ev.mu;
 	if(toggle_fullscreen){toggle_fullscreen=0;windowed=!windowed;window_set_fullscreen(!windowed);}

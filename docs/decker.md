@@ -623,7 +623,7 @@ Interfaces allow Lil programs to interact with deck resources and mutable data. 
 Decker's interfaces break down into several general categories:
 
 - _Datatypes_ : [Font](#fontinterface), [Image](#imageinterface), [Sound](#soundinterface), [Array](#arrayinterface)
-- _Utilities_ : [Bits](#bitsinterface), [System](#systeminterface), [App](#appinterface), [RText](#rtextinterface), [Pointer](#pointerinterface)
+- _Utilities_ : [Bits](#bitsinterface), [System](#systeminterface), [App](#appinterface), [RText](#rtextinterface), [Pointer](#pointerinterface), [Gamepad](#gamepadinterface)
 - _Deck Parts_ : [Deck](#deckinterface), [Card](#cardinterface), [Patterns](#patternsinterface), [Module](#moduleinterface), [KeyStore](#keystoreinterface), [Prototype](#prototypeinterface)
 - _Widgets_ : [Button](#buttoninterface), [Field](#fieldinterface), [Slider](#sliderinterface), [Grid](#gridinterface), [Canvas](#canvasinterface), [Contraption](#contraptioninterface)
 
@@ -781,6 +781,34 @@ The pointer interface represents the global state of the user's pointing device,
 | `x.prev`   | The value of `x.pos` _before_ the most recent update.                   |
 | `x.start`  | The `pos` where the pointing device was last pressed down.              |
 | `x.end`    | The `pos` where the pointing device was last released.                  |
+
+
+Gamepad Interface
+-----------------
+The gamepad interface represents the global state of the user's virtual "gamepad", abstracting a shared subset of input capabilities of a keyboard or game controller. It is available as a global constant named `gamepad`. Its attributes will update live at 60hz, even if a script is running.
+
+| Name       | Description                                                                       |
+| :--------- | :-------------------------------------------------------------------------------- |
+| `typeof x` | `"gamepad"`                                                                       |
+| `x.held`   | Dictionary from string to bool. Which buttons are held down?                      |
+| `x.down`   | Dictionary from string to bool. Which buttons were pressed since the last frame?  |
+| `x.up`     | Dictionary from string to bool. Which buttons were released since the last frame? |
+| `x.dir`    | As a convenience, the state of the directional pad as a `(x,y)` offset, -1 to 1.  |
+
+The dictionaries exposed as `gamepad.held`, `gamepad.down`, and `gamepad.up` will indicate the state of six named virtual "buttons":
+
+| Button Name | Keyboard Equivalents       |
+| :---------- | :------------------------- |
+| `"up"`      | up cursor                  |
+| `"down"`    | down cursor                |
+| `"left"`    | left cursor                |
+| `"right"`   | right cursor               |
+| `"action"`  | `z`, `c`, `n`, or spacebar |
+| `"cancel"`  | `x`, `v`, or `m`           |
+
+Some devices- especially phones or tablets- may not have a physical keyboard or game controller, and in some cases where these devices exist, Decker may not be able to detect or access them. All of the information provided by this interface is offered on _a best-effort basis_. Consider using [Pointer](#pointerinterface), visible Button widgets (perhaps with keyboard shortcuts), and the `navigate[]` event instead of or in addition to `gamepad` for portability.
+
+In practice, most cards that intend to make use of the gamepad's directional buttons should override the default `navigate[]` event handler to avoid changing cards when the left and right cursor keys are pressed.
 
 
 Deck Interface
@@ -1481,6 +1509,7 @@ When the deck script executes, the following constants will be defined:
 - `deck`: the deck interface itself.
 - `patterns`: the global patterns interface.
 - `pointer`: the global pointer interface.
+- `gamepad`: the global gamepad interface.
 - All cards will be available as variables by their `name`.
 - All module _values_ will be available as variables by their `name`.
 
@@ -1569,7 +1598,7 @@ on quit do
 end
 ```
 
-While a script is executing (or performing a `sleep[]`), no additional events can be fired until it completes. The `pointer` interface will, however, continue to update to reflect the current state of the pointing device.
+While a script is executing (or performing a `sleep[]`), no additional events can be fired until it completes. The `pointer` and `gamepad` interfaces will, however, continue to update to reflect the current state of input devices.
 
 Widgets, Cards, and the Deck itself all expose a function called `event[name ...args]`, which can be used to issue synthetic events at that target. The `name` may be the name of an existing event or any function in that target's script. When calling an event handler via `event[]` it will have all of the normal "magic" constants available as when called by Decker itself.
 
@@ -1824,7 +1853,7 @@ on click
 end
 ```
 
-This approach to animation can be very convenient and flexible- just write ordinary code with loops and conditionals and insert a few `sleep[]` calls whenever you finish drawing a frame. The disadvantage, though, is that while our animation script is running, everything else in Decker grinds to a halt. The user can't click on buttons, edit fields, or even navigate to another card! Our single escape-hatch is the `pointer` interface, which gives us live-updating information about the mouse (or whatever pointing device is available) even while our script is running.
+This approach to animation can be very convenient and flexible- just write ordinary code with loops and conditionals and insert a few `sleep[]` calls whenever you finish drawing a frame. The disadvantage, though, is that while our animation script is running, everything else in Decker grinds to a halt. The user can't click on buttons, edit fields, or even navigate to another card! Our escape-hatches are the `pointer` interface, which gives us live-updating information about the mouse (or whatever pointing device is available) even while our script is running, and the `gamepad` interface, which does the same for an abstract game controller.
 
 As a simple example, we could stop our `while` loop when the user clicks the mouse anywhere:
 ```lil

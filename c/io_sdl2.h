@@ -129,6 +129,9 @@ void event_pointer_move(pair raw,pair scaled);
 void event_pointer_button(int primary,int middle,int down);
 void event_file(char*p);
 void field_input(char*text);
+void event_padbutton(int b,int down);
+void event_padaxes(int x,int y);
+SDL_GameController*pad=NULL;
 
 void process_events(pair disp,pair size,int scale){
 	SDL_Event e;
@@ -147,6 +150,11 @@ void process_events(pair disp,pair size,int scale){
 		if(e.type==SDL_MOUSEBUTTONUP  )event_pointer_button(e.button.button==SDL_BUTTON_LEFT,e.button.button==SDL_BUTTON_MIDDLE,0);
 		if(e.type==SDL_FINGERDOWN     )event_touch();
 		if(e.type==SDL_DROPFILE       )event_file(e.drop.file),SDL_free(e.drop.file);
+		if(e.type==SDL_CONTROLLERDEVICEADDED  &&pad==NULL){if(e.cdevice.which==0){pad=SDL_GameControllerOpen(0);}}
+		if(e.type==SDL_CONTROLLERDEVICEREMOVED&&pad!=NULL){if(e.cdevice.which==0){SDL_GameControllerClose(pad),pad=NULL;}}
+		if(e.type==SDL_CONTROLLERBUTTONDOWN   &&pad!=NULL)event_padbutton(e.cbutton.button,1);
+		if(e.type==SDL_CONTROLLERBUTTONUP     &&pad!=NULL)event_padbutton(e.cbutton.button,0);
+		if(e.type==SDL_CONTROLLERAXISMOTION   &&pad!=NULL)event_padaxes(SDL_GameControllerGetAxis(pad,0),SDL_GameControllerGetAxis(pad,1));
 	}
 	SDL_FlushEvent(SDL_USEREVENT);
 }
@@ -239,7 +247,7 @@ void tick(lv*env);
 void sync(void);
 
 void io_init(void){
-	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | (nosound?0:SDL_INIT_AUDIO));
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER | (nosound?0:SDL_INIT_AUDIO));
 	gil=SDL_CreateMutex();
 	CURSORS[0]=SDL_GetDefaultCursor();
 	CURSORS[1]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
@@ -254,6 +262,7 @@ void io_init(void){
 		SDL_OpenAudio(&audio,NULL),SDL_PauseAudio(0);
 	}
 	SDL_AddTimer((1000/60),tick_pump,NULL);
+	SDL_GameControllerEventState(SDL_ENABLE);
 }
 void io_run(lv*env){
 	while(!should_exit){tick(env);sync();}

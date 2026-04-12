@@ -501,7 +501,7 @@ modal_pop=value=>{
 	if(l){const c=rcopy(wid.cursor),s=field_linkspan(l);if(c.x<c.y){c.y-=s}else{c.x-=s};wid.cursor=c}
 	if(p){const c=rcopy(wid.cursor);field_patspan(value);wid.cursor=c}
 }
-let kc={shift:0,lock:0,alt:0,comb:0,on:0,heading:null}, keydown={},keyup={}
+let kc={shift:0,lock:0,alt:0,comb:0,on:0,heading:null}
 keycaps_force_enter=_=>{kc.shift=0,kc.lock=0,kc.alt=0,kc.comb=0,kc.on=1,ev.mu=ev.md=0}
 keycaps_enter=_=>{if(!enable_touch||kc.on)return;keycaps_force_enter()}
 
@@ -3628,6 +3628,28 @@ gestures=_=>{
 	image_paste(rect(ev.pos.x-8,ev.pos.y-8,16,16),frame.clip,GESTURES[dir],frame.image,0)
 	if(ev.mu)msg.target_navigate=con(),msg.arg_navigate=lms(dir)
 }
+gamepad_poll=_=>{
+	try{
+		const bval=(b)=>b&&b.pressed
+		const bset=(k,v)=>{
+			keypress[k]=!keydown[k]&& v
+			keyup   [k]= keydown[k]&&!v
+			keydown [k]=v
+		}
+		navigator.getGamepads().filter(x=>x).forEach(g=>{
+			bset('GamepadUp',bval(g.buttons[12]))
+			bset('GamepadDn',bval(g.buttons[13]))
+			bset('GamepadLf',bval(g.buttons[14]))
+			bset('GamepadRt',bval(g.buttons[15]))
+			bset('GamepadA1',[1,3,5].some(x=>bval(g.buttons[x])))
+			bset('GamepadA2',[0,2,4].some(x=>bval(g.buttons[x])))
+			bset('GamestickLf',g.axes[0]<-.2)
+			bset('GamestickRt',g.axes[0]> .2)
+			bset('GamestickUp',g.axes[1]<-.2)
+			bset('GamestickDn',g.axes[1]> .2)
+		})
+	}catch(e){}
+}
 
 validate_modules=_=>{
 	for(let z=0;z<count(deck.modules);z++){
@@ -3642,7 +3664,7 @@ load_deck=d=>{
 	seed=0|(new Date().getTime()/1000),n_play([NIL,lms('loop')])
 }
 tick=_=>{
-	pointer.up=ev.mu,pointer.down=ev.md,toolbars()
+	pointer.up=ev.mu,pointer.down=ev.md,gamepad_poll(),toolbars()
 	msg.pending_drag=0,msg.pending_halt=0,frame=context,uicursor=0,fb.pix.fill(0)
 	menu_setup(),all_menus(),widget_setup()
 	const ev_stash=ev;kc.heading=null;if(kc.on)ev=event_state()
@@ -3685,7 +3707,7 @@ tick=_=>{
 	if(ev.pos.x!=ev.dpos.x||ev.pos.y!=ev.dpos.y)ev.clicklast=0
 	wid.cursor_timer=(wid.cursor_timer+1)%(2*FIELD_CURSOR_DUTY)
 	if(wid.change_timer){wid.change_timer--;if(wid.change_timer==0)field_change()}
-	keyup={},pending_tick=1,frame_count++
+	keyup={},keypress={},pending_tick=1,frame_count++
 }
 
 let id=null
@@ -3754,7 +3776,7 @@ q('body').addEventListener('touchmove'  ,e=>touch(e,move))
 q('body').onwheel=e=>ev.scroll=e.deltaY<0?-1:e.deltaY>0?1:0
 q('body').onkeydown=e=>{
 	initaudio()
-	keydown[e.key]=1
+	keypress[e.key]=!keydown[e.key],keydown[e.key]=1
 	if(e.shiftKey)ev.shift=1
 	if(e.key=='ArrowUp'   )ev.dir='up'
 	if(e.key=='ArrowDown' )ev.dir='down'

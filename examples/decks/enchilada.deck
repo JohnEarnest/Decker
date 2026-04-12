@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:34
+card:35
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -965,6 +965,40 @@ end
 on click do
  c.outline[0]
 end
+{end}
+
+{card:gamepad_tester}
+script:"gamepad_tester.0"
+{widgets}
+up:{"type":"button","size":[51,48],"pos":[236,81],"text":"Up"}
+down:{"type":"button","size":[51,48],"pos":[236,177],"text":"Down"}
+left:{"type":"button","size":[51,48],"pos":[175,129],"text":"Left"}
+right:{"type":"button","size":[51,48],"pos":[296,129],"text":"Right"}
+cancel:{"type":"button","size":[51,48],"pos":[373,177],"text":"Cancel"}
+action:{"type":"button","size":[51,48],"pos":[434,129],"text":"Action"}
+log:{"type":"field","size":[131,298],"pos":[10,28],"animated":1,"volatile":1,"scrollbar":1}
+gamepad_dir:{"type":"field","size":[100,20],"pos":[274,279],"locked":1,"volatile":1}
+
+{script:gamepad_tester.0}
+on view do
+ on record x do
+  log.text:log.text,"\n ",x
+  log.scroll:99999999
+ end
+ each v k in gamepad.down
+  if v record["pressed ",k] end
+ end
+ each v k in gamepad.up
+  if v record["released ",k] end
+ end
+ each v k in gamepad.held
+  card.widgets[k].show:("solid","invert")[v]
+ end
+ gamepad_dir.data:gamepad.dir
+end
+
+on navigate do end
+
 {end}
 
 {module:fancyTransitions}
