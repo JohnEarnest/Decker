@@ -3506,17 +3506,7 @@ void event_pointer_button(int primary,int middle,int down){
 		if(!primary)ev.rup=1;
 	}
 }
-void event_padbutton(int b,int down){
-	int btn=b==SDL_CONTROLLER_BUTTON_DPAD_UP   ?GAMEPAD_UP:
-	        b==SDL_CONTROLLER_BUTTON_DPAD_DOWN ?GAMEPAD_DN:
-	        b==SDL_CONTROLLER_BUTTON_DPAD_LEFT ?GAMEPAD_LF:
-	        b==SDL_CONTROLLER_BUTTON_DPAD_RIGHT?GAMEPAD_RT:
-	        b==SDL_CONTROLLER_BUTTON_A         ?GAMEPAD_A2:
-	        b==SDL_CONTROLLER_BUTTON_B         ?GAMEPAD_A1:
-	        b==SDL_CONTROLLER_BUTTON_X         ?GAMEPAD_A2:
-	        b==SDL_CONTROLLER_BUTTON_Y         ?GAMEPAD_A1:
-	        0;
-	if(btn==0)return;
+void event_padbutton(int btn,int down){
 	if(down){keypress[btn]=!keydown[btn];keydown[btn]=1;}
 	else    {keydown[btn]=0;keyup[btn]=1;}
 }

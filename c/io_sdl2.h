@@ -133,6 +133,19 @@ void event_padbutton(int b,int down);
 void event_padaxes(int x,int y);
 SDL_GameController*pad=NULL;
 
+void event_padbutton_wrap(int b,int down){
+	int btn=b==SDL_CONTROLLER_BUTTON_DPAD_UP   ?GAMEPAD_UP:
+	        b==SDL_CONTROLLER_BUTTON_DPAD_DOWN ?GAMEPAD_DN:
+	        b==SDL_CONTROLLER_BUTTON_DPAD_LEFT ?GAMEPAD_LF:
+	        b==SDL_CONTROLLER_BUTTON_DPAD_RIGHT?GAMEPAD_RT:
+	        b==SDL_CONTROLLER_BUTTON_A         ?GAMEPAD_A2:
+	        b==SDL_CONTROLLER_BUTTON_B         ?GAMEPAD_A1:
+	        b==SDL_CONTROLLER_BUTTON_X         ?GAMEPAD_A2:
+	        b==SDL_CONTROLLER_BUTTON_Y         ?GAMEPAD_A1:
+	        0;
+	if(btn)event_padbutton(btn,down);
+}
+
 void process_events(pair disp,pair size,int scale){
 	SDL_Event e;
 	while(SDL_WaitEvent(&e)){
@@ -152,8 +165,8 @@ void process_events(pair disp,pair size,int scale){
 		if(e.type==SDL_DROPFILE       )event_file(e.drop.file),SDL_free(e.drop.file);
 		if(e.type==SDL_CONTROLLERDEVICEADDED  &&pad==NULL){if(e.cdevice.which==0){pad=SDL_GameControllerOpen(0);}}
 		if(e.type==SDL_CONTROLLERDEVICEREMOVED&&pad!=NULL){if(e.cdevice.which==0){SDL_GameControllerClose(pad),pad=NULL;}}
-		if(e.type==SDL_CONTROLLERBUTTONDOWN   &&pad!=NULL)event_padbutton(e.cbutton.button,1);
-		if(e.type==SDL_CONTROLLERBUTTONUP     &&pad!=NULL)event_padbutton(e.cbutton.button,0);
+		if(e.type==SDL_CONTROLLERBUTTONDOWN   &&pad!=NULL)event_padbutton_wrap(e.cbutton.button,1);
+		if(e.type==SDL_CONTROLLERBUTTONUP     &&pad!=NULL)event_padbutton_wrap(e.cbutton.button,0);
 		if(e.type==SDL_CONTROLLERAXISMOTION   &&pad!=NULL)event_padaxes(SDL_GameControllerGetAxis(pad,0),SDL_GameControllerGetAxis(pad,1));
 	}
 	SDL_FlushEvent(SDL_USEREVENT);
