@@ -882,7 +882,7 @@ end
 
 {module:dd}
 description:"Display sequential, styled modal dialogs for visual novels."
-version:1.7
+version:1.8
 {script}
 # state/constants:
 local host:0
@@ -918,7 +918,16 @@ on ifmt x do x format names end
 on fmt x do update text:ifmt @ text from rtext.cat[x] end
 on tween a b t do a+(b-a)*0|1&t end
 on rin x pos size do min(x>pos),(x<pos+size) end
-on tick do host.card.event["animate"] sleep[] end
+
+local gamepad_mode:0
+on tick do
+ if !gamepad_mode
+  if max range gamepad.down|gamepad.held|gamepad.up
+   gamepad_mode:1
+  end
+ end
+ host.card.event["animate"] sleep[]
+end
 
 on sfx x do
  play[if "list"~typeof x random[x] else x end]
@@ -1055,6 +1064,7 @@ module.say:on say text do
     si:0 db:0 while si<count splits
      sfx[tsound]
      each in range speed
+      if gamepad.up.action si:-1+count splits end
       if pointer.down si:-1+count splits db:1 end
       tick[]
      end
@@ -1076,9 +1086,9 @@ module.say:on say text do
     canvas.paste[a canvas.size-(pad.r,pad.b)+a.size]
     tick[]
    end
-   while !pointer.held|pointer.down wait[] end
+   while !pointer.held|pointer.down|gamepad.held.action|gamepad.down.action wait[] end
    sfx[nsound]
-   while  pointer.held|pointer.up   wait[] end
+   while pointer.held|pointer.up|gamepad.held.action|gamepad.up.action wait[] end
   end
  end
 end
@@ -1096,6 +1106,7 @@ module.ask:on ask text choices do
  szh:dim[1]+(pad.t+pad.b)+(sum dims)+(padding*count dims)
  if dsize[0] dim[0]:dsize[0]-pad.l+pad.r end
  resize[szh unless dsize[1]]
+ local gamepad_cursor:0
  local r:-1 while -1~r
   draw_border[]
   canvas.font:tfont
@@ -1110,13 +1121,20 @@ module.ask:on ask text choices do
    local tsize:rsize-((bpad.l+bpad.r),(bpad.t+bpad.b))
    # active background (invert label)
    canvas.pattern:fcolor
-   if (pointer.held|pointer.down|pointer.up)&rin[pointer.pos-canvas.pos rpos rsize]
+   on active_background do
     if bborder.type~"image"
      canvas.rect[rpos rsize]
     else
      canvas.rect[rpos+2 rsize-4]
     end
-    if pointer.up r:i sfx[asound] end
+   end
+   if (pointer.held|pointer.down|pointer.up)&rin[pointer.pos-canvas.pos rpos rsize]
+    active_background[]
+    if pointer.up r:i end
+    canvas.pattern:bcolor
+   elseif (i~gamepad_cursor)&gamepad_mode
+    active_background[]
+    if gamepad.up.action r:i end
     canvas.pattern:bcolor
    end
    # label
@@ -1131,8 +1149,11 @@ module.ask:on ask text choices do
    end
    c:c+padding+dims[i]
   end
+  if gamepad.up.up   gamepad_cursor:(count segs)%gamepad_cursor-1 end
+  if gamepad.up.down gamepad_cursor:(count segs)%gamepad_cursor+1 end
   tick[]
  end
+ sfx[asound]
  r
 end
 

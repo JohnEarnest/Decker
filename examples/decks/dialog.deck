@@ -86,6 +86,16 @@ field2:{"type":"field","size":[217,72],"pos":[285,56],"locked":1,"border":0,"val
 button3:{"type":"button","size":[60,20],"pos":[285,278],"script":"say.0","text":"Try It!"}
 button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
 
+{card:accessibility}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,28],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"input accessibility"}
+ex1:{"type":"field","size":[244,204],"pos":[10,56],"style":"code","value":"dd.open[deck]\n\ndd.say[\"Line 1\"]\ndd.say[\"Line 2\"]\ndd.ask[\"Question\" (\"A\",\"B\",\"C\")]\ndd.say[\"Line 3\"]\n\ndd.close[]"}
+field2:{"type":"field","size":[236,238],"pos":[266,56],"locked":1,"border":0,"value":"Dialogizer dialog boxes can be controlled with a keyboard or game controller.\n\nPressing the space key is equivalent to clicking through dialogs. When using dd.ask[], if Dialogizer has ever observed keyboard interaction, it will automatically highlight the first dialog option and allow the user to use the cursor keys to cycle between options; pressing space will choose the highlighted option.\n\nIf you have a game controller connected, you can use the \"action\" button as an alternative to pressing space and the directional pad arrows as an alternative to cursor keys."}
+button4:{"type":"button","size":[60,20],"pos":[267,240],"script":"say.0","text":"Try It!"}
+button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
+
 {card:chat}
 image:"%%IMG3AgABVgKEj6nL7Q+jnLTai7PevPsPhuJIluaJpurKtu4Lx/JM1/aN5/rO9/4PDAqHxKLxiEwql8ym8wmNSqfUqvWKzWq33K73Cw6Lx+Sy+YxOq9fstvsNj8vn9Lr9js/r9/y+/w8YKDhIWGh4iJiouMjY6PgIGSk5SVlpeYmZqbnJ2en5CRoqOkpaanqKmqq6ytrq+gobKztLW2t7i5uru8vb6/sLHCw8TFxsfIycrLzM3Oz8DB0tPU1dbX2Nna29zd3t/Q0eLj5OXm5+jp6uvs7e7v4OHy8/T19vf4+fr7/P3+//DzCgwIEECxo8iDChwoUMGzp8CDGixIkUK1q8iDGjxo0cO3r8CDKkyJEkS5o8iTKlypUsW7p8CTOmzJk0a9q8iTOnzp08e/r8CTSo0KFEixo9ijSp0qVMmzp9CjWq1KlUq1q9ijWr1q1cu3r9Cjas2LFky5o9izat2rVs27p9Czeu3Ll069q9izev3r18+/r9Cziw4MGECxs+jDix4sWMGzt+DDmy5MmUK1u+jDmz5s2cO3v+DDq06NGkS5s+jTq16tWsW7t+DTu27Nm0a9u+jTu37t28e/v+DTy48OHEixs/jjy58uXMmzt/Dj269OnUq1u/jj279u3cu3sPHSC8+PHky5s/jz69+vK8Ayhxvxs+Evm56Ruxfxs/Ef218a8Pz8B//AmoAH+0+QfBgAkGuGACBs6G4AMKSsgghQ62V+CFGmZ4gHgbfughAhHqNiIAAH4oYocqrsihiSy6iGJ+LbpXYootwnjjizXKiOKOBtQ4oY0v/ohhjzkO6SOOQipJZHw5JkmffkEumeSBTx7ZJJNDsihflFj2N+N4SwpJ3pg6nrjlg7JVuWWWDUxZoZm2semmnDHWuQCdsfn3X4B95vmnnVZeEOKbCaJZgZp7YoAooIo2OoGisEmap5YdimkopV8OmsGDamoaZ30cGOjpqEVuQKOImKoIqqFOdtBooZd60OpqtTqKpaydngproLDyaqqFtAKLaoPDvnrsj7Le6iqYbe7qZpcgUMosZWhWW2m2lkJ76GkhYnskouDeiWtpYo47pp4UUKurZAKa52Kq8sZL77z28Vlvvvbq++6q4HmI7rOCEiqBv//CF3Cd6kZaMKSgXTutsb9G4PDDA1vwaMQUt5awib4GS+J7xO438hAdW5zEyZ+pzALLnfULc8wyV/xdzTbfjHPOOu/Mc88+/wx00EIPTXTRRh+NdNJKL810004/DXXUUk9NddVWX4111lpvzXXXXn8Ndthij0122WafjXbaaq/Ndttuvw133HLPTXfddt+Nd9567813335jUQA="
 {widgets}
@@ -422,7 +432,7 @@ image:"%%IMG3AgABVgZAgHBILBqPyKRyyWw6n9CodEqtWq/YrHbL7Xq/4LB4TC6bz+i0es1uu9/wuHx
 
 {module:dd}
 description:"Display sequential, styled modal dialogs for visual novels."
-version:1.7
+version:1.8
 {script}
 # state/constants:
 local host:0
@@ -458,7 +468,16 @@ on ifmt x do x format names end
 on fmt x do update text:ifmt @ text from rtext.cat[x] end
 on tween a b t do a+(b-a)*0|1&t end
 on rin x pos size do min(x>pos),(x<pos+size) end
-on tick do host.card.event["animate"] sleep[] end
+
+local gamepad_mode:0
+on tick do
+ if !gamepad_mode
+  if max range gamepad.down|gamepad.held|gamepad.up
+   gamepad_mode:1
+  end
+ end
+ host.card.event["animate"] sleep[]
+end
 
 on sfx x do
  play[if "list"~typeof x random[x] else x end]
@@ -595,6 +614,7 @@ module.say:on say text do
     si:0 db:0 while si<count splits
      sfx[tsound]
      each in range speed
+      if gamepad.up.action si:-1+count splits end
       if pointer.down si:-1+count splits db:1 end
       tick[]
      end
@@ -616,9 +636,9 @@ module.say:on say text do
     canvas.paste[a canvas.size-(pad.r,pad.b)+a.size]
     tick[]
    end
-   while !pointer.held|pointer.down wait[] end
+   while !pointer.held|pointer.down|gamepad.held.action|gamepad.down.action wait[] end
    sfx[nsound]
-   while  pointer.held|pointer.up   wait[] end
+   while pointer.held|pointer.up|gamepad.held.action|gamepad.up.action wait[] end
   end
  end
 end
@@ -636,6 +656,7 @@ module.ask:on ask text choices do
  szh:dim[1]+(pad.t+pad.b)+(sum dims)+(padding*count dims)
  if dsize[0] dim[0]:dsize[0]-pad.l+pad.r end
  resize[szh unless dsize[1]]
+ local gamepad_cursor:0
  local r:-1 while -1~r
   draw_border[]
   canvas.font:tfont
@@ -650,13 +671,20 @@ module.ask:on ask text choices do
    local tsize:rsize-((bpad.l+bpad.r),(bpad.t+bpad.b))
    # active background (invert label)
    canvas.pattern:fcolor
-   if (pointer.held|pointer.down|pointer.up)&rin[pointer.pos-canvas.pos rpos rsize]
+   on active_background do
     if bborder.type~"image"
      canvas.rect[rpos rsize]
     else
      canvas.rect[rpos+2 rsize-4]
     end
-    if pointer.up r:i sfx[asound] end
+   end
+   if (pointer.held|pointer.down|pointer.up)&rin[pointer.pos-canvas.pos rpos rsize]
+    active_background[]
+    if pointer.up r:i end
+    canvas.pattern:bcolor
+   elseif (i~gamepad_cursor)&gamepad_mode
+    active_background[]
+    if gamepad.up.action r:i end
     canvas.pattern:bcolor
    end
    # label
@@ -671,8 +699,11 @@ module.ask:on ask text choices do
    end
    c:c+padding+dims[i]
   end
+  if gamepad.up.up   gamepad_cursor:(count segs)%gamepad_cursor-1 end
+  if gamepad.up.down gamepad_cursor:(count segs)%gamepad_cursor+1 end
   tick[]
  end
+ sfx[asound]
  r
 end
 
