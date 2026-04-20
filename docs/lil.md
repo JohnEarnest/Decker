@@ -88,7 +88,7 @@ Lil has a soft, spongy, dynamic type system in which values do their best to con
 - When a number is required, nil becomes `0`, strings are parsed, and lists or dictionaries attempt to convert their first _element_. Otherwise, the number 0 is used.
 - When a string is required, nil becomes `""`, numbers are formatted, and lists are recursively converted to strings and joined. Otherwise, the empty string is used.
 - When a list is required, nil becomes `()`, strings are treated as a list of their characters (each a length-1 string), dictionaries are treated as their value list, tables are treated as the list of their rows (each a dictionary), and anything else (number, function, interface) is enclosed in a length-1 list.
-- When a dictionary is required, strings and lists become dictionaries from their indices to their _elements_, tables become dictionaries of their columns, and otherwise an empty dictionary is used.
+- When a dictionary is required, nil becomes the empty dictionary, strings and lists become dictionaries from their indices to their _elements_, tables become dictionaries of their columns, and otherwise an empty dictionary is used.
 - When a table is required, nil becomes the empty table, lists become a single-column "value" table, and dictionaries become two-column "key" and "value" tables. Anything else is interpreted as if it were a list.
 
 When indexing into values, we will uniformly refer to _elements_:
@@ -269,9 +269,9 @@ show[b]  # 1,5,3
 
 Statements in Lil are always _expressions_. That is, they always return a value and can be composed within larger expressions. Assignments evaluate to the value being assigned. `if` returns the value of the last statement in its taken half. (A missing `else` just means the falsey half evaluates to nil.) `while` likewise evaluates to the last statement on the last iteration of its body:
 ```lil
-x:y:z                       # assign both x and y the value of z
-a: if x>5 99 else 33 end    # assign a to either 99 or 33
-c: while b<100 b:b*2 end    # assign c to 128
+x:y:z                           # assign both x and y the value of z
+a: if x>5 99 else 33 end        # assign a to either 99 or 33
+b:1  c: while b<100 b:b*2 end   # assign c to 128
 ```
 
 The `each` loop collects together the results of _each_ iteration of the loop and returns them. If the input was a dictionary, the output will be a dictionary with the same keys. Otherwise, the output will be a list. Some other languages call this operation _map_:
@@ -1253,7 +1253,13 @@ sys                  # <system>
 time:sys             # <system>
 time.now             # 1636682495
 ```
-Interfaces cannot be defined from Lil programs- they are furnished by a host application like Decker. Consult Decker's manual for a description of the interfaces you can use in your scripts. Many "utility" interfaces offer considerably more efficient ways of performing operations than with raw Lil alone: of particular note are the `Array` interface, which provides a mutable data structure for manipulating and parsing binary data, the `Bits` interface, which provides functions for performing bitwise arithmetic, and the `Image` interface, which offers a variety of ways to manipulate two-dimensional arrays of bytes in bulk.
+Interfaces cannot be defined from Lil programs- they are furnished by a host application like Decker. Consult Decker's manual for a description of the interfaces you can use in your scripts. Many "utility" interfaces offer considerably more efficient ways of performing operations than with raw Lil alone:
+
+- The _Array_ interface provides mutable, sliceable data structures for manipulating and parsing binary data.
+- The _KeyStore_ interface provides mutable dictionaries.
+- The _Image_ interface provides mutable two-dimensional arrays and a variety of ways to manipulate them in bulk.
+- The _Bits_ interface provides functions for performing bitwise arithmetic.
+- The _RText_ interface provides functions for searching, altering, and otherwise manipulating plain strings and "rich-text" tables.
 
 It is not possible to enumerate the keys of an interface; they may have infinitely many keys, populated on the fly. Thus, the `in` operator will always return `0` when an interface is its right argument, and the `keys` operator will always return `()`.
 
