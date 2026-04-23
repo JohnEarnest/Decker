@@ -262,7 +262,7 @@ void sync(void);
 SDL_Cursor* makeCursor(pair offset,lv*image){
 	pair s=image_size(image);
 	Uint8*data=malloc((s.x/8)*s.y);
-	Uint8*mask=malloc((s.y/8)*s.y);
+	Uint8*mask=malloc((s.x/8)*s.y);
 	// see: https://www.libsdl.org/release/SDL-1.2.15/docs/html/sdlcreatecursor.html
 	for(int y=0,i=0;y<s.y;y++)for(int bx=0;bx<s.x;bx+=8,i++){
 		int d=0,m=0;for(int x=0;x<8;x++){
