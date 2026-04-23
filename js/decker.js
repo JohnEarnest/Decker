@@ -353,7 +353,7 @@ unpack_grid_value=x=>({
 })
 
 let cursor={default:'default',point:'pointer',ibeam:'text',drag:'grabbing'}
-let cursor_names={default:'default',point:'pointer',insert:'text',drag:'grabbing'}
+let cursor_names={default:'default',point:'pointer',insert:'text',drag:'grabbing',none:'none',wait:'wait',no:'not-allowed',crosshair:'crosshair'}
 image_tiles=(count,size,image)=>range(count).map(x=>image_copy(image,rect(0,x*size,size,size)))
 TOOLS=image_tiles(12,16,image_read(
 	'%%IMG3ABAAwAKEH3HLoN7aexEZWqHOGq90XQk2dRAYOqXCWptFlRHJed7H3Gk+9xIHDAqHlZHx6Kq9arpZU/LkRUWio/VjNR'+

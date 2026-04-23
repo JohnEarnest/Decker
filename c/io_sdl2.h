@@ -1,7 +1,7 @@
 
 #include <SDL.h>
 
-SDL_Cursor*CURSORS[4];
+SDL_Cursor*CURSORS[8];
 
 // keyboard keys
 
@@ -266,6 +266,10 @@ void io_init(void){
 	CURSORS[1]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
 	CURSORS[2]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
 	CURSORS[3]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
+	CURSORS[4]=SDL_CreateCursor(calloc(8,sizeof(char)),calloc(8,sizeof(char)),8,8,0,0);
+	CURSORS[5]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAIT);
+	CURSORS[6]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO);
+	CURSORS[7]=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_CROSSHAIR);
 	if(!nosound){
 		audio.freq=SFX_RATE;
 		audio.format=SFX_OUTPUT_FORMAT;

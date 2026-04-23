@@ -701,6 +701,10 @@ The `app.cursor` field recognizes the following options:
 - `"point"`: indicate clickable targets.
 - `"drag"`: indicate draggable targets.
 - `"insert"`: indicate text selection or insertion is possible.
+- `"wait"`: indicate that the application is busy.
+- `"no"`: indicate that interaction is not permitted.
+- `"none"`: hide the cursor.
+- `"crosshair"`: precision selection.
 
 
 Bits Interface

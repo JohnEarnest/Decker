@@ -1009,6 +1009,10 @@ button3:{"type":"button","size":[103,20],"pos":[35,165],"script":"cursortests.1"
 button4:{"type":"button","size":[103,20],"pos":[35,197],"script":"cursortests.1","text":"drag"}
 button5:{"type":"button","size":[103,20],"pos":[35,230],"script":"cursortests.1","text":"insert"}
 field1:{"type":"field","size":[134,20],"pos":[190,45],"locked":1,"animated":1,"volatile":1,"script":"cursortests.2","border":0}
+button6:{"type":"button","size":[103,20],"pos":[188,131],"script":"cursortests.1","text":"none"}
+button7:{"type":"button","size":[103,20],"pos":[188,165],"script":"cursortests.1","text":"wait"}
+button8:{"type":"button","size":[103,20],"pos":[188,197],"script":"cursortests.1","text":"no"}
+button9:{"type":"button","size":[103,20],"pos":[188,230],"script":"cursortests.1","text":"crosshair"}
 
 {script:cursortests.0}
 on click do

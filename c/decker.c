@@ -21,7 +21,7 @@ lv*CHECK,*LOCK,*ANIM,*ZOOM,*CHECKS[4],*CORNERS[4],*RADIOS[4],*ICONS[8],*GESTURES
 lv*FONT_BODY,*FONT_MENU,*FONT_MONO,*TOOLS,*ARROWS,*TOOLB,*PLAYING,*ATTRS;
 enum mini_icons {icon_dir,icon_doc,icon_sound,icon_font,icon_app,icon_lil,icon_pat,icon_chek,icon_none};
 enum cursor_styles {cursor_default=0,cursor_point=1,cursor_ibeam=2,cursor_drag=3};
-char*cursor_names[]={"default","point","insert","drag",NULL};
+char*cursor_names[]={"default","point","insert","drag","none","wait","no","crosshair",NULL};
 int uicursor=cursor_default, enable_touch=0, set_touch=0;
 int set_tracing=0, tracing=0, toolbar_scroll=0, toolbars_enable=0, kiosk=0;
 #define PROFILE_HIST_SZ 200
