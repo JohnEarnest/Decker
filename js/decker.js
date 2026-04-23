@@ -3699,7 +3699,7 @@ tick=_=>{
 			if(ev.mu&&over(b)&&dover(b))modal_enter(card_is(con())?'card_props':'prototype_props')
 		}
 	}
-	if(desired_cursor&&uimode=='interact')uicursor=cursor_names[desired_cursor]
+	if(desired_cursor&&uimode=='interact'&&ms.type==null)uicursor=cursor_names[desired_cursor]
 	q('#display').style.cursor=uicursor||'default'
 	if(msg.pending_loop)sfx_doloop()
 	if(ui_container&&ui_container.dead)ui_container=null

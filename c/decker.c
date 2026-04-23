@@ -3614,7 +3614,8 @@ void sync(void){
 		}
 		finish_flip();
 	}
-	window_set_cursor((desired_cursor!=-1&&uimode==mode_interact)?desired_cursor: uicursor);
+	if(desired_cursor!=-1&&uimode==mode_interact&&ms.type==modal_none)uicursor=desired_cursor;
+	window_set_cursor(uicursor);
 	if(do_panic)setuimode(mode_object);
 	do_panic=0;
 }
