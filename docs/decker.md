@@ -683,6 +683,7 @@ The _app_ interface exposes control over the Decker application itself. It is av
 | `x.fullscreen`             | Is Decker in fullscreen mode? On write, attempt to switch if possible; may not succeed. (r/w)         |
 | `x.gridsize`               | A `(w,h)` pair giving the current grid overlay dimensions. (r/w)                                      |
 | `x.kiosk`                  | Are we in "kiosk mode"? (r/w)                                                                         |
+| `x.cursor`                 | String or nil. Ask Decker to use an alternate pointer cursor image while in interact mode. (r/w)      |
 | `x.playing`                | If any audio is currently playing (not counting a background `loop`), `1`. Otherwise, `0`.            |
 | `x.render[x]`              | Draw the visual appearance of card or widget `x` as an Image interface.                               |
 | `x.save[]`                 | Save the current deck, in-place if possible. May prompt the user for a save location.                 |
@@ -693,6 +694,13 @@ The _app_ interface exposes control over the Decker application itself. It is av
 Note that `app.exit[]` doesn't do anything in Web-Decker. Exposing a button for closing Decker is very handy in locked decks, but you may want to hide or disable it when `sys.platform~"web"`.
 
 In "kiosk mode", Decker will disable the normal behavior of the _Decker &#8594; Quit_ menu item (or its keyboard shortcut); instead, these user actions will send a `quit` event to the active card, offering Lil scripts the opportunity to intercept them. This functionality is intended to make it possible to use Decker to make locked-down displays in public settings where users should not be able to exit the application or to make decks behave more like freestanding applications. Exercise caution with this feature: malformed scripts in a locked deck with this feature enabled can get you into a real pickle! Kiosk mode is not available for Web-Decker.
+
+The `app.cursor` field recognizes the following options:
+- `nil`: defer to Decker's normal behavior.
+- `"default"`: the default cursor.
+- `"point"`: indicate clickable targets.
+- `"drag"`: indicate draggable targets.
+- `"insert"`: indicate text selection or insertion is possible.
 
 
 Bits Interface

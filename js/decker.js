@@ -353,6 +353,7 @@ unpack_grid_value=x=>({
 })
 
 let cursor={default:'default',point:'pointer',ibeam:'text',drag:'grabbing'}
+let cursor_names={default:'default',point:'pointer',insert:'text',drag:'grabbing'}
 image_tiles=(count,size,image)=>range(count).map(x=>image_copy(image,rect(0,x*size,size,size)))
 TOOLS=image_tiles(12,16,image_read(
 	'%%IMG3ABAAwAKEH3HLoN7aexEZWqHOGq90XQk2dRAYOqXCWptFlRHJed7H3Gk+9xIHDAqHlZHx6Kq9arpZU/LkRUWio/VjNR'+
@@ -3658,7 +3659,7 @@ validate_modules=_=>{
 	}
 }
 load_deck=d=>{
-	deck=d, dirty=0, wid.active=-1, wid.hist=[], au.hist=[], doc_hist=[], doc_hist_cursor=0, dr=draw_state(), con_set(null)
+	deck=d, dirty=0, wid.active=-1, wid.hist=[], au.hist=[], doc_hist=[], doc_hist_cursor=0, dr=draw_state(), desired_cursor=null, con_set(null)
 	FONT_BODY=dget(deck.fonts,lms('body')),FONT_MENU=dget(deck.fonts,lms('menu')),FONT_MONO=dget(deck.fonts,lms('mono'))
 	fb=image_make(getpair(ifield(ifield(deck,'card'),'size'))),context=frame=draw_frame(fb),validate_modules(),setmode('interact'),msg.next_view=1
 	seed=0|(new Date().getTime()/1000),n_play([NIL,lms('loop')])
@@ -3698,6 +3699,7 @@ tick=_=>{
 			if(ev.mu&&over(b)&&dover(b))modal_enter(card_is(con())?'card_props':'prototype_props')
 		}
 	}
+	if(desired_cursor&&uimode=='interact')uicursor=cursor_names[desired_cursor]
 	q('#display').style.cursor=uicursor||'default'
 	if(msg.pending_loop)sfx_doloop()
 	if(ui_container&&ui_container.dead)ui_container=null

@@ -20,8 +20,9 @@ void quit(void);
 lv*CHECK,*LOCK,*ANIM,*ZOOM,*CHECKS[4],*CORNERS[4],*RADIOS[4],*ICONS[8],*GESTURES[4],*HANDLES[2],*ACCENTS[10];
 lv*FONT_BODY,*FONT_MENU,*FONT_MONO,*TOOLS,*ARROWS,*TOOLB,*PLAYING,*ATTRS;
 enum mini_icons {icon_dir,icon_doc,icon_sound,icon_font,icon_app,icon_lil,icon_pat,icon_chek,icon_none};
-enum cursor_styles {cursor_default,cursor_point,cursor_ibeam,cursor_drag};
-int uicursor=0, enable_touch=0, set_touch=0;
+enum cursor_styles {cursor_default=0,cursor_point=1,cursor_ibeam=2,cursor_drag=3};
+char*cursor_names[]={"default","point","insert","drag",NULL};
+int uicursor=cursor_default, enable_touch=0, set_touch=0;
 int set_tracing=0, tracing=0, toolbar_scroll=0, toolbars_enable=0, kiosk=0;
 #define PROFILE_HIST_SZ 200
 int profiler=0, profiler_ix=0, profiler_hist[PROFILE_HIST_SZ]={0};
@@ -309,16 +310,19 @@ lv*n_appprint(lv*self,lv*a){(void)self;return a->c==1&&array_is(a->lv[0])?print_
 lv*n_appshow(lv*self,lv*a){(void)self;str s=str_new();EACH(z,a){if(z)str_addc(&s,' ');show(&s,a->lv[z],a->c==1);}printf("%s\n",drom_to_utf8(lmstr(s))->sv);return l_first(a);}
 lv* draw_widget(lv*w);lv* draw_con(lv*card,int active); // forward refs
 lv*n_apprender(lv*self,lv*a){(void)self;a=l_first(a);return widget_is(a)?draw_widget(a): card_is(a)?draw_con(a,1): image_empty();}
+int desired_cursor=-1;
 lv*interface_app(lv*self,lv*i,lv*x){
 	if(x&&lis(i)){
 		ikey("fullscreen"){toggle_fullscreen=windowed!=!lb(x);return x;}
 		ikey("gridsize"  ){dr.grid_size=pair_max((pair){1,1},getpair(x));return x;}
 		ikey("kiosk"     ){kiosk=lb(x);return x;}
+		ikey("cursor"    ){desired_cursor=linil(x)?-1: ordinal_enum(x,cursor_names);return x;}
 	}else if(lis(i)){
 		ikey("fullscreen")return lmn(!windowed);
 		ikey("playing"   )return lmn(audio_playing);
 		ikey("gridsize"  )return lmpair(dr.grid_size);
 		ikey("kiosk"     )return lmn(kiosk);
+		ikey("cursor"    )return desired_cursor==-1?LNIL: lmistr(cursor_names[desired_cursor]);
 		ikey("save"      )return lmnat(n_appsave,NULL);
 		ikey("exit"      )return lmnat(n_appexit,NULL);
 		ikey("show"      )return lmnat(n_appshow,NULL);
@@ -3610,7 +3614,7 @@ void sync(void){
 		}
 		finish_flip();
 	}
-	window_set_cursor(uicursor);
+	window_set_cursor((desired_cursor!=-1&&uimode==mode_interact)?desired_cursor: uicursor);
 	if(do_panic)setuimode(mode_object);
 	do_panic=0;
 }
@@ -4204,7 +4208,7 @@ void tick(lv*env){
 		dirty_timer--;
 		if(dirty_timer==0)dirty=0,save_deck(lmcstr(document_path));
 	}
-	frame=context,uicursor=0;
+	frame=context,uicursor=cursor_default;
 	menu_setup(),all_menus(),widget_setup();
 	memset(frame.buffer->sv,0,frame.buffer->c);
 	event_state ev_stash=ev;kc.heading=NULL;if(kc.on){ev=(event_state){0};}
@@ -4304,7 +4308,7 @@ void resize_window(lv*deck){
 	window_set_size(wsize,size,minscale);
 }
 void load_deck(lv*d){
-	dirty=0; wid.active=-1; dr=ddr; con_set(NULL);
+	dirty=0; wid.active=-1; dr=ddr; desired_cursor=-1; con_set(NULL);
 	dset(env,lmistr("deck"),deck=d);
 	dset(env,lmistr("hist" ),wid.hist=lml(0));
 	dset(env,lmistr("ahist"),au.hist=lml(0));

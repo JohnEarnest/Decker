@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:35
+card:36
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -999,6 +999,33 @@ end
 
 on navigate do end
 
+{end}
+
+{card:cursortests}
+{widgets}
+button1:{"type":"button","size":[103,20],"pos":[35,45],"script":"cursortests.0","text":"nil cursor"}
+button2:{"type":"button","size":[103,20],"pos":[35,131],"script":"cursortests.1","text":"default"}
+button3:{"type":"button","size":[103,20],"pos":[35,165],"script":"cursortests.1","text":"point"}
+button4:{"type":"button","size":[103,20],"pos":[35,197],"script":"cursortests.1","text":"drag"}
+button5:{"type":"button","size":[103,20],"pos":[35,230],"script":"cursortests.1","text":"insert"}
+field1:{"type":"field","size":[134,20],"pos":[190,45],"locked":1,"animated":1,"volatile":1,"script":"cursortests.2","border":0}
+
+{script:cursortests.0}
+on click do
+ app.cursor:nil
+end
+{end}
+
+{script:cursortests.1}
+on click do
+ app.cursor:me.text
+end
+{end}
+
+{script:cursortests.2}
+on view do
+ me.text:"app.cursor is %J" format app.cursor
+end
 {end}
 
 {module:fancyTransitions}
