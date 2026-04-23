@@ -1114,6 +1114,7 @@ module.ask:on ask text choices do
   canvas.text[seg (pad.l,pad.t),dim ("top_%s" format align)]
   c:dim[1]+pad.t+padding
   ow:canvas.size[0]-(pad.l+pad.r)
+  local overone:0
   each choice i in segs
    local rpos:pad.l,c
    local rsize:ow,dims[i]
@@ -1128,7 +1129,9 @@ module.ask:on ask text choices do
      canvas.rect[rpos+2 rsize-4]
     end
    end
-   if (pointer.held|pointer.down|pointer.up)&rin[pointer.pos-canvas.pos rpos rsize]
+   local hovering:rin[pointer.pos-canvas.pos rpos rsize]
+   overone:overone|hovering
+   if (pointer.held|pointer.down|pointer.up)&hovering
     active_background[]
     if pointer.up r:i end
     canvas.pattern:bcolor
@@ -1151,8 +1154,10 @@ module.ask:on ask text choices do
   end
   if gamepad.up.up   gamepad_cursor:(count segs)%gamepad_cursor-1 end
   if gamepad.up.down gamepad_cursor:(count segs)%gamepad_cursor+1 end
+  app.cursor:(nil,"point")[overone]
   tick[]
  end
+ app.cursor:nil
  sfx[asound]
  r
 end
