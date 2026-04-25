@@ -145,6 +145,8 @@ void event_pointer_move(pair raw,pair scaled);
 void event_pointer_button(int primary,int middle,int down);
 void event_file(char*p);
 void field_input(char*text);
+void event_padbutton(int b,int down);
+void event_padaxes(int x,int y);
 
 void process_events(pair disp,pair size,int scale){
 	SDL_Event e;
