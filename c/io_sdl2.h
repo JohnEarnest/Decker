@@ -53,6 +53,12 @@ SDL_Cursor*CURSORS[8];
 #define KEY_F10          SDLK_F10
 #define KEY_F11          SDLK_F11
 #define KEY_F12          SDLK_F12
+#define KEYPAD_UP        SDLK_KP_8
+#define KEYPAD_DOWN      SDLK_KP_2
+#define KEYPAD_LEFT      SDLK_KP_4
+#define KEYPAD_RIGHT     SDLK_KP_6
+#define KEYPAD_OK        SDLK_KP_1
+#define KEYPAD_CANCEL    SDLK_KP_3
 
 #define KEYM_LSHIFT      KMOD_LSHIFT
 #define KEYM_RSHIFT      KMOD_RSHIFT

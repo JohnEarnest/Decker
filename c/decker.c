@@ -3413,6 +3413,12 @@ void event_touch(void){
 	if(!set_touch)enable_touch=1;
 }
 void event_key(int c,int m,int down,const char*name){
+	if(c==KEYPAD_UP    ){event_padbutton(GAMEPAD_UP,down);return;}
+	if(c==KEYPAD_DOWN  ){event_padbutton(GAMEPAD_DN,down);return;}
+	if(c==KEYPAD_LEFT  ){event_padbutton(GAMEPAD_LF,down);return;}
+	if(c==KEYPAD_RIGHT ){event_padbutton(GAMEPAD_RT,down);return;}
+	if(c==KEYPAD_OK    ){event_padbutton(GAMEPAD_A1,down);return;}
+	if(c==KEYPAD_CANCEL){event_padbutton(GAMEPAD_A2,down);return;}
 	int cmd=m&(KEYM_LCTRL|KEYM_RCTRL|KEYM_LGUI|KEYM_RGUI);
 	if(down){
 		if(c>0&&c<4096)keypress[c]=!keydown[c],keydown[c]=1;
