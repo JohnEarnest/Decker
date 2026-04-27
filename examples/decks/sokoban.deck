@@ -22,7 +22,7 @@ event_pump:{"type":"button","size":[64,32],"pos":[416,64],"animated":1,"script":
 undo:{"type":"button","size":[64,32],"pos":[20,282],"locked":1,"script":"game.4","show":"transparent","text":"Undo","style":"rect","shortcut":"z"}
 hist:{"type":"grid","size":[100,50],"pos":[20,29],"show":"none","format":"j","value":{"actors":[]}}
 box1:{"type":"contraption","size":[32,32],"pos":[256,160],"show":"transparent","def":"mover","widgets":{"c":{},"s":{"value":"{\"anim\":0,\"orig\":[256,160],\"dest\":[100,100]}"},"i":{"value":"box"}}}
-player:{"type":"contraption","size":[32,32],"pos":[160,160],"show":"transparent","def":"mover","widgets":{"c":{},"s":{"value":"{\"anim\":0,\"orig\":[152,160],\"dest\":[160,160]}"},"i":{"value":"player"}}}
+player:{"type":"contraption","size":[32,32],"pos":[160,160],"show":"transparent","def":"mover","widgets":{"c":{},"s":{"value":"{\"anim\":0,\"orig\":[256,160],\"dest\":[100,100]}"},"i":{"value":"player"}}}
 
 {script:game.0}
 CELL:32 # grid size
@@ -62,6 +62,10 @@ on thud pos do
 end
 
 on navigate dir do
+ if !gamepad.up[dir] navigated[dir] end
+end
+
+on navigated dir do
  moved:0
  act:act:findActors[]
  before:(act..name) dict (act..dest)
@@ -94,7 +98,21 @@ on navigate dir do
  end
 end
 
+on undomove do
+ each pos name in first last hist.value
+  card.widgets[name].pos:pos
+ end
+ hist.value:-1 drop hist.value
+ undo.locked:0~count hist.value
+ play["reset"]
+end
+
 on check_board do
+ local dir:first extract key where value from ("up","down","left","right") take gamepad.up
+ if dir navigated[dir] end
+ if gamepad.up.cancel reset.event.click end
+ if gamepad.up.action undomove[] end
+
  won:min each box in findBoxes[]
   isGoal[box.dest]&box.done
  end
@@ -134,12 +152,7 @@ end
 
 {script:game.4}
 on click do
- each pos name in first last hist.value
-  card.widgets[name].pos:pos
- end
- hist.value:-1 drop hist.value
- undo.locked:0~count hist.value
- play["reset"]
+ if !gamepad.up.action undomove[] end
 end
 {end}
 
@@ -147,7 +160,7 @@ end
 image:"%%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"
 script:"win.0"
 {widgets}
-button1:{"type":"button","size":[96,32],"pos":[384,288],"script":"win.1","text":"Play Again?","shortcut":"r"}
+button1:{"type":"button","size":[96,32],"pos":[384,288],"animated":1,"script":"win.1","text":"Play Again?","shortcut":"r"}
 
 {script:win.0}
 on navigate do end
@@ -159,6 +172,10 @@ on click do
  game.event["resetLevel"]
  play["reset"]
  go[game "BoxIn"]
+end
+
+on view do
+ if gamepad.up.action click[] end
 end
 {end}
 
