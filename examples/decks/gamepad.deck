@@ -1,0 +1,55 @@
+{deck}
+version:1
+card:1
+size:[512,342]
+name:"gamepad.deck"
+
+{card:home}
+
+{card:gamepad_tester}
+script:"gamepad_tester.0"
+{widgets}
+field3:{"type":"field","size":[353,84],"pos":[150,151],"locked":1}
+up:{"type":"button","size":[39,28],"pos":[241,163],"text":"up"}
+down:{"type":"button","size":[39,28],"pos":[241,197],"text":"down"}
+left:{"type":"button","size":[39,28],"pos":[196,176],"text":"left"}
+right:{"type":"button","size":[39,28],"pos":[286,176],"text":"right"}
+cancel:{"type":"button","size":[51,28],"pos":[378,197],"text":"cancel"}
+action:{"type":"button","size":[51,28],"pos":[407,163],"text":"action"}
+log:{"type":"field","size":[131,153],"pos":[10,151],"locked":1,"animated":1,"volatile":1,"scrollbar":1}
+gamepad_dir:{"type":"field","size":[66,17],"pos":[228,287],"locked":1,"volatile":1,"border":1,"style":"code","align":"center"}
+field1:{"type":"field","size":[493,17],"pos":[10,22],"font":"menu","show":"invert","border":0,"align":"center","value":"Gamepad Tester"}
+field2:{"type":"field","size":[131,14],"pos":[10,134],"locked":1,"border":0,"align":"center","value":"Event Log:"}
+button1:{"type":"button","size":[131,21],"pos":[10,309],"script":"gamepad_tester.1","text":"Clear Log"}
+field4:{"type":"field","size":[353,14],"pos":[150,134],"locked":1,"border":0,"align":"center","value":"Buttons Currently .held:"}
+field5:{"type":"field","size":[228,74],"pos":[10,46],"locked":1,"border":0,"value":"The gamepad interface allows scripts to observe the state of a virtual game controller which unifies keyboard inputs and inputs from a physical game controller, when available. Decks that use this functionality may not be fully usable on tablets or phones that lack a physical keyboard!"}
+field6:{"type":"field","size":[66,16],"pos":[228,265],"locked":1,"border":0,"align":"center","value":".dir:"}
+
+{script:gamepad_tester.0}
+on view do
+ on record x do
+  log.text:log.text,"\n ",x
+  log.scroll:99999999
+ end
+ each v k in gamepad.down
+  if v record["pressed ",k] end
+ end
+ each v k in gamepad.up
+  if v record["released ",k] end
+ end
+ each v k in gamepad.held
+  card.widgets[k].show:("solid","invert")[v]
+ end
+ gamepad_dir.data:gamepad.dir
+end
+
+on navigate do end
+
+{end}
+
+{script:gamepad_tester.1}
+on click do
+ log.text:""
+end
+{end}
+
