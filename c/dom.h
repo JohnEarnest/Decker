@@ -3251,7 +3251,8 @@ lv* n_writewav(lv*self,lv*a){
 	FILE*f=fopen(name->sv,"wb");if(f)fwrite(data,1,len,f),fclose(f);free(data);return f?ONE:ZERO;
 }
 lv* readbin(lv*path){
-	struct stat st;path=drom_to_utf8(path);if(stat(path->sv,&st))return array_make(0,0,0,lms(0));FILE*f=fopen(path->sv,"rb");
+	struct stat st;path=drom_to_utf8(path);if(stat(path->sv,&st))return array_make(0,0,0,lms(0));
+	FILE*f=fopen(path->sv,"rb");if(!f)return array_make(0,0,0,lms(0));
 	lv*r=lms(st.st_size);if(fread(r->sv,1,r->c,f)!=(unsigned)r->c){fclose(f);return array_make(0,0,0,lms(0));}
 	fclose(f);return array_make(st.st_size,0,0,r);
 }
