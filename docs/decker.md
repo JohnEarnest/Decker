@@ -489,7 +489,7 @@ Decker provides a number of useful pre-defined functions:
 | `readxml[x]`           | Turn a useful subset of XML/HTML into a Lil structure.(8)                                                                 | Data       |
 | `writexml[x fmt]`      | Turn a Lil structure `x` into an XML string, formatted with whitespace if `fmt` is truthy.(9)                             | Data       |
 | `alert[text type x y]` | Open a modal dialog with the string or rtext `text`, and potentially prompt for input.(10)                                | Modal      |
-| `read[type hint]`      | Open a modal dialog prompting the user to open a document, and return its contents (or `""`).(11)                         | Modal      |
+| `read[type hint]`      | Open a modal dialog prompting the user to open a document, and return its contents (or nil).(11)                          | Modal      |
 | `write[x hint]`        | Open a modal dialog prompting the user to save `x`. Returns `1` if the file was saved successfully, `0` otherwise.(12)    | Modal      |
 
 1) if `print[]` is provided more than one argument, the first argument will be interpreted as a _format string_, and each remaining argument will be treated as an element of a list of right arguments to `format`. The resulting string will then be printed on its own line. For example, `print["%s, %i" "first" 2]` is equivalent to `print["%s, %i" format ("first",2)]`.
@@ -574,9 +574,7 @@ The `type` argument allows you to specify the type of file(s) the user should be
 - `"text"`: files with a `.txt` or `.csv` extension. The result will always be a string.
 - `"any"`: any file. The result may be an image, sound, or string.
 
-If a sound file is unreadable (or the user cancels), it will be loaded as a sound with `size` `0`.
-
-There are several possible `hint` arguments to control the interpretation of colors in an image:
+If an image contains transparent pixels, they will be read as pattern 0. There are several possible `hint` arguments to control the interpretation of colors in an image:
 
 - `"color"` (or no hint): convert to Decker's 16-color palette (patterns 32-47). Read only the first frame of an animated GIF.
 - `"gray"`: convert to 256 grays based on a perceptual weighting of the RGB channels. Read only the first frame of an animated GIF.
@@ -587,7 +585,7 @@ The `"frames"` or `"gray_frames"` hints will cause `read[]` of a GIF to return a
 - `frames`: a list of images.
 - `delays`: a list of integers representing interframe delays in 1/100ths of a second.
 
-If an image contains transparent pixels, they will be read as pattern 0.
+If the user cancels the open dialog instead of selecting a file, the result of `read[]` will always be nil. If a file is chosen but unreadable for some reason, it will be read as an empty value: an empty string, an array or sound of `.size` `0`, an image of `.size` `(0,0)`, etc.
 
 12) `write[x hint]` recognizes several types of Lil value and will serialize each appropriately:
 - _array interfaces_ are written as binary files. If `hint` is provided, use it as the file extension (for example `".png"`).

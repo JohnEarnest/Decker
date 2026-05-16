@@ -1989,7 +1989,7 @@ modals=_=>{
 			else if(ms.filter=='.html,.deck')open_text(ms.filter,                               text =>{arg(),ret(deck_read(text)),modal_exit(1)  })
 			else                             open_text(''       ,                               text =>{arg(),ret(lms(text))      ,modal_exit(1)  })
 		}),c.x-=65
-		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_exit(0)
+		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit){arg(),ret(NIL),modal_exit(0)}
 	}
 	else if(ms.type=='fullscreen_lil'){
 		const b=draw_modalbox(rect(150,45))

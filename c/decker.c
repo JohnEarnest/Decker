@@ -1566,8 +1566,9 @@ void modal_exit(int value){
 		save_deck(path);
 		if(ms.subtype==modal_save_locked)iwrite(deck,lmistr("locked"),ZERO);
 	}
-	if(ms.subtype==modal_open_lil&&value){
-		lv*hint=ms.verb,*name=modal_open_path();lv*type=arg();ret(array_is(type)?readbin(name):n_readfile(NULL,lml2(name,hint)));
+	if(ms.subtype==modal_open_lil){
+		if(!value){arg();ret(LNIL);}
+		else{lv*hint=ms.verb,*name=modal_open_path();lv*type=arg();ret(array_is(type)?readbin(name):n_readfile(NULL,lml2(name,hint)));}
 	}
 	if(ms.subtype==modal_save_lil){
 		if(ms.type==modal_save&&!value){arg();ret(ZERO);ms.type=modal_none;return;}
