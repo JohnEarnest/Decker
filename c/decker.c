@@ -3776,10 +3776,10 @@ void all_menus(void){
 	if(uimode==mode_script){
 		if(menu_item("Close Script",1,'\0'))close_script(NULL);
 		menu_separator();
-		if(menu_item("Go to Deck",!deck_is(sc.target)           ,'\0'))close_script(deck);
+		if(menu_item("Go to Deck",!deck_is(sc.target)           ,'d'))close_script(deck);
 		lv*container=con();
-		if(prototype_is(container)){if(menu_item("Go to Prototype",sc.target!=container,'\0'))close_script(container);}
-		else                       {if(menu_item("Go to Card"     ,sc.target!=container,'\0'))close_script(container);}
+		if(prototype_is(container)){if(menu_item("Go to Prototype",sc.target!=container,'e'))close_script(container);}
+		else                       {if(menu_item("Go to Card"     ,sc.target!=container,'e'))close_script(container);}
 		if(menu_check("X-Ray Specs",!kc.on,sc.xray,'r'))sc.xray^=1;
 	}
 	else if(ms.type==modal_sounds){
