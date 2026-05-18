@@ -1996,7 +1996,7 @@ void modals(void){
 	}
 	else if(ms.type==modal_pattern||ms.type==modal_fill||ms.type==modal_widpattern||ms.type==modal_spanpattern){
 		pair grid={8,6};int ss=25, gs=ss+4, m=5, lh=font_h(FONT_BODY);
-		int*v=ms.type==modal_widpattern||ms.type==modal_spanpattern?&ob.pending_pattern: modal_pattern?&dr.pattern: &dr.fill;
+		int*v=ms.type==modal_widpattern||ms.type==modal_spanpattern?&ob.pending_pattern: ms.type==modal_pattern?&dr.pattern: &dr.fill;
 		rect b=draw_modalbox((pair){m+(grid.x*gs)+m,m+(grid.y*gs)+lh+m});
 		char*label=ms.type==modal_widpattern||ms.type==modal_spanpattern?"Choose a pattern.":
 		    ms.type==modal_fill?"Choose a fill pattern.":"Choose a stroke pattern.";
