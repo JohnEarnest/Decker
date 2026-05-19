@@ -559,6 +559,15 @@ assert["font minimum size" (1,1) f.size]
 f.size:-.3,2.9
 assert["font bogus size" (1,2) f.size]
 
+f.size:255,255
+assert["font max size" (255,255) f.size]
+assert["font max glyph (empty)" (1,255) f.A.size]
+fullglyph:image[255,255].map[0,1]
+f.A:fullglyph
+assert["font max glyph (full)" fullglyph.encoded f.A.encoded]
+f.space:255
+assert["font max space" 255 f.space]
+
 assert["font glyph by index" f.B.encoded f[first "%a" parse "B"].encoded]
 assert["font oob read min" image[].encoded f[ -1].encoded]
 assert["font oob read max" image[].encoded f[256].encoded]

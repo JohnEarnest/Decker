@@ -805,12 +805,16 @@ char*FONT_BLOCK_MONO=
 	"AAAAAD/BQAA+IiIiIiI+AAA";
 
 
-#define font_w(f)            ((f->b->sv)[0])                                        // max glyph width
-#define font_h(f)            ((f->b->sv)[1])                                        // max glyph height
-#define font_sw(f)           ((f->b->sv)[2])                                        // glyph spacing
+#define font_wv(f)           ((f->b->sv)[0])                                        // max glyph width
+#define font_hv(f)           ((f->b->sv)[1])                                        // max glyph height
+#define font_swv(f)          ((f->b->sv)[2])                                        // glyph spacing
+#define font_w(f)            (0xFF&font_wv(f))
+#define font_h(f)            (0xFF&font_hv(f))
+#define font_sw(f)           (0xFF&font_swv(f))
 #define font_gs(f)           (font_h(f)*(int)ceil(font_w(f)/8.0)+1)
 #define font_gb(f,c)         (3+(0xFF&(c))*font_gs(f))
-#define font_gw(f,c)         ((f->b->sv)[font_gb(f,c)])                            // actual glyph width
+#define font_gwv(f,c)        ((f->b->sv)[font_gb(f,c)])                             // actual glyph width
+#define font_gw(f,c)         (0xFF&font_gwv(f,c))
 #define font_pp(f,c,x,y)     (f->b->sv)[font_gb(f,c)+1+y*((int)ceil(iw/8.0))+(x/8)]
 #define font_bit(x,v)        (v<<(7-(x%8)))
 #define font_gpix(f,c,x,y)   ((font_pp(f,c,x,y)&font_bit(x,1))?1:0)                             // get pixel
@@ -834,7 +838,7 @@ lv* interface_font(lv*self,lv*i,lv*x){
 		if(x){
 			if(ix<0||ix>255)return x;if(!image_is(x))x=image_empty();pair s=image_size(x);
 			font_each(self,ix){int col=(b>=s.x||a>=s.y)?0: x->b->sv[b+a*s.x]?1:0; font_spix(self,ix,b,a,col);}
-			font_gw(self,ix)=MIN(s.x,font_w(self));return x;
+			font_gwv(self,ix)=MIN(s.x,font_w(self));return x;
 		}
 		if(ix<0||ix>255)return image_empty();
 		pair s={font_gw(self,ix),font_h(self)};lv*r=lmbuff(s);
@@ -842,7 +846,7 @@ lv* interface_font(lv*self,lv*i,lv*x){
 		return image_make(r);
 	}
 	if(x){
-		ikey("space"){font_sw(self)=ln(x);return x;}
+		ikey("space"){int n=ln(x);font_swv(self)=0xFF&CLAMP(0,n,255);return x;}
 		ikey("size" ){
 			lv*r=font_make(pair_max(getpair(x),(pair){1,1}));iwrite(r,lmistr("space"),ifield(self,"space"));
 			for(int z=0;z<256;z++)iindex(r,z,iindex(self,z,NULL));self->b=r->b;return x;
@@ -857,24 +861,24 @@ lv* interface_font(lv*self,lv*i,lv*x){
 lv* font_make(pair s){
 	s=pair_max(s,(pair){1,1});
 	lv*r=lmi(interface_font,lmistr("font"),lms(3+256*(1+s.y*(int)ceil(s.x/8.0))));
-	return font_w(r)=s.x,font_h(r)=s.y,font_sw(r)=1,r;
+	return font_wv(r)=0xFF&s.x,font_hv(r)=0xFF&s.y,font_swv(r)=1,r;
 }
 lv* font_read(lv*x){
 	char f=0;lv*r=data_read("FNT",&f,x);lv*ri=NULL;
 	if(r&&f=='0'){
 		pair s=pair_max((pair){0xFF&(r->sv[0]),0xFF&(r->sv[1])},(pair){1,1});int gs=ceil(s.x/8.0)*s.y;
-		ri=font_make(s);font_sw(ri)=0xFF&(r->sv[2]);
+		ri=font_make(s);font_swv(ri)=0xFF&(r->sv[2]);
 		for(int z=3,ci=32;(z<r->c)&&(ci<128);ci++,z+=gs){
 			int gw=0xFF&r->sv[z++];if(z+gs>r->c)break;
-			memcpy(ri->b->sv+font_gb(ri,ci)+1,r->sv+z,gs);font_gw(ri,ci)=gw;
+			memcpy(ri->b->sv+font_gb(ri,ci)+1,r->sv+z,gs);font_gwv(ri,ci)=gw;
 		}
 	}
 	if(r&&f=='1'){
 		pair s=pair_max((pair){0xFF&(r->sv[0]),0xFF&(r->sv[1])},(pair){1,1});int gs=ceil(s.x/8.0)*s.y;
-		ri=font_make(s);font_sw(ri)=0xFF&(r->sv[2]);
+		ri=font_make(s);font_swv(ri)=0xFF&(r->sv[2]);
 		for(int z=3;z+1<r->c;z+=gs){
 			int ci=0xFF&r->sv[z++], gw=0xFF&r->sv[z++];if(z+gs>r->c)break;
-			memcpy(ri->b->sv+font_gb(ri,ci)+1,r->sv+z,gs);font_gw(ri,ci)=gw;
+			memcpy(ri->b->sv+font_gb(ri,ci)+1,r->sv+z,gs);font_gwv(ri,ci)=gw;
 		}
 	}
 	return ri;
