@@ -1123,6 +1123,8 @@ Fonts are dynamically created interfaces, each representing the glyphs of a bitm
 
 The glyph images of a font will always have the same height as the font, and represent the true width of the glyph without padding or spacing. Writing images to glyph slots will clip the image to respect the font's `size` as a maximum. Font glyphs are strictly monochrome- they may not contain patterns or colors. Accessing an invalid glyph index will return an empty image. Writes to invalid glyph indices are ignored. Writing nil, the number `0`, or an Image interface with width `0` to a glyph by index or character name will remove it from the font.
 
+The maximum glyph size of a font is `(255,255)` pixels, and the maximum inter-character `.space` is 255.
+
 Decker comes with three built-in fonts:
 - `body`, a variable-width body text font.
 - `menu`, a variable-width bold font suitable for headings.
