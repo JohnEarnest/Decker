@@ -1641,7 +1641,7 @@ modals=_=>{
 		const b=draw_modalbox(rect(250,frame.size.y-16-30)), gsize=rect(b.x,b.y+15,b.w,b.h-16-(2*25))
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Sounds',FONT_MENU,1)
 		const s=ms.grid.row>=0?dget(deck.sounds,tab_cell(ms.grid.table,'name',ms.grid.row)):null
-		if(ui_table(gsize,[16,130],'Isss',ms.grid))n_play([s])
+		if(ui_table(gsize,[16,120],'Isss',ms.grid))n_play([s])
 		if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'OK',1)||ev.exit){
 			if(ms.from_action){
 				if(ms.grid.row>=0)ms.message=deck.sounds.k[ms.grid.row]

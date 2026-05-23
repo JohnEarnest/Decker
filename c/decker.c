@@ -1710,7 +1710,7 @@ void modals(void){
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Sounds",FONT_MENU,1);
 		rect gsize={b.x,b.y+15,b.w,b.h-16-(2*25)};
 		lv*s=ms.grid.row>=0?dget(ifield(deck,"sounds"),ms.grid.table->lv[1]->lv[ms.grid.row]):NULL;
-		if(ui_table(gsize,2,16,130,"Isss",&ms.grid))n_play(deck,l_list(s));
+		if(ui_table(gsize,2,16,120,"Isss",&ms.grid))n_play(deck,l_list(s));
 		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"OK",1)||ev.exit){
 			if(ms.from_action){
 				if(ms.grid.row>=0)ms.message=ifield(deck,"sounds")->kv[ms.grid.row];
