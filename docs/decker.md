@@ -835,10 +835,12 @@ The deck interface represents the global attributes of a Decker document. The op
 | `x.author`        | String. The name of the author of the deck. r/w.                                            |
 | `x.corners`       | Number. The pattern index for drawing the "corners" of the deck, when applicable. r/w.      |
 | `x.script`        | String. The Lil source code of the deck's script, or `""`. r/w.                             |
-| `x.patterns`      | An instance of the _patterns_ interface.                                                    |
-| `x.sounds`        | A dictionary of _sound_ interfaces stored in this deck, keyed by name.                      |
-| `x.fonts`         | A dictionary of _font_ interfaces stored in this deck, keyed by name.                       |
-| `x.cards`         | A dictionary of _card_ interfaces stored in this deck, keyed by name.                       |
+| `x.patterns`      | An instance of the [Patterns](#patternsinterface) interface.                                |
+| `x.sounds`        | A dictionary of [Sounds](#soundinterface) stored in this deck, keyed by name.               |
+| `x.fonts`         | A dictionary of [Fonts](#fontinterface) stored in this deck, keyed by name.                 |
+| `x.cards`         | A dictionary of [Cards](#cardinterface) stored in this deck, keyed by name.                 |
+| `x.modules`       | A dictionary of [Modules](#moduleinterface) stored in this deck, keyed by name.             |
+| `x.contraptions`  | A dictionary of [Prototypes](#prototypeinterface) stored in this deck, keyed by name.       |
 | `x.card`          | The current _card_. Writing this attribute behaves the same as calling `go[x]`.             |
 | `x.add[x y z]`    | Add a resource to this deck, and return it.                                                 |
 | `x.remove[x]`     | Remove a resource, card, or widget from this deck. Returns 1 on success.                    |
