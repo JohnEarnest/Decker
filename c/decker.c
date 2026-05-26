@@ -52,7 +52,7 @@ lv* deck_get(lv*text){interpreter_lock();lv*r=deck_read(text);interpreter_unlock
 void mark_dirty(void){dirty=1,dirty_timer=AUTOSAVE_DELAY;}
 void set_path(char*path){
 	snprintf(document_path,PATH_MAX,"%s",path);
-	char t[4096];snprintf(t,sizeof(t),"Decker - %s",path);
+	char t[4096];snprintf(t,sizeof(t),"Decker - %s",drom_to_utf8(lmcstr(path))->sv);
 	window_set_title(strlen(path)?t:"Decker");
 }
 
