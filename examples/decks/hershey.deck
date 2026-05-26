@@ -93,7 +93,7 @@ brush:{"type":"contraption","size":[142,20],"pos":[351,246],"script":"fontmodule
 field2:{"type":"field","size":[40,16],"pos":[309,250],"locked":1,"border":0,"align":"center","value":"Brush"}
 scale:{"type":"slider","size":[142,20],"pos":[351,272],"script":"fontmodules.2","interval":[1,5],"value":1,"step":0.1}
 field3:{"type":"field","size":[40,16],"pos":[309,276],"locked":1,"border":0,"align":"center","value":"Scale"}
-preview:{"type":"contraption","size":[276,258],"pos":[10,48],"volatile":1,"def":"scrollcanvas","widgets":{"display":{"size":[261,243],"pattern":13},"h":{"size":[261,16],"pos":[0,242],"interval":[0,77]},"v":{"size":[16,243],"pos":[260,0],"locked":1,"interval":[0,0]},"c":{"size":[338,212],"pos":[320,-12],"volatile":1}}}
+preview:{"type":"contraption","size":[276,258],"pos":[10,48],"volatile":1,"def":"scrollcanvas","widgets":{"display":{"size":[261,243],"pattern":13},"h":{"size":[261,16],"pos":[0,242],"interval":[0,77]},"v":{"size":[16,243],"pos":[260,0],"locked":1,"interval":[0,0]},"c":{"size":[26,51],"pos":[320,-12],"volatile":1}}}
 
 {script:fontmodules.0}
 on redraw do
@@ -297,6 +297,18 @@ button4:{"type":"button","size":[60,20],"pos":[293,282],"script":"hershey_text.0
 c:{"type":"canvas","size":[209,91],"pos":[293,183],"locked":1,"volatile":1,"scale":1}
 field5:{"type":"field","size":[209,14],"pos":[293,167],"locked":1,"border":0,"style":"plain","align":"center","value":"c"}
 
+{card:path_shear}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"background.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"background.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Paths: Shearing"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"background.1","text":"Index","style":"rect"}
+field1:{"type":"field","size":[209,106],"pos":[293,48],"locked":1,"border":0,"value":"Shearing a path along the x or y axis involves isolating one of the axes from the path while retaining its structure.\n\nThe \"unary @ @\" pattern allows us to push the \"first\" or \"last\" primitive down to each point of the path, obtaining the x component or y component, respectively."}
+ex1:{"type":"field","size":[276,254],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","value":"p:2*hershey.textpath[hf_futura \"Text\"]\nc.clear[]\n\non path_shearx delta x do\n x+(last@@x)*list list delta,0\nend\non path_sheary delta x do\n x+(first@@x)*list list 0,delta\nend\n\nc.brush:0\nc.pattern:colors.black\nc.line @ p\n\nc.brush:2\nc.pattern:colors.red\nc.line @ path_shearx[.75 p]\nc.pattern:colors.blue\nc.line @ path_sheary[.25 p]"}
+button4:{"type":"button","size":[60,20],"pos":[293,282],"script":"hershey_text.0","text":"Try It!"}
+c:{"type":"canvas","size":[209,91],"pos":[293,183],"locked":1,"volatile":1,"pattern":38,"brush":2,"scale":1}
+field5:{"type":"field","size":[209,14],"pos":[293,167],"locked":1,"border":0,"style":"plain","align":"center","value":"c"}
+
 {card:path_wiggle}
 {widgets}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"background.1","text":"Next","style":"rect"}
@@ -333,9 +345,31 @@ button4:{"type":"button","size":[122,20],"pos":[341,282],"script":"path_wiggle.0
 c:{"type":"canvas","size":[209,91],"pos":[293,187],"locked":1,"volatile":1,"scale":1}
 field5:{"type":"field","size":[209,14],"pos":[293,171],"locked":1,"border":0,"style":"plain","align":"center","value":"c"}
 
+{card:path_wave}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"background.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"background.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Paths: Waving"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"background.1","text":"Index","style":"rect"}
+field1:{"type":"field","size":[209,106],"pos":[293,48],"locked":1,"border":0,"value":"Using an approach similar to shearing, we can decompose the path into x and y components, feed them through offset sinusoids, and recombine them.\n\nWith the right set of constants, you can produce something that resembles a flag flapping in the wind or the rippling surface of a body of water. Experiment!"}
+ex1:{"type":"field","size":[276,254],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","value":"p:1.5*hershey.textpath[\n hf_gothic \"Flapping\"\n]\nc.clear[]\n\nf:sys.frame\npx:first @ @ p\npy:last  @ @ p\nnp:((sin(f/4)+.20*px)*list list 1.5,0.6)+\n   ((sin(f/5)+.30*px)*list list 0.6,0.2)+\n   ((cos(f/7)+.05*py)*list list 0.0,1.2)+\n   ((cos(f/2)+.04*py)*list list 0.1,0.2)\n\nc.line @ p + np"}
+button4:{"type":"button","size":[122,20],"pos":[341,282],"script":"path_wave.0","show":"transparent","text":"Animate at 60fps","style":"check","value":0}
+c:{"type":"canvas","size":[209,91],"pos":[293,187],"locked":1,"volatile":1,"scale":1}
+field5:{"type":"field","size":[209,14],"pos":[293,171],"locked":1,"border":0,"style":"plain","align":"center","value":"c"}
+
+{script:path_wave.0}
+on view do
+ eval[ex1.text () 1]
+end
+
+on click do
+ me.animated:me.value
+end
+{end}
+
 {module:hershey}
 description:"Read, write, render and manipulate Hershey vector fonts."
-version:0.2
+version:0.3
 {script}
 # see https://en.wikipedia.org/wiki/Hershey_fonts
 
@@ -399,7 +433,10 @@ end
 
 on hershey_textsize font text do
  local lines:"\n" split text
- local w:max each line in lines linepath[font line].wid end
+ local w:max each line in lines
+  local t:table MISSING fill font.glyphs @ "%a" parse line
+  sum t.left+t.right
+ end
  w,font.lineheight*count lines
 end
 
