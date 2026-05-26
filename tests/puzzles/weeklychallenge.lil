@@ -23,6 +23,18 @@ on maxscan   x do a:0 each v in x a:a|v end                 end # k: |\
 
 # the problems:
 
+problem[361.1]
+# decompose x<=100 into a sum of fibonacci numbers
+on f x do
+ fib:89,55,34,21,13,8,5,3,2,1
+ nil drop each v in fib if !x<v x:x-v v end end
+end
+assert[f[  4]    (3,1)]
+assert[f[ 12]  (8,3,1)]
+assert[f[ 20] (13,5,2)]
+assert[f[ 96] (89,5,2)]
+assert[f[100] (89,8,3)]
+
 problem[359.1]
 # compute the digital root and additive persistence of x
 on f x n do
