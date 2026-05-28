@@ -456,6 +456,7 @@ monad(a_trim){
 	x=ls(x);
 	int a=0;     while(     (x->sv[a]==' '||x->sv[a]=='\n'))a++;
 	int b=x->c-1;while(b>0&&(x->sv[b]==' '||x->sv[b]=='\n'))b--;
+	if(b==x->c-1)return lmslice(x,a);
 	str r=str_new();str_add(&r,x->sv+a,b-a+1);return lmstr(r);
 }
 monad(l_trim){return perfuse(x,a_trim);}
