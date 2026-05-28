@@ -161,6 +161,7 @@ show["%j%n"     parse "[12,13,@99"               ] # garbage in list
 show["%j"       parse "\"foob\""                 ] # simple string
 show["%j"       parse "\"A\\\\nB\\\\C\\/D\\\"\"" ] # simple escapes
 show["%j"       parse "\"D\\u0041B\""            ] # unicode escape
+show["%j"       parse "\"D\\U0041B\""            ] # uppercase unicode escape
 show["%j"       parse "\"a\\u0009b\\u0009c\\n1 2\\u00093\\u00094\""] # unicode escape normalization
 show["%j"       parse "\"A\\?B\""                ] # bogus escape
 show["%j"       parse "\"AB"                     ] # unterminated string
