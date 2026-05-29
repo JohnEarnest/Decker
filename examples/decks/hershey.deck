@@ -8,7 +8,7 @@ name:"hershey.deck"
 script:"Index.0"
 {widgets}
 index:{"type":"field","size":[292,201],"pos":[7,134],"locked":1,"volatile":1,"script":"Index.1","scrollbar":1}
-version:{"type":"field","size":[25,14],"pos":[480,321],"locked":1,"border":0,"value":"v0.2"}
+version:{"type":"field","size":[25,14],"pos":[480,321],"locked":1,"border":0,"value":"v0.4"}
 logotype:{"type":"canvas","size":[498,112],"pos":[7,20],"locked":1,"volatile":1,"border":0,"brush":6,"scale":1}
 field1:{"type":"field","size":[186,14],"pos":[319,134],"locked":1,"show":"transparent","border":0,"align":"center","value":"vector fonts for decker"}
 button1:{"type":"button","size":[94,23],"pos":[363,277],"script":"Index.2","text":"Begin..."}
@@ -189,11 +189,12 @@ button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"background.1",
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"background.1","text":"Prev","style":"rect"}
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"hershey.text[canvas font string pos]"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"background.1","text":"Index","style":"rect"}
-field1:{"type":"field","size":[209,254],"pos":[293,48],"locked":1,"border":0,"value":"The hershey.text[] function draws a lil string on a canvas widget with the top left corner of its bounding-box at a position pos.\n\nThis operation respects the .brush and .pattern settings of the canvas, making a wide variety of style variants possible for every font."}
-ex1:{"type":"field","size":[276,131],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","value":"c.clear[]\n\nc.brush:0\nc.pattern:colors.blue\nhershey.text[c hf_futura \"ABC\" 10,10]\n\nc.brush:2\nc.pattern:colors.red\nhershey.text[c hf_futura \"ABC\" 10,40]"}
+field1:{"type":"field","size":[209,131],"pos":[293,48],"locked":1,"border":0,"value":"The hershey.text[] function draws a lil string on a canvas widget with the top left corner of its bounding-box at a position pos.\n\nThis operation respects the .brush and .pattern settings of the canvas, making a wide variety of style variants possible for every font."}
+ex1:{"type":"field","size":[276,131],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","value":"c.clear[]\n\nc.brush:0\nc.pattern:colors.blue\nhershey.text[c hf_futura \"ABC\" 10,10]\n\nc.brush:2\nc.pattern:colors.red\nhershey.text[c hf_futura 65,66,67 10,40]"}
 button4:{"type":"button","size":[60,20],"pos":[293,159],"script":"hershey_text.0","text":"Try It!"}
 c:{"type":"canvas","size":[276,103],"pos":[10,199],"locked":1,"volatile":1,"pattern":35,"brush":2,"scale":1}
 field5:{"type":"field","size":[276,14],"pos":[10,183],"locked":1,"border":0,"style":"plain","align":"center","value":"c"}
+field2:{"type":"field","size":[209,88],"pos":[293,197],"locked":1,"border":0,"value":"You can also specify \"string\" as a list of numeric indices, to access glyph indices that don't correspond to DeckRoman characters. If you supply a list of lists, each sublist will be treated as a line of text."}
 
 {script:hershey_text.0}
 on click do
@@ -207,11 +208,12 @@ button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"background.1",
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"background.1","text":"Prev","style":"rect"}
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"hershey.textc[canvas font string pos size]"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"background.1","text":"Index","style":"rect"}
-field1:{"type":"field","size":[209,254],"pos":[293,48],"locked":1,"border":0,"value":"The hershey.textc[] function draws a lil string on a canvas widget centered and center- aligned within a rectangle defined by a position pos and size.\n\nThis operation respects the .brush and .pattern settings of the canvas, making a wide variety of style variants possible for every font."}
-ex1:{"type":"field","size":[276,131],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","value":"c.clear[]\nc.pattern:colors.blue\np:10,10 s:100,30\nc.box[p s]\nhershey.textc[c hf_times \"ABC\" p s]\n\nc.pattern:colors.red\np:10,45 s:200,50\nc.box[p s]\nhershey.textc[c hf_times \"ABC\" p s]"}
+field1:{"type":"field","size":[209,131],"pos":[293,48],"locked":1,"border":0,"value":"The hershey.textc[] function draws a lil string on a canvas widget centered and center- aligned within a rectangle defined by a position pos and size.\n\nThis operation respects the .brush and .pattern settings of the canvas, making a wide variety of style variants possible for every font."}
+ex1:{"type":"field","size":[276,131],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","value":"c.clear[]\nc.pattern:colors.blue\np:10,10 s:100,30\nc.box[p s]\nhershey.textc[c hf_times \"ABC\" p s]\n\nc.pattern:colors.red\np:10,45 s:200,50\nc.box[p s]\nhershey.textc[c hf_times 97,98,99 p s]"}
 button4:{"type":"button","size":[60,20],"pos":[293,159],"script":"hershey_text.0","text":"Try It!"}
 c:{"type":"canvas","size":[276,103],"pos":[10,199],"locked":1,"volatile":1,"pattern":35,"scale":1}
 field5:{"type":"field","size":[276,14],"pos":[10,183],"locked":1,"border":0,"style":"plain","align":"center","value":"c"}
+field2:{"type":"field","size":[209,88],"pos":[293,197],"locked":1,"border":0,"value":"You can also specify \"string\" as a list of numeric indices, to access glyph indices that don't correspond to DeckRoman characters. If you supply a list of lists, each sublist will be treated as a line of text."}
 
 {card:hershey_textpath}
 {widgets}
@@ -220,7 +222,7 @@ button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"background.1","
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"hershey.textpath[font string]"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"background.1","text":"Index","style":"rect"}
 field1:{"type":"field","size":[209,254],"pos":[293,48],"locked":1,"border":0,"value":"The hershey.textpath[] function lays out text like hershey.text[], but returns a path- a list of lists of points- instead of drawing it to a canvas.\n\nLater in this deck, we will demonstrate how to manipulate these paths."}
-ex1:{"type":"field","size":[276,131],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","value":"p:hershey.textpath[hf_futura \"ABC\"]\n\nc.clear[]\nc.line @ p"}
+ex1:{"type":"field","size":[276,131],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","value":"p:hershey.textpath[hf_futura \"ABC\"]\n\nc.clear[]\nc.line @ p\n"}
 button4:{"type":"button","size":[60,20],"pos":[293,159],"script":"hershey_text.0","text":"Try It!"}
 c:{"type":"canvas","size":[276,103],"pos":[10,199],"locked":1,"volatile":1,"scale":1}
 field5:{"type":"field","size":[276,14],"pos":[10,183],"locked":1,"border":0,"style":"plain","align":"center","value":"c"}
@@ -367,9 +369,21 @@ on click do
 end
 {end}
 
+{card:path_moreshapes}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"background.1","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"background.1","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Paths: More Shapes"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"background.1","text":"Index","style":"rect"}
+field1:{"type":"field","size":[209,106],"pos":[293,48],"locked":1,"border":0,"value":"If you're working with lots of text paths, you may find yourself wanting some additional geometric shapes, too. Here are a few handy routines to get you started:"}
+ex1:{"type":"field","size":[276,254],"pos":[10,48],"border":1,"scrollbar":1,"style":"code","value":"on stroke ...points do\n list points\nend\n\ncorners:\"%j\" parse \"[\n [0,0],[1,0],[1,1],[0,1],[0,0]\n]\"\non box pos size do\n list (corners*list size)+list pos\nend\n\non ngon n size do\n list (unit 2*pi*(range n+1)/n)*list size\nend\n\nc.clear[]\nc.line@(\n stroke[10,10 20,10 15,20],\n box[30,10 40,20],\n (ngon[ 5 20   ]+list list 100,35),\n (ngon[20 30,40]+list list 160,45)\n)"}
+button4:{"type":"button","size":[60,20],"pos":[293,282],"script":"hershey_text.0","text":"Try It!"}
+c:{"type":"canvas","size":[209,91],"pos":[293,183],"locked":1,"volatile":1,"scale":1}
+field5:{"type":"field","size":[209,14],"pos":[293,167],"locked":1,"border":0,"style":"plain","align":"center","value":"c"}
+
 {module:hershey}
 description:"Read, write, render and manipulate Hershey vector fonts."
-version:0.3
+version:0.5
 {script}
 # see https://en.wikipedia.org/wiki/Hershey_fonts
 
@@ -419,9 +433,16 @@ on hershey_scale font scale do
  end
 end
 
+on linechars text do
+ if "string"~typeof text (list "%a") parse "\n" split text
+ elseif "list"~typeof first text text
+ else list text
+ end
+end
+
 on linepath font text do
  local x:0
- r.path:raze each char in "%a" parse text
+ r.path:raze each char in text
   local glyph:MISSING unless font.glyphs[char]
   x:x+glyph.left
   t:glyph.strokes+list list x,0
@@ -432,9 +453,9 @@ on linepath font text do
 end
 
 on hershey_textsize font text do
- local lines:"\n" split text
+ local lines:linechars[text]
  local w:max each line in lines
-  local t:table MISSING fill font.glyphs @ "%a" parse line
+  local t:table MISSING fill font.glyphs @ line
   sum t.left+t.right
  end
  w,font.lineheight*count lines
@@ -445,13 +466,13 @@ on pathtranslate pos path do
 end
 
 on hershey_textpath font text do
- raze each line i in "\n" split text
+ raze each line i in linechars[text]
   pathtranslate[(0,font.lineheight*i+.5) linepath[font line].path]
  end
 end
 
 on hershey_textpathc font text size do
- local lines:"\n" split text
+ local lines:linechars[text]
  local l:raze each line i in lines
   local p:linepath[font line]
   pathtranslate[((.5*size[0]-p.wid),(font.lineheight*i)) p.path]
