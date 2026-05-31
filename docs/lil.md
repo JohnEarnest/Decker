@@ -1101,6 +1101,9 @@ each x in 2 cross 3 (27,19)+x end
 
 flip(27,19)+flip 2 cross 3
 # ((27,19),(28,19),(27,20),(28,20),(27,21),(28,21))
+
+(2 cross 3)+list(27,19)        # (see below)
+# ((27,19),(28,19),(27,20),(28,20),(27,21),(28,21))
 ```
 
 Conforming is why Lil has two different equality operators: `=` (equals) conforms, and `~` (match) does not. Consider these cases:
