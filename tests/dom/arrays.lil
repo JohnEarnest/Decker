@@ -101,6 +101,39 @@ limits["u32l"             0,1,4294967295]
 limits["i32b" -2147483648,0,1,2147483647]
 limits["i32l" -2147483648,0,1,2147483647]
 
+a:array[1 "f32l"]
+a[0]:128.0
+assert["array float read int" 128 a[0]]
+a[0]:1234.5678
+assert["array float read dec" "1234.567749" "%f" format a[0]]
+assert["array float bytes, le" (43,82,154,68) a.slice[0 "u8"][0,4]]
+a.cast:"f32b"
+a[0]:1234.5678
+assert["array float bytes, be" (68,154,82,43) a.slice[0 "u8"][0,4]]
+
+a:array[2 "f64l"]
+a[0]:-1234
+a[1]:99999999.82
+assert["array double read" "[-1234,99999999.82]" "%j" format list a[0,2]]
+assert["array double bytes, le" (0,0,0,0,0,72,147,192,20,174,71,255,131,215,151,65) a.slice[0 "u8"][0,16]]
+a.cast:"f64b"
+a[0]:-1234
+a[1]:99999999.82
+assert["array double bytes, be" (192,147,72,0,0,0,0,0,65,151,215,131,255,71,174,20) a.slice[0 "u8"][0,16]]
+
+a:array[10 "u8"]
+a[0,10]:10*1+range 10
+a.slice[1 "f32l"][0,2]:-128,128
+assert["array unaligned float write" (10,0,0,0,195,0,0,0,67,100) a[0,10]]
+a.slice[7 "f32l"][0]:9999
+assert["array oob float write"       (10,0,0,0,195,0,0,0,67,100) a[0,10]]
+
+a:array[2 "f32l"]
+a[0]:128
+a[1]:-27.5
+assert["array float encode" "%%DAT<AAAAQwAA3ME=" a.encoded]
+assert["array float decode" (128,-27.5) array["%%DAT<AAAAQwAA3ME="][0,2]]
+
 bin:read["tests/dom/a.gif" "array"]
 assert["read array from file" (86,"array") (bin.size,typeof bin)]
 write["temp.gif" bin]

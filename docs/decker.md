@@ -897,19 +897,23 @@ a[0,4]          # read 4 characters, starting at index 0: "AAAA"
 
 Every array has a _cast_ which controls how it is interpreted: signed or unsigned, 8-, 16- or 32-bit, and big- or little-endian packing, where appropriate:
 
-| Cast     | Range                     | Description                        |
-| :------- | :------------------------ | :--------------------------------- |
-| `"u8"`   | 0...255                   | unsigned 8-bit int                 |
-| `"i8"`   | -128...127                | signed 8-bit int                   |
-| `"u16b"` | 0...65535                 | unsigned 16-bit int, big-endian    |
-| `"u16l"` | 0...65535                 | unsigned 16-bit int, little-endian |
-| `"i16b"` | -32768...32767            | signed 16-bit int, big-endian      |
-| `"i16l"` | -32768...32767            | signed 16-bit int, little-endian   |
-| `"u32b"` | 0...4294967295            | unsigned 32-bit int, big-endian    |
-| `"u32l"` | 0...4294967295            | unsigned 32-bit int, little-endian |
-| `"i32b"` | -2147483648...2147483647  | signed 32-bit int, big-endian      |
-| `"i32l"` | -2147483648...2147483647  | signed 32-bit int, little-endian   |
-| `"char"` | n/a                       | ASCII/DeckRoman character          |
+| Cast     | Range                     | Description                           |
+| :------- | :------------------------ | :------------------------------------ |
+| `"u8"`   | 0...255                   | unsigned 8-bit int                    |
+| `"i8"`   | -128...127                | signed 8-bit int                      |
+| `"u16b"` | 0...65535                 | unsigned 16-bit int, big-endian       |
+| `"u16l"` | 0...65535                 | unsigned 16-bit int, little-endian    |
+| `"i16b"` | -32768...32767            | signed 16-bit int, big-endian         |
+| `"i16l"` | -32768...32767            | signed 16-bit int, little-endian      |
+| `"u32b"` | 0...4294967295            | unsigned 32-bit int, big-endian       |
+| `"u32l"` | 0...4294967295            | unsigned 32-bit int, little-endian    |
+| `"i32b"` | -2147483648...2147483647  | signed 32-bit int, big-endian         |
+| `"i32l"` | -2147483648...2147483647  | signed 32-bit int, little-endian      |
+| `"char"` | n/a                       | ASCII/DeckRoman character             |
+| `"f32b"` | large                     | IEEE-754 32-bit float, big-endian     |
+| `"f32l"` | large                     | IEEE-754 32-bit float, little-endian  |
+| `"f64b"` | larger                    | IEEE-754 64-bit double, big-endian    |
+| `"f64l"` | larger                    | IEEE-754 64-bit double, little-endian |
 
 While arrays do not benefit from the full range of operators Lil can bring to bear on lists and numbers, the array interface provides a number of useful methods for reading and writing data, including ways to perform efficient fills and copies.
 

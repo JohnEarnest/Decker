@@ -1583,46 +1583,58 @@ module_write=x=>{
 	return r
 }
 
-const casts={u8:1,i8:1,u16b:2,u16l:2,i16b:2,i16l:2,u32b:4,u32l:4,i32b:4,i32l:4,char:1}
+const casts={u8:1,i8:1,u16b:2,u16l:2,i16b:2,i16l:2,u32b:4,u32l:4,i32b:4,i32l:4,char:1,f32b:4,f32l:4,f64b:8,f64l:8}
 array_write=x=>data_write('DAT'+String.fromCharCode(48+Object.keys(casts).indexOf(x.cast)),x.data.slice(x.base,x.base+x.size))
-array_read=x=>{const f=x.charCodeAt(5),d=data_read('DAT',x);return d?array_make(d.length,Object.keys(casts)[clamp(0,f-48,10)],0,d):array_make(0,'u8',0)}
+array_read=x=>{const f=x.charCodeAt(5),d=data_read('DAT',x);return d?array_make(d.length,Object.keys(casts)[clamp(0,f-48,14)],0,d):array_make(0,'u8',0)}
 n_array=([x,y])=>{if(lis(x))return array_read(ls(x));const size=ln(x),cast=y?normalize_enum(casts,ls(y)):'u8';return array_make(size,cast,0)}
 array_make=(size,cast,base,buffer)=>{
 	const offset=x=>({offset:ln(lil(x)?monad.first(x):x),len:lil(x)?max(0,ln(monad.last(x))):-1})
+	const view=a=>{if(!a.dv)a.dv=new DataView(a.data.buffer);return a.dv}
 	const shift=(a,here)=>({here:0, size:a.size-here, base:a.base+here, cast:a.cast, data:a.data})
 	const resize=(a,size)=>{
-		if(a.slice)return;size=max(0,size);const old=a.data;a.data=new Uint8Array(size)
+		if(a.slice)return;size=max(0,size);const old=a.data;a.data=new Uint8Array(size),a.dv=null
 		for(let z=0;z<a.data.length;z++)a.data[z]=z>=old.length?0:old[z];a.size=size
 	}
 	const get_raw=(a,index)=>{
 		const step=casts[a.cast];if(index<0||index>=(0|(a.size/step)))return 0
 		const ix=a.base+step*index;if(ix<0||ix+step>a.data.length)return 0
-		const ur=(i,s)=>a.data[ix+i]<<s
-		const s8 =x=>x<<24>>24
-		const s16=x=>x<<16>>16
-		const u32=(a,b,c,d)=>(2*a)+(b|c|d)
-		if(a.cast=='u8'  )return     ur(0,0)
-		if(a.cast=='i8'  )return  s8(ur(0,0))
-		if(a.cast=='u16b')return    (ur(0,8)|ur(1,0))
-		if(a.cast=='u16l')return    (ur(1,8)|ur(0,0))
-		if(a.cast=='i16b')return s16(ur(0,8)|ur(1,0))
-		if(a.cast=='i16l')return s16(ur(1,8)|ur(0,0))
-		if(a.cast=='u32b')return u32(ur(0,23),ur(1,16),ur(2,8),ur(3,0))
-		if(a.cast=='u32l')return u32(ur(3,23),ur(2,16),ur(1,8),ur(0,0))
-		if(a.cast=='i32b')return    (ur(0,24)|ur(1,16)|ur(2,8)|ur(3,0))
-		if(a.cast=='i32l')return    (ur(3,24)|ur(2,16)|ur(1,8)|ur(0,0))
-		return drom_from_ord(ur(0,0))
+		const d=view(a)
+		if(a.cast=='u8'  )return d.getUint8  (ix)
+		if(a.cast=='i8'  )return d.getInt8   (ix)
+		if(a.cast=='u16b')return d.getUint16 (ix,0)
+		if(a.cast=='u16l')return d.getUint16 (ix,1)
+		if(a.cast=='i16b')return d.getInt16  (ix,0)
+		if(a.cast=='i16l')return d.getInt16  (ix,1)
+		if(a.cast=='u32b')return d.getUint32 (ix,0)
+		if(a.cast=='u32l')return d.getUint32 (ix,1)
+		if(a.cast=='i32b')return d.getInt32  (ix,0)
+		if(a.cast=='i32l')return d.getInt32  (ix,1)
+		if(a.cast=='f32b')return d.getFloat32(ix,0)
+		if(a.cast=='f32l')return d.getFloat32(ix,1)
+		if(a.cast=='f64b')return d.getFloat64(ix,0)
+		if(a.cast=='f64l')return d.getFloat64(ix,1)
+		return drom_from_ord(getUint8(ix))
 	}
 	const set_raw=(a,index,v)=>{
 		if('string'==typeof v)v=drom_to_ord(v)
 		const step=casts[a.cast];if(index<0||index>=(0|(a.size/step)))return
 		const ix=a.base+step*index;if(ix<0||ix+step>a.data.length)return
-		const uw=(i,s)=>a.data[ix+i]=v>>>s
-		if     (a.cast=='u16b'||a.cast=='i16b')uw(0,8),uw(1,0)
-		else if(a.cast=='u16l'||a.cast=='i16l')uw(1,8),uw(0,0)
-		else if(a.cast=='u32b'||a.cast=='i32b')uw(0,24),uw(1,16),uw(2,8),uw(3,0)
-		else if(a.cast=='u32l'||a.cast=='i32l')uw(3,24),uw(2,16),uw(1,8),uw(0,0)
-		else uw(0,0)
+		const d=view(a)
+		if     (a.cast=='u8'  )d.setUint8  (ix,v)
+		else if(a.cast=='i8'  )d.setInt8   (ix,v)
+		else if(a.cast=='u16b')d.setUint16 (ix,v,0)
+		else if(a.cast=='u16l')d.setUint16 (ix,v,1)
+		else if(a.cast=='i16b')d.setInt16  (ix,v,0)
+		else if(a.cast=='i16l')d.setInt16  (ix,v,1)
+		else if(a.cast=='u32b')d.setUint32 (ix,v,0)
+		else if(a.cast=='u32l')d.setUint32 (ix,v,1)
+		else if(a.cast=='i32b')d.setInt32  (ix,v,0)
+		else if(a.cast=='i32l')d.setInt32  (ix,v,1)
+		else if(a.cast=='f32b')d.setFloat32(ix,v,0)
+		else if(a.cast=='f32l')d.setFloat32(ix,v,1)
+		else if(a.cast=='f64b')d.setFloat64(ix,v,0)
+		else if(a.cast=='f64l')d.setFloat64(ix,v,1)
+		else d.setUint8(ix,v)
 	}
 	const get=(a,index,len)=>{
 		if(a.cast=='char'&&len<0)len=1

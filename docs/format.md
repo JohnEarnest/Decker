@@ -69,19 +69,23 @@ The data block types used by Decker are as follows:
 - `SND`: a _sound record_. Sound records are used for audio clips in decks, as well as sound data copied to the clipboard. The format is always `0`. The payload consists of a series of 8-bit signed 8khz PCM monophonic samples.
 - `DAT`: a _data record_. Data records are the serialized representation of Lil's _Array Interface_ and can be used for representing arbitrary binary data. The format may be any of the codes described below, which specifies the datatype of values in the array. The payload consists of a series of bytes, which will always be a multiple of the _width_ of the specified format:
 
-| Format | Width | Cast     | Range                     | Description                        |
-| :----- | :---- | :------- | :------------------------ | :--------------------------------- |
-| `DAT0` | 1     | `"u8"`   | 0...255                   | unsigned 8-bit int                 |
-| `DAT1` | 1     | `"i8"`   | -128...127                | signed 8-bit int                   |
-| `DAT2` | 2     | `"u16b"` | 0...65535                 | unsigned 16-bit int, big-endian    |
-| `DAT3` | 2     | `"u16l"` | 0...65535                 | unsigned 16-bit int, little-endian |
-| `DAT4` | 2     | `"i16b"` | -32768...32767            | signed 16-bit int, big-endian      |
-| `DAT5` | 2     | `"i16l"` | -32768...32767            | signed 16-bit int, little-endian   |
-| `DAT6` | 4     | `"u32b"` | 0...4294967295            | unsigned 32-bit int, big-endian    |
-| `DAT7` | 4     | `"u32l"` | 0...4294967295            | unsigned 32-bit int, little-endian |
-| `DAT8` | 4     | `"i32b"` | -2147483648...2147483647  | signed 32-bit int, big-endian      |
-| `DAT9` | 4     | `"i32l"` | -2147483648...2147483647  | signed 32-bit int, little-endian   |
-| `DAT:` | 1     | `"char"` | n/a                       | ASCII/DeckRoman character          |
+| Format | Width | Cast     | Range                     | Description                           |
+| :----- | :---- | :------- | :------------------------ | :------------------------------------ |
+| `DAT0` | 1     | `"u8"`   | 0...255                   | unsigned 8-bit int                    |
+| `DAT1` | 1     | `"i8"`   | -128...127                | signed 8-bit int                      |
+| `DAT2` | 2     | `"u16b"` | 0...65535                 | unsigned 16-bit int, big-endian       |
+| `DAT3` | 2     | `"u16l"` | 0...65535                 | unsigned 16-bit int, little-endian    |
+| `DAT4` | 2     | `"i16b"` | -32768...32767            | signed 16-bit int, big-endian         |
+| `DAT5` | 2     | `"i16l"` | -32768...32767            | signed 16-bit int, little-endian      |
+| `DAT6` | 4     | `"u32b"` | 0...4294967295            | unsigned 32-bit int, big-endian       |
+| `DAT7` | 4     | `"u32l"` | 0...4294967295            | unsigned 32-bit int, little-endian    |
+| `DAT8` | 4     | `"i32b"` | -2147483648...2147483647  | signed 32-bit int, big-endian         |
+| `DAT9` | 4     | `"i32l"` | -2147483648...2147483647  | signed 32-bit int, little-endian      |
+| `DAT:` | 1     | `"char"` | n/a                       | ASCII/DeckRoman character             |
+| `DAT;` | 4     | `"f32b"` | large                     | IEEE-754 32-bit float, big-endian     |
+| `DAT<` | 4     | `"f32l"` | large                     | IEEE-754 32-bit float, little-endian  |
+| `DAT=` | 8     | `"f64b"` | larger                    | IEEE-754 64-bit double, big-endian    |
+| `DAT>` | 8     | `"f64l"` | larger                    | IEEE-754 64-bit double, little-endian |
 
 Lil Object-Value Encoding (LOVE)
 --------------------------------
@@ -471,3 +475,7 @@ Changelog
 
 1.64:
 - Introduced the `IMG3` datablock format.
+
+1.67:
+- Added `f32b`, `f32l`, `f64b`, and `f64l` float support to Arrays.
+

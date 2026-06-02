@@ -1391,8 +1391,10 @@ lv* n_sound(lv*self,lv*z){
 
 // Array interface
 
-char*casts[]   ={"u8","i8","u16b","u16l","i16b","i16l","u32b","u32l","i32b","i32l","char",NULL};
-int cast_size[]={   1,   1,     2,     2,     2,     2,     4,     4,     4,     4,     1,   1};
+char*casts[]   ={"u8","i8","u16b","u16l","i16b","i16l","u32b","u32l","i32b","i32l","char","f32b","f32l","f64b","f64l",NULL};
+int cast_size[]={   1,   1,     2,     2,     2,     2,     4,     4,     4,     4,     1,     4,     4,     8,     8,   1};
+union floatbytes {float f;uint32_t i;};
+union doublebytes {double f;uint64_t i;};
 typedef struct {int here,base,size,cast;lv*data;} array;
 #define numf(n)   ln(dget(x->b,lmistr(n)))
 #define numv(n,v) dset(d,lmistr(n),lmn(v))
@@ -1424,15 +1426,24 @@ double array_get_raw(array a,int index){
 	if(a.cast==7)return               (ur(3,24)|ur(2,16)|ur(1,8)|ur(0,0));
 	if(a.cast==8)return (signed int  )(ur(0,24)|ur(1,16)|ur(2,8)|ur(3,0));
 	if(a.cast==9)return (signed int  )(ur(3,24)|ur(2,16)|ur(1,8)|ur(0,0));
+	if(a.cast==11){union floatbytes  b;b.i=(ur(0,24)|ur(1,16)|ur(2,8)|ur(3,0));return b.f;}
+	if(a.cast==12){union floatbytes  b;b.i=(ur(3,24)|ur(2,16)|ur(1,8)|ur(0,0));return b.f;}
+	if(a.cast==13){union doublebytes b;b.i=(ur(0,56)|ur(1,48)|ur(2,40)|ur(3,32)|ur(4,24)|ur(5,16)|ur(6,8)|ur(7,0));return b.f;}
+	if(a.cast==14){union doublebytes b;b.i=(ur(7,56)|ur(6,48)|ur(5,40)|ur(4,32)|ur(3,24)|ur(2,16)|ur(1,8)|ur(0,0));return b.f;}
 	return 0x7F&ur(0,0);
 }
-void array_set_raw(array a,int index,long long int v){
+void array_set_raw(array a,int index,double num){
+	long long int v=num;
 	array_data();
 	#define uw(i,s) d[i]=(v>>s)
 	if     (a.cast==2||a.cast==4)uw(0,8),uw(1,0);
 	else if(a.cast==3||a.cast==5)uw(1,8),uw(0,0);
 	else if(a.cast==6||a.cast==8)uw(0,24),uw(1,16),uw(2,8),uw(3,0);
 	else if(a.cast==7||a.cast==9)uw(3,24),uw(2,16),uw(1,8),uw(0,0);
+	else if(a.cast==11){union floatbytes  b;b.f=num;v=b.i;uw(0,24),uw(1,16),uw(2,8),uw(3,0);}
+	else if(a.cast==12){union floatbytes  b;b.f=num;v=b.i;uw(3,24),uw(2,16),uw(1,8),uw(0,0);}
+	else if(a.cast==13){union doublebytes b;b.f=num;v=b.i;uw(0,56),uw(1,48),uw(2,40),uw(3,32),uw(4,24),uw(5,16),uw(6,8),uw(7,0);}
+	else if(a.cast==14){union doublebytes b;b.f=num;v=b.i;uw(7,56),uw(6,48),uw(5,40),uw(4,32),uw(3,24),uw(2,16),uw(1,8),uw(0,0);}
 	else uw(0,0);
 }
 lv* array_get(array a,int index,int len){
@@ -1514,7 +1525,7 @@ lv* array_write(lv*x){
 	if(!array_is(x))return lms(0);array a=unpack_array(x);int f=a.cast+'0';a.cast=0;
 	lv*r=lms(a.size);for(int z=0;z<a.size;z++)r->sv[z]=0xFF&(int)array_get_raw(a,z);return data_write("DAT",f,r);
 }
-lv* array_read(lv*x){char f=0;lv*data=data_read("DAT",&f,x);return data?array_make(data->c,CLAMP(0,(f-'0'),10),0,data):array_make(0,0,0,NULL);}
+lv* array_read(lv*x){char f=0;lv*data=data_read("DAT",&f,x);return data?array_make(data->c,CLAMP(0,(f-'0'),14),0,data):array_make(0,0,0,NULL);}
 lv* n_array(lv*self,lv*a){
 	(void)self;if(lis(l_first(a)))return array_read(l_first(a));
 	int size=ln(l_first(a)),cast=a->c>1?ordinal_enum(a->lv[1],casts):0;return array_make(size,cast,0,NULL);
