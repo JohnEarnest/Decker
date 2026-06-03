@@ -1349,8 +1349,17 @@ contraptions_enumerate=_=>{
 	const r=lmt(),iv=[],nv=[];tab_set(r,'icon',iv),tab_set(r,'name',nv)
 	deck.contraptions.k.map(k=>{iv.push(lmn(ICON.app)),nv.push(k)});return r
 }
+let baseline_deck_size=null
+res_size=x=>{
+	let kb=-1;
+	if(baseline_deck_size==null){baseline_deck_size=deck_write(deck_read(''),0).length}
+	if(sound_is(x)){kb=sound_write(x).length}
+	if(font_is(x)){kb=font_write(x).length}
+	if(module_is(x)||prototype_is(x)){const d=deck_read('');deck_add(d,x);kb=deck_write(d,0).length-baseline_deck_size}
+	return kb==-1?lms(''): dyad.format(lms('%0.2fkb'),lml([lmn(kb/1000.0)]))
+}
 res_enumerate=(source)=>{
-	const r=lmt(),iv=[],nv=[],vv=[];tab_set(r,'icon',iv),tab_set(r,'name',nv),tab_set(r,'value',vv)
+	const r=lmt(),iv=[],nv=[],vv=[],kb=[];tab_set(r,'icon',iv),tab_set(r,'name',nv),tab_set(r,'value',vv),tab_set(r,'kb',kb)
 	const pat=source.patterns,pp=patterns_write(pat),pa=anims_write(pat),da=dyad.parse(lms('%j'),lms(DEFAULT_ANIMS))
 	if(!match(pa,da)||pp!=DEFAULT_PATTERNS)iv.push(lmn(ICON.pat)),nv.push(lms('patterns')),vv.push(pat)
 	const fonts=dyad.drop(lms('mono'),dyad.drop(lms('menu'),dyad.drop(lms('body'),source.fonts)))
@@ -1361,6 +1370,7 @@ res_enumerate=(source)=>{
 	modules.v.map((mod,i)=>{iv.push(lmn(ICON.lil)),nv.push(modules.k[i]),vv.push(mod)})
 	const defs=source.contraptions
 	defs.v.map((def,i)=>{iv.push(lmn(ICON.app)),nv.push(defs.k[i]),vv.push(def)})
+	vv.forEach(x=>kb.push(res_size(x)))
 	return r
 }
 title_caps=x=>{let w=1;return x.split('').map(c=>{if(w)c=drom_toupper(c);w=c==' '||c=='\n';return c}).join('')}
@@ -1822,6 +1832,7 @@ modals=_=>{
 		const cb=rect(lgrid.x+lgrid.w+5,lgrid.y+5,b.w-(lgrid.w+5+5+rgrid.w),20)
 		const rvalue=(g,k)=>tab_cell(g.table,k,g.row)
 		let sel=(ms.grid.table&&ms.grid.row>-1)?rvalue(ms.grid,'value'): ms.grid2.row>-1?rvalue(ms.grid2,'value'): null
+		let skb=(ms.grid.table&&ms.grid.row>-1)?rvalue(ms.grid,'kb'   ): ms.grid2.row>-1?rvalue(ms.grid2,'kb'   ): null
 		let copy_message='>> Copy >>',can_copy=1
 		if(ms.grid.row>-1&&sel&&(module_is(sel)||prototype_is(sel))){
 			const name=ifield(sel,'name');let sver=ln(ifield(sel,'version')),dver=sver;can_copy=0
@@ -1842,14 +1853,17 @@ modals=_=>{
 		}cb.y+=25
 		const pre=rect(cb.x,cb.y,cb.w,b.h-(cb.y-b.y))
 		if(sel&&font_is(sel)){
-			draw_textc(rect(pre.x,pre.y+pre.h-18,pre.w,18),count(ifield(sel,'glyphs'))+' glyphs',FONT_BODY,1);pre.h-=20
+			draw_textc(rect(pre.x,pre.y+pre.h-18,pre.w,18),count(ifield(sel,'glyphs'))+' glyphs     '+ls(skb),FONT_BODY,1);pre.h-=20
 			const l=layout_plaintext(PANGRAM,sel,ALIGN.center,rect(pre.w,pre.h));draw_text_wrap(pre,l,1)
 		}
 		if(sel&&(module_is(sel)||prototype_is(sel))){
-			draw_textc(rect(pre.x,pre.y+pre.h-18,pre.w,18),ls(dyad.format(lms('version %f'),ifield(sel,'version'))),FONT_BODY,1);pre.h-=20
+			draw_textc(rect(pre.x,pre.y+pre.h-18,pre.w,18),ls(dyad.format(lms('version %f     '+ls(skb)),ifield(sel,'version'))),FONT_BODY,1);pre.h-=20
 			const l=layout_plaintext(ls(ifield(sel,'description')),FONT_BODY,ALIGN.center,rect(pre.w,pre.h));draw_text_wrap(pre,l,1)
 		}
-		if(sel&&sound_is(sel)){if(ui_button(cb,'Play',1))n_play([sel])}
+		if(sel&&sound_is(sel)){
+			if(ui_button(cb,'Play',1))n_play([sel])
+			draw_textc(rect(pre.x,pre.y+pre.h-18,pre.w,18),ls(skb),FONT_BODY,1)
+		}
 		if(sel&&patterns_is(sel)){
 			const c=frame.clip,pal=sel.pal.pix;frame.clip=pre;
 			const anim_ants   =(x,y)=>(0|((x+y+(0|(frame_count/2)))/3))%2?15:0

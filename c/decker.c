@@ -1195,8 +1195,19 @@ lv*n_readfile(lv*self,lv*a){
 
 // Modal Helpers
 
+double baseline_deck_size=-1;
+lv* res_size(lv*x){
+	double kb=-1;
+	if(baseline_deck_size==-1){lv*d=deck_read(lmistr(""));baseline_deck_size=deck_write(d,0)->c;}
+	if(sound_is    (x)){kb=sound_write   (x)->c;}
+	if(font_is     (x)){kb=font_write    (x)->c;}
+	if(module_is   (x)){lv*d=deck_read(lmistr(""));n_deck_add(d,l_list(x));kb=deck_write(d,0)->c-baseline_deck_size;}
+	if(prototype_is(x)){lv*d=deck_read(lmistr(""));n_deck_add(d,l_list(x));kb=deck_write(d,0)->c-baseline_deck_size;}
+	if(kb!=-1){char t[64];snprintf(t,sizeof(t),"%.2fkb",kb/1000);return lmcstr(t);}return lmistr("");
+}
 lv* res_enumerate(lv*source){
-	lv*r=lmt(),*i=lml(0),*n=lml(0),*v=lml(0);dset(r,lmistr("icon"),i),dset(r,lmistr("name"),n),dset(r,lmistr("value"),v);
+	lv*r=lmt(),*i=lml(0),*n=lml(0),*v=lml(0),*kb=lml(0);
+	dset(r,lmistr("icon"),i),dset(r,lmistr("name"),n),dset(r,lmistr("value"),v),dset(r,lmistr("kb"),kb);
 	lv*pat=ifield(source,"patterns");
 	char*pal=patterns_pal(pat),*pv=patterns_write(pat)->sv;lv*pa=anims_write(pal),*da=l_parse(lmistr("%j"),lmistr(DEFAULT_ANIMS));
 	if(!matchr(pa,da)||strcmp(pv,DEFAULT_PATTERNS)){ll_add(i,lmn(icon_pat)),ll_add(n,lmistr("patterns")),ll_add(v,pat);}
@@ -1205,6 +1216,7 @@ lv* res_enumerate(lv*source){
 	lv*sounds=ifield(source,"sounds");EACH(z,sounds)ll_add(i,lmn(icon_sound)),ll_add(n,sounds->kv[z]),ll_add(v,sounds->lv[z]);
 	lv*modules=ifield(source,"modules");EACH(z,modules)ll_add(i,lmn(icon_lil)),ll_add(n,modules->kv[z]),ll_add(v,modules->lv[z]);
 	lv*defs=ifield(source,"contraptions");EACH(z,defs)ll_add(i,lmn(icon_app)),ll_add(n,defs->kv[z]),ll_add(v,defs->lv[z]);
+	EACH(z,v)ll_add(kb,res_size(v->lv[z]));
 	return torect(r);
 }
 void draw_thumbnail(lv*card,rect r){
@@ -1816,6 +1828,7 @@ void modals(void){
 		rect cb={lgrid.x+lgrid.w+5,lgrid.y+5,b.w-(lgrid.w+5+5+rgrid.w),20};
 		#define rvalue(g,k) dget(ms.g.table,lmistr(k))->lv[ms.g.row]
 		lv*sel=(ms.grid.table&&ms.grid.row>-1)?rvalue(grid,"value"): ms.grid2.row>-1?rvalue(grid2,"value"): NULL;
+		lv*skb=(ms.grid.table&&ms.grid.row>-1)?rvalue(grid,"kb"   ): ms.grid2.row>-1?rvalue(grid2,"kb"   ): NULL;
 		char*copy_message=">> Copy >>";int can_copy=1;
 		if(ms.grid.row>-1&&sel&&(module_is(sel)||prototype_is(sel))){
 			lv*name=ifield(sel,"name");
@@ -1837,14 +1850,17 @@ void modals(void){
 		}cb.y+=25;
 		rect pre={cb.x,cb.y,cb.w,b.h-(cb.y-b.y)};
 		if(sel&&font_is(sel)){
-			draw_textc((rect){pre.x,pre.y+pre.h-18,pre.w,18},l_format(lmistr("%i glyphs"),l_count(ifield(sel,"glyphs")))->sv,FONT_BODY,1);pre.h-=20;
+			draw_textc((rect){pre.x,pre.y+pre.h-18,pre.w,18},l_format(lmistr("%i glyphs     %s"),lml2(l_count(ifield(sel,"glyphs")),skb))->sv,FONT_BODY,1);pre.h-=20;
 			layout_plaintext(pangram,sel,align_center,(pair){pre.w,pre.h}),draw_text_wrap(pre,1);
 		}
 		if(sel&&(module_is(sel)||prototype_is(sel))){
-			draw_textc((rect){pre.x,pre.y+pre.h-18,pre.w,18},l_format(lmistr("version %f"),ifield(sel,"version"))->sv,FONT_BODY,1);pre.h-=20;
+			draw_textc((rect){pre.x,pre.y+pre.h-18,pre.w,18},l_format(lmistr("version %f     %s"),lml2(ifield(sel,"version"),skb))->sv,FONT_BODY,1);pre.h-=20;
 			layout_plaintext(ifield(sel,"description")->sv,FONT_BODY,align_center,(pair){pre.w,pre.h}),draw_text_wrap(pre,1);
 		}
-		if(sel&&sound_is(sel)){if(ui_button(cb,"Play",1))n_play(deck,l_list(sel));}
+		if(sel&&sound_is(sel)){
+			if(ui_button(cb,"Play",1))n_play(deck,l_list(sel));
+			draw_textc((rect){pre.x,pre.y+pre.h-18,pre.w,18},skb->sv,FONT_BODY,1);
+		}
 		if(sel&&patterns_is(sel)){
 			rect c=frame.clip;frame.clip=pre;char*pal=patterns_pal(sel);for(int z=0;z<32;z++)for(int y=0;y<16;y++)for(int x=0;x<16;x++){
 				int bx=3+x+pre.x+16*(z%(pre.w/16)), by=y+pre.y+16*(z/(pre.w/16));if(inclip(bx,by))PIX(bx,by)=32+draw_color(pal,z,frame_count,x,y);
