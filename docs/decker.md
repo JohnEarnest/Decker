@@ -997,7 +997,7 @@ Images are dynamically created interfaces, each representing a mutable rectangul
 | `x.size`               | The `size` of the image in pixels. Resizing pads with `0` or truncates, as needed. r/w.                                  |
 | `x[pos]`               | The pattern index of an (x,y) pixel of the image. Reads nil out of bounds, ignores out of bounds writes. r/w.            |
 | `x.map[x y]`           | Replace every pixel of the image by indexing the dictionary `x`, using `y` as a default if provided.                     |
-| `x.transform[x]`       | Update the image in place according to one of {`"horiz"`,`"vert"`,`"flip"`,`"left"`,`"right"`,`"dither"`}.               |
+| `x.transform[x]`       | Update the image in place according to one of {`"horiz"`,`"vert"`,`"flip"`,`"left"`,`"right"`,`"turn"`,`"dither"`}.      |
 | `x.rotate[x]`          | Update the image in place, rotating it clockwise around its centerpoint by `x` radians.                                  |
 | `x.translate[pos w]`   | Update the image in place, translating it by `pos` (x,y) pixels. If `w` is truthy, wrap the image at the edges.          |
 | `x.scale[n a]`         | Update the image in place, nearest-neighbor scaling it by `n`, which can be a single number or `(x,y)` pair.             |
