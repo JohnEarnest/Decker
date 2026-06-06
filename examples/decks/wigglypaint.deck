@@ -1141,10 +1141,11 @@ end
 size:[57,35]
 margin:[0,0,0,0]
 description:"save a wigglypaint canvas temporarily, and restore it later!"
+version:1
 image:"%%IMG3ADkAIwZAQGBILBqPyKRyKQQ5n9CodEqtWofWrHZbxXK/4G4gTC6DvOa0Fq1uT9nuuBMud9Pr6jverN+T+35ggIFcg4RrY4dphopijXyJj2GMklGUlU+XmGeRm4iehUuio6SjdZ1tXqqrmYmub6uusnO0nGe1r7evube4vb+7uGOoucNQvMe0kcvKwnPMnKzR0NHPtdO9s5m+v7rXyd7XwdnG2b7j1OPAzeTW3NrI27qsu8P2p6dCpfv8SgBB"
 script:"wigglyStash.0p"
 {widgets}
-preview:{"type":"canvas","size":[53,21],"pos":[2,2],"volatile":1,"scale":1}
+preview:{"type":"canvas","size":[53,21],"pos":[2,2],"locked":1,"volatile":1,"scale":1}
 stashbutton:{"type":"button","size":[29,13],"pos":[-1,23],"script":"wigglyStash.1p","style":"invisible"}
 recallbutton:{"type":"button","size":[29,13],"pos":[29,23],"script":"wigglyStash.2p","style":"invisible"}
 data:{"type":"field","size":[100,20],"pos":[105,-7],"locked":1,"show":"none"}
