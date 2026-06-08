@@ -8,7 +8,7 @@ name:"hershey.deck"
 script:"Index.0"
 {widgets}
 index:{"type":"field","size":[292,201],"pos":[7,134],"locked":1,"volatile":1,"script":"Index.1","scrollbar":1}
-version:{"type":"field","size":[25,14],"pos":[480,321],"locked":1,"border":0,"value":"v0.4"}
+version:{"type":"field","size":[25,14],"pos":[480,321],"locked":1,"volatile":1,"border":0}
 logotype:{"type":"canvas","size":[498,112],"pos":[7,20],"locked":1,"volatile":1,"border":0,"brush":6,"scale":1}
 field1:{"type":"field","size":[186,14],"pos":[319,134],"locked":1,"show":"transparent","border":0,"align":"center","value":"vector fonts for decker"}
 button1:{"type":"button","size":[94,23],"pos":[363,277],"script":"Index.2","text":"Begin..."}
@@ -100,7 +100,7 @@ on redraw do
  local f:deck.modules[first fontlist.rowvalue].value
  local c:preview.canvas
  local margin:10
- local alpha:"\n" fuse 16 window "%a" format list 32+range 95
+ local alpha:16 window keys f.glyphs
 
  f:hershey.scale[f scale.value]
  c.brush:brush.valueIndex
@@ -138,12 +138,19 @@ button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"background.1",
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"background.1","text":"Prev","style":"rect"}
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"The .jhf Format"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"background.1","text":"Index","style":"rect"}
-field1:{"type":"field","size":[248,241],"pos":[254,47],"locked":1,"border":0,"value":".jhf files are a common text format for representing Hershey fonts.\n\nEach line of the file consists of four fixed-width fields (id, length, left, right) followed by a sequence of (x,y) points making up the vertices of a series of polylines which make up a glyph, each delimited by the pair of characters \" R\" (a space followed by a capital R).\n\n\n\n\nthe left/right field and each of the pairs of characters making up a point are encoded as ASCII characters. Subtracting 'R' from the character gives its integral value: R is 0, Q is -1, T is +2, and so on.\n\nWell-formed .jhf files should not contain newlines within glyphs or non-displayable ASCII characters. The \"id\" field should correspond to a DeckRoman character index. .jhf files you find online may be malformed, but this is easy to correct by hand once you understand their structure."}
+field1:{"type":"field","size":[248,257],"pos":[254,47],"locked":1,"border":0,"value":".jhf files are a common text format for representing Hershey fonts.\n\nEach line of the file consists of four fixed-width fields (id, length, left, right) followed by a sequence of (x,y) points making up the vertices of a series of polylines which make up a glyph, each delimited by the pair of characters \" R\" (a space followed by a capital R).\n\n\n\n\nthe left/right field and each of the pairs of characters making up a point are encoded as ASCII characters. Subtracting 'R' from the character gives its integral value: R is 0, Q is -1, T is +2, and so on.\n\nWell-formed .jhf files should not contain newlines within glyphs or non-displayable ASCII characters. The \"id\" field should correspond to a DeckRoman character index. .jhf files you find online may be malformed; the hershey.fix_jhf[text] function will attempt to remove spurious newlines and- if duplicate glyph ids are detected- renumber glyphs sequentially starting from 32."}
 grid1:{"type":"grid","size":[233,90],"pos":[10,64],"locked":1,"scrollbar":0,"widths":[39,35],"value":{"name":["id    ","length","left  ","right ","points"],"length":["5","3","1","1","n"],"description":["decimal id of glyph","decimal number of points","left offset of bounding box","right offset of bounding box","a list of points"]}}
 field2:{"type":"field","size":[233,17],"pos":[10,44],"locked":1,"font":"menu","border":0,"align":"center","value":"glyph fields"}
 field3:{"type":"field","size":[233,17],"pos":[10,159],"locked":1,"font":"menu","border":0,"align":"center","value":"point encoding"}
 grid2:{"type":"grid","size":[233,31],"pos":[10,178],"locked":1,"scrollbar":0,"lines":1,"value":{"...":["..."],"O":["-3"],"P":["-2"],"Q":["-1"],"R":["0"],"S":["+1"],"T":["+2"],"U":["+3"],"... ":["..."]}}
-field4:{"type":"field","size":[100,16],"pos":[79,244],"locked":1,"border":0,"align":"center","value":{"text":["( ","see also"," )"],"font":["","",""],"arg":["","https://wiki.xxiivv.com/site/hershey.html",""]}}
+field4:{"type":"field","size":[100,16],"pos":[79,222],"locked":1,"border":0,"align":"center","value":{"text":["( ","see also"," )"],"font":["","",""],"arg":["","https://wiki.xxiivv.com/site/hershey.html",""]}}
+fix:{"type":"button","size":[133,29],"pos":[66,254],"script":"jhf_format.0","text":"Fix Malformed .jhf..."}
+
+{script:jhf_format.0}
+on click do
+ write[hershey.fix_jhf[read[] ".jhf"]]
+end
+{end}
 
 {card:hershey_parse}
 script:"hershey_parse.0"
@@ -383,12 +390,35 @@ field5:{"type":"field","size":[209,14],"pos":[293,167],"locked":1,"border":0,"st
 
 {module:hershey}
 description:"Read, write, render and manipulate Hershey vector fonts."
-version:0.5
+version:1
 {script}
 # see https://en.wikipedia.org/wiki/Hershey_fonts
 
 COLUMNS:"%[id]5i%[n]3i%[left]1s%[right]1s%[points]s"
 MISSING:("left","right","strokes")dict 0,0,list ()
+
+on hershey_fix_jhf text do
+ # correct newline-mangled jhf files:
+ local entries:()
+ while count text
+  local entry:"%[id]5i%[n]3i" parse text
+  local p:""
+  text:8 drop text
+  while !(2*entry.n)<count p
+   local c:first text
+   text:1 drop text
+   if !c~"\n" p:p,c end
+  end
+  entry.payload:""fuse p
+  entries:entries,list entry
+  while "\n"~first text text:1 drop text end
+ end
+ # detect mangled glyph ids, assume ASCII:
+ if (count entries)>count distinct entries..id
+  entries:each e index in entries e.id:32+index end
+ end
+ ("\n","%[id]5i%[n]3i%[payload]s") format entries
+end
 
 on hershey_parse text do
  on pos x do ("%a" parse x)-82 end
@@ -488,6 +518,7 @@ on hershey_textc canvas font text pos size do
  canvas.line @ pathtranslate[pos hershey_textpathc[font text size]]
 end
 
+module.fix_jhf  :hershey_fix_jhf
 module.parse    :hershey_parse
 module.format   :hershey_format
 module.scale    :hershey_scale
