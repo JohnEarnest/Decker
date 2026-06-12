@@ -282,7 +282,7 @@ field4:{"type":"field","size":[121,15],"pos":[347,175],"locked":1,"border":0,"st
 field5:{"type":"field","size":[174,17],"pos":[251,118],"locked":1,"style":"code","align":"center","value":"references.widgets.chicken"}
 field6:{"type":"field","size":[174,15],"pos":[251,100],"locked":1,"border":0,"style":"plain","align":"center","value":"\"path\" to this widget from elsewhere:"}
 field7:{"type":"field","size":[70,15],"pos":[242,175],"locked":1,"border":0,"style":"plain","align":"center","value":"(this card!)"}
-field8:{"type":"field","size":[106,12],"pos":[88,101],"locked":1,"border":0,"style":"plain","align":"center","value":"a checkbox widget:"}
+field8:{"type":"field","size":[106,14],"pos":[88,101],"locked":1,"border":0,"style":"plain","align":"center","value":"a checkbox widget:"}
 button1:{"type":"button","size":[131,44],"pos":[62,229],"script":"references.0","text":"Reset 'Memory' on the Previous Card"}
 field3:{"type":"field","size":[219,39],"pos":[241,229],"locked":1,"style":"code","value":"on click do\n remembering.widgets.memory.value:0\nend"}
 
