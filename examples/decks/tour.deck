@@ -19,9 +19,11 @@ that's the tagline:{"type":"field","size":[163,14],"pos":[282,200],"locked":1,"v
 button1:{"type":"button","size":[86,26],"pos":[11,303],"script":"home.1","text":"Credits","style":"rect"}
 button2:{"type":"button","size":[86,26],"pos":[415,305],"script":"home.2","text":"Guided Tour","style":"rect"}
 ee:{"type":"button","size":[57,50],"pos":[162,157],"script":"home.3","show":"transparent","style":"invisible"}
+version:{"type":"field","size":[100,13],"pos":[407,18],"locked":1,"volatile":1,"border":0,"align":"right"}
 
 {script:home.0}
 on view do
+ version.text:"v",sys.version
  card.widgets["that's the tagline"].text:random[
   "a multimedia sketchpad",
   "a multimedia sketchbook",
@@ -243,6 +245,52 @@ field4:{"type":"field","size":[85,33],"pos":[226,78],"locked":1,"border":0,"styl
 field5:{"type":"field","size":[92,25],"pos":[289,129],"locked":1,"border":0,"style":"plain","align":"center","value":"Play a sound with the name \"sosumi\"."}
 field6:{"type":"field","size":[192,48],"pos":[63,225],"locked":1,"border":0,"style":"plain","align":"center","value":"The names \"Next\", \"Prev\", \"First\", \"Last\", and \"Back\" have special meanings.\nAny other string in double-quotes would refer to a card by name."}
 field7:{"type":"field","size":[127,55],"pos":[279,175],"locked":1,"border":0,"style":"plain","align":"center","value":"\"BoxIn\" is the name of a transition animation.\nYou can define your own reusable transition animations with scripts!"}
+
+{card:remembering}
+image:"%%IMG3AgABVgQQyEmrvTjrzbv/YCiOZGmeaKqubOu+cCzPdG3feK7vfO//wKBwSCwaj8ikcslsOp/QqHRKrVqv2Kx2y+16v+CweEwum8/otHrNbrvf8Lh8Tq/b7/i8fs/v+/+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/wADChxIsKDBgwgTKlzIsKHDhxAjSpxIsaLFixgzatzIsaPHjyBDihxJsqTJkyhTqlzJsqXLlzBjypxJs6bNmzhz6tzJs6fPn0CDCh1KtKjRo0iTKl3KtKnTp1CjzmlAtarVq1izat3KtavXr2C7Ss0StqzZs2jTfh17Ra3bt3DjVmVrZe4fu3Sn4O2zNy+UvnsA+20iOE/hwUoO31GM+AjjOo8bE4k8larkJ5TlZL78YzMcz5x5gHYzOnSO0mxQm7ahWk3r1TNeo5ENGwZtM7drt8hNhrduFb7FBP99YjgY48RJIPeyPHmI5lygO/cgXUv16RuuY9GOHQP3upa7dw7v57t4CuappD8PYL0U9+Lh/yXPXod8zPTr47jvhL9z/0wASJyAieWnH2sG6kGgbgsi0SBsDxoRoWkTTpbggbFdiEeFnHEohIeSgQiEiIiR6IOJfqEomoYY2saiHSrSFaN9L7a4W410zDiWjvvhaCNwPmoW5I/FDfmZkUQqhyRpSyb5XJOpQZlIAAvxeIOVUwSgpUJydenll1ptouWYVCIE5ploxpUJmWyWaVCacMYJ1pptsukkJ3aOCQCZd2JipwR6Arpln5T8KeighhIKSaAUMJqoopYwuuegkPpJaaWdSIqpmJduqommnlrqZqh0jkrqJaCeWminqq5qaquuwooqq7IuSmutjqSKayO67rpIr75OeWuwwr5KrCLAHltIssoOwmyzgTwL7R/STttHtdbugW22eWzL7R3efltHuOLSYWy56Kar7rrstuvuu/DGK++89NZr77345qvvvvz26++/AAcs8MAEF2zwwQgnrPDCDDfs8MMQRyzxxBRXbPHFGGes8cYcd+zxxyCHLPLIJJds8skop6zyyiy37PLLMMcs88w012zzzTjnrPPOPPfs889ABy300EQXbfTRSCet9NJMN+3001BHLfXUVFdt9dVYZ6311lx37fXXYIct9thkl2322WinrfbabLft9ttwxy333HTXbffdeOet99589+3334AHLvjghBdu+OGIJ6744oxDFAE="
+{widgets}
+next:{"type":"button","size":[86,26],"pos":[415,305],"script":"home.2","text":"Next","style":"rect"}
+prev:{"type":"button","size":[86,26],"pos":[12,304],"script":"What's a Card?.0","text":"Previous","style":"rect"}
+field2:{"type":"field","size":[273,44],"pos":[114,24],"locked":1,"font":"deckbuilder","border":0,"align":"center","value":"Widgets Remember Information"}
+field1:{"type":"field","size":[276,34],"pos":[122,300],"locked":1,"border":0,"style":"plain","align":"center","value":"Anything a script needs to \"remember\" lives inside a widget on some card. You can make widgets invisible or tucked away on another card if they aren't meant to be seen."}
+field5:{"type":"field","size":[277,96],"pos":[199,168],"locked":1,"style":"code","value":"on click do\n if memory.value\n  alert[\"I have a sense of deja vu.\"]\n else\n  alert[\"That's the first time you clicked.\"]\n  memory.value:1\n end\nend"}
+field6:{"type":"field","size":[174,15],"pos":[241,85],"locked":1,"border":0,"style":"plain","align":"center","value":"a button:"}
+field8:{"type":"field","size":[134,15],"pos":[62,85],"locked":1,"border":0,"style":"plain","align":"center","value":"a checkbox named \"memory\":"}
+memory:{"type":"button","size":[104,46],"pos":[77,105],"text":"You've Clicked\nThe Button\nPreviously","style":"check","value":0}
+button1:{"type":"button","size":[118,41],"pos":[268,106],"script":"remembering.0","text":"Click Me (Statefully)"}
+
+{script:remembering.0}
+on click do
+ if memory.value
+  alert["I have a sense of deja vu."]
+ else
+  alert["That's the first time you clicked."]
+  memory.value:1
+ end
+end
+{end}
+
+{card:references}
+image:"%%IMG3AgABVgQQyEmrvTjrzbv/YCiOZGmeaKqubOu+cCzPdG3feK7vfO//wKBwSCwaj8ikcslsOp/QqHRKrVqv2Kx2y+16v+CweEwum8/otHrNbrvf8Lh8Tq/b7/i8fs/v+/+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/wADChxIsKDBgwgTKlzIsKHDhxAjSpxIsaLFixgzatzIsaPHjyBDihxJsqTJkyhTqlzJsqXLlzBjypxJs6bNmzhz6tzJs6fPn0CDCh1KtKjRo0iTKl3KtKnTp1CjSp1KtarVq1izat3KtavXr2DDih1LtqxZqA3Sql3Ltq3bt3Djyp1Lt+3ZK3Xz6t3Lt+/dKn0DCx689y8VtW0QG5aieE3jxU8ep5EMmQnlM5crJ8lchrNmI57HhP48ZHQY06SBoP6yOnWP1l1gu9Yhe0vt2TduZ9GNmwZvvGl7I/lthbjwF8YPBz9eJPkU58xVQI8yPfqJ6pGXWw+C3Un37SK+W9aeJQBY8UvQ4wjAXon5Mu+Xqd9M/gr7+Ebuk9Evvz6a+TbcJ+CABBZo4IEIJkgEfivwpwyAR0BYQ4IUVmihgkM4yMGFGiIjYXP+2cfhiCQWWESJIzLzIRErMtHhFyhe2AxhNNZoYwN1vAgGid3c6OOPedGhIxxDVgPkkUiuJWR7eBQJXoNMNhnlkzA4GYeVVJaA5ZVTZqnClkR26eUJYHLJ4JgklCmHmmhawKaZbaYpph9vxlknnHGCcCeeeXqwJ599avAnoIFiMGiYZxZKgYCIHBqdo4gqegGjiUDam6WRSrronIRQqikAmGb6aahvkPqZp5VyaqepbrAKmattwGqYrGzQeleiiuD66a689urrr8AGK+ywxBZr7LHIJqvsssw26+yz0EYr7bTUVmvttdhmq+223Hbr7bfghivuuOSWa+656Kar7rrstuvuu/DGK++89NZr77345qvvvvz26++/AAcs8MAEF2zwwQgnrPDCDDfs8MNK6QrxDLZOvKmqFruAasYUY8wxCxVzDGaMFS78IskxJozyygOqzOPHcmII85cbz/xCzTa3gHPOUHrMswkhfxx0xjv/jILPRiet9NJMN+3001BHLfXUVFdt9dVYZ6311lx37fXXYIct9thkl2322WinrfbabLft9ttwxy333HTXbffdeOet99589+3334AHLvjghBdu+OGIJ6744ow37vjjkEcu+eSUV2755VlGAA=="
+{widgets}
+next:{"type":"button","size":[86,26],"pos":[415,305],"script":"home.2","text":"Next","style":"rect"}
+prev:{"type":"button","size":[86,26],"pos":[12,304],"script":"What's a Card?.0","text":"Previous","style":"rect"}
+field2:{"type":"field","size":[273,44],"pos":[114,24],"locked":1,"font":"deckbuilder","border":0,"align":"center","value":"Referencing Widgets"}
+field1:{"type":"field","size":[276,34],"pos":[122,300],"locked":1,"border":0,"style":"plain","align":"center","value":"There are several ways for scripts to refer to widgets. When a widget is on another card, you'll need to specify a \"path\" to it that includes the card where it's located."}
+chicken:{"type":"button","size":[85,22],"pos":[102,119],"text":"Chicken?","style":"check","value":0}
+field4:{"type":"field","size":[121,15],"pos":[347,175],"locked":1,"border":0,"style":"plain","align":"center","value":"(local name of the widget!)"}
+field5:{"type":"field","size":[174,17],"pos":[251,118],"locked":1,"style":"code","align":"center","value":"references.widgets.chicken"}
+field6:{"type":"field","size":[174,15],"pos":[251,100],"locked":1,"border":0,"style":"plain","align":"center","value":"\"path\" to this widget from elsewhere:"}
+field7:{"type":"field","size":[70,15],"pos":[242,175],"locked":1,"border":0,"style":"plain","align":"center","value":"(this card!)"}
+field8:{"type":"field","size":[106,12],"pos":[88,101],"locked":1,"border":0,"style":"plain","align":"center","value":"a checkbox widget:"}
+button1:{"type":"button","size":[131,44],"pos":[62,229],"script":"references.0","text":"Reset 'Memory' on the Previous Card"}
+field3:{"type":"field","size":[219,39],"pos":[241,229],"locked":1,"style":"code","value":"on click do\n remembering.widgets.memory.value:0\nend"}
+
+{script:references.0}
+on click do
+ remembering.widgets.memory.value:0
+end
+{end}
 
 {card:The Listener}
 {widgets}
