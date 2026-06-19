@@ -1183,10 +1183,10 @@ lv* contraptions_enumerate(void){
 lv*n_readfile(lv*self,lv*a){
 	lv*name=ls(l_first(a)),*hint=a->c>1?ls(a->lv[1]):lms(0);
 	if(!strcmp(hint->sv,"array"))return readbin(name);
-	if(has_suffix(name->sv,".png" ))return readimage(name->sv,!strcmp(hint->sv,"gray"));
-	if(has_suffix(name->sv,".bmp" ))return readimage(name->sv,!strcmp(hint->sv,"gray"));
-	if(has_suffix(name->sv,".jpg" ))return readimage(name->sv,!strcmp(hint->sv,"gray"));
-	if(has_suffix(name->sv,".jpeg"))return readimage(name->sv,!strcmp(hint->sv,"gray"));
+	if(has_suffix(name->sv,".png" ))return readimage(drom_to_utf8(name)->sv,!strcmp(hint->sv,"gray"));
+	if(has_suffix(name->sv,".bmp" ))return readimage(drom_to_utf8(name)->sv,!strcmp(hint->sv,"gray"));
+	if(has_suffix(name->sv,".jpg" ))return readimage(drom_to_utf8(name)->sv,!strcmp(hint->sv,"gray"));
+	if(has_suffix(name->sv,".jpeg"))return readimage(drom_to_utf8(name)->sv,!strcmp(hint->sv,"gray"));
 	if(has_suffix(name->sv,".gif" ))return n_readgif(self,a);
 	if(has_suffix(name->sv,".wav" ))return n_readwav(self,a);
 	if(has_suffix(name->sv,".deck"))return n_readdeck(self,a);
@@ -1462,6 +1462,7 @@ void modal_enter(int type){
 }
 void bg_paste(lv*b,int fit);void proto_prop(lv*target,char*key,lv*value);void proto_size(lv*target,pair size,rect margin); // forward refs
 void import_image(char*path){
+	// note: 'path' is a raw UTF-8 string!
 	lv*i=readimage(path,0),*m=NULL;if(is_empty(i))return;
 	int color=0,c[256]={0};EACH(z,i->b)c[0xFF&(i->b->sv[z])]++;
 	int tw=c[0],ow=c[32];c[32]=0,c[47]=0;for(int z=2;z<256;z++)if(c[z]){color=1;break;}
@@ -1484,7 +1485,7 @@ void modal_exit(int value){
 	wid=ms.old_wid;
 	if(wid.gv==&ms.old_wid.gv_slot)wid.gv=&wid.gv_slot;
 	if(wid.fv==&ms.old_wid.fv_slot)wid.fv=&wid.fv_slot;
-	if(ms.subtype==modal_import_image&&value){import_image(modal_open_path()->sv);}
+	if(ms.subtype==modal_import_image&&value){import_image(drom_to_utf8(modal_open_path())->sv);}
 	if(ms.subtype==modal_open_deck&&value){
 		lv*path=modal_open_path();
 		load_deck(deck_get(n_read(NULL,l_list(path))));
