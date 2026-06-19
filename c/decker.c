@@ -3561,7 +3561,7 @@ void event_file(char*p){
 	if(lb(ifield(deck,"locked")))return;
 	if(has_suffix(p,".html")||has_suffix(p,".deck")){
 		modal_enter(modal_resources);
-		ms.message=deck_get(n_read(NULL,l_list(lmcstr(p))));
+		ms.message=deck_get(n_read(NULL,l_list(lmutf8(p))));
 		ms.grid=(grid_val){res_enumerate(ms.message),0,-1,-1};
 	}
 	if(has_suffix(p,".gif"))import_image(p);
@@ -3574,7 +3574,7 @@ void event_file(char*p){
 	}
 	if(has_suffix(p,".csv")||has_suffix(p,".psv")){
 		setuimode(mode_object);lv*a=lmd();
-		lv* dat=n_read(NULL,l_list(lmcstr(p)));
+		lv* dat=n_read(NULL,l_list(lmutf8(p)));
 		lv* sep=lmistr(has_suffix(p,".csv")?",": "|");
 		lv* arg=lml(3);arg->lv[0]=dat,arg->lv[1]=LNIL,arg->lv[2]=sep;
 		dset(a,lmistr("type"),lmistr("grid"));
@@ -3583,7 +3583,7 @@ void event_file(char*p){
 	}
 	if(has_suffix(p,".hex")){
 		lv*pat=ifield(deck,"patterns");iwrite(pat,lmn(32),lmn(0xFFFFFF));iwrite(pat,lmn(47),ZERO);
-		lv*t=l_parse(lmistr("%h"),l_split(lmistr("\n"),ls(n_read(NULL,l_list(lmcstr(p))))));
+		lv*t=l_parse(lmistr("%h"),l_split(lmistr("\n"),ls(n_read(NULL,l_list(lmutf8(p))))));
 		if(t->c&&ln(t->lv[t->c-1])==0)t->c--; // trailing newline?
 		if(t->c>14){
 			int a=0,b=0;EACH(z,t){
