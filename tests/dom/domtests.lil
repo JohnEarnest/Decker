@@ -619,6 +619,10 @@ if !sys.platform~"web"
 	assert["read valid wav size" 7990  w.size]
 	assert["read valid wav data" (-4,-9,-13,-15,-15) w[0,5]]
 
+	w:read["tests/dom/é4.wav" 10]
+	assert["read valid accented wav size" 7990  w.size]
+	assert["read valid accented wav data" (-4,-9,-13,-15,-15) w[0,5]]
+
 	w:read["tests/dom/a.wav"]
 	assert["read invalid wav type" "sound" (typeof w)]
 	assert["read invalid wav size" 0       w.size]
