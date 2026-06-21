@@ -304,6 +304,8 @@ Attribute `type`s may be one of the following:
 - `string`: A string value, editable with a field.
 - `code`: A string value, editable with a larger field in "code" editing mode.
 - `rich`: A string value, editable with a larger field in "rich" editing mode.
+- `data`: A LOVE-compatible value, editable with a large field in "code" editing mode.
+- `note`: An informative description of the contraption's behavior; no editor, the label is simply displayed as inline text.
 
 An example of a complete `{contraption:ID}` chunk and its associated `{widgets}` and `{script:ID}` chunks:
 ```
@@ -479,3 +481,5 @@ Changelog
 1.67:
 - Added `f32b`, `f32l`, `f64b`, and `f64l` float support to Arrays.
 
+1.68:
+- Added contraption attribute types `data` and `note`.

@@ -2810,7 +2810,7 @@ normalize_margin=(x,s)=>{
 }
 prototype_read=(x,deck)=>{
 	x=ld(x)
-	const attribute_types={'':1,bool:1,number:1,string:1,code:1,rich:1}
+	const attribute_types={'':1,bool:1,number:1,string:1,code:1,rich:1,data:1,note:1}
 	const normalize_attributes=x=>{
 		const r=lmt();tab_set(r,'name',[]),tab_set(r,'label',[]),tab_set(r,'type',[]);if(!lit(x))return r
 		const sn=tab_get(x,'name'),sl=tab_get(x,'label')||sn,st=tab_get(x,'type')

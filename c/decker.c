@@ -1011,21 +1011,23 @@ void ui_richedit(rect r,int border,field_val*value){widget_field(NULL,(field){r,
 int  ui_table   (rect r,int w0,int w1,int w2,char*fmt,grid_val*value){return widget_grid(NULL,(grid){r,FONT_BODY,{w0,w1,w2,0,0},fmt,2,1,0,0,show_solid,1},value);}
 int  ui_list    (rect r,                              grid_val*value){return widget_grid(NULL,(grid){r,FONT_BODY,{0 },"" ,0,1,0,0,show_solid,1},value);}
 
-typedef struct {int type,bval;char label[1024];field_val value;} attr_item; attr_item* attrs=NULL;int attrs_count=0,attrs_size=0,attrs_scroll=0;
-int attr_heights[]={0,16,20,20,80,80}; // nil,bool,number,string,code,rtext
+typedef struct {int type,bval,height;char label[4096];field_val value;} attr_item; attr_item* attrs=NULL;int attrs_count=0,attrs_size=0,attrs_scroll=0;
+int attr_heights[]={0,16,20,20,80,80,80,0}; // nil,bool,number,string,code,rtext,data,note
 void attr_push(attr_item x){grower(attrs,attr_item);attrs[attrs_count++]=x;}
 void widget_attributes(rect b){
 	draw_box(b,0,1);
-	int h=5,lw=0;for(int z=0;z<attrs_count;z++){h+=attr_heights[attrs[z].type]+5;if(attrs[z].type!=attr_bool)lw=MAX(lw,font_textsize(FONT_MENU,attrs[z].label).x);}
+	int h=5,lw=0;for(int z=0;z<attrs_count;z++){h+=attrs[z].height+5;if(attrs[z].type!=attr_bool&&attrs[z].type!=attr_note)lw=MAX(lw,font_textsize(FONT_MENU,attrs[z].label).x);}
 	rect bi=scrollbar(b,MAX(0,h-b.h),10,b.h,&attrs_scroll,1,0);bi.y+=1;rect oc=frame.clip;frame.clip=bi;lw=MIN(lw+10,bi.w*.6);
 	pair bp=ev.pos,bd=ev.dpos;int bs=ev.scroll;ev.scroll=0;if(!over(bi))ev.pos=(pair){-1,-1};if(!dover(bi))ev.dpos=(pair){-1,-1};
 	int y=5;for(int z=0;z<attrs_count;z++){
-		rect lb={bi.x+5,bi.y+y-attrs_scroll,lw,attr_heights[attrs[z].type]}, wb={lb.x+lb.w+5,lb.y,(bi.w-15)-lb.w,lb.h};y+=lb.h+5;
-		if(attrs[z].type==attr_bool){lb.w=bi.w-10;if(ui_checkbox(lb,attrs[z].label,1,attrs[z].bval))attrs[z].bval^=1;continue;}
+		rect lb={bi.x+5,bi.y+y-attrs_scroll,lw,attrs[z].height}, wb={lb.x+lb.w+5,lb.y,(bi.w-15)-lb.w,lb.h};y+=lb.h+5;
+		if     (attrs[z].type==attr_bool){lb.w=bi.w-10;if(ui_checkbox(lb,attrs[z].label,1,attrs[z].bval))attrs[z].bval^=1;continue;}
+		else if(attrs[z].type==attr_note){lb.w=bi.w-10;layout_plaintext(attrs[z].label,FONT_BODY,align_left,(pair){lb.w,lb.h});draw_text_rich_raw(lb,1,1,NULL);continue;}
 		else{draw_text_fit(lb,attrs[z].label,FONT_MENU,1);}
 		if(attrs[z].type==attr_number)ui_field(wb,&attrs[z].value);
 		if(attrs[z].type==attr_string)ui_field(wb,&attrs[z].value);
 		if(attrs[z].type==attr_code  )ui_codeedit(wb,1,&attrs[z].value);
+		if(attrs[z].type==attr_data  )ui_codeedit(wb,1,&attrs[z].value);
 		if(attrs[z].type==attr_rich  )ui_richedit(wb,1,&attrs[z].value);
 	}frame.clip=oc,ev.pos=bp,ev.dpos=bd,ev.scroll=bs;
 }
@@ -1389,9 +1391,12 @@ void modal_enter(int type){
 		for(int z=0;z<a->n;z++){
 			attr_item i={0};lv*v=iwrite(w,a->lv[0]->lv[z],NULL);
 			i.type=ordinal_enum(a->lv[2]->lv[z],attribute_types);
+			i.height=attr_heights[i.type];
 			snprintf(i.label,sizeof(i.label),"%s",a->lv[1]->lv[z]->sv);
 			if     (i.type==attr_bool){i.bval=lb(v);}
+			else if(i.type==attr_data){i.value=(field_val){rtext_cast(l_format(lmistr("%J"),l_list(v))),0};}
 			else if(i.type==attr_rich){i.value=(field_val){rtext_cast(v),0};}
+			else if(i.type==attr_note){i.height=layout_plaintext(i.label,FONT_BODY,align_left,(pair){213,400}).y;}
 			else {i.value=(field_val){rtext_cast(ls(v)),0};}
 			attr_push(i);
 		}
@@ -1529,6 +1534,7 @@ void modal_exit(int value){
 			if(t==attr_string)v=rtext_all(attrs[z].value.table);
 			if(t==attr_code  )v=rtext_all(attrs[z].value.table);
 			if(t==attr_rich  )v=attrs[z].value.table;
+			if(t==attr_data  )v=l_parse(lmistr("%J"),rtext_all(attrs[z].value.table));
 			iwrite(w,a->lv[0]->lv[z],v);
 		}attrs_count=0;
 	}
@@ -2224,7 +2230,7 @@ void modals(void){
 		if(ui_button((rect){b.x+b.w-60,c.y,60,20},"OK",1)||ev.exit)modal_exit(0);
 	}
 	else if(ms.type==modal_prototype_attrs){
-		rect b=draw_modalbox((pair){220,200});lv*def=con();int lw=42;
+		rect b=draw_modalbox((pair){220,220});lv*def=con();int lw=42;
 		draw_textc((rect){b.x,b.y-5,b.w,20},title_caps(ifield(def,"name")->sv," Attributes"),FONT_MENU,1);
 		rect gsize={b.x,b.y+20,80,b.h-(20+5+20)};
 		int before=ms.grid.row;ui_table(gsize,1,gsize.w-18,0,"s",&ms.grid);
@@ -2235,15 +2241,15 @@ void modals(void){
 		int sel=ms.grid.row>=0;
 		draw_text((rect){gsize.x+gsize.w+10,b.y+20+2,lw,20},"Name" ,FONT_MENU,1);
 		draw_text((rect){gsize.x+gsize.w+10,b.y+40+2,lw,20},"Label",FONT_MENU,1);
-		draw_text((rect){gsize.x+gsize.w+10,b.y+60+2,lw,20},"Type" ,FONT_MENU,1);
+		draw_text((rect){gsize.x+gsize.w+10,b.y+80+2,lw,20},"Type" ,FONT_MENU,1);
 		ui_dfield((rect){gsize.x+gsize.w+5+lw,b.y+20,b.w-(lw+5+gsize.w),18},sel,&ms.name);
-		ui_dfield((rect){gsize.x+gsize.w+5+lw,b.y+40,b.w-(lw+5+gsize.w),18},sel,&ms.text);
+		ui_dfield((rect){gsize.x+gsize.w+5+lw,b.y+40,b.w-(lw+5+gsize.w),2*18},sel,&ms.text);
 		if(sel){
 			ms.grid.table->lv[0]->lv[ms.grid.row]=rtext_all(ms.name.table);
 			ms.grid.table->lv[1]->lv[ms.grid.row]=rtext_all(ms.text.table);
 		}
-		pair cr={gsize.x+gsize.w+5+lw,b.y+62}, c={b.x,b.y+b.h-20};
-		char*attr_labels[]={"","Boolean","Number","String","Code","Rich Text",NULL};
+		pair cr={gsize.x+gsize.w+5+lw,b.y+80}, c={b.x,b.y+b.h-20};
+		char*attr_labels[]={"","Boolean","Number","String","Code","Rich Text","Data","Note",NULL};
 		char*t=sel?ms.grid.table->lv[2]->lv[ms.grid.row]->sv:"";
 		for(int z=1;attr_labels[z];z++,cr.y+=16)if(ui_radio((rect){cr.x,cr.y,b.w-(lw+5+gsize.w),16},attr_labels[z],sel,!strcmp(t,attribute_types[z]))){
 			ms.grid.table->lv[2]->lv[ms.grid.row]=lmistr(attribute_types[z]);

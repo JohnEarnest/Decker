@@ -1512,7 +1512,9 @@ The `attributes` table provides information about the attributes of contraption 
 | `"number"`     | A Lil number          | Field.                              |
 | `"string"`     | A Lil string          | Field.                              |
 | `"code"`       | A Lil string          | Large field in "code" editing mode. |
+| `"data"`       | LOVE value            | Large field in "code" editing mode. |
 | `"rich"`       | An rtext table        | Large field in "rich" editing mode. |
+| `"note"`       | Inline documentation  | Just descriptive text; no editor.   |
 
 Modifying the attributes of a Prototype will automatically update Contraption instances in the current deck. Modifying the attributes of widgets contained in this Prototype will require explicitly calling `prototype.update[]`. In either case, when a definition is updated, the `name`, `pos`, `show`, `locked`, `animated`, `volatile`, `font`, `pattern`, and `script` attributes of Contraptions will be preserved, as well the `value`, `scroll`, `row`, `col`, and image content of the widgets they contain (as applicable) if they have been modified from their original values in the prototype, but everything else will be regenerated from the definition. The _state_ of contraptions is kept, and the _behavior and appearance_ is changed.
 
@@ -1766,7 +1768,7 @@ Some of our custom attributes might be things that users of the contraption woul
 
 ![](images/protoattrs.gif)
 
-From this dialog you can add metadata for any of the attributes you wrote `get_` and `set_` functions for. The "name" of an attribute should be the part that comes immediately after `get_`; in our case, "value". The "label" can be a longer/more detailed human-readable name. The "type" indicates which sort of picker should be provided for manipulating this attribute: a boolean becomes a checkbox, a number or string become small field, and code or rich text becomes a larger field of the appropriate style.
+From this dialog you can add metadata for any of the attributes you wrote `get_` and `set_` functions for. The "name" of an attribute should be the part that comes immediately after `get_`; in our case, "value". The "label" can be a longer/more detailed human-readable name. The "type" indicates which sort of picker should be provided for manipulating this attribute: a boolean becomes a checkbox, a number or string become small field, and code, rich text, or data becomes a larger field of the appropriate style. A "note" displays the label as a block of text, offering a way to supply more detailed built-in documentation for your contraptions and clarify the meaning of complex attributes.
 
 With the "value" attribute set up as above, exit the prototype editor and double-click one of your contraption instances to see the new field in its Properties panel:
 
@@ -1804,6 +1806,20 @@ end
 
 When designing custom event and custom attribute logic, try to follow the examples and conventions of Decker's built-in widgets when it makes sense. Having consistency makes your widget's behavior easier to understand and remember!
 
+Design Principles
+-----------------
+If you want your contraption prototype to be reusable across projects, here are a few ideas to keep in mind:
+
+- Give your prototype a `.value` attribute which represents its primary "data", if any.
+- Make your prototype respond to universal widget attributes like `.locked`, `.font`, `.show`, `.pattern`, or `.volatile` where it makes sense. (Consult `card.locked`, `card.font`, etc, from within the prototype's `view[]` event handler.)
+- If instances of your prototype aren't usable without a specific `.show` style- like "transparent"- set this style in the prototype's `view[]` event handler: `card.show:"transparent"`.
+- Use the facilities Decker provides to make your prototype self-documenting! In _Prototype &#8594; Properties..._ provide a brief but clear explanation of what the contraption does, and include a template script that illustrates any events an instance might handle. Use _Prototype &#8594; Attributes..._ to document any user-editable attributes of your prototype and allow them to be modified manually.
+- Make your prototype resizable if it makes sense. Resizable widgets are more versatile!
+- _Consider_ making attribute `set_` functions refresh the appearance of the prototype if it can be done quickly. (see _Limitations_ below.)
+- Try to make your attribute `set_` functions _generous_ in what types they accept; setting a numeric attribute to a nil or a string can still "do the right thing" if you're careful, and this will make it easier for scripts to use your contraption. Conversely, try to make your attribute `get_` functions _conservative_ in what they provide; always return results with a consistent type and structure, including sensible default values at startup.
+- If a prototype is internally animated, consider exposing a `.animate` attribute which returns a function that can be called to pump an internal event. Many existing modules and prototypes use this convention to allow contraptions to continue to animate during "blocking" scripts.
+- Don't try to do everything! Several simple prototypes that are easy to understand, use, and modify are often better than one complex prototype that can serve all the same purposes but is harder to use or change.
+
 
 Limitations
 -----------
@@ -1812,6 +1828,7 @@ Contraptions and prototypes have a few important limitations to keep in mind:
 - Prototypes cannot contain contraptions. In other words, contraptions are non-recursive.
 - Unlike a card, contraption instances cannot add or remove "child" widgets dynamically.
 - The [Contraption Interface](#contraptioninterface) does not have a `.widgets` attribute: using `card.widgets` to enumerate and search inner widgets by name will work in the Prototype editor, but will _not_ work in actual contraption instances!
+- Prototype scripts cannot directly access modules installed in the host deck; prototypes and modules are meant to be independent, freestanding components. Consider making your prototypes more generic and moving code that interacts directly with a module into external events. Alternatively, you _can_ access modules indirectly through `deck.modules`.
 - Custom attribute reads and writes (from the outside) run in a brief quota, just like transition functions and module startup. If they take too long to execute, they halt and return nil. Reading or writing custom attributes therefore should _not_ directly trigger external events or elaborate logic to refresh the appearance of a contraption; instead, they can set the `.animated` flag on an internal widget to _indirectly_ request that Decker supplies a `view[]` event on the next frame and use this opportunity to run arbitrarily lengthy code, clearing the `.animated` flag if further refreshes are not needed.
 - Custom attributes cannot be invoked recursively or directly call other custom attributes. If this is attempted, they halt and return nil. For example, a script inside a prototype should use `get_value[]` instead of `card.value` to access the `value` attribute.
 

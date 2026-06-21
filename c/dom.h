@@ -2695,8 +2695,8 @@ void contraption_update(lv*def){
 	}
 }
 lv* n_prototype_update(lv*self,lv*z){(void)z;contraption_update(self);return LNIL;}
-char*attribute_types[]={"","bool","number","string","code","rich",NULL};
-enum attribute_type{attr_nil,attr_bool,attr_number,attr_string,attr_code,attr_rich};
+char*attribute_types[]={"","bool","number","string","code","rich","data","note",NULL};
+enum attribute_type{attr_nil,attr_bool,attr_number,attr_string,attr_code,attr_rich,attr_data,attr_note};
 lv* normalize_attributes(lv*x){
 	lv*r=lmt(),*n=lml(0),*l=lml(0),*t=lml(0),*nk=lmistr("name"),*lk=lmistr("label"),*tk=lmistr("type");dset(r,nk,n),dset(r,lk,l),dset(r,tk,t);
 	if(lit(x)){

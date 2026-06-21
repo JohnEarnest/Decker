@@ -1099,18 +1099,20 @@ widget_contraption=x=>{
 
 let attrs=[], attrs_scroll=0
 widget_attributes=b=>{
-	const attr_heights={bool:16,number:20,string:20,code:80,rich:80}
 	draw_box(b,0,1)
-	let h=5,lw=0;attrs.map(a=>{h+=attr_heights[a.type]+5;if(a.type!='bool')lw=max(lw,font_textsize(FONT_MENU,a.label).x)})
+	let h=5,lw=0;attrs.map(a=>{h+=a.height+5;if(a.type!='bool')lw=max(lw,font_textsize(FONT_MENU,a.label).x)})
 	const sbar=scrollbar(b,max(0,h-b.h),10,b.h,attrs_scroll,1,0), bi=sbar.size;attrs_scroll=sbar.scroll,bi.y+=1
 	const oc=frame.clip;frame.clip=bi,lw=0|min(lw+10,bi.w*.6)
 	const bp=ev.pos,bd=ev.dpos,bs=ev.scroll;ev.scroll=0;if(!over(bi))ev.pos=rect(-1,-1);if(!dover(bi))ev.dpos=rect(-1,-1)
 	let y=5;attrs.map(a=>{
-		const lb=rect(bi.x+5,bi.y+y-attrs_scroll,lw,attr_heights[a.type]), wb=rect(lb.x+lb.w+5,lb.y,(bi.w-15)-lb.w,lb.h);y+=lb.h+5
-		if(a.type=='bool'){lb.w=bi.w-10;if(ui_checkbox(lb,a.label,1,a.bval))a.bval^=1;return}else{draw_text_fit(lb,a.label,FONT_MENU,1)}
+		const lb=rect(bi.x+5,bi.y+y-attrs_scroll,lw,a.height), wb=rect(lb.x+lb.w+5,lb.y,(bi.w-15)-lb.w,lb.h);y+=lb.h+5
+		if     (a.type=='bool'){lb.w=bi.w-10;if(ui_checkbox(lb,a.label,1,a.bval))a.bval^=1;return}
+		else if(a.type=='note'){lb.w=bi.w-10;const l=layout_plaintext(a.label,FONT_BODY,ALIGN.left,rect(lb.w,lb.h));draw_text_rich_raw(lb,l,1,1,null);return;}
+		else{draw_text_fit(lb,a.label,FONT_MENU,1)}
 		if(a.type=='number')ui_field(wb,a.value)
 		if(a.type=='string')ui_field(wb,a.value)
 		if(a.type=='code'  )ui_codeedit(wb,1,a.value)
+		if(a.type=='data'  )ui_codeedit(wb,1,a.value)
 		if(a.type=='rich'  )ui_richedit(wb,1,a.value)
 	});frame.clip=oc,ev.pos=bp,ev.dpos=bd,ev.scroll=bs
 }
@@ -1433,9 +1435,13 @@ modal_enter=type=>{
 	if(type=='contraption_props'){
 		const w=ob.sel[0],a=ifield(w.def,'attributes');ms.name=fieldstr(ifield(w,'name'))
 		attrs=[],attrs_scroll=0;tab_get(a,'name').map((n,i)=>{
+			const attr_heights={bool:16,number:20,string:20,code:80,rich:80,data:80,note:0}
 			const v=iwrite(w,n), item={type:ls(tab_cell(a,'type',i)), label:ls(tab_cell(a,'label',i)), bval:0, value:fieldstr('')}
+			item.height=attr_heights[item.type]
 			if     (item.type=='bool'){item.bval=lb(v)}
+			else if(item.type=='data'){item.value.table=rtext_cast(dyad.format(lms('%J'),monad.list(v)))}
 			else if(item.type=='rich'){item.value.table=rtext_cast(v)}
+			else if(item.type=='note'){item.height=layout_plaintext(item.label,FONT_BODY,ALIGN.left,rect(213,400)).size.y}
 			else {item.value.table=rtext_cast(v)}
 			attrs.push(item)
 		})
@@ -1515,6 +1521,7 @@ modal_exit=value=>{
 			if(t=='string')v=rtext_string(attrs[i].value.table)
 			if(t=='code'  )v=rtext_string(attrs[i].value.table)
 			if(t=='rich'  )v=attrs[i].value.table
+			if(t=='data'  )v=dyad.parse(lms('%J'),rtext_string(attrs[i].value.table))
 			iwrite(w,n,v)
 		})
 	}
@@ -1780,7 +1787,7 @@ modals=_=>{
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(0)
 	}
 	else if(ms.type=='prototype_attrs'){
-		const b=draw_modalbox(rect(220,200)),def=con(), lw=42
+		const b=draw_modalbox(rect(220,220)),def=con(), lw=42
 		draw_textc(rect(b.x,b.y-5,b.w,20),`${title_caps(def.name)} Attributes`,FONT_MENU,1)
 		const gsize=rect(b.x,b.y+20,80,b.h-(20+5+20))
 		const before=ms.grid.row;ui_table(gsize,[gsize.w-18],'s',ms.grid)
@@ -1791,16 +1798,16 @@ modals=_=>{
 		const sel=ms.grid.row>=0
 		draw_text(rect(gsize.x+gsize.w+10,b.y+20+2,lw,20),'Name' ,FONT_MENU,1)
 		draw_text(rect(gsize.x+gsize.w+10,b.y+40+2,lw,20),'Label',FONT_MENU,1)
-		draw_text(rect(gsize.x+gsize.w+10,b.y+60+2,lw,20),'Type' ,FONT_MENU,1)
+		draw_text(rect(gsize.x+gsize.w+10,b.y+80+2,lw,20),'Type' ,FONT_MENU,1)
 		ui_dfield(rect(gsize.x+gsize.w+5+lw,b.y+20,b.w-(lw+5+gsize.w),18),sel,ms.name)
-		ui_dfield(rect(gsize.x+gsize.w+5+lw,b.y+40,b.w-(lw+5+gsize.w),18),sel,ms.text)
+		ui_dfield(rect(gsize.x+gsize.w+5+lw,b.y+40,b.w-(lw+5+gsize.w),2*18),sel,ms.text)
 		if(sel){
 			tab_get(ms.grid.table,'name' )[ms.grid.row]=rtext_string(ms.name.table)
 			tab_get(ms.grid.table,'label')[ms.grid.row]=rtext_string(ms.text.table)
 		}
-		const cr=rect(gsize.x+gsize.w+5+lw,b.y+62), c=rect(b.x,b.y+b.h-20)
-		const attr_types=['bool','number','string','code','rich']
-		const attr_labels=['Boolean','Number','String','Code','Rich Text']
+		const cr=rect(gsize.x+gsize.w+5+lw,b.y+80), c=rect(b.x,b.y+b.h-20)
+		const attr_types=['bool','number','string','code','rich','data','note']
+		const attr_labels=['Boolean','Number','String','Code','Rich Text','Data','Note']
 		const t=sel?ls(tab_cell(ms.grid.table,'type',ms.grid.row)):''
 		for(let z=0;z<attr_types.length;z++,cr.y+=16)if(ui_radio(rect(cr.x,cr.y,b.w-(lw+5+gsize.w),16),attr_labels[z],sel,t==attr_types[z])){
 			tab_get(ms.grid.table,'type')[ms.grid.row]=lms(attr_types[z])
