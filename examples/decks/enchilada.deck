@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:26
+card:13
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -258,6 +258,7 @@ button2:{"type":"button","size":[86,23],"pos":[285,138],"script":"modals.6","tex
 preview:{"type":"canvas","size":[100,100],"pos":[280,31],"scale":1}
 button3:{"type":"button","size":[86,23],"pos":[285,168],"script":"modals.7","text":"Write Image"}
 button4:{"type":"button","size":[100,38],"pos":[385,138],"script":"modals.8","text":"Read Image\n(Dithered)"}
+button5:{"type":"button","size":[90,34],"pos":[138,254],"script":"modals.9","text":"Read a big 'ol WAV file"}
 
 {script:modals.0}
 on click do
@@ -322,6 +323,29 @@ on click do
   x:read["image" "gray"]
   preview.paste[x (0,0),preview.size]
   preview.paste[preview.copy[].transform["dither"]]
+end
+{end}
+
+{script:modals.9}
+on click do
+ a:read["sound" "samples"]
+ if a
+  app.show[a a.cast a.size a[1000,5]]
+  n:a.size
+  s:n/8000
+  alert["the wav you chose was %i samples (%f seconds) long." format (n,s)]
+  if alert["Play it sequentially?" "bool" "Play"]
+   
+   seg:8000*10
+   each i n in seg*range ceil a.size/seg
+    app.print["segment %n" n]
+    play[sound[a[i,seg]]]
+    sleep["play"]
+   end
+   
+   app.print["done"]
+  end
+ end
 end
 {end}
 
@@ -783,7 +807,7 @@ b:{"type":"contraption","size":[150,50],"pos":[40,150],"def":"spinner","widgets"
 contraption1:{"type":"contraption","size":[200,140],"pos":[276,89],"def":"enchilada","widgets":{"bool":{"size":[190,18],"pos":[5,4]},"number":{"size":[190,18],"pos":[5,27]},"string":{"size":[190,18],"pos":[5,49]},"code":{"size":[190,18],"pos":[5,71]},"rich":{"size":[190,17],"pos":[5,94]},"data":{"size":[190,18],"pos":[5,116],"value":"null"}}}
 contraption2:{"type":"contraption","size":[150,90],"pos":[54,222],"def":"paintbox","widgets":{}}
 smol1:{"type":"contraption","size":[20,20],"pos":[222,268],"def":"smol","widgets":{}}
-viewCounter1:{"type":"contraption","size":[102,26],"pos":[326,29],"def":"viewCounter","widgets":{"c":{"value":"19"}}}
+viewCounter1:{"type":"contraption","size":[102,26],"pos":[326,29],"def":"viewCounter","widgets":{"c":{"value":"20"}}}
 
 {script:contraptions.0}
 on change do

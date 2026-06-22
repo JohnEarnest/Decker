@@ -615,13 +615,19 @@ if !sys.platform~"web"
 	write["temp.wav" snd]
 	assert_file["write wav" "tests/dom/a4.wav" "temp.wav"]
 
-	w:read["tests/dom/a4.wav" 10]
-	assert["read valid wav size" 7990  w.size]
-	assert["read valid wav data" (-4,-9,-13,-15,-15) w[0,5]]
+	ref:(0,5,10,13,15,15,14,10,5,0,-4,-9,-13,-15,-15)
 
-	w:read["tests/dom/é4.wav" 10]
-	assert["read valid accented wav size" 7990  w.size]
-	assert["read valid accented wav data" (-4,-9,-13,-15,-15) w[0,5]]
+	w:read["tests/dom/a4.wav"]
+	assert["read valid wav size" 8000  w.size]
+	assert["read valid wav data" ref w[0,15]]
+
+	ws:read["tests/dom/a4.wav" "samples"]
+	assert["read valid wav samples size/cast" (8000,"i8") ws.size,ws.cast]
+	assert["read valid wav samples content"   1 w[0,8000]~ws[0,8000]]
+
+	w:read["tests/dom/é4.wav"]
+	assert["read valid accented wav size" 8000  w.size]
+	assert["read valid accented wav data" ref w[0,15]]
 
 	w:read["tests/dom/a.wav"]
 	assert["read invalid wav type" "sound" (typeof w)]

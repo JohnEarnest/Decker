@@ -569,7 +569,7 @@ The `type` argument allows you to specify the type of file(s) the user should be
 
 - `"array"`: any file. The result will be an _array_ interface with a default `cast` of `u8`.
 - `"image"`: files with a `.gif`, `.png`, `.bmp`, `.jpg`, or `.jpeg` extension. The result will always be an _image interface_.
-- `"sound"`: files with a `.wav` extension. The result will always be a _sound interface_.
+- `"sound"`: files with a `.wav` extension. The result will normally be a _sound interface_. If the `hint` argument is the string `"samples"`, all the samples of the sound will instead be returned as an _array interface_ with a cast of `i8`.
 - `"deck"`: files with a `.deck` or `.html` extension. The result will aways be a _deck interface_.
 - `"text"`: files with a `.txt` or `.csv` extension. The result will always be a string.
 - `"any"`: any file. The result may be an image, sound, or string.

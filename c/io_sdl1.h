@@ -119,14 +119,16 @@ SDL_AudioSpec audio;
 void sfx_pump(void*user,Uint8*stream,int len);
 void record_pump(void* userdata,Uint8* stream,int len);
 
-lv*readwav(char*name){
+lv*readwav(char*name,int rawsamples){
 	Uint8* raw; Uint32 length; SDL_AudioSpec spec; SDL_AudioCVT cvt;
 	if(SDL_LoadWAV(name,&spec,&raw,&length)==NULL)return sound_make(lms(0));
 	if(SDL_BuildAudioCVT(&cvt, spec.format,spec.channels,spec.freq, SFX_INPUT_FORMAT,SFX_CHANNELS,SFX_RATE)){
 		cvt.len=length,cvt.buf=malloc(cvt.len * cvt.len_mult);
 		memcpy(cvt.buf,raw,length),SDL_FreeWAV(raw),SDL_ConvertAudio(&cvt);
 		raw=cvt.buf, length=cvt.len_cvt;
-	}lv*r=lmv(1);r->c=MIN(length,10*SFX_RATE);r->sv=(char*)raw;return sound_make(r);
+	}
+	if(rawsamples){lv*r=lmv(1);r->c=length;r->sv=(char*)raw;return array_make(length,1,0,r);}
+	lv*r=lmv(1);r->c=MIN(length,10*SFX_RATE);r->sv=(char*)raw;return sound_make(r);
 }
 
 int record_possible(void){return 0;} // stubbed

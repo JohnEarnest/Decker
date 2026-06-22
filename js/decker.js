@@ -1202,8 +1202,12 @@ n_panic=z=>{
 let audio=null, samples_playing=0, audio_loop=null, audio_loop_playing=null
 const audioContext=window.AudioContext||window.webkitAudioContext, offline=window.OfflineAudioContext||window.webkitOfflineAudioContext
 initaudio=_=>{if(!audio)audio=new audioContext({sampleRate:44100})}
-load_sound=(file,after)=>{
+load_sound=(file,hint,after)=>{
 	decode_sound=data=>{
+		if(after&&hint=='samples'){
+			const r=[];for(let z=0;z<data.length;z+=8)r.push(sample_to_byte(data[z]));
+			after(array_make(r.length,'i8',0,Uint8Array.from(r)));return;
+		}
 		const r=[];for(let z=0;z<data.length&&r.length<10*SFX_RATE;z+=8)r.push(sample_to_byte(data[z]));
 		if(after){after(sound_make(Uint8Array.from(r)));return;}
 		au.target=deck_add(deck,sound_read(ln(0))),mark_dirty()
@@ -2005,7 +2009,7 @@ modals=_=>{
 		ui_button(rect(c.x,c.y,60,20),'Open',1,_=>{
 			if     (ls(ms.verb)=='array'    )open_file(ms.filter,file=>{load_array(file,        array=>{arg(),ret(array)          ,modal_exit(1)})})
 			else if(ms.filter=='image/*'    )open_file(ms.filter,file=>{load_image(file,ms.verb,image=>{arg(),ret(image)          ,modal_exit(1)})})
-			else if(ms.filter=='audio/*'    )open_file(ms.filter,file=>{load_sound(file,        sound=>{arg(),ret(sound)          ,modal_exit(1)})})
+			else if(ms.filter=='audio/*'    )open_file(ms.filter,file=>{load_sound(file,ms.verb,sound=>{arg(),ret(sound)          ,modal_exit(1)})})
 			else if(ms.filter=='.csv,.txt'  )open_text(ms.filter,                               text =>{arg(),ret(lms(text))      ,modal_exit(1)  })
 			else if(ms.filter=='.html,.deck')open_text(ms.filter,                               text =>{arg(),ret(deck_read(text)),modal_exit(1)  })
 			else                             open_text(''       ,                               text =>{arg(),ret(lms(text))      ,modal_exit(1)  })
@@ -2278,7 +2282,7 @@ modals=_=>{
 n_open=([type,hint])=>{
 	modal_enter('open_lil');let t=type?ls(type):'',r=lms('');ms.filter=''
 	if(t=='array')r=array_make(0,'u8',0)
-	if(t=='sound')ms.filter='audio/*',r=sound_make(new Uint8Array(0))
+	if(t=='sound')ms.filter='audio/*',r=(hint&&ls(hint)=='samples')?array_make(0,'i8',0): sound_make(new Uint8Array(0))
 	if(t=='image')ms.filter='image/*',r=image_make(rect())
 	if(t=='deck')ms.filter='.html,.deck',r=deck_read('')
 	if(t=='text')ms.filter='.csv,.txt'

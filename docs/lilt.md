@@ -108,7 +108,7 @@ Built-in Functions
 
 - if the `hint` argument is the string `"array"`, the file will be read as an _array interface_ with a default `cast` of `u8`.
 - `.gif` files are read as _image interfaces_ (or a dictionary containing _image interfaces_, as noted below).
-- `.wav` files are read as _sound interfaces_.
+- `.wav` files are read as _sound interfaces_. If the `hint` argument is the string `"samples"`, all the samples of the sound will instead be returned as an _array interface_ with a cast of `i8`. This makes it possible to process sound files longer than 10 seconds and e.g. slice them into multiple sound interfaces for storage and playback.
 - `.deck` files are read as _deck interfaces_. If you want to read a `.html` deck export, you can read it as a text file (below) and then use `newdeck[]` to decode it.
 - anything else is treated as a UTF-8 text file and read as a string. A Byte-Order Mark, if present, is skipped. ASCII `\r` (Carriage-Return) characters are removed, tabs become a single space, "smart-quotes" are straightened, and anything else outside the range of valid Lil characters becomes "unknown" (`�`).
 

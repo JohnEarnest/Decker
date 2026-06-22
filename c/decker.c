@@ -257,7 +257,7 @@ lv* modal_open_path(void){
 }
 void modal_enter(int type);void modal_exit(int value);int field_linkspan(lv*arg);void field_patspan(int pat); // forward refs
 void sound_edit(lv*v);
-lv* n_readwav(lv*self,lv*a){(void)self;return readwav(drom_to_utf8(l_first(a))->sv);}
+lv* n_readwav(lv*self,lv*a){(void)self;return readwav(drom_to_utf8(l_first(a))->sv,a->c>1&&lis(a->lv[1])&&!strcmp(a->lv[1]->sv,"samples"));}
 void modal_push(int type){
 	if(ms.type!=modal_none){
 		ms_stack[ms_index]=(modal_context){ms,wid};
@@ -3576,7 +3576,7 @@ void event_file(char*p){
 	if(has_suffix(p,".bmp"))import_image(p);
 	if(has_suffix(p,".wav")){
 		au.target=n_deck_add(deck,l_list(lmistr("sound")));mark_dirty();modal_enter(modal_recording);
-		sound_edit(readwav(p));au.sel=(pair){0,0},au.head=0;
+		sound_edit(readwav(p,0));au.sel=(pair){0,0},au.head=0;
 	}
 	if(has_suffix(p,".csv")||has_suffix(p,".psv")){
 		setuimode(mode_object);lv*a=lmd();
