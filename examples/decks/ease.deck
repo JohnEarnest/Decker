@@ -10,22 +10,25 @@ deckbuilder:"%%FNT1GCABIAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 {card:home}
 script:"home.0"
 {widgets}
-field1:{"type":"field","size":[241,36],"pos":[148,23],"locked":1,"font":"deckbuilder","border":0,"style":"plain","align":"center","value":"Easing Functions"}
-c:{"type":"canvas","size":[188,170],"pos":[66,150],"border":0,"image":"%%IMG3ALwAqgQQyEmrvTjrzbv/YCiOZGmeaKqubOu+cCzPdNvcTa3vfIr/wFtvSCxKgsigccl0JZ/ApnQaglqj1KyWcu3+tmCpd4wLm4fktPDMllk15Lbc9vyM5/hTverN+0FJJnF/hBd7gneFiocoamuKcoF0aZBtkk5qlWaMmIkzAZoil259NKChdkg9bzWnqB2jO7Eyrq9wqrYetbmGuLwbu78Ts8IWwcXExRTHv8nKE8y8zs8A0bbT1Nav2M/aqL7UGN6a3N3U5crjkOjpz+zF6otK4cDK7/D24PQX8YT6+8aQ/QO4TOA8gvwMfkEoTti9ds0GMqzm8ODECv3wPISYayM+aRYvFuwo8WLGSCUnnrQUUiQ0kFhcYiTZUubKMx45fqtp81pKkz55urwZ5ifQbUKHIk0qkuiWnOZ2xpQZUOpCqlXJGT2qlWlTq2WwJgy1leu6sirJomXolMpatmqnih1Z6S3CtmLsEsTbBGo4vkz07u16de7Ms157IpZrWAJgI4IHLw7b+LA8xpUfE/FLTzOayAA9r0pMVTQP0KEnP6pM9w/nzpcxZ45NmXVrP6hT+8u9z3SN17B3y2btmwbv3oWOB8et/K/w4bNdkxZbnBT06HmAI2c+HWt1GM2Xa+zuXfp17HO0bx9PvjT3wrazpm/vnv159CzpK55/Hz/O8Ovl119j37EAYIBsHCjef/rVJyB88cnHIIQRWjYhhRW+9GBtGVq4SYPlJagggmCoB5eIA9pWYCMghvhhiw4WNSKJWsxIo1s2Llhjjs7JCKOLT/HYY4k/ApmFiV8RWWSMRy7J5BRIJrmjk/vhSGWVUAp54xJabllElEo1eSWWgXXp5WdjkgmZmfQ0EACbR8DpjpucGCdnPnSyMkOdHd7iZgCABirooIQWauihiCaq6KKMNuqoonZm8gKYVDmSwyRpYmXppT5QatsgetwpE6gjeNqnJ6mY2icAqG4Axao6kGqBnrBGuimttf52K5+52rrrar2O9muwZVpKbJaUHCsmrsoGCWyz0EYr7bSoRAA=","scale":1}
-names:{"type":"grid","size":[180,136],"pos":[278,134],"locked":1,"script":"home.1","scrollbar":1,"headers":1,"lines":0,"value":{"Function Name":["lerp","inSine","outSine","inOutSine","inQuad","outQuad","inOutQuad","inCubic","outCubic","inOutCubic","inQuart","outQuart","inOutQuart","inQuint","outQuint","inOutQuint","inExpo","outExpo","inOutExpo","inCirc","outCirc","inOutCirc","inBack","outBack","inOutBack","inElastic","outElastic","inOutElastic","inBounce","outBounce","inOutBounce"]},"scroll":18,"row":24}
-usageLabel:{"type":"field","size":[180,40],"pos":[278,280],"locked":1,"value":"usage:"}
-field2:{"type":"field","size":[392,57],"pos":[66,65],"locked":1,"value":" Easing functions smoothly interpolate from one value to another. They're essential building-blocks of scripted animation! This deck contains an \"ease\" module with a wide variety of easing functions that each take a time (from 0 to 1, inclusive) and numeric values \"a\" and \"b\" to interpolate between. So long as \"a\" and \"b\" conform, they may be scalars, points, or entire polylines."}
-field3:{"type":"field","size":[101,34],"pos":[405,22],"locked":1,"border":0,"value":{"text":["(based on ","easings.net",", by Andrey Sitnik and Ivan Solovev!)"],"font":["","",""],"arg":["","https://easings.net",""]}}
-field4:{"type":"field","size":[64,14],"pos":[132,314],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"time"}
-field5:{"type":"field","size":[18,14],"pos":[76,308],"locked":1,"border":0,"style":"plain","align":"center","value":"0"}
-field6:{"type":"field","size":[18,14],"pos":[228,308],"locked":1,"border":0,"style":"plain","align":"center","value":"1"}
-field7:{"type":"field","size":[40,14],"pos":[41,227],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"output"}
-field8:{"type":"field","size":[18,14],"pos":[62,291],"locked":1,"border":0,"style":"plain","align":"center","value":"a"}
-field9:{"type":"field","size":[18,14],"pos":[62,164],"locked":1,"border":0,"style":"plain","align":"center","value":"b"}
-usage:{"type":"field","size":[158,17],"pos":[290,296],"volatile":1,"font":"mono","border":0}
+field1:{"type":"field","size":[241,36],"pos":[148,16],"locked":1,"font":"deckbuilder","border":0,"style":"plain","align":"center","value":"Easing Functions"}
+c:{"type":"canvas","size":[188,170],"pos":[66,129],"border":0,"image":"%%IMG3ALwAqgQQyEmrvTjrzbv/YCiOZGmeaKqubOu+cCzPdNvcTa3vfIr/wFtvSCxKgsigccl0JZ/ApnQaglqj1KyWcu3+tmCpd4wLm4fktPDMllk15Lbc9vyM5/hTverN+0FJJnF/hBd7gneFiocoamuKcoF0aZBtkk5qlWaMmIkzAZoil259NKChdkg9bzWnqB2jO7Eyrq9wqrYetbmGuLwbu78Ts8IWwcXExRTHv8nKE8y8zs8A0bbT1Nav2M/aqL7UGN6a3N3U5crjkOjpz+zF6otK4cDK7/D24PQX8YT6+8aQ/QO4TOA8gvwMfkEoTti9ds0GMqzm8ODECv3wPISYayM+aRYvFuwo8WLGSCUnnrQUUiQ0kFhcYiTZUubKMx45fqtp81pKkz55urwZ5ifQbUKHIk0qkuiWnOZ2xpQZUOpCqlXJGT2qlWlTq2WwJgy1leu6sirJomXolMpatmqnih1Z6S3CtmLsEsTbBGo4vkz07u16de7Ms157IpZrWAJgI4IHLw7b+LA8xpUfE/FLTzOayAA9r0pMVTQP0KEnP6pM9w/nzpcxZ45NmXVrP6hT+8u9z3SN17B3y2btmwbv3oWOB8et/K/w4bNdkxZbnBT06HmAI2c+HWt1GM2Xa+zuXfp17HO0bx9PvjT3wrazpm/vnv159CzpK55/Hz/O8Ovl119j37EAYIBsHCjef/rVJyB88cnHIIQRWjYhhRW+9GBtGVq4SYPlJagggmCoB5eIA9pWYCMghvhhiw4WNSKJWsxIo1s2Llhjjs7JCKOLT/HYY4k/ApmFiV8RWWSMRy7J5BRIJrmjk/vhSGWVUAp54xJabllElEo1eSWWgXXp5WdjkgmZmfQ0EACbR8DpjpucGCdnPnSyMkOdHd7iZgCABirooIQWauihiCaq6KKMNuqoonZm8gKYVDmSwyRpYmXppT5QatsgetwpE6gjeNqnJ6mY2icAqG4Axao6kGqBnrBGuimttf52K5+52rrrar2O9muwZVpKbJaUHCsmrsoGCWyz0EYr7bSoRAA=","scale":1}
+names:{"type":"grid","size":[180,120],"pos":[278,113],"locked":1,"script":"home.1","scrollbar":1,"headers":1,"lines":0,"value":{"Function Name":["lerp","inSine","outSine","inOutSine","inQuad","outQuad","inOutQuad","inCubic","outCubic","inOutCubic","inQuart","outQuart","inOutQuart","inQuint","outQuint","inOutQuint","inExpo","outExpo","inOutExpo","inCirc","outCirc","inOutCirc","inBack","outBack","inOutBack","inElastic","outElastic","inOutElastic","inBounce","outBounce","inOutBounce","spline","spline_at"]},"scroll":18,"row":24}
+usageLabel:{"type":"field","size":[180,40],"pos":[278,239],"locked":1,"value":"usage:"}
+field2:{"type":"field","size":[392,57],"pos":[66,54],"locked":1,"value":" Easing functions smoothly interpolate from one value to another. They're essential building-blocks of scripted animation! This deck contains an \"ease\" module with a wide variety of easing functions that each take a time (from 0 to 1, inclusive) and numeric values \"a\" and \"b\" to interpolate between. So long as \"a\" and \"b\" conform, they may be scalars, points, or entire polylines."}
+field3:{"type":"field","size":[101,34],"pos":[405,18],"locked":1,"border":0,"value":{"text":["(based on ","easings.net",", by Andrey Sitnik and Ivan Solovev!)"],"font":["","",""],"arg":["","https://easings.net",""]}}
+field4:{"type":"field","size":[64,14],"pos":[132,293],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"time"}
+field5:{"type":"field","size":[18,14],"pos":[76,287],"locked":1,"border":0,"style":"plain","align":"center","value":"0"}
+field6:{"type":"field","size":[18,14],"pos":[228,287],"locked":1,"border":0,"style":"plain","align":"center","value":"1"}
+field7:{"type":"field","size":[40,14],"pos":[41,206],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"output"}
+field8:{"type":"field","size":[18,14],"pos":[62,270],"locked":1,"border":0,"style":"plain","align":"center","value":"a"}
+field9:{"type":"field","size":[18,14],"pos":[62,143],"locked":1,"border":0,"style":"plain","align":"center","value":"b"}
+usage:{"type":"field","size":[158,17],"pos":[290,255],"volatile":1,"font":"mono","border":0}
+version:{"type":"field","size":[100,20],"pos":[4,18],"locked":1,"volatile":1,"border":0}
+button1:{"type":"button","size":[76,20],"pos":[382,297],"script":"home.2","text":"Splining..."}
 
 {script:home.0}
 on view do
+ version.text:"v%0.1f" format deck.modules.ease.version
  names.value:select "Function Name":key from ease
  name:first names.rowvalue
  usage.text:"ease.%s[time a b]" format name
@@ -51,9 +54,74 @@ on click do
 end
 {end}
 
+{script:home.2}
+on click do
+ go["splining" "BoxIn" 15]
+end
+{end}
+
+{card:splining}
+script:"splining.0"
+{widgets}
+button1:{"type":"button","size":[76,20],"pos":[18,306],"script":"splining.1","text":"Index"}
+field1:{"type":"field","size":[241,36],"pos":[148,16],"locked":1,"font":"deckbuilder","border":0,"style":"plain","align":"center","value":"Catmull-Rom Splines"}
+target:{"type":"canvas","size":[220,220],"pos":[30,67],"locked":1,"volatile":1,"pattern":35,"scale":1}
+c1:{"type":"canvas","size":[16,16],"pos":[158,86],"locked":1,"volatile":1,"script":"splining.2","show":"transparent","border":1,"draggable":1,"scale":1}
+c2:{"type":"canvas","size":[16,16],"pos":[83,153],"locked":1,"volatile":1,"script":"splining.2","show":"transparent","border":1,"draggable":1,"scale":1}
+c3:{"type":"canvas","size":[16,16],"pos":[189,148],"locked":1,"volatile":1,"script":"splining.2","show":"transparent","border":1,"draggable":1,"scale":1}
+c4:{"type":"canvas","size":[16,16],"pos":[191,249],"locked":1,"volatile":1,"script":"splining.2","show":"transparent","border":1,"draggable":1,"scale":1}
+c5:{"type":"canvas","size":[16,16],"pos":[76,234],"locked":1,"volatile":1,"script":"splining.2","show":"transparent","border":1,"draggable":1,"scale":1}
+field2:{"type":"field","size":[220,14],"pos":[30,53],"locked":1,"border":0,"align":"center","value":"drag the control points to update the spline!"}
+field3:{"type":"field","size":[234,148],"pos":[265,67],"locked":1,"value":"Catmull-Rom splines create a smooth curve which follows a series of \"control points\". \n\nThe ease.spline[controls steps] function produces a list of points which follow control points using uniform divisions (an integer \"steps\" per division) between each control point. This is handy for directly plotting a spline.\n\nThe ease.spline_at[controls indices] takes a number or list of numbers \"indices\"- each between 0 and 1- and samples the spline at that percentage along its entire path. This is handy for controlling animation with a spline."}
+field4:{"type":"field","size":[234,24],"pos":[265,217],"locked":1,"border":0,"align":"center","value":"View the card script\nto see how these examples work!"}
+slider:{"type":"slider","size":[234,25],"pos":[265,262],"volatile":1,"script":"splining.3","interval":[0,1],"step":0.01}
+
+{script:splining.0}
+on view do
+ # calculate control points based on the center of each
+ # draggable canvas, offset to the origin of the drawing canvas:
+ p:((c1,c2,c3,c4,c5)..pos)-list (-c1.size/2)+target.pos
+ 
+ target.clear[]
+ 
+ # draw a spline through the control points,
+ # with 10 steps between each control point:
+ target.pattern:1
+ target.brush:2
+ target.line[ease.spline[p 10]]
+ 
+ # sample a position along the spline based
+ # on an interactive slider:
+ target.pattern:colors.red
+ target.brush:4
+ target.line[ease.spline_at[p slider.value]]
+ 
+ # sample multiple points leading up to the slider value:
+ target.brush:0
+ target.line[ease.spline_at[p slider.value*.01*range 100]]
+end
+{end}
+
+{script:splining.1}
+on click do
+ go["home" "BoxOut" 15]
+end
+{end}
+
+{script:splining.2}
+on drag    do view[] end
+on release do view[] end
+{end}
+
+{script:splining.3}
+on change do
+ view[]
+end
+{end}
+
 {module:ease}
 description:"a collection of easing functions"
-version:1
+version:1.1
 {script}
 on tween f do
  # for ease of use (har har), wrap all the basic
@@ -114,5 +182,32 @@ end
 module.inBounce   :tween[on inBounce    x do 1-outBounce[1-x] end]
 module.outBounce  :tween[outBounce]
 module.inOutBounce:tween[on inOutBounce x do .5*if x<.5 1-outBounce[1-2*x] else 1+outBounce[-1+2*x] end end]
+
+local cr_basis: .5 * "%j" parse "[[0,2,0,0],[-1,0,1,0],[2,-5,4,-1],[-1,3,-3,1]]"
+
+module.spline:on spline controls divisions do
+ local segs: -4 window (list first controls),controls,(list last controls)
+ local tween: (4 take list (range divisions+1)/divisions)^range 4
+ raze each segment in segs
+  flip each axis in flip segment
+   sum tween * sum @ cr_basis * list axis
+  end
+ end
+end
+
+module.spline_at:on spline_at controls indices do
+ local segs: -4 window (list first controls),controls,(list last controls)
+ local ix:0|1&if "number"~typeof indices list indices else indices end
+ local n: count segs
+ local wi: (n-1)&floor ix*n   # window index
+ local wt: (ix=1)+1%ix*n # tween within window
+ local r:raze each segment i in segs @ wi
+  local tween: wt[i]^range 4
+  flip each axis in flip segment
+   sum tween * sum @ cr_basis * list axis
+  end
+ end
+ if "number"~typeof indices first r else r end
+end
 {end}
 
