@@ -499,8 +499,16 @@ hash_t hash_key(lv*x){
 	else if(lid(x)||lit(x)){hash_t r=1;EACH(z,x)r=(31*((31*r)+hash_key(x->lv[z])))+hash_key(x->kv[z]);return r;}
 	else{return (hash_t)((uintptr_t)x);}
 }
-void hash_add(lv*x){hash_t i=hash_key(x)%hash_n;while(hash_v[i])i=(i+1)%hash_n;hash_v[i]=x;}
-int hash_in(lv*x){hash_t i=hash_key(x)%hash_n;while(hash_v[i]){if(matchr(hash_v[i],x))return 1;i=(i+1)%hash_n;}return 0;}
+void hash_addh(lv*x,hash_t i){while(hash_v[i])i=(i+1)%hash_n;hash_v[i]=x;}
+int hash_inh(lv*x,hash_t i){while(hash_v[i]){if(matchr(hash_v[i],x))return 1;i=(i+1)%hash_n;}return 0;}
+void hash_add(lv*x){hash_addh(x,hash_key(x)%hash_n);}
+int hash_in(lv*x){return hash_inh(x,hash_key(x)%hash_n);}
+int*hash_i=NULL;
+int matchrow(lv*t,int a,int b){EACH(z,t)if(!matchr(t->lv[z]->lv[a],t->lv[z]->lv[b]))return 0;return 1;}
+hash_t hash_row(lv*t,int n){hash_t r=1;EACH(z,t)r=(31*r)+hash_key(t->lv[z]->lv[n]);return r;}
+void hash_addi(lv*t,int n,hash_t i){(void)t;while(hash_i[i])i=(i+1)%hash_n;hash_i[i]=n+1;}
+int hash_ini(lv*t,int n,hash_t i){while(hash_i[i]){if(matchrow(t,hash_i[i]-1,n))return 1;i=(i+1)%hash_n;}return 0;}
+
 dyad(l_in){
 	if(lil(x)&&(lil(y)||lid(y))&&y->c>32){
 		hash_n=ceil(1.3*y->c),hash_v=calloc(hash_n,sizeof(lv*));
@@ -513,10 +521,15 @@ monad(l_distinct){
 	if(lis(x)&&x->c>1){str r=str_new();char m[256]={0};EACH(z,x){char c=x->sv[z];if(!m[0xFF&c])m[0xFF&c]=1,str_addc(&r,c);}return lmstr(r);}
 	if(lil(x)&&x->c>32){
 		lv*r=lml(0);hash_n=ceil(1.3*x->c),hash_v=calloc(hash_n,sizeof(lv*));
-		EACH(z,x){lv*e=x->lv[z];if(!hash_in(e))hash_add(e),ll_add(r,e);}free(hash_v);return r;
+		EACH(z,x){lv*e=x->lv[z];hash_t h=hash_key(e)%hash_n;if(!hash_inh(e,h))hash_addh(e,h),ll_add(r,e);}free(hash_v);return r;
 	}
 	if(lil(x)&&x->c>1){lv*r=lml(0),*m=lmd();EACH(z,x){lv*e=x->lv[z];if(!dget(m,e))dset(m,e,LNIL),ll_add(r,e);}return r;}
-	if(lit(x)&&x->c>1){return l_table(l_distinct(l_rows(x)));}
+	if(lit(x)&&x->n>32){
+		lv*r=lmt();EACH(z,x)dset(r,x->kv[z],lml(0));hash_n=ceil(1.3*x->n),hash_i=calloc(hash_n,sizeof(int));
+		for(int z=0;z<x->n;z++){hash_t h=hash_row(x,z)%hash_n;if(!hash_ini(x,z,h)){hash_addi(x,z,h);EACH(c,r)ll_add(r->lv[c],x->lv[c]->lv[z]);r->n++;}}
+		free(hash_i);return r;
+	}
+	if(lit(x)&&x->n>1){return l_table(l_distinct(l_rows(x)));}
 	return x;
 }
 lv*filter(int in,lv*x,lv*y){
