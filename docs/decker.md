@@ -560,26 +560,27 @@ If the third argument (`z`) is truthy, `eval[]` will instead execute _within_ th
 
 11) `read[type hint]` understands several types of file and will interpret each appropriately:
 
-- Image files (`.gif`, `.png`, `.bmp`, `.jpg`, `.jpeg`) are read as _image interfaces_.
-- Sound files (`.wav`) are read as _sound interfaces_.
-- Deck files (`.deck`) are read as _deck interfaces_.
+- Image files (`.gif`, `.png`, `.bmp`, `.jpg`, `.jpeg`) are read as _image interfaces_. If an image contains transparent pixels, they will be read as pattern 0.
+- Sound files (`.wav`) are read as _sound interfaces_. If you want to manipulate a sound longer than 10 seconds, use the `"samples"` hint to read the audio samples as an _array interface_.
+- Deck files (`.deck`) are read as _deck interfaces_. If you want to read a `.html` deck export, you can read it as a text file and then use `newdeck[]` to decode it.
 - anything else is treated as a UTF-8 text file and read as a string. A Byte-Order Mark, if present, is skipped. ASCII `\r` (Carriage-Return) characters are removed, tabs become a single space, "smart-quotes" are straightened, and anything else outside the range of valid DeckRoman characters becomes "unknown" (`�`).
 
-The `type` argument allows you to specify the type of file(s) the user should be allowed to choose:
+The `hint` argument can also influence the returned type:
 
-- `"array"`: any file. The result will be an _array_ interface with a default `cast` of `u8`.
-- `"image"`: files with a `.gif`, `.png`, `.bmp`, `.jpg`, or `.jpeg` extension. The result will always be an _image interface_.
-- `"sound"`: files with a `.wav` extension. The result will normally be a _sound interface_. If the `hint` argument is the string `"samples"`, all the samples of the sound will instead be returned as an _array interface_ with a cast of `i8`.
-- `"deck"`: files with a `.deck` or `.html` extension. The result will aways be a _deck interface_.
-- `"text"`: files with a `.txt` or `.csv` extension. The result will always be a string.
-- `"any"`: any file. The result may be an image, sound, or string.
-
-If an image contains transparent pixels, they will be read as pattern 0. There are several possible `hint` arguments to control the interpretation of colors in an image:
-
-- `"color"` (or no hint): convert to Decker's 16-color palette (patterns 32-47). Read only the first frame of an animated GIF.
-- `"gray"`: convert to 256 grays based on a perceptual weighting of the RGB channels. Read only the first frame of an animated GIF.
-- `"frames"`: 16 colors, but read all frames of an animated GIF.
-- `"gray_frames"`: 256 grays, but read all frames of an animated GIF.
+| Arguments                       | Files                               | Result                                                                     |
+| :------------------------------ | :---------------------------------- | :------------------------------------------------------------------------- |
+| `read[]`                        | any                                 | A string or interface based on file extension.                             |
+| `read["any"]`                   | any                                 | A string or interface based on file extension.                             |
+| `read["array"]`                 | any                                 | An _array interface_ with a default `.cast` of `u8`.                       |
+| `read["text"]`                  | `.txt`,`.csv`                       | A Lil string.                                                              |
+| `read["image"]`                 | `.gif`,`.png`,`.bmp`,`.jpg`,`.jpeg` | An _image interface_, posterized to 16-color (patterns 32-47).             |
+| `read["image" "color"]`         | `.gif`,`.png`,`.bmp`,`.jpg`,`.jpeg` | An _image interface_, posterized to 16-color (patterns 32-47).             |
+| `read["image" "gray"]`          | `.gif`,`.png`,`.bmp`,`.jpg`,`.jpeg` | An _image interface_, interpolated to 256 grays (patterns 0-255).          |
+| `read["image" "frames"]`        | `.gif`                              | All frames of a GIF in 16 colors.                                          |
+| `read["image" "gray_frames"]`   | `.gif`                              | All frames of a GIF in 256 grays.                                          |
+| `read["sound"]`                 | `.wav`                              | A _sound interface_.                                                       |
+| `read["sound" "samples"]`       | `.wav`                              | An _array interface_ with a `.cast` of `i8`; all samples of an audio file. |
+| `read["deck"]`                  | `.deck`,`.html`                     | A _deck interface_.                                                        |
 
 The `"frames"` or `"gray_frames"` hints will cause `read[]` of a GIF to return a dictionary containing the following keys:
 - `frames`: a list of images.

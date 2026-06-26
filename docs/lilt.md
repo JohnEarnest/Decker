@@ -104,26 +104,29 @@ Built-in Functions
 - `name`: the filename of the item.
 - `type`: the extension including a dot (like `.txt`), if any, always converted to lowercase.
 
-2) `read[x hint]` recognizes several types of file by extension and will interpret each appropriately:
+2) `read[path hint]` recognizes several types of file by extension and will interpret each appropriately:
 
-- if the `hint` argument is the string `"array"`, the file will be read as an _array interface_ with a default `cast` of `u8`.
-- `.gif` files are read as _image interfaces_ (or a dictionary containing _image interfaces_, as noted below).
-- `.wav` files are read as _sound interfaces_. If the `hint` argument is the string `"samples"`, all the samples of the sound will instead be returned as an _array interface_ with a cast of `i8`. This makes it possible to process sound files longer than 10 seconds and e.g. slice them into multiple sound interfaces for storage and playback.
-- `.deck` files are read as _deck interfaces_. If you want to read a `.html` deck export, you can read it as a text file (below) and then use `newdeck[]` to decode it.
-- anything else is treated as a UTF-8 text file and read as a string. A Byte-Order Mark, if present, is skipped. ASCII `\r` (Carriage-Return) characters are removed, tabs become a single space, "smart-quotes" are straightened, and anything else outside the range of valid Lil characters becomes "unknown" (`�`).
+- Image files (`.gif`, `.png`, `.bmp`, `.jpg`, `.jpeg`) are read as _image interfaces_. If an image contains transparent pixels, they will be read as pattern 0.
+- Sound files (`.wav`) are read as _sound interfaces_. If you want to manipulate a sound longer than 10 seconds, use the `"samples"` hint to read the audio samples as an _array interface_.
+- Deck files (`.deck`) are read as _deck interfaces_. If you want to read a `.html` deck export, you can read it as a text file and then use `newdeck[]` to decode it.
+- anything else is treated as a UTF-8 text file and read as a string. A Byte-Order Mark, if present, is skipped. ASCII `\r` (Carriage-Return) characters are removed, tabs become a single space, "smart-quotes" are straightened, and anything else outside the range of valid DeckRoman characters becomes "unknown" (`�`).
 
-There are several possible `hint` arguments to control the interpretation of colors in an image:
+The `hint` argument can also influence the returned type:
 
-- `"color"` (or no hint): convert to Decker's 16-color palette (patterns 32-47). Read only the first frame of an animated GIF.
-- `"gray"`: convert to 256 grays based on a perceptual weighting of the RGB channels. Read only the first frame of an animated GIF.
-- `"frames"`: 16 colors, but read all frames of an animated GIF.
-- `"gray_frames"`: 256 grays, but read all frames of an animated GIF.
+| Arguments                    | Files                               | Result                                                                     |
+| :--------------------------- | :---------------------------------- | :------------------------------------------------------------------------- |
+| `read[path]`                 | any                                 | A string or interface based on file extension.                             |
+| `read[path "array"]`         | any                                 | An _array interface_ with a default `.cast` of `u8`.                       |
+| `read[path "color"]`         | `.gif`,`.png`,`.bmp`,`.jpg`,`.jpeg` | An _image interface_, posterized to 16-color (patterns 32-47).             |
+| `read[path "gray"]`          | `.gif`,`.png`,`.bmp`,`.jpg`,`.jpeg` | An _image interface_, interpolated to 256 grays (patterns 0-255).          |
+| `read[path "frames"]`        | `.gif`                              | All frames of a GIF in 16 colors.                                          |
+| `read[path "gray_frames"]`   | `.gif`                              | All frames of a GIF in 256 grays.                                          |
+| `read[path "samples"]`       | `.wav`                              | An _array interface_ with a `.cast` of `i8`; all samples of an audio file. |
+| `read[path]`                 | `.deck`,`.html`                     | A _deck interface_.                                                        |
 
 The `"frames"` or `"gray_frames"` hints will cause `read[]` of a GIF to return a dictionary containing the following keys:
 - `frames`: a list of images.
 - `delays`: a list of integers representing interframe delays in 1/100ths of a second.
-
-If an image contains transparent pixels, they will be read as pattern 0.
 
 The [WAV file format](https://en.wikipedia.org/wiki/WAV) is much more complex than one might imagine. For this reason, and in order to avoid drawing in large dependencies, `read[]` in Lilt accepts only a very specific subset of valid WAV files corresponding to the output of `write[]`: monophonic, 8khz, with 8-bit unsigned PCM samples and no optional headers. Any other format (or an altogether invalid audio file) will be read as a `sound` with a `size` of 0. For reference, you can convert nearly any audio file into a compatible format using [ffmpeg](https://ffmpeg.org) like so:
 ```
