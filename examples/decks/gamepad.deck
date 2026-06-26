@@ -22,7 +22,7 @@ field1:{"type":"field","size":[493,17],"pos":[10,22],"font":"menu","show":"inver
 field2:{"type":"field","size":[131,14],"pos":[10,134],"locked":1,"border":0,"align":"center","value":"Event Log:"}
 button1:{"type":"button","size":[131,21],"pos":[10,309],"script":"gamepad_tester.1","text":"Clear Log"}
 field4:{"type":"field","size":[353,14],"pos":[150,134],"locked":1,"border":0,"align":"center","value":"Buttons Currently .held:"}
-field5:{"type":"field","size":[228,74],"pos":[10,46],"locked":1,"border":0,"value":"The gamepad interface allows scripts to observe the state of a virtual game controller which unifies keyboard inputs and inputs from a physical game controller, when available. Decks that use this functionality may not be fully usable on tablets or phones that lack a physical keyboard!"}
+field5:{"type":"field","size":[228,74],"pos":[10,46],"locked":1,"border":0,"value":{"text":["The ","gamepad interface"," allows scripts to observe the state of a virtual game controller which unifies keyboard inputs and inputs from a physical game controller, when available. Decks that use this functionality may not be fully usable on tablets or phones that lack a physical keyboard!"],"font":["","",""],"arg":["","http://beyondloom.com/decker/decker.html#gamepadinterface",""]}}
 field6:{"type":"field","size":[66,16],"pos":[228,265],"locked":1,"border":0,"align":"center","value":".dir:"}
 
 {script:gamepad_tester.0}
