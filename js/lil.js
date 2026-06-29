@@ -321,7 +321,7 @@ dyad={
 			}
 			else if(t=='e'||t=='p'){
 				const [dy,dm,dd,dh,dmi,ds,dl,dma]=ll(dyad.parse(ISODATE,lms(y.slice(h)))), l=ln(dl), d=new Date(y.slice(h,h+l))
-				if(l&&ln(dma)){h+=l}else{m=0}; v=t=='e'?lmn(m?0|(d.getTime()/1000):0):lmd(PARTS,[dy,dm,dd,dh,dmi,ds].map(x=>lmn(ln(x))))
+				if(l&&ln(dma)){h+=l}else{m=0}; v=t=='e'?lmn(m?Math.floor(d.getTime()/1000):0):lmd(PARTS,[dy,dm,dd,dh,dmi,ds].map(x=>lmn(ln(x))))
 			}else{m=0}while(n&&y[h]&&h-si<n)h++,m=0;
 			if(!sk&&v){
 				if     (!im&&'%mnz'.indexOf(t)==-1)v=NIL              // some previous pattern failed

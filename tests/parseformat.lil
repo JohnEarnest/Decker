@@ -99,6 +99,7 @@ show["%p" format "%p" parse  "2021-02-03T04:05:58Z" ] # parts
 on t x do ("%e" format x),("%e" format "%e" parse "%e" format x) end
 show[t[1706907420]]
 show[t[1643835420]]
+show[t[2147484077]]
 
 d.year:1984 d.month:5 d.day:25
 show["%p"             format d                      ] # partial parts
