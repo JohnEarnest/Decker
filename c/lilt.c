@@ -43,7 +43,7 @@ lv*runstring(char*t,lv*env){
 }
 lv*runfile(char*path,lv*env){
 	struct stat st;if(stat(path,&st)){fprintf(stderr,"unable to open '%s'\n",path);return LNIL;}
-	return runstring(n_read(NULL,l_list(lmcstr(path)))->sv,env);
+	return runstring(n_read(NULL,l_list(lmutf8(path)))->sv,env);
 }
 lv* print_array(lv*arr,FILE*out){array a=unpack_array(arr);for(int z=0;z<a.size;z++)fputc(0xFF&(int)array_get_raw(a,z),out);return arr;}
 lv*n_print(lv*self,lv*a){(void)self;return a->c==1&&array_is(a->lv[0])?print_array(l_first(a),stdout):n_printf(a,1,stdout);}

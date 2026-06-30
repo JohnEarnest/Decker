@@ -3461,7 +3461,7 @@ lv*n_danger_open(lv*self,lv*a){
 	danger_open_pending=1;(void)self;return LNIL;
 }
 lv* interface_danger(lv*self,lv*i,lv*x){
-	ikey("homepath"){char t[PATH_MAX];directory_home(t);return lmcstr(t);}
+	ikey("homepath"){char t[PATH_MAX];directory_home(t);return lmutf8(t);}
 	ikey("env"     )return env_enumerate();
 	ikey("dir"     )return lmnat(n_dir      ,self);
 	ikey("path"    )return lmnat(n_path     ,self);
