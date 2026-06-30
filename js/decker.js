@@ -507,7 +507,7 @@ keycaps_force_enter=_=>{kc.shift=0,kc.lock=0,kc.alt=0,kc.comb=0,kc.on=1,ev.mu=ev
 keycaps_enter=_=>{if(!enable_touch||kc.on)return;keycaps_force_enter()}
 
 let msg={ // interpreter event messages
-	pending_drag:0,pending_halt:0,pending_view:0,pending_loop:0,next_view:0,overshoot:0,
+	pending_halt:0,pending_view:0,pending_loop:0,next_view:0,overshoot:0,
 	target_click:null,target_drag:null,target_release:null,target_order:null,target_run:null,target_link:null,target_ccell:null,target_change:null,target_navigate:null,
 	arg_click:rect(),arg_drag:rect(),lastdrag:rect(),arg_release:rect(),arg_order:null,arg_run:null,arg_link:null,arg_ccell:null,arg_change:null,arg_navigate:null,
 }
@@ -3691,7 +3691,7 @@ load_deck=d=>{
 }
 tick=_=>{
 	pointer.up=ev.mu,pointer.down=ev.md,gamepad_poll(),toolbars()
-	msg.pending_drag=0,msg.pending_halt=0,frame=context,uicursor=0,fb.pix.fill(0)
+	pointer_updated=0,msg.pending_halt=0,frame=context,uicursor=0,fb.pix.fill(0)
 	menu_setup(),all_menus(),widget_setup()
 	const ev_stash=ev;kc.heading=null;if(kc.on)ev=event_state()
 	if(uimode=='script'){const mh=3+font_h(FONT_MENU);if(!kc.on)script_editor(rect(0,mh,frame.size.x+1,frame.size.y-mh))}else{main_view()}
@@ -3756,7 +3756,8 @@ sync=_=>{
 	const g=q('#display').getContext('2d');g.imageSmoothingEnabled=zoom!=(0|zoom),g.save(),g.scale(zoom,zoom),g.drawImage(r,0,0),g.restore()
 }
 
-move=(x,y)=>{if(!msg.pending_drag)pointer.prev=pointer.pos;pointer.pos=ev.pos=rect(x,y);if(pointer.held)msg.pending_drag=1}
+let pointer_updated=0
+move=(x,y)=>{if(!pointer_updated)pointer.prev=pointer.pos;pointer.pos=ev.pos=rect(x,y);pointer_updated=1}
 down=(x,y,alt)=>{
 	ev.rawdpos=ev.rawpos,ev.down_modal=ms.type,ev.down_uimode=uimode,ev.down_caps=kc.on
 	move(x,y),pointer.held=ev.drag=1;pointer.start=ev.dpos=pointer.pos,ev.md=1,ev.clicktime=12;if(alt)ev.rdown=1;initaudio()}

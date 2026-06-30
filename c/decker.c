@@ -57,7 +57,6 @@ void set_path(char*path){
 }
 
 typedef struct {
-	int pending_drag;
 	int pending_halt;
 	int pending_view, next_view, overshoot;
 	int pending_loop;
@@ -3521,10 +3520,11 @@ void event_key(int c,int m,int down,const char*name){
 void event_scroll(pair s){
 	ev.scroll=s.y<0?1:s.y>0?-1:0;
 }
+int pointer_updated=0;
 void event_pointer_move(pair raw,pair scaled){
-	if(!msg.pending_drag)pointer_prev=pointer;
+	if(!pointer_updated)pointer_prev=pointer;
 	ev.rawpos=raw;pointer=ev.pos=scaled;
-	if(pointer_held)msg.pending_drag=1;
+	pointer_updated=1;
 }
 void event_pointer_button(int primary,int middle,int down){
 	if(middle){if(down)ev.mdown=1;return;}
@@ -4235,7 +4235,7 @@ lv* modal_track(modal_state*m){
 }
 void tick(lv*env){
 	interpreter_lock();
-	msg.pending_drag=0,msg.pending_halt=0;
+	pointer_updated=0,msg.pending_halt=0;
 	if(dirty&&dirty_timer>0&&!running()&&autosave&&strlen(document_path)){
 		dirty_timer--;
 		if(dirty_timer==0)dirty=0,save_deck(lmcstr(document_path));
