@@ -1283,7 +1283,23 @@ draw_line_function=(r,func,pattern)=>{
 		}if(r.x==r.w&&r.y==r.h)break;let e2=err*2; if(e2>=dy)err+=dy,r.x+=sx; if(e2<=dx)err+=dx,r.y+=sy; a.v[1]=ZERO
 	}popstate()
 }
+clip_line=(r,clip)=>{
+	const xmin=clip.x-10, xmax=clip.x+clip.w+10, ymin=clip.y-10, ymax=clip.y+clip.h+10
+	const outcode=(a,b)=>(a<xmin)|((a>xmax)<<1)|((b<ymin)<<2)|((b>ymax)<<3)
+	let o1=outcode(r.x,r.y), o2=outcode(r.w,r.h)
+	while(1){
+		if(!(o1|o2))return rint(r);if(o1&o2)return null
+		let oo=o1?o1:o2, x=0, y=0
+		if     (oo&8){x=r.x+(r.w-r.x)*(ymax-r.y)/(r.h-r.y),y=ymax}
+		else if(oo&4){x=r.x+(r.w-r.x)*(ymin-r.y)/(r.h-r.y),y=ymin}
+		else if(oo&2){y=r.y+(r.h-r.y)*(xmax-r.x)/(r.w-r.x),x=xmax}
+		else if(oo&1){y=r.y+(r.h-r.y)*(xmin-r.x)/(r.w-r.x),x=xmin}
+		if(oo==o1){r.x=x,r.y=y,o1=outcode(x,y)}
+		else      {r.w=x,r.h=y,o2=outcode(x,y)}
+	}
+}
 draw_line=(r,brush,pattern,deck)=>{
+	r=clip_line(r,frame.clip);if(!r)return
 	if(brush>=0&&brush<=23){draw_line_simple(r,brush,pattern);return}
 	const b=deck.brushes;if(brush<0||brush-24>=b.v.length)return;const f=b.v[brush-24]
 	if(image_is(f)){draw_line_custom(r,f,pattern)}else if(lion(f)){draw_line_function(r,f,pattern)}

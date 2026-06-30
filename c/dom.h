@@ -1030,7 +1030,23 @@ void draw_line_function(rect r,lv*func,int pattern){
 		}if(r.x==r.w&&r.y==r.h)break;int e2=err*2;if(e2>=dy)err+=dy,r.x+=sx;if(e2<=dx)err+=dx,r.y+=sy;a->lv[1]=ZERO;
 	}popstate();
 }
+int clip_line(rect*r,rect clip){
+	int xmin=clip.x-10, xmax=clip.x+clip.w+10, ymin=clip.y-10, ymax=clip.y+clip.h+10;
+	#define outcode(a,b) (a<xmin)|((a>xmax)<<1)|((b<ymin)<<2)|((b>ymax)<<3)
+	int o1=outcode(r->x,r->y),o2=outcode(r->w,r->h);
+	while(1){
+		if(!(o1|o2))return 0;if(o1&o2)return 1;
+		int oo=o1?o1:o2, x=0, y=0;
+		if     (oo&8){x=r->x+(r->w-r->x)*(ymax-r->y)/(r->h-r->y),y=ymax;}
+		else if(oo&4){x=r->x+(r->w-r->x)*(ymin-r->y)/(r->h-r->y),y=ymin;}
+		else if(oo&2){y=r->y+(r->h-r->y)*(xmax-r->x)/(r->w-r->x),x=xmax;}
+		else if(oo&1){y=r->y+(r->h-r->y)*(xmin-r->x)/(r->w-r->x),x=xmin;}
+		if(oo==o1){r->x=x,r->y=y,o1=outcode(x,y);}
+		else      {r->w=x,r->h=y,o2=outcode(x,y);}
+	}
+}
 void draw_line(rect r,int brush,int pattern,lv*deck){
+	if(clip_line(&r,frame.clip))return;
 	if(brush>=0&&brush<=23){draw_line_simple(r,brush,pattern);return;}
 	lv*b=dget(deck->b,lmistr("brushes"));if(brush<0||brush-24>=b->c)return;lv*f=b->lv[brush-24];
 	if(image_is(f)){draw_line_custom(r,f->b,pattern);}else if(lion(f)){draw_line_function(r,f,pattern);}
