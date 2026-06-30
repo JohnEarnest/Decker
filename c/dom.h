@@ -3164,7 +3164,7 @@ lv* readgif(char*data,int size,int gray,int frames){
 		if(type==0x2C){ // image descriptor
 			int xo=readshort(&i,data),yo=readshort(&i,data),iw=readshort(&i,data),ih=readshort(&i,data),packed=data[i++],local=packed&0x80;
 			if(local){readcolors(&i,data,lpal,packed,gray);}else{memcpy(lpal,gpal,sizeof(lpal));}if(hastrans)lpal[trans]=gray?255:0;
-			int min_code=0xFF&data[i++], si=0; unsigned char*src=calloc(iw*ih*2,1),*dst=calloc(iw*ih,1);
+			int min_code=0xFF&data[i++], si=0; unsigned char*src=calloc((size_t)iw, (size_t)ih * 2),*dst=calloc((size_t)iw, (size_t)ih);
 			while(1){unsigned char s=data[i++];if(!s)break;for(int z=0;z<s;z++)src[si++]=data[i++];}decode_lzw(src,si,dst,iw*ih,min_code);
 			for(int y=0;y<ih;y++)for(int x=0;x<iw;x++)if(xo+x>=0&&yo+y>=0&&xo+x<w&&yo+y<h&&(!hastrans||dst[x+y*iw]!=trans))r->sv[(xo+x)+(yo+y)*w]=lpal[0xFF&(int)dst[x+y*iw]];
 			free(src),free(dst);ll_add(r_frames,image_make(buffer_clone(r))),ll_add(r_delays,lmn(delay)),ll_add(r_disposal,lmn(dispose));if(!frames)break;
