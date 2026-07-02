@@ -777,6 +777,16 @@ The `rtext.find[table x i]` function expects `x` to be a key string or list of s
 
 To measure the on-screen dimensions of an rtext, see `canvas.textsize[]`.
 
+Here's a simple example of using the `rtext` module to construct a rich-text table of contents for a deck, where every line starts with a bullet point icon and contains a hyperlink to cards by name:
+```lil
+bullet:image["%%IMG0AAYADQAAAAB49Pz8/HgAAAA="]
+indexField.value:raze each name in keys deck.cards
+ rtext.cat[bullet],
+ rtext.make["  "],
+ rtext.make[("%s\n" format name) "mono" name]
+end
+```
+
 
 Pointer Interface
 -----------------
@@ -792,6 +802,12 @@ The pointer interface represents the global state of the user's pointing device,
 | `x.prev`   | The value of `x.pos` _before_ the most recent update.                   |
 | `x.start`  | The `pos` where the pointing device was last pressed down.              |
 | `x.end`    | The `pos` where the pointing device was last released.                  |
+
+Here's a snippet that uses the `pointer` interface to synchronously wait for the user to press and then release the pointing device before continuing:
+```lil
+while !pointer.held|pointer.down sleep[] end
+while  pointer.held|pointer.up   sleep[] end
+```
 
 
 Gamepad Interface
@@ -861,6 +877,17 @@ The deck interface represents the global attributes of a Decker document. The op
 - If `x` is `"contraption"`, insert a new prototype, using `y` as a name (or an appropriate default name).
 
 `deck.remove[x]` will conversely remove existing widgets, cards, sounds, modules, prototypes or fonts from the deck. The argument `x` must be an interface value. The built-in fonts may not be removed from a deck. Removing a font will adjust any existing widgets which use it as their `font` attribute with the built-in "body" font. Decks will always have at least one card; attempting to remove the final card will have no effect. Removing `patterns` will reset the deck's palette to the defaults. When a card or widget is removed from its deck, the interface becomes inert: it will ignore all reads and writes of attributes.
+
+Here's an example of how you can create a temporary canvas widget for drawing by making a new deck on the fly and adding a widget:
+```lil
+on temporary_canvas size do
+ local d:newdeck[]
+ local r:d.card.add["canvas"]
+ r.size:size
+ r
+end
+```
+
 
 Patterns Interface
 ------------------
@@ -981,6 +1008,33 @@ b.cat[345,9000]
 b.cat[blob]
 
 c:array[0 "u16l"].cat["TEXT" 345,9000 blob]
+```
+
+As another practical example, here's a routine for constructing the bytes of a complete `.wav` audio file from an array of 8khz mono signed-byte audio samples:
+```lil
+on writewav arr do
+	local a:arr.slice[0 "i8"]
+	local r:array[0 "u8"]
+	r.struct["char",4 "RIFF"] # magic number
+	r.struct["u32l"        0] # reserve body size
+	r.struct["char",4 "WAVE"] # format id
+	r.struct["char",4 "fmt "] # block type
+	r.struct["u32l"       16] # block size
+	r.struct["u16l"        1] # pcm samples
+	r.struct["u16l"        1] # channels
+	r.struct["u32l"     8000] # 8khz sample rate
+	r.struct["u32l"     8000] # 8khz * 1 byte/sample * 1 channel
+	r.struct["u16l"        1] #        1 byte/sample * 1 channel
+	r.struct["u16l"        8] # 8 bits/sample
+	r.struct["char",4 "data"] # block type
+	r.struct["u32l"   a.size] # block size
+	r.cat[128+a[0,a.size]]    # payload
+	if 2%a.size r.cat[0] end  # pad for alignment
+	r.here:4
+	r.struct["u32l" r.size-8] # finalize body size
+	r
+end
+
 ```
 
 
@@ -1621,7 +1675,10 @@ end
 
 While a script is executing (or performing a `sleep[]`), no additional events can be fired until it completes. The `pointer` and `gamepad` interfaces will, however, continue to update to reflect the current state of input devices.
 
-Widgets, Cards, and the Deck itself all expose a function called `event[name ...args]`, which can be used to issue synthetic events at that target. The `name` may be the name of an existing event or any function in that target's script. When calling an event handler via `event[]` it will have all of the normal "magic" constants available as when called by Decker itself.
+Widgets, Cards, and the Deck itself all expose a function called `event[name ...args]`, which can be used to issue synthetic events at that target. The `name` may be the name of an existing event or any function in that target's script. When calling an event handler via `event[]` it will have all of the normal "magic" constants available as when called by Decker itself. If you have a button named `button1`, you can simulate a user clicking on it by calling `.event[]` like so:
+```lil
+button1.event["click"]
+```
 
 
 Modules
