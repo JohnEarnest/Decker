@@ -2089,7 +2089,7 @@ field unpack_field(lv*x,field_val*value){
 }
 lv* n_field_scrollto(lv*self,lv*x){
 	field_val v;field f=unpack_field(self,&v);rect bi=inset(f.size,2);if(f.scrollbar)bi.w-=12+3; // arrow size+pad
-	layout_richtext(ivalue(ivalue(self,"card"),"deck"),v.table,f.font,f.align,bi.w);
+	layout_richtext(ivalue(ivalue(self,"card"),"deck"),v.table,f.font,f.align,bi.w);if(layout_count<1)return self;
 	int i=ln(l_first(x));rect c=layout[MIN(MAX(0,i),(layout_count-1))].pos;c.y-=v.scroll;int ch=MIN(bi.h,c.h),t=v.scroll;
 	if(c.y<0){t+=c.y;}if(c.y+ch>=bi.h){t+=((c.y+ch)-bi.h);}if(t!=v.scroll)iwrite(self,lmistr("scroll"),lmn(t));
 	return self;
@@ -2254,7 +2254,7 @@ int grid_scrollto_simple(int rowcount,grid g,int s,int r){
 	return (r-s<0)?r: (r-s>=nrd)?r-(nrd-1): s;
 }
 int grid_scrollto(lv*self,grid g,int s,int r){
-	lv*pv=NULL,*vp=NULL;if(self!=NULL)grid_pv(self,&pv,&vp);r=CLAMP(0,r,vp->c-1);
+	lv*pv=NULL,*vp=NULL;if(self!=NULL)grid_pv(self,&pv,&vp);if(vp->c<1)return r;r=CLAMP(0,r,vp->c-1);
 	#define permuted_row(disp_row) (((disp_row)==-1)?-1:pv?((int)ln(pv->lv[(disp_row)])):(disp_row))
 	#define display_row(perm_row)  (((perm_row)==-1)?-1:vp?((int)ln(vp->lv[(perm_row)])):(perm_row))
 	int nrd=grid_nrd(pv->c,g), rs=0;while(r<vp->c){rs=ln(vp->lv[r]);if(rs!=-1)break;r++;}

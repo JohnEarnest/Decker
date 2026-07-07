@@ -885,7 +885,9 @@ grid_insertrow=_=>{
 	tab_cols(x).map((k,col)=>{
 		const o=tab_get(x,k)
 		tab_set(r,k,range(o.length+1).map(i=>(i==s)?('slurotT'.indexOf(f[col])>=0?lms(''):ZERO): o[i-(i>=s?1:0)]))
-	});grid_edit(r),iwrite(wid.gt,lms('col'),ZERO),iwrite(wid.gt,lms('row'),lmn(s))
+	})
+	if(count(r)==0)tab_set(r,'value',[NIL])
+	grid_edit(r),iwrite(wid.gt,lms('col'),ZERO),iwrite(wid.gt,lms('row'),lmn(s))
 	const os=wid.gv.scroll,ns=grid_scrollto(wid.gt,wid.g,os,s);if(os!=ns){wid.gv.scroll=ns,iwrite(wid.gt,lms('scroll'),lmn(ns))}
 }
 grid_edit_cell=(cell,v)=>{

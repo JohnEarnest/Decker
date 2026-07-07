@@ -750,9 +750,10 @@ void grid_redo(void){lv*x=wid.hist->lv[(wid.hist_cursor)++];grid_apply(x->lv[1])
 void grid_edit(lv*v){wid.hist->c=wid.hist_cursor,ll_add(wid.hist,lml2(wid.gv->table,v)),grid_redo();}
 void grid_deleterow(void){grid_edit(l_drop(l_list(lmn(wid.gv->row)),wid.gv->table));}
 void grid_insertrow(void){
-	lv*f=grid_format(),*x=wid.gv->table,*r=lmt();int s=wid.gv->row+1;EACH(z,x){
-		lv*c=lml(x->n+1);dset(r,x->kv[z],c);EACH(i,c)c->lv[i]=(i==s)?(strchr("slurotT",f->sv[z])?lmistr(""):ZERO): x->lv[z]->lv[i-(i>=s?1:0)];
-	}grid_edit(torect(r));iwrite(wid.gt,lmistr("col"),ZERO),iwrite(wid.gt,lmistr("row"),lmn(s));
+	lv*f=grid_format(),*x=wid.gv->table,*r=lmt();int s=wid.gv->row+1;
+	EACH(z,x){lv*c=lml(x->n+1);dset(r,x->kv[z],c);EACH(i,c)c->lv[i]=(i==s)?(strchr("slurotT",f->sv[z])?lmistr(""):ZERO): x->lv[z]->lv[i-(i>=s?1:0)];}
+	if(r->c==0){dset(r,lmistr("value"),l_list(LNIL));}
+	grid_edit(torect(r));iwrite(wid.gt,lmistr("col"),ZERO),iwrite(wid.gt,lmistr("row"),lmn(s));
 	int os=wid.gv->scroll,ns=grid_scrollto(wid.gt,wid.g,os,s);if(os!=ns){wid.gv->scroll=ns,iwrite(wid.gt,lmistr("scroll"),lmn(ns));}
 }
 void grid_edit_cell(pair cell,lv*v){
