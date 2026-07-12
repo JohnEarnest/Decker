@@ -2220,8 +2220,9 @@ lv* slider_read(lv*x,lv*r){
 }
 lv* slider_write(lv*x){
 	lv*data=x->b,*r=lmd();dset(r,lmistr("type"),lmistr("slider"));
+	int child=contraption_is(dget(data,lmistr("card")));
 	{lv*k=lmistr("interval"),*v=dget(data,k);if(v)dset(r,k,v);}
-	{lv*k=lmistr("value"   ),*v=dget(data,k);if(v&&ln(v)!=0&&!lb(ifield(x,"volatile")))dset(r,k,v);}
+	{lv*k=lmistr("value"   ),*v=dget(data,k);if(v&&(child||ln(v)!=0)&&!lb(ifield(x,"volatile")))dset(r,k,v);}
 	{lv*k=lmistr("step"    ),*v=dget(data,k);if(v&&ln(v)!=1)dset(r,k,v);}
 	{lv*k=lmistr("format"  ),*v=dget(data,k);if(v&&strcmp("%f",v->sv))dset(r,k,v);}
 	{lv*k=lmistr("style"   ),*v=dget(data,k);if(v&&strcmp(slider_styles[0],v->sv))dset(r,k,v);}

@@ -263,7 +263,7 @@ button4:{"type":"button","size":[60,20],"pos":[146,312],"script":"scatterplotsty
 {card:windowing}
 script:"scatterplot.0"
 {widgets}
-examples:{"type":"contraption","size":[236,111],"pos":[10,194],"script":"windowing.0","def":"scriptViewer","widgets":{"o":{"size":[100,22],"pos":[259,1],"value":"scatter\nline\nhist\nbar\nbox"},"c":{"size":[236,18]},"i":{"size":[100,27],"pos":[259,36],"interval":[0,4]},"scr":{"size":[232,90]}}}
+examples:{"type":"contraption","size":[236,111],"pos":[10,194],"script":"windowing.0","def":"scriptViewer","widgets":{"o":{"size":[100,22],"pos":[259,1],"value":"scatter\nline\nhist\nbar\nbox"},"c":{"size":[236,18]},"i":{"size":[100,27],"pos":[259,36],"interval":[0,4],"value":0},"scr":{"size":[232,90]}}}
 button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.2","text":"Next","style":"rect"}
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.2","text":"Prev","style":"rect"}
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"Windowing"}

@@ -117,10 +117,10 @@ button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisafont.0",
 field1:{"type":"field","size":[248,254],"pos":[254,48],"locked":1,"border":0,"value":"Every widget (including custom-made Contraptions) has a .font attribute that can be altered to control the main font it uses for its text. You can set a widget's font by value (with a Font Interface), or by name, which is usually more convenient.\n\nYou can manually set the font for one or more widgets by selecting them with the \"Widgets\" tool and choosing \"Widgets -> Font...\" from the menu.\n\nTry changing the font of some of the widgets on the left! You may need to resize widgets to make room for a font with larger glyphs."}
 button4:{"type":"button","size":[100,20],"pos":[26,115],"text":"Click Me"}
 field2:{"type":"field","size":[100,46],"pos":[26,143],"font":"menu","value":"Some text."}
-enum1:{"type":"contraption","size":[100,25],"pos":[26,197],"font":"menu","def":"enum","widgets":{"s":{"font":"menu","interval":[0,3],"format":"Alpha"},"o":{"value":"Alpha\nBeta\nGamma\nDelta"}}}
+enum1:{"type":"contraption","size":[100,25],"pos":[26,197],"font":"menu","def":"enum","widgets":{"s":{"font":"menu","interval":[0,3],"value":0,"format":"Alpha"},"o":{"value":"Alpha\nBeta\nGamma\nDelta"}}}
 button5:{"type":"button","size":[100,20],"pos":[136,115],"font":"mono","text":"Click Me"}
 field3:{"type":"field","size":[100,46],"pos":[136,143],"font":"mono","value":"Some text."}
-enum2:{"type":"contraption","size":[100,25],"pos":[136,197],"font":"mono","def":"enum","widgets":{"s":{"font":"mono","interval":[0,3],"format":"Alpha"},"o":{"value":"Alpha\nBeta\nGamma\nDelta"}}}
+enum2:{"type":"contraption","size":[100,25],"pos":[136,197],"font":"mono","def":"enum","widgets":{"s":{"font":"mono","interval":[0,3],"value":0,"format":"Alpha"},"o":{"value":"Alpha\nBeta\nGamma\nDelta"}}}
 
 {card:gettingmorefonts}
 {widgets}
@@ -676,7 +676,7 @@ to_sheet:{"type":"button","size":[66,20],"pos":[147,322],"script":"font.8","text
 to_diacritics:{"type":"button","size":[66,20],"pos":[216,323],"locked":1,"script":"font.8","text":"Diacritics","style":"invisible"}
 description:{"type":"field","size":[133,150],"pos":[374,22],"locked":1,"value":"This tool is designed to save time adding diacritic marks to fonts that only support English letters. Consider the generated glyphs a \"first draft\"; many generated glyphs will need tweaking for legibility and style.\n\nSome glyphs will still need to be drawn manually:"}
 field1:{"type":"field","size":[71,26],"pos":[407,140],"locked":1,"font":"mono","value":"ÆæŒœÞþðẞßÐØøŁłı«»€°…¡¿"}
-class:{"type":"contraption","size":[100,25],"pos":[142,22],"script":"diacritics.1","def":"enum","widgets":{"s":{"interval":[0,14],"format":"acute"},"o":{"value":"acute\ngrave\ncircumflex\ncaron\numlaut\nhungarumlaut\ntilde\nmacron\nring\nbreve\noverdot\nogonek\ncedilla\ncomma\nother"}}}
+class:{"type":"contraption","size":[100,25],"pos":[142,22],"script":"diacritics.1","def":"enum","widgets":{"s":{"interval":[0,14],"value":0,"format":"acute"},"o":{"value":"acute\ngrave\ncircumflex\ncaron\numlaut\nhungarumlaut\ntilde\nmacron\nring\nbreve\noverdot\nogonek\ncedilla\ncomma\nother"}}}
 ref:{"type":"field","size":[334,26],"pos":[28,51],"locked":1,"font":"mono","border":0,"value":"as seen in: Á É Í Ó Ú Ý á é í ó ú ý Ć ć Ń ń Ś ś Ź ź\n  based on: A E I O U Y a e i o u y C c N n S s Z z"}
 preview:{"type":"canvas","size":[430,56],"pos":[8,255],"locked":1,"volatile":1,"scale":1}
 editor:{"type":"canvas","size":[120,160],"pos":[132,86],"volatile":1,"script":"diacritics.2","pattern":0,"scale":5}

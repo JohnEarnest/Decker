@@ -2044,6 +2044,20 @@ d:read["temp.deck"]
 assert["name collision card script disambiguation" "# the card script"  (d.card                  .script)]
 assert["name collision card script disambiguation" "# the proto script" (d.contraptions.collision.script)]
 
+d:newdeck[]
+c:d.add["contraption" "testcon"]
+c.script:"on get_slider do sly end"
+s:c.add["slider" "sly"]
+s.interval:-5,50
+s.value:47
+i:d.card.add["contraption" "testcon"]
+v1:i.slider.value  # inherit the parent value
+i.slider.value:0   # override the parent value
+v2:i.slider.value  # observe the local value
+c.update[]
+v3:i.slider.value  # the local value should be retained, even if it is falsey
+assert["slider in contraption zero serialization" (47,0,0) (v1,v2,v3)]
+
 #######################################
 #
 #  Lilt features
