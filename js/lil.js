@@ -1952,9 +1952,16 @@ is_blank=x=>!image_is(x)?0: !x.pix.some(x=>x>0)
 sound_make=data=>{
 	const sign_extend=x=>(x<<24>>24)
 	const ri=lmi((self,i,x)=>{
-		const fetch=ix=>ix<0||ix>=self.data.length?NIL:lmn(sign_extend(self.data[ix]))
+		const interpolate=ix=>{
+			if(self.data.length<1)return 0;
+			if(ix<0)return sign_extend(self.data[0]);
+			if(ix>self.data.length-1)return sign_extend(self.data[self.data.length-1])
+			const a=sign_extend(self.data[Math.floor(ix)]), b=sign_extend(self.data[Math.ceil(ix)])
+			return 0|(a+((ix%1.0)*(b-a)))
+		}
+		const fetch=ix=>ix<0||ix>=self.data.length?NIL:lmn(interpolate(ix))
 		if(i&&lin(i)){ // read/write single samples
-			return x?((self.data[0|ln(i)]=0xFF&ln(x)),x): fetch(0|ln(i))
+			return x?((self.data[0|ln(i)]=0xFF&ln(x)),x): fetch(ln(i))
 		}
 		if(i&&lil(i)){ // read/write ranges
 			const n=rint(getpair(i));n.x=min(n.x,self.data.length),n.y=max(0,n.y);if(x){
@@ -1963,7 +1970,7 @@ sound_make=data=>{
 				for(let z=0;z<sc          ;z++)r[n.x+z   ]=0xFF&ln(s[z])
 				for(let z=0;z<dc-(n.x+n.y);z++)r[n.x+sc+z]=0xFF&self.data[n.x+n.y+z]
 				return self.data=r,x
-			}else{return lml(range(n.y).map(x=>fetch(x+n.x)))}
+			}else{const b=ln(monad.first(i));return lml(range(n.y).map(x=>fetch(b+x)))}
 		}
 		if(ikey(i,'encoded'))return lms(sound_write(self))
 		if(ikey(i,'hist'))return buffer_hist(self.data,1)
@@ -1974,6 +1981,12 @@ sound_make=data=>{
 		}
 		if(ikey(i,'duration'))return lmn(self.data.length/SFX_RATE)
 		if(ikey(i,'map'))return lmnat(([x,fill])=>(buffer_map(self.data,x,fill),self))
+		if(ikey(i,'scaled'))return lmnat(([s])=>{
+			const scale=ln(s),dst=new Uint8Array(clamp(0,0|(self.data.length*Math.abs(scale)),10*SFX_RATE))
+			if     (self.data.length>0&&scale>0)for(let z=0;z<dst.length;z++)dst[z]=interpolate(              z  / scale)
+			else if(self.data.length>0&&scale<0)for(let z=0;z<dst.length;z++)dst[z]=interpolate((dst.length-1-z) /-scale)
+			return sound_make(dst)
+		})
 		return x?x:NIL
 	},'sound')
 	if(data&&data.length>10*SFX_RATE)data=data.slice(0,10*SFX_RATE)
