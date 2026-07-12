@@ -1954,10 +1954,10 @@ sound_make=data=>{
 	const ri=lmi((self,i,x)=>{
 		const fetch=ix=>ix<0||ix>=self.data.length?NIL:lmn(sign_extend(self.data[ix]))
 		if(i&&lin(i)){ // read/write single samples
-			return x?((self.data[ln(i)]=0xFF&ln(x)),x): fetch(ln(i))
+			return x?((self.data[0|ln(i)]=0xFF&ln(x)),x): fetch(0|ln(i))
 		}
 		if(i&&lil(i)){ // read/write ranges
-			const n=getpair(i);n.x=min(n.x,self.data.length),n.y=max(0,n.y);if(x){
+			const n=rint(getpair(i));n.x=min(n.x,self.data.length),n.y=max(0,n.y);if(x){
 				const s=ll(x),dc=self.data.length,sc=s.length, r=new Uint8Array(clamp(0,(dc-n.y)+sc,10*SFX_RATE))
 				for(let z=0;z<n.x         ;z++)r[z]=self.data[z]
 				for(let z=0;z<sc          ;z++)r[n.x+z   ]=0xFF&ln(s[z])
@@ -2286,6 +2286,7 @@ field_read=(x,card)=>{
 			if(ikey(i,'scrollto' ))return lmnat(([x])=>{
 				const bi=inset(rpair(getpair(ifield(self,'pos')),getpair(ifield(self,'size'))),2);if(lb(ifield(self,'scrollbar')))bi.w-=12+3
 				const l=layout_richtext(self.card.deck,ifield(self,'value'),ifield(self,'font'),ALIGN[ls(ifield(self,'align'))],bi.w)
+				if(l.layout.length<1)return self
 				const i=x?min(max(0,0|ln(monad.first(x))),l.layout.length-1):0, c=rcopy(l.layout[i].pos), os=ln(ifield(self,'scroll'));c.y-=os
 				const ch=min(bi.h,c.h);let t=os;if(c.y<0){t+=c.y};if(c.y+ch>=bi.h){t+=((c.y+ch)-bi.h)}
 				if(t!=os)iwrite(self,lms('scroll'),lmn(t));return self
@@ -2366,7 +2367,7 @@ grid_nrd=(rowcount,g)=>{
 }
 grid_scrollto=(self,g,s,r)=>{
 	let nrd=0;if((typeof self)!='number'){
-		const p=grid_pv(self);nrd=grid_nrd(p.pv.length,g);r=clamp(0,r,p.vp.length-1)
+		const p=grid_pv(self);nrd=grid_nrd(p.pv.length,g);if(p.vp.length<1)return r;r=clamp(0,r,p.vp.length-1)
 		let rs=0;while(r<p.vp.length){rs=p.vp[r];if(rs!=-1)break;r++};r=rs
 	}else{nrd=grid_nrd(self,g)};return (r-s<0)?r: (r-s>=nrd)?r-(nrd-1): s
 }

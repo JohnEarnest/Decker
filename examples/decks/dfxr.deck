@@ -1,0 +1,457 @@
+{deck}
+version:1
+card:0
+size:[512,342]
+name:"dfxr.deck"
+
+{card:home}
+image:"%%IMG3AgABVgKEj6nL7Q+jnLTai7PevPsPhuJIluaJpurKtu4Lx/JM1/aN5/rO9/4PDAqHxKLxiEwql8ym8wmNSqfUqvWKzWq33K73Cw6Lx+Sy+YxOq9fstvsNj8vn9Lr9js/r9/y+/w8YKDhIWGh4iJiouMjY6PgIGSk5SVlpeYmZqbnJ2en5CRoqOkpaanqKmqq6ytrq+gobKztLW2t7i5uru8vb6/sLHCw8TFxsfIycrLzM3Oz8DB0tPU1dbX2Nna29zd3t/Q0eLj5OXm5+jp6uvs7e7v4OHy8/T19vf4+fr7/P3+//DzCgwIEECxo8iDChwoUMG3IJADGixIkUK1q8iDGjxogOUwWY8rHjqZBRSIokZfJJypOhVjZxydITzCUzY26qmQSnTUw6j/TcWelnEaFAJREdcrToo6RBmCpl5PRH1KeJpvawStUQ1h1bsw7qmgOsV0Bib5Qd2+dsDbVo9bCd8bbtnbgx6MqlY/dF3rtx9rbwy9cN4BWDA68pnAKxYTSKTzReXOZxCcmQxVAecbnyl8whOGt+CPKzI88fSIvGYrpD6tNVVm9wzVoK7AyzY6sMbRtR7Qu7c9PE7btQ7wrDg/sEblxQ8QnLkyNF7vxP8wjTo0uFbp1P9Qfbs3PF7j1P9wbjw5sFb95O+QXr08NF735O+wTz4+uFbx9O/QP78xPG718b/QEwYICOAWigGgMWmCAJCzYoH4IQmvHghPpJaOEYFWYoIIYcgrHhhwp6KGIXIZZ4xokoRkbiilmo6KJlLcZoBYw0bjbjjTkCwaCOzO3o422yBSnjkESCCOSRvxmppIlJNomEjVC29uSUQ1Vp5XNMZnmFlFxC4eWXToQpJhNklqnEmWhGieWa323pppAlxQnnmHTOWeedabap51p89vlenoAaoeagPhRqKA+IJqrDoozi4OijNkQqKQ2UVirDpZjCoOmmLnTqKQughqrCqKSiYOqpJqSqqoN/tioCq7B29uqspdVqq2q45vrarrzS5uuvvAUrLHHEFvujoMj+deyyEMjqrAXQRkvBtNRKYO21zzarrQLZdkset+DyJ+64BJY77rfm0ocuuOquS66y8ILw7rz1wnvvuvmau2+67Xbbr7v/ahswwANfWzDBB1ObMMILR9swww87GzHEEy9bMcUXI5sxxhsX2zHHHwsbMsgj/1oyySfzmjLKK+faMssv2xozzDPPWjPNN8OaM847t9ozzz+rGjTQQ59aNNFHk5o00kuH2jTTT3saNdRTb1o11VdjmjXWW1faNddfSxo22GM/WjbZZzOaNtprJ9o2228bGjfccw9aN913A5o33nv32Tfff+sZOOCD31k44YfTmTjii8fZOOOPuxk55JOvWTnll6OZOeabl9k555+LGTroo39ZOumnc5k66qtn2Trrr1sZO+yzT1k77bdDmTvuG/0OfPDCTzRv8cYfj3zyyi/PfPPOPw999NJPT3311l+Pffbab899995/D3744o9Pfvnmn49++uqvz3777r8Pf/zyz0//rAUA"
+script:"home.0"
+{widgets}
+code:{"type":"field","size":[255,20],"pos":[91,317],"script":"home.1","style":"code","value":"BQAAPyUTtRaSptAJE8xvAABLEQAAAAAAAAAAP/8="}
+coin:{"type":"button","size":[69,20],"pos":[11,83],"script":"home.2","text":"Coin"}
+laser:{"type":"button","size":[69,20],"pos":[11,107],"script":"home.2","text":"Laser"}
+explosion:{"type":"button","size":[69,20],"pos":[11,131],"script":"home.2","text":"Explosion"}
+powerup:{"type":"button","size":[69,20],"pos":[11,155],"script":"home.2","text":"Powerup"}
+hit:{"type":"button","size":[69,20],"pos":[11,179],"script":"home.2","text":"Hit"}
+jump:{"type":"button","size":[69,20],"pos":[11,203],"script":"home.2","text":"Jump"}
+select:{"type":"button","size":[69,20],"pos":[11,227],"script":"home.2","text":"Select"}
+push:{"type":"button","size":[69,20],"pos":[11,251],"script":"home.2","text":"Push"}
+any:{"type":"button","size":[69,20],"pos":[11,275],"script":"home.2","text":"Random"}
+s_wave:{"type":"contraption","size":[145,20],"pos":[151,46],"script":"home.3","def":"enum","widgets":{"s":{"size":[145,20],"interval":[0,6],"value":5,"format":"breaker"},"o":{"size":[145,20],"value":"square\nsawtooth\nsine\nnoise\ntriangle\nbreaker\nvowel"}}}
+s_duty:{"type":"slider","size":[145,20],"pos":[151,69],"script":"home.3","interval":[-1,1],"value":0.59,"step":0.01}
+s_attack:{"type":"slider","size":[145,20],"pos":[151,106],"script":"home.3","interval":[0,1],"step":0.01}
+s_sustain:{"type":"slider","size":[145,20],"pos":[151,129],"script":"home.3","interval":[0,1],"value":0.25,"step":0.01}
+s_punch:{"type":"slider","size":[145,20],"pos":[151,152],"script":"home.3","interval":[0,1],"value":0.08,"step":0.01}
+s_decay:{"type":"slider","size":[145,20],"pos":[151,175],"script":"home.3","interval":[0,1],"value":0.09,"step":0.01}
+s_base:{"type":"slider","size":[145,20],"pos":[151,210],"script":"home.3","interval":[0,1],"value":0.65,"step":0.01}
+s_cut:{"type":"slider","size":[145,20],"pos":[151,233],"script":"home.3","interval":[0,1],"value":0.04,"step":0.01}
+s_ramp:{"type":"slider","size":[145,20],"pos":[151,256],"script":"home.3","interval":[-1,1],"value":-0.4,"step":0.01}
+s_dramp:{"type":"slider","size":[145,20],"pos":[151,279],"script":"home.3","interval":[-1,1],"step":0.01}
+s_amag:{"type":"slider","size":[145,20],"pos":[362,155],"script":"home.3","interval":[-1,1],"step":0.01}
+s_aspeed:{"type":"slider","size":[145,20],"pos":[362,178],"script":"home.3","interval":[-1,1],"step":0.01}
+s_vmag:{"type":"slider","size":[145,20],"pos":[362,214],"script":"home.3","interval":[-1,1],"step":0.01}
+s_vspeed:{"type":"slider","size":[145,20],"pos":[362,237],"script":"home.3","interval":[-1,1],"step":0.01}
+s_vol:{"type":"slider","size":[145,20],"pos":[362,279],"script":"home.3","interval":[0,1],"value":0.25,"step":0.01}
+mutate:{"type":"button","size":[69,20],"pos":[11,317],"script":"home.4","show":"invert","text":"Mutate","shortcut":"m"}
+playcode:{"type":"button","size":[69,20],"pos":[359,317],"script":"home.5","text":"Play","shortcut":" "}
+exportcode:{"type":"button","size":[69,20],"pos":[438,317],"script":"home.6","text":"Export..."}
+field1:{"type":"field","size":[58,16],"pos":[91,50],"locked":1,"show":"transparent","border":0,"align":"right","value":"waveform"}
+field10:{"type":"field","size":[58,16],"pos":[91,73],"locked":1,"show":"transparent","border":0,"align":"right","value":"wave tweak"}
+field2:{"type":"field","size":[58,16],"pos":[91,110],"locked":1,"show":"transparent","border":0,"align":"right","value":"attack"}
+field3:{"type":"field","size":[58,16],"pos":[91,133],"locked":1,"show":"transparent","border":0,"align":"right","value":"sustain"}
+field4:{"type":"field","size":[58,16],"pos":[91,179],"locked":1,"show":"transparent","border":0,"align":"right","value":"decay"}
+field5:{"type":"field","size":[58,16],"pos":[91,156],"locked":1,"show":"transparent","border":0,"align":"right","value":"punch"}
+field6:{"type":"field","size":[58,16],"pos":[91,214],"locked":1,"show":"transparent","border":0,"align":"right","value":"base freq"}
+field7:{"type":"field","size":[58,16],"pos":[91,237],"locked":1,"show":"transparent","border":0,"align":"right","value":"cutoff freq"}
+field8:{"type":"field","size":[58,16],"pos":[91,260],"locked":1,"show":"transparent","border":0,"align":"right","value":"freq ramp"}
+field9:{"type":"field","size":[58,16],"pos":[91,283],"locked":1,"show":"transparent","border":0,"align":"right","value":"ramp ramp"}
+field11:{"type":"field","size":[58,16],"pos":[302,159],"locked":1,"show":"transparent","border":0,"align":"right","value":"tone mag"}
+field12:{"type":"field","size":[58,16],"pos":[302,182],"locked":1,"show":"transparent","border":0,"align":"right","value":"tone speed"}
+field13:{"type":"field","size":[58,16],"pos":[302,218],"locked":1,"show":"transparent","border":0,"align":"right","value":"vib mag"}
+field14:{"type":"field","size":[58,16],"pos":[302,241],"locked":1,"show":"transparent","border":0,"align":"right","value":"vib speed"}
+field15:{"type":"field","size":[58,16],"pos":[302,283],"locked":1,"show":"transparent","border":0,"align":"right","value":"volume"}
+version:{"type":"field","size":[46,15],"pos":[4,20],"locked":1,"volatile":1,"show":"invert","border":0}
+field16:{"type":"field","size":[467,15],"pos":[40,20],"locked":1,"font":"menu","show":"invert","border":0,"align":"right","value":"DFXR: Procedural Sound Effects for Decker"}
+field17:{"type":"field","size":[185,85],"pos":[322,40],"locked":1,"value":{"text":["inspired by ","sfxr"," by DrPetter.\nspecial thanks to Scaevolus for suggestions and enhancements.\n\nThis synthesizer can directly export sound resources or .wav files, and is also packaged as a decker module. For more information about the module, ","click here","."],"font":["","","","",""],"arg":["","http://www.drpetter.se/project_sfxr.html","","Next",""]}}
+field18:{"type":"field","size":[56,24],"pos":[17,57],"locked":1,"border":0,"align":"center","value":"preset generators"}
+
+{script:home.0}
+on view do
+ version.text:"v%0.1f" format deck.modules.dfxr.version
+ each val name in dfxr.decode[code.text]
+  card.widgets["s_%s" format name].value:val
+ end
+end
+
+on changeparam do
+ code.text:dfxr.encode[
+  each val name in dfxr.decode[]
+   card.widgets["s_%s" format name].value
+  end
+ ]
+end
+{end}
+
+{script:home.1}
+on change do
+ view[]
+end
+{end}
+
+{script:home.2}
+on click do
+ code.text:dfxr.encode[dfxr.generators[me.name][]]
+ code.event.change
+ playcode.event.click
+end
+{end}
+
+{script:home.3}
+on change do
+ changeparam[]
+end
+{end}
+
+{script:home.4}
+on click do
+ p:dfxr.decode[code.text]
+ k:random[("wave","vol") drop keys p]
+ p[k]:p[k]+-.1+.2*random[]
+ code.text:dfxr.encode[p]
+ code.event.change
+ playcode.event.click
+end
+{end}
+
+{script:home.5}
+on click do
+ play[dfxr.sound[code.text]]
+end
+{end}
+
+{script:home.6}
+on click do
+ x:alert[
+  "How do you want to export this sound?" "choose"
+  (".WAV File","Sound Resource","Cancel")dict("wav","sound","none")
+ ]
+ s:dfxr.sound[code.text]
+ if x~"wav"
+  write[s]
+ end
+ if x~"sound"
+  name:alert["Please provide a name for the new sound resource." "string"]
+  if name deck.add[s name] end
+ end
+end
+{end}
+
+{card:modulehelp}
+{widgets}
+back:{"type":"button","size":[60,20],"pos":[6,316],"script":"modulehelp.0","text":"Back"}
+field1:{"type":"field","size":[236,270],"pos":[6,41],"locked":1,"border":0,"value":{"text":["The dfxr module exposes several utility functions:\n\n- ","dfxr.sound[params]"," generates a sound interface based on a dictionary of synthesis parameters \"params\". As a convenience, you can also call this function with a packed parameter string (see below). Sounds with a larger envelope will take longer to generate, but short sounds can be generated on the fly in your scripts.\n\n- ","dfxr.encode[params]"," converts a parameters dictionary into a short, opaque \"packed\" string. Note that this encoding will discard some precision in the synth parameters for brevity. Use this format to store your sound effects to save space!\n\n- ","dfxr.decode[string]"," converts a packed parameters string into a parameters dictionary.\n\n- ","dfxr.generators"," is a dictionary of functions which generate \"presets\". Calling one of these functions will generate a parameters dictionary for a random \"preset\" sound.\n\nExamine the scripts on the main card to see various ways these functions can be used!"],"font":["","mono","","mono","","mono","","mono",""],"arg":["","","","","","","","",""]}}
+field16:{"type":"field","size":[501,17],"pos":[6,20],"locked":1,"font":"menu","show":"invert","border":0,"align":"right","value":"Scripting With DFXR"}
+grid1:{"type":"grid","size":[260,253],"pos":[247,58],"locked":1,"widths":[44],"value":{"name":["wave","duty","attack","sustain","punch","decay","base","cut","ramp","dramp","amag","aspeed","vmag","vspeed","vol"],"meaning":["square, sawtooth, sine, noise, triangle, breaker","Waveform-specific adjustment","Envelope attack duration","Envelope sustain duration","Envelope sustain punch","Envelope decay duration","Base frequency","Minimum frequency cutoff","Frequency slide/ramp","Frequency slide/ramp change","Tonal Change amount","Tonal Change speed","Vibrato depth","Vibrato speed","Sound Volume"]}}
+field2:{"type":"field","size":[260,14],"pos":[247,41],"locked":1,"border":0,"align":"center","value":"fields of a parameters dictionary:"}
+
+{script:modulehelp.0}
+on click do
+  go["First"]
+end
+{end}
+
+{module:dfxr}
+description:"A procedural sound effect generator inspired by 'sfxr' by DrPetter."
+version:0.2
+{script}
+# dfxr: dynamic sound effect generation for Decker
+# inspired by and adapted from 'sfxr' by DrPetter:
+# http://www.drpetter.se/project_sfxr.html
+# special thanks to Scaevolus for a number of
+# suggestions and enhancements.
+
+packed.wave   :"u8"
+packed.attack :"u16b" # [ 0,1] Envelope attack
+packed.sustain:"u16b" # [ 0,1] Envelope sustain
+packed.punch  :"u16b" # [ 0,1] Envelope sustain punch 
+packed.decay  :"u16b" # [ 0,1] Envelope decay
+packed.base   :"u16b" # [ 0,1] Start frequency
+packed.cut    :"u16b" # [ 0,1] Min frequency cutoff
+packed.ramp   :"i16b" # [-1,1] Slide
+packed.dramp  :"i16b" # [-1,1] Delta slide
+packed.duty   :"i16b" # [-1,1] Square wave duty
+packed.amag   :"i16b" # [-1,1] Tonal Change amount
+packed.aspeed :"i16b" # [-1,1] Tonal Change speed
+packed.vmag   :"i16b" # [-1,1] Vibrato depth
+packed.vspeed :"i16b" # [-1,1] Vibrato speed
+packed.vol    :"u16b" # [ 0,1] Sound Volume
+
+on short_to_signed     x do x/32767 end
+on short_to_unsigned   x do x/65535 end
+on short_from_signed   x do floor 32767*-1|1&x end
+on short_from_unsigned x do floor 65535* 0|1&x end
+
+local wavenames:"|" split "square|sawtooth|sine|noise|triangle|breaker|vowel"
+local waveids:wavenames dict keys wavenames
+
+on dfxr_encode x do
+ local r:array[]
+ each type name in packed
+  if     name~"wave" r.struct[type waveids            [x[name]]]
+  elseif type~"u16b" r.struct[type short_from_unsigned[x[name]]]
+  elseif type~"i16b" r.struct[type short_from_signed  [x[name]]]
+  end
+ end
+ 6 drop r.encoded
+end
+
+on dfxr_decode x do
+ local a:array["%%%%DAT0%s" format x]
+ local r:()
+ each type name in packed
+  if     name~"wave" r[name]:wavenames        [a.struct[type]]
+  elseif type~"u16b" r[name]:short_to_unsigned[a.struct[type]]
+  elseif type~"i16b" r[name]:short_to_signed  [a.struct[type]]
+  end
+ end
+ r
+end
+
+on sums x do local a:0 each v in x a:a+v end end
+
+on dfxr_sound ps do
+ if "string"~typeof ps ps:dfxr_decode[ps] end
+ local gain   :2*10^(-40*(1-.25 unless ps.vol)/20)
+ local fslide :     1-.01*ps.ramp ^3
+ local fdslide: -0.000001*ps.dramp^3
+ local fperiod: 100.0/0.001+ps.base^2
+ local fmax   : 100.0/0.001+ps.cut^2
+ local duty   : .5-.5*ps.duty
+ local vib_mag: .5*ps.vmag
+ local vib_spd: 0.01*ps.vspeed^2
+ local arp_mag: if !ps.amag<0 1-.9*ps.amag^2 else 1+10*ps.amag^2 end
+ local arp_spd: if ps.aspeed=1 0 else floor 32+20000*(1.0-ps.aspeed)^2 end
+ local wave:(raze insert k v with
+  "square"   on wave_square   x do (-.5,5)@x<duty end
+  "sawtooth" on wave_sawtooth x do 1-2*x end
+  "sine"     on wave_sine     x do sin 2*pi*x end
+  "noise"    on wave_noise    x do -1+random[1000 count x]/500 end
+  "triangle" on wave_triangle x do -1+mag@1-2*x   end
+  "breaker"  on wave_breaker  x do -1+mag@1-2*x^2 end
+  "vowel"    on wave_vowel    x do 
+   local pos: ps.duty+1
+    ((1-x)^4)*0.4*sin 2*pi*x*(if pos<1 2+4*pos else  6-3*(pos-1) end)
+                 +sin 2*pi*x*(if pos<1 3+7*pos else 10+4*(pos-1) end)
+  end
+ end)[ps.wave]
+ local phase:0
+ on stage start len volume do
+  local t:start+5*range len/5
+  local fs:fslide+fdslide*t
+  local fp:fmax&fperiod*(fs^t)*(arp_mag,1)@(!arp_spd~0)&t<arp_spd
+  local pd:8|floor if vib_mag>0 fp*1.0+vib_mag*sin t*vib_spd else fp end
+  volume[(t-start)/len]*wave[each p in pd phase:p%phase+40 end/pd]
+ end
+ local env_cnt:floor 100000*(ps.attack,ps.sustain,ps.decay)^2
+ local env_end:sums[env_cnt]
+ sound[floor 127*-1|1&gain*
+  stage[         0 env_cnt[0] on s0 x do x                  end],
+  stage[env_end[0] env_cnt[1] on s1 x do 1+(1-x)*2*ps.punch end],
+  stage[env_end[1] env_cnt[2] on s2 x do 1-x                end]
+ ]
+end
+
+on sfx_empty do
+ local r:(keys packed)dict 0
+ r.wave:"square"
+ r.vol:0.25
+end
+
+sfx.coin:on sfx_coin do
+ local r:sfx_empty[]
+ r.wave :random[("noise","vowel") drop wavenames]
+ r.base :.4+.5*random[]
+ r.attack:0
+ r.sustain:.1*random[]
+ r.decay:.1+.4*random[]
+ r.punch:.3+.3*random[]
+ if random[2]
+  r.aspeed:.5+.2*random[]
+  local num:    1+bits.or[1 7*random[]]
+  local den:num+2+bits.or[1 7*random[]]
+  r.amag:num/den
+ end
+ r
+end
+
+sfx.laser:on sfx_laser do
+ local r:sfx_empty[]
+ r.wave:random[("noise","vowel") drop wavenames]
+ r.attack:0
+ r.sustain:.1+.2*random[]
+ r.decay:.4*random[]
+ if random[2]
+  r.base:.3+.6*random[]
+  r.cut :.1*random[]
+  r.ramp:-0.35-.3*random[]
+ else
+  r.base:.5+.5*random[]
+  r.cut :.2|(r.base-.2)-.6*random[]
+  r.ramp:.15-.2*random[] 
+ end
+ r.duty :if random[2] .5*random[] else .4+.5*random[] end
+ r.punch:if random[2] .3*random[] else 0 end
+ r
+end
+
+sfx.explosion:on sfx_explosion do
+ local r:sfx_empty[]
+ r.attack:0
+ r.sustain:.1+.3*random[]
+ r.decay:.5*random[]
+ r.punch:.2+.6*random[]
+ if random[2]
+  r.base:( .1+.4*random[])^2
+  r.ramp: -.1+.4*random[]
+ else
+  r.base:( .2+.7*random[])^2
+  r.ramp: -.2+.2*random[]
+ end
+ if !random[5] r.ramp:0 end
+ if random[2]
+  r.vmag:  .7*random[]
+  r.vspeed:.6*random[]
+ end
+ if !random[3]
+  r.amag:  .8-1.6*random[]
+  r.aspeed:.6+.3*random[]
+ end
+ r
+end
+
+sfx.powerup:on sfx_powerup do
+ r:sfx_empty[]
+ r.wave:random[("noise","vowel") drop wavenames]
+ r.attack:0
+ r.sustain:.4*random[]
+ r.decay:.1+.4*random[]
+ if random[2]
+  r.base:.2+.3*random[]
+  r.ramp:.1+.4*random[]
+ else
+  r.base:.2 +.3*random[]
+  r.ramp:.05+.2*random[]
+  if random[2]
+   r.vmag:  .7*random[]
+   r.vspeed:.6*random[]
+  end
+ end
+ if !random[2] r.duty:.6*random[] end
+ r
+end
+
+sfx.hit:on sfx_hit do
+ r:sfx_empty[]
+ r.wave:random["vowel" drop wavenames]
+ r.attack:0
+ r.sustain:.1*random[]
+ r.decay:.1+.2*random[]
+ r.base:.2+.6*random[]
+ r.ramp:-.3-.4*random[]
+ if !random[6] r.duty:.6*random[] end
+ r
+end
+
+sfx.jump:on sfx_jump do
+ r:sfx_empty[]
+ r.wave:random[("noise","vowel") drop wavenames]
+ r.attack:0
+ r.sustain:.1+.3*random[]
+ r.decay:.1+.2*random[]
+ r.base:.3+.3*random[]
+ r.ramp:.1+.2*random[]
+ r.duty:.6*random[]
+ r
+end
+
+sfx.select:on sfx_select do
+ r:sfx_empty[]
+ r.wave:random[("noise","vowel") drop wavenames]
+ r.attack:0
+ r.sustain:.1+.1*random[]
+ r.decay:.2*random[]
+ r.base:.2+.4*random[]
+ if r.wave="square" r.duty:.6*random[] end
+ r
+end
+
+sfx.push:on sfx_push do
+ r:sfx_empty[]
+ r.wave:random["noise","noise","noise","sawtooth","triangle","breaker"]
+ r.attack:.01+.09*random[]
+ r.sustain:.01+.09*random[]
+ r.decay:.01+.09*random[]
+ r.base:.1+.4*random[]
+ r.ramp:.05+.2*random[]
+ r.amag:.8-1.6*random[]
+ r.aspeed:.6+.3*random[]
+ r
+end
+
+sfx.any:on sfx_any do
+ r:sfx_empty[]
+ r.wave:random[wavenames]
+ r.attack :mag (-1+2*random[])^3
+ r.sustain:mag (-1+2*random[])^2
+ r.decay  :mag -1+2*random[]
+ r.punch:(.8*random[])^2
+ if .2>sum r.attack,r.sustain,r.decay
+  r.sustain:r.sustain+.2+.3*random[]
+  r.decay  :r.decay  +.2+.3*random[]
+ end
+ r.base:if random[2] (-1+2*random[])^3 else (-1+2*random[])^2 end
+ r.ramp:  (-1+2*random[])^5
+ if (r.base>.7)&(r.ramp> .2 ) r.ramp:r.ramp*-1 end
+ if (r.base<.2)&(r.ramp<-.05) r.ramp:r.ramp*-1 end
+ r.dramp: (-1+2*random[])^3
+ r.duty:   -1+2*random[]
+ r.vmag:  (-1+2*random[])^3
+ r.vspeed: -1+2*random[]
+ r.aspeed: -1+2*random[]
+ r.amag:   -1+2*random[]
+ r
+end
+
+raze insert k v with
+ "encode" dfxr_encode
+ "decode" dfxr_decode
+ "sound"  dfxr_sound
+ "generators" sfx
+end
+{end}
+
+{contraption:enum}
+size:[100,25]
+resizable:1
+margin:[5,5,5,5]
+description:"select from among enumerated string values."
+script:"enum.0p"
+template:"on change val do\n \nend"
+attributes:{"name":["options"],"label":["Options"],"type":["code"]}
+{widgets}
+s:{"type":"slider","size":[100,25],"pos":[0,0],"interval":[0,100],"style":"compact"}
+o:{"type":"field","size":[100,20],"pos":[0,-30],"locked":1,"style":"plain"}
+
+{script:enum.0p}
+on get_options   do o.text end
+on get_value     do ("\n" split o.text)[s.value] end
+on set_options x do o.text:x s.value:0 view[] end
+
+on set_value x do
+ v:"\n" split o.text
+ d:v dict range count v
+ s.interval:0,(count v)-1
+ s.value:v[0] unless d[x]
+ s.format:v[s.value]
+ s.font:card.font
+ s.show:card.show
+ s.locked:card.locked
+end
+
+on change do
+ view[]
+ card.event["change" get_value[]]
+end
+
+on view do
+ v:"\n" split o.text
+ s.interval:0,(count v)-1
+ s.format:v[s.value]
+ s.font:card.font
+ s.show:card.show
+ s.locked:card.locked
+end
+
+{end}
+

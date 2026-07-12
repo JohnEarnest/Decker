@@ -336,6 +336,11 @@ assert["field.data round-tripping 1" dat cf.data]
 cf.data:11,22,33
 assert["field.data round-tripping 2" (11,22,33) cf.data]
 
+# test scrollto with no text
+f:newdeck[].card.add["field"]
+f.value:""
+f.scrollto[5]
+
 #######################################
 #
 #  Slider
@@ -480,6 +485,10 @@ assert["grid write cellvalue" insert a b with 11 22 101 99 end g.value]
 g.row:-1
 g.cellvalue:99999
 assert["grid write cellvalue with invalid row index" insert a b with 11 22 101 99 end g.value]
+
+# test scrollto with no rows/columns
+g.value:insert with end
+g.scrollto[5]
 
 #######################################
 #
@@ -668,6 +677,10 @@ assert["sound delete EOB data" (0,0,0,0,0) s[0,5]]
 s[5,0]:11,22
 assert["sound insert EOB size" 7 s.size]
 assert["sound insert EOB data" (0,0,0,0,0,11,22) s[0,7]]
+
+s:sound[1,2,3,4,5,6]
+assert["sound index by float"       (3)   s[2.3]]
+assert["sound index range by float" (3,4) s[2.3,2.1]]
 
 #######################################
 #
