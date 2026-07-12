@@ -1954,10 +1954,10 @@ sound_make=data=>{
 	const ri=lmi((self,i,x)=>{
 		const fetch=ix=>ix<0||ix>=self.data.length?NIL:lmn(sign_extend(self.data[ix]))
 		if(i&&lin(i)){ // read/write single samples
-			return x?((self.data[ln(i)]=0xFF&ln(x)),x): fetch(ln(i))
+			return x?((self.data[0|ln(i)]=0xFF&ln(x)),x): fetch(0|ln(i))
 		}
 		if(i&&lil(i)){ // read/write ranges
-			const n=getpair(i);n.x=min(n.x,self.data.length),n.y=max(0,n.y);if(x){
+			const n=rint(getpair(i));n.x=min(n.x,self.data.length),n.y=max(0,n.y);if(x){
 				const s=ll(x),dc=self.data.length,sc=s.length, r=new Uint8Array(clamp(0,(dc-n.y)+sc,10*SFX_RATE))
 				for(let z=0;z<n.x         ;z++)r[z]=self.data[z]
 				for(let z=0;z<sc          ;z++)r[n.x+z   ]=0xFF&ln(s[z])

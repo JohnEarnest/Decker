@@ -678,6 +678,10 @@ s[5,0]:11,22
 assert["sound insert EOB size" 7 s.size]
 assert["sound insert EOB data" (0,0,0,0,0,11,22) s[0,7]]
 
+s:sound[1,2,3,4,5,6]
+assert["sound index by float"       (3)   s[2.3]]
+assert["sound index range by float" (3,4) s[2.3,2.1]]
+
 #######################################
 #
 #  Patterns
