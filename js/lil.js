@@ -1114,6 +1114,13 @@ ivalue=(x,k,d)=>x.hasOwnProperty(k)?x[k]:d
 ifield=(x,k)  =>x.f(x,lms(k))
 iindex=(x,k,v)=>x.f(x,lmn(k),v)
 iwrite=(x,k,v)=>x.f(x,k,v)
+
+value_is_default=(self,key,dval)=>{
+	let r=self[key];if(r==undefined)return 1;if(typeof r=='string')r=lms(r);if(typeof r=='number'||typeof r=='boolean')r=lmn(r);
+	const card=self.card;if(!contraption_is(card))return match(r,dval)
+	const p=dget(card.def.widgets,ifield(self,'name'));if(!p)return 0
+	const v=ifield(p,key);return v!=undefined&&match(r,v)
+}
 value_inherit=(self,key)=>{
 	let r=self[key];if(typeof r=='string')r=lms(r);if(typeof r=='number'||typeof r=='boolean')r=lmn(r);
 	const card=self.card;if(!contraption_is(card))return r
@@ -2321,7 +2328,10 @@ field_write=x=>{
 	if(x.style&&x.style!='rich')dset(r,lms('style'),lms(x.style))
 	if(x.align&&x.align!='left')dset(r,lms('align'),lms(x.align))
 	if(x.scroll&&!x.volatile)dset(r,lms('scroll'),lmn(x.scroll))
-	if(x.value&&!x.volatile){if(rtext_is_plain(x.value)){const v=rtext_string(x.value);if(ls(v))dset(r,lms('value'),v)}else{dset(r,lms('value'),rtext_write(x.value))}}
+	if(x.value&&!x.volatile){
+		if(rtext_is_plain(x.value)){const v=rtext_string(x.value);if(!value_is_default(x,'value',rtext_cast()))dset(r,lms('value'),v)}
+		else{dset(r,lms('value'),rtext_write(x.value))}
+	}
 	return r
 }
 slider_styles={horiz:1,vert:1,bar:1,compact:1}
@@ -2355,7 +2365,7 @@ slider_read=(x,card)=>{
 slider_write=x=>{
 	const r=lmd([lms('type')],[lms('slider')])
 	if(x.interval)dset(r,lms('interval'),lmpair(x.interval))
-	if(x.value!=undefined&&((contraption_is(x.card))||(x.value!=0))&&!x.volatile)dset(r,lms('value'),lmn(x.value))
+	if(x.value!=undefined&&!value_is_default(x,'value',ZERO)&&!x.volatile)dset(r,lms('value'),lmn(x.value))
 	if(x.step!=undefined&&x.step!=1)dset(r,lms('step'),lmn(x.step))
 	if(x.format!=undefined&&x.format!='%f')dset(r,lms('format'),lms(x.format))
 	if(x.style&&x.style!='horiz')dset(r,lms('style'),lms(x.style))

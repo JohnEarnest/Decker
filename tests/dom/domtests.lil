@@ -2046,17 +2046,46 @@ assert["name collision card script disambiguation" "# the proto script" (d.contr
 
 d:newdeck[]
 c:d.add["contraption" "testcon"]
-c.script:"on get_slider do sly end"
+c.script:"
+on get_slider do sly end
+on get_field do fie end
+on get_button do but end
+on get_grid do gre end
+"
 s:c.add["slider" "sly"]
+f:c.add["field"  "fie"]
+b:c.add["button" "but"]
+g:c.add["grid"   "gre"]
 s.interval:-5,50
 s.value:47
+f.value:"teeth"
+b.value:1
+g.value:insert k v with "apple" 11 end
 i:d.card.add["contraption" "testcon"]
 v1:i.slider.value  # inherit the parent value
+f1:i.field.text
+b1:i.button.value
+g1:i.grid.value
 i.slider.value:0   # override the parent value
+i.field.text:""
+i.button.value:0
+i.grid.value:insert with end
 v2:i.slider.value  # observe the local value
+f2:i.field.text
+b2:i.button.value
+g2:i.grid.value
 c.update[]
 v3:i.slider.value  # the local value should be retained, even if it is falsey
-assert["slider in contraption zero serialization" (47,0,0) (v1,v2,v3)]
+f3:i.field.text
+b3:i.button.value
+g3:i.grid.value
+assert["slider in contraption zero serialization" (47,0,0)        (v1,v2,v3)]
+assert["field in contraption empty serialization" ("teeth","","") (f1,f2,f3)]
+assert["button in contraption empty serialization" (1,0,0)        (b1,b2,b3)]
+assert["grid in contraption empty serialization"
+	(list insert k v with "apple" 11 end),(list insert with end),(list insert with end)
+	(list g1),(list g2),(list g3)
+]
 
 #######################################
 #

@@ -235,7 +235,7 @@ field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"va
 ex1:{"type":"field","size":[232,147],"pos":[10,48],"border":1,"style":"code","value":"pt.command[deck\n \"!show boxy smile centerleft\",\n \"!anim boxy %s\" format mode.value\n]\n"}
 button4:{"type":"button","size":[60,20],"pos":[254,266],"script":"commandandclear.0","text":"Try It!"}
 button6:{"type":"button","size":[108,20],"pos":[214,312],"script":"showhide.0","text":"Clear Puppets","style":"rect"}
-mode:{"type":"contraption","size":[140,26],"pos":[56,244],"script":"anim.0","def":"enum","widgets":{"s":{"size":[140,26],"interval":[0,5],"value":0,"format":"none"},"o":{"size":[140,20],"value":"none\nbob\nshake\nbreathe\nbackforth\nspin"}}}
+mode:{"type":"contraption","size":[140,26],"pos":[56,244],"script":"anim.0","def":"enum","widgets":{"s":{"size":[140,26],"interval":[0,5],"format":"none"},"o":{"size":[140,20],"value":"none\nbob\nshake\nbreathe\nbackforth\nspin"}}}
 field3:{"type":"field","size":[57,13],"pos":[56,229],"locked":1,"border":0,"value":"mode"}
 
 {script:anim.0}
