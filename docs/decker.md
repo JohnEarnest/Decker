@@ -1125,6 +1125,7 @@ Sounds are dynamically created interfaces, each representing a mutable buffer of
 | `x.size`     | An integer giving the number of samples in the sound. Resizing pads with `0` or truncates, as needed. r/w. |
 | `x.duration` | A float giving the play time of the sound in seconds.                                                      |
 | `x[y]`       | The value of sample `y`. Reads nil out of bounds, ignores out of bounds writes. r/w.                       |
+| `x.scaled[f]`| Clone this sound, scaled to `floor f*x.size`, resampling uniformly. Negative `f` reverses samples.         |
 | `x.map[x y]` | Replace every sample of the sound by indexing the dictionary `x`, using `y` as a default if provided.      |
 
 The following example creates a new sound and then writes a 1 second long A-4 (440hz) sine wave to it:
@@ -1157,6 +1158,13 @@ s[(0,0)]:16*sin (440/8000)*2*pi*range 8000
 But the simplest way to create such a sound is to pass the list of samples directly to the `sound[]` function instead of a length:
 ```lil
 s:sound[16*sin (440/8000)*2*pi*range 8000]
+```
+
+As a convenience, reading samples at non-integer indices will linearly interpolate adjacent samples:
+```lil
+s:sound[10,20,30,40,50]
+s[0.5]    # 15
+s[0.25,3] # (12,22,32)
 ```
 
 The `sound.hist` attribute can be used to efficiently calculate several properties of its samples:

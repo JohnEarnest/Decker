@@ -678,9 +678,38 @@ s[5,0]:11,22
 assert["sound insert EOB size" 7 s.size]
 assert["sound insert EOB data" (0,0,0,0,0,11,22) s[0,7]]
 
+s:sound[10,20,30,20,10]
+ss:s.scaled[1]
+assert["sound scale clone" (10,20,30,20,10) ss[0,ss.size]]
+ss:s.scaled[2]
+assert["sound scale up len" 10 ss.size]
+assert["sound scale up data" (10,15,20,25,30,25,20,15,10,10) ss[0,ss.size]]
+ss:s.scaled[.5]
+assert["sound scale down len" 2 ss.size]
+assert["sound scale down data" (10,30) ss[0,ss.size]]
+ss:s.scaled[100000]
+assert["sound scale big len" 80000 ss.size]
+assert["sound scale big sample" (10,10,10,10,10) ss[0,5]]
+ss:s.scaled[0]
+assert["sound scale to zero" 0 ss.size]
+
+s:sound[10,20,30,40]
+ss:s.scaled[-1]
+assert["sound scale reverse" (40,30,20,10) ss[0,ss.size]]
+ss:s.scaled[-2]
+assert["sound scale interpolate reverse" (40,40,35,30,25,20,15,10) ss[0,ss.size]]
+
+s:sound[()]
+ss:s.scaled[2]
+assert["sound scale empty" (list 0),(list ()) (list ss.size),(list ss[0,ss.size])]
+
 s:sound[1,2,3,4,5,6]
 assert["sound index by float"       (3)   s[2.3]]
 assert["sound index range by float" (3,4) s[2.3,2.1]]
+s:sound[10,20,30,40,50]
+assert["sound interpolate"       (10,12,15,17,20) s@(0,.25,.5,.75,1)]
+assert["sound interpolate range" (12,22,32) s[.25,3]]
+
 
 #######################################
 #
@@ -2014,6 +2043,20 @@ write["temp.deck" d]
 d:read["temp.deck"]
 assert["name collision card script disambiguation" "# the card script"  (d.card                  .script)]
 assert["name collision card script disambiguation" "# the proto script" (d.contraptions.collision.script)]
+
+d:newdeck[]
+c:d.add["contraption" "testcon"]
+c.script:"on get_slider do sly end"
+s:c.add["slider" "sly"]
+s.interval:-5,50
+s.value:47
+i:d.card.add["contraption" "testcon"]
+v1:i.slider.value  # inherit the parent value
+i.slider.value:0   # override the parent value
+v2:i.slider.value  # observe the local value
+c.update[]
+v3:i.slider.value  # the local value should be retained, even if it is falsey
+assert["slider in contraption zero serialization" (47,0,0) (v1,v2,v3)]
 
 #######################################
 #

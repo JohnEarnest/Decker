@@ -28,7 +28,7 @@ image:"%%IMG3AgABVgWgJo5kaZ5oqq5s675wLM90bd94ru987//AoHBILBqPyKRyyWw6n9CodEqtWq/
 {widgets}
 field1:{"type":"field","size":[108,13],"pos":[334,240],"locked":1,"border":0,"style":"plain","align":"center","value":"An interactive tutorial"}
 button2:{"type":"button","size":[94,23],"pos":[401,306],"script":"home.0","text":"Begin..."}
-version:{"type":"field","size":[25,15],"pos":[8,322],"locked":1,"value":"v1.1"}
+version:{"type":"field","size":[25,15],"pos":[8,322],"locked":1,"value":"v1.2"}
 
 {script:home.0}
 on click do
@@ -288,7 +288,7 @@ field7:{"type":"field","size":[89,15],"pos":[50,110],"locked":1,"show":"transpar
 field8:{"type":"field","size":[91,24],"pos":[49,146],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"reset field\nbackground colors"}
 field9:{"type":"field","size":[89,25],"pos":[50,229],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"return the sound\nto play next"}
 field10:{"type":"field","size":[91,24],"pos":[47,187],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"highlight a field\nand count up"}
-button2:{"type":"button","size":[60,20],"pos":[436,307],"script":"Shuffling.1","text":"Home"}
+button2:{"type":"button","size":[60,20],"pos":[436,307],"script":"Looping.1","text":"Next"}
 
 {script:Shuffling.0}
 on loop do
@@ -303,10 +303,40 @@ on loop do
 end
 {end}
 
-{script:Shuffling.1}
+{card:Generating}
+image:"%%IMG3AgABVgKEj6nL7Q+jnLTai7PevPsPhuJIluaJpurKtu4Lx/JM1/aN5/rO9/4PDAqHxKLxiEwql8ym8wmNSqfUqvWKzWq33K73Cw6Lx+Sy+YxOq9fstvsNj8vn9Lr9js/r9/y+/w8YKDhIWGh4iJiouMjY6PgIGSk5SVlpeYmZqbnJ2en5CRoqOkpaanqKmqq6ytrq+gobKztLW2t7i5uru8vb6/sLHCw8TFxsfIycrLzM3Oz8DB0tPU1dbX2Nna29zd3t/Q0eLj5OXm5+jp6uvs7e7v4OHy8/T19vf4+fr7/P3+//DzCgwIEECxo8iDChwoUMGzp8CDGixIkUK1q8iDGjxo0cO3r8CDKkyJEkS5o8iTKlypUsW7p8CTOmzJk0a9q8iTOnzp08e/r8CTSo0KFEixo9ijSp0qVMmzp9CjWq1KlUq1q9ijWr1q1cu3r9Cjas2LFky5o9izat2rVs27p9yzRAALiV5MqlK8nuXLyP9O7l28gvYEd6Bwe2a/jw3cSL/Dp+DDlyZMZjJFu+jJkyGMycOxfWvBkyaESORycSbNoQ6tSFPrMmtPi17BB/ZwdCDMP17dhJdbN4vHt1UeG/gf+RTLT0i8LE73AOatyF6+ZzoivvyRx3ce0AqMPJXrs7753guae4bmC8nM/moeNG3L4EfPV5eMfHbv+ubxLgW9P3Gd5794EgYHiADOhebf8RmJ+BfiAIFIQimCdhfQtGeCF/ClSIB4fkZaiCh86ByJOIJphIB4o1qcgfiR26mBOLI8j4HYw40UibjXbg6BKPOTr4oI40+cggkH0QuRKSHiipBpMnObkBlGdIORKVGlhZmZAxYYkBl2HsV6KWKHj5pZgtkWkBmEEaeaOZY7r5nVBopgmnbcvVeaKdR7CpZ59+/glooIIOSmihhh6KaKKKLspoo44+Cmmkkk5KaaWWXopppppuymmnnn4Kaqiijkpqqaaeimqqqq7KaquuvgprrLLOSmuttt6Ka6667sprr77+Cmywwg5LbLHGHotsssouy2yzzj4LbbTSTktttdZei2222m7LbbfefgtuuOKOS2655p6Lbrrqrstuu+6+C2+88s5Lb7323otvvvruy2+//v4LcMACD0xwwQYfjHDCCi/McMMOPwxxxBJPTHHFFl+MccYab8xxxx5/DHLIIo9Mcskmn4xyyiqvzHLLUBQA"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[15,307],"script":"Looping.0","text":"Back"}
+button2:{"type":"button","size":[60,20],"pos":[436,307],"script":"Looping.1","text":"Next"}
+field1:{"type":"field","size":[204,19],"pos":[148,28],"locked":1,"font":"menu","border":0,"style":"plain","align":"center","value":"Generating Sounds With Scripts"}
+field2:{"type":"field","size":[277,46],"pos":[121,281],"locked":1,"border":0,"style":"plain","align":"center","value":"Scripts can construct sounds on the fly with the sound[] function by providing a list of samples.\n This example produces and then immediately plays a 2-second, 440 hz sine-wave tone."}
+example:{"type":"field","size":[285,17],"pos":[45,131],"script":"Looping.5","style":"code","value":"play[sound[64*sin(440/8000)*2*pi*range 2000]]"}
+button3:{"type":"button","size":[91,32],"pos":[389,122],"script":"Generating.0","text":"Try It!"}
+field7:{"type":"field","size":[54,14],"pos":[81,181],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"amplitude"}
+field3:{"type":"field","size":[72,14],"pos":[148,181],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"frequency (hz)"}
+field4:{"type":"field","size":[72,14],"pos":[273,181],"locked":1,"show":"transparent","border":0,"style":"plain","align":"center","value":"duration (ms)"}
+
+{script:Generating.0}
 on click do
- play[0 "loop"]
- go["Next" "BoxIn"]
+ eval[example.text () 1]
+end
+{end}
+
+{card:Scaling}
+image:"%%IMG3AgABVgKEj6nL7Q+jnLTai7PevPsPhuJIluaJpurKtu4Lx/JM1/aN5/rO9/4PDAqHxKLxiEwql8ym8wmNSqfUqvWKzWq33K73Cw6Lx+Sy+YxOq9fstvsNj8vn9Lr9js/r9/y+/w8YKDhIWGh4iJiouMjY6PgIGSk5SVlpeYmZqbnJ2en5CRoqOkpaanqKmqq6ytrq+gobKztLW2t7i5uru8vb6/sLHCw8TFxsfIycrLzM3Oz8DB0tPU1dbX2Nna29zd3t/Q0eLj5OXm5+jp6uvs7e7v4OHy8/T19vf4+fr7/P3+//DzCgwIEECxo8iDChwoUMGzp8CDGixIkUK1q8iDGjxo0cO3r8CDKkyJEkS5o8iTKlypUsW7p8CTOmzJk0a9q8iTOnzp08e/r8CTSo0KFEixo9ijSp0qVMmzp9CjWq1KlUq1q9ijWr1q1cu3r9Cjas2LFky5o9izat2rVs27p9Czeu3Ll069q9izev3r18+/r9Cziw4MGECxs+jDix4sWMGzt+DDmy5MmUK1u+jDmz5s3dAnBWEyD05zOhRY8mU9r06TCpPa9mXfq1mNSyZ6uu3aW17t28b+Me0ju48N9FhBvXTdxI6+S5YzNv7vr5FufSs9Cubj069u3cu3v/Dj68+PHky5s/jz69+vXs27t/Dz++/Pn069u/jz+//v38+/v/D2CAAg5IYIEGHohgggouyGCDDj4IYYQSTkhhhRZeiGGGGm7IYYcefghiiCKOSGKJJp6IYooqrshiiy6+CGOMMs5IY4023ohjjjruyGOPPv4IZJBCDklkkUYeiWSSSi7JZJNOPglllFJOSWWVVl6JZZZabslll15+CWaYYo5JZplmnolmmmquyWabbr4JZ5xyzklnnXbeiWeeeu7JZ59+zlIA"
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[15,307],"script":"Looping.0","text":"Back"}
+button2:{"type":"button","size":[60,20],"pos":[436,307],"script":"Looping.1","text":"Next"}
+field1:{"type":"field","size":[204,19],"pos":[148,28],"locked":1,"font":"menu","border":0,"style":"plain","align":"center","value":"Scaling Sounds"}
+field2:{"type":"field","size":[293,36],"pos":[114,291],"locked":1,"border":0,"style":"plain","align":"center","value":"The sound.scaled[] function can be used to create scaled copies of sounds that play back faster or slower, with corresponding changes to their pitch."}
+example:{"type":"field","size":[156,141],"pos":[136,98],"script":"Looping.5","style":"code","value":"s:deck.sounds.sosumi\n\nplay[s]\nsleep[60]\n\nplay[s.scaled[2]]\nsleep[60]\n\nplay[s.scaled[0.5]]\nsleep[60]\n\nplay[s.scaled[-1]"}
+button3:{"type":"button","size":[91,32],"pos":[320,155],"script":"Scaling.0","text":"Try It!"}
+
+{script:Scaling.0}
+on click do
+ example.locked:1
+ eval[example.text () 1]
+ example.locked:0
 end
 {end}
 

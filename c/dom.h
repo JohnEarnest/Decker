@@ -1374,13 +1374,27 @@ void sound_resize(lv*self,int n){
 	lv*data=self->b;int o=data->c;n=CLAMP(0,n,10*SFX_RATE); // cap (programmatic) size at 10 seconds.
 	data->sv=realloc(data->sv,n),data->c=n;if(o<n)memset(data->sv+o,0,n-o);
 }
+int sound_interpolate(lv*self,double i){
+	lv*src=self->b;if(src->c<1)return 0;
+	if(i<0)return (signed char)src->sv[0];
+	if(i>src->c-1)return (signed char)src->sv[src->c-1];
+	signed char a=src->sv[(int)floor(i)], b=src->sv[(int)ceil(i)];
+	return a+(fmod(i,1.0)*(b-a));
+}
+lv* sound_make(lv*buffer); // forward ref
+lv* n_sound_scaled(lv*self,lv*a){
+	double scale=ln(l_first(a));lv*src=self->b, *dst=lms(CLAMP(0,(src->c*fabs(scale)),10*SFX_RATE));
+	if     (src->c>0&&scale>0)for(int z=0;z<dst->c;z++){dst->sv[z]=0xFF&sound_interpolate(self,          z / scale);}
+	else if(src->c>0&&scale<0)for(int z=0;z<dst->c;z++){dst->sv[z]=0xFF&sound_interpolate(self,(dst->c-1-z)/-scale);}
+	return sound_make(dst);
+}
 lv* sound_write(lv*x){return data_write("SND",'0',x->b);}
 lv* interface_sound(lv*self,lv*i,lv*x){
 	lv*data=self->b;
 	if(i&&lin(i)){ // read/write single samples
 		int n=ln(i),ib=n>=0&&n<data->c;
 		if(x){if(ib)data->sv[n]=0xFF&(int)ln(x);return x;}
-		else{return ib?lmn((signed char)data->sv[n]):LNIL;}
+		else{return ib?lmn(sound_interpolate(self,ln(i))):LNIL;}
 	}
 	if(i&&lil(i)){ // read/write ranges
 		pair n=getpair(i);n.x=MIN(n.x,data->c),n.y=MAX(0,n.y);if(x){
@@ -1389,12 +1403,13 @@ lv* interface_sound(lv*self,lv*i,lv*x){
 			EACH(z,s)if(n.x+z>=0&&n.x+z<r->c)r->sv[n.x+z]=0xFF&(int)ln(s->lv[z]); // splice
 			for(int z=0;z<(data->c)-(n.x+n.y);z++)if(n.x+s->c+z>=0&&n.x+s->c+z<r->c)r->sv[n.x+s->c+z]=n.x+n.y+z>=data->c?0:data->sv[n.x+n.y+z]; // after splice
 			self->b=r;return x;
-		}else{GEN(r,n.y)((z+n.x<0||z+n.x>=data->c)?LNIL:lmn((signed char)data->sv[z+n.x]));return r;}
+		}else{double b=ln(l_first(i));GEN(r,n.y)((z+n.x<0||z+n.x>=data->c)?LNIL:lmn(sound_interpolate(self,b+z)));return r;}
 	}
 	ikey("size"){if(x){sound_resize(self,ln(x));return x;}return lmn(data->c);}
 	ikey("duration")return lmn(data->c/(1.0*SFX_RATE));
 	ikey("encoded")return sound_write(self);
 	ikey("hist")return buffer_hist(self->b,1);
+	ikey("scaled")return lmnat(n_sound_scaled,self);
 	ikey("map")return lmnat(n_buffer_map,self);
 	return x?x:LNIL;
 }
@@ -2205,8 +2220,9 @@ lv* slider_read(lv*x,lv*r){
 }
 lv* slider_write(lv*x){
 	lv*data=x->b,*r=lmd();dset(r,lmistr("type"),lmistr("slider"));
+	int child=contraption_is(dget(data,lmistr("card")));
 	{lv*k=lmistr("interval"),*v=dget(data,k);if(v)dset(r,k,v);}
-	{lv*k=lmistr("value"   ),*v=dget(data,k);if(v&&ln(v)!=0&&!lb(ifield(x,"volatile")))dset(r,k,v);}
+	{lv*k=lmistr("value"   ),*v=dget(data,k);if(v&&(child||ln(v)!=0)&&!lb(ifield(x,"volatile")))dset(r,k,v);}
 	{lv*k=lmistr("step"    ),*v=dget(data,k);if(v&&ln(v)!=1)dset(r,k,v);}
 	{lv*k=lmistr("format"  ),*v=dget(data,k);if(v&&strcmp("%f",v->sv))dset(r,k,v);}
 	{lv*k=lmistr("style"   ),*v=dget(data,k);if(v&&strcmp(slider_styles[0],v->sv))dset(r,k,v);}
