@@ -3102,6 +3102,11 @@ toolbars=_=>{
 		setmode('draw');if(dr.tool=='select'||dr.tool=='lasso'||dr.tool=='fill')settool('pencil');dr.brush=brush
 	}
 	const palbtn=(pos,dn,b,pattern)=>{
+		if(uimode=='object'){
+			draw_rect(b,pattern)
+			if(ob.sel&&ob.sel.length&&rin(b,pos)){uicursor=cursor.point;if(ev.mu&&rin(b,dn)){ob_edit_prop('pattern',lmn(pattern)),ev.mu=0}}
+			draw_box(b,0,1);return
+		}
 		if((dr.pickfill?dr.fill:dr.pattern)==pattern){draw_rect(inset(b,3),pattern),draw_box(inset(b,3),0,1)}else{draw_rect(b,pattern)}
 		if(rin(b,pos)){uicursor=cursor.point;if(ev.mu&&rin(b,dn)){if(dr.pickfill){dr.fill=pattern}else{dr.pattern=pattern}}}draw_box(b,0,1)
 	}
