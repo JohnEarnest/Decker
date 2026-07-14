@@ -3389,6 +3389,11 @@ void cbrushbtn(pair pos,pair dn,rect b,int brush,lv*bt){
 	dr.brush=brush;
 }
 void palbtn(pair pos,pair dn,rect b,int pattern){
+	if(uimode==mode_object){
+		draw_rect(b,pattern);
+		if(ob.sel->c&&box_in(b,pos)){uicursor=cursor_point;if(ev.mu&&box_in(b,dn)){ob_edit_prop("pattern",lmn(pattern));ev.mu=0;}}
+		draw_box(b,0,1);return;
+	}
 	if((dr.pickfill?dr.fill:dr.pattern)==pattern){draw_rect(inset(b,3),pattern),draw_box(inset(b,3),0,1);}else{draw_rect(b,pattern);}
 	if(box_in(b,pos)){uicursor=cursor_point;if(ev.mu&&box_in(b,dn)){if(dr.pickfill){dr.fill=pattern;}else{dr.pattern=pattern;}}}draw_box(b,0,1);
 }

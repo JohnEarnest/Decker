@@ -1684,6 +1684,12 @@ widget unpack_widget(lv*x){
 		lb(ifield(x,"locked")),
 	};
 }
+int value_is_default(lv*self,lv*key,lv*dval){
+	lv*r=dget(self->b,key);if(r==NULL)return 1;
+	lv*card=dget(self->b,lmistr("card"));if(!contraption_is(card))return matchr(r,dval);
+	lv*p=dget(ifield(ifield(card,"def"),"widgets"),ifield(self,"name"));if(!p)return 0;
+	lv*v=iwrite(p,key,NULL);return v!=NULL&&matchr(r,v);
+}
 lv* value_inherit(lv*self,lv*key){
 	lv*card=dget(self->b,lmistr("card")),*r=dget(self->b,key);if(!contraption_is(card))return r;
 	lv*p=dget(ifield(ifield(card,"def"),"widgets"),ifield(self,"name"));if(!p)return r;
@@ -2162,7 +2168,10 @@ lv* field_write(lv*x){
 	{lv*k=lmistr("style"    ),*v=dget(data,k);if(v&&strcmp(field_styles[0],v->sv))dset(r,k,v);}
 	{lv*k=lmistr("align"    ),*v=dget(data,k);if(v&&strcmp(field_aligns[0],v->sv))dset(r,k,v);}
 	{lv*k=lmistr("scroll"   ),*v=dget(data,k);if(v&&ln(v)!=0&&!vol)dset(r,k,v);}
-	{lv*k=lmistr("value"    ),*v=dget(data,k);if(v&&!vol){if(rtext_is_plain(v)){v=rtext_all(v);if(v->c)dset(r,k,v);}else{dset(r,k,rtext_write(v));}}}
+	{lv*k=lmistr("value"    ),*v=dget(data,k);if(v&&!vol){
+		if(rtext_is_plain(v)){v=rtext_all(v);if(!value_is_default(x,k,rtext_cast(lmistr(""))))dset(r,k,v);}
+		else{dset(r,k,rtext_write(v));}}
+	}
 	return r;
 }
 
@@ -2220,9 +2229,8 @@ lv* slider_read(lv*x,lv*r){
 }
 lv* slider_write(lv*x){
 	lv*data=x->b,*r=lmd();dset(r,lmistr("type"),lmistr("slider"));
-	int child=contraption_is(dget(data,lmistr("card")));
 	{lv*k=lmistr("interval"),*v=dget(data,k);if(v)dset(r,k,v);}
-	{lv*k=lmistr("value"   ),*v=dget(data,k);if(v&&(child||ln(v)!=0)&&!lb(ifield(x,"volatile")))dset(r,k,v);}
+	{lv*k=lmistr("value"   ),*v=dget(data,k);if(v&&!value_is_default(x,k,ZERO)&&!lb(ifield(x,"volatile")))dset(r,k,v);}
 	{lv*k=lmistr("step"    ),*v=dget(data,k);if(v&&ln(v)!=1)dset(r,k,v);}
 	{lv*k=lmistr("format"  ),*v=dget(data,k);if(v&&strcmp("%f",v->sv))dset(r,k,v);}
 	{lv*k=lmistr("style"   ),*v=dget(data,k);if(v&&strcmp(slider_styles[0],v->sv))dset(r,k,v);}
