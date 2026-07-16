@@ -976,6 +976,8 @@ widget_field=(target,x,value)=>{
 	if(sel){if(wid.gv)grid_exit();wid.infield=1,wid.f=x,wid.fv=value,wid.ft=target,keycaps_enter()}
 	// render
 	const bc=rclip(frame.clip,bi); const oc=frame.clip;frame.clip=bc
+	const selcol=((tfcol==0||tfcol==32)&&(bcol==0||bcol==32))?47: // try to avoid completely illegible text/selection
+	             ((tfcol==1||tfcol==47)&&(bcol==1||bcol==47))?32: tfcol
 	for(let z=0;z<layout.layout.length;z++){
 		const g=layout.layout[z], pos=rcopy(g.pos);if(pos.w<1)continue // skip squashed spaces/newlines
 		pos.y-=value.scroll;if(pos.y+pos.h<0||pos.y>bc.h)continue; pos.x+=bi.x, pos.y+=bi.y // coarse clip
@@ -985,7 +987,7 @@ widget_field=(target,x,value)=>{
 			if(a&&ev.mu&&dover(pos))msg.target_link=target,msg.arg_link=g.arg
 		}
 		const csel=sel&&wid.cursor.x!=wid.cursor.y&&z>=min(wid.cursor.x,wid.cursor.y)&&z<max(wid.cursor.x,wid.cursor.y)
-		if(csel)draw_rect(rclip(pos,frame.clip),tfcol)
+		if(csel)draw_rect(rclip(pos,frame.clip),selcol)
 		if(image_is(g.arg)){image_paste(pos,frame.clip,g.arg,frame.image,x.show!='transparent');if(csel)draw_invert(pal,pos)}
 		else{draw_char(pos,g.font,g.char,csel?bcol: g.pat==1?tfcol:g.pat)}
 	}

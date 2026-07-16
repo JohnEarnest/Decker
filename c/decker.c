@@ -837,6 +837,8 @@ void widget_field(lv*target,field x,field_val*value){
 	if(sel){if(wid.gv)grid_exit();wid.infield=1,wid.f=x,wid.fv=value,wid.ft=target;keycaps_enter();}
 	// render
 	rect bc=box_intersect(frame.clip,bi); rect oc=frame.clip;frame.clip=bc; char*pal=patterns_pal(ifield(deck,"patterns"));
+	int selcol=((tfcol==0||tfcol==32)&&(bcol==0||bcol==32))?47: // try to avoid completely illegible text/selection
+	           ((tfcol==1||tfcol==47)&&(bcol==1||bcol==47))?32: tfcol;
 	for(int z=0;z<layout_count;z++){
 		glyph_box g=layout[z] ;if(g.pos.w<1)continue; // skip squashed spaces/newlines
 		g.pos.y-=value->scroll;if(g.pos.y+g.pos.h<0||g.pos.y>bc.h)continue; g.pos.x+=bi.x, g.pos.y+=bi.y; // coarse clip
@@ -847,7 +849,7 @@ void widget_field(lv*target,field x,field_val*value){
 		}
 		int csel=sel&&wid.cursor.x!=wid.cursor.y&&z>=MIN(wid.cursor.x,wid.cursor.y)&&z<MAX(wid.cursor.x,wid.cursor.y);
 		int ccol=g.pat==1?tfcol:g.pat;
-		if(csel)draw_rect(box_intersect(g.pos,frame.clip),tfcol);
+		if(csel)draw_rect(box_intersect(g.pos,frame.clip),selcol);
 		if(image_is(g.arg)){buffer_paste(g.pos,frame.clip,g.arg->b,frame.buffer,x.show!=show_transparent);if(csel)draw_invert(pal,g.pos);}
 		else{font_each(g.font,g.c)if(font_gpix(g.font,g.c,b,a)&&inclip(g.pos.x+b,g.pos.y+a))PIX(g.pos.x+b,g.pos.y+a)=csel?bcol:ccol;}
 	}
