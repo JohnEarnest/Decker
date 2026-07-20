@@ -1227,6 +1227,14 @@ count @ ("Alpha","Beta") dict (list 11,22,33),(list 44,55)
 # {"Alpha":3,"Beta":2}
 ```
 
+You can use multiple `@`s when you wish to "push" down multiple levels of nested structure:
+```lil
+a:"%J" parse "[[[1,2],[3,4]],[[5,6],[7,9,10]]"
+count a        # 2
+count @ a      # (2,2)
+count @ @ a    # ((2,2),(2,3))
+count @ @ @ a  # (((1,1),(1,1)),((1,1),(1,1,1)))
+```
 
 Lil, the Decker Language
 ------------------------
