@@ -1143,6 +1143,53 @@ lv* n_panic(lv*self,lv*z){
 	n_show(self,z),dset(li.vars,lmistr("_"),l_first(z));return LNIL;
 }
 
+// Resources
+
+lv* sounds_enumerate(void){
+	lv*r=lmt(),*i=lml(0),*n=lml(0),*b=lml(0),*s=lml(0),*sounds=ifield(deck,"sounds");
+	dset(r,lmistr("icon"),i),dset(r,lmistr("name"),n),dset(r,lmistr("bytes"),b),dset(r,lmistr("secs"),s);
+	EACH(z,sounds){
+		ll_add(i,lmn(icon_sound)),ll_add(n,sounds->kv[z]);lv*sn=sounds->lv[z];
+		ll_add(b,l_format(lmistr("%.2fkb"),lmn(ln(ifield(sn,"size"))/1000.0*1.33)));
+		ll_add(s,l_format(lmistr("%.2fs" ),ifield(sn,"duration")));
+	}return table_sort_asc(torect(r),1);
+}
+lv* contraptions_enumerate(void){
+	lv*r=lmt(),*i=lml(0),*n=lml(0),*defs=ifield(deck,"contraptions");dset(r,lmistr("icon"),i),dset(r,lmistr("name"),n);
+	EACH(z,defs){ll_add(i,lmn(icon_app)),ll_add(n,defs->kv[z]);}
+	return table_sort_asc(torect(r),1);
+}
+lv* fonts_enumerate(void){
+	lv*r=lmt(),*i=lml(0),*n=lml(0),*fonts=ifield(deck,"fonts");dset(r,lmistr("icon"),i),dset(r,lmistr("name"),n);
+	EACH(z,fonts){ll_add(i,lmn(icon_font)),ll_add(n,fonts->kv[z]);}
+	return table_sort_asc(torect(r),1);
+}
+
+double baseline_deck_size=-1;
+lv* res_size(lv*x){
+	double kb=-1;
+	if(baseline_deck_size==-1){lv*d=deck_read(lmistr(""));baseline_deck_size=deck_write(d,0)->c;}
+	if(sound_is    (x)){kb=sound_write   (x)->c;}
+	if(font_is     (x)){kb=font_write    (x)->c;}
+	if(module_is   (x)){lv*d=deck_read(lmistr(""));n_deck_add(d,l_list(x));kb=deck_write(d,0)->c-baseline_deck_size;}
+	if(prototype_is(x)){lv*d=deck_read(lmistr(""));n_deck_add(d,l_list(x));kb=deck_write(d,0)->c-baseline_deck_size;}
+	if(kb!=-1){char t[64];snprintf(t,sizeof(t),"%.2fkb",kb/1000);return lmcstr(t);}return lmistr("");
+}
+lv* res_enumerate(lv*source){
+	lv*r=lmt(),*i=lml(0),*n=lml(0),*v=lml(0),*kb=lml(0);
+	dset(r,lmistr("icon"),i),dset(r,lmistr("name"),n),dset(r,lmistr("value"),v),dset(r,lmistr("kb"),kb);
+	lv*pat=ifield(source,"patterns");
+	char*pal=patterns_pal(pat),*pv=patterns_write(pat)->sv;lv*pa=anims_write(pal),*da=l_parse(lmistr("%j"),lmistr(DEFAULT_ANIMS));
+	if(!matchr(pa,da)||strcmp(pv,DEFAULT_PATTERNS)){ll_add(i,lmn(icon_pat)),ll_add(n,lmistr("patterns")),ll_add(v,pat);}
+	lv*fonts=ifield(source,"fonts" );fonts=l_drop(lmistr("body"),fonts),fonts=l_drop(lmistr("menu"),fonts),fonts=l_drop(lmistr("mono"),fonts);
+	EACH(z,fonts )ll_add(i,lmn(icon_font )),ll_add(n,fonts ->kv[z]),ll_add(v,fonts ->lv[z]);
+	lv*sounds=ifield(source,"sounds");EACH(z,sounds)ll_add(i,lmn(icon_sound)),ll_add(n,sounds->kv[z]),ll_add(v,sounds->lv[z]);
+	lv*modules=ifield(source,"modules");EACH(z,modules)ll_add(i,lmn(icon_lil)),ll_add(n,modules->kv[z]),ll_add(v,modules->lv[z]);
+	lv*defs=ifield(source,"contraptions");EACH(z,defs)ll_add(i,lmn(icon_app)),ll_add(n,defs->kv[z]),ll_add(v,defs->lv[z]);
+	EACH(z,v)ll_add(kb,res_size(v->lv[z]));
+	return table_sort_radix(torect(r),0,1);
+}
+
 // Audio Editor
 
 void sound_apply(lv*v){int len=v->b->c;au.target->b->c=len;memcpy(au.target->b->sv,v->b->sv,len);mark_dirty();}
@@ -1171,20 +1218,6 @@ void record_pump(void* userdata,Uint8* stream,int len){
 	au.head=h;if(h>au.target->b->c)au.target->b->c=edit->b->c=h;
 	if(h>=end){sound_finish();au.mode=record_stopped;}
 }
-lv* sounds_enumerate(void){
-	lv*r=lmt(),*i=lml(0),*n=lml(0),*b=lml(0),*s=lml(0),*sounds=ifield(deck,"sounds");
-	dset(r,lmistr("icon"),i),dset(r,lmistr("name"),n),dset(r,lmistr("bytes"),b),dset(r,lmistr("secs"),s);
-	EACH(z,sounds){
-		ll_add(i,lmn(icon_sound)),ll_add(n,sounds->kv[z]);lv*sn=sounds->lv[z];
-		ll_add(b,l_format(lmistr("%.2fkb"),lmn(ln(ifield(sn,"size"))/1000.0*1.33)));
-		ll_add(s,l_format(lmistr("%.2fs" ),ifield(sn,"duration")));
-	}return torect(r);
-}
-lv* contraptions_enumerate(void){
-	lv*r=lmt(),*i=lml(0),*n=lml(0),*defs=ifield(deck,"contraptions");dset(r,lmistr("icon"),i),dset(r,lmistr("name"),n);
-	EACH(z,defs){ll_add(i,lmn(icon_app)),ll_add(n,defs->kv[z]);}
-	return torect(r);
-}
 lv*n_readfile(lv*self,lv*a){
 	lv*name=ls(l_first(a)),*hint=a->c>1?ls(a->lv[1]):lms(0);
 	if(!strcmp(hint->sv,"array"))return readbin(name);
@@ -1200,30 +1233,6 @@ lv*n_readfile(lv*self,lv*a){
 
 // Modal Helpers
 
-double baseline_deck_size=-1;
-lv* res_size(lv*x){
-	double kb=-1;
-	if(baseline_deck_size==-1){lv*d=deck_read(lmistr(""));baseline_deck_size=deck_write(d,0)->c;}
-	if(sound_is    (x)){kb=sound_write   (x)->c;}
-	if(font_is     (x)){kb=font_write    (x)->c;}
-	if(module_is   (x)){lv*d=deck_read(lmistr(""));n_deck_add(d,l_list(x));kb=deck_write(d,0)->c-baseline_deck_size;}
-	if(prototype_is(x)){lv*d=deck_read(lmistr(""));n_deck_add(d,l_list(x));kb=deck_write(d,0)->c-baseline_deck_size;}
-	if(kb!=-1){char t[64];snprintf(t,sizeof(t),"%.2fkb",kb/1000);return lmcstr(t);}return lmistr("");
-}
-lv* res_enumerate(lv*source){
-	lv*r=lmt(),*i=lml(0),*n=lml(0),*v=lml(0),*kb=lml(0);
-	dset(r,lmistr("icon"),i),dset(r,lmistr("name"),n),dset(r,lmistr("value"),v),dset(r,lmistr("kb"),kb);
-	lv*pat=ifield(source,"patterns");
-	char*pal=patterns_pal(pat),*pv=patterns_write(pat)->sv;lv*pa=anims_write(pal),*da=l_parse(lmistr("%j"),lmistr(DEFAULT_ANIMS));
-	if(!matchr(pa,da)||strcmp(pv,DEFAULT_PATTERNS)){ll_add(i,lmn(icon_pat)),ll_add(n,lmistr("patterns")),ll_add(v,pat);}
-	lv*fonts=ifield(source,"fonts" );fonts=l_drop(lmistr("body"),fonts),fonts=l_drop(lmistr("menu"),fonts),fonts=l_drop(lmistr("mono"),fonts);
-	EACH(z,fonts )ll_add(i,lmn(icon_font )),ll_add(n,fonts ->kv[z]),ll_add(v,fonts ->lv[z]);
-	lv*sounds=ifield(source,"sounds");EACH(z,sounds)ll_add(i,lmn(icon_sound)),ll_add(n,sounds->kv[z]),ll_add(v,sounds->lv[z]);
-	lv*modules=ifield(source,"modules");EACH(z,modules)ll_add(i,lmn(icon_lil)),ll_add(n,modules->kv[z]),ll_add(v,modules->lv[z]);
-	lv*defs=ifield(source,"contraptions");EACH(z,defs)ll_add(i,lmn(icon_app)),ll_add(n,defs->kv[z]),ll_add(v,defs->lv[z]);
-	EACH(z,v)ll_add(kb,res_size(v->lv[z]));
-	return torect(r);
-}
 void draw_thumbnail(lv*card,rect r){
 	lv*back=ifield(card,"image");r=inset(r,1);draw_rect(r,0);if(!is_empty(back))draw_scaled(r,back->b,1);
 	lv*wids=ifield(card,"widgets");pair s=getpair(ifield(card,"size"));float xr=r.w*(1.0/s.x), yr=r.h*(1.0/s.y);
@@ -1331,12 +1340,12 @@ void modal_enter(int type){
 	if(type==modal_sounds){ms.grid=(grid_val){sounds_enumerate(),0,-1,-1};}
 	if(type==modal_contraptions||type==modal_pick_contraption){ms.grid=(grid_val){contraptions_enumerate(),0,-1,-1};}
 	if(type==modal_fonts){
-		lv*r=lmt(),*i=lml(0),*n=lml(0),*fonts=ifield(deck,"fonts");dset(r,lmistr("icon"),i),dset(r,lmistr("name"),n);
-		int fi=-1;EACH(z,fonts){
-			if(uimode==mode_object){int f=1;EACH(o,ob.sel)if(!matchr(ifield(ob.sel->lv[o],"font"),fonts->lv[z])){f=0;break;}if(f)fi=z;}
-			else if(ms.old_wid.ft){if(matchr(ifield(ms.old_wid.ft,"font"),fonts->lv[z]))fi=z;}
-			ll_add(i,lmn(icon_font)),ll_add(n,fonts->kv[z]);
-		}ms.grid=(grid_val){torect(r),-99,fi,-1};
+		lv*fonts=ifield(deck,"fonts"),*fonts_sorted=fonts_enumerate(),*font_names=dget(fonts_sorted,lmistr("name"));
+		int fi=-1;EACH(z,font_names){lv*font=dget(fonts,font_names->lv[z]);
+			if(uimode==mode_object){int f=1;EACH(o,ob.sel)if(!matchr(ifield(ob.sel->lv[o],"font"),font)){f=0;break;}if(f)fi=z;}
+			else if(ms.old_wid.ft){if(matchr(ifield(ms.old_wid.ft,"font"),font))fi=z;}
+		}
+		ms.grid=(grid_val){fonts_sorted,-99,fi,-1};
 	}
 	if(type==modal_resources){
 		ms.message=NULL;
@@ -1560,7 +1569,9 @@ void modal_exit(int value){
 	if(ms.type==modal_recording){
 		if(au.mode==record_recording)sound_finish();
 		lv*name=rtext_all(ms.name.table);rename_sound(deck,au.target,name);mark_dirty();
-		au.mode=record_stopped;modal_enter(modal_sounds);ms.grid.row=dgeti(ifield(deck,"sounds"),name);return;
+		au.mode=record_stopped;modal_enter(modal_sounds);
+		lv*names=dget(ms.grid.table,lmistr("name"));EACH(z,names)if(matchr(name,names->lv[z]))ms.grid.row=z;
+		return;
 	}
 	if(ms.type==modal_widpattern&&value!=-1){ob_edit_prop("pattern",lmn(value));}
 	if(ms.type==modal_confirm&&ms.subtype==modal_save_deck    &&!value){modal_enter(ms.subtype);return;}
@@ -1737,7 +1748,7 @@ void modals(void){
 		if(ui_table(gsize,2,16,120,"Isss",&ms.grid))n_play(deck,l_list(s));
 		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"OK",1)||ev.exit){
 			if(ms.from_action){
-				if(ms.grid.row>=0)ms.message=ifield(deck,"sounds")->kv[ms.grid.row];
+				if(ms.grid.row>=0){ms.message=dget(ms.grid.table,lmistr("name"))->lv[ms.grid.row];}
 				ms.grid=(grid_val){l_table(l_keys(dget(deck->b,lmistr("transit")))),0,ms.act_transno,-1},ms.type=modal_action;ms.from_action=0;
 			}else{modal_exit(1);}
 		}
@@ -1753,20 +1764,20 @@ void modals(void){
 		rect gsize={b.x,b.y+15,b.w,b.h-20-50-25-25};
 		int choose=ui_table(gsize,1,16,0,"Is",&ms.grid);
 		rect psize={b.x,gsize.y+gsize.h+5,b.w,50};draw_box(psize,0,1);psize=inset(psize,2);
-		if(ms.grid.row>=0){
-			char*desc=ifield(ifield(deck,"contraptions")->lv[ms.grid.row],"description")->sv;
+		lv*proto=ms.grid.row<0?NULL: dget(ifield(deck,"contraptions"),dget(ms.grid.table,lmistr("name"))->lv[ms.grid.row]);
+		if(proto!=NULL){
+			char*desc=ifield(proto,"description")->sv;
 			layout_plaintext(desc,FONT_BODY,align_left,(pair){psize.w,psize.h});draw_text_wrap(psize,1);
 		}
 		if(ui_button((rect){b.x+b.w-60,b.y+b.h-20,60,20},"OK",1)||ev.exit){modal_exit(0);}
 		if(ui_button((rect){b.x,b.y+b.h-45,60,20},"New...",1)){modal_exit(1);con_set(n_deck_add(deck,l_list(lmistr("contraption"))));mark_dirty();}
-		if(ui_button((rect){b.x,b.y+b.h-20,60,20},"Edit...",ms.grid.row>=0)||choose){modal_exit(2);con_set(ifield(deck,"contraptions")->lv[ms.grid.row]);}
-		if(ui_button((rect){b.x+65,b.y+b.h-45,60,20},"Clone",ms.grid.row>=0)){
-			lv*s=ifield(deck,"contraptions")->lv[ms.grid.row];
-			n_deck_add(deck,lml2(s,l_format(lmistr("%s_clone"),ifield(s,"name"))));
+		if(ui_button((rect){b.x,b.y+b.h-20,60,20},"Edit...",proto!=NULL)||choose){modal_exit(2);con_set(proto);}
+		if(ui_button((rect){b.x+65,b.y+b.h-45,60,20},"Clone",proto!=NULL)){
+			n_deck_add(deck,lml2(proto,l_format(lmistr("%s_clone"),ifield(proto,"name"))));
 			ms.grid=(grid_val){contraptions_enumerate(),0,-1,-1};
 		}
-		if(ui_button((rect){b.x+65,b.y+b.h-20,60,20},"Delete",ms.grid.row>=0)){
-			n_deck_remove(deck,l_list(ifield(deck,"contraptions")->lv[ms.grid.row]));
+		if(ui_button((rect){b.x+65,b.y+b.h-20,60,20},"Delete",proto!=NULL)){
+			n_deck_remove(deck,l_list(proto));
 			ms.grid=(grid_val){contraptions_enumerate(),0,-1,-1};
 		}
 	}
@@ -1815,7 +1826,10 @@ void modals(void){
 		if(ms.grid.scroll==-99){ms.grid.scroll=grid_scrollto_simple(ms.grid.table->n,(grid){gsize,FONT_BODY,{0},"",0,1,0,0,show_solid,1},-1,ms.grid.row);}
 		int choose=ui_table(gsize,1,16,0,"Is",&ms.grid);
 		rect psize={b.x,gsize.y+gsize.h+5,b.w,50};draw_box(psize,0,1);psize=inset(psize,2);
-		if(ms.grid.row>=0){layout_plaintext(pangram,ifield(deck,"fonts")->lv[ms.grid.row],align_left,(pair){psize.w,psize.h});draw_text_wrap(psize,1);}
+		if(ms.grid.row>=0){
+			lv*fv=dget(ifield(deck,"fonts"),dget(ms.grid.table,lmistr("name"))->lv[ms.grid.row]);
+			layout_plaintext(pangram,fv,align_left,(pair){psize.w,psize.h});draw_text_wrap(psize,1);
+		}
 		pair c={b.x+b.w-60,b.y+b.h-20};
 		if(ui_button((rect){c.x,c.y,60,20},"OK",ms.grid.row>=0)||choose){
 			lv*nf=ms.grid.table->lv[1]->lv[ms.grid.row];int nested=ms_index>0;modal_pop(1);
@@ -2329,7 +2343,8 @@ void modals(void){
 		int choose=ui_table(gsize,1,16,0,"Is",&ms.grid);
 		rect psize={b.x,gsize.y+gsize.h+5,b.w,50};draw_box(psize,0,1);psize=inset(psize,2);
 		if(ms.grid.row>=0){
-			char*desc=ifield(ifield(deck,"contraptions")->lv[ms.grid.row],"description")->sv;
+			lv*proto=dget(ifield(deck,"contraptions"),dget(ms.grid.table,lmistr("name"))->lv[ms.grid.row]);
+			char*desc=ifield(proto,"description")->sv;
 			layout_plaintext(desc,FONT_BODY,align_left,(pair){psize.w,psize.h});draw_text_wrap(psize,1);
 		}
 		pair c={b.x+b.w-60,b.y+b.h-20};

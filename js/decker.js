@@ -1345,19 +1345,22 @@ sounds_enumerate=_=>{
 		iv.push(lmn(ICON.sound)),nv.push(deck.sounds.k[i])
 		bv.push(dyad.format(lms('%.2fkb'),lmn(ln(ifield(sn,'size'))/1000.0*1.33)))
 		sv.push(dyad.format(lms('%.2fs' ),ifield(sn,'duration')))
-	});return r
+	});return table_sort_asc(r,'name')
 }
 fonts_enumerate=_=>{ // note that this ALSO finds the selected font, if any!
-	const r=lmt(),iv=[],nv=[];tab_set(r,'icon',iv),tab_set(r,'name',nv);let fi=-1
-	deck.fonts.v.map((font,z)=>{
-		if(uimode=='object'){if(ob.sel.every(x=>ifield(x,'font')==font))fi=z}
-		else if(ms.old_wid.ft){if(ifield(ms.old_wid.ft,'font')==font)fi=z}
-		iv.push(lmn(ICON.font)),nv.push(deck.fonts.k[z])
-	});return gridtab(r,fi)
+	const r=lmt(),iv=[],nv=[];tab_set(r,'icon',iv),tab_set(r,'name',nv)
+	deck.fonts.v.map((font,z)=>{iv.push(lmn(ICON.font)),nv.push(deck.fonts.k[z])})
+	const rt=table_sort_asc(r,'name');let fi=-1
+	tab_get(rt,'name').map((name,i)=>{
+		const font=dget(deck.fonts,name)
+		if(uimode=='object'){if(ob.sel.every(x=>ifield(x,'font')==font))fi=i}
+		else if(ms.old_wid.ft){if(ifield(ms.old_wid.ft,'font')==font)fi=i}
+	})
+	return gridtab(rt,fi)
 }
 contraptions_enumerate=_=>{
 	const r=lmt(),iv=[],nv=[];tab_set(r,'icon',iv),tab_set(r,'name',nv)
-	deck.contraptions.k.map(k=>{iv.push(lmn(ICON.app)),nv.push(k)});return r
+	deck.contraptions.k.map(k=>{iv.push(lmn(ICON.app)),nv.push(k)});return table_sort_asc(r,'name')
 }
 let baseline_deck_size=null
 res_size=x=>{
@@ -1381,7 +1384,7 @@ res_enumerate=(source)=>{
 	const defs=source.contraptions
 	defs.v.map((def,i)=>{iv.push(lmn(ICON.app)),nv.push(defs.k[i]),vv.push(def)})
 	vv.forEach(x=>kb.push(res_size(x)))
-	return r
+	return table_sort_radix(r,'icon','name')
 }
 title_caps=x=>{let w=1;return x.split('').map(c=>{if(w)c=drom_toupper(c);w=c==' '||c=='\n';return c}).join('')}
 do_transition=(tween,dest,errors)=>{
@@ -1545,7 +1548,9 @@ modal_exit=value=>{
 	}
 	if(ms.type=='recording'){
 		const name=rtext_string(ms.name.table);rename_sound(deck,au.target,name)
-		au.mode='stopped',modal_enter('sounds'),ms.grid.row=dkix(deck.sounds,name);return
+		au.mode='stopped',modal_enter('sounds')
+		tab_get(ms.grid.table,'name').map((k,i)=>{if(match(name,k))ms.grid.row=i})
+		return
 	}
 	if(ms.type=='widpattern'&&value!=-1)ob_edit_prop('pattern',lmn(value))
 	if(ms.subtype=='confirm_new'   &&value)load_deck(deck_read(''))
@@ -1669,7 +1674,7 @@ modals=_=>{
 		if(ui_table(gsize,[16,120],'Isss',ms.grid))n_play([s])
 		if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'OK',1)||ev.exit){
 			if(ms.from_action){
-				if(ms.grid.row>=0)ms.message=deck.sounds.k[ms.grid.row]
+				if(ms.grid.row>=0)ms.message=tab_cell(ms.grid.table,'name',ms.grid.row)
 				ms.grid=gridtab(transit_enumerate(),ms.act_transno),ms.type='action',ms.from_action=0
 			}else{modal_exit(1)}
 		}
@@ -1720,8 +1725,8 @@ modals=_=>{
 		if(ms.grid.scroll==-99){ms.grid.scroll=grid_scrollto(tab_rowcount(ms.grid.table),{size:gsize,font:FONT_BODY,headers:0},-1,ms.grid.row)}
 		const choose=ui_table(gsize,[16],'Is',ms.grid)
 		let psize=rect(b.x,gsize.y+gsize.h+5,b.w,50);draw_box(psize,0,1),psize=inset(psize,2)
-		if(ms.grid.row>=0){
-			const l=layout_plaintext(PANGRAM,deck.fonts.v[ms.grid.row],ALIGN.left,rect(psize.w,psize.h));draw_text_wrap(psize,l,1)}
+		const font=ms.grid.row<0?null: dget(deck.fonts,tab_cell(ms.grid.table,'name',ms.grid.row))
+		if(font){const l=layout_plaintext(PANGRAM,font,ALIGN.left,rect(psize.w,psize.h));draw_text_wrap(psize,l,1)}
 		const c=rect(b.x+b.w-60,b.y+b.h-20)
 		if(ui_button(rect(c.x,c.y,60,20),'OK',ms.grid.row>=0)||choose){
 			const nf=tab_cell(ms.grid.table,'name',ms.grid.row),nested=ms_stack.length>0;modal_pop(1)
@@ -1737,22 +1742,22 @@ modals=_=>{
 		const gsize=rect(b.x,b.y+15,b.w,b.h-20-50-25-(ms.type=='contraptions'?25:0))
 		const choose=ui_table(gsize,[16],'Is',ms.grid)
 		let psize=rect(b.x,gsize.y+gsize.h+5,b.w,50);draw_box(psize,0,1),psize=inset(psize,2)
-		if(ms.grid.row>=0){
-			const desc=ls(ifield(deck.contraptions.v[ms.grid.row],'description'))
+		const proto=ms.grid.row<0?null: dget(deck.contraptions,tab_cell(ms.grid.table,'name',ms.grid.row))
+		if(proto){
+			const desc=ls(ifield(proto,'description'))
 			const l=layout_plaintext(desc,FONT_BODY,ALIGN.left,rect(psize.w,psize.h));draw_text_wrap(psize,l,1)
 		}
 		const c=rect(b.x+b.w-60,b.y+b.h-20)
 		if(ms.type=='contraptions'){
 			if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'OK',1)||ev.exit){modal_exit(0)}
 			if(ui_button(rect(b.x,b.y+b.h-45,60,20),'New...',1)){modal_exit(1),con_set(deck_add(deck,lms('contraption'))),mark_dirty()}
-			if(ui_button(rect(b.x,b.y+b.h-20,60,20),'Edit...',ms.grid.row>=0)||choose){modal_exit(2),con_set(deck.contraptions.v[ms.grid.row])}
-			if(ui_button(rect(b.x+65,b.y+b.h-45,60,20),'Clone',ms.grid.row>=0)){
-				const s=ifield(deck,'contraptions').v[ms.grid.row]
-				deck_add(deck,s,lms(ls(ifield(s,'name'))+'_clone'))
+			if(ui_button(rect(b.x,b.y+b.h-20,60,20),'Edit...',proto)||choose){modal_exit(2),con_set(proto)}
+			if(ui_button(rect(b.x+65,b.y+b.h-45,60,20),'Clone',proto)){
+				deck_add(deck,proto,lms(ls(ifield(proto,'name'))+'_clone'))
 				ms.grid=gridtab(contraptions_enumerate())
 			}
-			if(ui_button(rect(b.x+65,b.y+b.h-20,60,20),'Delete',ms.grid.row>=0)){
-				deck_remove(deck,ifield(deck,'contraptions').v[ms.grid.row])
+			if(ui_button(rect(b.x+65,b.y+b.h-20,60,20),'Delete',proto)){
+				deck_remove(deck,proto)
 				ms.grid=gridtab(contraptions_enumerate())
 			}
 		}

@@ -433,21 +433,25 @@ n_eval=([x,y,extend])=>{
 		issue(env_bind(extend&&lb(extend)?getev():null,yy.k.map(ls),lml(yy.v)),prog)
 	}catch(e){dset(r,lms('error'),lms(e.x)),dset(r,lms('errorpos'),lml([lmn(e.r),lmn(e.c)]))};return r
 }
+orderby=(tab,o,order_dir)=>{
+	const lex_list=(x,y,a,ix)=>{
+		if(x.length<ix&&y.length<ix)return 0;const xv=x[ix]||NIL,yv=y[ix]||NIL
+		return lex_less(xv,yv)?a: lex_more(xv,yv)?!a: lex_list(x,y,a,ix+1)
+	}
+	const lex_less=(a,b)=>lil(a)&&lil(b)? lex_list(a.v,b.v,1,0): lb(dyad['<'](a,b))
+	const lex_more=(a,b)=>lil(a)&&lil(b)? lex_list(a.v,b.v,0,0): lb(dyad['>'](a,b))
+	const pv=range(count(tab)).sort((a,b)=>{
+		if(lex_less(o[a],o[b]))return  order_dir
+		if(lex_more(o[a],o[b]))return -order_dir
+		return a-b // produce a stable sort
+	})
+	return dyad.take(lml(pv.map(lmn)),tab)
+}
+table_sort_asc=(tab,colname)=>orderby(tab,tab_get(tab,colname),-1)
+table_sort_radix=(tab,a,b)=>{const av=tab_get(tab,a),bv=tab_get(tab,b);return orderby(tab,av.map((x,i)=>lml([x,bv[i]])),-1)}
 triad={
 	'@orderby': (col,tab,order_dir)=>{
-		const lex_list=(x,y,a,ix)=>{
-			if(x.length<ix&&y.length<ix)return 0;const xv=x[ix]||NIL,yv=y[ix]||NIL
-			return lex_less(xv,yv)?a: lex_more(xv,yv)?!a: lex_list(x,y,a,ix+1)
-		}
-		const lex_less=(a,b)=>lil(a)&&lil(b)? lex_list(a.v,b.v,1,0): lb(dyad['<'](a,b))
-		const lex_more=(a,b)=>lil(a)&&lil(b)? lex_list(a.v,b.v,0,0): lb(dyad['>'](a,b))
-		const o=dyad.take(lmn(count(tab)),lml(ll(col)));order_dir=ln(order_dir)
-		const pv=range(count(tab)).sort((a,b)=>{
-			if(lex_less(o.v[a],o.v[b]))return  order_dir
-			if(lex_more(o.v[a],o.v[b]))return -order_dir
-			return a-b // produce a stable sort
-		})
-		const rt=dyad.take(lml(pv.map(lmn)),tab)
+		const rt=orderby(tab,dyad.take(lmn(count(tab)),lml(ll(col))).v,ln(order_dir))
 		tab_set(rt,'gindex',range(count(tab)).map(lmn));return rt
 	},
 	'@sel': (orig,vals,keys)=>{

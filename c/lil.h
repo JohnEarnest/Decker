@@ -894,6 +894,16 @@ lv* l_orderby(lv*col,lv*tab,lv*dir){
 	lv*p=l_range(lmn(order_vec->c));qsort(p->lv,p->c,sizeof(lv*),orderby);
 	lv*r=l_take(p,tab);dset(r,lmistr("gindex"),l_range(lmn(r->n)));return r;
 }
+lv* table_sort_asc(lv*tab,int col){
+	order_vec=tab->lv[col],order_dir=-1;
+	lv*p=l_range(lmn(order_vec->c));qsort(p->lv,p->c,sizeof(lv*),orderby);
+	return l_take(p,tab);
+}
+lv* table_sort_radix(lv*tab,int a,int b){
+	order_vec=l_join(tab->lv[a],tab->lv[b]),order_dir=-1;
+	lv*p=l_range(lmn(order_vec->c));qsort(p->lv,p->c,sizeof(lv*),orderby);
+	return l_take(p,tab);
+}
 
 #define prim(n,f) {n,(void*)f}
 primitive monads[]={
