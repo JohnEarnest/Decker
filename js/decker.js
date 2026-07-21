@@ -144,7 +144,7 @@ draw_modalbox=s=>{
 draw_modal_rtext=extra=>{
 	const size=rect(200,100)
 	const l=lit(ms.message)?layout_richtext(deck,ms.message,FONT_BODY,ALIGN.center,size.x):layout_plaintext(ls(ms.message),FONT_BODY,ALIGN.center,size)
-	const b=draw_modalbox(radd(l.size,extra)), tbox=rect(b.x,b.y,b.w,l.size.y)
+	const b=draw_modalbox(radd(l.size,extra)), tbox=rclip(rect(b.x,b.y,b.w,l.size.y),frame.clip)
 	if(lit(ms.message)){draw_text_rich(tbox,l,1,1)}else{draw_text_wrap(tbox,l,1)}
 	return b
 }

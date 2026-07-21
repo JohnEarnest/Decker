@@ -1263,11 +1263,13 @@ rect modal_rtext(pair extra){
 	pair size={200,100};
 	if(lit(ms.message)){
 		pair t=layout_richtext(deck,ms.message,FONT_BODY,align_center,size.x);
-		rect b=draw_modalbox((pair){t.x+extra.x,t.y+extra.y});draw_text_rich((rect){b.x,b.y,b.w,t.y},1,1);return b;
+		rect b=draw_modalbox((pair){t.x+extra.x,t.y+extra.y}), bb=box_intersect((rect){b.x,b.y,b.w,t.y},frame.clip);
+		draw_text_rich(bb,1,1);return b;
 	}
 	else{
 		pair t=layout_plaintext(ms.message->sv,FONT_BODY,align_center,size);
-		rect b=draw_modalbox((pair){t.x+extra.x,t.y+extra.y});draw_text_wrap((rect){b.x,b.y,b.w,t.y},1);return b;
+		rect b=draw_modalbox((pair){t.x+extra.x,t.y+extra.y}), bb=box_intersect((rect){b.x,b.y,b.w,t.y},frame.clip);
+		draw_text_wrap(bb,1);return b;
 	}
 }
 char title_buffer[4096];
