@@ -1628,10 +1628,10 @@ int keypress[4096]={0},keydown[4096]={0},keyup[4096]={0};
 lv* interface_gamepad(lv*self,lv*i,lv*x){
 	lv*kup=lmistr("up"),*kdown=lmistr("down"),*kleft=lmistr("left"),*kright=lmistr("right");
 	lv*ka1=lmistr("action"),*ka2=lmistr("cancel");
-	#define gamepad_up(s) (s[KEYBOARD_UP]||s[GAMEPAD_UP]||s[GAMESTK_UP])
-	#define gamepad_dn(s) (s[KEYBOARD_DN]||s[GAMEPAD_DN]||s[GAMESTK_DN])
-	#define gamepad_lf(s) (s[KEYBOARD_LF]||s[GAMEPAD_LF]||s[GAMESTK_LF])
-	#define gamepad_rt(s) (s[KEYBOARD_RT]||s[GAMEPAD_RT]||s[GAMESTK_RT])
+	#define gamepad_up(s) (s['w']||s[KEYBOARD_UP]||s[GAMEPAD_UP]||s[GAMESTK_UP])
+	#define gamepad_dn(s) (s['s']||s[KEYBOARD_DN]||s[GAMEPAD_DN]||s[GAMESTK_DN])
+	#define gamepad_lf(s) (s['a']||s[KEYBOARD_LF]||s[GAMEPAD_LF]||s[GAMESTK_LF])
+	#define gamepad_rt(s) (s['d']||s[KEYBOARD_RT]||s[GAMEPAD_RT]||s[GAMESTK_RT])
 	#define gamepad_a1(s) (s['z']||s['c']||s['n']||s[' ']||s[GAMEPAD_A1])
 	#define gamepad_a2(s) (s['x']||s['v']||s['m']        ||s[GAMEPAD_A2])
 	ikey("held"){

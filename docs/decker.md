@@ -826,10 +826,10 @@ The dictionaries exposed as `gamepad.held`, `gamepad.down`, and `gamepad.up` wil
 
 | Button Name | Keyboard Equivalents       |
 | :---------- | :------------------------- |
-| `"up"`      | up cursor                  |
-| `"down"`    | down cursor                |
-| `"left"`    | left cursor                |
-| `"right"`   | right cursor               |
+| `"up"`      | `w` or up cursor           |
+| `"down"`    | `s` or down cursor         |
+| `"left"`    | `a` or left cursor         |
+| `"right"`   | `d` or right cursor        |
 | `"action"`  | `z`, `c`, `n`, or spacebar |
 | `"cancel"`  | `x`, `v`, or `m`           |
 

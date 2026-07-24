@@ -1528,10 +1528,10 @@ pointer={f:(self,i,x)=>{
 let keypress={},keydown={},keyup={}
 gamepad={f:(self,i,x)=>{
 	const keymap={
-		'up'    :['ArrowUp'   ,'GamepadUp','GamestickUp'],
-		'down'  :['ArrowDown' ,'GamepadDn','GamestickDn'],
-		'left'  :['ArrowLeft' ,'GamepadLf','GamestickLf'],
-		'right' :['ArrowRight','GamepadRt','GamestickRt'],
+		'up'    :['w','ArrowUp'   ,'GamepadUp','GamestickUp'],
+		'down'  :['s','ArrowDown' ,'GamepadDn','GamestickDn'],
+		'left'  :['a','ArrowLeft' ,'GamepadLf','GamestickLf'],
+		'right' :['d','ArrowRight','GamepadRt','GamestickRt'],
 		'action':['z','c','n',' ','GamepadA1'],
 		'cancel':['x','v','m'    ,'GamepadA2'],
 	}
