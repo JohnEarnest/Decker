@@ -3868,7 +3868,17 @@ void all_menus(void){
 		if(menu_item("Resources..." ,1,'\0'))modal_enter(modal_resources);
 		if(menu_item("Properties...",1,'\0'))modal_enter(modal_deck_props);
 	}
-	if(ms.type==modal_none||wid.gv||wid.fv){
+	if(ms.type==modal_prototype_attrs){
+		menu_bar("Edit",1);
+		if(menu_item("Move Attribute Up",ms.grid.row>0,',')){
+			ms.grid.table=table_swap_rows(ms.grid.table,ms.grid.row-1,ms.grid.row);ms.grid.row--;
+		}
+		if(menu_item("Move Attribute Down",ms.grid.row>=0&&ms.grid.row<ms.grid.table->n-1,'.')){
+			ms.grid.table=table_swap_rows(ms.grid.table,ms.grid.row+1,ms.grid.row);ms.grid.row++;
+		}
+		if(wid.fv){menu_separator();text_edit_menu();}
+	}
+	else if(ms.type==modal_none||wid.gv||wid.fv){
 		menu_bar("Edit",wid.gv||wid.fv||(ms.type==modal_none&&uimode==mode_interact)||uimode==mode_draw||uimode==mode_object);
 		if(wid.gv){
 			int mutable=!wid.g.locked&&ms.type==modal_none;

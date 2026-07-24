@@ -904,6 +904,11 @@ lv* table_sort_radix(lv*tab,int a,int b){
 	lv*p=l_range(lmn(order_vec->c));qsort(p->lv,p->c,sizeof(lv*),orderby);
 	return l_take(p,tab);
 }
+lv* table_swap_rows(lv*tab,int a,int b){
+	if(a==b||a<0||b<0||a>tab->n-1||b>tab->n-1)return tab;
+	lv*pv=lml(tab->n);for(int z=0;z<pv->c;z++)pv->lv[z]=lmn(z);
+	pv->lv[a]=lmn(b),pv->lv[b]=lmn(a);return l_take(pv,tab);
+}
 
 #define prim(n,f) {n,(void*)f}
 primitive monads[]={

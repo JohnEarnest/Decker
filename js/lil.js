@@ -449,6 +449,10 @@ orderby=(tab,o,order_dir)=>{
 }
 table_sort_asc=(tab,colname)=>orderby(tab,tab_get(tab,colname),-1)
 table_sort_radix=(tab,a,b)=>{const av=tab_get(tab,a),bv=tab_get(tab,b);return orderby(tab,av.map((x,i)=>lml([x,bv[i]])),-1)}
+table_swap_rows=(tab,a,b)=>{
+	if(a==b||a<0||b<0||a>tab_rowcount(tab)-1||b>tab_rowcount(tab)-1)return tab
+	const pv=monad.range(lmn(tab_rowcount(tab)));pv.v[a]=lmn(b),pv.v[b]=lmn(a);return dyad.take(pv,tab)
+}
 triad={
 	'@orderby': (col,tab,order_dir)=>{
 		const rt=orderby(tab,dyad.take(lmn(count(tab)),lml(ll(col))).v,ln(order_dir))

@@ -3334,7 +3334,17 @@ all_menus=_=>{
 		if(menu_item('Resources...' ,1,   ))modal_enter('resources')
 		if(menu_item('Properties...',1,   ))modal_enter('deck_props')
 	}
-	if(ms.type==null||wid.gv||wid.fv){
+	if(ms.type=='prototype_attrs'){
+		menu_bar('Edit',1)
+		if(menu_item('Move Attribute Up',ms.grid.row>0)){
+			ms.grid.table=table_swap_rows(ms.grid.table,ms.grid.row-1,ms.grid.row),ms.grid.row--
+		}
+		if(menu_item('Move Attribute Down',ms.grid.row>=0&&ms.grid.row<tab_rowcount(ms.grid.table)-1)){
+			ms.grid.table=table_swap_rows(ms.grid.table,ms.grid.row+1,ms.grid.row),ms.grid.row++
+		}
+		if(wid.fv){menu_separator(),text_edit_menu()}
+	}
+	else if(ms.type==null||wid.gv||wid.fv){
 		menu_bar("Edit",wid.gv||wid.fv||(ms.type==null&&uimode=='interact')||uimode=='draw'||uimode=='object')
 		if(wid.gv){
 			const mutable=!wid.g.locked&&ms.type==null

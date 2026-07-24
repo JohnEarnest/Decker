@@ -1836,6 +1836,8 @@ Some of our custom attributes might be things that users of the contraption woul
 
 From this dialog you can add metadata for any of the attributes you wrote `get_` and `set_` functions for. The "name" of an attribute should be the part that comes immediately after `get_`; in our case, "value". The "label" can be a longer/more detailed human-readable name. The "type" indicates which sort of picker should be provided for manipulating this attribute: a boolean becomes a checkbox, a number or string become small field, and code, rich text, or data becomes a larger field of the appropriate style. A "note" displays the label as a block of text, offering a way to supply more detailed built-in documentation for your contraptions and clarify the meaning of complex attributes.
 
+If you'd like to reorder attributes in the list, select one and then choose _Move Attribute Up_ or _Move Attribute Down_ from the _Edit_ menu.
+
 With the "value" attribute set up as above, exit the prototype editor and double-click one of your contraption instances to see the new field in its Properties panel:
 
 ![](images/conprops.gif)
