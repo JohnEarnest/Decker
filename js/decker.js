@@ -3058,12 +3058,12 @@ const tooltypes=['select','pencil','lasso','line','fill','poly','rect','fillrect
 const patorder=[0,1,4,5,8,9,16,17,12,13,18,19,20,21,22,23,24,25,26,27,2,6,3,7,10,11,14,15,28,29,30,31] // pleasing visual ramps for 2 columns
 
 toolbars=_=>{
-	if(!toolbars_enable||kc.on)return
-	if(ms.type||uimode=='script'||deck.locked){
-		clr=x=>{const c=q(x);c.getContext('2d').clearRect(0,0,c.width,c.height);}
-		clr('#ltools'),clr('#rtools');return
-	}
-	const toolbar=(element,render,behavior)=>{
+	if(!toolbars_enable)return
+	const enable=uimode!='script'&&!deck.locked
+	const enable_left=enable&&!ms.type&&!kc.on
+	const enable_right=enable&&((!ms.type)||(wid.fv!=null&&wid.f.style=='rich'))
+	const toolbar=(enable,element,render,behavior)=>{
+		if(!enable){element.getContext('2d').clearRect(0,0,element.width,element.height);return}
 		const c=element.getBoundingClientRect()
 		const pos =rint(rect((ev.rawpos .x-c.x)/tzoom,(ev.rawpos .y-c.y)/tzoom))
 		const dpos=rint(rect((ev.rawdpos.x-c.x)/tzoom,(ev.rawdpos.y-c.y)/tzoom))
@@ -3109,6 +3109,12 @@ toolbars=_=>{
 		setmode('draw');if(dr.tool=='select'||dr.tool=='lasso'||dr.tool=='fill')settool('pencil');dr.brush=brush
 	}
 	const palbtn=(pos,dn,b,pattern)=>{
+		if(wid.fv){
+			draw_rect(b,pattern)
+			const canpat=(wid.cursor.x!=wid.cursor.y)&&(wid.f.style=='rich')
+			if(rin(b,pos)){if(canpat)uicursor=cursor.point;if(ev.md&&rin(b,dn)){if(canpat)field_patspan(pattern);ev.md=0}}
+			draw_box(b,0,1);return
+		}
 		if(uimode=='object'){
 			draw_rect(b,pattern)
 			if(ob.sel&&ob.sel.length&&rin(b,pos)){uicursor=cursor.point;if(ev.mu&&rin(b,dn)){ob_edit_prop('pattern',lmn(pattern)),ev.mu=0}}
@@ -3117,7 +3123,7 @@ toolbars=_=>{
 		if((dr.pickfill?dr.fill:dr.pattern)==pattern){draw_rect(inset(b,3),pattern),draw_box(inset(b,3),0,1)}else{draw_rect(b,pattern)}
 		if(rin(b,pos)){uicursor=cursor.point;if(ev.mu&&rin(b,dn)){if(dr.pickfill){dr.fill=pattern}else{dr.pattern=pattern}}}draw_box(b,0,1)
 	}
-	toolbar(q('#ltools'),q('#lrender'),(pos,dn)=>{
+	toolbar(enable_left,q('#ltools'),q('#lrender'),(pos,dn)=>{
 		const bs=deck.brushes,bt=deck.brusht,th=count(bs)?17:tcellh;toolbar_scroll=clamp(0,toolbar_scroll,count(bs))
 		draw_rect(rect(0,6*tcellh,toolsize.x,tgap),1)
 		if(toolbtn(pos,dn,rect(0     ,0,tcellw+1,tcellh+1),0,uimode=='interact'))setmode('interact'),ev.mu=ev.md=0
@@ -3139,10 +3145,15 @@ toolbars=_=>{
 			if(toolbar_scroll<count(bs))if(scrollbtn(pos,dn,rect(tcellw,cy,tcellw+1,toolsize.y-cy),1))toolbar_scroll++
 		}
 	})
-	toolbar(q('#rtools'),q('#rrender'),(pos,dn)=>{
+	toolbar(enable_right,q('#rtools'),q('#rrender'),(pos,dn)=>{
 		draw_rect(rect(0,16*tcellh,toolsize.x,tgap),1)
-		if(modebtn(pos,dn,rect(0,0     ,tcellw*2+1,tcellh+1),'Stroke',dr.pickfill==0))dr.pickfill=0
-		if(modebtn(pos,dn,rect(0,tcellh,tcellw*2+1,tcellh+1),'Fill'  ,dr.pickfill==1))dr.pickfill=1
+		if(wid.fv){
+			const b=rect(1,1,tcellw*2-1,tcellh*2-1)
+			draw_rect(b,1),draw_box(b,0,13);if(rin(b,pos)&&rin(b,dn)&&ev.md)ev.md=0
+		}else{
+			if(modebtn(pos,dn,rect(0,0     ,tcellw*2+1,tcellh+1),'Stroke',dr.pickfill==0))dr.pickfill=0
+			if(modebtn(pos,dn,rect(0,tcellh,tcellw*2+1,tcellh+1),'Fill'  ,dr.pickfill==1))dr.pickfill=1
+		}
 		if(dr.color){for(let z=0;z<16 ;z++)palbtn(pos,dn,rect(0,(2*tcellh)+z*tcellh,2*tcellw+1,tcellh+1),(z>=2?31:0)+z)}
 		else        {for(let z=0;z<4*8;z++)palbtn(pos,dn,rect((z%2)*tcellw,(2*tcellh)+(0|(z/2))*tcellh+(z>=28?tgap:0),tcellw+1,tcellh+1),patorder[z])}
 	})

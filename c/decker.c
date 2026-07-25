@@ -3408,6 +3408,12 @@ void cbrushbtn(pair pos,pair dn,rect b,int brush,lv*bt){
 	dr.brush=brush;
 }
 void palbtn(pair pos,pair dn,rect b,int pattern){
+	if(wid.fv){
+		draw_rect(b,pattern);
+		int canpat=(wid.cursor.x!=wid.cursor.y)&&(wid.f.style==field_rich);
+		if(box_in(b,pos)){if(canpat)uicursor=cursor_point;if(ev.md&&box_in(b,dn)){if(canpat)field_patspan(pattern);ev.md=0;}}
+		draw_box(b,0,1);return;
+	}
 	if(uimode==mode_object){
 		draw_rect(b,pattern);
 		if(ob.sel->c&&box_in(b,pos)){uicursor=cursor_point;if(ev.mu&&box_in(b,dn)){ob_edit_prop("pattern",lmn(pattern));ev.mu=0;}}
@@ -3445,8 +3451,13 @@ void rtoolbar(pair pos,pair dn){
 	int pp[]={0,1,4,5,8,9,16,17,12,13,18,19,20,21,22,23,24,25,26,27,2,6,3,7,10,11,14,15,28,29,30,31}; // pleasing visual ramps
 	pair size=buff_size(TOOLB);frame=draw_buffer(TOOLB);
 	memset(frame.buffer->sv,0,frame.buffer->c),draw_box((rect){0,0,size.x,size.y},0,1),draw_rect((rect){0,16*tcellh,size.x,tgap},1);
-	if(modebtn(pos,dn,(rect){0,0     ,tcellw*2+1,tcellh+1},"Stroke",dr.pickfill==0))dr.pickfill=0;
-	if(modebtn(pos,dn,(rect){0,tcellh,tcellw*2+1,tcellh+1},"Fill"  ,dr.pickfill==1))dr.pickfill=1;
+	if(wid.fv){
+		rect b={1,1,tcellw*2-1,tcellh*2-1};
+		draw_rect(b,1),draw_box(b,0,13);if(box_in(b,pos)&&box_in(b,dn)&&ev.md)ev.md=0;
+	}else{
+		if(modebtn(pos,dn,(rect){0,0     ,tcellw*2+1,tcellh+1},"Stroke",dr.pickfill==0))dr.pickfill=0;
+		if(modebtn(pos,dn,(rect){0,tcellh,tcellw*2+1,tcellh+1},"Fill"  ,dr.pickfill==1))dr.pickfill=1;
+	}
 	if(dr.color){for(int z=0;z<16 ;z++)palbtn(pos,dn,(rect){0,(2*tcellh)+z*tcellh,2*tcellw+1,tcellh+1},(z>=2?31:0)+z);}
 	else        {for(int z=0;z<4*8;z++)palbtn(pos,dn,(rect){(z%2)*tcellw,(2*tcellh)+(z/2)*tcellh+(z>=28?tgap:0),tcellw+1,tcellh+1},pp[z]);}
 }
@@ -3650,8 +3661,10 @@ void sync(void){
 	pick_palette(deck);
 	if(framebuffer_flip(disp,size,scale,dr.trans_mask&&uimode==mode_draw,dr.show_anim?frame_count:0,patterns_pal(ifield(deck,"patterns")),context.buffer)){
 		char*pal=patterns_pal(ifield(deck,"patterns"));
-		int showwings=!kc.on&&toolbars_enable&&tscale>0&&!(lb(ifield(deck,"locked")))&&ms.type==modal_none&&uimode!=mode_script;
-		if(showwings){
+		int toolbars=toolbars_enable&&tscale>0&&!(lb(ifield(deck,"locked")))&&uimode!=mode_script;
+		int showleft=toolbars&&ms.type==modal_none&&!kc.on;
+		int showright=toolbars&&((ms.type==modal_none)||(wid.fv!=NULL&&wid.f.style==field_rich));
+		if(showleft){
 			rect dst={0,(disp.y-tscale*tsize.y)/2,tscale*tsize.x,tscale*tsize.y};
 			ltoolbar(
 				(pair){(ev.rawpos .x-dst.x/dpi)/tmscale,(ev.rawpos .y-dst.y/dpi)/tmscale},
@@ -3659,7 +3672,7 @@ void sync(void){
 			);
 			toolbar_flip(TOOLB,dr.show_anim?frame_count:0,pal,dst);
 		}
-		if(showwings){
+		if(showright){
 			rect dst={disp.x-tscale*tsize.x,(disp.y-tscale*tsize.y)/2,tscale*tsize.x,tscale*tsize.y};
 			rtoolbar(
 				(pair){(ev.rawpos .x-dst.x/dpi)/tmscale,(ev.rawpos .y-dst.y/dpi)/tmscale},
