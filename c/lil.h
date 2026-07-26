@@ -765,7 +765,10 @@ void format_type(str*r,lv*a,char t,int n,int d,int lf,int pz,int*f,char*c){
 	else if(t=='j'){str v=str_new();fjson(&v,a    );op=lmstr(v)->sv;}
 	else if(t=='J'){str v=str_new();flove(&v,a    );op=lmstr(v)->sv;}
 	else if(t=='q'){str v=str_new();fjson(&v,ls(a));op=lmstr(v)->sv;}
-	else if(t=='e'){time_t v=ln(a);strftime(o,NUM,"%FT%TZ",gmtime(&v));}
+	else if(t=='e'){
+		time_t v=ln(a);struct tm tv;gmtime_r(&v,&tv);
+		snprintf(o,NUM,"%04i-%02i-%02iT%02i:%02i:%02iZ",tv.tm_year+1900,tv.tm_mon+1,tv.tm_mday,tv.tm_hour,tv.tm_min,tv.tm_sec);
+	}
 	else if(t=='p'){
 		lv*isodate=lmistr("%[year]04i-%[month]02i-%[day]02iT%[hour]02i:%[minute]02i:%[second]02iZ%n%m");
 		snprintf(o,NUM,"%s",l_format(isodate,ld(a))->sv);
