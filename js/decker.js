@@ -957,7 +957,7 @@ widget_field=(target,x,value)=>{
 	// find active link (if any)
 	let alink=null;if(x.locked&&!sel&&in_layer()&&x.locked&&(ev.md||ev.drag))for(let z=0;z<layout.layout.length;z++){
 		const g=layout.layout[z], pos=rcopy(g.pos);if(pos.w<1)continue // skip squashed spaces/newlines
-		pos.y-=value.scroll;if(pos.y+pos.h<0||pos.y>bi.h)continue; pos.x+=bi.x, pos.y+=bi.y // coarse clip
+		pos.y-=value.scroll;if(pos.y+pos.h<0||pos.y>bi.y+bi.h)continue; pos.x+=bi.x, pos.y+=bi.y // coarse clip
 		if(lis(g.arg)&&count(g.arg)&&dover(pos)&&over(pos)){alink=g.arg;break}
 	}
 	if(!x.locked&&!l&&dover(bi)&&(ev.md||ev.mu||ev.drag)){
@@ -980,7 +980,7 @@ widget_field=(target,x,value)=>{
 	             ((tfcol==1||tfcol==47)&&(bcol==1||bcol==47))?32: tfcol
 	for(let z=0;z<layout.layout.length;z++){
 		const g=layout.layout[z], pos=rcopy(g.pos);if(pos.w<1)continue // skip squashed spaces/newlines
-		pos.y-=value.scroll;if(pos.y+pos.h<0||pos.y>bc.h)continue; pos.x+=bi.x, pos.y+=bi.y // coarse clip
+		pos.y-=value.scroll;if(pos.y+pos.h<0||pos.y>bc.y+bc.h)continue; pos.x+=bi.x, pos.y+=bi.y // coarse clip
 		if(lis(g.arg)&&count(g.arg)){
 			draw_hline(pos.x,pos.x+pos.w,pos.y+pos.h-1,alink==g.arg?fcol:19)
 			const a=x.locked&&in_layer()&&over(pos)&&target;if(a&&!ev.drag)uicursor=cursor.point

@@ -818,7 +818,7 @@ void widget_field(lv*target,field x,field_val*value){
 	// find active link (if any)
 	lv*alink=NULL;if(x.locked&&!sel&&in_layer()&&x.locked&&(ev.md||ev.drag))for(int z=0;z<layout_count;z++){
 		glyph_box g=layout[z] ;if(g.pos.w<1)continue; // skip squashed spaces/newlines
-		g.pos.y-=value->scroll;if(g.pos.y+g.pos.h<0||g.pos.y>bi.h)continue; g.pos.x+=bi.x, g.pos.y+=bi.y; // coarse clip
+		g.pos.y-=value->scroll;if(g.pos.y+g.pos.h<0||g.pos.y>bi.y+bi.h)continue; g.pos.x+=bi.x, g.pos.y+=bi.y; // coarse clip
 		if(lis(g.arg)&&g.arg->c&&dover(g.pos)&&over(g.pos)){alink=g.arg;break;}
 	}
 	if(!x.locked&&!l&&dover(bi)&&(ev.md||ev.mu||ev.drag)){
@@ -841,7 +841,7 @@ void widget_field(lv*target,field x,field_val*value){
 	           ((tfcol==1||tfcol==47)&&(bcol==1||bcol==47))?32: tfcol;
 	for(int z=0;z<layout_count;z++){
 		glyph_box g=layout[z] ;if(g.pos.w<1)continue; // skip squashed spaces/newlines
-		g.pos.y-=value->scroll;if(g.pos.y+g.pos.h<0||g.pos.y>bc.h)continue; g.pos.x+=bi.x, g.pos.y+=bi.y; // coarse clip
+		g.pos.y-=value->scroll;if(g.pos.y+g.pos.h<0||g.pos.y>bc.y+bc.h)continue; g.pos.x+=bi.x, g.pos.y+=bi.y; // coarse clip
 		if(lis(g.arg)&&g.arg->c){
 			draw_hline(g.pos.x,g.pos.x+g.pos.w,g.pos.y+g.pos.h-1,alink==g.arg?fcol:19);
 			int a=x.locked&&in_layer()&&over(g.pos)&&target;if(a&&!ev.drag)uicursor=cursor_point;
