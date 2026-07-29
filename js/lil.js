@@ -2848,7 +2848,10 @@ contraption_update=(deck,def)=>{
 		card.widgets.v.filter(x=>contraption_is(x)&&x.def==def).map(widget=>{
 			const d=widget_write(widget), n=widget.name
 			dset(d,lms('widgets'),contraption_strip(widget))
+			widget.widgets.v.map(w=>w.dead=true)
 			for(var k in widget)delete widget[k];Object.assign(widget,widget_read(d,card));widget.name=n
+			widget.widgets.v.map(w=>w.card=widget)
+			widget.viewproxy.card=widget
 		})
 	})
 }

@@ -2730,7 +2730,10 @@ void contraption_update(lv*def){
 			lv*widget=widgets->lv[w];if(!contraption_is(widget)||ifield(widget,"def")!=def)continue;
 			lv*d=widget_write(widget),*n=ifield(widget,"name");
 			dset(d,lmistr("widgets"),contraption_strip(widget));
+			{lv*c=ivalue(widget,"widgets");EACH(z,c)dset(c->lv[z]->b,lmistr("dead"),ONE);}
 			widget->b=widget_read(d,card)->b;dset(widget->b,lmistr("name"),n);
+			{lv*c=ivalue(widget,"widgets");EACH(z,c)dset(c->lv[z]->b,lmistr("card"),widget);}
+			dset(ivalue(widget,"viewproxy")->b,lmistr("card"),widget);
 		}
 	}
 }

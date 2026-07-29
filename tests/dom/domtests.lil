@@ -2087,6 +2087,34 @@ assert["grid in contraption empty serialization"
 	(list g1),(list g2),(list g3)
 ]
 
+d:newdeck[]
+c:d.add["contraption" "stalescripty"]
+c.script:"
+on get_msg do m.value end
+on set_msg x do m.value: x end
+on get_b do b end
+on get_m do m end
+on click pos do card.event[\"click\" pos] end
+"
+c.add["button" "b"]
+c.add["field"  "m"]
+i:d.card.add["contraption" "stalescripty"]
+i.script:"on click do me.msg:\"test\" end"
+i.m.text:"novel string"
+assert["stale script initial" "novel string" i.m.text]
+i.b.event.click
+assert["stale script before mutate" "test" i.m.text]
+# when a contraption is updated, all the old instances should be explicitly deactivated:
+old_m:i.m
+assert["internal ref before update" ("field","m","test") ((typeof old_m),(old_m.name),(old_m.text))]
+i.def.update[]
+assert["stale ref after update" ("field",nil,nil) ((typeof old_m),(old_m.name),(old_m.text))]
+# the contraption instance itself remains valid:
+i.m.text:"novel string 2"
+i.script:"on click do me.msg:\"another\" end"
+i.b.event.click
+assert["stale script after mutate" "another" i.m.text]
+
 #######################################
 #
 #  Lilt features
