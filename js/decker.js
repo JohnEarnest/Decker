@@ -3375,8 +3375,9 @@ all_menus=_=>{
 			if(menu_item('Redo',has_redo(),'Z'))redo()
 			menu_separator()
 			if(menu_item('Paste',1,'v',menupaste)){}
+			if(menu_item('Paste as new Canvas',1,0,pasteascanvas)){}
 		}
-		if(ms.type==null&&uimode=='draw'){
+		else if(ms.type==null&&uimode=='draw'){
 			const sel=bg_has_sel()||bg_has_lasso()
 			if(menu_item('Undo',(!sel)&&has_undo(),'z'))undo()
 			if(menu_item('Redo',(!sel)&&has_redo(),'Z'))redo()
@@ -3384,6 +3385,7 @@ all_menus=_=>{
 			if(menu_item('Cut Image',sel,0,menucut)){}
 			if(menu_item('Copy Image',sel,0,menucopy)){}
 			if(menu_item('Paste',1,'v',menupaste)){}
+			if(menu_item('Paste as new Canvas',1,0,pasteascanvas)){}
 			if(menu_item('Clear',1)){const t=dr.tool;if(!sel){settool('select'),dr.sel_here=rcopy(con_dim())}bg_delete_selection(),settool(t)}
 			menu_separator()
 			if(menu_item('Select All',1,'a')){settool('select'),dr.sel_here=rcopy(con_dim())}
@@ -3427,7 +3429,7 @@ all_menus=_=>{
 				if(menu_item('Darken  Image',dr.dither_threshold< 2.0))dr.dither_threshold+=.1
 			}
 		}
-		if(ms.type==null&&uimode=='object'){
+		else if(ms.type==null&&uimode=='object'){
 			if(menu_item('Undo',has_undo(),'z'))undo()
 			if(menu_item('Redo',has_redo(),'Z'))redo()
 			menu_separator()
@@ -3435,7 +3437,6 @@ all_menus=_=>{
 			if(menu_item('Copy Widgets',ob.sel.length,'c',menucopy)){}
 			if(menu_item('Copy Image',ob.sel.length==1,0,copywidgetimg)){}
 			if(menu_item('Paste',1,'v',menupaste)){}
-			menu_separator()
 			if(menu_item('Paste as new Canvas',1,0,pasteascanvas)){}
 			if(menu_item('Paste into Canvas',ob.sel.length==1&&canvas_is(ob.sel[0]),0,pasteintocanvas)){}
 			menu_separator()
@@ -3445,7 +3446,7 @@ all_menus=_=>{
 			if(menu_item('Move Down'    ,ob.sel.length))ob_move_dn()
 			if(menu_item('Move to Back' ,ob.sel.length))ob_order(),ob.sel.slice(0).reverse().map(w=>iwrite(w,lms('index'),ZERO          )),mark_dirty()
 		}
-		if(wid.fv&&wid.f){
+		else if(wid.fv&&wid.f){
 			const selection=wid.fv!=null&&wid.cursor.x!=wid.cursor.y
 			menu_bar('Text',selection&&wid.f.style!='plain')
 			if(wid.f.style=='rich'){
@@ -3468,7 +3469,7 @@ all_menus=_=>{
 			}
 		}
 	}
-	if(ms.type=='recording'&&!wid.fv){
+	else if(ms.type=='recording'&&!wid.fv){
 		menu_bar('Edit',au.mode=='stopped')
 		if(menu_item('Undo',au.hist_cursor>0             ,'z'))sound_undo()
 		if(menu_item('Redo',au.hist_cursor<au.hist.length,'Z'))sound_redo()

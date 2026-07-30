@@ -3756,9 +3756,13 @@ int interpret(void){
 	return FRAME_QUOTA-quota;
 }
 void paste_any(void){
-	if(has_clip("%%IMG")){if(menu_item("Paste Image",1,'v')){
-		lv*b=image_read(get_clip())->b;setuimode(mode_draw);bg_paste(b,0);
-	}}
+	if(has_clip("%%IMG")){
+		if(menu_item("Paste Image",1,'v')){lv*b=image_read(get_clip())->b;setuimode(mode_draw);bg_paste(b,0);}
+		if(menu_item("Paste as new Canvas",1,'\0')){
+			lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas")),dset(p,lmistr("locked"),ONE),dset(p,lmistr("border"),ZERO);
+			dset(p,lmistr("image"),get_clip()),ob_create(l_list(p));frame=context;
+		}
+	}
 	else if(has_clip("%%WGT")){if(menu_item("Paste Widgets",1,'v')){
 		lv*t=get_clip();int f=1,i=6,n=t->c-i;lv*v=plove(t->sv,&i,&f,&n);
 		lv*defs=dget(v,lmistr("d")),*wids=dget(v,lmistr("w"));wids=wids?ll(wids):lml(0);
@@ -3916,7 +3920,7 @@ void all_menus(void){
 			menu_separator();
 			paste_any();
 		}
-		if(ms.type==modal_none&&uimode==mode_draw){
+		else if(ms.type==modal_none&&uimode==mode_draw){
 			int sel=bg_has_sel()||bg_has_lasso();
 			if(menu_item("Undo",(!sel)&&has_undo(),'z'))undo();
 			if(menu_item("Redo",(!sel)&&has_redo(),'Z'))redo();
@@ -3977,7 +3981,7 @@ void all_menus(void){
 				if(menu_item("Darken  Image",dither_threshold< 2.0,'k'))dither_threshold+=.1;
 			}
 		}
-		if(ms.type==modal_none&&uimode==mode_object){
+		else if(ms.type==modal_none&&uimode==mode_object){
 			if(menu_item("Undo",has_undo(),'z'))undo();
 			if(menu_item("Redo",has_redo(),'Z'))redo();
 			menu_separator();
@@ -3985,11 +3989,6 @@ void all_menus(void){
 			if(menu_item("Copy Widgets",ob.sel->c,'c' )){ob_order();set_clip(n_con_copy(con(),l_list(ob.sel)));}
 			if(menu_item("Copy Image",ob.sel->c==1,'\0')){set_clip(image_write(draw_widget(ob.sel->lv[0])));frame=context;}
 			paste_any();
-			menu_separator();
-			if(menu_item("Paste as new Canvas",has_clip("%%IMG"),'\0')){
-				lv*p=lmd();dset(p,lmistr("type"),lmistr("canvas")),dset(p,lmistr("locked"),ONE),dset(p,lmistr("border"),ZERO);
-				dset(p,lmistr("image"),get_clip()),ob_create(l_list(p));frame=context;
-			}
 			if(menu_item("Paste into Canvas",has_clip("%%IMG")&&ob.sel->c==1&&canvas_is(ob.sel->lv[0]),'\0')){
 				lv*i=image_read(get_clip());
 				lv*c=ob.sel->lv[0];iwrite(c,lmistr("lsize"),ifield(i,"size")),dset(c->b,lmistr("image"),i);
@@ -4001,7 +4000,7 @@ void all_menus(void){
 			if(menu_item("Move Down"    ,ob.sel->c,'\0')){ob_move_dn();}
 			if(menu_item("Move to Back" ,ob.sel->c,'\0')){ob_order();EACHR(z,ob.sel){iwrite(ob.sel->lv[z],lmistr("index"),ZERO);};mark_dirty();}
 		}
-		if(wid.fv){
+		else if(wid.fv){
 			int selection=wid.fv!=NULL&&wid.cursor.x!=wid.cursor.y;
 			menu_bar("Text",selection&&wid.f.style!=field_plain);
 			if(wid.f.style==field_rich){
@@ -4024,7 +4023,7 @@ void all_menus(void){
 			}
 		}
 	}
-	if(ms.type==modal_recording&&!wid.fv){
+	else if(ms.type==modal_recording&&!wid.fv){
 		menu_bar("Edit",au.mode==record_stopped);
 		if(menu_item("Undo",au.hist_cursor>0         ,'z'))sound_undo();
 		if(menu_item("Redo",au.hist_cursor<au.hist->c,'Z'))sound_redo();
