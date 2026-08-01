@@ -1838,7 +1838,7 @@ modals=_=>{
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit){iwrite(def,lms('attributes'),ms.grid.table),mark_dirty(),modal_exit(1)}
 	}
 	else if(ms.type=='resources'){
-		const b=draw_modalbox(rect(380,190))
+		const b=draw_modalbox(rect(380,215))
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Font/Deck Accessory Mover',FONT_MENU,1)
 		const lgrid=rect(b.x            ,b.y+15 ,120    ,b.h-(15+15+5+20))
 		const rgrid=rect(b.x+b.w-lgrid.w,lgrid.y,lgrid.w,lgrid.h         )
@@ -1871,6 +1871,10 @@ modals=_=>{
 			deck_remove(deck,rvalue(ms.grid2,'value'))
 			ms.grid2=gridtab(res_enumerate(deck)),mark_dirty(),sel=null
 		}cb.y+=25
+		if(sel&&module_is(sel)){
+			if(ui_button(cb,'Script...',1)){modal_exit(0),setscript(sel)}
+			cb.y+=25
+		}
 		const pre=rect(cb.x,cb.y,cb.w,b.h-(cb.y-b.y))
 		if(sel&&font_is(sel)){
 			draw_textc(rect(pre.x,pre.y+pre.h-18,pre.w,18),count(ifield(sel,'glyphs'))+' glyphs     '+ls(skb),FONT_BODY,1);pre.h-=20

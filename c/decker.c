@@ -1840,7 +1840,7 @@ void modals(void){
 		if(ui_button((rect){c.x,c.y,60,20},"Cancel",1)||ev.exit)modal_pop(0);
 	}
 	else if(ms.type==modal_resources){
-		rect b=draw_modalbox((pair){380,190});
+		rect b=draw_modalbox((pair){380,215});
 		draw_textc((rect){b.x,b.y-5,b.w,20},"Font/Deck Accessory Mover",FONT_MENU,1);
 		rect lgrid={b.x            ,b.y+15 ,120    ,b.h-(15+15+5+20)};
 		rect rgrid={b.x+b.w-lgrid.w,lgrid.y,lgrid.w,lgrid.h         };
@@ -1874,6 +1874,10 @@ void modals(void){
 		if(ui_button(cb,"Remove",ms.grid2.row>-1)){
 			n_deck_remove(deck,l_list(rvalue(grid2,"value")));ms.grid2=(grid_val){res_enumerate(deck),0,-1,-1},mark_dirty();sel=NULL;
 		}cb.y+=25;
+		if(sel&&module_is(sel)){
+			if(ui_button(cb,"Script...",1)){modal_exit(0),setscript(sel);}
+			cb.y+=25;
+		}
 		rect pre={cb.x,cb.y,cb.w,b.h-(cb.y-b.y)};
 		if(sel&&font_is(sel)){
 			draw_textc((rect){pre.x,pre.y+pre.h-18,pre.w,18},l_format(lmistr("%i glyphs     %s"),lml2(l_count(ifield(sel,"glyphs")),skb))->sv,FONT_BODY,1);pre.h-=20;
