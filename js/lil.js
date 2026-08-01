@@ -1219,10 +1219,14 @@ interface_app=lmi((self,i,x)=>{
 	if(x&&lis(i)){
 		if(i.v=='fullscreen')return set_fullscreen(lb(x)),x
 		if(i.v=='gridsize'  )return dr.grid_size=rmax(rect(1,1),rint(getpair(x))),x
+		if(i.v=='penstroke' )return dr.pattern=0|clamp(0,ln(x),255),x
+		if(i.v=='penfill'   )return dr.fill   =0|clamp(0,ln(x),255),x
 		if(i.v=='cursor'    ){desired_cursor=linil(x)?null: normalize_enum(cursor_names,ls(x));return x}
 	}else if(lis(i)){
 		if(i.v=='fullscreen')return lmn(is_fullscreen())
 		if(i.v=='gridsize'  )return lmpair(dr.grid_size)
+		if(i.v=='penstroke' )return lmn(dr.pattern)
+		if(i.v=='penfill'   )return lmn(dr.fill)
 		if(i.v=='cursor'    )return desired_cursor==null?NIL: lms(desired_cursor)
 		if(i.v=='playing'   )return lmn(audio_playing)
 		if(i.v=='save'      )return lmnat(_=>((modal_enter&&modal_enter('save_deck'),NIL)))

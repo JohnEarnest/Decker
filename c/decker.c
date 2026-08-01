@@ -315,12 +315,16 @@ lv*interface_app(lv*self,lv*i,lv*x){
 	if(x&&lis(i)){
 		ikey("fullscreen"){toggle_fullscreen=windowed!=!lb(x);return x;}
 		ikey("gridsize"  ){dr.grid_size=pair_max((pair){1,1},getpair(x));return x;}
+		ikey("penstroke" ){dr.pattern=CLAMP(0,ln(x),255);return x;}
+		ikey("penfill"   ){dr.fill   =CLAMP(0,ln(x),255);return x;}
 		ikey("kiosk"     ){kiosk=lb(x);return x;}
 		ikey("cursor"    ){desired_cursor=linil(x)?-1: ordinal_enum(x,cursor_names);return x;}
 	}else if(lis(i)){
 		ikey("fullscreen")return lmn(!windowed);
 		ikey("playing"   )return lmn(audio_playing);
 		ikey("gridsize"  )return lmpair(dr.grid_size);
+		ikey("penstroke" )return lmn(dr.pattern);
+		ikey("penfill"   )return lmn(dr.fill);
 		ikey("kiosk"     )return lmn(kiosk);
 		ikey("cursor"    )return desired_cursor==-1?LNIL: lmistr(cursor_names[desired_cursor]);
 		ikey("save"      )return lmnat(n_appsave,NULL);

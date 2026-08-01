@@ -1,6 +1,6 @@
 {deck}
 version:1
-card:13
+card:14
 size:[512,342]
 script:"0"
 name:"The Entire Enchilada"
@@ -346,6 +346,35 @@ on click do
    app.print["done"]
   end
  end
+end
+{end}
+
+{card:app pen stuff}
+image:"%%IMG3AgABVgKEj6nL7Q+jnLTai7PevPsPhuJIluaJpurKtu4Lx/JM1/aN5/rO9/4PDAqHxKLxiEwql8ym8wmNSqfUqvWKzWq33K73Cw6Lx+Sy+YxOq9fstvsNj8vn9Lr9js/r9/y+/w8YKDhIWGh4iJiouMjY6PgIGSk5SVlpeYmZqbnJ2en5CRoqOkpaanqKmqq6ytrq+gobKztLW2t7i5uru8vb6/sLHCw8TFxsfIycrLzM3Oz8DB0tPU1dbX2Nna29zd3t/Q0eLj5OXm5+jp6uvs7e7v4OHy8/T19vf4+fr7/P3+//DzCgwIEECxo8iDChwoUMGzp8CDGixIkUK1q8iDGjxo0cO3r8CDKkyJEkS5o8iTKlypUsW7p8CTOmzJk0a9q8iTOnzp08e/r8CTSo0KFEixo9ijSp0qVMmzp9CjWqVGgBAFSdCiuAVq1YXW392lXV17Fcw5Iiy5WsWVBqtx4Yu7YTXANuEdSNu6nsW71v8Z7l69fU3cCCARMeNfgwYsOK2TJu/Ckx5MiPJ+etbFmT5MyXr3Km7Pkzp82iL5Eubek0akqhV7t+DTu27Nm0a9u+jTu37t28e/v+DTy48OHEixs/jjy58uXMmzt/Dj269OnUq1u/jj279u3cu3v/Dj68+PHky5s/jz69+vXs27t/Dz++/Pn069u/jz+//v38+/v/D2CAAg5IYIEGHohgggouyGCDDj4IYYQSTkhhhRZeiGGGGm7IYYcefghiiCKOSGKJJp6IYooqrshiiy6+CGOMMs5IY4023ohjjjruyGOPPv4IZJBCDklkkUYeiWSSSi7JZJNOPglllFJOSWWVVl6JZZZabslll15+CWaYYo5JZplmnolmmmquyWabbr4JZ5xyzklnnXbeiWeeeu7JZ59+/glooIIOSmihhh6KaKKKLspoo44+GlAB"
+script:"app pen stuff.0"
+{widgets}
+canvas1:{"type":"canvas","size":[205,146],"pos":[29,38],"volatile":1,"script":"app pen stuff.1","pattern":13,"brush":3,"scale":1}
+stroke:{"type":"slider","size":[100,25],"pos":[286,79],"volatile":1,"script":"app pen stuff.2","interval":[0,47],"format":"stroke: %f","style":"compact"}
+field1:{"type":"field","size":[183,122],"pos":[286,134],"locked":1,"border":0,"value":"note that decker does not send us any kind of event when the user alters the pen stroke/fill pattern. the only way to observe changes perfectly is to poll with an animated widget."}
+
+{script:app pen stuff.0}
+on view do
+ stroke.value:app.penstroke
+end
+{end}
+
+{script:app pen stuff.1}
+on click pos do
+ me.brush:3
+ me.pattern:app.penstroke
+ stroke.value:app.penstroke
+end
+
+{end}
+
+{script:app pen stuff.2}
+on change do
+ app.penstroke:me.value
 end
 {end}
 

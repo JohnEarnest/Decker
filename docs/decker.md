@@ -681,6 +681,8 @@ The _app_ interface exposes control over the Decker application itself. It is av
 | `typeof x`                 | `"app"`                                                                                               |
 | `x.fullscreen`             | Is Decker in fullscreen mode? On write, attempt to switch if possible; may not succeed. (r/w)         |
 | `x.gridsize`               | A `(w,h)` pair giving the current grid overlay dimensions. (r/w)                                      |
+| `x.penstroke`              | A number [0,255]. Decker's currently-selected stroke pattern id. (r/w)                                |
+| `x.penfill`                | A number [0,255]. Decker's currently-selected fill pattern id. (r/w)                                  |
 | `x.kiosk`                  | Are we in "kiosk mode"? (r/w)                                                                         |
 | `x.cursor`                 | String or nil. Ask Decker to use an alternate pointer cursor image while in interact mode. (r/w)      |
 | `x.playing`                | If any audio is currently playing (not counting a background `loop`), `1`. Otherwise, `0`.            |
