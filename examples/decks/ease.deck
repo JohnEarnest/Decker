@@ -29,7 +29,7 @@ button1:{"type":"button","size":[76,20],"pos":[382,297],"script":"home.2","text"
 {script:home.0}
 on view do
  version.text:"v%0.1f" format deck.modules.ease.version
- names.value:select "Function Name":key from ease
+ names.value:select "Function Name":key from ("spline","spline_at") drop ease
  name:first names.rowvalue
  usage.text:"ease.%s[time a b]" format name
  
