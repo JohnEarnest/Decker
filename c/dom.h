@@ -1979,7 +1979,7 @@ lv* rtext_cast(lv*x){
 	if(image_is(x))return n_rtext_make(NULL,lml3(lmistr(""),lmistr(""),x));
 	if(lid(x))x=l_table(x);if(!lit(x))return n_rtext_make(NULL,l_list(ls(x)));
 	lv*t=lmistr("text"),*f=lmistr("font"),*a=lmistr("arg"),*p=lmistr("pat"),*tv=dget(x,t),*fv=dget(x,f),*av=dget(x,a),*pv=dget(x,p);
-	if(x->c==4&&tv&&fv&&av&&pv){int v=1;EACH(z,tv){if(!lis(tv->lv[z])||!lis(fv->lv[z])||(!lis(av->lv[z])&&!image_is(av->lv[z]))||!lin(pv->lv[z])||ln(pv->lv[z])<0||ln(pv->lv[z])>255)v=0;break;}if(v)return x;}lv*r=lmt();
+	if(tv&&fv&&av&&pv){int v=1;EACH(z,tv){if(!lis(tv->lv[z])||!lis(fv->lv[z])||(!lis(av->lv[z])&&!image_is(av->lv[z]))||!lin(pv->lv[z])||ln(pv->lv[z])<0||ln(pv->lv[z])>255)v=0;break;}if(v)return x;}lv*r=lmt();
 	{lv*v=dget(x,t);dset(r,t,v?v:l_list(lmistr("")));}
 	{lv*v=dget(x,f);dset(r,f,v?v:l_list(lmistr("")));}
 	{lv*v=dget(x,a);dset(r,a,v?v:l_list(lmistr("")));}

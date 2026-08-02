@@ -341,6 +341,19 @@ f:newdeck[].card.add["field"]
 f.value:""
 f.scrollto[5]
 
+deck:newdeck[]
+f:deck.card.add["field"]
+rtext_with_bonus:insert font arg text pat bonus with
+ "mono" "" "one"   1 "extra A"
+ "mono" "" "two"   2 "extra B"
+ "mono" "" "three" 3 "extra C"
+end
+f.value:rtext_with_bonus
+assert["field can contain rtext with bonus columns" rtext_with_bonus f.value]
+write["temp.deck" deck]
+deck:read["temp.deck"]
+assert["field can serialize/round-trip rtext with bonus columns" rtext_with_bonus (first deck.card.widgets).value]
+
 #######################################
 #
 #  Slider
