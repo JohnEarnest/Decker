@@ -1561,6 +1561,7 @@ modal_exit=value=>{
 	if(ms.subtype=='input_lil'  )arg(),ret(rtext_string(ms.text.table))
 	if(ms.subtype=='choose_lil' )arg(),ret(ms.verb.v[ms.grid.row])
 	ms.type=null
+	ev.callback=null
 	if(ms.from_listener)modal_enter('listen')
 	if(enable_touch&&ms.from_keycaps)kc.on=1
 	if(ms.type==null&&uimode=='interact')msg.next_view=1
@@ -1992,7 +1993,8 @@ modals=_=>{
 				else if(deck_is(x))                        {save_deck(name,x)}
 				else                                       {save_text(name,ls(x))}
 			}
-		}))modal_exit(1);c.x-=65;
+			modal_exit(1)
+		}));c.x-=65
 		if(ui_button(rect(c.x,c.y,60,20),'Cancel',1)||ev.exit)modal_exit(0)
 	}
 	else if(ms.type=='alert'){
