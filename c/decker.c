@@ -3523,7 +3523,7 @@ void event_key(int c,int m,int down,const char*name){
 		if(c==KEY_l&&ms.type==modal_none&&!wid.ingrid&&!wid.infield&&ev.shift)ev.shortcuts['l']=1;
 		if(c==KEY_j&&ms.type==modal_none&&!cmd&&dr.limbo_dither&&dither_threshold>-2.0)dither_threshold-=.1;
 		if(c==KEY_k&&ms.type==modal_none&&!cmd&&dr.limbo_dither&&dither_threshold< 2.0)dither_threshold+=.1;
-		if(ev.alt&&keydown['u']&&keydown['l']&&keydown['d']&&deck&&lb(ifield(deck,"locked"))){
+		if(ev.alt&&keydown['u']&&keydown['l']&&keydown['d']&&deck&&lb(ifield(deck,"locked"))&&!kiosk){
 			iwrite(deck,lmistr("locked"),ZERO);ev.alt=0,keydown['u']=0,keydown['l']=0,keydown['d']=0;
 		}
 	}
