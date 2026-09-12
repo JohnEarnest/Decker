@@ -25,7 +25,6 @@ Native-Decker
 Decker is also available as a native application, written in C. Building Native-Decker from source requires:
 
 - a c compiler and libc
-- the `xxd` utility (standard with MacOS and most \*nix distros)
 - [SDL2](https://www.libsdl.org/download-2.0.php)
 - [SDL2_image](https://github.com/libsdl-org/SDL_image)
 

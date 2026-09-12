@@ -86,7 +86,11 @@ c/build/decker: c/resources.h c/decker.c c/dom.h c/lil.h
 	@mkdir -p c/build
 	$(Q)$(COMPILER) ./c/decker.c -o ./c/build/decker $(SDL) $(FLAGS) -DVERSION="\"$(VERSION)\""
 
-c/resources.h: examples/decks/tour.deck js/lil.js js/danger.js js/decker.js js/decker.html
+c/build/ra: c/ra.c
+	@mkdir -p c/build
+	$(Q)$(COMPILER) ./c/ra.c -o ./c/build/ra $(FLAGS)
+
+c/resources.h: c/build/ra examples/decks/tour.deck js/lil.js js/danger.js js/decker.js js/decker.html
 	@chmod +x ./scripts/resources.sh
 	$(Q)./scripts/resources.sh examples/decks/tour.deck
 

@@ -13,8 +13,8 @@ fi
 DST=c/resources.h
 
 printf "%s\n" "// auto-generated from web-decker source!" > $DST
-xxd -i js/lil.js      >> $DST
-xxd -i js/danger.js   >> $DST
-xxd -i js/decker.html >> $DST
-xxd -i js/decker.js   >> $DST
-xxd -i $DECK          >> $DST
+./c/build/ra js/lil.js      >> $DST
+./c/build/ra js/danger.js   >> $DST
+./c/build/ra js/decker.html >> $DST
+./c/build/ra js/decker.js   >> $DST
+./c/build/ra $DECK          >> $DST
