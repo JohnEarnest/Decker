@@ -3540,6 +3540,22 @@ void event_key(int c,int m,int down,const char*name){
 		if(ev.alt&&keydown['u']&&keydown['l']&&keydown['d']&&deck&&lb(ifield(deck,"locked"))&&!kiosk){
 			iwrite(deck,lmistr("locked"),ZERO);ev.alt=0,keydown['u']=0,keydown['l']=0,keydown['d']=0;
 		}
+		if(ev.alt&&keydown['t']&&keydown['b']&&!kiosk){
+			pair sz=buff_size(frame.buffer),tsz=buff_size(TOOLB);lv*b=NULL;
+			if(toolbars_enable){
+				pair bsz=(pair){sz.x+tsz.x*2+4,MAX(sz.y,tsz.y)}, na={-1000,-1000};rect clip={0,0,bsz.x,bsz.y};
+				b=lmbuff(bsz);EACH(z,b)b->sv[z]=1;
+				                buffer_paste((rect){tsz.x+2       ,0.5*(bsz.y- sz.y), sz.x, sz.y},clip,frame.buffer,b,1);
+				ltoolbar(na,na);buffer_paste((rect){0             ,0.5*(bsz.y-tsz.y),tsz.x,tsz.y},clip,TOOLB,b,1);
+				rtoolbar(na,na);buffer_paste((rect){tsz.x+2+sz.x+2,0.5*(bsz.y-tsz.y),tsz.x,tsz.y},clip,TOOLB,b,1);
+			}else{
+				b=lmbuff(sz);
+				buffer_paste((rect){0,0,sz.x,sz.y},(rect){0,0,sz.x,sz.y},frame.buffer,b,1);
+			}
+			lv*s=image_make(b);n_buffer_map(s,l_list(l_list(lmn(32))));
+			char fn[4096]={0};snprintf(fn,sizeof(fn),"screenshot-%lld.gif",((long long int)ln(time_ms())));
+			n_writegif(NULL,lml2(lmcstr(fn),s));printf("saved screenshot as '%s'\n",fn);
+		}
 	}
 	else{
 		if(c>0&&c<4096)keydown[c]=0,keyup[c]=1;
