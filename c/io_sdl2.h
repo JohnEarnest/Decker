@@ -79,7 +79,7 @@ void interpreter_unlock(void){SDL_UnlockMutex(gil);}
 
 void base_path(char*path){
 	char*t=SDL_GetBasePath();
-	if(t){snprintf(path,PATH_MAX,"%s",t);SDL_free(t);}else{snprintf(path,PATH_MAX,"");}
+	if(t){snprintf(path,PATH_MAX,"%s",t);SDL_free(t);}else{path[0]='\0';}
 }
 void open_url(char*x){
 	(void)x;
