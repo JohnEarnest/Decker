@@ -3285,10 +3285,7 @@ char* writewav(lv*data,int*len){
 	if(data->c%2)str_addraw(&r,0);
 	return *len=r.c, r.sv;
 }
-
-#ifndef __COSMOPOLITAN__
 #include <sys/stat.h>
-#endif
 lv* n_readgif(lv*self,lv*a){
 	(void)self;lv*name=drom_to_utf8(l_first(a));lv*hint=a->c>1?ls(a->lv[1]):lmistr("color");
 	int gray=!strcmp("gray",hint->sv)||!strcmp("gray_frames",hint->sv);
@@ -3394,9 +3391,7 @@ void directory_parent(char*x){
 }
 char** os_env_list(void){return *__p__environ();}
 #else
-#ifndef __COSMOPOLITAN__
 #include <dirent.h>
-#endif
 #define SEPARATOR "/"
 #define HOME      "HOME"
 void directory_fetch(char*path,int filter){
@@ -3465,9 +3460,7 @@ lv*n_dir(lv*self,lv*a){
 	r->kv[0]=lmistr("dir");return r;
 }
 #ifndef _WIN32
-#ifndef __COSMOPOLITAN__
 #include <sys/wait.h>
-#endif
 lv*n_shell(lv*self,lv*a){
 	(void)self;lv*x=drom_to_utf8(l_first(a)),*r=lmd();FILE*child=popen(x->sv,"r");str o=str_new();
 	while(1){int c=fgetc(child);if(feof(child))break;str_addraw(&o,c);}int e=pclose(child);lv*os=lmstr(o);

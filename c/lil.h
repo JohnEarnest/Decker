@@ -1,5 +1,5 @@
 // Learning in Layers
-#ifndef __COSMOPOLITAN__
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -7,7 +7,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
-#endif
 
 typedef struct{int c,size;char*sv;}str;
 typedef struct lvs{int t,c,n,s,ns,g;double nv;char*sv;struct lvs**lv,**kv,*a,*b,*env;void*f;}lv;
@@ -1515,9 +1514,7 @@ lv* time_zone_offset(void){
 	return lmn((tzi.Bias+(r==TIME_ZONE_ID_STANDARD?tzi.StandardBias: r==TIME_ZONE_ID_DAYLIGHT?tzi.DaylightBias: 0))/-60.0); // minutes -> hours
 }
 #else
-#ifndef __COSMOPOLITAN__
 #include <sys/time.h>
-#endif
 lv* time_ms(void){
 	struct timeval now;gettimeofday(&now,NULL);
 	return lmn((((long long)now.tv_sec)*1000)+(now.tv_usec/1000));

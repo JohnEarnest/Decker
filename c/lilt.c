@@ -1,10 +1,8 @@
 // Lil Terminal
 #include "lil.h"
 #include "dom.h"
-#ifndef __COSMOPOLITAN__
 #include <sys/wait.h>
 #include <unistd.h>
-#endif
 
 #include "lib/bestline.h"
 #include "lib/bestline.c"

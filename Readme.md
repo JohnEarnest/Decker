@@ -74,20 +74,6 @@ $ lilt
 1
 ```
 
-You can build Lilt against [Cosmopolitan Libc](https://github.com/jart/cosmopolitan), producing a single binary that will run on most popular operating systems:
-```
-$ ./apelilt.sh
-successfully compiled lilt.com
-running tests against ./lilt.com...
-all interpreter tests passed.
-all dom tests passed.
-all roundtrip tests passed.
-
-$ sh ./lilt.com
-  range 10
-(0,1,2,3,4,5,6,7,8,9)
-```
-
 The Danger Zone
 ---------------
 Decker normally sandboxes the execution of scripts within decks to prevent low-level access to the host computer and ensure parity between the capabilities of Web-Decker and Native-Decker. Both implementations offer opt-in APIs for performing more "dangerous" or non-portable operations called [The Danger Zone](http://beyondloom.com/decker/decker.html#thedangerzone).
