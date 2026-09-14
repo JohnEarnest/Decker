@@ -1142,7 +1142,7 @@ normalize_font=(x,v)=>ls(dkey(x,v)||x.k[dkix(x,v)]||lms('body'))
 data_enc=x=>x[5]==undefined?-1:+x[5]
 data_read=(type,x)=>(x.slice(0,2)!='%%'||x.slice(2,5)!=type)?null:new Uint8Array(atob(x.slice(6)).split('').map(x=>x.charCodeAt(0)))
 data_write=(type,x)=>`%%${type}${btoa(Array.from(x).map(x=>String.fromCharCode(x)).join(''))}`
-is_rooted=x=>card_is(x)?!x.dead: widget_is(x)?(is_rooted(x.card)&&!x.dead): 1
+is_rooted=x=>card_is(x)||prototype_is(x)?!x.dead: widget_is(x)?(is_rooted(x.card)&&!x.dead): 1
 
 ceil=Math.ceil, clamp=(a,x,b)=>x<a?a:x>b?b:x, sign=x=>x>0?1:-1
 first=x=>x[0]
