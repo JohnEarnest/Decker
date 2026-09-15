@@ -1656,6 +1656,14 @@ b.script:"on custom x do 2+3*x end"
 r:b.event["custom" 100]
 assert["custom event rvalue" 302 r]
 
+deck:newdeck[]
+c:deck.card.add["card"]
+b:c.add["button" "doomed"]
+b.script:"on custom x do x,x end"
+e:b.event
+deck.remove[c]
+assert["deactivated widgets should not handle events" nil e["custom" 5]]
+
 #######################################
 #
 #  Copying and Pasting

@@ -3265,6 +3265,7 @@ fire_attr_sync=(target,name,a)=>{
 }
 parent_deck=x=>deck_is(x)?x: card_is(x)||prototype_is(x)?x.deck: parent_deck(x.card)
 event_invoke=(target,name,arg,hunk,nodiscard)=>{
+	if(!is_rooted(target))return lmblk()
 	const scopes=lmd([ZERO],[parse(DEFAULT_HANDLERS)]); let deck=null
 	const ancestors_record=(target,src)=>{try{dset(scopes,target,parse(ls(ifield(src,'script'))))}catch(e){dset(scopes,target,lmblk())}}
 	const ancestors_inner=target=>{

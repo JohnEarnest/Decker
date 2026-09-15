@@ -172,6 +172,11 @@ char* default_transitions=""
 "transition[on BoxOut     c a b t do  c.rect[c.size/2   c.size*1-t \"center\"]   c.merge[b a] end]\n"
 ;
 
+int is_rooted(lv*self){
+	if(card_is(self)||prototype_is(self))return ivalue(self,"dead")==NULL;
+	if(widget_is(self))return is_rooted(ivalue(self,"card"))&&ivalue(self,"dead")==NULL;
+	return 1;
+}
 void ancestors_inner(lv*target,lv*found,lv**deck){
 	if(deck_is(target)){*deck=target;return;}
 	if(contraption_is(target)){*deck=ivalue(ivalue(target,"card"),"deck");}
@@ -198,6 +203,7 @@ lv* parent_deck(lv*x){
 	return parent_deck(ivalue(x,"card"));
 }
 lv* event_invokev(lv*target,lv*name,lv*arg,lv*hunk,int nodiscard){
+	if(!is_rooted(target))return lmblk();
 	lv*scopes=lmd();dset(scopes,ZERO,parse(default_handlers));
 	lv*deck=NULL,*core=NULL;ancestors(target,scopes,&deck);
 	for(int z=scopes->c-1;z>=0;z--){
@@ -321,11 +327,6 @@ void reorder(lv*dict,int old,int n){
 	if(n<old){for(int z=old;z>n;z--)dict->kv[z]=dict->kv[z-1],dict->lv[z]=dict->lv[z-1];}
 	else     {for(int z=old;z<n;z++)dict->kv[z]=dict->kv[z+1],dict->lv[z]=dict->lv[z+1];}
 	dict->kv[n]=k,dict->lv[n]=v;
-}
-int is_rooted(lv*self){
-	if(card_is(self)||prototype_is(self))return ivalue(self,"dead")==NULL;
-	if(widget_is(self))return is_rooted(ivalue(self,"card"))&&ivalue(self,"dead")==NULL;
-	return 1;
 }
 
 // Data Blocks
