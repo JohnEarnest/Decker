@@ -11,7 +11,7 @@ If you're interested in _Lil_, Decker's scripting language, you can access docum
 
 Web-Decker
 ----------
-Decker is available as [a web application](http://beyondloom.com/decker/tour.html) (written in vanilla JavaScript) which is distributed as a single freestanding HTML file. Web-Decker can be built with a `make` script. The test suite uses [Node.js](https://nodejs.org/en/):
+Decker is available as [a web application](http://beyondloom.com/decker/tour.html) (written in vanilla JavaScript) which is distributed as a single freestanding HTML file. Web-Decker can be built with a `make` script. [Node.js](https://nodejs.org/en/) is exclusively used for running the test suite:
 
 ```
 make testjs
@@ -52,7 +52,7 @@ make decker
 
 Lilt
 ----
-Decker's scripting language, [Lil](http://beyondloom.com/tools/trylil.html), is available as a standalone interpreter, with extended IO functionality to make it suitable for general-purpose programming and scripting: this package is called [Lilt](http://beyondloom.com/decker/lilt.html). Lilt only requires libc and `xxd` to build from source:
+Decker's scripting language, [Lil](http://beyondloom.com/tools/trylil.html), is available as a standalone interpreter, with extended IO functionality to make it suitable for general-purpose programming and scripting: this package is called [Lilt](http://beyondloom.com/decker/lilt.html). Lilt only requires libc to build from source:
 ```
 make lilt
 ```
