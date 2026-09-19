@@ -954,6 +954,7 @@ While arrays do not benefit from the full range of operators Lil can bring to be
 | :--------------------- | :----------------------------------------------------------------------------------------------------------------------- |
 | `typeof x`             | `"array"`                                                                                                                |
 | `x.encoded`            | The content of this array (and its _cast_) losslessly encoded as an opaque string, suitable for decoding with `array[]`. |
+| `x.value`              | The content of this array as a plain list or string, as if by `x[0,x.size]`.                                             |
 | `x.cast`               | A string indicating the interpretation of the content of this array. r/w.                                                |
 | `x.size`               | The number of elements in this array, respecting the _cast_. r/w, unless the array is a _slice_ (see below).             |
 | `x.here`               | An integer count of bytes from the beginning of this array used by `x.struct[]`. r/w.                                    |

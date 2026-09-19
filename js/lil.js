@@ -1754,6 +1754,7 @@ array_make=(size,cast,base,buffer)=>{
 			if(ikey(i,'here'))return self.here=max(0,ln(x)),x
 		}else{
 			if(ikey(i,'encoded'))return lms(array_write(self))
+			if(ikey(i,'value'  ))return iwrite(self,lml([ZERO,ifield(self,'size')]))
 			if(ikey(i,'cast'   ))return lms(self.cast)
 			if(ikey(i,'size'   ))return lmn(self.size/casts[self.cast])
 			if(ikey(i,'here'   ))return lmn(self.here)

@@ -1574,6 +1574,7 @@ lv* interface_array(lv*self,lv*i,lv*x){
 		ikey("here"){dset(self->b,lmistr("here"),lmn(MAX(0,ln(x))));return x;}
 	}else{
 		ikey("encoded")return array_write(self);
+		ikey("value"  )return interface_array(self,lml2(ZERO,lmn(a.size/cast_size[a.cast])),NULL);
 		ikey("cast"   )return lmistr(casts[a.cast]);
 		ikey("size"   )return lmn(a.size/cast_size[a.cast]);
 		ikey("here"   )return lmn(a.here);

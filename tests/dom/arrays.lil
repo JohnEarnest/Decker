@@ -186,6 +186,11 @@ assert["array slice offset" (123,123,0,0,0,2) (ds[0],mem[8,4],ds.size)]
 dc:mem.copy[8,2 "i32l"]
 assert["array copy offset"  (123,2) (ds[0],ds.size)]
 
+a:array[].cat[11,22,33,44]
+assert["array value u8" (11,22,33,44) a.value]
+a:array[0 "char"].cat["Some Text"]
+assert["array value char" "Some Text" a.value]
+
 #######################################
 #
 #  Wrap Up
