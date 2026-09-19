@@ -1313,29 +1313,31 @@ sound_record=_=>{
 		conv.oncomplete=event=>{after(event.renderedBuffer.getChannelData(0))}
 		buff.buffer=input,buff.connect(conv.destination),buff.start(0),conv.startRendering()
 	}
-	navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
-		try{
-			const source=audio.createMediaStreamSource(stream)
-			const scriptNode=audio.createScriptProcessor(4096,1,1)
-			scriptNode.onaudioprocess=event=>{
-				if(au.mode!='recording')return
-				resample(event.inputBuffer,data=>{
-					const r=[];for(let z=0;z<data.length;z+=8)r.push(sample_to_byte(data[z]))
-					let h=au.head, end=(au.sel.x!=au.sel.y)?au.sel.y:(10*SFX_RATE), edit=au.hist[au.hist_cursor-1][1]
-					const appended=min(max(au.target.data.length,h+r.length),end)
-					if(appended>au.target.data.length){
-						const a=new Uint8Array(appended), b=new Uint8Array(appended)
-						for(let z=0;z<appended;z++)a[z]=b[z]=au.target.data[z]
-						au.target.data=a,edit.data=b
-					}
-					for(let z=0;z<r.length&&h<end;z++){au.target.data[h]=edit.data[h]=r[z],h++}
-					au.head=h;if(h>=end){sound_finish()}
-				})
-			}
-			source.connect(scriptNode),scriptNode.connect(audio.destination)
-			au.record_stream=stream,sound_begin_record()
-		}catch(err){console.log(err),au.norecord=1}
-	}).catch(err=>{console.log(err),au.norecord=1})
+	try{
+		navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
+			try{
+				const source=audio.createMediaStreamSource(stream)
+				const scriptNode=audio.createScriptProcessor(4096,1,1)
+				scriptNode.onaudioprocess=event=>{
+					if(au.mode!='recording')return
+					resample(event.inputBuffer,data=>{
+						const r=[];for(let z=0;z<data.length;z+=8)r.push(sample_to_byte(data[z]))
+						let h=au.head, end=(au.sel.x!=au.sel.y)?au.sel.y:(10*SFX_RATE), edit=au.hist[au.hist_cursor-1][1]
+						const appended=min(max(au.target.data.length,h+r.length),end)
+						if(appended>au.target.data.length){
+							const a=new Uint8Array(appended), b=new Uint8Array(appended)
+							for(let z=0;z<appended;z++)a[z]=b[z]=au.target.data[z]
+							au.target.data=a,edit.data=b
+						}
+						for(let z=0;z<r.length&&h<end;z++){au.target.data[h]=edit.data[h]=r[z],h++}
+						au.head=h;if(h>=end){sound_finish()}
+					})
+				}
+				source.connect(scriptNode),scriptNode.connect(audio.destination)
+				au.record_stream=stream,sound_begin_record()
+			}catch(err){console.log(err),au.norecord=1}
+		}).catch(err=>{console.log(err),au.norecord=1})
+	}catch(err){console.log(err),au.norecord=1}
 }
 
 // Modal Helpers
