@@ -1587,15 +1587,25 @@ lv* interface_array(lv*self,lv*i,lv*x){
 
 // Bits interface
 
-#define lbits(x) (0xFFFFFFFF&((long long unsigned int)ln(x)))
+#define lbits(x) (0xFFFFFFFF&((long long int)ln(x)))
 lv* conformb(lv*z,lv*(f(lv*,lv*))){if(z->c<2)z=l_first(z);lv*r=l_first(z);for(int i=1;i<z->c;i++)r=conform(r,z->lv[i],f);return r;}
 lv* a_bits_and(lv*x,lv*y){return lmn(lbits(x)&lbits(y));}lv* n_bits_and(lv*self,lv*z){(void)self;return conformb(z,a_bits_and);}
 lv* a_bits_or (lv*x,lv*y){return lmn(lbits(x)|lbits(y));}lv* n_bits_or (lv*self,lv*z){(void)self;return conformb(z,a_bits_or );}
 lv* a_bits_xor(lv*x,lv*y){return lmn(lbits(x)^lbits(y));}lv* n_bits_xor(lv*self,lv*z){(void)self;return conformb(z,a_bits_xor);}
+lv* n_bits_decode(lv*self,lv*z){
+	(void)self;if(z->c<2)return lml(0);int w=ln(z->lv[0]);w=CLAMP(0,w,32);lv*d=l_raze(ll(z->lv[1])),*r=lml(w*d->c);
+	int i=0;EACH(z,d){unsigned int v=lbits(d->lv[z]);for(int b=w-1;b>=0;b--)r->lv[i++]=lmbool(1&(v>>b));}return r;
+}
+lv* n_bits_encode(lv*self,lv*z){
+	(void)self;if(z->c<2)return lml(0);int w=ln(z->lv[0]);w=CLAMP(0,w,32);lv*d=l_raze(ll(z->lv[1])),*r=lml(w==0?0: (int)ceil(d->c/(w*1.0)));
+	int i=0;EACH(z,r){unsigned int v=0;for(int b=0;b<w;b++)v=(v<<1)|(i>=d->c?0:lb(d->lv[i++]));r->lv[z]=lmn(v);}return r;
+}
 lv* interface_bits(lv*self,lv*i,lv*x){
-	ikey("and")return lmnat(n_bits_and,self);
-	ikey("or" )return lmnat(n_bits_or ,self);
-	ikey("xor")return lmnat(n_bits_xor,self);
+	ikey("and"   )return lmnat(n_bits_and   ,self);
+	ikey("or"    )return lmnat(n_bits_or    ,self);
+	ikey("xor"   )return lmnat(n_bits_xor   ,self);
+	ikey("decode")return lmnat(n_bits_decode,self);
+	ikey("encode")return lmnat(n_bits_encode,self);
 	return x?x:LNIL;
 }
 

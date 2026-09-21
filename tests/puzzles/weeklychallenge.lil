@@ -506,9 +506,7 @@ problem[271.2]
 # sort the integers in x in ascending order by the number of 1 bits in their binary representation,
 # breaking ties by their value.
 on f x do
-  masks:2^range 32
-  on onebits x do sum!!bits.and[x masks] end
-  extract orderby onebits@value asc orderby value asc from x
+  extract orderby sum @ 32 window bits.decode[32 value] asc orderby value asc from x
 end
 assert[f[(0,1,2,3,4,5,6,7,8  )] (0,1,2,4,8,3,5,6,7  )]
 assert[f[(1024,512,256,128,64)] (64,128,256,512,1024)]

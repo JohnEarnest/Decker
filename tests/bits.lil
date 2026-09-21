@@ -22,3 +22,32 @@ show[bits.and[]~nil]
 
 # bounds
 show[bits.or[2^8,16,24,30,31]]
+
+# decoding
+print["decode:"]
+show[bits.decode[]]
+show[bits.decode[3]]
+show[bits.decode[4 3]]
+show[bits.decode[4 201]]
+show[bits.decode[0 3]] # bit width is clamped between 0 and 32
+show[bits.decode[4 ()]]
+show[3 window bits.decode[3 range 8]]
+show[4 window bits.decode[4 0,-1,-2,-3]]  # decode two's complement signed values
+show[4 window bits.decode[32 4275878552]] # 0xFEDCBA98
+show[8 window bits.decode[32 123       ]]
+show[4 window bits.decode[4 (list 0,1),(list 2,3)]]
+
+# encoding
+print["encode:"]
+show[bits.encode[]]
+show[bits.encode[3]]
+show[bits.encode[4 1]]     # missing trailing bits are treated as zeroes!
+show[bits.encode[4 (0,1)]] # see above
+show[bits.encode[4 (0,0,1,1)]]
+show[bits.encode[0 (1,0,0,1)]]
+show[bits.encode[4 ()]]
+show[bits.encode[3 (0,0,1,0,1,0,0,1,1)]]
+bignum:bits.decode[32 4275878552]
+show[bits.encode[32 bignum]]
+show[bits.encode[32 8 window bignum]]
+show[bits.encode[32 bits.decode[32 123]]]
