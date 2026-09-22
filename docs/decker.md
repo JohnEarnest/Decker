@@ -1480,7 +1480,7 @@ after.merge[a.copy[] b.copy[]]
 ```
 ![](images/merge.gif)
 
-If the first argument to `canvas.merge[]` is a single-character string consisting of one of Lil's primitive arithmetic or logical operatiors (`+ - * & | < > =`), it will apply that operator between the pixel on the canvas and the corresponding pixel from the second argument image (truncating or repeating it to match) and update the canvas in-place. This permits many interesting types of blending:
+If the first argument to `canvas.merge[]` is a single-character string consisting of an arithmetic or logical operatior (`+ - * & | < > =` as in Lil, or `^` for bitwise XOR), it will apply that operator between the pixel on the canvas and the corresponding pixel from the second argument image (truncating or repeating it to match) and update the canvas in-place. This permits many interesting types of blending:
 ```lil
 after.merge["+" b.copy[]]
 ```

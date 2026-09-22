@@ -258,9 +258,10 @@ assert["image - merge" "%%IMG3AAgACAgAAfzz14/fPn35AggkaFCfAIUDC+4b8HBhQQIUIRIsgL
 assert["image * merge" "%%IMG3AAgACAZAgHA4DAgGhILhABAQDAgFwwEYGBKMh6QCICAYEAqGAygoHpSMZwQwMCQYD0kFODgqnJEqFgQ=" horiz.copy[].merge["*" vert].encoded]
 assert["image & merge" "%%IMG3AAgACAMIuhv+AQRBqxQj5zuIJxxRjGFhGKVxJA=="                                         horiz.copy[].merge["&" vert].encoded]
 assert["image | merge" "%%IMG3AAgACAMIIUNlJ6z2jrgUjp0P+V9VjCRknCh0rOyaAA=="                                     horiz.copy[].merge["|" vert].encoded]
-assert["image = merge" "%%IMG0AAgACIBAIBAIBAIB"                                                                             horiz.copy[].merge["=" vert].encoded]
-assert["image > merge" "%%IMG0AAgACACAwODw+Pz+"                                                                             horiz.copy[].merge[">" vert].encoded]
-assert["image < merge" "%%IMG0AAgACH8/Hw8HAwEA"                                                                             horiz.copy[].merge["<" vert].encoded]
+assert["image = merge" "%%IMG0AAgACIBAIBAIBAIB"                                                                 horiz.copy[].merge["=" vert].encoded]
+assert["image > merge" "%%IMG0AAgACACAwODw+Pz+"                                                                 horiz.copy[].merge[">" vert].encoded]
+assert["image < merge" "%%IMG0AAgACH8/Hw8HAwEA"                                                                 horiz.copy[].merge["<" vert].encoded]
+assert["image ^ merge" "%%IMG3AAgACAMIIUNlJ4AhCjmGKeioxJYDKYyFSRRXaAFIeEAC"                                     horiz.copy[].merge["^" vert].encoded]
 assert["image op merge with empty image" horiz.encoded horiz.copy[].merge["+" image[0,0]].encoded]
 
 a:image[8,1] a.pixels:1,2,3,4,5,6,7,8

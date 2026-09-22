@@ -417,6 +417,7 @@ void buff_merge_op(lv*target,lv*src,char op){
 	if(op=='<'){op_kernel t[i]=(0xFF&t[i]) <op_index                   ;}
 	if(op=='>'){op_kernel t[i]=(0xFF&t[i]) >op_index                   ;}
 	if(op=='='){op_kernel t[i]=(0xFF&t[i])==op_index                   ;}
+	if(op=='^'){op_kernel t[i]=(0xFF&t[i]) ^op_index                   ;}
 }
 lv* n_image_merge(lv*self,lv*z){
 	if(lis(l_first(z))){if(z->c>=2&&image_is(z->lv[1]))buff_merge_op(self->b,z->lv[1]->b,ls(l_first(z))->sv[0]);return self;}
