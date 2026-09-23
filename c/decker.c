@@ -3831,7 +3831,10 @@ void text_edit_menu(void){
 	if(menu_item("Undo",wid.hist_cursor>0          ,'z'))field_undo();
 	if(menu_item("Redo",wid.hist_cursor<wid.hist->c,'Z'))field_redo();
 	menu_separator();
-	if(menu_item("Cut",selection,'x')){set_clip(rtext_string(wid.fv->table,wid.cursor,1));field_keys(KEY_DELETE,0);}
+	if(menu_item("Cut",selection,'x')){
+		lv*s=rtext_span(wid.fv->table,wid.cursor),*i=rtext_is_image(s);
+		set_clip((i?image_write(i):rtext_all(s)));field_keys(KEY_DELETE,0);
+	}
 	if(menu_item("Copy",selection,'c')){
 		lv*s=rtext_span(wid.fv->table,wid.cursor),*i=rtext_is_image(s);
 		set_clip((i?image_write(i):rtext_all(s)));
