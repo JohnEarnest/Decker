@@ -211,7 +211,6 @@ local ECCLEVEL:"MLHQ" dict 0,1,2,3
 
 on is_numeric x do min 1,("" split x) in "0123456789" end
 on is_alphanum x do min 1,("" split x) in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:" end
-on getsizebyver ver do 17 + 4 * ver end
 on ndatabits ver ecclevel do
  local v:data.VERSIONS[ver]
  data.NFULLBITS[ver] - 8*v[0][ecclevel]*v[1][ecclevel]
@@ -255,8 +254,7 @@ on encode ver mode x maxbuflen do
  end,
  bits.decode[4 0]
  local r:array[0 "u8"].cat[bits.encode[8 b]]
- while maxbuflen>1+r.size r.cat[236,17] end
- if    r.size<maxbuflen   r.cat[236   ] end
+ r.cat[(maxbuflen-r.size) take 236,17]
  r
 end
 
@@ -264,16 +262,16 @@ on calculateecc poly genpoly do
  local fm:data.GF256_MAP
  local im:data.GF256_INVMAP
  local polylen:count poly
- local modulus:poly,((count genpoly) take 0)
+ local modulus:array[polylen+(count genpoly) "u8"].cat[poly]
+ local xor:bits.xor
  each i in range polylen
   local quotient:im[modulus[i]]
-  if !quotient<0
-   each gpv j in genpoly
-    modulus[i+j+1]: bits.xor[modulus[i+j+1] fm[255 % quotient+gpv]]
-   end
+  if quotient>-1
+   local slice:(i+1),(count genpoly)
+   modulus[slice]: xor[modulus[slice] fm @ 255 % quotient + genpoly]
   end
  end
- polylen drop modulus
+ modulus[(polylen,count genpoly)]
 end
 on augmenteccs poly nblocks genpoly do
  local subsize:floor poly.size/nblocks
@@ -283,7 +281,7 @@ on augmenteccs poly nblocks genpoly do
  local eccs:each span in -2 window subsizes
   calculateecc[poly[(first span),(last span)-(first span)] genpoly]
  end
- local result:array[]
+ local result:array[0 "u8"]
  result.cat[poly @ raze (range subsize)+list -1 drop subsizes]
  result.cat[poly @ -1+ (1+pivot) drop subsizes]
  result.cat[raze flip eccs]
@@ -299,10 +297,10 @@ on putdata matrix reserved payload do
  while !i<0
   if i~6 i:i-1 end
   local jj:if d<0 n-1 else 0 end
-  each j in range n
+  each in range n
    local ii:i
    while ii>i-2
-    pos:jj,ii
+    local pos:jj,ii
     if reserved[pos] matrix[pos]:b[k] k:k+1 end
     ii:ii-1
    end
