@@ -66,7 +66,7 @@ button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisaqrcode.
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisaqrcode.0","text":"Prev","style":"rect"}
 title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"What is a QR Code?"}
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisaqrcode.0","text":"Index","style":"rect"}
-field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["QR (Quick-Response) codes are two-dimensional barcodes invented by Masahiro Hara in 1994. Today they are a common method of representing hyperlinks in the physical world, and most cell phoneswith cameras can scan and decode them.\n\nThe \"qr\" module can generate images of QR codes. It is particularly useful in combination with ","the \"pdf\" module",", which is often used to produce printable versions of decks, zines, or greeting cards.\n\nThis module was developed by referencing Kang Seonghoon's public-domain QR code generation library, ","qr.js",", with many simplifications and adaptations to suit Lil and its standard library."],"font":["","","","",""],"arg":["","https://beyondloom.com/decker/pdf.html","","https://github.com/lifthrasiir/qr.js",""]}}
+field1:{"type":"field","size":[248,238],"pos":[254,48],"locked":1,"border":0,"value":{"text":["QR (Quick-Response) codes are two-dimensional barcodes invented by Masahiro Hara in 1994. Today they are a common method of representing hyperlinks in the physical world, and most cell phones with cameras can scan and decode them.\n\nThe \"qr\" module can generate images of QR codes. It is particularly useful in combination with ","the \"pdf\" module",", which is often used to produce printable versions of decks, zines, or greeting cards.\n\nThis module was developed by referencing Kang Seonghoon's public-domain QR code generation library, ","qr.js",", with many simplifications and adaptations to suit Lil and its standard library."],"font":["","","","",""],"arg":["","https://beyondloom.com/decker/pdf.html","","https://github.com/lifthrasiir/qr.js",""]}}
 
 {script:whatisaqrcode.0}
 on click do
@@ -113,6 +113,18 @@ title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","sh
 button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisaqrcode.0","text":"Index","style":"rect"}
 ex1:{"type":"field","size":[247,115],"pos":[10,56],"style":"code","value":"target.data:qr.configure[\"eggbug\"]"}
 field2:{"type":"field","size":[236,241],"pos":[266,56],"locked":1,"border":0,"value":"The qr.configure[data etc] function takes a \"data\" payload and additional optional settings in a dictionary \"etc\", and returns a dictionary indicating what version, mode, ecclevel, and mask settings the qr.generate[] function would select to fill in the missing options."}
+button4:{"type":"button","size":[60,20],"pos":[267,151],"script":"qr_generate.0","text":"Try It!"}
+field1:{"type":"field","size":[100,14],"pos":[88,181],"border":0,"align":"center","value":"target:"}
+target:{"type":"field","size":[247,100],"pos":[10,197],"volatile":1,"scrollbar":1,"style":"code"}
+
+{card:qr_capacity}
+{widgets}
+button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"whatisaqrcode.0","text":"Next","style":"rect"}
+button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"whatisaqrcode.0","text":"Prev","style":"rect"}
+title:{"type":"field","size":[492,17],"pos":[10,22],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"qr.capacity[]"}
+button3:{"type":"button","size":[60,20],"pos":[78,312],"script":"whatisaqrcode.0","text":"Index","style":"rect"}
+ex1:{"type":"field","size":[247,115],"pos":[10,56],"style":"code","value":"target.data:each version in 1+range 6\n qr.capacity[version \"octets\" \"L\"]\nend"}
+field2:{"type":"field","size":[236,241],"pos":[266,56],"locked":1,"border":0,"value":"The qr.capacity[version mode ecclevel] function indicates the number of input bytes/characters that can be stored in a QR code with a specific combination of version, mode, and ecclevel:\n\n- version: an integer [1,40]\n- mode: \"numeric\",\"alphanumeric\", or \"octets\"\n- ecclevel: \"L\",\"M\",\"Q\", or \"H\""}
 button4:{"type":"button","size":[60,20],"pos":[267,151],"script":"qr_generate.0","text":"Try It!"}
 field1:{"type":"field","size":[100,14],"pos":[88,181],"border":0,"align":"center","value":"target:"}
 target:{"type":"field","size":[247,100],"pos":[10,197],"volatile":1,"scrollbar":1,"style":"code"}
@@ -375,8 +387,17 @@ on generate_params x etc do
  r
 end
 
+module.capacity:on capacity ver mode ecclevel do
+ getmaxdatalen[ver MODE[mode] ECCLEVEL[ecclevel]]
+end
 module.configure:on configure x etc do
- "data" drop generate_params[x etc]
+ local p:generate_params[x etc]
+ local r:()
+ r.version :p.version
+ r.mask    :p.mask
+ r.mode    :(rev MODE    )[p.mode]
+ r.ecclevel:(rev ECCLEVEL)[p.ecclevel]
+ r
 end
 module.generate:on generate x etc do
  local p:generate_params[x etc]

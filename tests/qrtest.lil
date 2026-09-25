@@ -1,0 +1,91 @@
+# test fixture for the qr module
+local qr:import["examples/decks/qr.deck"].qr
+
+on assert x y do
+ a:"%J" format list x
+ b:"%J" format list y
+ if !a~b
+  print["error\ngot:       %s\nexpected:  %s" a b]
+  exit[0]
+ end
+end
+
+assert[(keys qr) ("capacity","configure","generate")]
+
+assert[qr.generate[4096 take "fail0a!"                ] ().error:"data payload is too large"  ]
+assert[qr.generate[4096 take "fail0b!" ().version :2  ] ().error:"data payload is too large"  ]
+assert[qr.generate["fail1"             ().ecclevel:"Z"] ().error:"ecc level must be {M,L,H,Q}"]
+assert[qr.generate["fail2"             ().mask    :8  ] ().error:"mask must be [0,7]"         ]
+assert[qr.generate["fail3"             ().version :42 ] ().error:"version must be [1,40]"     ]
+
+assert[each v in 1+range 6 qr.capacity[v "octets"  "L"]end (17,32,53,78,106,134)]
+assert[each v in 1+range 6 qr.capacity[v "numeric" "M"]end (34,63,101,149,202,255)]
+
+assert[qr.configure["42"   ] "%j" parse "{'version':1,'mask':0,'mode':'numeric'     ,'ecclevel':'L'}"]
+assert[qr.configure["TEXT" ] "%j" parse "{'version':1,'mask':0,'mode':'alphanumeric','ecclevel':'L'}"]
+assert[qr.configure["text?"] "%j" parse "{'version':1,'mask':0,'mode':'octet'       ,'ecclevel':'L'}"]
+
+local tests:insert
+ name         data                     ver ecc mask mode             encoded
+with
+ "empty"      ""                       nil  nil  nil  nil            "%%IMG0ABUAFf7T+IKaCLrC6LpS6Lq66ILSCP6r+ADQACOvuPHBmEr2+PGHgK8pKACHgP7a2IIHgLopKLoHgLra2IJVQP4qqA=="
+ "a"          "a"                      nil  nil  nil  nil            "%%IMG0ABUAFf6b+IKaCLrC6LoS6Lrq6ILaCP6r+ADoACOnuPG1OErxwPGHgK8pKACHgP7a2IIHgLopKLoHgLra2IJGWP4uqA=="
+ "B"          "B"                      nil  nil  nil  nil            "%%IMG0ABUAFf7r+ILKCLrC6LpS6Lr66ILSCP6r+ADQACPfuPGqWEqcyPGHgK8pKACHgP7a2IIHgLopKLoHgLra2IJZUP44uA=="
+ "beyondloom" "beyondloom.com/decker"  nil  nil  nil  nil            "%%IMG0ABkAGf6iv4CCmSCAutkugLpproC6/S6Agr0ggP6qv4AAhgAAI/D7gLUlj4B7w2+AUNbWgOMPDwAJ3yUAmxaDgN0J44BD2f2AAOeJgP7NqACCIo+AuhH+ALpiAAC65EIAgi9pgP5v6oA"
+ "200"        200 take "g"             nil  nil  nil  nil            "%%IMG0ADUANf77WGQro/iCs+y+KnIIuqTOKmaS6LpFsYveaui6wij4umLogsZJjQciCP6qqqqqq/gAopmI6qAAI4W9/pZPuF1KacrFkCDPYejTGbgQZZyrLmPTWGZ/Psseq0AkL+wv7Bf4gr0+vT6sCPjyAvIC8gBeoNCg0KDQoewv7C/sKIc+vT69PrgYAvIC8gLwvtCg0KDQoCBv7C/sL+gDvT69Pr04vIiIsAAGOP+AAP3d3/i4oiKO7uiI+oAAr//6gCju7oiIiLgP///4AA/47IiIiIiIiP4AAAAAAACJu7u7u7u4A///////+OyIiIiIiIj+AAAAAAAAibu7u7u7uAP///////jsiIiIiIiI/gAAAAAAAIm7u7u7u7gD///////4jIiIiIiIiN4AAAAAAABgIiI4AAJoEgAA/3d/+ACIiIu7uKD+gACv//qAgju7iiIo6Lp///gAD/i6IiIiIiIguoAAAAAAAIJu7u7u9vj+f////+eI"
+ "numeric"    "5678901234"             nil  nil  nil  nil            "%%IMG0ABUAFf67+IKyCLrq6Lpi6LqK6ILSCP6r+ADQACPHuPGWWEqugPGHgK8pKACHgP7a2IIH0LopKLok4Lr2SIIlQP59qA=="
+ "num200"     200 take "5"             nil  nil  nil  nil            "%%IMG0ACUAJf740Cv4gq0uUgi6tkdC6LoPM6LouvO/SuiCpDwiCP6qqqv4AN8rWAAj49a3uLVAsih4e9vAwhhQ1tbW0OMPDw8ItSUlJSB7w8PDwFDbui6I46Gi6Li46LouiIoui6Lo6aLouiiKLoui6Cy6Lougooui6Ligi6LouC66LougiC6Loujroui6KIgui6bQuui6L8AAxdF42P7RdFqQgkXReNi6F0Xf8LpdF0XQupdF0XCCdF0VAP5RdF/o"
+ "octets"     "john@beyondloom.com?"   nil  nil  nil  nil            "%%IMG0ABkAGf7Sv4CCkSCAuo6ugLoDLoC6oC6AgviggP6qv4AAuwAAI6B7gFhS5QCGPeUAJW1tAB7w8ICNslIA39g8APyY44Bjnf2AAP+IAP7eqYCCI4qAuhP+gLpARAC65KAAgm95gP53aoA="
+ "deckroman1" "jene großen Bücher"     nil  nil  nil  nil            "%%IMG0ABkAGf7qv4CC3SCAuuIugLp6roC6gi6AgraggP6qv4AAggAAI6P7gFhR6YCGPbWAJW1tAB7w8IDF8lIAv2g8AP2mRQBjDvuAAK6IAP6eqQCCco8Auk3/gLoDQoC6wiAAgm95gP5vaoA="
+ "deckroman2" "jene großen Bücher"     nil  nil  nil  "octet"        "%%IMG0ABkAGf7qv4CC3SCAuuIugLp6roC6gi6AgraggP6qv4AAggAAI6P7gFhR6YCGPbWAJW1tAB7w8IDF8lIAv2g8AP2mRQBjDvuAAK6IAP6eqQCCco8Auk3/gLoDQoC6wiAAgm95gP5vaoA="
+ "ver5"       "test"                     5  nil  nil  nil            "%%IMG0ACUAJf7xk6v4gr1W0gi65Neq6LpMtvrourUwIuiC8cpKCP6qqqv4AIuiiAAjnZpPuLU0k1Kge816QkBQ1tbW0OMPDw8ItSUlJSB7w8PDwFDW1tbQ4w8PDwi1JSUlIHvDw8PAUNbW1tDjDw8PCLUlJSUge8PDw8BQ1tbW0OMPDw8ItSUlJSB7w8PDwFDW1tTg4w8PD8gAvDw4mP6SkprognDw+Pi6La2vkLp4eHh4uq2traiCfaL72P4S/u6o"
+ "ver10"      "test"                    10  nil  nil  nil            "%%IMG3ADkAOQKMH2CqeY0amJEylCCe3N1HZR4kdQspciFaOs8Cg656henrjiK8ejFfod1iLJ4qZdvUlsZcqfNkrhg2qvUFPWKANV/36w1/lDSJLon8qDPmstCEFcNB0tlcs2bru+zx8/TT5jRicaIR0ae3sQNnUUfSQnfI1YcylHNzRIW5ppkJGCRkKArqNsUU54P5uVnYyGlkprSFtkVmSmpLexUHljdIJBa2W6s7ijtn3HvmeOUq3Nq851aJPKlsLQoGDOw7bNldJpmtTEy++uwtndUKvQpaPm4dX6FI6c1tqe4FWU0dBM2ZtFm0cMxQFc/UrEPs/hHzV8xQon1feI3p5u6ixIi6oNADCLIgxYXrHC2youXYvI8QHbZIF3CawIwts3G0ZfPVL3CC9uXDcS1XwpzXOsZkN41mNIGTinYkyrISK3c/g42EGOrcR6hE2lFkmvQrUXEsxy6revAqT6A4U9Izu/VoSa8ZwTbSWA7uVlQjZVXt+0MlLqP3Ai3Kisdgz1vJsKEUKlhTLXKNRapay2+qWsnInj52S8ZwLLlO9Q1LxcImotImPqMp0s4qoW+jMEbZJO8ux4sKWZvkIycsEncFAA=="
+ "ver20"      "test"                    20  nil  nil  nil            "%%IMG3AGEAYQKMH4Bq3ABbiqqma3OFzB0HfmJ0IR+XiZKkYdMDvy/aoWqJh9TErS4P5Hl8pqJRU6Mpl7aSZaWz9UiPofE6mo5cqS40Bd06TzESVUXp4WRndg123oWE4De2OKWddlUMdZ7zt0F35WXIhXiomMi4+GTC1AeUt4G0RwmJlja5yQLClPaplnNjJePUUWaqCofKR8Q5Ruoz1yTEWYk75uGYqEe7UCpMZgpoHLukS5l77Pk22Dz7xOzGOmNleW09/RyqLBg1K84b+UkYuJ3UYgbazvIOHI9O7Zces1DZq3+7Hzt+AzDaMWjv9rXARwZhNSXaMDlc1+YfrVAEzfCDdSeTH4vyjHHk1i4Sm1t0QjaRkjElEWjeHv75NujLKYmk8m1yqatKTDlbvASDJ1CMIWYtKbYy1y9Vqo5oGjE6VWyYOHzuLqk8YjLZOIMzuFQkChZZQ6eKvsIsafRSVq06r96xhdYk2R9KmdqdVnBuHaAAqYLy6xYL3LVV22bqYhbnw3o8ud68FrbcqLiEyUUMbFgnYb2y8NqV1pmzz7pT/YrMjBmw2sqT4RaUk7goyF+o8fR8ShqW68FrbYdZ6nM1W5KQbAYJbCtPaqrHib9NW1e2WIs6RDeKTZTu4TiTVS7jfRlXb2LgZmq3HgxxV2+FpOYuLjw88tasGVpdfvS3dc+eadYK7Rha83FXH3irDGiZJmfBtt5+Y0mnGETxHeiWgQVaRmFKPO3iIHCy+NeUhwEOpyF9FxKYoXcmKhghYyO66GJkRcGomWvLWVigavhtGJ2DHIIYD38dClihiSfqiJ9zo3QjI4wvPgZhlDRSluR9NdaHZGo85sXVj0EFCWCH9l2FI5ZWJgkei1KyNCSbLMmYHZtXylckihdmidmWbYYJJGgiikmbinbmeOaOK8rUopttYrcglDFRWaWSJ6JYpZ5P6tfnf386RmKJcXC5HyCUhTTSKlGaFelPh32WIR9L8sVUog9K0qUo8PSEIZkbneacV2bmBRR1ZBF03Jc1OdrgaNTZKCgvqTZr6EuQTVeRmOvB+Y2TPxRHaqE3Gnmnt8oJ+aKX7g1Drl6/gEtobd8OmpWacc7K6bWNzgvlGhMamGqZrOE5bpgBmstqiPo5si68/3qrJbvxIjqjoiMyGmFsiOAhF8N5OrywuwFv6iNpxmp68LAnKVwZng2jXBiT1CYbqr0Vv9wYVt26uzKG4XqcL4cDi3wumCCXdbLO7fb6rtEPo5KtxNYyOPPH1RaTMc4bszwez9X6HDKsmcJqUMJKd4x0zqb1psaa9MYM9ak0I6bH0mVfPXbK4kKG79QbQWsVR0AeZJ5NRuq6yI/9doe3FIX1+t1me6yBJeK2lSXzXgVfB/PPivMNB53eNRd3iuId24vh3N4buMBOpQdM1nNruOvZ4w2xm1AhugqqPngt9TdKXm6e0WD7Lo6S6DbTLpisuE+cObZSd1UA"
+ "eccL"       "some test data?"        nil  "L"  nil  nil            "%%IMG0ABUAFf6j+ILyCLqi6Lp66LrS6IKqCP6r+AC4ACPHuPHfoEqM4Gx6eJLu6ADpQP6CIIIvsLpu6LoiMLrGIIJi2P5/KA=="
+ "eccM"       "some test data?"        nil  "M"  nil  nil            "%%IMG0ABkAGf6iv4CCBSCAurAugLpYLoC63K6AgkuggP6qv4AARAAASiFKgDyD0gBOO18AQebWgJufDwC1JSUAe8PDgFDJZoDjkPuAAF+JgP5uqICCS4qAuqD+gLojSAC6YiIAgu4tgP538oA="
+ "eccQ"       "some test data?"        nil  "Q"  nil  nil            "%%IMG0ABkAGf4av4CC/SCAur6ugLpproC6l66Agg+ggP6qv4AAuYAA+3lrAEzHI4CWzq8AZAvAAELKOIC1JUeAe8CEgFDJZoDjkPuAAF+JgP7uqICCS4qAuqD+gLqjSAC64iIAgu4tgP738oA="
+ "eccH"       "some test data?"        nil  "H"  nil  nil            "%%IMG0AB0AHf4Aq/iCZpIIuvHa6LouKui6uIrogurqCP6qq/gAT5AAkriFoOUR8xCPFU/AnDRGGIPBzdhl6R+47xNO8GQZJQgjW9W4SDq9AH4m4lhdaVIY4vsP4AD8KKD+LqqQggn4yLpSr+i6+jIAuiROWIJnqlj+/vao"
+ "mask0"      "http://beyondloom.com"  nil  nil    0  nil            "%%IMG0ABkAGf7Kv4CCwSCAusuugLoiroC6zy6Agv2ggP6qv4AA1YAAI6L7gLUgWAB7wyMAUNbWgOMPDwCBuSUA+xGDgMyJ54DH3/uAAI6IAP7NqQCCIY6AuiD/ALoN0wC6okQAgjtpgP5uaoA="
+ "mask1"      "http://beyondloom.com"  nil  nil    1  nil            "%%IMG0ABkAGf7Kv4CCvqCAusuugLpdLoC6Ty6AgoIggP6qv4AAKgAAz6LTgEjfp4B7wyMArSkpAOMPDwB8RtqA+xGDgDF2GADH3/uAAPGPgP7NqQCC3okAuqD/ALpyLIC6IkQAgsSWAP7uaoA="
+ "mask2"      "http://beyondloom.com"  nil  nil    2  nil            "%%IMG0ABkAGf6fv4CClCCAuuEugLqILoC65a6AgiiggP6qv4AAgIAAVohvgB2K8oDTaYmABYODgLZaWgDU7HAAU7spAGQjTQBvdfkAANuNAP4YrACC9IuAugr9gLqneYC6CO6Agu48gP47P4A="
+ "mask3"      "http://beyondloom.com"  nil  nil    3  nil            "%%IMG0ABkAGf6pP4CChiCAusWugLq+roC6d66AggwggP6qv4AAEoAAuqzHgHA8KYD3+8CATKcRgNvsgQDwfjkAGp+7AAmVlgBL5/gAAP+PAP4urwCCZoqAuq7/gLqRooC6mqeAgkqugP6N5IA="
+ "mask4"      "http://beyondloom.com"  nil  nil    4  nil            "%%IMG0ABkAGf6sv4CC2KCAui2ugLpEroC61q6AgpuggP6qv4AATAAA9kTZgNFGPgDiWrqANLCwgIdpaQAYILyAn3flgKjvgYBeRvoAAGiOAP4rrwCCuI8Aukb5ALrrtQC6u92Agt0PgP6IDIA="
+ "mask5"      "http://beyondloom.com"  nil  nil    5  nil            "%%IMG0ABkAGf6fv4CCnCCAuigugLpdLoC6LK6AgqCggP6qv4AAiIAAGkFxgEjfp4BDIK0AhYujALZaWgBU5FCAw/INgDF2GAD/PP2AAFONgP4YrACCfIsAusP5ALryLIC6QcoAgmYcAP47P4A="
+ "mask6"      "http://beyondloom.com"  nil  nil    6  nil            "%%IMG0ABkAGf6fv4CCmiCAugyugLrdLoC6vq6AghAggP6qv4AADoAAg2XNgEjfp4BnsuQAibtgALZaWgA1YkiAitafgDF2GADbrvyAAGOOgP6YrACCeosAumf7ALpyLIC6U4MAglbfAP67P4A="
+ "mask7"      "http://beyondloom.com"  nil  nil    7  nil            "%%IMG0ABkAGf7Kv4CC5aCAulmugLqiroC6a66Agm+ggP6qv4AA8QAAbzDlgLUgWAAy57EAdESfgOMPDwDInbcA34PKgMyJ54CO+/mAAByJAP7NqQCChYyAurL+ALoN0wC6htYAgqkggP5uaoA="
+ "mnumeric"   "8675309"                nil  nil    5  "numeric"      "%%IMG0ABUAFf67+ILqCLoS6Lpy6Lo66ILCCP6r+ACwABo3GPHnmJ9DUNklCI/HwAAlCP5OIIIHgLrxGLqZILo5+IJHMP4fIA=="
+ "malpha"     "BEYONDLOOM1"            nil  nil    6  "alphanumeric" "%%IMG0ABUAFf6z+IK6CLo66LrC6Lr66IJ6CP6r+ABYAIMs2PGVKLuLiNUVyI/HwABLEP7qsIIgALpD8Lp+qLo32IJzuP7XoA=="
+ "moctet"     "http://beyondloom.com"  nil  nil    7  "octet"        "%%IMG0ABkAGf7Kv4CC5aCAulmugLqiroC6a66Agm+ggP6qv4AA8QAAbzDlgLUgWAAy57EAdESfgOMPDwDInbcA34PKgMyJ54CO+/mAAByJAP7NqQCChYyAurL+ALoN0wC6htYAgqkggP5uaoA="
+end
+
+each config in rows tests
+ local etc:()
+ etc.mode    :config.mode
+ etc.version :config.ver
+ etc.mask    :config.mask
+ etc.ecclevel:config.ecc
+ local a:qr.generate[config.data etc].value
+ local b:image[config.encoded]
+ if !"image"~typeof a
+  print["error: output is not an image: "] show[a]
+  show[config] exit[0]
+ end
+ if !a.size~b.size
+  print["error: output size mismatch: "]
+  print[" expected: %J" format list b.size]
+  print[" got     : %J" format list a.size]
+  show[a.encoded]
+  show["provided" config]
+  show["detected" qr.configure[config.data etc]]
+  exit[0]
+ end
+ if !a.pixels~b.pixels
+  print["error: pixel mismatch!"]
+  show[a.encoded]
+  show["provided" config]
+  show["detected" qr.configure[config.data etc]]
+  exit[0]
+ end
+end
+
+print["all tests passed."]
