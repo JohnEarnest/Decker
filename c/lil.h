@@ -622,7 +622,9 @@ monad(l_raze){
 	if(lid(x)|linil(x))return x;
 	if(!lil(x))return l_list(x);
 	if(x->c==0)return LNIL;
-	lv*f=l_first(x);if(lit(f)||lid(f)){lv*r=f;for(int z=1;z<x->c;z++)r=l_comma(r,x->lv[z]);return r;}
+	lv*f=l_first(x);
+	if(lis(f)||lin(f)){int a=1;for(int z=1;z<x->c;z++)if(!lis(f)&&!lin(f)){a=0;break;};if(a)return x;}
+	if(lit(f)||lid(f)){lv*r=f;for(int z=1;z<x->c;z++)r=l_comma(r,x->lv[z]);return r;}
 	lv*r=lml(0);for(int z=0;z<x->c;z++)r=l_comma(r,x->lv[z]);return r;
 }
 char esc(char e,int*i,char*t,int*n){
