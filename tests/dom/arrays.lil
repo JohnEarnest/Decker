@@ -191,6 +191,44 @@ assert["array value u8" (11,22,33,44) a.value]
 a:array[0 "char"].cat["Some Text"]
 assert["array value char" "Some Text" a.value]
 
+assert["truncated array decoding"
+	"%J" parse "[
+	 [],
+	 [],
+	 [],
+	 [11],
+	 [11,22],
+	 [11,22,33],
+	 [11,22,33],
+	 [11,22,33,44],
+	 [11,22,33,44,55],
+	 [11,22,33,44,55,66],
+	 [11,22,33,44,55,66],
+	 [11,22,33,44,55,66,77],
+	 [11,22,33,44,55,66,77],
+	 [11,22,33,44,55,66,77],
+	]"
+	("%J" parse "[
+	 %%DAT,
+	 %%DAT0,
+	 %%DAT0C,
+	 %%DAT0Cx,
+	 %%DAT0CxY,
+	 %%DAT0CxYh,
+	 %%DAT0CxYhL,
+	 %%DAT0CxYhLD,
+	 %%DAT0CxYhLDd,
+	 %%DAT0CxYhLDdC,
+	 %%DAT0CxYhLDdCT,
+	 %%DAT0CxYhLDdCTQ,
+	 %%DAT0CxYhLDdCTQ=,
+	 %%DAT0CxYhLDdCTQ==,
+	]")..value
+]
+assert["bad char in array chunk 0" (11,22,33,44) array["%%DAT0CxYhLDÉCTQ=="].value]
+assert["bad char in array chunk 1" (11,22,33)    array["%%DAT0CxYhLÉdCTQ=="].value]
+assert["bad char in array chunk 2" (11,22,33)    array["%%DAT0CxYhÉDdCTQ=="].value]
+
 #######################################
 #
 #  Wrap Up

@@ -1140,7 +1140,13 @@ init_field=(dst,key,src)=>{const k=lms(key),v=dget(src,k);if(v)iwrite(dst,k,v)}
 normalize_enum=(x,v)=>x.hasOwnProperty(v)?v:Object.keys(x)[0]
 normalize_font=(x,v)=>ls(dkey(x,v)||x.k[dkix(x,v)]||lms('body'))
 data_enc=x=>x[5]==undefined?-1:+x[5]
-data_read=(type,x)=>(x.slice(0,2)!='%%'||x.slice(2,5)!=type)?null:new Uint8Array(atob(x.slice(6)).split('').map(x=>x.charCodeAt(0)))
+base64_read=(x)=>{
+	try{ // attempt to repair a malformed/non-base64 payload:
+		x=x.match(/^[-A-Za-z0-9+/]*/)[0];if(x.length%4==1)x=x.slice(0,-1)
+		return new Uint8Array(atob(x).split('').map(x=>x.charCodeAt(0)))
+	}catch(e){return new Uint8Array([])}
+}
+data_read=(type,x)=>(x.slice(0,2)!='%%'||x.slice(2,5)!=type)?null:base64_read(x.slice(6))
 data_write=(type,x)=>`%%${type}${btoa(Array.from(x).map(x=>String.fromCharCode(x)).join(''))}`
 is_rooted=x=>card_is(x)||prototype_is(x)?!x.dead: widget_is(x)?(is_rooted(x.card)&&!x.dead): 1
 
