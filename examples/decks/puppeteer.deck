@@ -882,7 +882,7 @@ end
 
 {module:dd}
 description:"Display sequential, styled modal dialogs for visual novels."
-version:1.8
+version:1.9
 {script}
 # state/constants:
 local host:0
@@ -1173,6 +1173,9 @@ module.chat:on chat text choices do
   if "number"~typeof vv
    choices:()
    r:vv
+  elseif "function"~typeof vv
+   choices:k[v] drop choices
+   vv[]
   else
    choices:k[v] drop choices
    say[vv]

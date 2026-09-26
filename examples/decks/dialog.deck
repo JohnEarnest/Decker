@@ -103,7 +103,7 @@ button1:{"type":"button","size":[60,20],"pos":[442,312],"script":"Index.1","text
 button2:{"type":"button","size":[60,20],"pos":[10,312],"script":"Index.1","text":"Prev","style":"rect"}
 title:{"type":"field","size":[492,17],"pos":[10,28],"locked":1,"font":"menu","show":"invert","border":1,"align":"center","value":"dd.chat[]"}
 ex1:{"type":"field","size":[266,242],"pos":[10,56],"style":"code","value":"ct:\"Chickens are fantastic animals.\n\nDid you know chickens can lay an egg roughly every 24 hours?\n\nThey stop laying when they moult.\"\nbt:\"Honestly I don't know much about bugs.\"\n\ndd.open[deck]\nr:dd.chat[\n \"Ask me anything you like.\"\n raze insert q a with\n  \"Tell me about chickens.\" ct\n  \"Tell me about bugs.\"     bt\n  \"I have to go.\" 0\n end\n]\ndd.say[\"goodbye, then.\"]\ndd.close[]"}
-field2:{"type":"field","size":[217,154],"pos":[285,56],"locked":1,"border":0,"value":"The dd.chat[] function makes certain patterns of dialog trees built out of dd.ask[] and dd.say[] easier to write.\n\nThe dd.chat[] function accepts a string as a prompt and a dictionary mapping strings (options) to responses. It will display a dialog box (as with dd.ask[]), and then consult the response corresponding to the user's choice. If the response is a number, dd.chat[] will return it immediately. Otherwise, dd.say[] will be called with the response, the selected choice will be removed from the list of choices, and the user will be prompted again with dd.ask[] until no options remain."}
+field2:{"type":"field","size":[217,163],"pos":[285,56],"locked":1,"border":0,"value":"The dd.chat[] function makes certain patterns of dialog trees built out of dd.ask[] and dd.say[] easier to write.\n\nThe dd.chat[] function accepts a string as a prompt and a dictionary mapping strings (options) to responses. It will display a dialog box (as with dd.ask[]), and then consult the response corresponding to the user's choice. If the response is a number, dd.chat[] will return it immediately. If it's a function, it will be called. Otherwise, dd.say[] will be called with the response. The selected choice will be removed from the list of choices, and the user will be prompted again with dd.ask[] until no options remain."}
 button3:{"type":"button","size":[60,20],"pos":[285,278],"script":"say.0","text":"Try It!"}
 button5:{"type":"button","size":[60,20],"pos":[78,312],"script":"Index.1","text":"Index","style":"rect"}
 
@@ -432,7 +432,7 @@ image:"%%IMG3AgABVgZAgHBILBqPyKRyyWw6n9CodEqtWq/YrHbL7Xq/4LB4TC6bz+i0es1uu9/wuHx
 
 {module:dd}
 description:"Display sequential, styled modal dialogs for visual novels."
-version:1.8
+version:1.9
 {script}
 # state/constants:
 local host:0
@@ -723,6 +723,9 @@ module.chat:on chat text choices do
   if "number"~typeof vv
    choices:()
    r:vv
+  elseif "function"~typeof vv
+   choices:k[v] drop choices
+   vv[]
   else
    choices:k[v] drop choices
    say[vv]
