@@ -1539,7 +1539,7 @@ Modules are chunks of reusable Lil code. See the [modules](#modules) section for
 | `x.version`             | Number. The revision number of this module. Higher numbers are considered "newer". r/w.                 |
 | `x.script`              | String. The Lil source code of the module's script. r/w.                                                |
 | `x.value`               | Dictionary. The contents of the module as returned by the final expression in the `script`.             |
-| `x.error`               | String. If there was a problem initializing this module, a description of the problem. Otherwise, `""`. |
+| `x.error`               | String. If there was a problem initializing this module, a description of the problem. Otherwise, nil.  |
 
 Whenever a module's `script` attribute is modified (or when a module is instantiated by loading a deck or copying it from another deck), the script is executed. Module scripts have access to all of Decker's usual [constants](#constants) and [built-in functions](#built-infunctions), as well as a reference (named `data`) to the module's _keystore_, but do _not_ have access to the deck interface unless it is provided to the module explicitly via function arguments.
 
