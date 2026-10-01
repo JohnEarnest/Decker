@@ -2534,7 +2534,7 @@ lv* widget_write(lv*x){
 
 lv* keystore_value(lv*self,lv*k,lv*v){
 	if(!v)return dgetv(self->b,k);
-	if(linil(v)){self->b=l_drop(l_list(k),self->b);}else{dset(self->b,k,v);}return self;
+	if(linil(v)){self->b=l_drop(l_list(k),self->b);}else{dset(self->b,k,v);}return v;
 }
 lv* n_keystore_value(lv*self,lv*x){return x->c<1?self: keystore_value(self,l_first(x),x->c<2?NULL: x->lv[1]);}
 lv* interface_keystore(lv*self,lv*i,lv*x){

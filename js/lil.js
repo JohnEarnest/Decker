@@ -1574,7 +1574,7 @@ keystore_read=x=>{
 	return {f:(self,i,x)=>{
 		const keystore_value=(k,v)=>{
 			if(!v)return dget(self.data,k)||NIL
-			if(linil(v)){self.data=dyad.drop(monad.list(k),self.data)}else{dset(self.data,k,v)}return self
+			if(linil(v)){self.data=dyad.drop(monad.list(k),self.data)}else{dset(self.data,k,v)}return v
 		}
 		if(ikey(i,'keys'))return monad.keys(self.data)
 		if(ikey(i,'dict'))return dyad.drop(ZERO,self.data)

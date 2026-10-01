@@ -1844,6 +1844,8 @@ assert["keystore raw write" 44 k.a]
 k.a:nil
 assert["keystore remove" ("bc" dict 33,99) k.dict]
 
+assert["keystore write thru" 999 k.a:999]
+
 #######################################
 #
 #  Contraptions
