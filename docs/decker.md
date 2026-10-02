@@ -355,6 +355,20 @@ Canvases
 --------
 A canvas is a rectangular widget that contains graphics. Canvases don't do very much on their own, or have much of an appearance on their own, but are very powerful in combination with scripts. See the [canvas interface](#canvasinterface) section for detail.
 
+```lil
+c.clear[]
+
+c.pattern:colors.blue
+c.rect[(10,40) (30,50)]
+
+c.pattern:colors.red
+c.poly[(100,20) (110,40) (80,50)]
+
+i:image["%%IMG0AAcAB0Bg0Ij8goA="]
+c.paste[i (130,70)]
+c.paste[i (130,30,20,20)]
+```
+
 All widgets can be "shown" in one of four ways, configurable with the _Widgets_ menu: _None_, _Solid_, _Transparent_, or _Inverted_.
 
 - _Show None_ widgets aren't drawn at all, and cannot be interacted with.
@@ -387,19 +401,6 @@ The cards dialog can be found in _File &#8594; Cards..._, and provides an overvi
 
 Clicking a card in the list will navigate to it immediately, and double-clicking will drill into its properties, allowing you to edit the card's name or script. You can also drag cards in the list or press shift and arrow keys together to reorder them.
 
-Sound
-=====
-Buttons and scripts can play sound using the `play[]` built-in function. Several sounds can play at the same time. Sound is always stored at an 8khz sample rate, in mono, and individual sounds are capped at 10 seconds.
-
-The sounds stored in the current deck can be listed with _File &#8594; Sounds..._
-
-![](images/sounds.gif)
-
-Double-clicking an item in this list will play a preview. Creating a new sound or editing an existing one will open the audio editor:
-
-![](images/audio.gif)
-
-Dragging on the audio waveform will make a selection, which can then be cut, copied, cropped or cleared. Audio in the clipboard can be pasted, replacing the current selection. With a selection active, pressing "Play" will only play the selected region of the waveform.
 
 Resources
 =========
@@ -463,6 +464,41 @@ Clicking the button will trigger a _click_ event. Since this script defines a fu
 The most important thing to understand about Decker's scripting model is that _scripts are stateless_. When an event fires, scripts are invoked, and may manipulate both the deck and their own local or global variables as desired while running. However, _only_ changes to the deck itself will be persistent; Lil variables will always be reset to a known configuration when the next event fires.
 
 Any data that needs to be preserved between events must be stored in widgets. Use widgets as an _embodied data model_: a visible, manipulable representation of your application's state. For example, fields can store plain or rich text (or arbitrary data encoded as XML or JSON), grids can store tabular or associative data, a canvas is a natural way to store an image, and a checkbox button is a natural way to store a boolean value. By avoiding "hidden" state, Decker avoids surprises and data loss when editing or saving a deck and its scripts. If an application _needs_ state that cannot be displayed to a user for some reason (like the answer to a guessing game), you can make invisible widgets, or place widgets on a out-of-the-way card.
+
+A script can refer to widgets and deck-parts in several different ways, depending on their relative location within the deck. For a script on a widget or a card:
+```lil
+me                                   # the widget or card that was sent the event
+widname                              # another widget on the same card
+cardname                             # a card in the deck
+cardname.widgets.widname             # a widget on some other card
+deck                                 # the deck
+deck.cards.cardname                  # a "full path" to a card
+deck.cards.cardname.widgets.widname  # a "full path" to a widget
+```
+
+A deck-level script cannot refer to widgets by their short names, since widgets of the same name may exist on many cards; it must use the longer, more specific "paths" to disambiguate. From inside a contraption, you can only access deck-parts by their full path, and from within a module you can't access deck-parts at all unless they're explicitly passed in as arguments.
+
+If you want to refer to the same widget easily throughout a deck's scripts, you could set up an alias for it in the deck-level script, using an explicit path from its card. Let's say we have a slider widget named `scoreCounter` on a card named `inventoryCard`:
+```lil
+score: inventoryCard.widgets.scoreCounter
+```
+
+Since it's in the deck-level script, this definition will execute before any event handlers on the deck, a card, or a widget, so scripts elsewhere can use the shortcut:
+```lil
+on click do
+ score.value: score.value+1
+ # ...
+end
+```
+instead of the equivalent (and very verbose) explicit path:
+```lil
+on click do
+ inventoryCard.widgets.scoreCounter.value: inventoryCard.widgets.scoreCounter.value+1
+ # ...
+end
+```
+
+For more detail, see the [events](#events) section.
 
 
 Built-In Functions
@@ -1743,41 +1779,35 @@ version:1.01
 log:<"time":[],"message":[]>
 
 {script}
-log:data.log
-
 mod.put:on _ x do
-	log:insert time message with sys.now x into log
-	data.log:log
-	log
+	data.log:insert time message with sys.now x into data.log
 end
 
 mod.get:on _ do
-	log
+	data.log
 end
 {end}
 ```
 
 The `{module:logger}` line indicates the beginning of a module named `logger`. The `description:"..."` is what the Font/DA mover displays as a preview for the module. The (optional) `{data}` section contains supplementary user-defined key-value pairs that can be accessed and modified by the module. Everything between `{script}` and `{end}` is the source code for the module itself. (Curly braces and some forward slashes need to be escaped- see the [Decker file format](format.html) for details!)
 
-In this module, the variable `log` is initialized with a table drawn from the module's [keystore](#keystoreinterface), and an (implicit) dictionary named `mod` is created, containing a pair of functions which manipulate `log`. Since the last line of the script is an assignment to `mod`, the return value of the script is the `mod` dictionary.
+In this module, `data.log` is a table drawn from the module's [keystore](#keystoreinterface), and an (implicit) dictionary named `mod` is created, containing a pair of functions which manipulate `data.log`. Since the last line of the script is an assignment to `mod`, the return value of the script is the `mod` dictionary.
 
-The script in a module is only executed _once_, when a deck is loaded. For large scripts, this can be much more efficient than defining functions in `deck.script`, which have to be processed again every time an event occurs. Since the `put` and `get` functions retain their closure, they both have access to the shared `log` variable, even after being packed together into a dictionary. As demonstrated in this example, modules _can_ be stateful, unlike ordinary scripts. It's important to note, however, that this state can be fragile: unless it is stashed with `data.key:...` it will _not_ be automatically preserved if the deck is saved and reopened later!
+The script in a module is only executed _once_, when a deck is loaded. For large scripts, this can be much more efficient than defining functions in `deck.script`, which have to be processed again every time an event occurs. Since the `put` and `get` functions retain their closure, they both have access to the shared `data.log` variable, even after being packed together into a dictionary. As demonstrated in this example, modules _can_ be stateful, unlike ordinary scripts. It's important to note, however, that this state can be fragile: unless it is stashed with `data.key:...` it will _not_ be automatically preserved if the deck is saved and reopened later!
 
-It's a great idea to provide documentation and examples for your new module in the deck it's packaged within. You might also want to perform automated tests of your module while developing it. That's where the "Lilt" command-line utility comes in. Using Lilt, you can read and write decks "headlessly", and interact with them as if you were using Decker's listener:
+It's a great idea to provide documentation and examples for your new module in the deck it's packaged within. You might also want to perform automated tests of your module while developing it. That's where the "Lilt" command-line utility comes in. Using Lilt, you can read and write decks "headlessly", and interact with them as if you were using Decker's listener. As a convenience, if you `import[]` a deck, you'll get a dictionary of that deck's modules keyed by their name:
 ```
 % lilt
-  d:read["logger.deck"]
-<deck>
-  d.modules
-{"logger":<module>}
-  log:d.modules.logger.value
+  log:import["/Users/ij/Desktop/log.deck"].logger
 {"put":on _ x do ... end,"get":on _ do ... end}
+
   log.put["first"]
 +------+---------+
 | time | message |
 +------+---------+
 | 0    | "first" |
 +------+---------+
+
   log.put["second"]
 +------+----------+
 | time | message  |
@@ -2130,6 +2160,18 @@ Like transition functions, brushes can be defined in any script, at any time, bu
 
 Playing Sound
 =============
+Buttons and scripts can play sounds. Several sounds can play at the same time. Sound is always stored at an 8khz sample rate, in mono, and individual sounds are capped at 10 seconds.
+
+The sounds stored in the current deck can be listed with _File &#8594; Sounds..._
+
+![](images/sounds.gif)
+
+Double-clicking an item in this list will play a preview. Creating a new sound or editing an existing one will open the audio editor:
+
+![](images/audio.gif)
+
+Dragging on the audio waveform will make a selection, which can then be cut, copied, cropped or cleared. Audio in the clipboard can be pasted, replacing the current selection. With a selection active, pressing "Play" will only play the selected region of the waveform.
+
 The `play[]` function is the main way of triggering audio playback in Decker. It can be called with a [Sound Interface](#soundinterface) or the name of a sound in the deck:
 ```lil
 play["amen"]
