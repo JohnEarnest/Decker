@@ -432,7 +432,7 @@ image:"%%IMG3AgABVgZAgHBILBqPyKRyyWw6n9CodEqtWq/YrHbL7Xq/4LB4TC6bz+i0es1uu9/wuHx
 
 {module:dd}
 description:"Display sequential, styled modal dialogs for visual novels."
-version:2.0
+version:2
 {script}
 # state/constants:
 local host:0
