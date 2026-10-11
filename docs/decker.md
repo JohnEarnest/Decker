@@ -158,6 +158,8 @@ Sometimes when you share a deck with others you won't want Decker's editing tool
 
 In the _File &#8594; Properties_ dialog, clicking _Protect..._ will prompt you for a location to save a locked copy of the current deck. Locked decks hide the menu bar and disable most editing features and keyboard shortcuts, leaving the user strictly in "Interact Mode". Note that card backgrounds in a locked deck will reveal drawings underneath the menu bar: pressing `m` while using drawing tools can temporarily reveal this area as well.
 
+If an unlocked deck is smaller than the default 512x342 size, Decker will show cards centered in its window, as in the [Prototype editor](#customwidgets), to ensure that all the menus and editing tools remain usable. If you want your deck to appear in a smaller size, you'll need to lock it.
+
 Locking a deck is _not_ obfuscation or encryption; it's a polite suggestion. If you ever get stuck in a locked deck in Native-Decker, you can use ctrl+U+L+D (Un-Lock-Deck) to unlock it again. In Web-Decker, you can unlock a deck by opening your browser's JavaScript console and typing
 ```
 deck.locked=false
@@ -860,7 +862,7 @@ end
 
 Pointer Interface
 -----------------
-The pointer interface represents the global state of the user's pointing device, such as a mouse, pen, or touchscreen. It is available as a global constant named `pointer`. Its attributes will update live at 60hz, even if a script is running. The coordinates of the pointer are always in "screen space"; pixels relative to the top-left corner of the card. If you want to compare pointer coordinates to the position of a widget, you should use `widget.offset` rather than `widget.pos`, to properly reflect the screen coordinates of widgets nested within contraptions or prototypes.
+The pointer interface represents the global state of the user's pointing device, such as a mouse, pen, or touchscreen. It is available as a global constant named `pointer`. Its attributes will update live at 60hz, even if a script is running. The coordinates of the pointer are always in "card space": pixels relative to the top-left corner of the active card, which is not _necessarily_ the top-left corner of the Decker window. If you want to compare pointer coordinates to the position of a widget, you should use `widget.offset` rather than `widget.pos`, to properly reflect the screen coordinates of widgets nested within contraptions or prototypes.
 
 | Name       | Description                                                             |
 | :--------- | :---------------------------------------------------------------------- |

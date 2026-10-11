@@ -1616,15 +1616,17 @@ lv* interface_bits(lv*self,lv*i,lv*x){
 
 // Pointer interface
 
-pair pointer={0,0}, pointer_start={0,0}, pointer_prev={0,0}, pointer_end={0,0}; int pointer_held=0, pointer_down=0, pointer_up=0;
+pair pointer_offset={0,0};
+pair pointer={0,0}, pointer_start={0,0}, pointer_prev={0,0}, pointer_end={0,0};
+int pointer_held=0, pointer_down=0, pointer_up=0;
 lv* interface_pointer(lv*self,lv*i,lv*x){
 	ikey("held" )return lmn(pointer_held);
 	ikey("down" )return lmn(pointer_down);
 	ikey("up"   )return lmn(pointer_up);
-	ikey("pos"  )return lmpair(pointer);
-	ikey("start")return lmpair(pointer_start);
-	ikey("prev" )return lmpair(pointer_prev);
-	ikey("end"  )return lmpair(pointer_end);
+	ikey("pos"  )return lmpair(pair_sub(pointer      ,pointer_offset));
+	ikey("start")return lmpair(pair_sub(pointer_start,pointer_offset));
+	ikey("prev" )return lmpair(pair_sub(pointer_prev ,pointer_offset));
+	ikey("end"  )return lmpair(pair_add(pointer_end  ,pointer_offset));
 	return x?x:LNIL;(void)self;
 }
 
@@ -2484,9 +2486,9 @@ lv* interface_widget(lv*self,lv*i,lv*x){
 		ikey("event"   )return lmnat(n_event,self);
 		ikey("parent"  )return card;
 		ikey("offset"  ){
-			pair c=getpair(ifield(card,"size")),p=getpair(ifield(self,"pos")),d=getpair(ivalue(deck,"size"));
-			lv*con=card;while(contraption_is(con)){pair o=getpair(ifield(con,"pos"));p.x+=o.x,p.y+=o.y;con=ivalue(con,"card"),c=getpair(ifield(con,"size"));}
-			rect b=box_center(rect_pair((pair){0,0},d),c);return lmpair((pair){p.x+b.x,p.y+b.y});
+			pair p=getpair(ifield(self,"pos"));lv*con=card;
+			while(contraption_is(con)){p=pair_add(p,getpair(ifield(con,"pos")));con=ivalue(con,"card");}
+			return lmpair(p);
 		}
 	}return x?x:LNIL;
 }

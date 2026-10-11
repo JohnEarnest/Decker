@@ -1097,7 +1097,7 @@ field_keys=(code,shift)=>{
 }
 widget_contraption=x=>{
 	const show=ls(ifield(x,'show'));if(show=='none')return
-	const b=rpair(getpair(ifield(x,'pos')),getpair(ifield(x,'size'))), image=ifield(x,'image')
+	const b=rpair(con_to_screen(getpair(ifield(x,'pos'))),getpair(ifield(x,'size'))), image=ifield(x,'image')
 	const oc=frame.clip,pal=deck.patterns.pal.pix;frame.clip=rclip(frame.clip,b)
 	draw_9seg(b,frame.image,image,getrect(ifield(x.def,'margin')),frame.clip,show=='solid',show=='invert'?pal:null)
 	handle_widgets(x.widgets,rect(b.x,b.y)),frame.clip=oc
@@ -3737,13 +3737,20 @@ validate_modules=_=>{
 		modal_enter('alert'),ms.message=rtext_cast(lms(`The module "${ls(deck.modules.k[z])}" failed to initialize: ${ls(err)}`));break
 	}
 }
+let previous_locked=0
+resize_framebuffer=_=>{
+	const csz=getpair(ifield(ifield(deck,'card'),'size')), fsz=deck.locked?csz: rmax(rect(512,342),csz)
+	fb=image_make(fsz), context=frame=draw_frame(fb), previous_locked=deck.locked, resize()
+}
 load_deck=d=>{
 	deck=d, dirty=0, wid.active=-1, wid.hist=[], au.hist=[], doc_hist=[], doc_hist_cursor=0, dr=draw_state(), desired_cursor=null, con_set(null)
 	FONT_BODY=dget(deck.fonts,lms('body')),FONT_MENU=dget(deck.fonts,lms('menu')),FONT_MONO=dget(deck.fonts,lms('mono'))
-	fb=image_make(getpair(ifield(ifield(deck,'card'),'size'))),context=frame=draw_frame(fb),validate_modules(),setmode('interact'),msg.next_view=1
+	resize_framebuffer(),validate_modules(),setmode('interact'),msg.next_view=1
 	seed=0|(new Date().getTime()/1000),n_play([NIL,lms('loop')])
 }
 tick=_=>{
+	if(deck.locked!=previous_locked)resize_framebuffer()
+	pointer.offset=con_offset()
 	pointer.up=ev.mu,pointer.down=ev.md,gamepad_poll(),toolbars()
 	pointer_updated=0,msg.pending_halt=0,frame=context,uicursor=0,fb.pix.fill(0)
 	menu_setup(),all_menus(),widget_setup()
@@ -3755,7 +3762,7 @@ tick=_=>{
 	menu_finish()
 	if(uimode=='draw'&&dr.fatbits&&!ev.hidemenu)draw_icon(rect(frame.size.x-14,2),ZOOM,1)
 	if(uimode=='interact'&&ev.drag&&ob.sel.length&&lb(ifield(ob.sel[0],'draggable'))){
-		const c=ob.sel[0].card, off=(contraption_is(c)||prototype_is(c))?getpair(ifield(c,'pos')):rect(0,0)
+		const c=ob.sel[0].card, off=radd(con_offset(),contraption_is(c)?getpair(ifield(c,'pos')):rect(0,0))
 		iwrite(ob.sel[0],lms('pos'),lmpair(rsub(rsub(ev.pos,ob.prev),off))),mark_dirty()
 	}
 	document.title=ls(ifield(deck,'name')) || 'Untitled Deck'

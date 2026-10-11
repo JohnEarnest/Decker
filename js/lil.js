@@ -1538,12 +1538,12 @@ pointer={f:(self,i,x)=>{
 	if(ikey(i,'held' ))return lmn(self.held)
 	if(ikey(i,'down' ))return lmn(self.down)
 	if(ikey(i,'up'   ))return lmn(self.up)
-	if(ikey(i,'pos'  ))return lmpair(self.pos)
-	if(ikey(i,'start'))return lmpair(self.start)
-	if(ikey(i,'prev' ))return lmpair(self.prev)
-	if(ikey(i,'end'  ))return lmpair(self.end)
+	if(ikey(i,'pos'  ))return lmpair(rsub(self.pos  ,self.offset))
+	if(ikey(i,'start'))return lmpair(rsub(self.start,self.offset))
+	if(ikey(i,'prev' ))return lmpair(rsub(self.prev ,self.offset))
+	if(ikey(i,'end'  ))return lmpair(rsub(self.end  ,self.offset))
 	return x?x:NIL
-},t:'int',n:'pointer',held:0,down:0,up:0,pos:rect(),start:rect(),prev:rect(),end:rect()}
+},t:'int',n:'pointer',held:0,down:0,up:0,pos:rect(),start:rect(),prev:rect(),end:rect(),offset:rect()}
 
 let keypress={},keydown={},keyup={}
 gamepad={f:(self,i,x)=>{
@@ -2700,9 +2700,9 @@ interface_widget=(self,i,x)=>{
 			const r=(a?match(o,n):(lb(v)&&!match(v,n)))?s:n;iwrite(self,lms('show'),r);return r
 		})
 		if(ikey(i,'offset')){
-			let c=getpair(ifield(self.card,'size')), p=getpair(ifield(self,'pos')), d=self.card.deck.size, con=self.card
-			while(contraption_is(con)){p=radd(p,getpair(ifield(con,'pos'))),con=con.card,c=getpair(ifield(con,'size'))}
-			return lmpair(radd(p,rcenter(rect(0,0,d.x,d.y),c)))
+			let p=getpair(ifield(self,'pos')), con=self.card
+			while(contraption_is(con)){p=radd(p,getpair(ifield(con,'pos'))),con=con.card}
+			return lmpair(p)
 		}
 	}return x?x:NIL
 }
