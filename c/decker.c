@@ -1150,7 +1150,7 @@ void listener(rect r){
 lv* n_panic(lv*self,lv*z){
 	do_panic=1,halt();for(int z=gc.ss-1;z>=0;z--){gc.st[z].t->c=0;}
 	modal_enter(modal_listen);
-	pair s={(512-22)-18,16};rect b=rect_pair((pair){0,0},s);lv*r=lmbuff(s);cstate t=frame;frame=draw_buffer(r);
+	pair s={(DEFAULT_SIZE.x-22)-18,16};rect b=rect_pair((pair){0,0},s);lv*r=lmbuff(s);cstate t=frame;frame=draw_buffer(r);
 	draw_box(b,0,35),draw_textc(inset(b,2),"PANIC",FONT_MONO,35),frame=t,listen_show_image(r,z);
 	n_show(self,z),dset(li.vars,lmistr("_"),l_first(z));return LNIL;
 }
@@ -4431,7 +4431,7 @@ void resize_window(lv*deck){
 	int locked=lb(ifield(deck,"locked")), te=toolbars_enable&&!locked; last_locked=locked;
 	lv*card=ifield(deck,"card");
 	pair csize=getpair(ifield(card,"size")), dis=get_display_size();
-	pair size=locked?csize: pair_max((pair){512,342},csize);
+	pair size=locked?csize: pair_max(DEFAULT_SIZE,csize);
 	context=draw_buffer(lmbuff(size));
 	dset(env,lmistr("buff"),context.buffer);
 	int minscale=noscale?1: (size.x*2<=dis.x&&size.y*2<=dis.y)?2:1;
@@ -4524,7 +4524,7 @@ int main(int argc,char**argv){
 	dset(env,lmistr("acc t" ),ACCENTS[8]=isolate_accent(8,FONT_MENU));
 	dset(env,lmistr("acc co"),ACCENTS[9]=isolate_accent(9,FONT_MENU));
 
-	context=draw_buffer(lmbuff((pair){512,342}));
+	context=draw_buffer(lmbuff(DEFAULT_SIZE));
 	dset(env,lmistr("buff"),context.buffer);
 
 	io_init();

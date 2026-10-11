@@ -25,6 +25,8 @@ typedef struct {
 	lv *buffer, *font;
 } cstate; cstate frame;
 
+pair DEFAULT_SIZE=(pair){512,342};
+
 itype(image)itype(sound)itype(font)itype(button)itype(field)itype(slider)itype(grid)itype(canvas)itype(deck)itype(card)itype(patterns)itype(module)itype(array)
 itype(prototype)itype(contraption)itype(proxy)itype(keystore)
 int widget_is(lv*x){return button_is(x)||field_is(x)||slider_is(x)||grid_is(x)||canvas_is(x)||contraption_is(x)||proxy_is(x);}
@@ -3060,7 +3062,7 @@ lv* deck_read(lv*x){
 	{lv*k=lmistr("patterns");dset(r,k,patterns_read(deck));}
 	{lv*k=lmistr("version" ),*f=dget(deck,k);dset(r,k,f?f:lmn(1));}
 	{lv*k=lmistr("locked"  ),*f=dget(deck,k);dset(r,k,bool_read(f,0));}
-	{lv*k=lmistr("size"    ),*f=dget(deck,k);dset(r,k,f?lmpair(pair_max(getpair(normalize_pair(f)),(pair){8,8})):lmpair((pair){512,342}));}
+	{lv*k=lmistr("size"    ),*f=dget(deck,k);dset(r,k,f?lmpair(pair_max(getpair(normalize_pair(f)),(pair){8,8})):lmpair(DEFAULT_SIZE));}
 	{lv*k=lmistr("name"    ),*f=dget(deck,k);dset(r,k,str_read(f,""));}
 	{lv*k=lmistr("author"  ),*f=dget(deck,k);dset(r,k,str_read(f,""));}
 	{lv*k=lmistr("script"  ),*f=dget(deck,k);dset(r,k,str_read(f,""));}

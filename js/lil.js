@@ -883,6 +883,7 @@ show=(x,toplevel)=>linat(x)?'on native x do ... end': linil(x)?(toplevel?'':'nil
 FORMAT_VERSION=1, RTEXT_END=2147483647, SFX_RATE=8000, ANTS=255
 FRAME_QUOTA=MODULE_QUOTA=10*4096, TRANS_QUOTA=2*4096, LOOP_QUOTA=1*4096, ATTR_QUOTA=1*4096, BRUSH_QUOTA=128
 sleep_frames=0, sleep_play=0, pending_popstate=0
+DEFAULT_SIZE={x:512,y:342}
 DEFAULT_HANDLERS=`
 on link x do go[x] end
 on drag x do if !me.locked|me.draggable me.line[(pointer.prev-me.offset)/me.scale x] end end
@@ -3132,7 +3133,7 @@ deck_read=x=>{
 	ri.corners     =deck.hasOwnProperty('corners')?clamp(0,ln(deck.corners),255):1
 	ri.script      =deck.hasOwnProperty('script' )?scripts.get(ls(deck.script)):''
 	ri.card        =deck.hasOwnProperty('card'   )?clamp(0,ln(deck.card),Object.keys(cards).length-1):0
-	ri.size        =deck.hasOwnProperty('size'   )?rclamp(rect(8,8),getpair(deck.size),rect(4096,4096)):rect(512,342)
+	ri.size        =deck.hasOwnProperty('size'   )?rclamp(rect(8,8),getpair(deck.size),rect(4096,4096)):DEFAULT_SIZE
 	if(Object.keys(cards).length==0)cards.home=lmd(['name'].map(lms),[lms('home')])
 	const root=lmenv();constants(root),primitives(root,ri)
 	pushstate(root),issue(root,parse(DEFAULT_TRANSITIONS));while(running())runop();popstate()

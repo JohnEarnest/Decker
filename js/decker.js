@@ -1199,7 +1199,7 @@ listener=r=>{
 }
 n_panic=z=>{
 	do_panic=1,halt(),states.map(x=>x.t=[]),modal_enter('listen')
-	const s=rect((512-22)-18,16),b=rpair(rect(0,0),s),r=image_make(s),t=frame;frame=draw_frame(r)
+	const s=rect((DEFAULT_SIZE.x-22)-18,16),b=rpair(rect(0,0),s),r=image_make(s),t=frame;frame=draw_frame(r)
 	draw_box(b,0,35),draw_textc(inset(b,2),'PANIC',FONT_MONO,35),frame=t,listen_show_image(r,NIL)
 	n_show(z),li.vars.set('_',z[0]||NIL);return NIL
 }
@@ -3739,7 +3739,7 @@ validate_modules=_=>{
 }
 let previous_locked=0
 resize_framebuffer=_=>{
-	const csz=getpair(ifield(ifield(deck,'card'),'size')), fsz=deck.locked?csz: rmax(rect(512,342),csz)
+	const csz=getpair(ifield(ifield(deck,'card'),'size')), fsz=deck.locked?csz: rmax(DEFAULT_SIZE,csz)
 	fb=image_make(fsz), context=frame=draw_frame(fb), previous_locked=deck.locked, resize()
 }
 load_deck=d=>{
