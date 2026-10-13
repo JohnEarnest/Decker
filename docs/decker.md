@@ -748,6 +748,15 @@ The `app.cursor` field recognizes the following options:
 - `"none"`: hide the cursor.
 - `"crosshair"`: precision selection.
 
+The elements of `app.params` (if any) will automatically be URI-decoded. If you want to _construct_ a URL with parameters which contain reserved characters, you might want a utility function like the following:
+```lil
+on url_escape x do
+ a:"" split " !#$&'()*+,/:;=?@[]"
+ b:3 window "%20%21%23%24%26%27%28%29%2A%2B%2C%2F%3A%3B%3D%3F%40%5B%5D"
+ rtext.string[rtext.replace[x a b]]
+end
+```
+
 
 Bits Interface
 --------------
