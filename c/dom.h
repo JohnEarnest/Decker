@@ -25,7 +25,7 @@ typedef struct {
 	lv *buffer, *font;
 } cstate; cstate frame;
 
-pair DEFAULT_SIZE=(pair){512,342};
+pair DEFAULT_SIZE={512,342};
 
 itype(image)itype(sound)itype(font)itype(button)itype(field)itype(slider)itype(grid)itype(canvas)itype(deck)itype(card)itype(patterns)itype(module)itype(array)
 itype(prototype)itype(contraption)itype(proxy)itype(keystore)
