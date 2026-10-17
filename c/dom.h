@@ -501,11 +501,12 @@ void buffer_paste(rect r,rect cl,lv*src,lv*dst,int opaque){
 #define lerp_scale() fpair sc={MAX(EPSILON,(r.w*1.0)/(s.x==0?EPSILON:s.x)),MAX(EPSILON,(r.h*1.0)/(s.y==0?EPSILON:s.y))};
 
 void buffer_paste_scaled(rect r,rect cl,lv*src,lv*dst,int opaque){
-	if(r.w==0||r.h==0)return;pair s=buff_size(src),ds=buff_size(dst);lerp_scale();
+	if(r.w==0||r.h==0)return;pair s=buff_size(src),ds=buff_size(dst);int w=ds.x;lerp_scale();
 	if(r.w==s.x&&r.h==s.y){buffer_paste(r,cl,src,dst,opaque);return;}
-	for(int a=0;a<r.h;a++)for(int b=0;b<r.w;b++){
-		int sx=b/sc.x, sy=a/sc.y, c=src->sv[sx+sy*s.x];
-		if((opaque||c!=0)&&box_in(cl,(pair){r.x+b,r.y+a}))dst->sv[r.x+b+ds.x*(r.y+a)]=c;
+	for(int a=0,ry=r.y,rs=w*r.y;a<r.h;a++,ry++,rs+=w){
+		if(ry>=cl.y&&ry<cl.y+cl.h)for(int b=0,rx=r.x;b<r.w;b++,rx++){
+			if(rx>=cl.x&&rx<cl.x+cl.w){int sx=b/sc.x, sy=a/sc.y; char sp=src->sv[sx+sy*s.x]; if(opaque||sp!=0)dst->sv[rx+rs]=sp;}
+		}
 	}
 }
 lv* n_image_copy(lv*self,lv*z){

@@ -1802,17 +1802,18 @@ image_paste=(r,clip,src,dst,opaque)=>{
 	}
 	for(let y=0,ry=r.y,rs=w*r.y,ss=0;y<s.y;y++,ry++,rs+=w,ss+=s.x){
 		if(ry>=clip.y&&ry<clip.y+clip.h)for(let x=0,rx=r.x;x<s.x;x++,rx++){
-			const sp=src.pix[x+ss];if(rx>=clip.x&&rx<clip.x+clip.w&&(opaque||sp))dst.pix[rx+rs]=sp
+			const sp=src.pix[x+ss];if(rx>=clip.x&&rx<clip.x+clip.w&&(opaque||sp!=0))dst.pix[rx+rs]=sp
 		}
 	}
 }
 lerp_scale=(r,s)=>rect(r.w/s.x,r.h/s.y)
 image_paste_scaled=(r,clip,src,dst,opaque)=>{
-	r=rint(r);if(r.w==0||r.h==0)return;const s=src.size,ds=dst.size,sc=lerp_scale(r,s)
+	r=rint(r);if(r.w==0||r.h==0)return;const s=src.size,w=dst.size.x,sc=lerp_scale(r,s)
 	if(r.w==s.x&&r.h==s.y)return image_paste(r,clip,src,dst,opaque)
-	for(let a=0;a<r.h;a++)for(let b=0;b<r.w;b++){
-		let sx=0|(b/sc.x), sy=0|(a/sc.y), c=src.pix[sx+sy*s.x]
-		if((opaque||c!=0)&&rin(clip,rect(r.x+b,r.y+a)))dst.pix[r.x+b+ds.x*(r.y+a)]=c
+	for(let a=0,ry=r.y,rs=w*r.y;a<r.h;a++,ry++,rs+=w){
+		if(ry>=clip.y&&ry<clip.y+clip.h)for(let b=0,rx=r.x;b<r.w;b++,rx++){
+			if(rx>=clip.x&&rx<clip.x+clip.w){const sx=0|(b/sc.x), sy=0|(a/sc.y), sp=src.pix[sx+sy*s.x]; if(opaque||sp!=0)dst.pix[rx+rs]=sp}
+		}
 	}
 }
 image_dither=i=>{
