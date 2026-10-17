@@ -231,6 +231,11 @@ assert_image["image paste onto itself"
 ]
 assert["image histogram" ((0,11,22,33,44) dict (4,2,2,2,2)) self.hist]
 
+ia:image["%%IMG3AAgACAZAgHAkLA6NwxHRqFQWnYBltOlsJq3PURA="]
+ib:image["%%IMG3AAgACAZAgGkIKAqHxGLSZCQimccnE6qcWo1RYxA="]
+assert["image direct composite, opaque"     (ib.encoded                                          ) ia.copy[].paste[ib      ].encoded]
+assert["image direct composite, tansparent" ("%%IMG3AAgACAZAgGkIKAqHxOJwNDIZl0jnMeo0MZnQqvWKBDCD") ia.copy[].paste[ib 0,0 1].encoded]
+
 i:image[1,1]
 i.pixels:5
 assert["image pixels write scalar" (list list 5) i.pixels]

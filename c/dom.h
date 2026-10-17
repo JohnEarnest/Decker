@@ -282,6 +282,7 @@ rect rect_add(rect a,pair b){return (rect){a.x+b.x,a.y+b.y,a.w,a.h};}
 rect rect_sub(rect a,pair b){return (rect){a.x-b.x,a.y-b.y,a.w,a.h};}
 rect rect_pair(pair a,pair b){return (rect){a.x,a.y,b.x,b.y};}
 rect rect_max(rect a,rect b){return (rect){MAX(a.x,b.x),MAX(a.y,b.y),MAX(a.w,b.w),MAX(a.h,b.h)};}
+int pair_same(pair a,pair b){return a.x==b.x&&a.y==b.y;}
 int rect_same(rect a,rect b){return a.x==b.x&&a.y==b.y&&a.w==b.w&&a.h==b.h;}
 rect inset(rect r,int n){return (rect){r.x+n,r.y+n,r.w-2*n,r.h-2*n};}
 rect box_union    (rect a,rect b){int x=MIN(a.x,b.x),y=MIN(a.y,b.y);return(rect){x,y,MAX(a.x+a.w,b.x+b.w)-x,MAX(a.y+a.h,b.y+b.h)-y};}
@@ -375,6 +376,7 @@ rect find_occupied(lv*buff,int mask){
 }
 lv* buffer_copy(lv*src,rect r){
 	lv*c=lmbuff((pair){r.w,r.h});pair size=buff_size(src);rect clip={0,0,size.x,size.y};
+	if(rect_same(r,clip)){memcpy(c->sv,src->sv,size.x*size.y);return c;} // fast full copy
 	for(int y=0;y<r.h;y++)for(int x=0;x<r.w;x++)c->sv[x+r.w*y]=box_in(clip,(pair){r.x+x,r.y+y})?src->sv[(r.x+x)+size.x*(r.y+y)]:0;
 	return c;
 }
@@ -483,8 +485,16 @@ lv* buffer_clone(lv*x){pair size=buff_size(x);return buffer_copy(x,(rect){0,0,si
 lv* image_clone(lv*x){pair size=image_size(x);return image_make(buffer_copy(x->b,(rect){0,0,size.x,size.y}));}
 lv* unpack_image(lv*z,int i){return (i>=z->c||!image_is(z->lv[i]))?image_empty():z->lv[i];}
 void buffer_paste(rect r,rect cl,lv*src,lv*dst,int opaque){
-	pair ss=buff_size(src),ds=buff_size(dst);
-	for(int y=0;y<ss.y;y++)for(int x=0;x<ss.x;x++)if(box_in(cl,(pair){r.x+x,r.y+y})&&(opaque||src->sv[x+ss.x*y]))dst->sv[r.x+x+ds.x*(r.y+y)]=src->sv[x+ss.x*y];
+	pair s=buff_size(src),ds=buff_size(dst);int w=ds.x;
+	if(rect_same(r,cl)&&rect_same(r,(rect){0,0,s.x,s.y})&&pair_same(s,ds)){ // fast full paste
+		if(opaque){memcpy(dst->sv,src->sv,dst->c);return;}
+		for(int z=0;z<dst->c;z++){char sp=src->sv[z];if(sp)dst->sv[z]=sp;}return;
+	}
+	for(int y=0,ry=r.y,rs=w*r.y,ss=0;y<s.y;y++,ry++,rs+=w,ss+=s.x){
+		if(ry>=cl.y&&ry<cl.y+cl.h)for(int x=0,rx=r.x;x<s.x;x++,rx++){
+			char sp=src->sv[x+ss];if(rx>=cl.x&&rx<cl.x+cl.w&&(opaque||sp))dst->sv[rx+rs]=sp;
+		}
+	}
 }
 
 #define EPSILON      0.000001

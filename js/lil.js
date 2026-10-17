@@ -1789,13 +1789,22 @@ find_occupied=(image,mask)=>{
 	}d.w-=d.x,d.h-=d.y,d.w++,d.h++;return d
 }
 image_copy=(i,r)=>{
-	r=r?rint(r):rect(0,0,i.size.x,i.size.y);const c=image_make(rect(r.w,r.h)), clip=rect(0,0,i.size.x,i.size.y)
+	if(!r||requ(r,rect(0,0,i.size.x,i.size.y))){const c=image_make(i.size);c.pix.set(i.pix);return c;} // fast full copy
+	r=rint(r);const c=image_make(rect(r.w,r.h)), clip=rect(0,0,i.size.x,i.size.y)
 	for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++)c.pix[x+r.w*y]=rin(clip,rect(r.x+x,r.y+y))?i.pix[(r.x+x)+i.size.x*(r.y+y)]:0
 	return c
 }
 image_paste=(r,clip,src,dst,opaque)=>{
-	r=rint(r);const s=src.size,ds=dst.size
-	for(let y=0;y<s.y;y++)for(let x=0;x<s.x;x++)if(rin(clip,rect(r.x+x,r.y+y))&&(opaque||src.pix[x+s.x*y]))dst.pix[r.x+x+ds.x*(r.y+y)]=src.pix[x+s.x*y]
+	r=rint(r);const s=src.size,w=dst.size.x
+	if(requ(r,clip)&&requ(r,rect(0,0,s.x,s.y))&&requ(s,dst.size)){ // fast full paste
+		if(opaque){dst.pix.set(src.pix);return}
+		for(let z=0;z<src.pix.length;z++){const sp=src.pix[z];if(sp)dst.pix[z]=sp};return
+	}
+	for(let y=0,ry=r.y,rs=w*r.y,ss=0;y<s.y;y++,ry++,rs+=w,ss+=s.x){
+		if(ry>=clip.y&&ry<clip.y+clip.h)for(let x=0,rx=r.x;x<s.x;x++,rx++){
+			const sp=src.pix[x+ss];if(rx>=clip.x&&rx<clip.x+clip.w&&(opaque||sp))dst.pix[rx+rs]=sp
+		}
+	}
 }
 lerp_scale=(r,s)=>rect(r.w/s.x,r.h/s.y)
 image_paste_scaled=(r,clip,src,dst,opaque)=>{
