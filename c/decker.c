@@ -3450,6 +3450,7 @@ void palbtn(pair pos,pair dn,rect b,int pattern){
 #define tcellh 19
 #define tgap   1
 void ltoolbar(pair pos,pair dn){
+	interpreter_lock();
 	lv*bs=dget(deck->b,lmistr("brushes")),*bt=dget(deck->b,lmistr("brusht"));
 	toolbar_scroll=CLAMP(0,toolbar_scroll,bs->c);int th=bs->c?17:tcellh;
 	pair size=buff_size(TOOLB);frame=draw_buffer(TOOLB);
@@ -3468,8 +3469,10 @@ void ltoolbar(pair pos,pair dn){
 		if(toolbar_scroll>0    )if(scrollbtn(pos,dn,(rect){0     ,cy,tcellw+1,size.y-cy},0))toolbar_scroll--;
 		if(toolbar_scroll<bs->c)if(scrollbtn(pos,dn,(rect){tcellw,cy,tcellw+1,size.y-cy},1))toolbar_scroll++;
 	}
+	interpreter_unlock();
 }
 void rtoolbar(pair pos,pair dn){
+	interpreter_lock();
 	int pp[]={0,1,4,5,8,9,16,17,12,13,18,19,20,21,22,23,24,25,26,27,2,6,3,7,10,11,14,15,28,29,30,31}; // pleasing visual ramps
 	pair size=buff_size(TOOLB);frame=draw_buffer(TOOLB);
 	memset(frame.buffer->sv,0,frame.buffer->c),draw_box((rect){0,0,size.x,size.y},0,1),draw_rect((rect){0,16*tcellh,size.x,tgap},1);
@@ -3485,6 +3488,7 @@ void rtoolbar(pair pos,pair dn){
 		if(PAL_COLORS<=16){for(int z=0;z<PAL_COLORS        ;z++)palbtn(pos,dn,(rect){0,(2*tcellh)+z*tcellh,2*tcellw+1,tcellh+1},(z>=2?31:0)+z);}
 		else              {for(int z=0;z<MIN(PAL_COLORS,32);z++)palbtn(pos,dn,(rect){(z/16)*tcellw,(2*tcellh)+(z%16)*tcellh,tcellw+1,tcellh+1},(z>=2?31:0)+(z>=16?1:0)+z);}
 	}
+	interpreter_unlock();
 }
 
 // Input and Events
