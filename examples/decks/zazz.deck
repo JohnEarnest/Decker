@@ -196,7 +196,7 @@ end
 
 {module:zazz}
 description:"easy animation effects for your decks"
-version:1.1
+version:1.2
 {script}
 
 on inbox targets box do
@@ -266,13 +266,14 @@ end
 
 on flipbook target source speed frames do
  if "card"~typeof target target:target.image end
+ sz:if "canvas"~typeof target target.lsize else target.size end
  if "card"~typeof source source:source.image end
  if "canvas"~typeof source source:source.copy[] end
  if !"image"~typeof source source:source.parent.image.copy[source.pos source.size] end
- fc:floor source.size/target.size
+ fc:floor source.size/sz
  fr:(range prod fc) unless frames
  fi:fr[(count fr)%floor sys.ms*speed]
- target.paste[source.copy[target.size*floor(fc[0]%fi),(fi/fc[0]) target.size]]
+ target.paste[source.copy[sz*floor(fc[0]%fi),(fi/fc[0]) sz]]
 end
 
 module.inbox:inbox
