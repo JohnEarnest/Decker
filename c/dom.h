@@ -1639,7 +1639,7 @@ lv* interface_pointer(lv*self,lv*i,lv*x){
 	ikey("pos"  )return lmpair(pair_sub(pointer      ,pointer_offset));
 	ikey("start")return lmpair(pair_sub(pointer_start,pointer_offset));
 	ikey("prev" )return lmpair(pair_sub(pointer_prev ,pointer_offset));
-	ikey("end"  )return lmpair(pair_add(pointer_end  ,pointer_offset));
+	ikey("end"  )return lmpair(pair_sub(pointer_end  ,pointer_offset));
 	return x?x:LNIL;(void)self;
 }
 

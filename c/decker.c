@@ -4335,13 +4335,13 @@ lv* modal_track(modal_state*m){
 void tick(lv*env){
 	interpreter_lock();
 	if(last_locked!=lb(ifield(deck,"locked")))resize_window(deck);
-	pointer_offset=con_offset();
 	pointer_updated=0,msg.pending_halt=0;
 	if(dirty&&dirty_timer>0&&!running()&&autosave&&strlen(document_path)){
 		dirty_timer--;
 		if(dirty_timer==0)dirty=0,save_deck(lmcstr(document_path));
 	}
 	frame=context,uicursor=cursor_default;
+	pointer_offset=con_offset();
 	menu_setup(),all_menus(),widget_setup();
 	memset(frame.buffer->sv,0,frame.buffer->c);
 	event_state ev_stash=ev;kc.heading=NULL;if(kc.on){ev=(event_state){0};}

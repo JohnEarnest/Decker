@@ -3750,9 +3750,9 @@ load_deck=d=>{
 }
 tick=_=>{
 	if(deck.locked!=previous_locked)resize_framebuffer()
-	pointer.offset=con_offset()
 	pointer.up=ev.mu,pointer.down=ev.md,gamepad_poll(),toolbars()
 	pointer_updated=0,msg.pending_halt=0,frame=context,uicursor=0,fb.pix.fill(0)
+	pointer.offset=con_offset()
 	menu_setup(),all_menus(),widget_setup()
 	const ev_stash=ev;kc.heading=null;if(kc.on)ev=event_state()
 	if(uimode=='script'){const mh=3+font_h(FONT_MENU);if(!kc.on)script_editor(rect(0,mh,frame.size.x+1,frame.size.y-mh))}else{main_view()}
