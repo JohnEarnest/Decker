@@ -226,11 +226,11 @@ void framebuffer_alloc(pair size,int minscale){
 }
 
 int sync_parity=0;
-int framebuffer_flip(pair disp,pair size,int scale,int mask,int frame,char*pal,lv*buffer){
+int framebuffer_flip(pair disp,pair size,int scale,int background,int frame,char*pal,lv*buffer){
 	sync_parity=(sync_parity+1)%SYNC_DUTY;
 	if(sync_parity)return 0;
 	SDL_LockSurface(gfx);
-	draw_frame(pal,buffer,gfx->pixels,gfx->pitch,frame,mask);frame_count++;
+	draw_frame(pal,buffer,gfx->pixels,gfx->pitch,frame,background);frame_count++;
 	SDL_UnlockSurface(gfx);
 	pair pos={(disp.x-scale*size.x)/2,(disp.y-scale*size.y)/2};
 	surface_blit(gfx,vid,pos,scale);
@@ -240,7 +240,7 @@ void toolbar_flip(lv*buffer,int frame,char*pal,rect dest){
 	if(sync_parity)return;
 	if(!gtool){pair s=buff_size(buffer);gtool=SDL_CreateRGBSurface(0,s.x,s.y,32,0,0,0,0);}
 	SDL_LockSurface(gtool);
-	draw_frame(pal,buffer,gtool->pixels,gtool->pitch,frame,0);
+	draw_frame(pal,buffer,gtool->pixels,gtool->pitch,frame,32);
 	SDL_UnlockSurface(gtool);
 	int scale=1; // TODO!
 	surface_blit(gtool,vid,(pair){dest.x,dest.y},scale);

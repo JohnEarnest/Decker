@@ -206,10 +206,10 @@ void framebuffer_alloc(pair size,int minscale){
 	(void)minscale;
 	gfx=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,size.x,size.y);
 }
-int framebuffer_flip(pair disp,pair size,int scale,int mask,int frame,char*pal,lv*buffer){
+int framebuffer_flip(pair disp,pair size,int scale,int background,int frame,char*pal,lv*buffer){
 	int* p, pitch;
 	SDL_LockTexture(gfx,NULL,(void**)&p,&pitch);
-	draw_frame(pal,buffer,p,pitch,frame,mask);frame_count++;
+	draw_frame(pal,buffer,p,pitch,frame,background);frame_count++;
 	SDL_UnlockTexture(gfx);
 	SDL_Rect src={0,0,size.x,size.y};
 	SDL_Rect dst={(disp.x-scale*size.x)/2,(disp.y-scale*size.y)/2,scale*size.x,scale*size.y};
@@ -225,7 +225,7 @@ void toolbar_flip(lv*buffer,int frame,char*pal,rect dest){
 	if(!gtool){pair s=buff_size(buffer);gtool=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,s.x,s.y);}
 	int*p, pitch;
 	SDL_LockTexture(gtool,NULL,(void**)&p,&pitch);
-	draw_frame(pal,buffer,p,pitch,frame,0);
+	draw_frame(pal,buffer,p,pitch,frame,32);
 	SDL_UnlockTexture(gtool);
 	SDL_RenderCopy(ren,gtool,&src,&dst);
 }

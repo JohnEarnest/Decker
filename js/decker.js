@@ -3634,7 +3634,7 @@ main_view=_=>{
 		if(back.size.x!=s.x||back.size.y!=s.y)image_resize(back,s),mark_dirty()
 		if(dr.fatbits){frame.image.pix.fill(46),draw_rect(cl,dr.trans_mask?45:32),draw_fat(cl,back,pal,frame_count,0,dr.zoom,dr.offset)}
 		else if(s.x==frame.size.x&&s.y==frame.size.y){for(let z=0;z<back.pix.length;z++)frame.image.pix[z]=back.pix[z]}
-		else{frame.image.pix.fill(46),draw_rect(cl,dr.trans_mask?45:32),image_paste(cl,frame.clip,back,frame.image,0)}
+		else{frame.image.pix.fill(46),image_paste(cl,frame.clip,back,frame.image,1)}
 	}
 	ev=ev_to_con(ev)
 	if(uimode=='draw'&&in_layer())bg_tools()
@@ -3801,14 +3801,14 @@ tick=_=>{
 let id=null
 sync=_=>{
 	pick_palette(deck)
-	const anim=deck.patterns.anim, pal=deck.patterns.pal.pix, mask=dr.trans_mask&&uimode=='draw', fc=dr.show_anim?0|(frame_count/4):0
+	const anim=deck.patterns.anim, pal=deck.patterns.pal.pix, background=dr.trans_mask&&uimode=='draw'?13:0, fc=dr.show_anim?0|(frame_count/4):0
 	const anim_ants   =(x,y)=>(0|((x+y+(0|(frame_count/2)))/3))%2?15:0
 	const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][fc%max(1,anim[pix-28].length)]
 	const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
 	const draw_color  =(pix,x,y)=>pix==ANTS?anim_ants(x,y): pix>=32+PAL_COLORS?0: pix>31?pix-32: draw_pattern(pix,x,y)?15:0
 	if(!id||id.width!=fb.size.x||id.height!=fb.size.y){id=new ImageData(fb.size.x,fb.size.y);id.data.fill(0xFF)}
 	for(let z=0,d=0,y=0;y<id.height;y++)for(let x=0;x<id.width;x++,z++,d+=4){
-		const pix=fb.pix[z], a=anim_pattern(pix,x,y), c=(a==0&&mask)?13:draw_color(a,x,y), cv=COLORS[c]
+		const pix=fb.pix[z], a=anim_pattern(pix,x,y), c=a==0?background: draw_color(a,x,y), cv=COLORS[c]
 		id.data[d  ]=0xFF&(cv>>16)
 		id.data[d+1]=0xFF&(cv>> 8)
 		id.data[d+2]=0xFF&(cv    )

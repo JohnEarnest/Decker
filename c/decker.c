@@ -3704,7 +3704,7 @@ void sync(void){
 	int tscale=MIN((disp.x-scale*size.x)/(2*tsize.x),disp.y/tsize.y),tmscale=tscale;if(tscale&&noscale)tscale=tmscale=1;
 	int dpi=get_display_density(disp);disp.x*=dpi,disp.y*=dpi,scale*=dpi,tscale*=dpi;
 	pick_palette(deck);
-	if(framebuffer_flip(disp,size,scale,dr.trans_mask&&uimode==mode_draw,dr.show_anim?frame_count:0,patterns_pal(ifield(deck,"patterns")),context.buffer)){
+	if(framebuffer_flip(disp,size,scale,dr.trans_mask&&uimode==mode_draw?45:32,dr.show_anim?frame_count:0,patterns_pal(ifield(deck,"patterns")),context.buffer)){
 		char*pal=patterns_pal(ifield(deck,"patterns"));
 		int toolbars=toolbars_enable&&tscale>0&&!(lb(ifield(deck,"locked")))&&uimode!=mode_script;
 		int showleft=toolbars&&ms.type==modal_none&&!kc.on;
@@ -4235,7 +4235,7 @@ void main_view(void){
 		if(bsize.x!=s.x||bsize.y!=s.y)image_resize(back,s),mark_dirty();
 		if(dr.fatbits){memset(frame.buffer->sv,46,frame.buffer->c),draw_rect(cl,dr.trans_mask?45:32);draw_fat(cl,back->b,pal,frame_count,0,FAT,dr.offset);}
 		else if(s.x==frame.size.x&&s.y==frame.size.y){memcpy(frame.buffer->sv,back->b->sv,frame.buffer->c);}
-		else{memset(frame.buffer->sv,46,frame.buffer->c),draw_rect(cl,dr.trans_mask?45:32);buffer_paste(cl,frame.clip,back->b,frame.buffer,0);}
+		else{memset(frame.buffer->sv,46,frame.buffer->c);buffer_paste(cl,frame.clip,back->b,frame.buffer,1);}
 	}
 	ev=ev_to_con(ev);
 	if(uimode==mode_draw&&in_layer())bg_tools();

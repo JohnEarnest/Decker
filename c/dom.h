@@ -996,10 +996,10 @@ int draw_pattern(char*pal,int pix,int x,int y){return get_pattern(pal,pix,x,y);}
 int anim_pattern(char*pal,int pix,int frame){return get_anim(pal,pix,frame);}
 int draw_color      (char*pal,int pix,int frame,int x,int y)      {pix=anim_pattern(pal,pix,frame);return get_color (pal,pix,frame,x,y);}
 int draw_color_trans(char*pal,int pix,int frame,int x,int y,int t){pix=anim_pattern(pal,pix,frame);return get_colort(pal,pix,frame,x,y,t);}
-void draw_frame(char*pal,lv*buffer,int*p,int pitch,int frame,int mask){
+void draw_frame(char*pal,lv*buffer,int*p,int pitch,int frame,int background){
 	pair size=buff_size(buffer);for(int y=0;y<size.y;y++)for(int x=0;x<size.x;x++){
 		int stride=pitch/sizeof(int), pix=0xFF&buffer->sv[x+y*size.x], ci=13;
-		if(pix||!mask){pix=anim_pattern(pal,pix,frame),ci=get_color(pal,pix,frame,x,y);}
+		if(!pix)pix=background; pix=anim_pattern(pal,pix,frame),ci=get_color(pal,pix,frame,x,y);
 		p[x+y*stride]=COLORS[ci];
 	}
 }
