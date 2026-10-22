@@ -73,6 +73,8 @@ lv* n_brush(lv*self,lv*z); // forward ref
 lv* n_panic(lv*self,lv*z); // forward ref
 #define MATH_PI 3.141592653589793
 #define MATH_E  2.718281828459045
+#define EPSILON      0.000001
+#define sdiv(a,b)    ((a)/((b)==0?EPSILON:(b)))
 void constants(lv*env){
 	dset(env,lmistr("sys"    ),lmi(interface_sys,    lmistr("system" ),NULL));
 	dset(env,lmistr("app"    ),lmi(interface_app,    lmistr("app"    ),NULL));
@@ -497,7 +499,6 @@ void buffer_paste(rect r,rect cl,lv*src,lv*dst,int opaque){
 	}
 }
 
-#define EPSILON      0.000001
 #define lerp_scale() fpair sc={MAX(EPSILON,(r.w*1.0)/(s.x==0?EPSILON:s.x)),MAX(EPSILON,(r.h*1.0)/(s.y==0?EPSILON:s.y))};
 
 void buffer_paste_scaled(rect r,rect cl,lv*src,lv*dst,int opaque){
@@ -1059,10 +1060,10 @@ int clip_line(rect*r,rect clip){
 	while(1){
 		if(!(o1|o2))return 0;if(o1&o2)return 1;
 		int oo=o1?o1:o2, x=0, y=0;
-		if     (oo&8){x=r->x+(r->w-r->x)*(ymax-r->y)/(r->h-r->y),y=ymax;}
-		else if(oo&4){x=r->x+(r->w-r->x)*(ymin-r->y)/(r->h-r->y),y=ymin;}
-		else if(oo&2){y=r->y+(r->h-r->y)*(xmax-r->x)/(r->w-r->x),x=xmax;}
-		else if(oo&1){y=r->y+(r->h-r->y)*(xmin-r->x)/(r->w-r->x),x=xmin;}
+		if     (oo&8){x=r->x+(r->w-r->x)*sdiv(ymax-r->y,r->h-r->y),y=ymax;}
+		else if(oo&4){x=r->x+(r->w-r->x)*sdiv(ymin-r->y,r->h-r->y),y=ymin;}
+		else if(oo&2){y=r->y+(r->h-r->y)*sdiv(xmax-r->x,r->w-r->x),x=xmax;}
+		else if(oo&1){y=r->y+(r->h-r->y)*sdiv(xmin-r->x,r->w-r->x),x=xmin;}
 		if(oo==o1){r->x=x,r->y=y,o1=outcode(x,y);}
 		else      {r->w=x,r->h=y,o2=outcode(x,y);}
 	}
@@ -1200,7 +1201,7 @@ rect poly_bounds(void){
 int poly_in(fpair pos){
 	int r=0;for(int i=0,j=poly_count-1;i<poly_count;i++){
 		if(pos.x==poly[i].x&&pos.y==poly[i].y)return 1;
-		if(((poly[i].y>=pos.y)!=(poly[j].y>=pos.y))&&(pos.x<=(poly[j].x-poly[i].x)*(pos.y-poly[i].y)/(poly[j].y-poly[i].y)+poly[i].x))r^=1;
+		if(((poly[i].y>=pos.y)!=(poly[j].y>=pos.y))&&(pos.x<=(poly[j].x-poly[i].x)*sdiv(pos.y-poly[i].y,poly[j].y-poly[i].y)+poly[i].x))r^=1;
 		j=i;
 	}return r;
 }
@@ -2237,7 +2238,7 @@ lv* interface_slider(lv*self,lv*i,lv*x){
 	lv*data=self->b;
 	if(x){
 		ikey("value"    ){dset(data,i,lmn(slider_normalize(getfpair(ifield(self,"interval")),ln(ifield(self,"step")),ln(x))));return x;}
-		ikey("step"     ){double n=ln(x);dset(data,i,lmn(n<=0?0.000001:n));iwrite(self,lmistr("value"),dget(data,lmistr("value")));return x;}
+		ikey("step"     ){double n=ln(x);dset(data,i,lmn(n<=0?EPSILON:n));iwrite(self,lmistr("value"),dget(data,lmistr("value")));return x;}
 		ikey("format"   ){dset(data,i,ls(x));return x;}
 		ikey("style"    ){dset(data,i,normalize_enum(x,slider_styles));return x;}
 		ikey("interval" ){
