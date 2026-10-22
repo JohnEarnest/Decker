@@ -106,3 +106,15 @@ show[insert a "quoted name" with 55 66 77 88 end]  # quoted column names
 show[insert a a with "one" 11 "two" 22 end]        # repeat column names: take the last one
 
 show[insert __proto__ with 11 22 end] # cursed column names
+
+# nil result columns
+show[select foo from ()]                           # missing column
+show[select foo from (11,22,33)]
+show[select foo value from ()]                     # missing and present columns
+show[select foo value from (11,22,33)]
+show[select a:nil b:11,22 from 0]                  # explicit nil column in context
+show[select a:nil from 0]                          # explicit nil column alone
+show[select a:list nil from 0]                     # enlisted nil shouldn't be collapsed
+show[table (list "a") dict (list nil)]
+show[table (list "a") dict (list list nil)]
+show[table ("a","b") dict (list nil),(list 55,66)]

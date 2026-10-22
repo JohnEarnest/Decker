@@ -222,7 +222,7 @@ lv* conform(lv*x,lv*y,lv*(f(lv*,lv*))){
 	if(!lil(x)&& lil(y)){MAP(r,y)conform(x,y->lv[z],f);return r;} return f(x,y);
 }
 lv* torect(lv*t){ // modifies t in-place to rectangularize columns!
-	int n=0;EACH(z,t)n=MAX(n,lil(t->lv[z])?t->lv[z]->c:1);
+	int n=0;EACH(z,t)n=MAX(n,lil(t->lv[z])?t->lv[z]->c: linil(t->lv[z])?0: 1);
 	t->n=n; EACH(z,t)t->lv[z]=l_take(lmn(n),lil(t->lv[z])?t->lv[z]:l_list(t->lv[z]));return t;
 }
 
