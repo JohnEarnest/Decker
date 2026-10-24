@@ -2999,6 +2999,7 @@ lv* interface_deck(lv*self,lv*i,lv*x){
 		ikey("author" ){dset(data,i,ls(x));return x;}
 		ikey("corners"){dset(data,i,lmn(CLAMP(0,ln(x),255)));return x;}
 		ikey("script" ){dset(data,i,ls(x));return x;}
+		ikey("size"   ){dset(data,i,lmpair(pair_max(getpair(normalize_pair(x)),(pair){8,8})));return x;}
 		ikey("card"   ){n_go(self,l_list(x));return x;}
 	}else{
 		ikey("version" )return dget(data,i);
@@ -3007,6 +3008,7 @@ lv* interface_deck(lv*self,lv*i,lv*x){
 		ikey("author"  )return dget(data,i);
 		ikey("corners" ){lv*r=dget(data,i);return r?r:ONE;}
 		ikey("script"  )return dget(data,i);
+		ikey("size"    )return dget(data,i);
 		ikey("patterns")return dget(data,i);
 		ikey("sounds"  )return dclone(dget(data,i)); // expose a shallow copy
 		ikey("fonts"   )return dclone(dget(data,i)); // expose a shallow copy

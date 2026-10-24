@@ -932,6 +932,7 @@ The deck interface represents the global attributes of a Decker document. The op
 | `x.name`          | String. A descriptive title for the deck. r/w.                                              |
 | `x.author`        | String. The name of the author of the deck. r/w.                                            |
 | `x.corners`       | Number. The pattern index for drawing the "corners" of the deck, when applicable. r/w.      |
+| `x.size`          | The `size` of this deck in pixels. r/w.                                                     |
 | `x.script`        | String. The Lil source code of the deck's script, or `""`. r/w.                             |
 | `x.patterns`      | An instance of the [Patterns](#patternsinterface) interface.                                |
 | `x.sounds`        | A dictionary of [Sounds](#soundinterface) stored in this deck, keyed by name.               |
@@ -968,6 +969,8 @@ on temporary_canvas size do
  r
 end
 ```
+
+The minimum `deck.size` is 8x8 pixels. Please keep in mind that sizes larger than the default 512x342 deck dimensions may lead to significant performance degradation, especially in Web-Decker and/or on slower devices!
 
 
 Patterns Interface

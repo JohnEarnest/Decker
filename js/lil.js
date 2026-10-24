@@ -3099,6 +3099,7 @@ deck_read=x=>{
 			if(ikey(i,'author' ))return self.author=ls(x),x
 			if(ikey(i,'corners'))return self.corners=clamp(0,ln(x),255),x
 			if(ikey(i,'script' ))return self.script=ls(x),x
+			if(ikey(i,'size'   ))return self.size=rclamp(rect(8,8),getpair(x),rect(4096,4096)),x
 			if(ikey(i,'card'   ))return n_go([x],self),x
 		}else{
 			if(ikey(i,'version' ))return lmn(self.version)
@@ -3107,6 +3108,7 @@ deck_read=x=>{
 			if(ikey(i,'author'  ))return lms(self.author)
 			if(ikey(i,'corners' ))return lmn(self.corners)
 			if(ikey(i,'script'  ))return lms(self.script)
+			if(ikey(i,'size'    ))return lmpair(self.size)
 			if(ikey(i,'patterns'))return self.patterns
 			if(ikey(i,'sounds'  ))return dyad.drop(ZERO,self.sounds)
 			if(ikey(i,'fonts'   ))return dyad.drop(ZERO,self.fonts)
