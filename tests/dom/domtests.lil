@@ -1334,6 +1334,8 @@ dattr.version:  1
 dattr.locked:   0
 dattr.name:     ""
 dattr.author:   ""
+dattr.size:     512,342
+dattr.esize:    512,342
 dattr.script:   ""
 dattr.patterns: "patterns"
 dattr.sounds:   "dict"
@@ -1346,6 +1348,8 @@ on deckattrs x do
 	r.locked:   x.locked
 	r.name:     x.name
 	r.author:   x.author
+	r.size:     x.size
+	r.esize:    x.esize
 	r.script:   x.script
 	r.patterns: typeof x.patterns
 	r.sounds:   typeof x.sounds

@@ -3738,10 +3738,10 @@ validate_modules=_=>{
 	}
 }
 let previous_locked=0
-let previous_size=rect(0,0)
+let previous_size=rect(0,0), previous_esize=rect(0,0)
 resize_framebuffer=_=>{
-	const csz=deck.size, fsz=deck.locked?csz: rmax(DEFAULT_SIZE,csz)
-	fb=image_make(fsz), context=frame=draw_frame(fb), previous_locked=deck.locked, previous_size=deck.size, resize()
+	const csz=deck.size, fsz=deck.locked?csz: rmax(deck.esize,csz)
+	fb=image_make(fsz), context=frame=draw_frame(fb), previous_locked=deck.locked, previous_size=deck.size, previous_esize=deck.esize, resize()
 }
 load_deck=d=>{
 	deck=d, dirty=0, wid.active=-1, wid.hist=[], au.hist=[], doc_hist=[], doc_hist_cursor=0, dr=draw_state(), desired_cursor=null, con_set(null)
@@ -3750,7 +3750,7 @@ load_deck=d=>{
 	seed=0|(new Date().getTime()/1000),n_play([NIL,lms('loop')])
 }
 tick=_=>{
-	if(deck.locked!=previous_locked||!requ(deck.size,previous_size))resize_framebuffer()
+	if(deck.locked!=previous_locked||!requ(deck.size,previous_size)||!requ(deck.esize,previous_esize))resize_framebuffer()
 	pointer.up=ev.mu,pointer.down=ev.md,gamepad_poll(),toolbars()
 	pointer_updated=0,msg.pending_halt=0,frame=context,uicursor=0,fb.pix.fill(0)
 	pointer.offset=con_offset()

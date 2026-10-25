@@ -46,7 +46,7 @@ char*pangram="How razorback jumping-frogs can level six piqued gymnasts.";
 lv*env,*deck=NULL,*doc_hist; int doc_hist_cursor=0;
 cstate context;
 int audio_playing=0,windowed=1,toggle_fullscreen=0;
-int last_locked=0;pair last_size={0,0};
+int last_locked=0;pair last_size={0,0}, last_editorsize={0,0};
 int autosave=0, noscale=0, dirty=0, dirty_timer=0; char document_path[PATH_MAX]={0};
 #define AUTOSAVE_DELAY (10*60)
 lv* deck_get(lv*text){interpreter_lock();lv*r=deck_read(text);interpreter_unlock();return r;}
@@ -4335,7 +4335,9 @@ lv* modal_track(modal_state*m){
 }
 void tick(lv*env){
 	interpreter_lock();
-	if(last_locked!=lb(ifield(deck,"locked"))||!pair_same(last_size,getpair(ifield(deck,"size"))))resize_window(deck);
+	if(last_locked!=lb(ifield(deck,"locked"))||
+		!pair_same(last_size      ,getpair(ifield(deck,"size" )))||
+		!pair_same(last_editorsize,getpair(ifield(deck,"esize"))))resize_window(deck);
 	pointer_updated=0,msg.pending_halt=0;
 	if(dirty&&dirty_timer>0&&!running()&&autosave&&strlen(document_path)){
 		dirty_timer--;
@@ -4433,9 +4435,9 @@ void save_deck(lv*path){
 	set_path(path->sv);
 }
 void resize_window(lv*deck){
-	last_locked=lb(ifield(deck,"locked")), last_size=getpair(ifield(deck,"size"));
+	last_locked=lb(ifield(deck,"locked")), last_size=getpair(ifield(deck,"size")), last_editorsize=getpair(ifield(deck,"esize"));
 	int te=toolbars_enable&&!last_locked;
-	pair dis=get_display_size(), size=last_locked?last_size: pair_max(DEFAULT_SIZE,last_size);
+	pair dis=get_display_size(), size=last_locked?last_size: pair_max(last_editorsize,last_size);
 	context=draw_buffer(lmbuff(size));
 	dset(env,lmistr("buff"),context.buffer);
 	int minscale=noscale?1: (size.x*2<=dis.x&&size.y*2<=dis.y)?2:1;

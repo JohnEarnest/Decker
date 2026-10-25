@@ -933,6 +933,7 @@ The deck interface represents the global attributes of a Decker document. The op
 | `x.author`        | String. The name of the author of the deck. r/w.                                            |
 | `x.corners`       | Number. The pattern index for drawing the "corners" of the deck, when applicable. r/w.      |
 | `x.size`          | The `size` of this deck in pixels. r/w.                                                     |
+| `x.esize`         | The minimum `size` for Decker's window while this deck is unlocked. r/w.                    |
 | `x.script`        | String. The Lil source code of the deck's script, or `""`. r/w.                             |
 | `x.patterns`      | An instance of the [Patterns](#patternsinterface) interface.                                |
 | `x.sounds`        | A dictionary of [Sounds](#soundinterface) stored in this deck, keyed by name.               |

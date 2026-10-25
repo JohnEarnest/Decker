@@ -3099,7 +3099,8 @@ deck_read=x=>{
 			if(ikey(i,'author' ))return self.author=ls(x),x
 			if(ikey(i,'corners'))return self.corners=clamp(0,ln(x),255),x
 			if(ikey(i,'script' ))return self.script=ls(x),x
-			if(ikey(i,'size'   ))return self.size=rclamp(rect(8,8),getpair(x),rect(4096,4096)),x
+			if(ikey(i,'size'   ))return self.size =rint(rclamp(rect(8,8)   ,getpair(x),rect(4096,4096))),x
+			if(ikey(i,'esize'  ))return self.esize=rint(rclamp(DEFAULT_SIZE,getpair(x),rect(4096,4096))),x
 			if(ikey(i,'card'   ))return n_go([x],self),x
 		}else{
 			if(ikey(i,'version' ))return lmn(self.version)
@@ -3109,6 +3110,7 @@ deck_read=x=>{
 			if(ikey(i,'corners' ))return lmn(self.corners)
 			if(ikey(i,'script'  ))return lms(self.script)
 			if(ikey(i,'size'    ))return lmpair(self.size)
+			if(ikey(i,'esize'   ))return lmpair(self.esize)
 			if(ikey(i,'patterns'))return self.patterns
 			if(ikey(i,'sounds'  ))return dyad.drop(ZERO,self.sounds)
 			if(ikey(i,'fonts'   ))return dyad.drop(ZERO,self.fonts)
@@ -3141,7 +3143,8 @@ deck_read=x=>{
 	ri.corners     =deck.hasOwnProperty('corners')?clamp(0,ln(deck.corners),255):1
 	ri.script      =deck.hasOwnProperty('script' )?scripts.get(ls(deck.script)):''
 	ri.card        =deck.hasOwnProperty('card'   )?clamp(0,ln(deck.card),Object.keys(cards).length-1):0
-	ri.size        =deck.hasOwnProperty('size'   )?rclamp(rect(8,8),getpair(deck.size),rect(4096,4096)):DEFAULT_SIZE
+	ri.size        =deck.hasOwnProperty('size'   )?rint(rclamp(rect(8,8)   ,getpair(deck.size ),rect(4096,4096))):DEFAULT_SIZE
+	ri.esize       =deck.hasOwnProperty('esize'  )?rint(rclamp(DEFAULT_SIZE,getpair(deck.esize),rect(4096,4096))):DEFAULT_SIZE
 	if(Object.keys(cards).length==0)cards.home=lmd(['name'].map(lms),[lms('home')])
 	const root=lmenv();constants(root),primitives(root,ri)
 	pushstate(root),issue(root,parse(DEFAULT_TRANSITIONS));while(running())runop();popstate()
@@ -3172,6 +3175,7 @@ deck_write=(x,html)=>{
 	strip_fnt('body'),strip_fnt('menu'),strip_fnt('mono')
 	write_line(x,'card'      ,x=>1                                  ,lmn                       )
 	write_line(x,'size'      ,x=>1                                  ,lmpair                    )
+	write_line(x,'esize'     ,x=>!requ(x,DEFAULT_SIZE)              ,lmpair                    )
 	write_line(x,'locked'    ,x=>x                                  ,lmn                       )
 	write_line(x,'script'    ,x=>x.length                           ,x=>script_ref(null,lms(x)))
 	write_line(x,'name'      ,x=>x.length                           ,lms                       )

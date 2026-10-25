@@ -3000,6 +3000,7 @@ lv* interface_deck(lv*self,lv*i,lv*x){
 		ikey("corners"){dset(data,i,lmn(CLAMP(0,ln(x),255)));return x;}
 		ikey("script" ){dset(data,i,ls(x));return x;}
 		ikey("size"   ){dset(data,i,lmpair(pair_max(getpair(normalize_pair(x)),(pair){8,8})));return x;}
+		ikey("esize"  ){dset(data,i,lmpair(pair_max(getpair(normalize_pair(x)),DEFAULT_SIZE)));return x;}
 		ikey("card"   ){n_go(self,l_list(x));return x;}
 	}else{
 		ikey("version" )return dget(data,i);
@@ -3009,6 +3010,7 @@ lv* interface_deck(lv*self,lv*i,lv*x){
 		ikey("corners" ){lv*r=dget(data,i);return r?r:ONE;}
 		ikey("script"  )return dget(data,i);
 		ikey("size"    )return dget(data,i);
+		ikey("esize"   )return dget(data,i);
 		ikey("patterns")return dget(data,i);
 		ikey("sounds"  )return dclone(dget(data,i)); // expose a shallow copy
 		ikey("fonts"   )return dclone(dget(data,i)); // expose a shallow copy
@@ -3076,7 +3078,8 @@ lv* deck_read(lv*x){
 	{lv*k=lmistr("patterns");dset(r,k,patterns_read(deck));}
 	{lv*k=lmistr("version" ),*f=dget(deck,k);dset(r,k,f?f:lmn(1));}
 	{lv*k=lmistr("locked"  ),*f=dget(deck,k);dset(r,k,bool_read(f,0));}
-	{lv*k=lmistr("size"    ),*f=dget(deck,k);dset(r,k,f?lmpair(pair_max(getpair(normalize_pair(f)),(pair){8,8})):lmpair(DEFAULT_SIZE));}
+	{lv*k=lmistr("size"    ),*f=dget(deck,k);dset(r,k,f?lmpair(pair_max(getpair(normalize_pair(f)),(pair){8,8} )):lmpair(DEFAULT_SIZE));}
+	{lv*k=lmistr("esize"   ),*f=dget(deck,k);dset(r,k,f?lmpair(pair_max(getpair(normalize_pair(f)),DEFAULT_SIZE)):lmpair(DEFAULT_SIZE));}
 	{lv*k=lmistr("name"    ),*f=dget(deck,k);dset(r,k,str_read(f,""));}
 	{lv*k=lmistr("author"  ),*f=dget(deck,k);dset(r,k,str_read(f,""));}
 	{lv*k=lmistr("script"  ),*f=dget(deck,k);dset(r,k,str_read(f,""));}
@@ -3132,6 +3135,7 @@ lv* deck_write(lv*x,int html){
 	lv*s=dget(data,lmistr("sounds"));
 	write_line("card"      ,1                                             ,v                                )
 	write_line("size"      ,1                                             ,v                                )
+	write_line("esize"     ,!pair_same(getpair(v),DEFAULT_SIZE)           ,v                                )
 	write_line("locked"    ,lb(v)                                         ,v                                )
 	write_line("script"    ,v->c                                          ,script_ref(scripts,NULL,&sci,v,0))
 	write_line("name"      ,v->c                                          ,v                                )
