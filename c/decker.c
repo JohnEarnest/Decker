@@ -143,10 +143,12 @@ lv* con_image(void){return ifield(con(),"image");}
 pair con_size(void){return getpair(ifield(con(),"size"));}
 rect con_dim(void){return rect_pair((pair){0,0},con_size());}
 #define FAT (dr.zoom)
+int menu_height(void){return 3+font_h(FONT_MENU);}
 rect con_clip(void){
 	pair size=con_size();
 	if(dr.fatbits)return box_center(frame.clip,pair_min(frame.size,(pair){size.x*FAT,size.y*FAT}));
-	return box_intersect(frame.clip,box_center(frame.clip,size));
+	int mh=menu_height(), ms=(frame.clip.h-size.y)>=mh?mh :0;
+	return box_intersect(frame.clip,box_center((rect){frame.clip.x,frame.clip.y+ms,frame.clip.w,frame.clip.h-ms},size));
 }
 pair con_offset(void){rect r=con_clip();return (pair){r.x,r.y};}
 pair con_to_screen  (pair a){if(dr.fatbits){a=pair_sub(a,dr.offset);a.x*=FAT,a.y*=FAT                  ;}return pair_add(a,con_offset());}
@@ -380,7 +382,7 @@ int menu_item(char*name,int enabled,char shortcut){return menu_check(name,enable
 void menu_separator(void){menu_check(NULL,0,0,'\0');}
 void menu_finish(void){
 	if(menus_off()||menus_hidden())return;
-	rect b={0,0,context.size.x,3+font_h(FONT_MENU)};
+	rect b={0,0,context.size.x,menu_height()};
 	draw_rect(b,32),draw_hline(0,b.w,b.h,1); char*pal=patterns_pal(ifield(deck,"patterns"));
 	for(int i=0;i<menu.head_count;i++){
 		menu_head x=menu.heads[i];int a=x.enabled&&(over(x.b)||i==menu.stick||i==menu.active);
@@ -2460,7 +2462,7 @@ void validate_modules(void){
 	}
 }
 void script_editor(rect r){
-	int mh=3+font_h(FONT_MENU);
+	int mh=menu_height();
 	lv*overw=NULL;if(sc.xray){
 		lv*wids=con_wids();int ow=0;EACHR(z,wids){
 			lv*wid=wids->lv[z];rect size=con_to_screenr(unpack_widget(wid).size);
@@ -2608,7 +2610,7 @@ void soft_keyboard(rect r,int*exit,int*eval){
 void keycaps(void){
 	if(!wid.fv)kc.on=0;if(!kc.on)return;
 	memset(frame.buffer->sv,0,frame.buffer->c);
-	int mh=3+font_h(FONT_MENU);
+	int mh=menu_height();
 	rect r={0,mh,frame.size.x+1,(frame.size.y/2)-mh};
 	if(kc.heading){pair s=font_textsize(FONT_MENU,kc.heading);rect h={r.x,r.y,r.w,s.y+5};draw_textc(h,kc.heading,FONT_MENU,1);r.h-=h.h,r.y+=h.h;}
 	if(ms.type)ms.in_modal=1;
@@ -4348,7 +4350,7 @@ void tick(lv*env){
 	menu_setup(),all_menus(),widget_setup();
 	memset(frame.buffer->sv,0,frame.buffer->c);
 	event_state ev_stash=ev;kc.heading=NULL;if(kc.on){ev=(event_state){0};}
-	if(uimode==mode_script){int mh=3+font_h(FONT_MENU);if(!kc.on)script_editor((rect){0,mh,frame.size.x+1,frame.size.y-mh});}else{main_view();}
+	if(uimode==mode_script){int mh=menu_height();if(!kc.on)script_editor((rect){0,mh,frame.size.x+1,frame.size.y-mh});}else{main_view();}
 	modals(),gestures();
 	if(uimode==mode_interact&&ev.drag&&ob.sel->c&&lb(ifield(ob.sel->lv[0],"draggable"))){
 		lv*c=ivalue(ob.sel->lv[0],"card");pair off=pair_add(con_offset(),contraption_is(c)?getpair(ifield(c,"pos")): (pair){0,0});

@@ -423,7 +423,12 @@ con_wids=_=>con().widgets
 con_image=_=>ifield(con(),'image')
 con_size=_=>getpair(ifield(con(),'size'))
 con_dim=_=>rpair(rect(),con_size())
-con_clip=_=>{const size=con_size();return dr.fatbits?rcenter(frame.clip,rmin(frame.size,rmul(size,dr.zoom))): rclip(frame.clip,rcenter(frame.clip,size))}
+menu_height=_=>3+font_h(FONT_MENU)
+con_clip=_=>{
+	const size=con_size();if(dr.fatbits)return rcenter(frame.clip,rmin(frame.size,rmul(size,dr.zoom)))
+	const mh=menu_height(), ms=(frame.clip.h-size.y)>=mh?mh :0
+	return rclip(frame.clip,rcenter(rect(frame.clip.x,frame.clip.y+ms,frame.clip.w,frame.clip.h-ms),size))
+}
 con_offset=_=>{const r=con_clip();return rect(r.x,r.y)}
 con_to_screen=a=>radd(dr.fatbits?rmul(rsub(a,dr.offset),dr.zoom):a,con_offset())
 screen_to_con=a=>{a=rsub(a,con_offset());return dr.fatbits?radd(rdiv(a,dr.zoom),dr.offset):a}
@@ -580,7 +585,7 @@ menu_item=(name,enabled,shortcut,func)=>menu_check(name,enabled,-1,shortcut,func
 menu_separator=_=>menu_check(0,0,0,0,0)
 menu_finish=_=>{
 	if(menus_off()||menus_hidden())return
-	const b=rect(0,0,context.size.x,3+font_h(FONT_MENU)); draw_rect(b,32),draw_hline(0,b.w,b.h,1); const pal=deck.patterns.pal.pix
+	const b=rect(0,0,context.size.x,menu_height()); draw_rect(b,32),draw_hline(0,b.w,b.h,1); const pal=deck.patterns.pal.pix
 	menu.heads.map((x,i)=>{
 		let a=x.enabled&&(over(x.b)||i==menu.stick||i==menu.active);if(ev.drag&&!dover(b))a=0
 		draw_text(x.t,x.name,FONT_MENU,x.enabled?1:13);if(a)draw_invert(pal,x.b)
@@ -2455,7 +2460,7 @@ soft_keyboard=r=>{
 keycaps=_=>{
 	if(!wid.fv)kc.on=0;if(!kc.on)return
 	frame.image.pix.fill(32)
-	const mh=3+font_h(FONT_MENU)
+	const mh=menu_height()
 	const r=rect(0,mh,frame.size.x+1,0|((frame.size.y/2)-mh))
 	if(kc.heading){const s=font_textsize(FONT_MENU,kc.heading);const h=rect(r.x,r.y,r.w,s.y+5);draw_textc(h,kc.heading,FONT_MENU,1),r.h-=h.h,r.y+=h.h}
 	if(ms.type)ms.in_modal=1
@@ -3205,7 +3210,7 @@ script_editor=r=>{
 		const e=cursor>=x.layout.length?1:0, i=cursor-e, l=x.layout[i].line, c=i-x.lines[l].range.x
 		return rect(l+1,c+1+e)
 	}
-	const mh=3+font_h(FONT_MENU)
+	const mh=menu_height()
 	let overw=null;if(sc.xray){
 		const wids=con_wids();let ow=0;for(let z=wids.v.length-1;z>=0;z--){
 			const wid=wids.v[z],size=con_to_screen(unpack_widget(wid).size), o=ev.alt&&over(size)&&!ow, col=o?(overw=wid,13):44; ow|=o
@@ -3756,7 +3761,7 @@ tick=_=>{
 	pointer.offset=con_offset()
 	menu_setup(),all_menus(),widget_setup()
 	const ev_stash=ev;kc.heading=null;if(kc.on)ev=event_state()
-	if(uimode=='script'){const mh=3+font_h(FONT_MENU);if(!kc.on)script_editor(rect(0,mh,frame.size.x+1,frame.size.y-mh))}else{main_view()}
+	if(uimode=='script'){const mh=menu_height();if(!kc.on)script_editor(rect(0,mh,frame.size.x+1,frame.size.y-mh))}else{main_view()}
 	modals(),gestures()
 	if(kc.on){ev=ev_stash,keycaps()}
 	if(uimode=='script'&&enable_touch&&ms.type==null)wid.active=0
