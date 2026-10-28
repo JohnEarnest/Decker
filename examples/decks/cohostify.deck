@@ -162,7 +162,7 @@ version:1
 is_syntax_highlighter:1
 language_name:"Octo"
 {script}
-ESCAPES   :"," split "\\\\,\\r,\\n,\\t,\\v,\\0"
+ESCAPES   :"," split "\\\\,\\r,\\n,\\t,\\v,\\0,\\\""
 REGISTERS :"i",((list "v%h") format range 16),((list "v%H") format range 16)
 OPERATORS :"," split ":=,+=,-=,=-,|=,&=,^=,<<=,>>=,==,!=,<=,>=,<,>"
 CONTROL   :"|" split "return|if|then|begin|else|end|loop|again|while|jump|jump0|;"
