@@ -1480,7 +1480,7 @@ The canvas will scale _up_ logical pixels to display them on the card (resulting
 | Name                    | Description                                                                                                       |
 | :---------------------- | :---------------------------------------------------------------------------------------------------------------- |
 | `typeof x`              | `"canvas"`                                                                                                        |
-| `x[pos]`                | The pattern index of an (x,y) pixel of the canvas. Reads `0` out of bounds, ignores out of bounds writes. r/w.    |
+| `x[pos]`                | The pattern index of an (x,y) pixel of the canvas. Reads nil out of bounds, ignores out of bounds writes. r/w.    |
 | `x.name`                | String. The name of this widget. r/w.                                                                             |
 | `x.script`              | String. The Lil source code of the widget's script, or `""`. r/w.                                                 |
 | `x.locked`              | Bool. If false, the user can draw on this canvas in the current brush and pattern. r/w.                           |
