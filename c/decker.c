@@ -2375,7 +2375,8 @@ void modals(void){
 	}
 	else if(ms.type==modal_trans){
 		do_transition((ms.time_curr*1.0)/ms.time_end,1);
-		lv*i=container_image(ms.canvas,1);buffer_paste(rect_pair((pair){0,0},frame.size),frame.clip,i->b,frame.buffer,1);
+		pair s=con_size();if(s.x!=frame.size.x&&s.y!=frame.size.y)memset(frame.buffer->sv,46,frame.buffer->c);
+		lv*i=container_image(ms.canvas,1);buffer_paste(rect_pair(con_offset(),frame.size),frame.clip,i->b,frame.buffer,1);
 		ms.time_curr++;if(ms.time_curr>ms.time_end||do_panic)modal_exit(0);
 	}
 	ms.in_modal=0;

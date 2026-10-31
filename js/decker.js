@@ -1397,11 +1397,16 @@ res_enumerate=(source)=>{
 	return table_sort_radix(r,'icon','name')
 }
 title_caps=x=>{let w=1;return x.split('').map(c=>{if(w)c=drom_toupper(c);w=c==' '||c=='\n';return c}).join('')}
+trans_buff=image_make(rect(1,1))
 do_transition=(tween,dest,errors)=>{
-	let f=frame;ms.canvas.image.size=dest.size,ms.canvas.image.pix=dest.pix,ms.canvas.image.pix.fill(0),canvas_clip(ms.canvas)
+	const cs=con_size(),co=con_offset(),f=frame;
+	if(requ(cs,dest.size)){ms.canvas.image.size=dest.size,ms.canvas.image.pix=dest.pix}
+	else{if(!requ(cs,trans_buff.size))trans_buff=image_make(cs);ms.canvas.image.size=cs,ms.canvas.image.pix=trans_buff.pix}
+	ms.canvas.image.pix.fill(0),canvas_clip(ms.canvas)
 	const a=lml([ms.canvas,ms.carda,ms.cardb,lmn(tween)]), p=lmblk();blk_lit(p,ms.trans),blk_lit(p,a),blk_op(p,op.CALL)
 	const e=lmenv();pushstate(e),issue(e,p);let quota=TRANS_QUOTA;while(quota&&running())runop(),quota--
 	if(running()&&errors){listen_show(ALIGN.right,1,lms(`warning: transition ${ms.trans.n} exceeded quota and was halted.`)),tween=2}
+	if(!requ(cs,dest.size)){dest.pix.fill(46);image_paste(rect(co.x,co.y,cs.x,cs.y),rect(0,0,dest.size.x,dest.size.y),ms.canvas.image,dest,1)}
 	popstate(),frame=f,sleep_play=0,sleep_frames=0;return tween
 }
 
