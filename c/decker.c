@@ -3065,6 +3065,7 @@ void bg_tighten(void){
 	rect d=find_occupied(dr.mask,0);if(d.w<1||d.h<1||(d.w==r.w&&d.h==r.h))return; // trim excess?
 	dr.limbo=buffer_copy(dr.limbo,d);if(dr.mask)dr.mask=buffer_copy(dr.mask,d);
 	dr.sel_here .x+=d.x,dr.sel_here .y+=d.y,dr.sel_here .w=d.w,dr.sel_here .h=d.h;
+	poly_count=0;
 }
 void bg_outline(void){
 	rect r=dr.sel_here;
