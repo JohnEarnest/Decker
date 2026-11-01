@@ -5,6 +5,12 @@ show[eval["\n99`5"]]
 # inappropriate keyword
 show[eval["if 1 do 2 else 3 end"].error]
 
+# bad arglist
+show[eval["on foo a b a do a+b end"]]
+
+# bad each varname list
+show[eval["each x y x in range 5 end"]]
+
 # cursed identifiers
 show[eval["__proto__:toString"]]
 

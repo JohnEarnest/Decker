@@ -1079,7 +1079,13 @@ str name(char*n){
 	if(!ident(r.sv))snprintf(par.error,sizeof(par.error),"'%s' is a keyword, and cannot be used for a %s name.",r.sv,n);
 	return r;
 }
-lv* names(char*end,char*type){lv*r=lml(0);while(!match(end)&&!perr())ll_add(r,lmstr(name(type)));return r;}
+lv* names(char*end,char*type){
+	lv*r=lml(0);while(!match(end)&&!perr()){
+		lv*n=lmstr(name(type));
+		for(int z=0;z<r->c;z++)if(matchr(n,r->lv[z])){snprintf(par.error,sizeof(par.error),"Repeated %s name '%s'.",type,n->sv);break;}
+		ll_add(r,n);
+	}return r;
+}
 void expr(lv*b);lv*n_uplevel(lv*self,lv*a); // forward refs
 lv* quote(void){lv*r=lmblk();expr(r);blk_end(r);return r;}
 void iblock(lv*r){

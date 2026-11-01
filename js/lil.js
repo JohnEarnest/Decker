@@ -557,7 +557,7 @@ parse=text=>{
 			into:1,from:1,where:1,by:1,orderby:1,asc:1,desc:1};return !(kw.hasOwnProperty(n)||monad.hasOwnProperty(n)||dyad.hasOwnProperty(n))
 	}
 	const name=n=>{const r=expect('name');if(!ident(r)&&n!='member')er(`'${r}' is a keyword, and cannot be used for a ${n} name.`);return r}
-	const names=(x,n)=>{const r=[];while(!match(x))r.push(name(n));return r}
+	const names=(x,n)=>{const r=[];while(!match(x)){const nv=name(n);if(r.indexOf(nv)>=0)er(`Repeated ${n} name '${nv}'.`);r.push(nv);}return r}
 	const quote=_=>{const r=lmblk();expr(r);blk_end(r);return r}
 	const block=_=>{const r=lmblk();iblock(r);return r}
 	const quotesub=_=>{let c=0,r=lmblk();while(hasnext()&&!matchsp(']'))expr(r),c++;blk_opa(r,op.BUND,c);return r}

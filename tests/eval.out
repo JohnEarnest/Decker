@@ -1,5 +1,7 @@
 {"value":nil,"vars":{},"error":"Invalid character '`'.","errorpos":(1,3)}
 "'do' is a keyword, and cannot be used for a variable name."
+{"value":nil,"vars":{},"error":"Repeated argument name 'a'.","errorpos":(0,12)}
+{"value":nil,"vars":{},"error":"Repeated variable name 'x'.","errorpos":(0,10)}
 {"value":nil,"vars":{"__proto__":nil}}
 {"value":nil,"vars":{}}
 {"value":3,"vars":{}}
