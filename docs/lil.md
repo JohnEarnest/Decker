@@ -253,6 +253,11 @@ several[11 22 33]
 # (-10,-21,-32)
 ```
 
+You may also occasionally want to _call_ a function with a varying number of arguments. The `$` operator applies a function on the left to a list of arguments on the right:
+```lil
+on add x y do x+y end
+add $ 2,3   # returns 5
+```
 
 Lil, the Functional Language
 ----------------------------
@@ -1351,6 +1356,8 @@ The `&` and `|` operators calculate the minimum or maximum of their arguments. A
 
 `x @ y` is spread-indexing: `x` is indexed with each element of `y`. For example, `(11,22,33) @ 0,1,0,1,0` is `(11,22,11,22,11)`. With an appropriate index `y`, this operator can be used to reorder, duplicate, or filter elements of a list `x`. The expression `x @ y` is essentially equivalent to `each v in y x[v] end`, and so it can also be used as shorthand for any `each` loop that would otherwise simply be applying a function to each element of its source. This also works if `x` is a unary primitive: `count @ "one","two","three","four"` is `(3,3,5,4)`.
 
+`x $ y` is application: the function `x` is called with the list of arguments `y`; each sequential element of the list `y` is bound to the corresponding named argument of the function `x`. This differs from calling the function with bracket notation (`x[y]`) because `y` can vary in length at runtime. This can be particularly useful when calling _ambivalent_ functions that can accept a variable number of arguments.
+
 `x split y` breaks a string `y` apart on any instance of the string `x`, resulting in a list of strings.
 
 `x fuse y` conversely combines the strings in the list `y` with the string `x`, resulting in a string. Combining `split` and `fuse` can allow one to replace instances of one substring with another.
@@ -1414,7 +1421,7 @@ The following is a slightly hand-waved EBNF description of Lil's syntax. The pro
 MONAD   := '-'|'!'|'floor'|'ceil'|'cos'|'sin'|'tan'|'exp'|'ln'|'sqrt'|'count'|'first'|'last'|'sum'|'min'|'max'|
            'raze'|'prod'|'range'|'keys'|'list'|'rows'|'cols'|'table'|'typeof'|'flip'|'mag'|'unit'|'heading'|
            'trim'|'rev'|'distinct'
-DYAD    := '+'|'-'|'*'|'/'|'%'|'^'|'<'|'>'|'='|'&'|'|'|','|'~'|'@'|'split'|'fuse'|'dict'|'take'|'drop'|
+DYAD    := '+'|'-'|'*'|'/'|'%'|'^'|'<'|'>'|'='|'&'|'|'|','|'~'|'@'|'$'|'split'|'fuse'|'dict'|'take'|'drop'|
            'in'|'join'|'cross'|'parse'|'format'|'unless'|'limit'|'like'|'window'|'fill'
 DIGIT   := '0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'
 NUMBER  := '-'? DIGIT+ '.'? | DIGIT* '.' DIGIT+

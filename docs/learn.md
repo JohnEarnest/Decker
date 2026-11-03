@@ -114,6 +114,9 @@ end
 # parameters are NOT separated by commas!
 myfunc[2 5] # -> 52
 
+# you can apply a function to a list of arguments with "$"
+myfunc $ 2,5 # -> 52
+
 # functions are values, and can be passed around:
 on twice f x do
  f[f[x]]
@@ -124,7 +127,7 @@ twice[on double x do x*2 end  10] # -> 40
 on vary ...x do
  show[x]
 end
-f[11 22 33]          # -> (11,22,33)
+vary[11 22 33]       # -> (11,22,33)
 
 # variables have lexical scope:
 on outer x do        # function argument defines local x.

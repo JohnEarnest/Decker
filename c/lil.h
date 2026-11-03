@@ -996,7 +996,7 @@ typedef struct{int i,r,c,tl;char*text;token here,next;char error[1024];}parser;p
 #define init_tok(x,v) (x->type=v,x->row=par.r,x->col=par.c)
 #define perr()        par.error[0]
 //         ! "#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
-char*tcc=" s\" sss ()ssssdsdddddddddd: sssn@nnnnnnnnnnnnnnnnnnnnnnnnnn[ ]sn nnnnnnnnnnnnnnnnnnnnnnnnnn s s";
+char*tcc=" s\" $ss ()ssssdsdddddddddd: sssn@nnnnnnnnnnnnnnnnnnnnnnnnnn[ ]sn nnnnnnnnnnnnnnnnnnnnnnnnnn s s";
 char*ncc= "                nnnnnnnnnn     n nnnnnnnnnnnnnnnnnnnnnnnnnn    n nnnnnnnnnnnnnnnnnnnnnnnnnn    ";
 char*mcc= "     xx x xxxx x          x xxx x                          x  x                             x x";
 char tc(void){return (par.i>=par.tl)?' ':par.text[par.i];}
@@ -1212,6 +1212,7 @@ void term(lv*b){
 }
 void expr(lv*b){
 	term(b);if(strchr("[.",peek()->type)){parseindex(b,NULL);}
+	if(matchsp('$')){expr(b),blk_op(b,CALL);return;}
 	if(matchsp('@')){
 		int depth=0;while(matchsp('@'))depth++;
 		lv*func=tempname();blk_set(b,func);blk_op(b,DROP);expr(b);
@@ -1248,6 +1249,7 @@ lv* env_bind(lv*e,lv*k,lv*v){lv*r=lmenv(e);EACH(z,k)env_local(r,k->lv[z],z<v->c?
 #define getpc()        idx_peek(&state.pcs)
 
 void docall(lv*f,lv*a,int tail){
+	if(!lil(a))a=l_list(a);
 	if(linat(f)){ret(((lv*(*)(lv*,lv*))f->f)(f->a,a));return;}
 	if(!lion(f)){ret(l_at(f,l_first(a)));return;}
 	if(tail){descope;}

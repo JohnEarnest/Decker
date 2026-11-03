@@ -1,0 +1,23 @@
+
+# test suite for the $ pseudo-operator.
+
+on three x y z do
+ (list x),(list y),(list z)
+end
+
+# bind listy right arguments in order:
+show[three $ 11,22,33]
+
+# the left argument can be a subexpression:
+show[(three) $ 44,55,66]
+
+# non-listy right arguments get enlisted:
+show[three $ nil]
+show[three $ 123]
+show[three $ "abc"]
+show[three $ ("ab" dict 11,22)]
+
+# apply can also be a shorthand for simple indexing:
+# (only the first element of a list is used as an index)
+show[(11,22,33) $ 1]
+show[(11,22,33) $ 2,1,0]

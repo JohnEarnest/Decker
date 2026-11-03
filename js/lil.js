@@ -523,7 +523,7 @@ parse=text=>{
 	const sw=_=>{while(iw())if(text[i]=='#')while(i<text.length&&text[i]!='\n')nc();else nc()}
 	const id=_=>0<='0123456789'.indexOf(text[i])
 	//          !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
-	const tcc=' s" sss ()ssssdsdddddddddd: sssn@nnnnnnnnnnnnnnnnnnnnnnnnnn[ ]sn nnnnnnnnnnnnnnnnnnnnnnnnnn s s'
+	const tcc=' s" $ss ()ssssdsdddddddddd: sssn@nnnnnnnnnnnnnnnnnnnnnnnnnn[ ]sn nnnnnnnnnnnnnnnnnnnnnnnnnn s s'
 	const ncc='                nnnnnnnnnn     n nnnnnnnnnnnnnnnnnnnnnnnnnn    n nnnnnnnnnnnnnnnnnnnnnnnnnn    '
 	const mcc='     xx x xxxx x          x xxx x                          x  x                             x x'
 	const esc={'\\':'\\','"':'"','n':'\n'}
@@ -666,6 +666,7 @@ parse=text=>{
 	}
 	const expr=b=>{
 		term(b);if(({'[':1,'.':1})[peek().t]){parseindex(b)}
+		if(matchsp('$')){expr(b),blk_op(b,op.CALL);return}
 		if(matchsp('@')){
 			let depth=0;while(matchsp('@'))depth++
 			const func=tempname();blk_set(b,func),blk_op(b,op.DROP),expr(b)
@@ -701,6 +702,7 @@ descope  =_=>(state.e.pop(),state.t.pop(),state.pcs.pop())
 ret      =x=>state.p.push(x)
 arg      =_=>state.p.pop()
 docall=(f,a,tail)=>{
+	if(!lil(a))a=lml([a])
 	if(linat(f)){ret(f.f(ll(a)));return}
 	if(!lion(f)){ret(l_at(f,monad.first(a)));return}
 	if(tail){descope()}
