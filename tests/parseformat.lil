@@ -15,12 +15,21 @@ show["%3i%2i%5i"      parse "12345678"              ] # fixed-width
 show["%h %h %H %H"    parse "AB ab AB ab"           ] # case insensitivity
 show["%h %h"          parse "FACEB00F ffffffff"     ] # large hex
 show["%*h%n,%*i%n%m"  parse "AB,42"                 ] # skip ints
+show["%i%n%m"         parse "-0"                    ] # "-0" is an int
+show["%i%n%m"         parse "-a"                    ] # "-" isn't an int
+show["%1i%n%m"        parse "-a"                    ] # "-" isn't an int, consume 1 char
 # floats
 show["%f%n %f%n %f%n" parse "-3 .3 0.997"           ] # basics
 show["%c %c %c"       parse "$23 -$3.5 420.69"      ] # currency ($ optional)
 show["%C %C %C"       parse "23 -3.5 420.69"        ] # plain currency (no $)
 show["%5f%f"          parse "12.3456.7"             ] # fixed-width
 show["%*f%n,%*f%n%m"  parse ".3,1.2"                ] # skip floats
+show["%i%n%m"         parse "-0"                    ] # "-0" is a float
+show["%f%n%m"         parse "-a"                    ] # "-" isn't a float
+show["%1f%n%m"        parse "-a"                    ] # "-" isn't a float, consume 1 char
+show["%f%n%m"         parse ".a"                    ] # "." isn't a float
+show["%f%n%m"         parse "-.a"                   ] # "-." isn't a float
+show["%c%n%m"         parse "-$.a"                  ] # "-$." isn't a currency value
 # strings
 show["%s,%s,%s"       parse "one,two,three"         ] # basics
 show["%3s%10s"        parse "ABCDE"                 ] # fixed-width

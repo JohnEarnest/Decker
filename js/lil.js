@@ -296,8 +296,8 @@ dyad={
 			else if(t=='s'||t=='l'||t=='u'){v=lms('');while(hn()&&(n?1:y[h]!=x[f]))v.v+=y[h++];if(t=='l')v.v=drom_tolower(v.v);if(t=='u')v.v=drom_toupper(v.v)}
 			else if(t=='a'){v=lml([]);while(hn()&&(n?1:y[h]!=x[f]))v.v.push(lmn(drom_to_ord(y[h++])))}
 			else if(t=='b'){v=lmbool(/[tTyYx1]/.test(y[h]));while(hn()&&(n?1:y[h]!=x[f]))h++}
-			else if(t=='i'){v=lmn(0);const s=(y[h]=='-')?(h++,-1):1;m&=id(y[h]);while(hn()&&id(y[h]))v.v=v.v*10+(+y[h++]);v.v*=s}
-			else if(t=='h'||t=='H'){v=lmn(0),                       m&=ix();    while(hn()&&ix())v.v=v.v*16+parseInt(y[h++],16)}
+			else if(t=='i'){v=lmn(0);const s=(y[h]=='-')?(h++,-1):1;let hd=0;m&=id(y[h]);while(hn()&&id(y[h]))hd=1,v.v=v.v*10+(+y[h++]);v.v*=s;if(!hd)h=si,v=NIL}
+			else if(t=='h'||t=='H'){v=lmn(0),                                m&=ix();    while(hn()&&ix())v.v=v.v*16+parseInt(y[h++],16)}
 			else if(t=='j'){if(m){const j=pjson(y,h,n);h=j.index,v=j.value}else{v=NIL}}
 			else if(t=='J'){if(m){const j=plove(y,h,n);h=j.index,v=j.value}else{v=NIL}}
 			else if(t=='v'){v=lms(''),m&=!id(y[h]);while(hn()&&/[0-9a-zA-Z_?]/.test(y[h]))v.v+=y[h++];m&=count(v)>0}
@@ -307,9 +307,10 @@ dyad={
 				}if(m&=y[h]=='"')h++;if(!m)v=NIL
 			}
 			else if(t=='f'||t=='c'||t=='C'){
-				v=lmn(0);let p=10,s=(y[h]=='-')?(h++,-1):1; if(t=='c'&&m&&y[h]=='$')h++
-				m&=id(y[h])||y[h]=='.';  while(hn()&&id(y[h]))v.v=v.v*10+(+y[h++])
-				m&&hn()&&y[h]=='.'&&h++; while(hn()&&id(y[h]))v.v+=(+y[h++])/p,p*=10;v.v*=s
+				v=lmn(0);let p=10,hd=0,s=(y[h]=='-')?(h++,-1):1; if(t=='c'&&m&&y[h]=='$')h++
+				m&=id(y[h])||y[h]=='.';  while(hn()&&id(y[h]))hd=1,v.v=v.v*10+(+y[h++])
+				m&&hn()&&y[h]=='.'&&h++; while(hn()&&id(y[h]))hd=1,v.v+=(+y[h++])/p,p*=10;v.v*=s
+				if(!hd)h=si,v=NIL
 			}
 			else if(t=='r'||t=='o'){
 				let cc=x.slice(f,f+(d||1));v=lms(''),f+=(d||1);

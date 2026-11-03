@@ -685,7 +685,7 @@ dyad(l_parse){
 		else if(t=='m')v=lmbool(m);
 		else if(t=='n')v=lmn(h);
 		else if(t=='z')v=lmbool(m&&h==y->c);
-		else if(t=='i'){long long r=0,s=hc=='-'?(h++,-1):1;m&=!!isdigit(hc);while(hn&&isdigit(hc))r=r*10+hc-'0',h++;v=lmn(r*s);}
+		else if(t=='i'){long long r=0,hd=0,s=hc=='-'?(h++,-1):1;m&=!!isdigit(hc);while(hn&&isdigit(hc))hd=1,r=r*10+hc-'0',h++;v=lmn(r*s);if(!hd)h=si,v=LNIL;}
 		else if(t=='h'||t=='H'){long long r=0;m&=!!isxdigit(hc);while(hn&&isxdigit(hc))r=r*16+(hc>'9'?drom_tolower(hc)-'a'+10:hc-'0'),h++;v=lmn(r);}
 		else if(strchr("slu",t)){str r=str_new();while(hn&&(n?1:hc!=fc))str_addc(&r,ulc(hc)),h++;v=lmstr(r);}
 		else if(t=='a'){v=lml(0);while(hn&&(n?1:hc!=fc))ll_add(v,lmn(0xFF&hc)),h++;}
@@ -706,9 +706,10 @@ dyad(l_parse){
 			}if(!m)r.c=0;v=lmstr(r);
 		}
 		else if(t=='f'||t=='c'||t=='C'){
-			double r=0,p=10,s=hc=='-'?(h++,-1):1;if(t=='c'&&m&&hc=='$')h++;
-			m&=!!isdigit(hc)||hc=='.';while(hn&&isdigit(hc))r=r*10+hc-'0',h++;
-			if(hn&&hc=='.')h++;while(hn&&isdigit(hc))r+=(hc-'0')/p,p*=10,h++;v=lmn(r*s);
+			double r=0,p=10,hd=0,s=hc=='-'?(h++,-1):1;if(t=='c'&&m&&hc=='$')h++;
+			m&=!!isdigit(hc)||hc=='.';while(hn&&isdigit(hc))hd=1,r=r*10+hc-'0',h++;
+			if(hn&&hc=='.')h++;while(hn&&isdigit(hc))hd=1,r+=(hc-'0')/p,p*=10,h++;v=lmn(r*s);
+			if(!hd)h=si,v=LNIL;
 		}
 		else if(t=='e'||t=='p'){
 			struct tm tm={0};if(m){
