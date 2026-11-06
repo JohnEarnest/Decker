@@ -449,12 +449,12 @@ lv* n_image_transform(lv*self,lv*z){
 }
 void buffer_shear_x(lv*b,lv*t,float shear){
 	pair s=buff_size(b);
-	for(int y=0;y<s.y;y++){int o=(y-(s.y/2))*shear;for(int x=0;x<s.x;x++)t->sv[x+y*s.x]=b->sv[mod(x+o,s.x)+y*s.x];}
+	for(int y=0;y<s.y;y++){int o=roundf((y-(s.y/2))*shear);for(int x=0;x<s.x;x++)t->sv[x+y*s.x]=b->sv[mod(x+o,s.x)+y*s.x];}
 	memcpy(b->sv,t->sv,b->c);
 }
 void buffer_shear_y(lv*b,lv*t,float shear){
 	pair s=buff_size(b);
-	for(int x=0;x<s.x;x++){int o=(x-(s.x/2))*shear;for(int y=0;y<s.y;y++)t->sv[x+y*s.x]=b->sv[x+mod(y+o,s.y)*s.x];}
+	for(int x=0;x<s.x;x++){int o=roundf((x-(s.x/2))*shear);for(int y=0;y<s.y;y++)t->sv[x+y*s.x]=b->sv[x+mod(y+o,s.y)*s.x];}
 	memcpy(b->sv,t->sv,b->c);
 }
 lv* n_image_rotate(lv*self,lv*z){

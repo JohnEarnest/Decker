@@ -391,7 +391,7 @@ end
 
 rot:"%%IMG2ACgAIgD/AFsBAQAlAQQAIgEGACABBwAeAQoAHgEKAB8BCQAgAQcAIAEIAB8BCQAeAQQAAQEEAB4BBAADAQMAHQEEAAUBAQAdAQQAJAEDACYBAQD/AKo="
 assert["rotate image negative"
-	"%%IMG3ACgAIgKEj6nL7Q+jnLTai7PevPsPhuIYlGNSmkrwpSrrslwM0/Jmx4Cq5Snou3mCvGHwlDspl8ym8wmNSqfUKqIA"
+	"%%IMG3ACgAIgKEj6nL7Q+jnLTai7PevPsPhlwgKmRAlgfKqsDJokuqxbFh01jO33vfe2WALQ9RB4L5XAgZc/WMSqfUqvWKzWoxBQ=="
 	image[rot].rotate[pi*-.8].encoded
 ]
 assert["rotate image positive"
