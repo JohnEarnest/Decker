@@ -1114,19 +1114,20 @@ lv* n_pre_listen(lv*self,lv*a){
 	return a;
 }
 lv* n_post_listen(lv*self,lv*a){
-	(void)self;EACH(z,ev())dset(li.vars,ev()->kv[z],ev()->lv[z]);
+	(void)self;EACH(z,ev())dset(li.vars,ev()->kv[z],ev()->lv[z]);a=l_first(a);
 	dset(li.vars,lmistr("_"),a);listen_show(align_right,0,a);return a;
 }
 lv* n_post_query(lv*self,lv*a){
-	(void)self;ms.grid=(grid_val){lt(a),0,-1,-1};return a;
+	(void)self;a=l_first(a);
+	ms.grid=(grid_val){lt(a),0,-1,-1};return a;
 }
 void listener_eval(void){
 	lv*str=rtext_all(ms.text.table);if(str->c<1)return;
 	lv*prog=parse(str->sv);if(perr()){char e[4096];snprintf(e,sizeof(e),"error: %s",par.error);listen_show(align_right,1,lmcstr(e));return;}
 	ms.text=(field_val){rtext_cast(lmistr("")),0};listen_show(align_left,1,str);lv*b=lmblk();
 	lv*target=uimode==mode_script?sc.target: ob.sel->c==1?ob.sel->lv[0]: con();
-	blk_lit(b,lmnat(n_pre_listen ,NULL)),blk_lit(b,LNIL),blk_op(b,CALL),blk_op(b,DROP);blk_cat(b,prog);
-	blk_lit(b,lmnat(n_post_listen,NULL)),blk_op (b,SWAP),blk_op(b,CALL),blk_op(b,DROP);fire_hunk_async(target,b);
+	                  blk_lit(b,lmnat(n_pre_listen ,NULL)),blk_lit(b,LNIL),blk_op(b,CALL),blk_op(b,DROP);blk_cat(b,prog);
+	blk_opa(b,BUND,1),blk_lit(b,lmnat(n_post_listen,NULL)),blk_op (b,SWAP),blk_op(b,CALL),blk_op(b,DROP);fire_hunk_async(target,b);
 }
 void listener(rect r){
 	int th=0;EACH(z,li.hist)th+=buff_size(li.hist->lv[z]->lv[0]).y+5;int h=MIN(th,LISTEN_H);
