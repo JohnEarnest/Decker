@@ -62,9 +62,9 @@ typedef struct {
 	int pending_view, next_view, overshoot;
 	int pending_loop;
 	int pending_quit;
-	lv* target_click;    fpair arg_click;
-	lv* target_drag;     fpair arg_drag, lastdrag;
-	lv* target_release;  fpair arg_release;
+	lv* target_click;    pair arg_click;
+	lv* target_drag;     pair arg_drag, lastdrag;
+	lv* target_release;  pair arg_release;
 	lv* target_order;    lv*  arg_order;
 	lv* target_run;      lv*  arg_run;
 	lv* target_link;     lv*  arg_link;
@@ -618,11 +618,11 @@ void widget_canvas(lv*target,canvas x,lv*image){
 	if(!target||!in_layer())return;
 	if(x.draggable){
 		int sel=ob.sel->c&&ob.sel->lv[0]==target;
-		if     (ev.md&&dover(b))msg.target_click  =target,msg.arg_click  =(fpair){b.x,b.y},ob.sel=l_list(target),ob.prev=(pair){ev.pos.x-b.x,ev.pos.y-b.y};
-		else if(ev.mu     &&sel)msg.target_release=target,msg.arg_release=(fpair){ev.dpos.x-ob.prev.x,ev.dpos.y-ob.prev.y},ob.sel->c=0;
-		else if(ev.drag   &&sel)msg.target_drag   =target,msg.arg_drag   =(fpair){ev.dpos.x-ob.prev.x,ev.dpos.y-ob.prev.y};
+		if     (ev.md&&dover(b))msg.target_click  =target,msg.arg_click  =(pair){b.x,b.y},ob.sel=l_list(target),ob.prev=(pair){ev.pos.x-b.x,ev.pos.y-b.y};
+		else if(ev.mu     &&sel)msg.target_release=target,msg.arg_release=(pair){ev.dpos.x-ob.prev.x,ev.dpos.y-ob.prev.y},ob.sel->c=0;
+		else if(ev.drag   &&sel)msg.target_drag   =target,msg.arg_drag   =(pair){ev.dpos.x-ob.prev.x,ev.dpos.y-ob.prev.y};
 	}else if(dover(b)){
-		fpair p={(ev.pos.x-b.x)/x.scale,(ev.pos.y-b.y)/x.scale}; int dp=p.x!=msg.lastdrag.x||p.y!=msg.lastdrag.y, im=over(b);
+		pair p={(ev.pos.x-b.x)/x.scale,(ev.pos.y-b.y)/x.scale}; int dp=!pair_same(p,msg.lastdrag), im=over(b);
 		if     (ev.md          )msg.target_click  =target,msg.arg_click  =p,msg.lastdrag=p;
 		else if(ev.mu          )msg.target_release=target,msg.arg_release=p;
 		else if(ev.drag&&dp&&im)msg.target_drag   =target,msg.arg_drag   =p,msg.lastdrag=p;
@@ -748,7 +748,7 @@ int widget_grid(lv*target,grid x,grid_val*value){
 	if(target&&os!=value->scroll)iwrite(target,lmistr("scroll"),lmn(value->scroll)),mark_dirty();
 	if(target&&or!=value->row)iwrite(target,lmistr("row"),lmn(value->row)),mark_dirty();
 	if(target&&oc!=value->col)iwrite(target,lmistr("col"),lmn(value->col)),mark_dirty();
-	if(target&&clicked)msg.target_click=target,msg.arg_click=(fpair){0,value->row};
+	if(target&&clicked)msg.target_click=target,msg.arg_click=(pair){0,value->row};
 	if(in_widgets())wid.count++;
 	return files?((clicked&&ev.dclick)||(sel&&ev.action)): clicked;
 }
@@ -796,7 +796,7 @@ void grid_keys(int code){
 	if(!m)return;if(ms.type==modal_prototype_attrs)ms.text.table=ms.name.table=NULL;
 	wid.gv->row=r=MAX(0,MIN(r,npr-1)),wid.gv->col=c=MAX(0,MIN(c,nc-1));if(wid.gt){
 		iwrite(wid.gt,lmistr("row"),lmn(r)),iwrite(wid.gt,lmistr("col"),lmn(c)),mark_dirty();
-		msg.target_click=wid.gt,msg.arg_click=(fpair){0,r};
+		msg.target_click=wid.gt,msg.arg_click=(pair){0,r};
 	}
 	int os=wid.gv->scroll, rs=display_row(r);if(rs-os<0)wid.gv->scroll=rs;if(rs-os>=nrd)wid.gv->scroll=rs-(nrd-1);
 	if(wid.gt&&os!=wid.gv->scroll)iwrite(wid.gt,lmistr("scroll"),lmn(wid.gv->scroll)),mark_dirty();
@@ -3789,11 +3789,11 @@ int interpret(void){
 		else if(msg.pending_quit){fire_event_async(ifield(deck,"card"),lmistr("quit"),lml(0));msg.pending_quit=0;}
 		else if(msg.pending_view){fire_view(con()),msg.pending_view=0;}
 		else if(msg.target_click){
-			lv*arg=grid_is(msg.target_click)?lmn(msg.arg_click.y): canvas_is(msg.target_click)?lmfpair(msg.arg_click): LNIL;
+			lv*arg=grid_is(msg.target_click)?lmn(msg.arg_click.y): canvas_is(msg.target_click)?lmpair(msg.arg_click): LNIL;
 			fire_event_async(msg.target_click,lmistr("click"),arg);msg.target_click=NULL;
 		}
-		else if(msg.target_drag    ){fire_event_async(msg.target_drag    ,lmistr("drag"      ),lmfpair(msg.arg_drag   ));msg.target_drag    =NULL;}
-		else if(msg.target_release ){fire_event_async(msg.target_release ,lmistr("release"   ),lmfpair(msg.arg_release));msg.target_release =NULL;}
+		else if(msg.target_drag    ){fire_event_async(msg.target_drag    ,lmistr("drag"      ),lmpair(msg.arg_drag    ));msg.target_drag    =NULL;}
+		else if(msg.target_release ){fire_event_async(msg.target_release ,lmistr("release"   ),lmpair(msg.arg_release ));msg.target_release =NULL;}
 		else if(msg.target_run     ){fire_event_async(msg.target_run     ,lmistr("run"       ),msg.arg_run             );msg.target_run     =NULL;}
 		else if(msg.target_link    ){fire_event_async(msg.target_link    ,lmistr("link"      ),msg.arg_link            );msg.target_link    =NULL;}
 		else if(msg.target_order   ){fire_event_async(msg.target_order   ,lmistr("order"     ),msg.arg_order           );msg.target_order   =NULL;}
