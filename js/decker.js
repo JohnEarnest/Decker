@@ -467,7 +467,7 @@ set_fullscreen=x=>{
 }
 setmode=mode=>{
 	n_play([NIL,lms('loop')])
-	grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel=[],wid.active=-1,sc.others=[],dr.poly=[]
+	grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel=[],wid.active=-1,sc.others=[],dr.poly=[],msg.target_hot=null
 	msg.next_view   =(uimode!=mode)&&mode=='interact'
 	msg.pending_loop=(uimode!=mode)&&mode=='interact'
 	uimode=mode;if(mode!='interact')msg.pending_halt=1;if(mode!='draw'&&!prototype_is(con()))dr.fatbits=0;if(mode=='interact')dr.fatbits=0
@@ -514,7 +514,7 @@ keycaps_force_enter=_=>{kc.shift=0,kc.lock=0,kc.alt=0,kc.comb=0,kc.on=1,ev.mu=ev
 keycaps_enter=_=>{if(!enable_touch||kc.on)return;keycaps_force_enter()}
 
 let msg={ // interpreter event messages
-	pending_halt:0,pending_view:0,pending_loop:0,next_view:0,overshoot:0,
+	pending_halt:0,pending_view:0,pending_loop:0,next_view:0,overshoot:0,target_hot:null,
 	target_click:null,target_drag:null,target_release:null,target_order:null,target_run:null,target_link:null,target_ccell:null,target_change:null,target_navigate:null,
 	arg_click:rect(),arg_drag:rect(),lastdrag:rect(),arg_release:rect(),arg_order:null,arg_run:null,arg_link:null,arg_ccell:null,arg_change:null,arg_navigate:null,
 }
@@ -760,11 +760,11 @@ widget_canvas=(target,x,image)=>{
 		if     (ev.md&&dover(b))msg.target_click  =target,msg.arg_click  =rect(b.x,b.y),ob.sel=[target],ob.prev=rint(rsub(ev.pos,b))
 		else if(ev.mu     &&sel)msg.target_release=target,msg.arg_release=rsub(ev.dpos,ob.prev),ob.sel=[]
 		else if(ev.drag   &&sel)msg.target_drag   =target,msg.arg_drag   =rsub(ev.dpos,ob.prev)
-	}else if(dover(b)){
-		const p=rint(rect((ev.pos.x-b.x)/x.scale,(ev.pos.y-b.y)/x.scale)), dp=p.x!=msg.lastdrag.x||p.y!=msg.lastdrag.y, im=over(b)
-		if     (ev.md          )msg.target_click  =target,msg.arg_click  =p,msg.lastdrag=p
-		else if(ev.mu          )msg.target_release=target,msg.arg_release=p
-		else if(ev.drag&&dp&&im)msg.target_drag   =target,msg.arg_drag   =p,msg.lastdrag=p
+	}else{
+		const p=rint(rect((ev.pos.x-b.x)/x.scale,(ev.pos.y-b.y)/x.scale)), dp=p.x!=msg.lastdrag.x||p.y!=msg.lastdrag.y, im=over(b), ih=msg.target_hot==target
+		if     (ev.md  &&    im    )msg.target_click  =target,msg.arg_click  =p,msg.lastdrag=p
+		else if(ev.mu  &&ih        )msg.target_release=target,msg.arg_release=p
+		else if(ev.drag&&ih&&im&&dp)msg.target_drag   =target,msg.arg_drag   =p,msg.lastdrag=p
 	}
 }
 
@@ -1142,6 +1142,8 @@ handle_widgets=(x,offset)=>{
 		}
 		if(contraption_is(w))widget_contraption(w)
 	})
+	if(canvas_is(msg.target_click)&&ev.md)msg.target_hot=msg.target_click
+	if(ev.mu)msg.target_hot=null
 }
 
 ui_button  =(r,label,    enable,func )=>widget_button(null,{text:label,size:r,font:FONT_MENU,pattern:32,style:'round',show:             'solid',locked:!enable},0,func)

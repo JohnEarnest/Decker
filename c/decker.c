@@ -62,6 +62,7 @@ typedef struct {
 	int pending_view, next_view, overshoot;
 	int pending_loop;
 	int pending_quit;
+	lv* target_hot;
 	lv* target_click;    pair arg_click;
 	lv* target_drag;     pair arg_drag, lastdrag;
 	lv* target_release;  pair arg_release;
@@ -423,7 +424,7 @@ void field_exit(void){
 void bg_end_selection(void);void bg_end_lasso(void); // forward-ref
 void setuimode(int mode){
 	n_play(deck,lml2(LNIL,lmistr("loop")));
-	grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel->c=0,wid.active=-1;poly_count=0;sc.others=NULL;
+	grid_exit(),field_exit(),bg_end_selection(),bg_end_lasso(),ob.sel->c=0,wid.active=-1;poly_count=0;sc.others=NULL;msg.target_hot=NULL;
 	msg.next_view   =(uimode!=mode)&&mode==mode_interact;
 	msg.pending_loop=(uimode!=mode)&&mode==mode_interact;
 	uimode=mode;if(mode!=mode_interact)msg.pending_halt=1;
@@ -621,11 +622,11 @@ void widget_canvas(lv*target,canvas x,lv*image){
 		if     (ev.md&&dover(b))msg.target_click  =target,msg.arg_click  =(pair){b.x,b.y},ob.sel=l_list(target),ob.prev=(pair){ev.pos.x-b.x,ev.pos.y-b.y};
 		else if(ev.mu     &&sel)msg.target_release=target,msg.arg_release=(pair){ev.dpos.x-ob.prev.x,ev.dpos.y-ob.prev.y},ob.sel->c=0;
 		else if(ev.drag   &&sel)msg.target_drag   =target,msg.arg_drag   =(pair){ev.dpos.x-ob.prev.x,ev.dpos.y-ob.prev.y};
-	}else if(dover(b)){
-		pair p={(ev.pos.x-b.x)/x.scale,(ev.pos.y-b.y)/x.scale}; int dp=!pair_same(p,msg.lastdrag), im=over(b);
-		if     (ev.md          )msg.target_click  =target,msg.arg_click  =p,msg.lastdrag=p;
-		else if(ev.mu          )msg.target_release=target,msg.arg_release=p;
-		else if(ev.drag&&dp&&im)msg.target_drag   =target,msg.arg_drag   =p,msg.lastdrag=p;
+	}else{
+		pair p={(ev.pos.x-b.x)/x.scale,(ev.pos.y-b.y)/x.scale}; int dp=!pair_same(p,msg.lastdrag), im=over(b), ih=msg.target_hot==target;
+		if     (ev.md  &&    im    )msg.target_click  =target,msg.arg_click  =p,msg.lastdrag=p;
+		else if(ev.mu  &&ih        )msg.target_release=target,msg.arg_release=p;
+		else if(ev.drag&&ih&&im&&dp)msg.target_drag   =target,msg.arg_drag   =p,msg.lastdrag=p;
 	}
 }
 str cf;void grid_edit_cell(pair cell,lv*v);
@@ -1005,6 +1006,8 @@ void handle_widgets(lv*x,pair offset){
 		}
 		if(contraption_is(w))widget_contraption(w);
 	}
+	if(canvas_is(msg.target_click)&&ev.md){msg.target_hot=msg.target_click;}
+	if(ev.mu)msg.target_hot=NULL;
 }
 void widget_contraption(lv*x){
 	int show=ordinal_enum(ifield(x,"show"),widget_shows);if(show==show_none)return;
@@ -4385,6 +4388,7 @@ void tick(lv*env){
 	if(ui_container&&ivalue(ui_container,"dead"))ui_container=NULL;
 	#define track(v) dset(env,lmistr(#v),v?v:LNIL);
 	track(msg.target_click)
+	track(msg.target_hot)
 	track(msg.target_drag)
 	track(msg.target_release)
 	track(msg.target_run)
