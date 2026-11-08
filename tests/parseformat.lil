@@ -72,6 +72,10 @@ show["%2.2rAB"        parse "ABC","ACC","ABBBC"     ] # read exactly two [AB]
 show["%-2.2rAB"       parse "CDC","CA","AAA"        ] # read exactly two [^AB]
 show["%-rA"           parse "   BCA"                ] # %r does not skip leading whitespace
 show["%oA"            parse "B","AB","AAB"          ] # zero or one As
+show["/%r%%n"         parse "%"                     ] # failed preceding literal
+show["/%r%%n"         parse "/%"                    ] # successful precedeing literal
+show["/%.2r%.%n"      parse "%"                     ] # failed preceding literal, 2-entry class
+show["/%.2r%.%n"      parse "/%"                    ] # successful preceding literal, 2-entry class
 
 print["format:"]
 

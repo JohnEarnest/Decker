@@ -700,7 +700,7 @@ dyad(l_parse){
 		}
 		else if(t=='r'||t=='o'){
 			str r=str_new();d=MAX(1,d);
-			int cc=f;for(int z=0;m&&z<d;z++){if(!fc){m=0;}else{f++;}}while(hn){
+			int cc=f;for(int z=0;z<d;z++){if(!fc){m=0;}else{f++;}}while(hn){
 				int mc=0;for(int z=0;z<d;z++)if(hc==x->sv[cc+z])mc=1;
 				if(mc==lf?1:0){if(n)m=0;break;}str_addc(&r,hc);h++;if(t=='o')break;
 			}if(!m)r.c=0;v=lmstr(r);
