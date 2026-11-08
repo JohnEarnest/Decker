@@ -76,6 +76,7 @@ show["/%r%%n"         parse "%"                     ] # failed preceding literal
 show["/%r%%n"         parse "/%"                    ] # successful precedeing literal
 show["/%.2r%.%n"      parse "%"                     ] # failed preceding literal, 2-entry class
 show["/%.2r%.%n"      parse "/%"                    ] # successful preceding literal, 2-entry class
+show["%.5rAB"         parse "ABx"                   ] # an incomplete/malformed character class cannot match anything!
 
 print["format:"]
 

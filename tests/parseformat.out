@@ -59,6 +59,7 @@ parse:
 ("%",2)
 (nil,0)
 ("%",2)
+""
 format:
 "one"
 "one"

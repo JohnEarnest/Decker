@@ -313,7 +313,7 @@ dyad={
 				if(!hd)h=si,v=NIL
 			}
 			else if(t=='r'||t=='o'){
-				let cc=x.slice(f,f+(d||1));v=lms(''),f+=(d||1);
+				let cc=x.slice(f,f+(d||1));v=lms(''),f+=(d||1);if(cc.length<d)m=0
 				while(hn()){if(cc.indexOf(y[h])>=0==lf?1:0){if(n)m=0;break}v.v+=y[h++];if(t=='o')break;}if(!m)v.v='';
 			}
 			else if(t=='e'||t=='p'){
